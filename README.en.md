@@ -10,7 +10,7 @@ Put a lens over a chat, a feed or a game. The original text disappears and the t
 <p align="center">
   <a href="https://github.com/midagedev/mwoyeo/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/midagedev/mwoyeo?style=flat-square&label=release&color=ff9f0a"></a>
   <a href="https://github.com/midagedev/mwoyeo/releases"><img alt="Downloads" src="https://img.shields.io/endpoint?style=flat-square&url=https%3A%2F%2Fraw.githubusercontent.com%2Fmidagedev%2Fmwoyeo%2Fstats%2Fdownloads.json"></a>
-  <img alt="macOS 27+" src="https://img.shields.io/badge/macOS-27%2B-bf5af2?style=flat-square&logo=apple&logoColor=white">
+  <img alt="macOS 26+" src="https://img.shields.io/badge/macOS-26%2B-bf5af2?style=flat-square&logo=apple&logoColor=white">
   <img alt="Apple silicon" src="https://img.shields.io/badge/Apple_silicon-native-5e5ce6?style=flat-square">
   <img alt="Privacy: on-device" src="https://img.shields.io/badge/privacy-on--device-64d2ff?style=flat-square">
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/github/license/midagedev/mwoyeo?style=flat-square&color=8e8e93"></a>
@@ -43,8 +43,8 @@ notes and issue tracker.
 
 | | |
 |---|---|
-| **macOS** | 27.0 or later |
-| **Mac** | Any Mac that runs macOS 27: Apple silicon, M1 or later, or MacBook Neo. There is no Intel build. |
+| **macOS** | 26.0 or later (translating without a pack and the *High fidelity* engine: 26.4 or later) |
+| **Mac** | Any Mac with Apple silicon (M1 or later) or MacBook Neo that runs macOS 26 or later. There is no Intel build. |
 | **Permission** | Screen Recording, nothing else: no Accessibility, no keyboard monitoring |
 | **Network** | None for translating. The only request is the daily update check, which you can turn off. |
 | **Disk** | About 20 MB for the app. Language packs (and Apple Intelligence's model, up to 8–14 GB) are downloaded and stored by macOS. |
@@ -54,11 +54,11 @@ notes and issue tracker.
 
 | Part | Needs |
 |---|---|
-| Reading the text (Vision), erasing it (Core ML) | Nothing more: every Mac that runs macOS 27 |
+| Reading the text (Vision), erasing it (Core ML) | Nothing more: every Mac above |
 | Translating with a **language pack** (fastest, offline) | The pack for your language pair, downloaded once from Mwoyeo's Settings › Translation or System Settings › General › Language & Region › Translation Languages |
-| Translating **without a pack**, the *High fidelity* engine and *Glossary first* | **Apple Intelligence** turned on in System Settings › Apple Intelligence & Siri |
+| Translating **without a pack**, the *High fidelity* engine and *Glossary first* | **Apple Intelligence** turned on in System Settings › Apple Intelligence & Siri. Translating without a pack and *High fidelity* need macOS 26.4 or later. |
 
-Apple Intelligence runs on every Mac that runs macOS 27, but it has two more conditions: your Mac's language and Siri's
+Apple Intelligence runs on every Mac above, but it has two more conditions: your Mac's language and Siri's
 language must be the same supported language, and it is not available in mainland China. It supports English,
 Korean, Japanese, Chinese, French, German, Spanish, Italian, Portuguese and Vietnamese among Mwoyeo's languages, but
 not Russian, Ukrainian or Thai: those translate with language packs only. Without Apple Intelligence, Mwoyeo uses

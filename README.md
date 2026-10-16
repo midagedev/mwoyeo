@@ -10,7 +10,7 @@
 <p align="center">
   <a href="https://github.com/midagedev/mwoyeo/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/midagedev/mwoyeo?style=flat-square&label=release&color=ff9f0a"></a>
   <a href="https://github.com/midagedev/mwoyeo/releases"><img alt="Downloads" src="https://img.shields.io/endpoint?style=flat-square&url=https%3A%2F%2Fraw.githubusercontent.com%2Fmidagedev%2Fmwoyeo%2Fstats%2Fdownloads.json"></a>
-  <img alt="macOS 27+" src="https://img.shields.io/badge/macOS-27%2B-bf5af2?style=flat-square&logo=apple&logoColor=white">
+  <img alt="macOS 26+" src="https://img.shields.io/badge/macOS-26%2B-bf5af2?style=flat-square&logo=apple&logoColor=white">
   <img alt="Apple silicon" src="https://img.shields.io/badge/Apple_silicon-native-5e5ce6?style=flat-square">
   <img alt="Privacy: on-device" src="https://img.shields.io/badge/privacy-on--device-64d2ff?style=flat-square">
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/github/license/midagedev/mwoyeo?style=flat-square&color=8e8e93"></a>
@@ -43,8 +43,8 @@ Mwoyeo를 응용 프로그램 폴더로 옮기면 돼요. Apple 공증을 받은
 
 | | |
 |---|---|
-| **macOS** | 27.0 이상 |
-| **Mac** | macOS 27이 설치되는 Mac이면 다 돼요. Apple silicon(M1 이상)이나 MacBook Neo이고 Intel 버전은 없어요. |
+| **macOS** | 26.0 이상(언어 팩 없이 번역하기와 *고품질* 엔진은 26.4 이상) |
+| **Mac** | macOS 26 이상이 설치된 Apple silicon(M1 이상) Mac이나 MacBook Neo면 다 돼요. Intel 버전은 없어요. |
 | **권한** | 화면 기록만 있으면 돼요. 손쉬운 사용 권한이나 키 입력 감시는 쓰지 않아요. |
 | **네트워크** | 번역할 때는 쓰지 않아요. 하루 한 번 하는 업데이트 확인이 전부이고 이것도 끌 수 있어요. |
 | **용량** | 앱은 20MB 정도예요. 언어 팩과 Apple Intelligence 모델(최대 8~14GB)은 macOS가 따로 받아서 관리해요. |
@@ -54,11 +54,11 @@ Mwoyeo를 응용 프로그램 폴더로 옮기면 돼요. Apple 공증을 받은
 
 | 기능 | 필요한 것 |
 |---|---|
-| 글자 인식(Vision), 원문 지우기(Core ML) | 따로 필요한 것 없음. macOS 27이 설치되는 Mac이면 다 돼요. |
+| 글자 인식(Vision), 원문 지우기(Core ML) | 따로 필요한 것 없음. 위 조건에 맞는 Mac이면 다 돼요. |
 | **언어 팩**으로 번역(가장 빠르고 오프라인에서도 됨) | 해당 언어 쌍의 언어 팩. Mwoyeo 설정 › 번역이나 시스템 설정 › 일반 › 언어 및 지역 › 번역 언어에서 한 번만 받으면 돼요. |
-| 언어 팩 **없이** 번역, *고품질* 엔진, *용어집 우선* | 시스템 설정 › Apple Intelligence 및 Siri에서 **Apple Intelligence**를 켜 두세요. |
+| 언어 팩 **없이** 번역, *고품질* 엔진, *용어집 우선* | 시스템 설정 › Apple Intelligence 및 Siri에서 **Apple Intelligence**를 켜 두세요. 언어 팩 없이 번역하기와 *고품질* 엔진은 macOS 26.4 이상에서 돼요. |
 
-Apple Intelligence는 macOS 27이 설치되는 Mac이면 어디서나 돌아가요. 다만 Mac 언어와 Siri 언어를 지원 언어 하나로
+Apple Intelligence는 위 조건에 맞는 Mac이면 어디서나 돌아가요. 다만 Mac 언어와 Siri 언어를 지원 언어 하나로
 똑같이 맞춰야 하고 중국 본토에서는 쓸 수 없어요. Mwoyeo가 다루는 언어 가운데 영어, 한국어, 일본어, 중국어,
 프랑스어, 독일어, 스페인어, 이탈리아어, 포르투갈어, 베트남어는 Apple Intelligence가 지원해요. 러시아어,
 우크라이나어, 태국어는 지원하지 않아서 언어 팩으로만 번역돼요. Apple Intelligence를 끄고 써도 괜찮아요. 그때는

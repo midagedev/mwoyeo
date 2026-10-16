@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "MwoyeoCore",
-    platforms: [.macOS("27.0")],
+    platforms: [.macOS("26.0")],
     products: [.library(name: "MwoyeoCore", targets: ["MwoyeoCore"])],
     targets: [
         .target(name: "MwoyeoCore"),

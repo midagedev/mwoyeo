@@ -10,7 +10,7 @@
 <p align="center">
   <a href="https://github.com/midagedev/mwoyeo/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/midagedev/mwoyeo?style=flat-square&label=release&color=ff9f0a"></a>
   <a href="https://github.com/midagedev/mwoyeo/releases"><img alt="Downloads" src="https://img.shields.io/endpoint?style=flat-square&url=https%3A%2F%2Fraw.githubusercontent.com%2Fmidagedev%2Fmwoyeo%2Fstats%2Fdownloads.json"></a>
-  <img alt="macOS 27+" src="https://img.shields.io/badge/macOS-27%2B-bf5af2?style=flat-square&logo=apple&logoColor=white">
+  <img alt="macOS 26+" src="https://img.shields.io/badge/macOS-26%2B-bf5af2?style=flat-square&logo=apple&logoColor=white">
   <img alt="Apple silicon" src="https://img.shields.io/badge/Apple_silicon-native-5e5ce6?style=flat-square">
   <img alt="Privacy: on-device" src="https://img.shields.io/badge/privacy-on--device-64d2ff?style=flat-square">
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/github/license/midagedev/mwoyeo?style=flat-square&color=8e8e93"></a>
@@ -38,8 +38,8 @@ Mwoyeoは1日1回GitHubで新しいバージョンを確認し、見つかれば
 
 | | |
 |---|---|
-| **macOS** | 27.0以降 |
-| **Mac** | macOS 27が動くすべてのMac（Appleシリコン搭載のM1以降、またはMacBook Neo）。Intel版はありません。 |
+| **macOS** | 26.0以降（言語パックなしの翻訳と*高品質*エンジンは26.4以降） |
+| **Mac** | macOS 26以降が動く、Appleシリコン搭載のMac（M1以降）またはMacBook Neo。Intel版はありません。 |
 | **許可** | 画面収録のみ。アクセシビリティや入力監視の許可は要りません |
 | **ネットワーク** | 翻訳には使いません。通信するのは1日1回のアップデート確認だけで、これもオフにできます。 |
 | **ディスク** | アプリ本体は約20 MB。言語パック（とApple Intelligenceのモデル、最大8〜14 GB）はmacOSがダウンロードして保存します。 |
@@ -49,11 +49,11 @@ Mwoyeoは1日1回GitHubで新しいバージョンを確認し、見つかれば
 
 | 機能 | 必要なもの |
 |---|---|
-| 文字の読み取り（Vision）と消去（Core ML） | 追加の条件はありません。macOS 27が動くMacならどれでも使えます |
+| 文字の読み取り（Vision）と消去（Core ML） | 追加の条件はありません。上の条件を満たすMacならどれでも使えます |
 | **言語パック**での翻訳（最速・オフライン対応） | 使う言語ペアの言語パック。Mwoyeoの設定 › 翻訳か、システム設定 › 一般 › 言語と地域 › 翻訳言語から一度だけダウンロードします |
-| **言語パックなし**の翻訳、*高品質*エンジン、*用語集を優先* | システム設定 › Apple IntelligenceとSiri で **Apple Intelligence** をオンにしておくこと |
+| **言語パックなし**の翻訳、*高品質*エンジン、*用語集を優先* | システム設定 › Apple IntelligenceとSiri で **Apple Intelligence** をオンにしておくこと。言語パックなしの翻訳と*高品質*エンジンはmacOS 26.4以降 |
 
-Apple IntelligenceはmacOS 27が動くすべてのMacで使えますが、条件があと2つあります。Macの言語とSiriの言語を同じ対応言語にそろえること、そして中国本土では使えないことです。Mwoyeoの対応言語のうちApple Intelligenceが扱えるのは、英語、韓国語、日本語、中国語、フランス語、ドイツ語、スペイン語、イタリア語、ポルトガル語、ベトナム語です。ロシア語、ウクライナ語、タイ語は対象外なので、言語パックでのみ翻訳します。Apple Intelligenceが使えない環境では、Mwoyeoはすべての翻訳を言語パックで行います。
+Apple Intelligenceは上の条件を満たすすべてのMacで使えますが、条件があと2つあります。Macの言語とSiriの言語を同じ対応言語にそろえること、そして中国本土では使えないことです。Mwoyeoの対応言語のうちApple Intelligenceが扱えるのは、英語、韓国語、日本語、中国語、フランス語、ドイツ語、スペイン語、イタリア語、ポルトガル語、ベトナム語です。ロシア語、ウクライナ語、タイ語は対象外なので、言語パックでのみ翻訳します。Apple Intelligenceが使えない環境では、Mwoyeoはすべての翻訳を言語パックで行います。
 
 **言語。** 英語、韓国語、日本語、中国語（簡体字・繁体字）、フランス語、ドイツ語、スペイン語、イタリア語、ポルトガル語（ブラジル）、ロシア語、ウクライナ語、ベトナム語、タイ語のあいだで、macOSに翻訳モデルがある組み合わせならどの方向にも翻訳できます。翻訳元を*自動*にしておくと、行ごとに言語を判別します。アプリの表示言語は英語、韓国語、日本語、中国語（簡体字・繁体字）、フランス語、ドイツ語、スペイン語、イタリア語、ポルトガル語（ブラジル）、ロシア語、ウクライナ語に対応しています。
 

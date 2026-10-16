@@ -3,7 +3,7 @@ options:
   bundleIdPrefix: dev.midagedev
   developmentLanguage: en
   deploymentTarget:
-    macOS: "27.0"
+    macOS: "26.0"
   createIntermediateGroups: true
 configFiles:
   Debug: Config/Base.xcconfig
@@ -30,7 +30,7 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSApplicationCategoryType: public.app-category.productivity
-        LSMinimumSystemVersion: "27.0"
+        LSMinimumSystemVersion: "26.0"
         LSUIElement: true
         NSHumanReadableCopyright: "© 2026 midagedev"
         NSScreenCaptureUsageDescription: "Mwoyeo reads the text under your lenses so it can translate it in place."

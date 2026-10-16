@@ -29,7 +29,8 @@ enum TranslationIssue: Error, Equatable, Sendable {
 /// - Apple Translation, high fidelity — Apple Intelligence's translation model; no pack needed, ~0.5 s a line.
 /// - Foundation Models — a prompted LLM, for when the glossary must be followed.
 actor TranslationService {
-    private typealias Strategy = TranslationSession.Strategy
+    /// The language pack's fast model, or Apple Intelligence's high-fidelity one (macOS 26.4 and later).
+    private enum Strategy { case lowLatency, highFidelity }
 
     private var settings: AppSettings
     private let cache = Memory()
@@ -159,21 +160,23 @@ actor TranslationService {
     /// Picks the session for `source` → target: the low-latency pack when installed (auto), otherwise
     /// Apple Intelligence's high-fidelity model.
     private func session(source: String) async throws -> (TranslationSession, Strategy) {
-        let wanted: [Strategy] = settings.engine == .highFidelity ? [.highFidelity] : [.lowLatency, .highFidelity]
+        // Before macOS 26.4 a session cannot pick its model: the language pack is the only one.
+        let wanted: [Strategy] = !TranslationEngineChoice.hasHighFidelity ? [.lowLatency]
+            : settings.engine == .highFidelity ? [.highFidelity] : [.lowLatency, .highFidelity]
         var downloadable = false
         for strategy in wanted {
             let id = "\(source)>\(settings.targetLanguage)|\(strategy == .highFidelity ? "hf" : "ll")"
             if let s = sessions[id] { return (s, strategy) }
             let status: LanguageAvailability.Status
             if let cached = pairStatus[id] { status = cached } else {
-                status = await LanguageAvailability(preferredStrategy: strategy)
+                status = await availability(strategy)
                     .status(from: Locale.Language(identifier: source), to: Locale.Language(identifier: settings.targetLanguage))
                 pairStatus[id] = status
             }
             if status == .supported { downloadable = true }
             guard status == .installed else { continue }
-            let s = TranslationSession(installedSource: Locale.Language(identifier: source),
-                                       target: Locale.Language(identifier: settings.targetLanguage), preferredStrategy: strategy)
+            let s = makeSession(source: Locale.Language(identifier: source), target: Locale.Language(identifier: settings.targetLanguage),
+                                strategy: strategy)
             sessions[id] = s
             return (s, strategy)
         }
@@ -181,6 +184,17 @@ actor TranslationService {
             throw TranslationIssue.languagePackMissing(source: source, target: settings.targetLanguage)
         }
         throw TranslationIssue.unsupportedPair(source: source, target: settings.targetLanguage)
+    }
+
+    private func availability(_ strategy: Strategy) -> LanguageAvailability {
+        guard #available(macOS 26.4, *) else { return LanguageAvailability() }
+        return LanguageAvailability(preferredStrategy: strategy == .highFidelity ? .highFidelity : .lowLatency)
+    }
+
+    private func makeSession(source: Locale.Language, target: Locale.Language, strategy: Strategy) -> TranslationSession {
+        guard #available(macOS 26.4, *) else { return TranslationSession(installedSource: source, target: target) }
+        return TranslationSession(installedSource: source, target: target,
+                                  preferredStrategy: strategy == .highFidelity ? .highFidelity : .lowLatency)
     }
 
     /// Batch request whose responses arrive one by one, in order.

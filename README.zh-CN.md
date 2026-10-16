@@ -10,7 +10,7 @@
 <p align="center">
   <a href="https://github.com/midagedev/mwoyeo/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/midagedev/mwoyeo?style=flat-square&label=release&color=ff9f0a"></a>
   <a href="https://github.com/midagedev/mwoyeo/releases"><img alt="Downloads" src="https://img.shields.io/endpoint?style=flat-square&url=https%3A%2F%2Fraw.githubusercontent.com%2Fmidagedev%2Fmwoyeo%2Fstats%2Fdownloads.json"></a>
-  <img alt="macOS 27+" src="https://img.shields.io/badge/macOS-27%2B-bf5af2?style=flat-square&logo=apple&logoColor=white">
+  <img alt="macOS 26+" src="https://img.shields.io/badge/macOS-26%2B-bf5af2?style=flat-square&logo=apple&logoColor=white">
   <img alt="Apple silicon" src="https://img.shields.io/badge/Apple_silicon-native-5e5ce6?style=flat-square">
   <img alt="Privacy: on-device" src="https://img.shields.io/badge/privacy-on--device-64d2ff?style=flat-square">
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/github/license/midagedev/mwoyeo?style=flat-square&color=8e8e93"></a>
@@ -38,8 +38,8 @@ Mwoyeo 每天会到 GitHub 检查一次新版本，有更新时菜单里会提�
 
 | | |
 |---|---|
-| **macOS** | 27.0 或更高版本 |
-| **Mac** | 能运行 macOS 27 的 Mac 都可以：Apple 芯片（M1 及更新机型）或 MacBook Neo。没有 Intel 版本。 |
+| **macOS** | 26.0 或更高版本（不用语言包翻译和*高保真*引擎需要 26.4 或更高版本） |
+| **Mac** | 运行 macOS 26 或更高版本的 Apple 芯片 Mac（M1 及更新机型）或 MacBook Neo。没有 Intel 版本。 |
 | **权限** | 只需“屏幕录制”，不需要“辅助功能”，也不监听键盘 |
 | **网络** | 翻译不需要联网。唯一的网络请求是每天一次的更新检查，可以关掉。 |
 | **磁盘** | App 本身约 20 MB。语言包（以及 Apple Intelligence 模型，最多 8–14 GB）由 macOS 负责下载和存放。 |
@@ -49,11 +49,11 @@ Mwoyeo 每天会到 GitHub 检查一次新版本，有更新时菜单里会提�
 
 | 功能 | 要求 |
 |---|---|
-| 识别文字（Vision）、擦除文字（Core ML） | 没有额外要求，能运行 macOS 27 的 Mac 都行 |
+| 识别文字（Vision）、擦除文字（Core ML） | 没有额外要求，符合上述条件的 Mac 都行 |
 | 用**语言包**翻译（最快，可离线） | 对应语言组合的语言包，下载一次即可：在 Mwoyeo 的“设置 › 翻译”或“系统设置 › 通用 › 语言与地区 › 翻译语言”中下载 |
-| **不用语言包**翻译、*高保真*引擎、*术语表优先* | 在“系统设置 › Apple 智能与 Siri”中打开 **Apple Intelligence** |
+| **不用语言包**翻译、*高保真*引擎、*术语表优先* | 在“系统设置 › Apple 智能与 Siri”中打开 **Apple Intelligence**。不用语言包翻译和*高保真*引擎需要 macOS 26.4 或更高版本 |
 
-能运行 macOS 27 的 Mac 都支持 Apple Intelligence，不过还有两个前提：Mac 的语言和 Siri 的语言必须是同一种受支持的语言；另外，中国大陆无法使用 Apple Intelligence。在 Mwoyeo 支持的语言里，Apple Intelligence 支持英语、韩语、日语、中文、法语、德语、西班牙语、意大利语、葡萄牙语和越南语，不支持俄语、乌克兰语和泰语，这三种语言只能用语言包翻译。没有 Apple Intelligence 时，Mwoyeo 全部改用语言包翻译。
+符合上述条件的 Mac 都支持 Apple Intelligence，不过还有两个前提：Mac 的语言和 Siri 的语言必须是同一种受支持的语言；另外，中国大陆无法使用 Apple Intelligence。在 Mwoyeo 支持的语言里，Apple Intelligence 支持英语、韩语、日语、中文、法语、德语、西班牙语、意大利语、葡萄牙语和越南语，不支持俄语、乌克兰语和泰语，这三种语言只能用语言包翻译。没有 Apple Intelligence 时，Mwoyeo 全部改用语言包翻译。
 
 **语言。** 英语、韩语、日语、中文（简体和繁体）、法语、德语、西班牙语、意大利语、葡萄牙语（巴西）、俄语、乌克兰语、越南语和泰语之间都能互译，前提是 macOS 有这个方向的翻译模型。选择*自动*时，会逐行识别源语言。App 界面支持英语、韩语、日语、中文（简体和繁体）、法语、德语、西班牙语、意大利语、葡萄牙语（巴西）、俄语和乌克兰语。
 

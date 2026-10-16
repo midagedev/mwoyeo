@@ -10,6 +10,12 @@ enum TranslationEngineChoice: String, Codable, CaseIterable, Identifiable {
     case customModel
 
     var id: String { rawValue }
+    /// Apple Intelligence's translation model can be asked for from macOS 26.4; before that only the language pack runs.
+    static var hasHighFidelity: Bool {
+        if #available(macOS 26.4, *) { true } else { false }
+    }
+    /// The choices this Mac offers.
+    static var offered: [Self] { allCases.filter { $0 != .highFidelity || hasHighFidelity } }
     var title: String {
         switch self {
         case .auto: String(localized: "Automatic")

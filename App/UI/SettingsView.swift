@@ -84,7 +84,7 @@ private struct TranslationSettings: View {
         Form {
             Section("Translation engine") {
                 Picker("Engine", selection: $model.settings.engine) {
-                    ForEach(TranslationEngineChoice.allCases) { choice in
+                    ForEach(TranslationEngineChoice.offered) { choice in
                         VStack(alignment: .leading) {
                             Text(choice.title)
                             Text(choice.detail).font(.caption).foregroundStyle(.secondary)

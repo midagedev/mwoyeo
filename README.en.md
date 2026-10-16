@@ -178,6 +178,8 @@ The name is Korean: *mwoyeo* (뭐여) is a dialect way of saying "what's that?"
 
 ## Development
 
+Issues and pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ### Building
 
 ```bash

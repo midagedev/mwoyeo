@@ -172,7 +172,7 @@ ScreenCaptureKit ──► change map (16 px tiles) ──► scroll? shift bloc
 
 ## 개발
 
-빌드, 테스트, 릴리즈 방법은 [영어 README](README.en.md#development)에 있어요.
+빌드, 테스트, 릴리즈 방법은 [영어 README](README.en.md#development)에 있어요. 이슈와 PR은 언제든 환영해요. 자세한 건 [CONTRIBUTING.md](CONTRIBUTING.md#한국어)를 봐 주세요.
 
 ## 크레딧
 

@@ -1,7 +1,10 @@
 # Mock OpenAI-compatible server for testing the chat-completions translation engine.
 #
 # Usage: python3 -I server.py <port> <mode>
-# Serves POST /v1/chat/completions and GET /v1/models on 127.0.0.1.
+# Serves POST /v1/chat/completions and GET /v1/models on 127.0.0.1, plus three more engine shapes:
+#   POST /v1/messages   Anthropic Messages API (modes ok, 401, garbage; others behave like ok)
+#   POST /v2/translate  DeepL: form or JSON `text` array -> {"translations": [{"text": ...}]}
+#   POST /translate     LibreTranslate: {"q": ..., "target": ...} -> {"translatedText": ...}
 # Modes:
 #   ok          reply {"translations": ["⟦<target>⟧ <line>", ...]} after ~50 ms
 #   fenced      same content wrapped in ```json fences
@@ -11,9 +14,11 @@
 #   429         HTTP 429 with an OpenAI-style error body
 #   garbage     content "sure! here you go"
 # <target> is read from the system prompt's "into X" phrase, or "T".
-# Each request logs one line to stderr: method, path, line count, mode, auth present/absent (never the value).
+# Each request logs one line to stderr: method, path, line count, mode, auth present/absent (never the value), and
+# thinking_off=yes when the JSON body carried any of reasoning_effort, reasoning, thinking, enable_thinking, think.
 import json
 import re
+import urllib.parse
 import sys
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -46,9 +51,10 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
-    def log(self, count):
-        auth = "present" if self.headers.get("Authorization") else "absent"
-        print(f"{self.command} {self.path} lines={count} mode={MODE} auth={auth}", file=sys.stderr, flush=True)
+    def log(self, count, thinking_off=False):
+        auth = "present" if (self.headers.get("Authorization") or self.headers.get("x-api-key")) else "absent"
+        off = "yes" if thinking_off else "no"
+        print(f"{self.command} {self.path} lines={count} mode={MODE} auth={auth} thinking_off={off}", file=sys.stderr, flush=True)
 
     def do_GET(self):
         self.log("-")
@@ -57,11 +63,55 @@ class Handler(BaseHTTPRequestHandler):
         else:
             self.send_json(404, error_body("not found", "invalid_request_error", None))
 
+    def other_engine(self, path, raw, req, thinking_off):
+        if path == "/v1/messages":
+            user = next((m["content"] for m in reversed(req.get("messages", [])) if m.get("role") == "user"), "{}")
+            try:
+                lines = json.loads(user).get("lines", [])
+            except (ValueError, AttributeError, TypeError):
+                lines = []
+            self.log(len(lines), thinking_off)
+            if MODE == "401":
+                return self.send_json(401, {"type": "error", "error": {"type": "authentication_error", "message": "invalid x-api-key"}})
+            if MODE == "garbage":
+                text = "sure! here you go"
+            else:
+                time.sleep(0.05)
+                text = json.dumps({"translations": [f"⟦anthropic⟧ {l}" for l in lines]}, ensure_ascii=False)
+            return self.send_json(200, {"id": "msg_mock", "type": "message", "role": "assistant", "model": "mock",
+                                        "content": [{"type": "text", "text": text}], "stop_reason": "end_turn",
+                                        "usage": {"input_tokens": 0, "output_tokens": 0}})
+        if path == "/v2/translate":
+            texts, target = [], "T"
+            if isinstance(req, dict) and req:
+                texts, target = req.get("text", []), req.get("target_lang", "T")
+            else:
+                form = urllib.parse.parse_qs(raw.decode("utf-8", "replace"))
+                texts, target = form.get("text", []), (form.get("target_lang") or ["T"])[0]
+            if isinstance(texts, str):
+                texts = [texts]
+            self.log(len(texts), thinking_off)
+            if MODE == "401":
+                return self.send_json(403, {"message": "Authorization failure, check auth_key"})
+            return self.send_json(200, {"translations": [{"detected_source_language": "EN", "text": f"⟦{target}⟧ {t}"} for t in texts]})
+        self.log(1, thinking_off)
+        if MODE == "401":
+            return self.send_json(400, {"error": "Invalid API key"})
+        return self.send_json(200, {"translatedText": f"⟦{req.get('target', 'T')}⟧ {req.get('q', '')}"})
+
     def do_POST(self):
         raw = self.rfile.read(int(self.headers.get("Content-Length") or 0))
         lines, target = [], "T"
+        path = self.path.rstrip("/")
+        thinking_off = False
         try:
             req = json.loads(raw)
+            thinking_off = any(k in req for k in ("reasoning_effort", "reasoning", "thinking", "enable_thinking", "think"))
+        except (ValueError, AttributeError, TypeError):
+            req = {}
+        if path in ("/v1/messages", "/v2/translate", "/translate"):
+            return self.other_engine(path, raw, req, thinking_off)
+        try:
             msgs = req.get("messages", [])
             system = next((m["content"] for m in msgs if m.get("role") == "system"), "")
             user = next((m["content"] for m in reversed(msgs) if m.get("role") == "user"), "{}")
@@ -71,8 +121,8 @@ class Handler(BaseHTTPRequestHandler):
                 target = m.group(1)
         except (ValueError, AttributeError, TypeError):
             pass
-        self.log(len(lines))
-        if self.path.rstrip("/") != "/v1/chat/completions":
+        self.log(len(lines), thinking_off)
+        if path != "/v1/chat/completions":
             return self.send_json(404, error_body("not found", "invalid_request_error", None))
         if MODE == "401":
             return self.send_json(401, error_body("Incorrect API key provided.", "invalid_request_error", "invalid_api_key"))

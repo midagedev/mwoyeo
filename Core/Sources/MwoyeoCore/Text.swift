@@ -256,3 +256,17 @@ public enum TranslationFilter {
         }
     }
 }
+
+public enum LineAlignment {
+    /// Lines whose centres line up while their left edges do not are centred (subtitles, captions, titles). One line
+    /// cannot say, so an outlined line (the subtitle look) counts as centred and any other as left-aligned.
+    public static func isCentered(_ lines: [(minX: CGFloat, maxX: CGFloat)], outlined: Bool) -> Bool {
+        guard lines.count >= 2 else { return outlined && lines.count == 1 }
+        let widest = lines.map { $0.maxX - $0.minX }.max() ?? 0
+        let tol = max(4, widest * 0.04)
+        let centres = lines.map { ($0.minX + $0.maxX) / 2 }, lefts = lines.map(\.minX)
+        let centreSpread = (centres.max() ?? 0) - (centres.min() ?? 0)
+        let leftSpread = (lefts.max() ?? 0) - (lefts.min() ?? 0)
+        return centreSpread <= tol && leftSpread > 2 * tol
+    }
+}

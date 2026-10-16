@@ -26,6 +26,8 @@ enum BlockRenderer {
         var fontStyle: FontStyleChoice
         var targetLanguage: String
         var scale: CGFloat
+        /// Centred lines (subtitles, captions) stay centred on where the original was.
+        var centered = false
     }
 
     /// Background around the text (pixels) that an erased block takes in, for the glyph mask's ring.
@@ -57,10 +59,13 @@ enum BlockRenderer {
         // The text box is the original block; `spareWidth` on the right is only used if the text needs it.
         let full = bounds.insetBy(dx: padX, dy: padY)
         let original = CGRect(x: full.minX, y: full.minY, width: max(1, full.width - input.spareWidth), height: full.height)
-        let textColor = legibleTextColor(input.appearance)
+        let outline = input.appearance.outlineColor?.cgColor
+        // Outlined text keeps its own fill: the outline, not the background, is what it is read against.
+        let textColor = outline != nil ? input.appearance.textColor.cgColor : legibleTextColor(input.appearance)
         let weight = fontWeight(coverage: input.appearance.coverage)
         func make(_ s: CGFloat) -> NSAttributedString {
-            attributed(input.text, size: s, weight: weight, style: input.fontStyle, color: textColor, language: input.targetLanguage)
+            attributed(input.text, size: s, weight: weight, style: input.fontStyle, color: textColor, language: input.targetLanguage,
+                       centered: input.centered)
         }
 
         let maxSize = max(6 * input.scale, min(input.fontSize ?? input.lineHeight * 0.78, input.lineHeight * 1.05))
@@ -73,7 +78,8 @@ enum BlockRenderer {
             // right into free space, and only then shrinking. Wrap as a last resort.
             let unwrapped = { (s: CGFloat) in TextFitter.measure(make(s), width: .greatestFiniteMagnitude) }
             let needed = unwrapped(maxSize).width
-            if needed > original.width { box.size.width = min(full.width, max(original.width, needed + 2)) }
+            // Centred text has no free side to spill into: it shrinks, then wraps, around its centre.
+            if needed > original.width, !input.centered { box.size.width = min(full.width, max(original.width, needed + 2)) }
             size = TextFitter.fitFontSize(in: CGSize(width: box.width, height: .greatestFiniteMagnitude), minSize: minSize, maxSize: maxSize, measure: unwrapped)
             if unwrapped(size).width > box.width + 0.5 {
                 wraps = true
@@ -81,7 +87,7 @@ enum BlockRenderer {
             }
         } else {
             size = TextFitter.fitFontSize(in: box.size, minSize: minSize, maxSize: maxSize) { TextFitter.measure(make($0), width: box.width) }
-            if TextFitter.measure(make(size), width: box.width).height > box.height + 0.5, input.spareWidth > 0 {
+            if TextFitter.measure(make(size), width: box.width).height > box.height + 0.5, input.spareWidth > 0, !input.centered {
                 box.size.width = full.width
                 size = TextFitter.fitFontSize(in: box.size, minSize: minSize, maxSize: maxSize) { TextFitter.measure(make($0), width: box.width) }
             }
@@ -91,20 +97,34 @@ enum BlockRenderer {
 
         // Vertically centre; CoreText draws in a y-up space, which matches CGContext's default.
         let textRect = CGRect(x: box.minX, y: box.midY - measured.height / 2, width: box.width, height: measured.height)
-        if !input.appearance.isFlatBackground, case .erased = input.background {
+        if outline == nil, !input.appearance.isFlatBackground, case .erased = input.background {
             // Busy background: a soft halo in the background colour keeps text readable.
             ctx.setShadow(offset: .zero, blur: size * 0.25, color: input.appearance.backgroundColor.cgColor)
         }
         if ProcessInfo.processInfo.environment["MWOYEO_ERASE_ONLY"] != nil { return ctx.makeImage() } // debug: background only
         let setter = CTFramesetterCreateWithAttributedString(string)
-        let path = CGPath(rect: CGRect(x: textRect.minX, y: textRect.minY - 2, width: max(textRect.width, measured.width + 1), height: textRect.height + 4), transform: nil)
+        let pathWidth = input.centered ? textRect.width : max(textRect.width, measured.width + 1)
+        let path = CGPath(rect: CGRect(x: textRect.minX, y: textRect.minY - 2, width: pathWidth, height: textRect.height + 4), transform: nil)
+        if let outline {
+            // The edge first, as a wide stroke in the outline colour, then the letters on top: the stroke shows only
+            // outside the glyphs, as subtitles are drawn. Same font and size, so both lay out identically.
+            let edge = NSMutableAttributedString(attributedString: string)
+            let all = NSRange(location: 0, length: edge.length)
+            edge.addAttribute(NSAttributedString.Key(kCTForegroundColorAttributeName as String), value: outline, range: all)
+            edge.addAttribute(NSAttributedString.Key(kCTStrokeColorAttributeName as String), value: outline, range: all)
+            edge.addAttribute(NSAttributedString.Key(kCTStrokeWidthAttributeName as String), value: 18.0, range: all)
+            ctx.saveGState()
+            ctx.setLineJoin(.round)
+            CTFrameDraw(CTFramesetterCreateFrame(CTFramesetterCreateWithAttributedString(edge), CFRange(location: 0, length: 0), path, nil), ctx)
+            ctx.restoreGState()
+        }
         let frame = CTFramesetterCreateFrame(setter, CFRange(location: 0, length: 0), path, nil)
         CTFrameDraw(frame, ctx)
         return ctx.makeImage()
     }
 
     private static func attributed(_ text: String, size: CGFloat, weight: NSFont.Weight, style: FontStyleChoice,
-                                   color: CGColor, language: String) -> NSAttributedString {
+                                   color: CGColor, language: String, centered: Bool = false) -> NSAttributedString {
         var font = NSFont.systemFont(ofSize: size, weight: weight)
         switch style {
         case .system: break
@@ -119,12 +139,14 @@ enum BlockRenderer {
         para.lineBreakMode = .byWordWrapping
         para.lineBreakStrategy = .standard
         para.lineHeightMultiple = 0.95
-        return NSAttributedString(string: text, attributes: [
+        if centered { para.alignment = .center }
+        let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
             NSAttributedString.Key(kCTForegroundColorAttributeName as String): color,
             .paragraphStyle: para,
             NSAttributedString.Key(kCTLanguageAttributeName as String): language,
-        ])
+        ]
+        return NSAttributedString(string: text, attributes: attributes)
     }
 
     /// Stroke density stands in for font weight: bold text covers more of its line box.

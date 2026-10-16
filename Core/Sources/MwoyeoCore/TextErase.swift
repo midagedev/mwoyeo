@@ -6,14 +6,17 @@ public struct TextAppearance: Sendable, Equatable {
     public var backgroundNoise: Double
     /// Fraction of the text rect classified as glyph pixels.
     public var coverage: Double
+    /// Colour of the outline around outlined text (video subtitles: white letters with a black edge); nil = plain text.
+    public var outlineColor: RGBA?
 
     public var isFlatBackground: Bool { backgroundNoise < 6 }
 
-    public init(textColor: RGBA, backgroundColor: RGBA, backgroundNoise: Double, coverage: Double) {
+    public init(textColor: RGBA, backgroundColor: RGBA, backgroundNoise: Double, coverage: Double, outlineColor: RGBA? = nil) {
         self.textColor = textColor
         self.backgroundColor = backgroundColor
         self.backgroundNoise = backgroundNoise
         self.coverage = coverage
+        self.outlineColor = outlineColor
     }
 }
 
@@ -56,7 +59,9 @@ public enum TextEraser {
     ///   reach into the text rect and do not run off the patch's outer edge — glyphs sit inside the ring,
     ///   while box borders, rules and neighbouring backgrounds continue past it.
     /// - The mask is dilated by `dilation` px to swallow anti-aliased edges.
-    public static func mask(for patch: RGBAImage, textRect: PixelRect, dilation: Int) -> TextMask {
+    /// `outlines`: also look for outlined text (white letters, black edge) and take both tones into the mask — for
+    /// erasing only; colour runs and labels want the plain one-tone mask.
+    public static func mask(for patch: RGBAImage, textRect: PixelRect, dilation: Int, outlines: Bool = false) -> TextMask {
         let w = patch.width, h = patch.height
         let inner = textRect.clamped(width: w, height: h)
         @inline(__always) func inInner(_ x: Int, _ y: Int) -> Bool {
@@ -147,11 +152,48 @@ public enum TextEraser {
             textColor = meanColor(Array(core))
         }
 
-        var m = TextMask(width: w, height: h, bits: bits,
-                         appearance: TextAppearance(textColor: textColor, backgroundColor: bg, backgroundNoise: noise, coverage: coverage),
-                         glyphBounds: glyphBounds)
+        var appearance = TextAppearance(textColor: textColor, backgroundColor: bg, backgroundNoise: noise, coverage: coverage)
+        // Outlined text (subtitles over video): the Otsu split keeps only one of its two tones, so the letters' fill
+        // or their edge would survive the erase and the translation would be drawn in the edge colour.
+        if outlines, let o = outline(in: patch, inner: inner, background: bg) {
+            appearance.textColor = o.fill
+            appearance.outlineColor = o.edge
+            for i in o.pixels { bits[i] = 1 }
+        }
+        var m = TextMask(width: w, height: h, bits: bits, appearance: appearance, glyphBounds: glyphBounds)
         m.bits = dilate(m.bits, width: w, height: h, radius: dilation)
         return m
+    }
+
+    /// Outlined text in `inner`: enough very light and very dark pixels, nearly every light one within a few pixels of
+    /// a dark one (the edge hugs the fill), on a background that is neither tone — white text on black, or black on
+    /// white, is plain text. Returns the two tones and the pixels of both (patch indices).
+    static func outline(in patch: RGBAImage, inner: PixelRect, background: RGBA) -> (fill: RGBA, edge: RGBA, pixels: [Int])? {
+        guard background.luma > 75, background.luma < 185 else { return nil }
+        let w = patch.width
+        var light: [Int] = [], dark: [Int] = []
+        var isDark = [Bool](repeating: false, count: w * patch.height)
+        for y in inner.y..<(inner.y + inner.height) {
+            for x in inner.x..<(inner.x + inner.width) {
+                let l = patch.luma(x: x, y: y)
+                if l >= 200 { light.append(y * w + x) } else if l <= 60 { dark.append(y * w + x); isDark[y * w + x] = true }
+            }
+        }
+        let area = max(1, inner.width * inner.height)
+        guard light.count * 25 >= area, dark.count * 25 >= area else { return nil }
+        let r = max(3, inner.height / 8)   // about half a stroke of subtitle text
+        var hugged = 0
+        for i in light {
+            let x = i % w, y = i / w
+            search: for dy in -r...r {
+                for dx in -r...r {
+                    let nx = x + dx, ny = y + dy
+                    if nx >= 0, ny >= 0, nx < w, ny < patch.height, isDark[ny * w + nx] { hugged += 1; break search }
+                }
+            }
+        }
+        guard hugged * 100 >= light.count * 80 else { return nil }
+        return (meanColor(light.map { patch.color(x: $0 % w, y: $0 / w) }), meanColor(dark.map { patch.color(x: $0 % w, y: $0 / w) }), light + dark)
     }
 
     /// Fills masked pixels from their surroundings: onion-peel propagation (each ring takes the mean of its

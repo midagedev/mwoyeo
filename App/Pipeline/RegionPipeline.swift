@@ -760,7 +760,7 @@ actor RegionPipeline {
             guard !lr.isEmpty else { continue }
             let text = PixelRect(line.rect).clamped(width: full.width, height: full.height)
             let local = PixelRect(x: text.x - lr.x, y: text.y - lr.y, width: text.width, height: text.height)
-            let m = TextEraser.mask(for: full.cropped(to: lr), textRect: local, dilation: max(1, Int(line.rect.height * 0.07)))
+            let m = TextEraser.mask(for: full.cropped(to: lr), textRect: local, dilation: max(1, Int(line.rect.height * 0.07)), outlines: true)
             masks.append((lr, m))
             if let g = m.glyphBounds { glyphHeights.append(CGFloat(g.height)) }
         }
@@ -927,7 +927,8 @@ actor RegionPipeline {
                 size: b.rect.size, text: text, background: background, appearance: b.appearance,
                 lineHeight: lineHeight, fontSize: b.fontSize, originalLineCount: max(1, b.lines.count), spareWidth: b.spareWidth,
                 fontStyle: options.fontStyle,
-                targetLanguage: options.targetLanguage, scale: scale))
+                targetLanguage: options.targetLanguage, scale: scale,
+                centered: LineAlignment.isCentered(b.lines.map { ($0.minX, $0.maxX) }, outlined: b.appearance.outlineColor != nil)))
         }
     }
 

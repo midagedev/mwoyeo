@@ -10,6 +10,7 @@ enum TranslationIssue: Error, Equatable, Sendable {
     case intelligenceUnavailable(String)
     case unsupportedPair(source: String, target: String)
     case failed(String)
+    case timedOut
 
     var message: String {
         switch self {
@@ -18,15 +19,36 @@ enum TranslationIssue: Error, Equatable, Sendable {
         case let .intelligenceUnavailable(why): String(localized: "Apple Intelligence is unavailable: \(why)")
         case let .unsupportedPair(s, t): String(localized: "\(Languages.name(s)) → \(Languages.name(t)) translation is not supported.")
         case let .failed(why): String(localized: "Translation failed: \(why)")
+        case .timedOut: String(localized: "Translation is taking too long. Trying again shortly.")
         }
     }
+}
+
+/// What one `translate` call produced, for a pipeline that must decide what to retry.
+struct TranslationOutcome: Sendable {
+    /// Source → translation for everything that came back (including text that needs none).
+    var translations: [String: String] = [:]
+    /// Sources not returned while others of the same group were: a strike each, not a reason to pause.
+    var failed: Set<String> = []
+    /// An engine call hit its deadline.
+    var timedOut = false
+    /// A group threw, timed out or returned nothing: the engine is in trouble, so the queue should rest.
+    var batchFailed = false
+}
+
+/// Streamed results, kept even if the call is abandoned at its deadline.
+private final class Streamed: @unchecked Sendable {
+    private let lock = NSLock()
+    private var out: [String: String] = [:]
+    func put(_ s: String, _ t: String) { lock.withLock { out[s] = t } }
+    var all: [String: String] { lock.withLock { out } }
 }
 
 /// Owns every translation engine and the translation cache. Shared by all regions.
 ///
 /// Engines, all on-device:
 /// - Apple Translation, low latency — needs the language pack; the fastest.
-/// - Apple Translation, high fidelity — Apple Intelligence's translation model; no pack needed, ~0.5 s a line.
+/// - Apple Translation, high fidelity — Apple Intelligence's translation model; no pack needed, ~1 s a line.
 /// - Foundation Models — a prompted LLM, for when the glossary must be followed.
 actor TranslationService {
     /// The language pack's fast model, or Apple Intelligence's high-fidelity one (macOS 26.4 and later).
@@ -74,7 +96,24 @@ actor TranslationService {
         if settings.engine == .customModel { intelligence.prewarm(settings: settings); return }
         // Loading the translation model takes a moment the first time; do it before the first region.
         let source = settings.sourceLanguage == "auto" ? "ja" : settings.sourceLanguage
+        let outcome = await withDeadline(Self.deadline(items: 1)) { await self.warm(source: source) }
+        // A model that never answers is dropped, so the first real call starts fresh.
+        if case .value = outcome {} else { dropSessions(source: source) }
+    }
+
+    private func warm(source: String) async {
         if let (session, _) = try? await session(source: source) { _ = try? await session.translate("。") }
+    }
+
+    /// 5 s + 2 s per item. Measured high-fidelity worst case: 4.2 s for 3 lines (2026-10-17), so 3 lines get 11 s,
+    /// about 2.6× the worst seen; slack enough for a loaded machine, short enough that a stall is noticed.
+    private static func deadline(items: Int) -> Duration { .seconds(5 + 2 * items) }
+
+    /// Forgets the cached sessions for a language pair so the next call builds fresh ones.
+    /// (`IntelligenceTranslator` keeps no session between calls: each request makes its own.)
+    private func dropSessions(source: String) {
+        let prefix = "\(source)>\(settings.targetLanguage)|"
+        for k in sessions.keys where k.hasPrefix(prefix) { sessions[k] = nil }
     }
 
     /// Cached translation, without doing any work.
@@ -86,25 +125,26 @@ actor TranslationService {
     nonisolated func clearCache() { cache.removeAll() }
 
     /// Translates `texts` (in the given order — callers pass reading order so results fill the screen top to
-    /// bottom), returning source → translation for those that succeeded. `onResult` fires as each one lands.
-    func translate(_ texts: [String], onResult: (@Sendable (String, String) -> Void)? = nil) async -> [String: String] {
-        var result: [String: String] = [:]
+    /// bottom). `onResult` fires as each one lands. Every engine call runs under a deadline; what streamed in before
+    /// it hit is kept.
+    func translate(_ texts: [String], onResult: (@Sendable (String, String) -> Void)? = nil) async -> TranslationOutcome {
+        var outcome = TranslationOutcome()
         var todo: [String] = []
         var seen = Set<String>()
         let cjkSource = ["ja", "zh-Hans", "zh-Hant", "ko"].contains(pageLanguage ?? "")
         for t in texts where seen.insert(t).inserted {
             if !TranslationFilter.needsTranslation(t, cjkSource: cjkSource) {
                 // Not source-language text (a handle, a brand, a counter): kept as is, and the pipeline leaves it alone.
-                result[t] = t
+                outcome.translations[t] = t
                 onResult?(t, t)
             } else if let hit = cache[t] {
-                result[t] = hit
+                outcome.translations[t] = hit
                 onResult?(t, hit)
             } else {
                 todo.append(t)
             }
         }
-        guard !todo.isEmpty else { return result }
+        guard !todo.isEmpty else { return outcome }
 
         // Group by source language (keeping order) so each session handles one pair.
         var order: [String] = []
@@ -117,24 +157,41 @@ actor TranslationService {
 
         for source in order {
             let items = groups[source]!
-            let deliver: @Sendable (String, String) -> Void = { s, t in onResult?(s, t) }
-            do {
-                let space = cache.namespace
-                let translated = try await translateGroup(items, source: source, onResult: deliver)
-                // Settings changed while it ran: the engine may have used either, so it is not cached under any.
-                let current = cache.namespace == space
-                for (s, t) in translated {
-                    result[s] = t
-                    if current { cache.store(t, for: s, in: space) }
-                }
+            let streamed = Streamed()
+            let deliver: @Sendable (String, String) -> Void = { s, t in streamed.put(s, t); onResult?(s, t) }
+            let space = cache.namespace
+            var translated: [String: String] = [:]
+            var groupFailed = false
+            switch await withDeadline(Self.deadline(items: items.count), { try await self.translateGroup(items, source: source, onResult: deliver) }) {
+            case let .value(r):
+                translated = r
                 issueHandler?(nil)
-            } catch let issue as TranslationIssue {
-                issueHandler?(issue)
-            } catch {
-                issueHandler?(.failed(error.localizedDescription))
+            case let .failed(error):
+                translated = streamed.all
+                groupFailed = true
+                dropSessions(source: source)
+                issueHandler?((error as? TranslationIssue) ?? .failed(error.localizedDescription))
+            case .timedOut:
+                translated = streamed.all
+                groupFailed = true
+                dropSessions(source: source)
+                outcome.timedOut = true
+                issueHandler?(.timedOut)
             }
+            // Settings changed while it ran: the engine may have used either, so it is not cached under any.
+            let current = cache.namespace == space
+            for (s, t) in translated {
+                outcome.translations[s] = t
+                if current { cache.store(t, for: s, in: space) }
+            }
+            let missing = items.filter { translated[$0] == nil }
+            if missing.count == items.count || groupFailed && !missing.isEmpty {
+                outcome.batchFailed = true
+            }
+            // Some of the group came back and these did not: the engine skipped them.
+            if missing.count < items.count { outcome.failed.formUnion(missing) }
         }
-        return result
+        return outcome
     }
 
     // MARK: - Engines
@@ -144,6 +201,9 @@ actor TranslationService {
         Trace.count("translate.requests")
         Trace.count("translate.texts", items.count)
         Trace.mark("engine ← \(items.map { $0.debugDescription }.joined(separator: " | "))", since: Trace.now)
+        if let fake = ProcessInfo.processInfo.environment["MWOYEO_FAKE_ENGINE"] {
+            return try await fakeEngine(fake, items, onResult: onResult)
+        }
         if settings.engine == .customModel {
             if intelligence.isAvailable {
                 return try await intelligence.translate(items, source: source == "und" ? nil : source, target: settings.targetLanguage,
@@ -155,6 +215,39 @@ actor TranslationService {
         guard source != "und" else { throw TranslationIssue.failed(String(localized: "Could not tell which language this is")) }
         let (session, _) = try await session(source: source)
         return try await stream(items, through: session, onResult: onResult)
+    }
+
+    private var fakeCalls = 0
+    private var fakeParked: [CheckedContinuation<Void, Never>] = []
+
+    /// Headless-harness engine, chosen by `MWOYEO_FAKE_ENGINE`: `hang` never returns and ignores cancellation, `fail`
+    /// always throws, `fail-once` throws on the first call then behaves like `slow:100`, `slow:<ms>` waits, then returns
+    /// "⟦<target>⟧ " + source for every item, streaming each one.
+    private func fakeEngine(_ mode: String, _ items: [String],
+                            onResult: @escaping @Sendable (String, String) -> Void) async throws -> [String: String] {
+        fakeCalls += 1
+        let target = settings.targetLanguage
+        var delay = 100
+        switch mode {
+        case "hang":
+            // Parked for good (kept alive so the runtime does not report a leaked continuation).
+            await withCheckedContinuation { (c: CheckedContinuation<Void, Never>) in fakeParked.append(c) }
+            return [:]
+        case "fail":
+            throw TranslationIssue.failed("fake engine")
+        case "fail-once":
+            if fakeCalls == 1 { throw TranslationIssue.failed("fake engine") }
+        default:
+            if mode.hasPrefix("slow:"), let ms = Int(mode.dropFirst(5)) { delay = ms }
+        }
+        try? await Task.sleep(for: .milliseconds(delay))
+        var out: [String: String] = [:]
+        for s in items {
+            let t = "⟦\(target)⟧ " + s
+            out[s] = t
+            onResult(s, t)
+        }
+        return out
     }
 
     /// Picks the session for `source` → target: the low-latency pack when installed (auto), otherwise

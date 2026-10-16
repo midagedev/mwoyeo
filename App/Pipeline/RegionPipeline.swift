@@ -125,6 +125,14 @@ actor RegionPipeline {
     /// Sources waiting for translation, and whether the translation worker runs.
     private var pending: Set<String> = []
     private var translating = false
+    /// Bumped by `reset()`: a batch started under an older epoch (other language, other region) lands nowhere.
+    private var translationEpoch = 0
+    /// The queue rests after a failed batch; only the resume task ends it. `pauseID` tells a stale resume from the current.
+    private var paused = false
+    private var pauseID = 0
+    private var resumeTask: Task<Void, Never>?
+    private var backoff = RetryBackoff()
+    private var strikes = SourceStrikes()
     private var version = 0
     private var scale: CGFloat = 2
     private var activity = RegionActivity.idle
@@ -193,8 +201,22 @@ actor RegionPipeline {
         churn.reset()
         seamlessDone = false
         pending = []
+        // A batch still running belongs to the old settings: its results are dropped, and a new queue may start.
+        translationEpoch += 1
+        translating = false
+        clearRecovery()
         emit(animated: false)
         if latest != nil { kick() }
+    }
+
+    /// Ends a pause and forgets failures: the queue starts from a clean slate.
+    private func clearRecovery() {
+        resumeTask?.cancel()
+        resumeTask = nil
+        paused = false
+        pauseID += 1
+        backoff.reset()
+        strikes.reset()
     }
 
     /// Re-translate everything currently on screen (e.g. after the user downloads a language pack).
@@ -202,12 +224,15 @@ actor RegionPipeline {
         for i in blocks.indices { blocks[i].translation = nil; blocks[i].image = nil }
         baseGray = nil
         seamlessDone = false
+        // The reason for earlier failures (a missing language pack) may be gone.
+        clearRecovery()
         kick()
     }
 
     /// For the headless self-test: whether work is pending, and what each block reads.
-    func debugState() -> (busy: Bool, blocks: [(String, String?)]) {
-        (working || translating || settleTask != nil && !seamlessDone, blocks.map { ($0.source, $0.translation) })
+    func debugState() -> (busy: Bool, translating: Bool, paused: Bool, parked: Int, blocks: [(String, String?)]) {
+        (working || translating || settleTask != nil && !seamlessDone, translating, paused, strikes.parkedCount,
+         blocks.map { ($0.source, $0.translation) })
     }
 
     func ingest(_ frame: CapturedFrame) {
@@ -844,11 +869,12 @@ actor RegionPipeline {
             if let hit = translator.cached(blocks[i].source) {
                 blocks[i].translation = hit
                 blocks[i].image = nil
-            } else {
+            } else if !strikes.isParked(blocks[i].source) {
                 pending.insert(blocks[i].source)
             }
         }
-        guard !translating, !pending.isEmpty else { return }
+        // While the queue rests, only the resume task starts it again.
+        guard !paused, !translating, !pending.isEmpty else { return }
         translating = true
         if lensPending { setActivity(.translating) }
         Task { await translateQueue() }
@@ -857,19 +883,58 @@ actor RegionPipeline {
     /// Translates a few lines at a time, always picking again what the lens shows first: the queue keeps up with a
     /// moving lens instead of finishing text that has already scrolled out of view.
     private func translateQueue() async {
+        let epoch = translationEpoch
         while let batch = nextBatch() {
             let t = Trace.now
-            let result = await translator.translate(batch) { source, translated in
-                Task { await self.receive([source: translated]) }
+            let outcome = await translator.translate(batch) { source, translated in
+                Task { await self.receive([source: translated], epoch: epoch) }
             }
             Trace.mark("translate ×\(batch.count)", since: t)
-            batch.forEach { pending.remove($0) }
-            receive(result)
+            // Settings changed meanwhile: `reset()` already cleared the queue state, and this result is for the old ones.
+            guard epoch == translationEpoch else { return }
+            receive(outcome.translations, epoch: epoch)
+            for source in batch {
+                pending.remove(source)
+                if outcome.translations[source] != nil {
+                    strikes.clear(source)
+                } else if outcome.failed.contains(source) {
+                    if !strikes.strike(source) { pending.insert(source) }
+                } else if outcome.batchFailed {
+                    pending.insert(source)
+                }
+            }
+            if outcome.batchFailed {
+                rest(now: ProcessInfo.processInfo.systemUptime)
+                return
+            }
+            backoff.success()
             // The overscan keeps translating quietly; "translating" is only what the lens is waiting for.
             if !working { setActivity(lensPending ? .translating : .idle) }
         }
         translating = false
         if !working { setActivity(.idle) }
+    }
+
+    /// Stops the queue for the backoff time and schedules the one task that restarts it, with or without a new frame.
+    private func rest(now: TimeInterval) {
+        let pause = backoff.failure(now: now)
+        translating = false
+        paused = true
+        pauseID += 1
+        let id = pauseID
+        if !working { setActivity(.idle) }
+        resumeTask?.cancel()
+        resumeTask = Task {
+            do { try await Task.sleep(for: .seconds(pause)) } catch { return }
+            self.resumeQueue(id)
+        }
+    }
+
+    private func resumeQueue(_ id: Int) {
+        guard paused, id == pauseID else { return }
+        resumeTask = nil
+        paused = false
+        fillTranslations()
     }
 
     private var lensPending: Bool {
@@ -897,7 +962,8 @@ actor RegionPipeline {
         return (1, hypot(dx, dy) / (1 + max(0, side.dx * lead.dx + side.dy * lead.dy)))
     }
 
-    private func receive(_ result: [String: String]) {
+    private func receive(_ result: [String: String], epoch: Int) {
+        guard epoch == translationEpoch else { return }
         var changed = false
         for i in blocks.indices {
             guard let t = result[blocks[i].source], blocks[i].translation != t else { continue }

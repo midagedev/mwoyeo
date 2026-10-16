@@ -5,8 +5,11 @@ import UniformTypeIdentifiers
 
 /// Headless end-to-end run on a still image:
 ///   Mwoyeo --render in.png out.png [--src ja] [--tgt ko] [--mode fast|seamless] [--engine auto|translation|intelligence]
-///                                  [--no-inpaint] [--scale 2] [--then en,ko,style]
+///                                  [--no-inpaint] [--scale 2] [--then en,ko,style] [--then-early ms] [--max-wait s]
 /// Prints what was read and translated, and writes the composited result. Exits when done.
+/// `--then-early ms` fires the `--then` steps `ms` after a translation batch is first in flight (a settings change
+/// mid-translation) and settles once at the end; `--max-wait s` is the settle ceiling (default 120).
+/// `MWOYEO_FAKE_ENGINE=hang|fail|fail-once|slow:<ms>` replaces the translation engine (see `TranslationService`).
 ///
 /// Simulated lens drag over a still "screen" (points; writes the lens view per step as outdir/frame_NNN.png):
 ///   Mwoyeo --render screen.png outdir --pan --lens x,y,w,h --to x,y [--steps 40] [--step-ms 100] [--hold-ms 3000]
@@ -87,34 +90,55 @@ enum SelfTest {
         let start = Date()
         await pipeline.ingest(CapturedFrame(image: image, gray: gray, grayStep: 4, scale: scale, rect: capture, time: ProcessInfo.processInfo.systemUptime))
 
-        // Wait for reading + translation to finish (or give up after 120 s).
+        // Wait for reading + translation to finish (or give up after `--max-wait`, 120 s by default).
+        let maxWait = Double(option("--max-wait") ?? "120") ?? 120
         func settle(from start: Date) async throws {
             var lastChange = Date(), lastVersion = -1
-            while Date().timeIntervalSince(start) < 120 {
+            while Date().timeIntervalSince(start) < maxWait {
                 try await Task.sleep(for: .milliseconds(200))
                 let state = await pipeline.debugState()
                 if let v = collector.latest?.version, v != lastVersion { lastVersion = v; lastChange = Date() }
-                if !state.busy, Date().timeIntervalSince(lastChange) > 0.6 { break }
+                if !state.busy, !state.paused, Date().timeIntervalSince(lastChange) > 0.6 { break }
             }
         }
-        try await settle(from: start)
-        print("pipeline: \(ms(start)) ms")
-        printCounts("still")
         // `--then en,ko,style`: change the settings as the user would (target language, or "style" = font and box
         // opacity), and report what each change costs.
-        for step in (option("--then") ?? "").split(separator: ",").map(String.init) {
+        func applyThen(_ step: String) async {
             if step == "style" {
                 settings.fontStyle = settings.fontStyle == .serif ? .system : .serif
                 settings.boxOpacity = settings.boxOpacity == 1 ? 0.94 : 1
             } else {
                 settings.targetLanguage = step
             }
-            let t = Date()
             await translator.update(settings: settings)
             await pipeline.update(options: PipelineOptions(settings))
-            try await settle(from: t)
-            print("then \(step): \(ms(t)) ms")
-            printCounts(step)
+        }
+        let steps = (option("--then") ?? "").split(separator: ",").map(String.init)
+        if let early = option("--then-early").flatMap({ Double($0) }) {
+            // Wait for a batch to be in flight, then change the settings `early` ms later.
+            while Date().timeIntervalSince(start) < maxWait {
+                try await Task.sleep(for: .milliseconds(20))
+                if await pipeline.debugState().translating { break }
+            }
+            try await Task.sleep(for: .milliseconds(Int(early)))
+            for step in steps {
+                await applyThen(step)
+                print("then-early \(step): \(ms(start)) ms")
+            }
+            try await settle(from: start)
+            print("pipeline: \(ms(start)) ms")
+            await printCounts("still", pipeline)
+        } else {
+            try await settle(from: start)
+            print("pipeline: \(ms(start)) ms")
+            await printCounts("still", pipeline)
+            for step in steps {
+                let t = Date()
+                await applyThen(step)
+                try await settle(from: t)
+                print("then \(step): \(ms(t)) ms")
+                await printCounts(step, pipeline)
+            }
         }
         for (source, translation) in await pipeline.debugState().blocks {
             print("  \(source)\n    → \(translation ?? "(no translation)")")
@@ -141,8 +165,10 @@ enum SelfTest {
     private static func ms(_ since: Date) -> Int { Int(Date().timeIntervalSince(since) * 1000) }
 
     /// The work done since the last call: OCR requests, erases, engine calls.
-    private static func printCounts(_ phase: String) {
-        print("work[\(phase)]: " + Trace.takeCounts().sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }.joined(separator: " "))
+    private static func printCounts(_ phase: String, _ pipeline: RegionPipeline? = nil) async {
+        var parts = Trace.takeCounts().sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }
+        if let pipeline { parts.append("parked=\(await pipeline.debugState().parked)") }
+        print("work[\(phase)]: " + parts.joined(separator: " "))
     }
 
     /// Drives the pipeline the way `RegionSession` does while a lens is dragged, with frames cropped from `screen`.
@@ -273,10 +299,11 @@ enum SelfTest {
         var quiet = Date()
         while Date().timeIntervalSince(start) < 120 {
             try await Task.sleep(for: .milliseconds(200))
-            if (await pipeline.debugState()).busy { quiet = Date() } else if Date().timeIntervalSince(quiet) > 0.6 { break }
+            let state = await pipeline.debugState()
+            if state.busy || state.paused { quiet = Date() } else if Date().timeIntervalSince(quiet) > 0.6 { break }
         }
         print("settled at start: \(ms(start)) ms")
-        printCounts("start")
+        await printCounts("start")
         try shoot()
 
         if blink != nil {
@@ -286,7 +313,7 @@ enum SelfTest {
                 try await Task.sleep(for: .milliseconds(100))
                 if i % 5 == 0 { try shoot() }
             }
-            printCounts("blink")
+            await printCounts("blink")
         } else if scrolling {
             // Scroll: frames change under a still capture; the pipeline notices the motion and asks for wide margins.
             let sub = max(1, wheelsPerFrame)
@@ -298,7 +325,7 @@ enum SelfTest {
                     try await Task.sleep(for: .milliseconds(250))
                     try shoot()
                 }
-                printCounts("down")
+                await printCounts("down")
             }
             for i in 1...(steps * sub) {
                 let t = CGFloat(i) / CGFloat(steps * sub), e = ease ? 1 - pow(1 - t, 3) : t, f = leg == 0 ? e : 1 - e
@@ -344,7 +371,7 @@ enum SelfTest {
         for (source, translation) in await pipeline.debugState().blocks {
             print("  \(source) → \(translation ?? "(no translation)")")
         }
-        printCounts(CommandLine.arguments.contains("--back") ? "back" : "moved")
+        await printCounts(CommandLine.arguments.contains("--back") ? "back" : "moved")
         print(String(format: "drift: mean %.1f pt, max %.1f pt, %d of %d frames over 2 pt", drifts.reduce(0, +) / CGFloat(max(1, drifts.count)),
                      drifts.max() ?? 0, drifts.filter { $0 > 2 }.count, drifts.count))
     }

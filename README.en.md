@@ -78,7 +78,7 @@ Ukrainian.
 3. **Pick your languages.** *Translate from* can stay on **Automatic**; *Translate to* starts as your Mac's language.
 4. **Get the language pack** (recommended). In Mwoyeo's Settings › Translation, click **Download** next to your
    language pair. With a pack, translation is near-instant and works offline. Without one, Apple Intelligence
-   translates instead, which needs no download but takes about half a second per line.
+   translates instead, which needs no download but takes about a second per line.
 5. **Press ⌃⌥L and drag a box** over the text you want to read, such as the message list of a Discord channel or a
    Reddit thread. Or just click, and a lens is dropped where you clicked. Hold ⌥ while you do it to pin the lens to
    the screen instead of the window (see below).
@@ -118,7 +118,7 @@ elsewhere, record a different one. The defaults stay clear of window managers su
 | Tab | What you can change |
 |---|---|
 | General | Languages · **Display**: *Adaptive* (default: plain boxes while things move, a seamless rewrite once still), *Quick* (always boxes, least battery) or *Seamless* (always rewrites) · how often the screen is checked (4, 8 or 15 fps) · open at login |
-| Translation | **Engine**: *Automatic* (language pack if installed, Apple Intelligence otherwise), *High fidelity* (always Apple Intelligence) or *Glossary first* · language packs · **translation memory**: how many translations to keep for reuse (1,000, 5,000 or 20,000; in memory only, cleared when Mwoyeo quits) · a **glossary** of names, one `original = translation` per line |
+| Translation | **Engine**: *Automatic* (language pack if installed, Apple Intelligence otherwise), *High fidelity* (always Apple Intelligence: the most natural and the slowest) or *Glossary first* · language packs · **translation memory**: how many translations to keep for reuse (1,000, 5,000 or 20,000; in memory only, cleared when Mwoyeo quits) · a **glossary** of names, one `original = translation` per line |
 | Appearance | **Lens style**: *Glow*, *Subtle* (glows only while reading) or *Minimal* (a faint line; the name tag shows on hover) · font (default, rounded, serif) · box opacity · AI erasing on photos and artwork |
 
 ## Tips and troubleshooting

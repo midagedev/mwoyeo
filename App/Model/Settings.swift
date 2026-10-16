@@ -26,7 +26,7 @@ enum TranslationEngineChoice: String, Codable, CaseIterable, Identifiable {
     var detail: String {
         switch self {
         case .auto: String(localized: "The fastest translation when a language pack is installed, Apple Intelligence otherwise")
-        case .highFidelity: String(localized: "Always Apple Intelligence’s translation model · about 0.5 s a line")
+        case .highFidelity: String(localized: "Always Apple Intelligence’s translation model · the most natural and the slowest, about 1 s a line")
         case .customModel: String(localized: "Foundation Models follows your glossary · for names in games and stories")
         }
     }

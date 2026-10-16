@@ -1035,72 +1035,72 @@
         }
       }
     },
-    "Always Apple Intelligence’s translation model · about 0.5 s a line": {
+    "Always Apple Intelligence’s translation model · the most natural and the slowest, about 1 s a line": {
       "localizations": {
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "항상 Apple Intelligence 번역 모델 · 한 줄에 0.5초 안팎"
+            "value": "항상 Apple Intelligence 번역 모델 · 가장 자연스럽지만 가장 느려요, 한 줄에 1초 안팎"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "常にApple Intelligenceの翻訳モデルを使用 · 1行あたり約0.5秒"
+            "value": "常にApple Intelligenceの翻訳モデルを使用 · いちばん自然ですが最も遅く、1行あたり約1秒"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "始终使用 Apple Intelligence 翻译模型 · 每行约 0.5 秒"
+            "value": "始终使用 Apple Intelligence 翻译模型 · 最自然，但也最慢，每行约 1 秒"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "一律使用 Apple Intelligence 翻譯模型 · 每行約 0.5 秒"
+            "value": "一律使用 Apple Intelligence 翻譯模型 · 最自然，但也最慢，每行約 1 秒"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Immer das Übersetzungsmodell von Apple Intelligence · ca. 0,5 s pro Zeile"
+            "value": "Immer das Übersetzungsmodell von Apple Intelligence · am natürlichsten und am langsamsten, ca. 1 s pro Zeile"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Toujours le modèle de traduction d’Apple Intelligence · environ 0,5 s par ligne"
+            "value": "Toujours le modèle de traduction d’Apple Intelligence · le plus naturel et le plus lent, environ 1 s par ligne"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Siempre el modelo de traducción de Apple Intelligence · unos 0,5 s por línea"
+            "value": "Siempre el modelo de traducción de Apple Intelligence · el más natural y el más lento, unos 1 s por línea"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Всегда модель перевода Apple Intelligence · около 0,5 с на строку"
+            "value": "Всегда модель перевода Apple Intelligence · самый естественный и самый медленный, около 1 с на строку"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sempre o modelo de tradução do Apple Intelligence · cerca de 0,5 s por linha"
+            "value": "Sempre o modelo de tradução do Apple Intelligence · o mais natural e o mais lento, cerca de 1 s por linha"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sempre il modello di traduzione di Apple Intelligence · circa 0,5 s a riga"
+            "value": "Sempre il modello di traduzione di Apple Intelligence · il più naturale e il più lento, circa 1 s a riga"
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Завжди модель перекладу Apple Intelligence · близько 0,5 с на рядок"
+            "value": "Завжди модель перекладу Apple Intelligence · найприродніший і найповільніший, близько 1 с на рядок"
           }
         }
       }

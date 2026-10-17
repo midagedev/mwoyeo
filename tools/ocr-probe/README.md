@@ -4,3 +4,6 @@ It prints the system's revisions and languages, then `lines=<n> <seconds>` or `n
 Healthy Mac: revision 3 (the default, the only one that reads ja/ko) answers in ~30 s the first time (the models compile) and ~0.3 s after; revision 2 and `.fast` in under 0.3 s.
 Stalled (2026-10-17): revision 3 never answers and `ANECompilerService` (root) spins at 60-99 % CPU, while revision 2 and `.fast` still answer.
 Never kill `ANECompilerService` or a probe that is still loading: a client that goes away restarts the compile.
+
+`healthy.sh` is the six-check gate for the fallback ladder (healthy, stall, stall-vn, slow, ja notice). Run it with
+`SP=<dir with in/chat.png, in/vn.png> NEW=<built Mwoyeo binary> MAIN=<baseline binary> ./healthy.sh`.

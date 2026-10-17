@@ -29,6 +29,14 @@ final class ImageTranslationModel {
 
     var isWorking: Bool { phase == .working }
 
+    /// A settled window without reading anything, for UI captures when the text recognizer is not answering.
+    func showSettled(_ picture: NSImage, lines: Int) {
+        title = "Sample"
+        original = picture
+        translated = picture
+        phase = .done(lines: lines)
+    }
+
     func open(url: URL) {
         let data = try? Data(contentsOf: url)
         start(title: url.lastPathComponent) { try data.map { try StillTranslation.decode($0) } ?? { throw StillTranslation.Unreadable(description: "Can’t read \(url.lastPathComponent).") }() }
@@ -153,6 +161,7 @@ struct ImageTranslationView: View {
             Spacer(minLength: 8)
             Toggle("Show Original", isOn: $model.showOriginal)
                 .toggleStyle(.button)
+                .foregroundStyle(model.showOriginal ? AnyShapeStyle(.tint) : AnyShapeStyle(.primary))
                 .disabled(model.translated == nil)
             Button("Copy Image") { model.copyImage() }.disabled(model.translated == nil)
             Button("Copy Text") { model.copyTextToPasteboard() }.disabled(model.texts.isEmpty)

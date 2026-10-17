@@ -8,9 +8,9 @@ struct MenuPanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             header
-            if let issue = model.issue {
+            if let issue = model.shownIssue {
                 if case .engineUnavailable = issue {
-                    IssueBanner(message: issue.headline, detail: issue.detail, action: String(localized: "Use Apple")) { model.selectEngine(nil) }
+                    EngineNotice(headline: issue.headline, reason: issue.detail, useApple: { model.selectEngine(nil) }, dismiss: { model.dismissIssue() })
                 } else {
                     IssueBanner(message: issue.message) { open() }
                 }
@@ -29,7 +29,7 @@ struct MenuPanel: View {
                 if !model.settings.engines.isEmpty { EngineMenu() }
             }
             if let profile = model.activeProfile {
-                Text("· \(profile.appName) profile").font(.caption2).foregroundStyle(.secondary)
+                Text("\(profile.appName) profile").font(.caption2).foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity).padding(.top, -6)
             }
             regionList
@@ -121,9 +121,10 @@ struct MenuPanel: View {
                       systemImage: model.translationsVisible ? "eye" : "eye.slash")
             }
             .help(withShortcut(String(localized: "Hide translations and show the original"), .toggleOriginal))
-            Button { ImageTranslation.shared.chooseImage() } label: { Label("Translate Image…", systemImage: "photo") }
-                .help("Translate a picture from a file or the clipboard")
             Spacer()
+            Button { ImageTranslation.shared.chooseImage() } label: { Image(systemName: "photo") }
+                .help("Translate Image… — a file or the clipboard")
+                .accessibilityLabel("Translate Image…")
             Button { open() } label: { Image(systemName: "gearshape") }
                 .help("Settings")
             Button { NSApp.terminate(nil) } label: { Image(systemName: "power") }
@@ -387,6 +388,35 @@ struct IssueBanner: View {
         }
         .padding(10)
         .background(.yellow.opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+}
+
+/// An added engine gave way to Apple: a quiet line the user can close, not a warning.
+private struct EngineNotice: View {
+    let headline: String
+    let reason: String?
+    let useApple: () -> Void
+    let dismiss: () -> Void
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.circle").foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(headline).font(.caption).fixedSize(horizontal: false, vertical: true)
+                if let reason { Text(reason).font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
+            }
+            Spacer(minLength: 0)
+            Button("Use Apple", action: useApple).controlSize(.small)
+            Button(action: dismiss) { Image(systemName: "xmark") }
+                .buttonStyle(.borderless)
+                .foregroundStyle(.secondary)
+                .help("Dismiss")
+                .accessibilityLabel("Dismiss")
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        // The language bar's glass and corner radius (half its 30 pt height); a notice of two lines would turn a Capsule into a pill.
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 15, style: .continuous))
     }
 }
 

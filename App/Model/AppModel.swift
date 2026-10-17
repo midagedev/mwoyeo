@@ -42,6 +42,8 @@ final class AppModel {
     private(set) var translationsVisible = true
     private(set) var isPaused = false
     private(set) var issue: TranslationIssue?
+    /// The engine notice the user closed. It stays closed while that same issue lasts.
+    private(set) var dismissedIssue: TranslationIssue?
     private(set) var hasScreenPermission = CGPreflightScreenCaptureAccess()
     private(set) var inpaintingAvailable = false
     /// Bumped when any session's activity/error changes, so views re-read them.
@@ -129,15 +131,18 @@ final class AppModel {
 
     /// The accurate text recognizer takes tens of seconds to load the first time; do it before the user needs it.
     private static func warmUpVision() {
-        Task.detached(priority: .utility) {
-            let ctx = CGContext(data: nil, width: 64, height: 32, bitsPerComponent: 8, bytesPerRow: 0,
-                                space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
-            ctx?.setFillColor(.white)
-            ctx?.fill(CGRect(x: 0, y: 0, width: 64, height: 32))
-            if let img = ctx?.makeImage() {
-                _ = try? await TextRecognizer.lines(in: img, languages: [Locale.Language(identifier: "ja")], fast: false)
-                _ = try? await TextRecognizer.blocks(in: img, languages: [])
-            }
+        Task.detached(priority: .utility) { await loadVision() }
+    }
+
+    /// Runs both recognizers once on a blank image, so their models are loaded when the first real picture comes.
+    static func loadVision() async {
+        let ctx = CGContext(data: nil, width: 64, height: 32, bitsPerComponent: 8, bytesPerRow: 0,
+                            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+        ctx?.setFillColor(.white)
+        ctx?.fill(CGRect(x: 0, y: 0, width: 64, height: 32))
+        if let img = ctx?.makeImage() {
+            _ = try? await TextRecognizer.lines(in: img, languages: [Locale.Language(identifier: "ja")], fast: false)
+            _ = try? await TextRecognizer.blocks(in: img, languages: [])
         }
     }
 
@@ -251,17 +256,46 @@ final class AppModel {
         settings.customEngineID = id
     }
 
+    /// A radio of the engine group: an Apple choice (which also leaves any added engine) or an added engine.
+    func select(_ choice: EngineSelection) {
+        switch choice {
+        case let .builtIn(c):
+            settings.engine = c
+            selectEngine(nil)
+        case let .added(id):
+            selectEngine(id)
+        }
+    }
+
     private func learned(_ fields: [String], for id: UUID) {
         guard settings.engines.contains(where: { $0.id == id }) else { return }
         let saved = fields.isEmpty ? nil : fields
         if settings.engineRejections[id] != saved { settings.engineRejections[id] = saved }
     }
 
+    /// The issue the menu panel shows: the current one unless the user closed it.
+    var shownIssue: TranslationIssue? { issue == dismissedIssue ? nil : issue }
+
+    /// The user closed the engine notice.
+    func dismissIssue() {
+        if case .engineUnavailable? = issue { dismissedIssue = issue }
+    }
+
+    /// What an incoming issue does: the dismissed record that survives it (only the same issue keeps it), and whether
+    /// the lenses are told (once per engine issue, never for one the user closed).
+    nonisolated static func step(old: TranslationIssue?, new: TranslationIssue?, dismissed: TranslationIssue?)
+        -> (dismissed: TranslationIssue?, tellLenses: Bool) {
+        let closed = new != nil && new == dismissed
+        guard case .engineUnavailable? = new else { return (nil, false) }
+        return (closed ? dismissed : nil, new != old && !closed)
+    }
+
     /// Shows the issue in the menu panel, and once on every lens when an engine gave way to Apple.
     func received(_ new: TranslationIssue?) {
-        let old = issue
+        let step = Self.step(old: issue, new: new, dismissed: dismissedIssue)
         issue = new
-        if case .engineUnavailable? = new, new != old {
+        dismissedIssue = step.dismissed
+        if step.tellLenses {
             for s in sessions.values { s.showNotice(new?.headline ?? "") }
         }
     }
@@ -290,7 +324,7 @@ final class AppModel {
     }
 
     func languagePacksChanged() async {
-        issue = nil
+        received(nil)
         await refreshAll()
     }
 }

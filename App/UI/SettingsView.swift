@@ -69,8 +69,37 @@ private struct GeneralSettings: View {
             } header: {
                 Text("Performance")
             }
+            Section {
+                Toggle("Save transcripts", isOn: $model.settings.savesTranscripts)
+                Text("Each lens writes what it reads and its translation to Markdown and SRT files.")
+                    .font(.caption).foregroundStyle(.secondary)
+                LabeledContent("Folder") {
+                    Text((model.settings.exportFolder as NSString).abbreviatingWithTildeInPath)
+                        .lineLimit(1).truncationMode(.middle).foregroundStyle(.secondary)
+                    Button("Choose…", action: chooseFolder)
+                    Button("Show in Finder", action: showFolder)
+                }
+            } header: {
+                Text("Saving")
+            }
         }
         .formStyle(.grouped)
+    }
+
+    private func chooseFolder() {
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.canCreateDirectories = true
+        panel.directoryURL = URL(fileURLWithPath: model.settings.exportFolder)
+        if panel.runModal() == .OK, let url = panel.url { model.settings.exportFolder = url.path }
+    }
+
+    /// The folder itself once something was saved there, else the nearest folder above it that exists.
+    private func showFolder() {
+        var url = URL(fileURLWithPath: model.settings.exportFolder)
+        while !FileManager.default.fileExists(atPath: url.path), url.path != "/" { url.deleteLastPathComponent() }
+        NSWorkspace.shared.open(url)
     }
 }
 

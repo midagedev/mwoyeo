@@ -17,6 +17,8 @@ final class RegionFrameWindow: NSPanel {
     var onCommit: (() -> Void)?
     var onClose: (() -> Void)?
     var onToggleFollowing: (() -> Void)?
+    /// Right-click on the name pill: the menu to show, built when asked.
+    var onContextMenu: (() -> NSMenu?)?
 
     private let chrome: FrameChromeView
 
@@ -70,6 +72,9 @@ final class RegionFrameWindow: NSPanel {
     /// Showing the original: the ring turns grey, the pill says so, and a sweep marks the switch.
     func setOriginal(_ on: Bool) { chrome.original = on }
 
+    /// Says `text` on the pill for a moment ("Copied", "Saved").
+    func flash(_ text: String, seconds: TimeInterval = 1.5) { chrome.flash(text, seconds: seconds) }
+
     /// A light sweep across the lens, for when it first comes alive.
     func sweep() { chrome.sweep() }
 }
@@ -82,6 +87,9 @@ private final class FrameChromeView: NSView {
     var original = false { didSet { if original != oldValue { applyStyle(); sweep() } } }
     var following = false { didSet { if following != oldValue { needsDisplay = true; updateToolTip() } } }
     var style = LensStyle.glow { didSet { if style != oldValue { applyStyle() } } }
+    /// A short message that takes the place of the pill's second line.
+    private var notice: String? { didSet { needsDisplay = true } }
+    private var noticeTimer: Timer?
 
     private enum Drag { case move, resize }
     private var drag: Drag?
@@ -183,11 +191,12 @@ private final class FrameChromeView: NSView {
 
     private var strong: Bool { emphasized || hovering || drag != nil }
     /// Minimal lenses show their name tag only under the pointer.
-    private var showsTab: Bool { style != .minimal || strong }
+    private var showsTab: Bool { style != .minimal || strong || notice != nil }
 
     private var tabRect: NSRect {
         let title = (name as NSString).size(withAttributes: [.font: Self.titleFont]).width
-        let sub = detail.isEmpty ? 0 : (detail as NSString).size(withAttributes: [.font: Self.detailFont]).width + 10
+        let longest = [detail, notice ?? ""].max { $0.count < $1.count } ?? ""
+        let sub = longest.isEmpty ? 0 : (longest as NSString).size(withAttributes: [.font: Self.detailFont]).width + 10
         let w = min(regionRect.width, title + sub + 40 + 20 + (strong ? 22 : 0))
         return NSRect(x: regionRect.minX, y: regionRect.maxY + 6, width: max(72, w), height: RegionFrameWindow.tabHeight)
     }
@@ -271,6 +280,12 @@ private final class FrameChromeView: NSView {
         updateToolTip() // the icon shifts when the close button shows
     }
 
+    func flash(_ text: String, seconds: TimeInterval) {
+        notice = text
+        noticeTimer?.invalidate()
+        noticeTimer = Timer.scheduledTimer(withTimeInterval: seconds, repeats: false) { [weak self] _ in self?.notice = nil }
+    }
+
     func sweep() {
         let move = CABasicAnimation(keyPath: "position.x")
         move.fromValue = regionRect.minX - regionRect.width / 2
@@ -313,6 +328,12 @@ private final class FrameChromeView: NSView {
 
     override func mouseEntered(with event: NSEvent) { hovering = true; updateGlow(); needsDisplay = true }
     override func mouseExited(with event: NSEvent) { hovering = false; updateGlow(); needsDisplay = true }
+
+    override func rightMouseDown(with event: NSEvent) {
+        let p = convert(event.locationInWindow, from: nil)
+        guard showsTab, tabRect.contains(p), let menu = window_?.onContextMenu?() else { return }
+        NSMenu.popUpContextMenu(menu, with: event, for: self)
+    }
 
     override func mouseDown(with event: NSEvent) {
         let p = convert(event.locationInWindow, from: nil)
@@ -427,8 +448,8 @@ private final class FrameChromeView: NSView {
         title.draw(with: NSRect(x: x, y: tab.midY - title.size().height / 2 + 1, width: limit, height: title.size().height),
                    options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])
         x += title.size().width + 10
-        if original || !detail.isEmpty, x < tab.maxX - 50 {
-            let sub = NSAttributedString(string: original ? String(localized: "Original") : busy ? String(localized: "Translating…") : detail,
+        if original || !detail.isEmpty || notice != nil, x < tab.maxX - 50 {
+            let sub = NSAttributedString(string: notice ?? (original ? String(localized: "Original") : busy ? String(localized: "Translating…") : detail),
                                          attributes: [.font: Self.detailFont, .foregroundColor: NSColor.white.withAlphaComponent(0.6)])
             sub.draw(with: NSRect(x: x, y: tab.midY - sub.size().height / 2 + 1, width: tab.maxX - x - (strong ? 48 : 30),
                                   height: sub.size().height), options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])

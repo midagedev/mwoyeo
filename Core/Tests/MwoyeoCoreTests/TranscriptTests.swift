@@ -137,4 +137,14 @@ import Testing
         #expect(TranscriptFormat.markdownHeader(lens: "Lens", date: start, timeZone: tz)
             == "## Lens · 1970-01-01 00:00\n\n")
     }
+
+    @Test func linesSeenTogetherCloseInTheOrderTheyWereGiven() {
+        var r = TranscriptRecorder()
+        let words = ["alpha", "bravo", "charlie", "delta", "echo", "foxtrot", "golf", "hotel"]
+        let lines = words.map { Obs(source: $0, translation: "t-\($0)", inLens: true) }
+        var ev = run(&r, [0, 1, 2], lines)
+        ev += r.finish(time: 2)
+        #expect(cues(ev).map(\.source) == words)
+        #expect(entries(ev).map(\.source) == words)
+    }
 }

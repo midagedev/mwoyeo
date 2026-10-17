@@ -109,6 +109,9 @@ struct AppSettings: Codable, Equatable {
     /// Ask GitHub once a day whether a newer version is out.
     var checksForUpdates = true
     var hasCompletedOnboarding = false
+    // Saving: every lens writes what it reads to `exportFolder` while this is on; lens images go there when asked for.
+    var savesTranscripts = false
+    var exportFolder = ("~/Documents/Mwoyeo" as NSString).expandingTildeInPath
 
     var glossaryPairs: [(String, String)] {
         glossary.split(whereSeparator: \.isNewline).compactMap { line in
@@ -138,6 +141,8 @@ struct AppSettings: Codable, Equatable {
         checksForUpdates = try c.decodeIfPresent(Bool.self, forKey: .checksForUpdates) ?? d.checksForUpdates
         cacheSize = max(100, try c.decodeIfPresent(Int.self, forKey: .cacheSize) ?? d.cacheSize)
         hasCompletedOnboarding = try c.decodeIfPresent(Bool.self, forKey: .hasCompletedOnboarding) ?? d.hasCompletedOnboarding
+        savesTranscripts = try c.decodeIfPresent(Bool.self, forKey: .savesTranscripts) ?? d.savesTranscripts
+        exportFolder = try c.decodeIfPresent(String.self, forKey: .exportFolder) ?? d.exportFolder
     }
 }
 

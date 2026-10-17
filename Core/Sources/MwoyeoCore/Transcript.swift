@@ -36,6 +36,8 @@ public struct TranscriptRecorder: Sendable {
     public static let gap: TimeInterval = 10
 
     private struct Open {
+        /// The order lines were first seen in; lines seen together keep the order they were given in.
+        var order: Int
         var start: TimeInterval
         var lastSeen: TimeInterval
         var translation: String?
@@ -43,6 +45,7 @@ public struct TranscriptRecorder: Sendable {
 
     private var open: [String: Open] = [:]
     private var lastTime: TimeInterval = 0
+    private var opened = 0
 
     public init() {}
 
@@ -51,15 +54,19 @@ public struct TranscriptRecorder: Sendable {
         return t
     }
 
-    private func cue(_ source: String, _ o: Open) -> Cue? {
+    private func cue(_ source: String, _ o: Open) -> (order: Int, cue: Cue)? {
         guard let t = o.translation else { return nil }
-        return Cue(start: o.start, end: o.lastSeen, source: source, translation: t)
+        return (o.order, Cue(start: o.start, end: o.lastSeen, source: source, translation: t))
+    }
+
+    private static func inOrder(_ cues: [(order: Int, cue: Cue)]) -> [TranscriptEvent] {
+        cues.sorted { ($0.cue.start, $0.order) < ($1.cue.start, $1.order) }.map { .cue($0.cue) }
     }
 
     public mutating func observe(time: TimeInterval, lines: [Observed]) -> [TranscriptEvent] {
         lastTime = time
         var entries: [TranscriptEvent] = []
-        var cues: [Cue] = []
+        var cues: [(order: Int, cue: Cue)] = []
         var inLensNow = Set<String>()
         for line in lines where line.inLens {
             let s = line.source
@@ -68,7 +75,8 @@ public struct TranscriptRecorder: Sendable {
                 if let c = cue(s, o) { cues.append(c) }
                 open[s] = nil
             }
-            var o = open[s] ?? Open(start: time, lastSeen: time, translation: nil)
+            var o = open[s] ?? Open(order: opened, start: time, lastSeen: time, translation: nil)
+            if open[s] == nil { opened += 1 }
             o.lastSeen = time
             if let t = Self.usable(line) {
                 if o.translation == nil { entries.append(.entry(Entry(time: time, source: s, translation: t))) }
@@ -80,14 +88,14 @@ public struct TranscriptRecorder: Sendable {
             if let c = cue(s, o) { cues.append(c) }
             open[s] = nil
         }
-        return entries + cues.sorted { $0.start < $1.start }.map { .cue($0) }
+        return entries + Self.inOrder(cues)
     }
 
     /// Closes every open cue at the last time it was seen in the lens.
     public mutating func finish(time: TimeInterval) -> [TranscriptEvent] {
-        let cues = open.compactMap { cue($0.key, $0.value) }.sorted { $0.start < $1.start }
+        let cues = open.compactMap { cue($0.key, $0.value) }
         open = [:]
-        return cues.map { .cue($0) }
+        return Self.inOrder(cues)
     }
 }
 
@@ -122,5 +130,91 @@ public enum TranscriptFormat {
     static func srtTime(_ t: TimeInterval) -> String {
         let ms = Int((t * 1000).rounded())
         return String(format: "%02d:%02d:%02d,%03d", ms / 3_600_000, ms / 60_000 % 60, ms / 1000 % 60, ms % 1000)
+    }
+}
+
+/// Merges the variants of one line the recorder reports as several. A lens reads a wrapped paragraph as line
+/// fragments while the page moves and as the whole paragraph once it is still ("Patch 1.4 finally fixed the double
+/// jump bug. What else are you hoping" and "… hoping they fix next?"); OCR also differs by a punctuation mark between
+/// reads. Entries are held a few seconds so a fragment is replaced by the fuller text instead of written beside it, and
+/// the cues of the fragments fold into the cue of the line they belong to, so entries and cues stay one to one.
+public struct TranscriptMerger: Sendable {
+    private struct Held {
+        var entry: TranscriptRecorder.Entry
+        var arrived: TimeInterval
+    }
+
+    /// How long an entry waits for a fuller reading of its line.
+    public var hold: TimeInterval
+    private var held: [Held] = []
+    /// A merged-away source → the text that survived.
+    private var into: [String: (source: String, translation: String)] = [:]
+    /// Every closed cue, sorted by start.
+    public private(set) var cues: [TranscriptRecorder.Cue] = []
+
+    public init(hold: TimeInterval = 3) { self.hold = hold }
+
+    /// Letters and digits only, lowercased: two readings of a line differ in punctuation and spacing.
+    private static func key(_ s: String) -> String {
+        String(s.lowercased().filter { $0.isLetter || $0.isNumber })
+    }
+
+    /// Whether `a` and `b` read the same line: equal, or one is a fragment of the other. A short fragment only counts at
+    /// the start or end of a line at least five times longer than it ("game" ends a paragraph; "1h ago" does not end "11h ago").
+    static func related(_ a: String, _ b: String) -> Bool {
+        let x = key(a), y = key(b)
+        guard !x.isEmpty, !y.isEmpty else { return false }
+        let (short, long) = x.count <= y.count ? (x, y) : (y, x)
+        if short == long { return true }
+        guard long.contains(short) else { return false }
+        return short.count >= 8 || (short.count >= 4 && long.count >= 5 * short.count && (long.hasPrefix(short) || long.hasSuffix(short)))
+    }
+
+    /// Feeds what the recorder reported at `now` (the recorder's clock); returns the entries now ready to write.
+    /// A cue in `events` changes `cues`.
+    public mutating func add(_ events: [TranscriptRecorder.TranscriptEvent], now: TimeInterval) -> [TranscriptRecorder.Entry] {
+        for event in events {
+            switch event {
+            case .entry(let e): holdEntry(e, now: now)
+            case .cue(let c): close(c)
+            }
+        }
+        guard let last = held.lastIndex(where: { $0.arrived <= now - hold }) else { return [] }
+        defer { held.removeSubrange(0...last) }
+        return held[0...last].map(\.entry)
+    }
+
+    /// The lens closed: everything held is ready.
+    public mutating func finish() -> [TranscriptRecorder.Entry] {
+        defer { held = [] }
+        return held.map(\.entry)
+    }
+
+    private mutating func holdEntry(_ e: TranscriptRecorder.Entry, now: TimeInterval) {
+        guard let i = held.firstIndex(where: { Self.related($0.entry.source, e.source) }) else {
+            held.append(Held(entry: e, arrived: now))
+            return
+        }
+        let old = held[i].entry
+        let fuller = Self.key(e.source).count > Self.key(old.source).count ? e : old
+        let gone = fuller.source == e.source ? old : e
+        into[gone.source] = (fuller.source, fuller.translation)
+        held[i] = Held(entry: .init(time: min(old.time, e.time), source: fuller.source, translation: fuller.translation), arrived: now)
+    }
+
+    private mutating func close(_ c: TranscriptRecorder.Cue) {
+        var cue = c
+        let own = into[c.source] == nil
+        if let t = into[c.source] { (cue.source, cue.translation) = t }
+        let gap = TranscriptRecorder.gap
+        if let i = cues.firstIndex(where: { $0.source == cue.source && $0.start <= cue.end + gap && cue.start <= $0.end + gap }) {
+            var k = cues.remove(at: i)
+            k.start = min(k.start, cue.start)
+            k.end = max(k.end, cue.end)
+            // The line's own cue carries its last translation.
+            if own { k.translation = cue.translation }
+            cue = k
+        }
+        cues.insert(cue, at: cues.firstIndex { $0.start > cue.start } ?? cues.endIndex)
     }
 }

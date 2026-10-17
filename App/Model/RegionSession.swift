@@ -21,6 +21,8 @@ final class RegionSession {
     /// The region's rect or anchor changed (lens dragged, window followed); persist it.
     var onConfigChange: ((RegionConfig) -> Void)?
     var onCloseRequest: (() -> Void)?
+    /// "Show Original" is the app's, not this lens's: the menu item asks the app.
+    var onToggleOriginal: (() -> Void)?
 
     private let capturer = RegionCapturer()
     private let pipeline: RegionPipeline
@@ -50,10 +52,20 @@ final class RegionSession {
     private var scrollWindow: CGWindowID?
     private var lastWheel: TimeInterval = 0
     private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "session")
+    private var settings: AppSettings
+    /// The newest snapshot: what the lens's own actions (copy, save, transcripts) work from.
+    private var lastSnapshot: OverlaySnapshot?
+    private var transcript: TranscriptWriter?
+    private var transcriptBegan: TimeInterval = 0
+    private var transcriptTimer: Timer?
+
+    /// Hands the pipeline's snapshots to the session once it exists (the pipeline is built inside `init`).
+    @MainActor private final class SnapshotTap { var handler: ((OverlaySnapshot) -> Void)? }
 
     init(config: RegionConfig, settings: AppSettings, translator: TranslationService, inpainter: Inpainter?) {
         self.config = config
         self.fps = settings.framesPerSecond
+        self.settings = settings
         let frame = ScreenGeometry.appKitRect(fromQuartz: config.rect)
         let panel = OverlayPanel(frame: frame)
         self.panel = panel
@@ -63,11 +75,13 @@ final class RegionSession {
         chrome.setStyle(settings.lensStyle)
         let capture = Self.overscan(config.rect, wide: false)
         self.capture = capture
+        let tap = SnapshotTap()
         pipeline = RegionPipeline(options: PipelineOptions(settings), capture: capture, translator: translator,
-                                  inpainter: inpainter, onSnapshot: { snapshot in Task { @MainActor in panel.apply(snapshot) } })
+                                  inpainter: inpainter, onSnapshot: { snapshot in Task { @MainActor in panel.apply(snapshot); tap.handler?(snapshot) } })
         capturer.onFrame = { [pipeline] frame in Task { await pipeline.ingest(frame) } }
         capturer.onStop = { [weak self] error in Task { @MainActor in self?.captureStopped(error) } }
         wireChrome()
+        tap.handler = { [weak self] in self?.received($0) }
     }
 
     func start() async {
@@ -100,6 +114,8 @@ final class RegionSession {
         calmTimer = nil
         mouseMonitors.forEach { NSEvent.removeMonitor($0) }
         mouseMonitors = []
+        finishTranscript()
+        Speaker.shared.stop(config.id)
         await capturer.stop()
         panel.orderOut(nil)
         chrome.orderOut(nil)
@@ -110,6 +126,12 @@ final class RegionSession {
     }
 
     func update(settings: AppSettings) async {
+        let before = self.settings
+        self.settings = settings
+        if !settings.savesTranscripts || settings.exportFolder != before.exportFolder
+            || settings.sourceLanguage != before.sourceLanguage || settings.targetLanguage != before.targetLanguage {
+            finishTranscript()
+        }
         chrome.setDetail(Self.languagePair(settings))
         chrome.setStyle(settings.lensStyle)
         await pipeline.update(options: PipelineOptions(settings))
@@ -164,6 +186,105 @@ final class RegionSession {
         onChange?()
     }
 
+    // MARK: - Keeping what the lens read
+
+    /// Whether the lens (global Quartz points) is under `point`.
+    func contains(_ point: CGPoint) -> Bool { config.rect.contains(point) }
+
+    private func received(_ snapshot: OverlaySnapshot) {
+        lastSnapshot = snapshot
+        observeTranscript()
+    }
+
+    private func lensBlocks() -> [BlockText] {
+        lastSnapshot.map { LensText.inLens($0, lens: config.rect) } ?? []
+    }
+
+    func copyOriginal() {
+        let lines = LensText.originals(lensBlocks())
+        guard !lines.isEmpty else { return NSSound.beep() }
+        LensText.copy(lines)
+        chrome.flash(String(localized: "Copied"))
+    }
+
+    func copyTranslation() {
+        let lines = LensText.translations(lensBlocks())
+        guard !lines.isEmpty else { return NSSound.beep() }
+        LensText.copy(lines)
+        chrome.flash(String(localized: "Copied"))
+    }
+
+    /// Reads the translations in the lens aloud, or stops if this lens is already reading.
+    func toggleReadAloud() {
+        if Speaker.shared.isReading(config.id) { return Speaker.shared.stop(config.id) }
+        let lines = LensText.translations(lensBlocks())
+        guard !lines.isEmpty, let voice = Speaker.voice(for: settings.targetLanguage) else { return NSSound.beep() }
+        Speaker.shared.read(lines, voice: voice, for: config.id)
+    }
+
+    /// The latest captured frame cropped to the lens, with the translations on it as the lens shows them.
+    func saveLensImage() {
+        guard let s = lastSnapshot, let frame = s.frame else { return NSSound.beep() }
+        let showing = translationsVisible && !hiddenByOcclusion
+        let layers = showing ? s.blocks.map { LensImage.Layer(frame: $0.frame, image: $0.image) } : []
+        let crop = config.rect.offsetBy(dx: -s.origin.x, dy: -s.origin.y)
+        let folder = LensExport.capturesFolder(settings.exportFolder), name = LensExport.fileName(config.name), now = Date()
+        Task.detached(priority: .utility) { [weak self] in
+            var saved = false
+            if let image = LensImage.composite(frame: frame, scale: s.scale, layers: layers, crop: crop) {
+                let url = LensExport.freeBase(in: folder, "\(name) \(LensExport.stamp(now, seconds: true))", ext: "png").appendingPathExtension("png")
+                saved = (try? LensImage.writePNG(image, to: url)) != nil
+            }
+            await self?.chrome.flash(saved ? String(localized: "Saved") : String(localized: "Couldn’t save image"), seconds: saved ? 1.5 : 4)
+        }
+    }
+
+    private func observeTranscript() {
+        guard settings.savesTranscripts, !hiddenByOcclusion, let s = lastSnapshot else { return }
+        let now = ProcessInfo.processInfo.systemUptime
+        if transcript == nil {
+            transcriptBegan = now
+            transcript = TranscriptWriter(directory: LensExport.transcriptsFolder(settings.exportFolder), lens: config.name,
+                                          sourceCode: settings.sourceLanguage, targetCode: settings.targetLanguage,
+                                          onError: { [weak self] in Task { @MainActor in self?.chrome.flash(String(localized: "Couldn’t save transcript"), seconds: 4) } })
+            // A line that stays put makes no snapshots; looking again keeps it one line instead of many.
+            let t = Timer(timeInterval: 1, repeats: true) { [weak self] _ in Task { @MainActor in self?.observeTranscript() } }
+            RunLoop.main.add(t, forMode: .common)
+            transcriptTimer = t
+        }
+        transcript?.observe(time: now - transcriptBegan, lines: LensText.observed(s, lens: config.rect))
+    }
+
+    /// Closes the open cues; the writer finishes off the capture path. `wait`: the app is quitting.
+    func finishTranscript(wait: Bool = false) {
+        transcriptTimer?.invalidate()
+        transcriptTimer = nil
+        guard let t = transcript else { return }
+        transcript = nil
+        let end = ProcessInfo.processInfo.systemUptime - transcriptBegan
+        if wait { t.finishAndWait(time: end) } else { t.finish(time: end) }
+    }
+
+    private func contextMenu() -> NSMenu {
+        let menu = NSMenu()
+        menu.autoenablesItems = false
+        let blocks = lensBlocks()
+        let original = ActionItem(String(localized: "Show Original")) { [weak self] in self?.onToggleOriginal?() }
+        original.state = translationsVisible ? .off : .on
+        menu.addItem(original)
+        menu.addItem(ActionItem(String(localized: "Copy Original Text"), enabled: !blocks.isEmpty) { [weak self] in self?.copyOriginal() })
+        menu.addItem(ActionItem(String(localized: "Copy Translation"), enabled: !LensText.translations(blocks).isEmpty) { [weak self] in self?.copyTranslation() })
+        let reading = Speaker.shared.isReading(config.id)
+        let voice = Speaker.voice(for: settings.targetLanguage)
+        let read = ActionItem(reading ? String(localized: "Stop Reading") : String(localized: "Read Aloud"),
+                              enabled: reading || (voice != nil && !LensText.translations(blocks).isEmpty)) { [weak self] in self?.toggleReadAloud() }
+        if voice == nil { read.toolTip = String(localized: "No voice for \(Languages.name(settings.targetLanguage)) is installed. Add one in System Settings › Accessibility › Spoken Content.") }
+        menu.addItem(read)
+        menu.addItem(.separator())
+        menu.addItem(ActionItem(String(localized: "Save Lens Image"), enabled: lastSnapshot?.frame != nil) { [weak self] in self?.saveLensImage() })
+        return menu
+    }
+
     // MARK: - Lens (drag / resize)
 
     private func wireChrome() {
@@ -172,6 +293,7 @@ final class RegionSession {
         chrome.onCommit = { [weak self] in self?.lensDropped() }
         chrome.onClose = { [weak self] in self?.onCloseRequest?() }
         chrome.onToggleFollowing = { [weak self] in self?.toggleFollowing() }
+        chrome.onContextMenu = { [weak self] in self?.contextMenu() }
     }
 
     private func lensMoved(_ appKitFrame: NSRect) {

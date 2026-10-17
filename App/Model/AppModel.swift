@@ -60,7 +60,14 @@ final class AppModel {
         HotKeys.shared.setHandler(.toggleOriginal) { [weak self] in self?.toggleTranslations() }
         HotKeys.shared.setHandler(.pause) { [weak self] in Task { await self?.togglePause() } }
         HotKeys.shared.setHandler(.refresh) { [weak self] in Task { await self?.refreshAll() } }
+        HotKeys.shared.setHandler(.saveLensImage) { [weak self] in self?.lensForShortcut()?.saveLensImage() }
+        HotKeys.shared.setHandler(.copyOriginal) { [weak self] in self?.lensForShortcut()?.copyOriginal() }
+        HotKeys.shared.setHandler(.readAloud) { [weak self] in self?.lensForShortcut()?.toggleReadAloud() }
         HotKeys.shared.apply(settings.shortcuts)
+        // Transcripts written so far are closed before the app goes.
+        NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.sessions.values.forEach { $0.finishTranscript(wait: true) } }
+        }
         Updates.shared.schedule(enabled: settings.checksForUpdates)
 
         await translator.setIssueHandler { issue in Task { @MainActor in AppModel.shared.issue = issue } }
@@ -163,6 +170,13 @@ final class AppModel {
 
     var isBusy: Bool { sessions.values.contains { $0.activity != .idle } }
 
+    /// The lens a lens shortcut acts on: the one under the pointer, else the newest.
+    private func lensForShortcut() -> RegionSession? {
+        let p = ScreenGeometry.quartzRect(fromAppKit: NSRect(origin: NSEvent.mouseLocation, size: .zero)).origin
+        return regions.last { sessions[$0.id]?.contains(p) == true }.flatMap { sessions[$0.id] }
+            ?? regions.last { sessions[$0.id] != nil }.flatMap { sessions[$0.id] }
+    }
+
     private func startSession(_ config: RegionConfig) async {
         guard sessions[config.id] == nil else { return }
         let s = RegionSession(config: config, settings: settings, translator: translator, inpainter: inpainter)
@@ -174,6 +188,7 @@ final class AppModel {
             regions[i].name = updated.name
         }
         s.onCloseRequest = { [weak self] in Task { await self?.remove(config.id) } }
+        s.onToggleOriginal = { [weak self] in self?.toggleTranslations() }
         sessions[config.id] = s
         s.setTranslationsVisible(translationsVisible)
         await s.start()

@@ -85,7 +85,8 @@ actor TranslationService {
     private var fingerprints: [UUID: String] = [:]
     private var rejectionsReported: [UUID: Set<String>] = [:]
     private var enginesSynced = false
-    /// What each added engine measured since launch: batch times, and how often a line was already in memory.
+    /// The one store of how fast each engine and language pair is (and how often a line was already in memory): the
+    /// scheduler's `expectedSeconds`, the logs' `paceStats` and the engine list's speed line all read it.
     private nonisolated let pace = PaceStats()
     /// Engines that failed, and until when (`ProcessInfo.systemUptime`) groups go straight to Apple.
     private var cooldowns: [UUID: Cooldown] = [:]
@@ -102,6 +103,7 @@ actor TranslationService {
         client = EngineClient(secrets: secrets)
         cache.use(Self.namespace(settings))
         cache.capacity = settings.cacheSize
+        pace.use(Self.paceSlot(settings, engine: Self.activeEngine(settings)))
     }
 
     func update(settings new: AppSettings) {
@@ -109,6 +111,7 @@ actor TranslationService {
         enginesSynced = false
         cache.capacity = new.cacheSize
         let space = Self.namespace(new)
+        pace.use(Self.paceSlot(new, engine: Self.activeEngine(new)))
         if space != cache.namespace {
             // Translations for the previous settings stay cached: switching back costs nothing.
             cache.use(space)
@@ -129,8 +132,17 @@ actor TranslationService {
     /// entries unreachable while switching engines back and forth keeps each one's. The same string keys the pace stats.
     /// `engine: nil` is Apple's namespace whatever engine is chosen (where a fallback stores).
     private static func namespace(_ s: AppSettings, engine: EngineConfig?) -> String {
+        "\(space(s, engine: engine))|\(s.glossary.hashValue)"
+    }
+
+    /// The namespace without the glossary: what an engine's speed depends on (pair and engine identity).
+    private static func space(_ s: AppSettings, engine: EngineConfig?) -> String {
         let identity = engine.map { "ext:\($0.id.uuidString.prefix(8)):\(fingerprint($0))" } ?? "apple:\(s.engine.rawValue)"
-        return "\(s.sourceLanguage)>\(s.targetLanguage)|\(identity)|\(s.glossary.hashValue)"
+        return "\(s.sourceLanguage)>\(s.targetLanguage)|\(identity)"
+    }
+
+    private static func paceSlot(_ s: AppSettings, engine: EngineConfig?) -> PaceStats.Slot {
+        PaceStats.Slot(key: space(s, engine: engine), engine: engine?.id)
     }
 
     private static func namespace(_ s: AppSettings) -> String { namespace(s, engine: activeEngine(s)) }
@@ -165,17 +177,31 @@ actor TranslationService {
     /// One sample translation through `e`, for the sheet's "it works, 840 ms" line. The time counts as a measurement.
     func engineProbe(_ e: EngineConfig) async -> (sample: String?, ms: Int, error: EngineError?) {
         let r = await client.probe(e, target: settings.targetLanguage)
-        if r.error == nil { pace.recordBatch(r.ms, for: e.id) }
+        if r.error == nil { pace.recordBatch(Double(r.ms) / 1000, slot: Self.paceSlot(settings, engine: e)) }
         return r
     }
 
-    /// Median seconds one batch took through the engine since launch (probes included); nil before the first.
+    /// Median seconds one batch took through the engine (over every language pair) since launch, probes included; nil
+    /// before the first.
     nonisolated func measuredSeconds(for engine: UUID) -> Double? { pace.medianSeconds(for: engine) }
 
     /// "First result 0.3 s · 62% from memory" numbers for the engine, once at least `minBatches` batches ran.
     nonisolated func speedSummary(for engine: UUID, minBatches: Int = 5) -> SpeedSummary? {
         pace.summary(for: engine, minBatches: minBatches)
     }
+
+    /// Seconds a call of `lines` lines is expected to take on the engine and pair in use now, from what it has been
+    /// measured at (first line, then per further line); nil until its first line has come back, since nothing is
+    /// assumed about an engine. Never waits.
+    nonisolated func expectedSeconds(lines: Int) -> Double? { pace.expectedSeconds(lines: lines) }
+
+    /// Seconds a running call of `lines` lines (`delivered` already back, `elapsed` s in) still needs; nil while unknown.
+    nonisolated func remainingSeconds(lines: Int, delivered: Int, elapsed: Double) -> Double? {
+        pace.remainingSeconds(lines: lines, delivered: delivered, elapsed: elapsed)
+    }
+
+    /// Speed of every engine and pair used so far, numbers only (no screen text), for the logs.
+    nonisolated func paceStats() -> [PaceStat] { pace.stats() }
 
     /// Translations stored per namespace since launch (a debug view: where did a fallback's results go).
     nonisolated var storeCounts: [String: Int] { cache.storeCounts }
@@ -269,11 +295,11 @@ actor TranslationService {
                 outcome.translations[t] = t
                 onResult?(t, t)
             } else if let hit = cache[t] {
-                if let e = activeEngine { pace.recordLookup(hit: true, for: e.id) }
+                pace.recordLookup(hit: true)
                 outcome.translations[t] = hit
                 onResult?(t, hit)
             } else {
-                if let e = activeEngine { pace.recordLookup(hit: false, for: e.id) }
+                pace.recordLookup(hit: false)
                 todo.append(t)
             }
         }
@@ -366,6 +392,8 @@ actor TranslationService {
         var route: Route
         var translated: [String: String]
         var status: Status
+        var isOK: Bool { if case .value = status { true } else { false } }
+        var isCancelled: Bool { if case .cancelled = status { true } else { false } }
     }
 
     /// The added engine while it is not cooling down after a failure; Apple otherwise.
@@ -381,9 +409,19 @@ actor TranslationService {
                          onResult: (@Sendable (String, String) -> Void)?) async -> Attempt {
         if !enginesSynced { await syncEngines() }
         let streamed = Streamed()
+        // Pace is learned from engine output only (text from the cache or kept as is takes no engine time), line by line,
+        // so a batch cut later still teaches what it delivered. An added engine answers a batch at once: its first
+        // result is the whole batch's time and the rest follow at no cost.
+        let slot: PaceStats.Slot
+        if case let .added(e) = route { slot = Self.paceSlot(settings, engine: e) } else { slot = Self.paceSlot(settings, engine: nil) }
+        let started = ProcessInfo.processInfo.systemUptime
+        let arrivals = Arrivals(since: started)
+        let book = pace
         let deliver: @Sendable (String, String) -> Void = { s, t in
             let shown = TranslationCheck.displayForm(t)
             streamed.put(s, shown)
+            let (delta, isFirst) = arrivals.next(at: ProcessInfo.processInfo.systemUptime)
+            book.record(delta, isFirst: isFirst, slot: slot)
             onResult?(s, shown)
         }
         let limit: Duration
@@ -392,6 +430,7 @@ actor TranslationService {
             try await self.translateGroup(items, source: source, via: route, onResult: deliver)
         }
         var a = Attempt(route: route, translated: streamed.all, status: .value)
+        defer { pace.finish(slot: slot, total: ProcessInfo.processInfo.systemUptime - started, ok: a.isOK, cancelled: a.isCancelled) }
         switch result {
         case let .value(r):
             a.translated = r.mapValues(TranslationCheck.displayForm)
@@ -410,6 +449,7 @@ actor TranslationService {
     private func engineRecovered(_ e: EngineConfig) {
         cooldowns[e.id] = nil
         cache.clearFallback()
+        pace.clearFallback()
         if engineIssue != nil { engineIssue = nil; issueHandler?(nil) }
     }
 
@@ -423,6 +463,8 @@ actor TranslationService {
         c.until = now + pause
         cooldowns[e.id] = c
         cache.useFallback(appleSpace, until: c.until)
+        // Groups go to Apple while the engine rests: their expected time is Apple's.
+        pace.useFallback(Self.paceSlot(settings, engine: nil), until: c.until)
         let issue = TranslationIssue.engineUnavailable(name: e.name, reason: reason)
         // The same words are not said again for every group.
         if engineIssue != issue { engineIssue = issue; issueHandler?(issue) }
@@ -465,7 +507,6 @@ actor TranslationService {
                                                glossary: settings.glossaryPairs, engine: engine)
         let elapsed = Int((clock.now - start) / .milliseconds(1))
         Trace.sample("translate.engine_ms", Double(elapsed))
-        pace.recordBatch(elapsed, for: engine.id)
         guard lines.count == items.count else { throw EngineError.countMismatch(expected: items.count, got: lines.count) }
         var out: [String: String] = [:]
         for (s, raw) in zip(items, lines) {
@@ -608,47 +649,18 @@ actor TranslationService {
     }
 }
 
-struct SpeedSummary: Equatable, Sendable {
-    /// Median batch time.
-    var seconds: Double
-    /// Share of lines that were already in memory, 0...1.
-    var fromMemory: Double
-}
-
-/// Per engine, since launch: batch times (ms) and cache lookups. Lock-guarded so the settings view can read it.
-private final class PaceStats: @unchecked Sendable {
+/// Arrival times of one call's results.
+private final class Arrivals: @unchecked Sendable {
     private let lock = NSLock()
-    private var batches: [UUID: [Int]] = [:]
-    private var lookups: [UUID: (hits: Int, total: Int)] = [:]
-
-    func recordBatch(_ ms: Int, for id: UUID) { lock.withLock { batches[id, default: []].append(ms) } }
-
-    func recordLookup(hit: Bool, for id: UUID) {
+    private var last: TimeInterval
+    private var count = 0
+    init(since t: TimeInterval) { last = t }
+    /// Seconds since the call began (first) or the previous result, and whether this is the first.
+    func next(at t: TimeInterval) -> (Double, Bool) {
         lock.withLock {
-            var l = lookups[id] ?? (0, 0)
-            l.total += 1
-            if hit { l.hits += 1 }
-            lookups[id] = l
+            defer { last = t; count += 1 }
+            return (t - last, count == 0)
         }
-    }
-
-    func medianSeconds(for id: UUID) -> Double? {
-        lock.withLock { Self.median(batches[id] ?? []) }
-    }
-
-    func summary(for id: UUID, minBatches: Int) -> SpeedSummary? {
-        lock.withLock {
-            let ms = batches[id] ?? []
-            guard ms.count >= minBatches, let median = Self.median(ms) else { return nil }
-            let l = lookups[id] ?? (0, 0)
-            return SpeedSummary(seconds: median, fromMemory: l.total == 0 ? 0 : Double(l.hits) / Double(l.total))
-        }
-    }
-
-    private static func median(_ ms: [Int]) -> Double? {
-        guard !ms.isEmpty else { return nil }
-        let s = ms.sorted()
-        return Double(s[s.count / 2]) / 1000
     }
 }
 

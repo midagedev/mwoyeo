@@ -168,6 +168,7 @@ actor RegionPipeline {
     private struct Flight {
         let id: Int
         let batch: [String]
+        let started: TimeInterval
         /// Sources whose result has streamed in.
         var done: Set<String> = []
         /// The batch before this one was cut because the lens was waiting: that rule stays quiet for this one.
@@ -181,6 +182,27 @@ actor RegionPipeline {
     /// When a block that waits for translation was first seen inside the lens, to measure how long the lens waited.
     private var lensSeen: [UUID: TimeInterval] = [:]
     private var onMotion: (@Sendable () -> Void)?
+
+    // MARK: Motion
+    // How content moves relative to the lens, for what the queue may start and when it must recover. Frames stop when
+    // content stops (the capture only sends changes), so the one wake task below is what notices a stop.
+    /// Text velocity relative to the lens, image pixels per second, +y toward the lens's maxY. Zero when unknown (an
+    /// animation, a page flip) or after the motion ends.
+    private var velocity = CGVector.zero
+    /// When the newest motion reached the pipeline (`systemUptime` clock; a frame read late counts from when it was
+    /// read, since more frames of the same scroll may still be queued behind it), and the capture-time gap between the
+    /// last two motion frames.
+    private var lastMotionAt: TimeInterval = -.infinity
+    private var lastMotionCapture: TimeInterval = -.infinity
+    private var motionInterval: TimeInterval = 0
+    private var wasMoving = false
+    /// Capture time of the last frame of the motion that just stopped; the lens's wait for translation counts from here.
+    private var settleFrom: TimeInterval?
+    private var stillTask: Task<Void, Never>?
+    private var lastVisibleChange: TimeInterval = 0
+    /// Still = no motion for 0.35 s or 2.5 intervals between motion frames, whichever is longer: a reading-speed scroll
+    /// steps every 400 ms and must not flicker between moving and still. An interval over 1 s is a new motion, not a rhythm.
+    private static let stillFloor: TimeInterval = 0.35, stillFactor = 2.5, rhythmCap: TimeInterval = 1
 
     /// Capture rect and the visible lens inside it, global Quartz points.
     private var origin: CGPoint
@@ -229,6 +251,10 @@ actor RegionPipeline {
     /// Forget everything (region moved/resized, settings changed). The next frame is read from scratch.
     func reset() {
         settleTask?.cancel()
+        stillTask?.cancel()
+        wasMoving = false
+        velocity = .zero
+        settleFrom = nil
         blocks = []
         baseGray = nil
         prevGray = nil
@@ -267,12 +293,13 @@ actor RegionPipeline {
     }
 
     /// For the headless self-test: whether work is pending, and what each block reads.
-    func debugState() -> (busy: Bool, translating: Bool, paused: Bool, parked: Int, blocks: [(String, String?)], flight: [String]) {
+    func debugState() -> (busy: Bool, translating: Bool, paused: Bool, parked: Int, blocks: [(String, String?)], flight: [String], motion: (moving: Bool, velocity: CGVector, expected: Double?), lens: (total: Int, untranslated: Int)) {
         (working || translating || settleTask != nil && !seamlessDone, translating, paused, strikes.parkedCount,
          blocks.map { ($0.source, $0.translation) }, (flight?.batch ?? []).map { source in
              let s = blocks.filter { $0.source == source }.map { TranslationScheduling.standing(of: $0.rect, lens: lensRect, lead: lead) }
              return s.contains(.lens) ? "lens" : s.contains(.leading) ? "lead" : s.isEmpty ? "gone" : "other"
-         })
+         }, (isMoving(at: ProcessInfo.processInfo.systemUptime), velocity, translator.expectedSeconds(lines: 3)),
+         (blocks.filter { $0.rect.intersects(lensRect) }.count, blocks.filter { $0.translation == nil && $0.rect.intersects(lensRect) }.count))
     }
 
     func ingest(_ frame: CapturedFrame) {
@@ -290,6 +317,7 @@ actor RegionPipeline {
         lastStep = frame.grayStep
         let previous = frameTime
         frameTime = frame.time
+        scrollVelocity = nil
         if let full = prevGray, full.width == frame.gray.width, full.height == frame.gray.height {
             let prev = prevValid.map { full.cropped(to: $0) } ?? full
             let gray = prevValid.map { frame.gray.cropped(to: $0) } ?? frame.gray
@@ -312,7 +340,12 @@ actor RegionPipeline {
                 if let d = change.dirtyRect(outside: scrolled.map(\.rect)) {
                     unexplained.append(PixelRect(x: d.x + (prevValid?.x ?? 0), y: d.y + (prevValid?.y ?? 0), width: d.width, height: d.height))
                 }
-                if raw.ratio > 0.2 || !scrolled.isEmpty { noteMotion(frame.time) }
+                if raw.ratio > 0.2 || !scrolled.isEmpty {
+                    noteMotion(frame.time)
+                    noteMotionFrame(captured: frame.time, velocity: scrollVelocity)
+                } else {
+                    velocity = CGVector(dx: velocity.dx / 2, dy: velocity.dy / 2)
+                }
             }
         } else {
             lastChange = frame.time
@@ -321,6 +354,64 @@ actor RegionPipeline {
         prevValid = nil
         latest = frame
         kick()
+    }
+
+    /// The velocity the scroll regions of the frame being read gave (the largest region's).
+    private var scrollVelocity: CGVector?
+    private var scrollArea = 0
+
+    /// A frame (or a lens move) showed motion, at `velocity` when it is known.
+    private func noteMotionFrame(captured t: TimeInterval, velocity v: CGVector?) {
+        let gap = max(0, t - lastMotionCapture)
+        motionInterval = gap < Self.rhythmCap ? gap : 0
+        if let v {
+            velocity = gap < Self.rhythmCap && velocity != .zero ? CGVector(dx: (velocity.dx + v.dx) / 2, dy: (velocity.dy + v.dy) / 2) : v
+        } else {
+            velocity = .zero
+        }
+        lastMotionCapture = t
+        lastMotionAt = max(t, ProcessInfo.processInfo.systemUptime)
+        wasMoving = true
+        settleFrom = nil
+        scheduleStill()
+    }
+
+    private var stillWindow: TimeInterval { max(Self.stillFloor, Self.stillFactor * motionInterval) }
+    /// Whether content is moving, as the time-aware rules see it. `MWOYEO_PLAN=off` (for measuring against) turns the rules off:
+    /// content then always counts as moving without a known speed, which is how the queue behaved before them.
+    private static let planning = ProcessInfo.processInfo.environment["MWOYEO_PLAN"] != "off"
+    private func isMoving(at now: TimeInterval) -> Bool { !Self.planning || !stopped(at: now) }
+    private func stopped(at now: TimeInterval) -> Bool { now - lastMotionAt >= stillWindow }
+    /// The velocity to plan with: known only while content moves; otherwise nil.
+    private func motionVelocity(at now: TimeInterval) -> CGVector? { Self.planning && isMoving(at: now) && velocity != .zero ? velocity : nil }
+
+    private func scheduleStill() {
+        stillTask?.cancel()
+        let due = max(lastMotionAt + stillWindow, ProcessInfo.processInfo.systemUptime) + 0.02
+        stillTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(due - ProcessInfo.processInfo.systemUptime))
+            guard !Task.isCancelled else { return }
+            await self?.refreshMotion(due: due)
+        }
+    }
+
+    /// Notices the end of motion (nothing else does: no frames come once content is still) and stamps it.
+    private func refreshMotion(due: TimeInterval) {
+        let now = ProcessInfo.processInfo.systemUptime
+        guard wasMoving else { return }
+        // Late: the actor was busy with a pass, so frames queued behind it have not been looked at yet. Look again a
+        // window later instead of calling the content still.
+        if now - due > 0.1 { lastMotionAt = now; scheduleStill(); return }
+        guard stopped(at: now) else { scheduleStill(); return }
+        wasMoving = false
+        velocity = .zero
+        settleFrom = lastMotionCapture
+        Trace.mark("motion stopped (window \(Int(stillWindow * 1000)) ms)", since: lastMotionCapture)
+        // Nothing else changes at a stop: this is the one moment to cut a batch the still lens no longer needs and to
+        // start text the motion held back.
+        guard Self.planning else { return }
+        reconsider()
+        startQueue()
     }
 
     private func noteMotion(_ t: TimeInterval) {
@@ -433,6 +524,10 @@ actor RegionPipeline {
                     + [strip].compactMap { $0 }
             }
             apply(Move(area: area, dx: 0, dy: CGFloat(r.dy) * step, gx: 0, gy: gy, grayArea: g, strip: strip))
+            if scrollVelocity == nil || r.rect.width * r.rect.height > scrollArea {
+                scrollArea = r.rect.width * r.rect.height
+                scrollVelocity = CGVector(dx: 0, dy: CGFloat(r.dy) * step / CGFloat(min(max(frame.time - t0, 0.016), 0.5)))
+            }
             onScroll?(ScrollReport(area: CGRect(x: origin.x + area.minX / scale, y: origin.y + area.minY / scale,
                                                 width: area.width / scale, height: area.height / scale),
                                    shift: CGFloat(r.dy) * step / scale, from: t0, to: frame.time))
@@ -442,7 +537,16 @@ actor RegionPipeline {
     /// The visible lens (global Quartz points), for translating what the user sees first.
     /// A moving lens also holds off the settled re-read until it stops.
     func setVisible(_ rect: CGRect) {
-        if rect != visible { lensMoved = ProcessInfo.processInfo.systemUptime }
+        let now = ProcessInfo.processInfo.systemUptime
+        if rect != visible {
+            // A dragged lens moves the text the opposite way relative to it.
+            if rect.size == visible.size {
+                let dt = min(max(now - lastVisibleChange, 0.016), 0.5)
+                noteMotionFrame(captured: now, velocity: CGVector(dx: -(rect.minX - visible.minX) * scale / dt, dy: -(rect.minY - visible.minY) * scale / dt))
+            }
+            lensMoved = now
+            lastVisibleChange = now
+        }
         visible = rect
         reconsider()
     }
@@ -942,7 +1046,7 @@ actor RegionPipeline {
                     Task { await self.streamed(source, translated, epoch: epoch, flight: id) }
                 }
             }
-            flight = Flight(id: id, batch: batch, afterLensPreemption: lastCutByLens, task: task)
+            flight = Flight(id: id, batch: batch, started: ProcessInfo.processInfo.systemUptime, afterLensPreemption: lastCutByLens, task: task)
             reconsider()
             let outcome = await task.value
             if flight?.id == id {
@@ -1004,16 +1108,32 @@ actor RegionPipeline {
     /// or results change, never on a timer.
     private func checkPreempt() {
         guard let f = flight, f.cut == nil else { return }
-        let lens = lensRect
-        let standings = f.batch.filter { !f.done.contains($0) && translator.cached($0) == nil }.map { source -> TranslationScheduling.Standing in
+        let lens = lensRect, now = ProcessInfo.processInfo.systemUptime
+        let moving = isMoving(at: now)
+        let planned = translator.expectedSeconds(lines: 1) == nil ? nil : motionVelocity(at: now)
+        // Once content is still, `lead` only ranks the overscan: text on the leading side is no longer on its way in.
+        let lead = moving ? lead : .zero
+        let unfinished = f.batch.filter { !f.done.contains($0) && translator.cached($0) == nil }
+        let standings = unfinished.map { source -> TranslationScheduling.Standing in
             let s = blocks.filter { $0.source == source && $0.translation == nil }
                 .map { TranslationScheduling.standing(of: $0.rect, lens: lens, lead: lead) }
             return s.contains(.lens) ? .lens : s.contains(.leading) ? .leading : s.isEmpty ? .gone : .other
         }
         let batch = Set(f.batch)
         let lensWaiting = blocks.contains { $0.translation == nil && $0.rect.intersects(lens) && pending.contains($0.source) && !batch.contains($0.source) }
-        guard let why = TranslationScheduling.preemption(unfinished: standings, lensWaiting: lensWaiting,
-                                                         afterLensPreemption: f.afterLensPreemption) else { return }
+        var why = TranslationScheduling.preemption(unfinished: standings, lensWaiting: lensWaiting,
+                                                   afterLensPreemption: f.afterLensPreemption, moving: moving)
+        if why == nil, let v = planned, !unfinished.isEmpty {
+            // What the engine can still deliver, against how long each source stays in the lens.
+            let dwells = unfinished.map { source in
+                blocks.filter { $0.source == source && $0.translation == nil }
+                    .map { TranslationScheduling.dwell(of: $0.rect, lens: lens, velocity: v) ?? .infinity }.max() ?? 0
+            }
+            let remaining = translator.remainingSeconds(lines: unfinished.count + f.done.count, delivered: f.done.count,
+                                                        elapsed: now - f.started) ?? 0
+            if TranslationScheduling.tooLate(dwells: dwells, remaining: remaining) { why = .tooLate }
+        }
+        guard let why else { return }
         flight?.cut = why
         Trace.count("translate.cancelled")
         Trace.mark("translate cancelled (\(why)): \(standings)", since: Trace.now)
@@ -1049,6 +1169,10 @@ actor RegionPipeline {
             }
         }
         for b in blocks where b.translation == nil && lensSeen[b.id] == nil && b.rect.intersects(lens) { lensSeen[b.id] = now }
+        if let from = settleFrom, !blocks.contains(where: { $0.translation == nil && $0.rect.intersects(lens) }) {
+            settleFrom = nil
+            Trace.sample("translate.settle_ms", (now - from) * 1000)
+        }
     }
 
     private var lensPending: Bool {
@@ -1059,11 +1183,22 @@ actor RegionPipeline {
         // Forget text that is gone or already translated.
         pending.formIntersection(blocks.filter { $0.translation == nil }.map(\.source))
         guard !pending.isEmpty else { return nil }
+        let lens = lensRect, now = ProcessInfo.processInfo.systemUptime
+        // While content moves at a known speed, start only what will still be in the lens when the engine is done; the
+        // rest waits (every pass looks again) until the motion slows or stops.
+        // Rules that need the engine's pace stay off until its first result has been seen.
+        if let v = motionVelocity(at: now), translator.expectedSeconds(lines: 1) != nil {
+            let candidates = blocks.filter { $0.translation == nil && pending.contains($0.source) }
+                .map { TranslationScheduling.Candidate(source: $0.source, rect: $0.rect) }
+            let batch = TranslationScheduling.batch(from: candidates, lens: lens, velocity: v, limit: 3,
+                                                    expectedSeconds: { [translator] in translator.expectedSeconds(lines: $0) ?? 0 })
+            return batch.isEmpty ? nil : batch
+        }
         var seen = Set<String>()
-        // Text motion has left far behind waits: `fillTranslations` re-queues it on every pass, and it is eligible again
-        // once the lead ends.
-        let lens = lensRect
-        let ordered = blocks.filter { !TranslationScheduling.isTrailing($0.rect, lens: lens, lead: lead) }
+        // Motion without a speed (an animation, a page flip) still holds back text it has left far behind; `fillTranslations`
+        // re-queues it on every pass. Once content is still, `lead` ranks the overscan only and holds nothing back.
+        let moving = isMoving(at: now)
+        let ordered = blocks.filter { !(moving && TranslationScheduling.isTrailing($0.rect, lens: lens, lead: lead)) }
             .sorted { priority($0.rect) < priority($1.rect) }.map(\.source)
             .filter { pending.contains($0) && seen.insert($0).inserted }
         return Array(ordered.prefix(3))
@@ -1083,7 +1218,11 @@ actor RegionPipeline {
     private func streamed(_ source: String, _ translated: String, epoch: Int, flight id: Int) {
         guard epoch == translationEpoch else { return }
         if flight?.id == id { flight?.done.insert(source) }
+        let lens = lensRect
+        let standings = blocks.filter { $0.source == source && $0.translation == nil }
+            .map { TranslationScheduling.standing(of: $0.rect, lens: lens, lead: lead) }
         if !blocks.contains(where: { $0.source == source }) { Trace.count("translate.wasted") }
+        else if !standings.isEmpty, standings.allSatisfy({ $0 == .other }) { Trace.count("translate.landed_outside") }
         receive([source: translated], epoch: epoch)
     }
 

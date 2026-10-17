@@ -228,6 +228,7 @@ enum SelfTest {
                 keeping.observe(still.latest, lens: lensRect, time: phase)
             }
         }
+        printPace(translator)
         for (source, translation) in await pipeline.debugState().blocks {
             print("  \(source)\n    → \(translation ?? "(no translation)")")
         }
@@ -274,17 +275,30 @@ enum SelfTest {
     /// The work done since the last call: OCR requests, erases, engine calls.
     private static func printCounts(_ phase: String, _ pipeline: RegionPipeline? = nil) async {
         var counts = Trace.takeCounts()
-        for key in ["translate.cancelled", "translate.wasted", "translate.lens_unserved"] where counts[key] == nil { counts[key] = 0 }
+        for key in ["translate.cancelled", "translate.wasted", "translate.landed_outside", "translate.lens_unserved"] where counts[key] == nil { counts[key] = 0 }
         var parts = counts.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }
         // How long text waited for its translation while in the lens (first seen there → translated).
         let samples = Trace.takeSamples()
-        let waits = (samples["translate.lens_wait_ms"] ?? []).sorted()
         let engine = (samples["translate.engine_ms"] ?? []).sorted()
         engineMs += engine
         if !engine.isEmpty { parts.append(String(format: "engine_ms[p50=%.0f max=%.0f n=%d]", engine[engine.count / 2], engine[engine.count - 1], engine.count)) }
-        parts.append(waits.isEmpty ? "lens_wait=n/a" : String(format: "lens_wait_ms[p50=%.0f max=%.0f n=%d]", waits[waits.count / 2], waits[waits.count - 1], waits.count))
+        func summary(_ name: String, _ key: String) -> String {
+            let all = samples[key] ?? [], v = all.sorted()
+            return v.isEmpty ? "\(name)=n/a" : String(format: "\(name)_ms[p50=%.0f max=%.0f last=%.0f n=%d]", v[v.count / 2], v[v.count - 1], all[all.count - 1], v.count)
+        }
+        parts.append(summary("lens_wait", "translate.lens_wait_ms"))
+        // From the stop of the motion to every block in the lens being translated.
+        parts.append(summary("settle", "translate.settle_ms"))
         if let pipeline { parts.append("parked=\(await pipeline.debugState().parked)") }
         print("work[\(phase)]: " + parts.joined(separator: " "))
+    }
+
+    /// The engine's measured speed per namespace (numbers only), from `TranslationService.paceStats()`.
+    private static func printPace(_ translator: TranslationService) {
+        func f(_ v: Double?) -> String { v.map { String(format: "%.2f", $0) } ?? "n/a" }
+        for p in translator.paceStats() {
+            print("pace: \(p.key) samples=\(p.samples) first=\(f(p.first))s perLine=\(f(p.perLine))s batch[p50=\(f(p.batchP50))s p90=\(f(p.batchP90))s n=\(p.batches)] cancelled=\(p.cancelled) lines[cached=\(p.cachedLines) translated=\(p.translatedLines)]")
+        }
     }
 
     /// Drives the pipeline the way `RegionSession` does while a lens is dragged, with frames cropped from `screen`.
@@ -401,7 +415,8 @@ enum SelfTest {
             }
             drifts.append(drift)
             keeping.observe(collector.latest, lens: lens, time: ProcessInfo.processInfo.systemUptime - began)
-            let flight = await pipeline.debugState().flight
+            let state = await pipeline.debugState()
+            let flight = state.flight, motion = state.motion
             guard let out = ctx.makeImage() else { return }
             let url = outdir.appendingPathComponent(String(format: "frame_%03d.png", frameIndex))
             if let dest = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil) {
@@ -409,8 +424,9 @@ enum SelfTest {
                 CGImageDestinationFinalize(dest)
             }
             frameIndex += 1
-            print(String(format: "frame %03d lens (%4.0f,%4.0f) capture (%4.0f,%4.0f %4.0f×%4.0f) blocks shown %d drift %.1f flight [%@]",
+            print(String(format: "frame %03d lens (%4.0f,%4.0f) capture (%4.0f,%4.0f %4.0f×%4.0f) blocks shown %d drift %.1f %@ flight [%@]",
                          frameIndex - 1, lens.minX, lens.minY, capture.minX, capture.minY, capture.width, capture.height, shown, drift,
+                         String(format: "%@ v=%.0f L=%@", motion.moving ? "moving" : "still", motion.velocity.dy, motion.expected.map { String(format: "%.1f", $0) } ?? "n/a"),
                          flight.joined(separator: " ")))
         }
 
@@ -507,6 +523,9 @@ enum SelfTest {
         for (source, translation) in await pipeline.debugState().blocks {
             print("  \(source) → \(translation ?? "(no translation)")")
         }
+        printPace(translator)
+        let lensState = await pipeline.debugState().lens
+        print("lens at end: \(lensState.total) blocks, \(lensState.untranslated) untranslated")
         await printCounts(CommandLine.arguments.contains("--back") ? "back" : "moved")
         try keeping.finish(collector.latest, lens: lens, time: ProcessInfo.processInfo.systemUptime - began)
         print(String(format: "drift: mean %.1f pt, max %.1f pt, %d of %d frames over 2 pt", drifts.reduce(0, +) / CGFloat(max(1, drifts.count)),

@@ -301,7 +301,7 @@ actor TranslationService {
                 case .cancelled:
                     break
                 case let .failed(error):
-                    engineFailed(engine, reason: (error as? EngineError)?.userMessage ?? error.localizedDescription,
+                    engineFailed(engine, reason: (error as? EngineError)?.localizedMessage ?? error.localizedDescription,
                                  after: error, appleSpace: appleSpace)
                     run = await attempt(items, source: source, via: .apple, onResult: onResult)
                 case .timedOut:

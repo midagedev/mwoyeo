@@ -99,12 +99,12 @@ struct EngineSheet: View {
         Form {
             Section("On this Mac") {
                 ForEach(Self.localNames, id: \.self) { name in
-                    if let p = Self.preset(name) { pickRow(verbatim: p.name, verbatim: p.hint, status: localRunning[p.name]) { begin(preset: p) } }
+                    if let p = Self.preset(name) { pickRow(verbatim: p.name, verbatim: p.localizedHint, status: localRunning[p.name]) { begin(preset: p) } }
                 }
             }
             Section("Cloud") {
                 ForEach(Self.cloudNames, id: \.self) { name in
-                    if let p = Self.preset(name) { pickRow(verbatim: p.name, verbatim: p.hint) { begin(preset: p) } }
+                    if let p = Self.preset(name) { pickRow(verbatim: p.name, verbatim: p.localizedHint) { begin(preset: p) } }
                 }
             }
             Section("Connect your own") {
@@ -563,7 +563,7 @@ struct EngineSheet: View {
                 case let .failure(error):
                     guard !Task.isCancelled else { return }
                     models = []
-                    work = .failed(error.userMessage)
+                    work = .failed(error.localizedMessage)
                     return
                 }
             }
@@ -574,7 +574,7 @@ struct EngineSheet: View {
         work = .working
         let r = await model.translator.engineProbe(config)
         guard !Task.isCancelled else { return }
-        if let error = r.error { work = .failed(error.userMessage) }
+        if let error = r.error { work = .failed(error.localizedMessage) }
         else { work = .ok(sample: r.sample ?? "", ms: r.ms) }
     }
 

@@ -11,7 +11,10 @@
 #   short       one translation fewer than lines (when more than one line), else ok
 #   slow:<ms>   like ok, after <ms> milliseconds
 #   401         HTTP 401 with an OpenAI-style error body
-#   429         HTTP 429 with an OpenAI-style error body
+#   429         HTTP 429 with an OpenAI-style error body and `Retry-After: 7`
+#   401echo     HTTP 401 whose message echoes the bearer token, as OpenAI's "Incorrect API key provided: sk-..." does
+#   hang        read the request, log it, and never answer (for cancellation tests); slow:<ms> also applies to the
+#               Anthropic and DeepL routes
 #   garbage     content "sure! here you go"
 #   strict      HTTP 400 when the body has `temperature` (OpenAI's real gpt-5-nano error, captured 2026-10-17) or
 #               `reasoning_effort` (same shape, message written by hand); else like ok. For the app's retry-without-field path.
@@ -45,9 +48,16 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args):
         pass
 
-    def send_json(self, status, obj):
+    def pause(self, default=0.05):
+        if MODE == "hang":
+            time.sleep(3600)
+        time.sleep(int(MODE.split(":", 1)[1]) / 1000 if MODE.startswith("slow:") else default)
+
+    def send_json(self, status, obj, headers=None):
         data = json.dumps(obj, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
+        for k, v in (headers or {}).items():
+            self.send_header(k, v)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(data)))
         self.end_headers()
@@ -78,7 +88,7 @@ class Handler(BaseHTTPRequestHandler):
             if MODE == "garbage":
                 text = "sure! here you go"
             else:
-                time.sleep(0.05)
+                self.pause()
                 text = json.dumps({"translations": [f"⟦anthropic⟧ {l}" for l in lines]}, ensure_ascii=False)
             return self.send_json(200, {"id": "msg_mock", "type": "message", "role": "assistant", "model": "mock",
                                         "content": [{"type": "text", "text": text}], "stop_reason": "end_turn",
@@ -95,10 +105,12 @@ class Handler(BaseHTTPRequestHandler):
             self.log(len(texts), thinking_off)
             if MODE == "401":
                 return self.send_json(403, {"message": "Authorization failure, check auth_key"})
+            self.pause(0)
             return self.send_json(200, {"translations": [{"detected_source_language": "EN", "text": f"⟦{target}⟧ {t}"} for t in texts]})
         self.log(1, thinking_off)
         if MODE == "401":
             return self.send_json(400, {"error": "Invalid API key"})
+        self.pause(0)
         return self.send_json(200, {"translatedText": f"⟦{req.get('target', 'T')}⟧ {req.get('q', '')}"})
 
     def do_POST(self):
@@ -128,6 +140,9 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(404, error_body("not found", "invalid_request_error", None))
         if MODE == "401":
             return self.send_json(401, error_body("Incorrect API key provided.", "invalid_request_error", "invalid_api_key"))
+        if MODE == "401echo":
+            token = (self.headers.get("Authorization") or "").removeprefix("Bearer ")
+            return self.send_json(401, error_body(f"Incorrect API key provided: {token}.", "invalid_request_error", "invalid_api_key"))
         if MODE == "strict":
             if "temperature" in req:
                 msg = "Unsupported value: 'temperature' does not support 0 with this model. Only the default (1) value is supported."
@@ -135,11 +150,8 @@ class Handler(BaseHTTPRequestHandler):
             if "reasoning_effort" in req:
                 return self.send_json(400, {"error": {"message": "Unsupported parameter: 'reasoning_effort' is not supported with this model.", "type": "invalid_request_error", "param": "reasoning_effort", "code": "unsupported_parameter"}})
         if MODE == "429":
-            return self.send_json(429, error_body("Rate limit reached.", "requests", "rate_limit_exceeded"))
-        delay = 0.05
-        if MODE.startswith("slow:"):
-            delay = int(MODE.split(":", 1)[1]) / 1000
-        time.sleep(delay)
+            return self.send_json(429, error_body("Rate limit reached.", "requests", "rate_limit_exceeded"), {"Retry-After": "7"})
+        self.pause()
         if MODE == "garbage":
             return self.send_json(200, envelope("sure! here you go"))
         out = [f"⟦{target}⟧ {line}" for line in lines]

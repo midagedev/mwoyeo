@@ -26,6 +26,12 @@ import UniformTypeIdentifiers
 /// Each step prints how far the shown translations are from the text they translate ("drift", points).
 /// `--blink x,y,w,h` (with `--pan`): instead of moving, an animated emoji plays there for `--hold-ms`, a frame every
 /// 100 ms; the work it causes is printed.
+///
+/// Keeping what the lens read (both modes; the lens is the whole capture unless `--lens x,y,w,h` — points in the image — is given):
+///   `--transcript dir` writes the lens's transcript (Markdown + two SRTs) into `dir`, with fake times in `--render` runs
+///   (one second per phase; `--then again` re-reads the same frame, a held subtitle);
+///   `--save-lens out.png` writes the lens image (the app's "Save Lens Image");
+///   `--copy` prints the original and translation lines the lens's copy actions would put on the pasteboard.
 enum SelfTest {
     static func run(_ args: [String]) -> Never {
         setvbuf(stdout, nil, _IOLBF, 0)
@@ -52,6 +58,55 @@ enum SelfTest {
         func put(_ s: OverlaySnapshot) { lock.withLock { snapshot = s } }
         func report(_ r: ScrollReport) { lock.withLock { reports.append(r) } }
         func drainReports() -> [ScrollReport] { lock.withLock { defer { reports = [] }; return reports } }
+    }
+
+    /// What `--transcript`, `--save-lens` and `--copy` ask for, fed the way the app feeds the lens's own actions.
+    private struct Keeping {
+        let writer: TranscriptWriter?
+        let saveTo: URL?
+        let copies: Bool
+
+        init(settings: AppSettings, option: (String) -> String?, args: [String]) {
+            writer = option("--transcript").map {
+                TranscriptWriter(directory: URL(fileURLWithPath: $0), lens: "Lens", sourceCode: settings.sourceLanguage,
+                                 targetCode: settings.targetLanguage, onError: { FileHandle.standardError.write("error: transcript write failed\n".data(using: .utf8)!) })
+            }
+            saveTo = option("--save-lens").map { URL(fileURLWithPath: $0) }
+            copies = args.contains("--copy")
+        }
+
+        func observe(_ snapshot: OverlaySnapshot?, lens: CGRect, time: TimeInterval) {
+            guard let snapshot else { return }
+            writer?.observe(time: time, lines: LensText.observed(snapshot, lens: lens))
+        }
+
+        /// The end of the run: closes the transcript, writes the lens image, prints the copy lines.
+        func finish(_ snapshot: OverlaySnapshot?, lens: CGRect, time: TimeInterval) throws {
+            writer?.finishAndWait(time: time)
+            guard let snapshot else { return }
+            if let saveTo {
+                guard let frame = snapshot.frame,
+                      let image = LensImage.composite(frame: frame, scale: snapshot.scale,
+                                                      layers: snapshot.blocks.map { .init(frame: $0.frame, image: $0.image) },
+                                                      crop: lens.offsetBy(dx: -snapshot.origin.x, dy: -snapshot.origin.y))
+                else { throw Failure(description: "no frame to save the lens image from") }
+                try LensImage.writePNG(image, to: saveTo)
+                print("wrote lens image \(saveTo.path) (\(image.width)×\(image.height))")
+            }
+            if copies {
+                let blocks = LensText.inLens(snapshot, lens: lens)
+                let originals = LensText.originals(blocks), translations = LensText.translations(blocks)
+                print("copy original: \(originals.count) lines")
+                originals.forEach { print("  \($0)") }
+                print("copy translation: \(translations.count) lines")
+                translations.forEach { print("  \($0)") }
+            }
+        }
+    }
+
+    private static func lensOption(_ option: (String) -> String?, default whole: CGRect) -> CGRect {
+        let v = (option("--lens") ?? "").split(separator: ",").compactMap { Double($0) }
+        return v.count == 4 ? CGRect(x: v[0], y: v[1], width: v[2], height: v[3]) : whole
     }
 
     private static func render(_ args: [String]) async throws {
@@ -102,7 +157,13 @@ enum SelfTest {
                                       onSnapshot: { collector.put($0) })
         let gray = rgba.withBGRA { GrayImage(bgra: $0, width: rgba.width, height: rgba.height, bytesPerRow: rgba.width * 4, step: 4) }
         let start = Date()
-        await pipeline.ingest(CapturedFrame(image: image, gray: gray, grayStep: 4, scale: scale, rect: capture, time: ProcessInfo.processInfo.systemUptime))
+        func capturedFrame() -> CapturedFrame {
+            CapturedFrame(image: image, gray: gray, grayStep: 4, scale: scale, rect: capture, time: ProcessInfo.processInfo.systemUptime)
+        }
+        await pipeline.ingest(capturedFrame())
+        let keeping = Keeping(settings: settings, option: option, args: args)
+        let lensRect = lensOption(option, default: capture)
+        var phase = 0.0
 
         // Wait for reading + translation to finish (or give up after `--max-wait`, 120 s by default).
         let maxWait = Double(option("--max-wait") ?? "120") ?? 120
@@ -122,7 +183,9 @@ enum SelfTest {
                 try? await Task.sleep(for: .milliseconds(ms))
                 return
             }
-            if step == "style" {
+            if step == "again" {
+                await pipeline.ingest(capturedFrame())   // the same screen read again: a held subtitle
+            } else if step == "style" {
                 settings.fontStyle = settings.fontStyle == .serif ? .system : .serif
                 settings.boxOpacity = settings.boxOpacity == 1 ? 0.94 : 1
             } else {
@@ -146,16 +209,20 @@ enum SelfTest {
             try await settle(from: start)
             print("pipeline: \(ms(start)) ms")
             await printCounts("still", pipeline)
+            keeping.observe(collector.latest, lens: lensRect, time: phase)
         } else {
             try await settle(from: start)
             print("pipeline: \(ms(start)) ms")
             await printCounts("still", pipeline)
+            keeping.observe(collector.latest, lens: lensRect, time: phase)
             for step in steps {
                 let t = Date()
                 await applyThen(step)
                 try await settle(from: t)
                 print("then \(step): \(ms(t)) ms")
                 await printCounts(step, pipeline)
+                phase += 1
+                keeping.observe(collector.latest, lens: lensRect, time: phase)
             }
         }
         for (source, translation) in await pipeline.debugState().blocks {
@@ -163,22 +230,12 @@ enum SelfTest {
         }
         await printEngineSummary(translator, issues: issues, wasAdded: !settings.engines.isEmpty)
 
-        // Composite: original + overlay blocks (frames are in points; multiply by scale).
-        guard let ctx = CGContext(data: nil, width: image.width, height: image.height, bitsPerComponent: 8, bytesPerRow: 0,
-                                  space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
-        else { throw Failure(description: "context") }
-        let h = CGFloat(image.height)
-        ctx.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height))
-        for b in collector.latest?.blocks ?? [] {
-            let r = CGRect(x: b.frame.minX * scale, y: h - b.frame.maxY * scale, width: b.frame.width * scale, height: b.frame.height * scale)
-            ctx.draw(b.image, in: r)
-        }
-        guard let out = ctx.makeImage(),
-              let dest = CGImageDestinationCreateWithURL(output as CFURL, UTType.png.identifier as CFString, 1, nil)
-        else { throw Failure(description: "cannot write \(output.path)") }
-        CGImageDestinationAddImage(dest, out, nil)
-        guard CGImageDestinationFinalize(dest) else { throw Failure(description: "cannot write \(output.path)") }
+        // Composite: original + overlay blocks, the same function the lens image uses.
+        let layers = (collector.latest?.blocks ?? []).map { LensImage.Layer(frame: $0.frame, image: $0.image) }
+        guard let out = LensImage.composite(frame: image, scale: scale, layers: layers) else { throw Failure(description: "context") }
+        do { try LensImage.writePNG(out, to: output) } catch { throw Failure(description: "cannot write \(output.path)") }
         print("wrote \(output.path)")
+        try keeping.finish(collector.latest, lens: lensRect, time: phase + 1)
     }
 
     private final class Counter: @unchecked Sendable {
@@ -259,6 +316,8 @@ enum SelfTest {
         var wide = false
         var capture = Overscan.rect(around: lens, wide: wide, display: display)
         let collector = Collector()
+        let keeping = Keeping(settings: settings, option: option, args: CommandLine.arguments)
+        let began = ProcessInfo.processInfo.systemUptime
         let pipeline = RegionPipeline(options: PipelineOptions(settings), capture: capture, translator: translator, inpainter: inpainter,
                                       onSnapshot: { collector.put($0) })
         await pipeline.setVisible(lens)
@@ -339,6 +398,7 @@ enum SelfTest {
                 }
             }
             drifts.append(drift)
+            keeping.observe(collector.latest, lens: lens, time: ProcessInfo.processInfo.systemUptime - began)
             let flight = await pipeline.debugState().flight
             guard let out = ctx.makeImage() else { return }
             let url = outdir.appendingPathComponent(String(format: "frame_%03d.png", frameIndex))
@@ -446,6 +506,7 @@ enum SelfTest {
             print("  \(source) → \(translation ?? "(no translation)")")
         }
         await printCounts(CommandLine.arguments.contains("--back") ? "back" : "moved")
+        try keeping.finish(collector.latest, lens: lens, time: ProcessInfo.processInfo.systemUptime - began)
         print(String(format: "drift: mean %.1f pt, max %.1f pt, %d of %d frames over 2 pt", drifts.reduce(0, +) / CGFloat(max(1, drifts.count)),
                      drifts.max() ?? 0, drifts.filter { $0 > 2 }.count, drifts.count))
         await printEngineSummary(translator, issues: issues, wasAdded: !settings.engines.isEmpty)

@@ -43,6 +43,8 @@ struct KeyCombo: Codable, Equatable {
 
 enum HotKeyAction: String, Codable, CaseIterable, Identifiable {
     case addLens, toggleOriginal, pause, refresh
+    /// Lens actions, no default combo; they act on the lens under the pointer, else the newest one.
+    case saveLensImage, copyOriginal, readAloud
 
     var id: String { rawValue }
     var title: String {
@@ -51,6 +53,9 @@ enum HotKeyAction: String, Codable, CaseIterable, Identifiable {
         case .toggleOriginal: String(localized: "Show Original")
         case .pause: String(localized: "Pause")
         case .refresh: String(localized: "Translate Again")
+        case .saveLensImage: String(localized: "Save Lens Image")
+        case .copyOriginal: String(localized: "Copy Original Text")
+        case .readAloud: String(localized: "Read Aloud")
         }
     }
 

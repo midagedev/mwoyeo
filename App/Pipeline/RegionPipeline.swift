@@ -26,6 +26,14 @@ struct OverlayBlock: Identifiable, @unchecked Sendable {
     var seamless: Bool
 }
 
+/// What a block reads, for the lens's own text actions (copy, transcripts): region-local frame in points (top-left
+/// origin) like `OverlayBlock`, whether or not it has a rendered translation.
+struct BlockText: Sendable, Equatable {
+    var frame: CGRect
+    var source: String
+    var translation: String?
+}
+
 struct OverlaySnapshot: @unchecked Sendable {
     let version: Int
     let blocks: [OverlayBlock]
@@ -35,6 +43,11 @@ struct OverlaySnapshot: @unchecked Sendable {
     let origin: CGPoint
     /// Capture time of the newest frame the block positions follow; scrolling after it is the overlay's to predict.
     var time: TimeInterval = 0
+    /// Every block's text, rendered or not.
+    var texts: [BlockText] = []
+    /// The newest captured frame (nil right after the capture moved) and its image pixels per point, for saving the lens.
+    var frame: CGImage?
+    var scale: CGFloat = 2
 }
 
 /// Content scrolled by `shift` points (positive = down) in `area` (global Quartz points) between frames captured at
@@ -1119,7 +1132,10 @@ actor RegionPipeline {
             return OverlayBlock(id: b.id, frame: CGRect(x: b.rect.minX / s, y: b.rect.minY / s, width: b.rect.width / s, height: b.rect.height / s),
                                 image: img, seamless: b.erased != nil)
         }
-        onSnapshot(OverlaySnapshot(version: version, blocks: out, animated: animated, origin: origin, time: frameTime))
+        let texts = blocks.map { BlockText(frame: CGRect(x: $0.rect.minX / s, y: $0.rect.minY / s, width: $0.rect.width / s, height: $0.rect.height / s),
+                                           source: $0.source, translation: $0.translation) }
+        onSnapshot(OverlaySnapshot(version: version, blocks: out, animated: animated, origin: origin, time: frameTime,
+                                   texts: texts, frame: latest?.image, scale: s))
         dump(out)
     }
 

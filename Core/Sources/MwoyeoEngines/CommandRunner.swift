@@ -6,7 +6,8 @@ import MwoyeoCore
 /// No shell: the executable is started directly with the spec's arguments. A bare name is looked up in PATH. The child
 /// gets only PATH, HOME and LANG, so it does not inherit the app's whole environment (a user's script has no business
 /// seeing whatever else the app was launched with). stdout is read to EOF and capped at 1 MB; stderr keeps its last
-/// 4 KB for the error. On cancel the child gets SIGTERM, and SIGKILL one second later if it is still there.
+/// 4 KB for the error. The child leads its own process group; on cancel the group gets SIGTERM, and SIGKILL one second later if any
+/// member is still there (a grandchild holding stdout would otherwise keep the reader alive).
 enum CommandRunner {
     static let maxOutput = 1 << 20
     static let stderrTail = 4096
@@ -49,7 +50,8 @@ enum CommandRunner {
         private let spec: CommandSpec
         private let input: Data
         private let lock = NSLock()
-        private var process: Process?
+        /// The child, which is also its process group's id; nil before the spawn and after it is reaped.
+        private var pid: pid_t?
         private var cancelled = false
         private var continuation: CheckedContinuation<Outcome, Never>?
 
@@ -74,18 +76,16 @@ enum CommandRunner {
         func cancel() {
             lock.lock()
             cancelled = true
-            let p = process, c = continuation
+            let p = pid, c = continuation
             continuation = nil
             lock.unlock()
             c?.resume(returning: .cancelled)
-            if let p { stop(p) }
+            if let p { stop(group: p) }
         }
 
-        private func stop(_ p: Process) {
-            guard p.isRunning else { return }
-            let pid = p.processIdentifier
-            p.terminate()
-            DispatchQueue.global().asyncAfter(deadline: .now() + 1) { if p.isRunning { kill(pid, SIGKILL) } }
+        private func stop(group: pid_t) {
+            killpg(group, SIGTERM)
+            DispatchQueue.global().asyncAfter(deadline: .now() + 1) { killpg(group, SIGKILL) }
         }
 
         private func finish(_ outcome: Outcome) {
@@ -96,63 +96,95 @@ enum CommandRunner {
             c?.resume(returning: outcome)
         }
 
+        /// A pipe whose ends close on exec (the child's own copies are made by `dup2`, which clears the flag).
+        private static func pipe() -> (read: Int32, write: Int32)? {
+            var fds: [Int32] = [0, 0]
+            guard Darwin.pipe(&fds) == 0 else { return nil }
+            for fd in fds { _ = fcntl(fd, F_SETFD, FD_CLOEXEC) }
+            return (fds[0], fds[1])
+        }
+
+        /// Starts the program as the leader of a new process group; stdin, stdout and stderr are the given pipe ends.
+        private func spawn(_ executable: String, env: [String: String], stdin: Int32, stdout: Int32, stderr: Int32) -> pid_t? {
+            var actions: posix_spawn_file_actions_t?
+            var attrs: posix_spawnattr_t?
+            posix_spawn_file_actions_init(&actions)
+            posix_spawnattr_init(&attrs)
+            defer { posix_spawn_file_actions_destroy(&actions); posix_spawnattr_destroy(&attrs) }
+            posix_spawn_file_actions_adddup2(&actions, stdin, 0)
+            posix_spawn_file_actions_adddup2(&actions, stdout, 1)
+            posix_spawn_file_actions_adddup2(&actions, stderr, 2)
+            posix_spawnattr_setflags(&attrs, Int16(POSIX_SPAWN_SETPGROUP))
+            posix_spawnattr_setpgroup(&attrs, 0)
+            let argv = ([executable] + spec.arguments).map { strdup($0) } + [nil]
+            let envp = env.map { strdup("\($0.key)=\($0.value)") } + [nil]
+            defer { for p in argv + envp { free(p) } }
+            var child: pid_t = 0
+            return posix_spawn(&child, executable, &actions, &attrs, argv, envp) == 0 ? child : nil
+        }
+
         private func work() {
             guard let executable = CommandRunner.resolve(spec.executable) else {
                 return finish(.failed("command not found: \(spec.executable)"))
             }
             let env = ProcessInfo.processInfo.environment
-            let p = Process()
-            p.executableURL = URL(fileURLWithPath: executable)
-            p.arguments = spec.arguments
-            p.environment = ["PATH": CommandRunner.searchPath.joined(separator: ":"),
-                             "HOME": env["HOME"] ?? NSHomeDirectory(), "LANG": env["LANG"] ?? "en_US.UTF-8"]
-            let stdin = Pipe(), stdout = Pipe(), stderr = Pipe()
-            p.standardInput = stdin
-            p.standardOutput = stdout
-            p.standardError = stderr
-
-            lock.lock()
-            if cancelled { lock.unlock(); return }
-            process = p
-            lock.unlock()
-            do { try p.run() } catch { return finish(.failed("could not start \(spec.executable)")) }
-            lock.lock()
-            let late = cancelled
-            lock.unlock()
-            if late { stop(p) }
-
+            let childEnv = ["PATH": CommandRunner.searchPath.joined(separator: ":"),
+                            "HOME": env["HOME"] ?? NSHomeDirectory(), "LANG": env["LANG"] ?? "en_US.UTF-8"]
+            guard let stdin = Self.pipe(), let stdout = Self.pipe(), let stderr = Self.pipe() else {
+                return finish(.failed("could not start \(spec.executable)"))
+            }
             // A child that exits without reading its stdin must not kill us with SIGPIPE.
             signal(SIGPIPE, SIG_IGN)
+
+            lock.lock()
+            if cancelled { lock.unlock(); for fd in [stdin.read, stdin.write, stdout.read, stdout.write, stderr.read, stderr.write] { close(fd) }; return }
+            // Spawned under the lock, so a cancel sees either no child yet or the child's pid.
+            let spawned = spawn(executable, env: childEnv, stdin: stdin.read, stdout: stdout.write, stderr: stderr.write)
+            pid = spawned
+            lock.unlock()
+            close(stdin.read); close(stdout.write); close(stderr.write)
+            guard let child = spawned else {
+                close(stdin.write); close(stdout.read); close(stderr.read)
+                return finish(.failed("could not start \(spec.executable)"))
+            }
+
+            let stdinHandle = FileHandle(fileDescriptor: stdin.write, closeOnDealloc: true)
+            let stdoutHandle = FileHandle(fileDescriptor: stdout.read, closeOnDealloc: true)
+            let stderrHandle = FileHandle(fileDescriptor: stderr.read, closeOnDealloc: true)
             let payload = input
             DispatchQueue.global().async {
-                try? stdin.fileHandleForWriting.write(contentsOf: payload)
-                try? stdin.fileHandleForWriting.close()
+                try? stdinHandle.write(contentsOf: payload)
+                try? stdinHandle.close()
             }
             let group = DispatchGroup()
             let tail = TailBox()
             group.enter()
             DispatchQueue.global().async {
-                while let d = try? stderr.fileHandleForReading.read(upToCount: 4096), !d.isEmpty { tail.append(d) }
+                while let d = try? stderrHandle.read(upToCount: 4096), !d.isEmpty { tail.append(d) }
                 group.leave()
             }
 
             var out = Data()
             var overflow = false
-            while let d = try? stdout.fileHandleForReading.read(upToCount: 65536), !d.isEmpty {
+            while let d = try? stdoutHandle.read(upToCount: 65536), !d.isEmpty {
                 out.append(d)
                 if out.count > CommandRunner.maxOutput {
                     overflow = true
-                    p.terminate()
+                    stop(group: child)
                     break
                 }
             }
             group.wait()
-            p.waitUntilExit()
+            var status: Int32 = 0
+            while waitpid(child, &status, 0) < 0 && errno == EINTR {}
+            lock.withLock { pid = nil }
             if overflow { return finish(.failed("output is larger than 1 MB")) }
-            guard p.terminationStatus == 0 else {
+            let exited = (status & 0x7f) == 0
+            let code = (status >> 8) & 0xff
+            guard exited && code == 0 else {
                 let text = String(decoding: tail.data, as: UTF8.self)
                 return finish(.failed(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                                      ? "exit status \(p.terminationStatus)" : text))
+                                      ? (exited ? "exit status \(code)" : "terminated by signal \(status & 0x7f)") : text))
             }
             finish(.ok(out))
         }

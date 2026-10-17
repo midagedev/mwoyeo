@@ -1,5 +1,6 @@
 import CoreGraphics
 import Foundation
+import MwoyeoCore
 
 enum TranslationEngineChoice: String, Codable, CaseIterable, Identifiable {
     /// The language pack's fast model when installed, Apple Intelligence's translation model otherwise.
@@ -90,7 +91,14 @@ struct AppSettings: Codable, Equatable {
     /// BCP-47 identifier, or "auto" to detect per line.
     var sourceLanguage = "auto"
     var targetLanguage = Languages.preferredTarget
+    /// The Apple choice. Apple is what translates unless `customEngineID` names an added engine.
     var engine = TranslationEngineChoice.auto
+    /// Engines the user added (keys are in the Keychain, never here).
+    var engines: [EngineConfig] = []
+    /// The added engine in use; nil, or an id no longer in `engines`, means Apple.
+    var customEngineID: UUID?
+    /// Request fields each engine's server refused, learned at run time (not a cache: a quirk of that server and model).
+    var engineRejections: [UUID: [String]] = [:]
     var renderMode = RenderMode.adaptive
     var useInpaintingModel = true
     /// One "source = target" pair per line.
@@ -126,6 +134,10 @@ struct AppSettings: Codable, Equatable {
         sourceLanguage = try c.decodeIfPresent(String.self, forKey: .sourceLanguage) ?? d.sourceLanguage
         targetLanguage = try c.decodeIfPresent(String.self, forKey: .targetLanguage) ?? d.targetLanguage
         engine = (try? c.decodeIfPresent(TranslationEngineChoice.self, forKey: .engine)) ?? d.engine
+        // One engine this build cannot read (saved by a newer version) must not take the others with it.
+        engines = ((try? c.decodeIfPresent([Lossy<EngineConfig>].self, forKey: .engines)) ?? nil)?.compactMap(\.value) ?? d.engines
+        customEngineID = (try? c.decodeIfPresent(UUID.self, forKey: .customEngineID)) ?? d.customEngineID
+        engineRejections = (try? c.decodeIfPresent([UUID: [String]].self, forKey: .engineRejections)) ?? d.engineRejections
         renderMode = (try? c.decodeIfPresent(RenderMode.self, forKey: .renderMode)) ?? d.renderMode
         useInpaintingModel = try c.decodeIfPresent(Bool.self, forKey: .useInpaintingModel) ?? d.useInpaintingModel
         glossary = try c.decodeIfPresent(String.self, forKey: .glossary) ?? d.glossary
@@ -139,6 +151,12 @@ struct AppSettings: Codable, Equatable {
         cacheSize = max(100, try c.decodeIfPresent(Int.self, forKey: .cacheSize) ?? d.cacheSize)
         hasCompletedOnboarding = try c.decodeIfPresent(Bool.self, forKey: .hasCompletedOnboarding) ?? d.hasCompletedOnboarding
     }
+}
+
+/// Decodes to nil instead of throwing, so one bad element does not fail the array around it.
+private struct Lossy<T: Decodable>: Decodable {
+    let value: T?
+    init(from decoder: Decoder) throws { value = try? T(from: decoder) }
 }
 
 /// A screen area being translated.

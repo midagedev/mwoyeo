@@ -36,6 +36,9 @@ targets:
         LSMinimumSystemVersion: "26.0"
         LSUIElement: true
         NSHumanReadableCopyright: "© 2026 midagedev"
+        # Ollama, LM Studio, LibreTranslate and DeepLX answer on http://localhost, which ATS blocks by default.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
         NSScreenCaptureUsageDescription: "Mwoyeo reads the text under your lenses so it can translate it in place."
     settings:
       base:

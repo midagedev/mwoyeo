@@ -18,9 +18,13 @@
 #   garbage     content "sure! here you go"
 #   strict      HTTP 400 when the body has `temperature` (OpenAI's real gpt-5-nano error, captured 2026-10-17) or
 #               `reasoning_effort` (same shape, message written by hand); else like ok. For the app's retry-without-field path.
+#   echo:<text> like ok, but a line containing <text> comes back unchanged (an engine that did not translate it)
 # <target> is read from the system prompt's "into X" phrase, or "T".
-# Each request logs one line to stderr: method, path, line count, mode, auth present/absent (never the value), and
-# thinking_off=yes when the JSON body carried any of reasoning_effort, reasoning, thinking, enable_thinking, think.
+# With the `native` flag, for a Korean, Japanese or Chinese target the chat route adds a word in that script after the line ("번역"), so the app's
+# untranslated-line check, which looks for the target script, accepts the mock's output.
+# Each request logs one line to stderr: method, path, line count, mode, auth present/absent (never the value),
+# thinking_off=yes when the JSON body carried any of reasoning_effort, reasoning, thinking, enable_thinking, think,
+# and with the `stamp` flag t=<unix seconds>.
 import json
 import re
 import urllib.parse
@@ -30,6 +34,15 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8765
 MODE = sys.argv[2] if len(sys.argv) > 2 else "ok"
+# Optional third argument, comma-separated: `native` (add a target-script word, see above), `stamp` (t= in the log).
+FLAGS = set(sys.argv[3].split(",")) if len(sys.argv) > 3 else set()
+
+
+NATIVE = {"Korean": "번역", "Japanese": "翻訳", "Chinese": "翻译"}
+
+
+def native_word(target):
+    return next((w for name, w in NATIVE.items() if name in target), "")
 
 
 def envelope(content):
@@ -66,7 +79,7 @@ class Handler(BaseHTTPRequestHandler):
     def log(self, count, thinking_off=False):
         auth = "present" if (self.headers.get("Authorization") or self.headers.get("x-api-key")) else "absent"
         off = "yes" if thinking_off else "no"
-        print(f"{self.command} {self.path} lines={count} mode={MODE} auth={auth} thinking_off={off}", file=sys.stderr, flush=True)
+        print(f"{self.command} {self.path} lines={count} mode={MODE} auth={auth} thinking_off={off}" + (f" t={time.time():.3f}" if "stamp" in FLAGS else ""), file=sys.stderr, flush=True)
 
     def do_GET(self):
         self.log("-")
@@ -154,7 +167,9 @@ class Handler(BaseHTTPRequestHandler):
         self.pause()
         if MODE == "garbage":
             return self.send_json(200, envelope("sure! here you go"))
-        out = [f"⟦{target}⟧ {line}" for line in lines]
+        word = native_word(target) if "native" in FLAGS else ""
+        echo = MODE.split(":", 1)[1] if MODE.startswith("echo:") else None
+        out = [line if echo and echo in line else f"⟦{target}⟧ {line} {word}".rstrip() for line in lines]
         if MODE == "short" and len(out) > 1:
             out = out[:-1]
         content = json.dumps({"translations": out}, ensure_ascii=False)

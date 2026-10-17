@@ -7,8 +7,9 @@ public enum TranslationCheck {
     /// target-script) and the translation's target-script share is no higher than the source's. A line with no
     /// letters (numbers, emoji) is never flagged. A name kept on purpose is not flagged either: a Latin line with a
     /// digit or an inner capital (`iPhone 17 Pro`) is a brand, and a brand inside a longer ko line raises the share.
-    /// Limits: Japanese and Chinese share Han, so an unchanged ja to zh line shows only as an equal string; a plain
-    /// capitalised name echoed unchanged (`Hello World`) is flagged, a one-word brand without digit or inner capital is too.
+    /// Limits: Japanese and Chinese share Han, so an unchanged ja to zh line shows only as an equal string; a Latin
+    /// line of one or two words, or one that starts with `#` or `@`, is taken as a name when echoed, so a real
+    /// two-word sentence an engine skipped (`Thank you`) goes unflagged.
     public static func isUntranslated(source: String, translation: String, target: String) -> Bool {
         let s = source.trimmingCharacters(in: .whitespacesAndNewlines)
         let t = translation.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -23,6 +24,9 @@ public enum TranslationCheck {
         guard s.unicodeScalars.allSatisfy({ $0.isASCII }) else { return false }
         let words = s.split(separator: " ")
         guard words.count <= 4 else { return false }
+        // A channel, tag or handle (`# general`, `@mina`), or one or two plain words, is a name an engine may keep:
+        // live Gemini and GPT both handed `# general` back (2026-10-17).
+        if s.first == "#" || s.first == "@" || words.count <= 2 { return true }
         return s.contains(where: \.isNumber) || words.contains { $0.dropFirst().contains(where: \.isUppercase) }
     }
 

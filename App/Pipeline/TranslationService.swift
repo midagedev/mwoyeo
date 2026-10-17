@@ -1,6 +1,7 @@
 import Foundation
 import FoundationModels
 import MwoyeoCore
+import MwoyeoEngines
 import NaturalLanguage
 import Translation
 
@@ -11,6 +12,8 @@ enum TranslationIssue: Error, Equatable, Sendable {
     case unsupportedPair(source: String, target: String)
     case failed(String)
     case timedOut
+    /// An added engine failed or timed out and Apple translates meanwhile. `reason` is the engine error's user message.
+    case engineUnavailable(name: String, reason: String)
 
     var message: String {
         switch self {
@@ -20,6 +23,7 @@ enum TranslationIssue: Error, Equatable, Sendable {
         case let .unsupportedPair(s, t): String(localized: "\(Languages.name(s)) → \(Languages.name(t)) translation is not supported.")
         case let .failed(why): String(localized: "Translation failed: \(why)")
         case .timedOut: String(localized: "Translation is taking too long. Trying again shortly.")
+        case let .engineUnavailable(name, reason): String(localized: "\(name) unavailable · using Apple") + " — " + reason
         }
     }
 }
@@ -62,31 +66,113 @@ actor TranslationService {
     private var pairStatus: [String: LanguageAvailability.Status] = [:]
     private let intelligence = IntelligenceTranslator()
     private var issueHandler: (@Sendable (TranslationIssue?) -> Void)?
+    /// The one client for every added engine: one connection pool, one place that remembers rejected request fields.
+    private let client: EngineClient
+    /// Told when an engine learns (or forgets) request fields its server rejects, so the app can save them with the engine.
+    private var rejectionHandler: (@Sendable (UUID, [String]) -> Void)?
+    /// Per engine: the fingerprint last seen (a change flushes what it learned) and the fields last reported.
+    private var fingerprints: [UUID: String] = [:]
+    private var rejectionsReported: [UUID: Set<String>] = [:]
+    private var enginesSynced = false
+    /// Engines that failed, and until when (`ProcessInfo.systemUptime`) groups go straight to Apple.
+    private var cooldowns: [UUID: Cooldown] = [:]
+    /// The added engine is failing and Apple is standing in: successful Apple groups must not clear its issue.
+    private var engineIssue: TranslationIssue?
 
-    init(settings: AppSettings) {
+    private struct Cooldown {
+        var backoff = RetryBackoff()
+        var until: TimeInterval = 0
+    }
+
+    init(settings: AppSettings, secrets: any SecretStore = KeychainSecrets()) {
         self.settings = settings
+        client = EngineClient(secrets: secrets)
         cache.use(Self.namespace(settings))
         cache.capacity = settings.cacheSize
     }
 
     func update(settings new: AppSettings) {
-        let changed = new.sourceLanguage != settings.sourceLanguage || new.targetLanguage != settings.targetLanguage
-            || new.glossary != settings.glossary || new.engine != settings.engine
         settings = new
+        enginesSynced = false
         cache.capacity = new.cacheSize
-        if changed {
+        let space = Self.namespace(new)
+        if space != cache.namespace {
             // Translations for the previous settings stay cached: switching back costs nothing.
-            cache.use(Self.namespace(new))
+            cache.use(space)
             sessions.removeAll()
+            if engineIssue != nil { engineIssue = nil; issueHandler?(nil) }
         }
     }
 
-    /// What a cached translation depends on besides the text.
-    private static func namespace(_ s: AppSettings) -> String {
-        "\(s.sourceLanguage)>\(s.targetLanguage)|\(s.engine.rawValue)|\(s.glossary.hashValue)"
+    /// The engine the user chose among the added ones; nil is Apple (also when the id no longer names one).
+    private var activeEngine: EngineConfig? { Self.activeEngine(settings) }
+
+    private static func activeEngine(_ s: AppSettings) -> EngineConfig? {
+        s.customEngineID.flatMap { id in s.engines.first { $0.id == id } }
+    }
+
+    /// What a cached translation depends on besides the text: pair | engine identity | glossary. The identity is the
+    /// Apple choice, or the added engine's id with a fingerprint of its kind, so editing its model or URL makes the old
+    /// entries unreachable while switching engines back and forth keeps each one's. The same string keys the pace stats.
+    /// `engine: nil` is Apple's namespace whatever engine is chosen (where a fallback stores).
+    private static func namespace(_ s: AppSettings, engine: EngineConfig?) -> String {
+        let identity = engine.map { "ext:\($0.id.uuidString.prefix(8)):\(fingerprint($0))" } ?? "apple:\(s.engine.rawValue)"
+        return "\(s.sourceLanguage)>\(s.targetLanguage)|\(identity)|\(s.glossary.hashValue)"
+    }
+
+    private static func namespace(_ s: AppSettings) -> String { namespace(s, engine: activeEngine(s)) }
+
+    /// 64-bit FNV-1a of the engine's kind as sorted-key JSON (id and name left out: renaming keeps the cache).
+    private static func fingerprint(_ e: EngineConfig) -> String {
+        let enc = JSONEncoder()
+        enc.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        guard let data = try? enc.encode(e), var obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return "0" }
+        obj["id"] = nil
+        obj["name"] = nil
+        let canonical = (try? JSONSerialization.data(withJSONObject: obj, options: [.sortedKeys, .withoutEscapingSlashes])) ?? Data()
+        var h: UInt64 = 0xcbf29ce484222325
+        for b in canonical { h = (h ^ UInt64(b)) &* 0x100000001b3 }
+        return String(h, radix: 16)
     }
 
     func setIssueHandler(_ h: @escaping @Sendable (TranslationIssue?) -> Void) { issueHandler = h }
+    func setRejectionHandler(_ h: @escaping @Sendable (UUID, [String]) -> Void) { rejectionHandler = h }
+
+    /// Request fields the active added engine's server refused (for the harness and the engine list).
+    func learnedFields() async -> [String] {
+        guard let e = activeEngine else { return [] }
+        return await client.learnedRejections(for: e.id).sorted()
+    }
+
+    /// Translations stored per namespace since launch (a debug view: where did a fallback's results go).
+    nonisolated var storeCounts: [String: Int] { cache.storeCounts }
+
+    /// Seeds the client with what the app saved for an engine seen for the first time, and lets go of what it learned for
+    /// one whose kind changed. Idempotent; runs before the first engine call after each settings change.
+    private func syncEngines() async {
+        enginesSynced = true
+        for e in settings.engines {
+            let fp = Self.fingerprint(e)
+            if let known = fingerprints[e.id], known != fp {
+                await client.seedRejections([], for: e.id)
+                rejectionsReported[e.id] = []
+                cooldowns[e.id] = nil
+                rejectionHandler?(e.id, [])
+            } else if fingerprints[e.id] == nil {
+                let saved = Set(settings.engineRejections[e.id] ?? [])
+                await client.seedRejections(saved, for: e.id)
+                rejectionsReported[e.id] = saved
+            }
+            fingerprints[e.id] = fp
+        }
+    }
+
+    private func reportRejections(_ e: EngineConfig) async {
+        let now = await client.learnedRejections(for: e.id)
+        guard now != rejectionsReported[e.id] ?? [] else { return }
+        rejectionsReported[e.id] = now
+        rejectionHandler?(e.id, now.sorted())
+    }
 
     /// Call after the user downloads a language pack.
     func invalidateAvailability() {
@@ -95,6 +181,11 @@ actor TranslationService {
     }
 
     func prewarm() async {
+        if let e = activeEngine {
+            // Opens the connection (TLS) before the first batch; Apple warms up below as the safety net.
+            if !enginesSynced { await syncEngines() }
+            _ = await withDeadline(Self.deadline(items: 1)) { await self.client.prewarm(e) }
+        }
         if settings.engine == .customModel { intelligence.prewarm(settings: settings); return }
         // Loading the translation model takes a moment the first time; do it before the first region.
         let source = settings.sourceLanguage == "auto" ? "ja" : settings.sourceLanguage
@@ -160,28 +251,44 @@ actor TranslationService {
         for source in order {
             if Task.isCancelled { outcome.cancelled = true; break }
             let items = groups[source]!
-            let streamed = Streamed()
-            let deliver: @Sendable (String, String) -> Void = { s, t in streamed.put(s, t); onResult?(s, t) }
             let space = cache.namespace
-            var translated: [String: String] = [:]
+            let appleSpace = Self.namespace(settings, engine: nil)
+            var run = await attempt(items, source: source, via: route(), onResult: onResult)
+            if case let .added(engine) = run.route {
+                switch run.status {
+                case .value:
+                    engineRecovered(engine)
+                case .cancelled:
+                    break
+                case let .failed(error):
+                    engineFailed(engine, reason: (error as? EngineError)?.userMessage ?? error.localizedDescription,
+                                 after: error, appleSpace: appleSpace)
+                    run = await attempt(items, source: source, via: .apple, onResult: onResult)
+                case .timedOut:
+                    engineFailed(engine, reason: String(localized: "The engine did not answer in time."), after: nil, appleSpace: appleSpace)
+                    run = await attempt(items, source: source, via: .apple, onResult: onResult)
+                }
+                await reportRejections(engine)
+            }
+            let translated = run.translated
+            // Whatever Apple translated, in a fallback or while the engine rests, is Apple's: it must not outlive the engine's recovery.
+            let storeSpace: String
+            if case .apple = run.route { storeSpace = appleSpace } else { storeSpace = space }
             var groupFailed = false, groupCancelled = false
-            switch await withDeadline(Self.deadline(items: items.count), { try await self.translateGroup(items, source: source, onResult: deliver) }) {
-            case let .value(r):
-                translated = r
-                issueHandler?(nil)
-            case let .failed(error) where Task.isCancelled && error is CancellationError:
+            switch run.status {
+            case .value:
+                // An added engine's issue stays up while Apple stands in for it.
+                if engineIssue == nil { issueHandler?(nil) }
+            case .cancelled:
                 // Not a failure: what streamed in is kept; the session is dropped as after a timeout (its state is unknown).
-                translated = streamed.all
                 groupCancelled = true
                 outcome.cancelled = true
                 dropSessions(source: source)
             case let .failed(error):
-                translated = streamed.all
                 groupFailed = true
                 dropSessions(source: source)
                 issueHandler?((error as? TranslationIssue) ?? .failed(error.localizedDescription))
             case .timedOut:
-                translated = streamed.all
                 groupFailed = true
                 dropSessions(source: source)
                 outcome.timedOut = true
@@ -191,7 +298,7 @@ actor TranslationService {
             let current = cache.namespace == space
             for (s, t) in translated {
                 outcome.translations[s] = t
-                if current { cache.store(t, for: s, in: space) }
+                if current { cache.store(t, for: s, in: storeSpace) }
             }
             if groupCancelled { break }
             let missing = items.filter { translated[$0] == nil }
@@ -204,13 +311,91 @@ actor TranslationService {
         return outcome
     }
 
+    // MARK: - Routing
+
+    private enum Route { case apple, added(EngineConfig) }
+
+    private enum Status {
+        case value
+        case failed(any Error)
+        case timedOut
+        case cancelled
+    }
+
+    private struct Attempt {
+        var route: Route
+        var translated: [String: String]
+        var status: Status
+    }
+
+    /// The added engine while it is not cooling down after a failure; Apple otherwise.
+    private func route() -> Route {
+        guard let e = activeEngine else { return .apple }
+        if let c = cooldowns[e.id], ProcessInfo.processInfo.systemUptime < c.until { return .apple }
+        return .added(e)
+    }
+
+    /// One group through one route, under one deadline. What streamed in before a deadline or a throw is kept.
+    /// Every result takes its display form here, whatever engine made it.
+    private func attempt(_ items: [String], source: String, via route: Route,
+                         onResult: (@Sendable (String, String) -> Void)?) async -> Attempt {
+        if !enginesSynced { await syncEngines() }
+        let streamed = Streamed()
+        let deliver: @Sendable (String, String) -> Void = { s, t in
+            let shown = TranslationCheck.displayForm(t)
+            streamed.put(s, shown)
+            onResult?(s, shown)
+        }
+        let result = await withDeadline(Self.deadline(items: items.count)) {
+            try await self.translateGroup(items, source: source, via: route, onResult: deliver)
+        }
+        var a = Attempt(route: route, translated: streamed.all, status: .value)
+        switch result {
+        case let .value(r):
+            a.translated = r.mapValues(TranslationCheck.displayForm)
+        case let .failed(error) where Task.isCancelled && error is CancellationError,
+             let .failed(error) where (error as? EngineError) == .cancelled:
+            a.status = .cancelled
+        case let .failed(error):
+            a.status = .failed(error)
+        case .timedOut:
+            a.status = .timedOut
+        }
+        return a
+    }
+
+    /// The engine answered: its cooldown and issue end, and Apple's stand-in entries stop being served.
+    private func engineRecovered(_ e: EngineConfig) {
+        cooldowns[e.id] = nil
+        cache.clearFallback()
+        if engineIssue != nil { engineIssue = nil; issueHandler?(nil) }
+    }
+
+    /// The engine failed: Apple takes this group at once, the engine rests (`Retry-After` capped at 120 s, else the
+    /// `RetryBackoff` steps), and while it rests lines Apple translated are served from Apple's own namespace.
+    private func engineFailed(_ e: EngineConfig, reason: String, after error: (any Error)?, appleSpace: String) {
+        let now = ProcessInfo.processInfo.systemUptime
+        var c = cooldowns[e.id] ?? Cooldown()
+        var pause = c.backoff.failure(now: now)
+        if case let .rateLimited(after?)? = error as? EngineError { pause = min(120, max(0, after)) }
+        c.until = now + pause
+        cooldowns[e.id] = c
+        cache.useFallback(appleSpace, until: c.until)
+        let issue = TranslationIssue.engineUnavailable(name: e.name, reason: reason)
+        // The same words are not said again for every group.
+        if engineIssue != issue { engineIssue = issue; issueHandler?(issue) }
+    }
+
     // MARK: - Engines
 
-    private func translateGroup(_ items: [String], source: String,
+    private func translateGroup(_ items: [String], source: String, via route: Route,
                                 onResult: @escaping @Sendable (String, String) -> Void) async throws -> [String: String] {
         Trace.count("translate.requests")
         Trace.count("translate.texts", items.count)
         Trace.mark("engine ← \(items.map { $0.debugDescription }.joined(separator: " | "))", since: Trace.now)
+        if case let .added(engine) = route {
+            return try await translateViaEngine(engine, items, source: source, onResult: onResult)
+        }
         if let fake = ProcessInfo.processInfo.environment["MWOYEO_FAKE_ENGINE"] {
             return try await fakeEngine(fake, items, onResult: onResult)
         }
@@ -225,6 +410,30 @@ actor TranslationService {
         guard source != "und" else { throw TranslationIssue.failed(String(localized: "Could not tell which language this is")) }
         let (session, _) = try await session(source: source)
         return try await stream(items, through: session, onResult: onResult)
+    }
+
+    /// One call to an added engine for the whole group (the engines translate a batch in one request, so results land
+    /// together). A line the engine handed back untranslated is missing, not stored and not shown. Provider-side prompt
+    /// caching is not used: the system prompt is far under the minimum size that providers cache.
+    private func translateViaEngine(_ engine: EngineConfig, _ items: [String], source: String,
+                                    onResult: @escaping @Sendable (String, String) -> Void) async throws -> [String: String] {
+        let clock = ContinuousClock()
+        let start = clock.now
+        let lines = try await client.translate(items, source: source == "und" ? nil : source, target: settings.targetLanguage,
+                                               glossary: settings.glossaryPairs, engine: engine)
+        Trace.sample("translate.engine_ms", Double((clock.now - start) / .milliseconds(1)))
+        guard lines.count == items.count else { throw EngineError.countMismatch(expected: items.count, got: lines.count) }
+        var out: [String: String] = [:]
+        for (s, raw) in zip(items, lines) {
+            let t = TranslationCheck.displayForm(raw)
+            if TranslationCheck.isUntranslated(source: s, translation: t, target: settings.targetLanguage) {
+                Trace.count("translate.untranslated")
+                continue
+            }
+            out[s] = t
+            onResult(s, t)
+        }
+        return out
     }
 
     private var fakeCalls = 0
@@ -309,7 +518,7 @@ actor TranslationService {
         var out: [String: String] = [:]
         for try await r in session.translate(batch: requests) {
             guard let id = r.clientIdentifier, let i = Int(id), i < items.count else { continue }
-            let t = applyGlossary(TranslationCleanup.restoreSourceTokens(TranslationCleanup.standaloneJamo(r.targetText), source: items[i]), source: items[i])
+            let t = applyGlossary(TranslationCleanup.restoreSourceTokens(r.targetText, source: items[i]), source: items[i])
             out[items[i]] = t
             onResult(items[i], t)
         }
@@ -361,8 +570,15 @@ private final class Memory: @unchecked Sendable {
     private let lock = NSLock()
     private let lru = LRUCache<String, String>(capacity: 5000)
     private var space = ""
+    /// While an added engine rests after a failure: Apple's namespace, read as a second place to look until `until`.
+    private var stand: (space: String, until: TimeInterval)?
+    private var stores: [String: Int] = [:]
     var namespace: String { lock.withLock { space } }
-    func use(_ namespace: String) { lock.withLock { space = namespace } }
+    func use(_ namespace: String) { lock.withLock { space = namespace; stand = nil } }
+    func useFallback(_ namespace: String, until: TimeInterval) { lock.withLock { stand = (namespace, until) } }
+    func clearFallback() { lock.withLock { stand = nil } }
+    /// How many translations each namespace has been given since launch (debug view; evictions are not subtracted).
+    var storeCounts: [String: Int] { lock.withLock { stores } }
     var capacity: Int {
         get { lock.withLock { lru.capacity } }
         set { lock.withLock { lru.capacity = max(1, newValue) } }
@@ -370,9 +586,18 @@ private final class Memory: @unchecked Sendable {
     var count: Int { lock.withLock { lru.count } }
     func removeAll() { lock.withLock { lru.removeAll() } }
     /// For the current settings.
-    subscript(text: String) -> String? { lock.withLock { lru[Self.key(text, space)] } }
+    subscript(text: String) -> String? {
+        lock.withLock {
+            if let hit = lru[Self.key(text, space)] { return hit }
+            guard let stand, ProcessInfo.processInfo.systemUptime < stand.until else { return nil }
+            return lru[Self.key(text, stand.space)]
+        }
+    }
     func store(_ translation: String, for text: String, in namespace: String) {
-        lock.withLock { lru[Self.key(text, namespace)] = translation }
+        lock.withLock {
+            lru[Self.key(text, namespace)] = translation
+            stores[namespace, default: 0] += 1
+        }
     }
     /// OCR spacing varies between reads of the same text: runs of whitespace count as one space, ends trimmed.
     private static func key(_ text: String, _ namespace: String) -> String {

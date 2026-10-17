@@ -78,4 +78,29 @@ import MwoyeoCore
         }
         #expect(gone)
     }
+
+    /// A grandchild that inherited stdout outlives its parent's death; only a signal to the whole group ends it (here both ignore SIGTERM, so it takes the SIGKILL a second later).
+    @Test func cancelKillsTheGrandchildToo() async throws {
+        let pidFile = FileManager.default.temporaryDirectory.appendingPathComponent("grandchild-\(UUID().uuidString).pid")
+        defer { try? FileManager.default.removeItem(at: pidFile) }
+        let e = engine("/bin/sh", ["-c", "trap '' TERM; sleep 30 & echo $! > '\(pidFile.path)'; wait"])
+        let task = Task { () -> EngineError? in
+            do throws(EngineError) { _ = try await client.translate(["a"], source: nil, target: "ko", glossary: [], engine: e); return nil } catch { return error }
+        }
+        var pid: pid_t = 0
+        for _ in 0..<100 {
+            if let s = try? String(contentsOf: pidFile, encoding: .utf8), let p = pid_t(s.trimmingCharacters(in: .whitespacesAndNewlines)) { pid = p; break }
+            try await Task.sleep(for: .milliseconds(30))
+        }
+        #expect(pid > 0)
+        task.cancel()
+        #expect(await task.value == EngineError.cancelled)
+        var gone = false
+        for _ in 0..<60 where !gone {
+            gone = kill(pid, 0) != 0 && errno == ESRCH
+            if !gone { try await Task.sleep(for: .milliseconds(50)) }
+        }
+        #expect(gone)
+        if !gone { kill(pid, SIGKILL) }
+    }
 }

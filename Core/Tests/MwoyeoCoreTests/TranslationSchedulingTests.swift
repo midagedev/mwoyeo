@@ -56,12 +56,15 @@ import Testing
     }
 
     @Test func aCancelledCallerOfWithDeadlineReturnsAtOnceAsCancelledNotTimedOut() async {
-        let start = ContinuousClock.now
         let task = Task { await withDeadline(.seconds(30)) { try await Task.sleep(for: .seconds(60)); return 1 } }
         try? await Task.sleep(for: .milliseconds(50))
+        let cancelled = ContinuousClock.now
         task.cancel()
         let r = await task.value
-        #expect(ContinuousClock.now - start < .milliseconds(150))
+        // Re-pinned 2026-10-17: the bound included the 50 ms lead-in and failed at 163 ms with the machine at load 160.
+        // The failure this guards is waiting for the deadline (30 s) or the work (60 s); 1 s from the cancel still
+        // separates those by 30x and a broken cancel path fails it.
+        #expect(ContinuousClock.now - cancelled < .seconds(1))
         guard case let .failed(e) = r else { Issue.record("expected .failed, got \(r)"); return }
         #expect(e is CancellationError)
     }

@@ -1,6 +1,7 @@
 import AppKit
 import ImageIO
 import MwoyeoCore
+import MwoyeoEngines
 import UniformTypeIdentifiers
 
 /// Headless end-to-end run on a still image:
@@ -10,6 +11,10 @@ import UniformTypeIdentifiers
 /// `--then-early ms` fires the `--then` steps `ms` after a translation batch is first in flight (a settings change
 /// mid-translation) and settles once at the end; `--max-wait s` is the settle ceiling (default 120).
 /// `MWOYEO_FAKE_ENGINE=hang|fail|fail-once|slow:<ms>` replaces the translation engine (see `TranslationService`).
+/// `--engine-config file.json` runs the pass through an added engine (an `EngineShare` file, as the app exports it) with
+/// the key from `MWOYEO_ENGINE_KEY` held in memory only; Apple stands in when the engine fails. It prints `engine: <name>
+/// <kind>`, `engine_ms` per phase, and at the end the issue count, the request fields the engine's server refused, and how
+/// many translations each cache namespace was given. A `--then` step `wait<ms>` just waits (a cooldown to run out).
 ///
 /// Simulated lens drag over a still "screen" (points; writes the lens view per step as outdir/frame_NNN.png):
 ///   Mwoyeo --render screen.png outdir --pan --lens x,y,w,h --to x,y [--steps 40] [--step-ms 100] [--hold-ms 3000]
@@ -68,9 +73,18 @@ enum SelfTest {
         settings.useInpaintingModel = !args.contains("--no-inpaint")
         let scale = CGFloat(Double(option("--scale") ?? "2") ?? 2)
 
-        let translator = TranslationService(settings: settings)
+        var secrets = MemorySecrets()
+        if let path = option("--engine-config") {
+            let config = try EngineShare.decode(try String(contentsOfFile: path, encoding: .utf8))
+            secrets = MemorySecrets([config.id: ProcessInfo.processInfo.environment["MWOYEO_ENGINE_KEY"] ?? ""])
+            settings.engines = [config]
+            settings.customEngineID = config.id
+            print("engine: \(config.name) \(kindName(config.kind))")
+        }
+        let translator = TranslationService(settings: settings, secrets: secrets)
+        let issues = Counter()
         await translator.setIssueHandler { issue in
-            if let issue { FileHandle.standardError.write("issue: \(issue.message)\n".data(using: .utf8)!) }
+            if let issue { issues.bump(); FileHandle.standardError.write("issue: \(issue.message)\n".data(using: .utf8)!) }
         }
         let t0 = Date()
         let inpainter = settings.useInpaintingModel ? Inpainter.load() : nil
@@ -78,7 +92,7 @@ enum SelfTest {
         if args.contains("--pan") {
             if option("--mode") == nil { settings.renderMode = .adaptive }
             try await pan(screen: image, scale: scale, settings: settings, translator: translator, inpainter: inpainter,
-                          outdir: output, option: option)
+                          outdir: output, issues: issues, option: option)
             return
         }
 
@@ -104,6 +118,10 @@ enum SelfTest {
         // `--then en,ko,style`: change the settings as the user would (target language, or "style" = font and box
         // opacity), and report what each change costs.
         func applyThen(_ step: String) async {
+            if step.hasPrefix("wait"), let ms = Int(step.dropFirst(4)) {
+                try? await Task.sleep(for: .milliseconds(ms))
+                return
+            }
             if step == "style" {
                 settings.fontStyle = settings.fontStyle == .serif ? .system : .serif
                 settings.boxOpacity = settings.boxOpacity == 1 ? 0.94 : 1
@@ -143,6 +161,7 @@ enum SelfTest {
         for (source, translation) in await pipeline.debugState().blocks {
             print("  \(source)\n    → \(translation ?? "(no translation)")")
         }
+        await printEngineSummary(translator, issues: issues, wasAdded: !settings.engines.isEmpty)
 
         // Composite: original + overlay blocks (frames are in points; multiply by scale).
         guard let ctx = CGContext(data: nil, width: image.width, height: image.height, bitsPerComponent: 8, bytesPerRow: 0,
@@ -162,6 +181,35 @@ enum SelfTest {
         print("wrote \(output.path)")
     }
 
+    private final class Counter: @unchecked Sendable {
+        private let lock = NSLock()
+        private var n = 0
+        func bump() { lock.withLock { n += 1 } }
+        var value: Int { lock.withLock { n } }
+    }
+
+    private static func kindName(_ kind: EngineKind) -> String {
+        switch kind {
+        case .openAICompatible: "openAICompatible"
+        case .anthropic: "anthropic"
+        case .deepL: "deepL"
+        case .httpTemplate: "httpTemplate"
+        case .command: "command"
+        }
+    }
+
+    /// `engine_ms` of every phase so far, kept because each phase's report drains the samples.
+    private nonisolated(unsafe) static var engineMs: [Double] = []
+
+    private static func printEngineSummary(_ translator: TranslationService, issues: Counter, wasAdded: Bool) async {
+        print("issues=\(issues.value)")
+        guard wasAdded else { return }
+        let ms = engineMs.sorted()
+        print(ms.isEmpty ? "engine_ms[n=0]" : String(format: "engine_ms[p50=%.0f max=%.0f n=%d]", ms[ms.count / 2], ms[ms.count - 1], ms.count))
+        print("learned=\(await translator.learnedFields())")
+        for (space, n) in translator.storeCounts.sorted(by: { $0.key < $1.key }) { print("cache[\(space)] stores=\(n)") }
+    }
+
     private static func ms(_ since: Date) -> Int { Int(Date().timeIntervalSince(since) * 1000) }
 
     /// The work done since the last call: OCR requests, erases, engine calls.
@@ -170,7 +218,11 @@ enum SelfTest {
         for key in ["translate.cancelled", "translate.wasted", "translate.lens_unserved"] where counts[key] == nil { counts[key] = 0 }
         var parts = counts.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }
         // How long text waited for its translation while in the lens (first seen there → translated).
-        let waits = (Trace.takeSamples()["translate.lens_wait_ms"] ?? []).sorted()
+        let samples = Trace.takeSamples()
+        let waits = (samples["translate.lens_wait_ms"] ?? []).sorted()
+        let engine = (samples["translate.engine_ms"] ?? []).sorted()
+        engineMs += engine
+        if !engine.isEmpty { parts.append(String(format: "engine_ms[p50=%.0f max=%.0f n=%d]", engine[engine.count / 2], engine[engine.count - 1], engine.count)) }
         parts.append(waits.isEmpty ? "lens_wait=n/a" : String(format: "lens_wait_ms[p50=%.0f max=%.0f n=%d]", waits[waits.count / 2], waits[waits.count - 1], waits.count))
         if let pipeline { parts.append("parked=\(await pipeline.debugState().parked)") }
         print("work[\(phase)]: " + parts.joined(separator: " "))
@@ -178,7 +230,7 @@ enum SelfTest {
 
     /// Drives the pipeline the way `RegionSession` does while a lens is dragged, with frames cropped from `screen`.
     private static func pan(screen: CGImage, scale: CGFloat, settings: AppSettings, translator: TranslationService, inpainter: Inpainter?,
-                            outdir: URL, option: (String) -> String?) async throws {
+                            outdir: URL, issues: Counter, option: (String) -> String?) async throws {
         func numbers(_ name: String) -> [CGFloat] {
             (option(name) ?? "").split(separator: ",").compactMap { Double($0) }.map { CGFloat($0) }
         }
@@ -396,6 +448,7 @@ enum SelfTest {
         await printCounts(CommandLine.arguments.contains("--back") ? "back" : "moved")
         print(String(format: "drift: mean %.1f pt, max %.1f pt, %d of %d frames over 2 pt", drifts.reduce(0, +) / CGFloat(max(1, drifts.count)),
                      drifts.max() ?? 0, drifts.filter { $0 > 2 }.count, drifts.count))
+        await printEngineSummary(translator, issues: issues, wasAdded: !settings.engines.isEmpty)
     }
 }
 

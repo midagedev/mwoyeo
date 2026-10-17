@@ -70,7 +70,7 @@ final class RegionSession {
         let panel = OverlayPanel(frame: frame)
         self.panel = panel
         chrome = RegionFrameWindow(region: frame, name: config.name)
-        chrome.setDetail(Self.languagePair(settings))
+        chrome.setDetail(Self.languagePair(settings), badge: settings.activeEngineConfig?.badgeSymbol)
         chrome.setFollowing(config.anchor != nil)
         chrome.setStyle(settings.lensStyle)
         let capture = Self.overscan(config.rect, wide: false)
@@ -121,6 +121,9 @@ final class RegionSession {
         chrome.orderOut(nil)
     }
 
+    /// A quiet line on the lens's pill for a few seconds.
+    func showNotice(_ text: String, seconds: TimeInterval = 6) { chrome.flash(text, seconds: seconds) }
+
     private static func languagePair(_ s: AppSettings) -> String {
         "\(s.sourceLanguage == "auto" ? String(localized: "Auto") : Languages.name(s.sourceLanguage)) → \(Languages.name(s.targetLanguage))"
     }
@@ -132,7 +135,7 @@ final class RegionSession {
             || settings.sourceLanguage != before.sourceLanguage || settings.targetLanguage != before.targetLanguage {
             finishTranscript()
         }
-        chrome.setDetail(Self.languagePair(settings))
+        chrome.setDetail(Self.languagePair(settings), badge: settings.activeEngineConfig?.badgeSymbol)
         chrome.setStyle(settings.lensStyle)
         await pipeline.update(options: PipelineOptions(settings))
         if settings.framesPerSecond != fps {
@@ -265,7 +268,7 @@ final class RegionSession {
         if wait { t.finishAndWait(time: end) } else { t.finish(time: end) }
     }
 
-    private func contextMenu() -> NSMenu {
+    func contextMenu() -> NSMenu {
         let menu = NSMenu()
         menu.autoenablesItems = false
         let blocks = lensBlocks()

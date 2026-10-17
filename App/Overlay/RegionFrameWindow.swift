@@ -57,7 +57,8 @@ final class RegionFrameWindow: NSPanel {
 
     func setName(_ name: String) { chrome.name = name }
     /// Second line of the pill, e.g. "English → Korean".
-    func setDetail(_ detail: String) { chrome.detail = detail }
+    /// `badge` is an SF Symbol name shown before it when an added engine translates (nil for Apple).
+    func setDetail(_ detail: String, badge: String? = nil) { chrome.badge = badge; chrome.detail = detail }
 
     /// Handles and full brightness while the pointer is near or a drag is in progress.
     func setEmphasized(_ on: Bool) { chrome.setEmphasized(on) }
@@ -83,6 +84,7 @@ private final class FrameChromeView: NSView {
     weak var window_: RegionFrameWindow?
     var name: String { didSet { needsDisplay = true } }
     var detail = "" { didSet { needsDisplay = true } }
+    var badge: String? { didSet { needsDisplay = true } }
     var busy = false { didSet { if busy != oldValue { updateGlow(); needsDisplay = true } } }
     var original = false { didSet { if original != oldValue { applyStyle(); sweep() } } }
     var following = false { didSet { if following != oldValue { needsDisplay = true; updateToolTip() } } }
@@ -196,7 +198,7 @@ private final class FrameChromeView: NSView {
     private var tabRect: NSRect {
         let title = (name as NSString).size(withAttributes: [.font: Self.titleFont]).width
         let longest = [detail, notice ?? ""].max { $0.count < $1.count } ?? ""
-        let sub = longest.isEmpty ? 0 : (longest as NSString).size(withAttributes: [.font: Self.detailFont]).width + 10
+        let sub = longest.isEmpty ? 0 : (longest as NSString).size(withAttributes: [.font: Self.detailFont]).width + 10 + (badge == nil ? 0 : 14)
         let w = min(regionRect.width, title + sub + 40 + 20 + (strong ? 22 : 0))
         return NSRect(x: regionRect.minX, y: regionRect.maxY + 6, width: max(72, w), height: RegionFrameWindow.tabHeight)
     }
@@ -451,6 +453,14 @@ private final class FrameChromeView: NSView {
         if original || !detail.isEmpty || notice != nil, x < tab.maxX - 50 {
             let sub = NSAttributedString(string: notice ?? (original ? String(localized: "Original") : busy ? String(localized: "Translating…") : detail),
                                          attributes: [.font: Self.detailFont, .foregroundColor: NSColor.white.withAlphaComponent(0.6)])
+            // An added engine's mark: a cloud for a remote one, a Mac for one on this Mac.
+            if let badge, notice == nil, !original,
+               let icon = NSImage(systemSymbolName: badge, accessibilityDescription: nil)?.withSymbolConfiguration(.init(pointSize: 9, weight: .medium)) {
+                let s = icon.size
+                icon.tinted(.white.withAlphaComponent(0.6))
+                    .draw(in: NSRect(x: x, y: tab.midY - s.height / 2 + 1, width: s.width, height: s.height))
+                x += s.width + 4
+            }
             sub.draw(with: NSRect(x: x, y: tab.midY - sub.size().height / 2 + 1, width: tab.maxX - x - (strong ? 48 : 30),
                                   height: sub.size().height), options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])
         }

@@ -1,4 +1,5 @@
 import Carbon.HIToolbox
+import MwoyeoCore
 import ServiceManagement
 import SwiftUI
 import Translation
@@ -16,7 +17,7 @@ struct SettingsView: View {
     }
 }
 
-private struct GeneralSettings: View {
+struct GeneralSettings: View {
     @Environment(AppModel.self) private var model
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
 
@@ -103,25 +104,51 @@ private struct GeneralSettings: View {
     }
 }
 
-private struct TranslationSettings: View {
+struct TranslationSettings: View {
     @Environment(AppModel.self) private var model
     @State private var cached = 0
+    @State private var sheet: EngineSheetTarget?
+    @State private var removing: EngineConfig?
     private let intelligence = IntelligenceTranslator()
+
+    /// The built-in choice in use; nil while an added engine translates.
+    private var builtIn: Binding<TranslationEngineChoice?> {
+        Binding(get: { model.settings.activeEngineConfig == nil ? model.settings.engine : nil },
+                set: { if let v = $0 { model.settings.engine = v; model.selectEngine(nil) } })
+    }
 
     var body: some View {
         @Bindable var model = model
         Form {
             Section("Translation engine") {
-                Picker("Engine", selection: $model.settings.engine) {
+                Picker("Engine", selection: builtIn) {
                     ForEach(TranslationEngineChoice.offered) { choice in
                         VStack(alignment: .leading) {
                             Text(choice.title)
                             Text(choice.detail).font(.caption).foregroundStyle(.secondary)
                         }
-                        .tag(choice)
+                        .tag(Optional(choice))
                     }
                 }
                 .pickerStyle(.radioGroup)
+                ForEach(model.settings.engines) { engine in
+                    EngineRow(engine: engine, selected: model.settings.customEngineID == engine.id,
+                              select: { model.selectEngine(engine.id) },
+                              edit: { sheet = .edit(engine) }, remove: { removing = engine })
+                }
+                Button { sheet = .add } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "plus").foregroundStyle(.secondary).frame(width: 16)
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text("Add another engine…")
+                            Text("Gemini, DeepSeek, Ollama, your own server").font(.caption).foregroundStyle(.secondary)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                if let e = model.settings.activeEngineConfig { SpeedLine(engine: e) }
                 LabeledContent("Apple Intelligence") {
                     if let why = intelligence.unavailableReason {
                         Label(why, systemImage: "xmark.circle").foregroundStyle(.secondary)
@@ -129,6 +156,18 @@ private struct TranslationSettings: View {
                         Label("Available · on device", systemImage: "checkmark.seal.fill").foregroundStyle(.green)
                     }
                 }
+            }
+            .sheet(item: $sheet) { target in
+                switch target {
+                case .add: EngineSheet().environment(model)
+                case let .edit(engine): EngineSheet(editing: engine).environment(model)
+                }
+            }
+            .confirmationDialog("Remove this engine?", isPresented: Binding(get: { removing != nil }, set: { if !$0 { removing = nil } }),
+                                presenting: removing) { engine in
+                Button("Remove \(engine.name)", role: .destructive) { model.removeEngine(engine.id) }
+            } message: { _ in
+                Text("Its saved key is deleted from the Keychain.")
             }
             Section {
                 LanguagePacksView(target: model.settings.targetLanguage) {
@@ -470,6 +509,74 @@ private struct AboutView: View {
                 Text("Version \(version) is available").foregroundStyle(Color.accentColor)
                 Button(Updates.viaHomebrew ? String(localized: "What’s New") : String(localized: "Download")) { NSWorkspace.shared.open(page) }
                     .controlSize(.small)
+            }
+        }
+    }
+}
+
+enum EngineSheetTarget: Identifiable {
+    case add
+    case edit(EngineConfig)
+    var id: String {
+        switch self {
+        case .add: "add"
+        case let .edit(e): e.id.uuidString
+        }
+    }
+}
+
+/// One added engine in the list: selectable like the built-in choices, with its measured time once there is one.
+private struct EngineRow: View {
+    @Environment(AppModel.self) private var model
+    let engine: EngineConfig
+    let selected: Bool
+    let select: () -> Void
+    let edit: () -> Void
+    let remove: () -> Void
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: selected ? "largecircle.fill.circle" : "circle")
+                .foregroundStyle(selected ? Color.accentColor : .secondary)
+                .frame(width: 16)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(engine.name)
+                Text(engine.subtitle).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
+            }
+            Spacer(minLength: 8)
+            TimelineView(.periodic(from: .now, by: 2)) { _ in
+                if let s = model.translator.measuredSeconds(for: engine.id) {
+                    Text(String(format: "~%.1f s", s)).font(.caption).monospacedDigit().foregroundStyle(.secondary)
+                }
+            }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture(perform: select)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+        .contextMenu {
+            Button("Edit…", action: edit)
+            Button("Duplicate") { model.duplicateEngine(engine.id) }
+            Button("Copy Setup") {
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(EngineShare.encode(engine), forType: .string)
+            }
+            Divider()
+            Button("Remove…", role: .destructive, action: remove)
+        }
+    }
+}
+
+/// "First result 0.3 s · 62% from memory", for the engine in use once it has run a few batches.
+private struct SpeedLine: View {
+    @Environment(AppModel.self) private var model
+    let engine: EngineConfig
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 2)) { _ in
+            if let s = model.translator.speedSummary(for: engine.id) {
+                Text("First result \(String(format: "%.1f", s.seconds)) s · \(Int((s.fromMemory * 100).rounded()))% from memory")
+                    .font(.caption).foregroundStyle(.secondary)
             }
         }
     }

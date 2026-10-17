@@ -1,3 +1,4 @@
+import MwoyeoCore
 import SwiftUI
 
 struct MenuPanel: View {
@@ -9,7 +10,11 @@ struct MenuPanel: View {
         VStack(alignment: .leading, spacing: 12) {
             header
             if let issue = model.issue {
-                IssueBanner(message: issue.message) { open() }
+                if case .engineUnavailable = issue {
+                    IssueBanner(message: issue.headline, detail: issue.detail, action: String(localized: "Use Apple")) { model.selectEngine(nil) }
+                } else {
+                    IssueBanner(message: issue.message) { open() }
+                }
             }
             if !model.hasScreenPermission {
                 IssueBanner(message: String(localized: "Mwoyeo needs Screen Recording permission."), action: String(localized: "Allow…")) {
@@ -19,7 +24,10 @@ struct MenuPanel: View {
             if case .available(let version, let page) = Updates.shared.state {
                 UpdateBanner(version: version) { NSWorkspace.shared.open(page) }
             }
-            LanguageBar(source: $model.settings.sourceLanguage, target: $model.settings.targetLanguage)
+            HStack(spacing: 8) {
+                LanguageBar(source: $model.settings.sourceLanguage, target: $model.settings.targetLanguage)
+                if !model.settings.engines.isEmpty { EngineMenu() }
+            }
             regionList
             addButton
             Divider().padding(.horizontal, -4)
@@ -301,6 +309,39 @@ struct LanguageBar: View {
     }
 }
 
+/// Apple or an added engine, next to the language bar. It exists only once an engine has been added.
+private struct EngineMenu: View {
+    @Environment(AppModel.self) private var model
+
+    private var active: EngineConfig? { model.settings.activeEngineConfig }
+
+    var body: some View {
+        Menu {
+            Picker("", selection: Binding(get: { model.settings.activeEngineConfig?.id }, set: { model.selectEngine($0) })) {
+                Text("Apple").tag(UUID?.none)
+                ForEach(model.settings.engines) { Text($0.name).tag(Optional($0.id)) }
+            }
+            .pickerStyle(.inline)
+            .labelsHidden()
+        } label: {
+            HStack(spacing: 4) {
+                if let active { Image(systemName: active.badgeSymbol).font(.caption) }
+                Text(active?.name ?? String(localized: "Apple")).font(.callout.weight(.medium)).lineLimit(1).frame(maxWidth: 96)
+                Image(systemName: "chevron.up.chevron.down").font(.system(size: 9, weight: .semibold)).foregroundStyle(.tertiary)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .contentShape(Rectangle())
+        }
+        .menuStyle(.button)
+        .buttonStyle(.plain)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .glassEffect(.regular, in: Capsule())
+        .help("Translation engine")
+    }
+}
+
 private struct UpdateBanner: View {
     let version: String
     let open: () -> Void
@@ -324,13 +365,17 @@ private struct UpdateBanner: View {
 
 struct IssueBanner: View {
     let message: String
+    var detail: String?
     var action = String(localized: "Open Settings")
     let perform: () -> Void
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
             Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.yellow)
-            Text(message).font(.caption).fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(message).font(.caption).fixedSize(horizontal: false, vertical: true)
+                if let detail { Text(detail).font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
+            }
             Spacer(minLength: 0)
             Button(action, action: perform).controlSize(.small)
         }

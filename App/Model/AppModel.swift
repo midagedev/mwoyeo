@@ -1,4 +1,6 @@
 import AppKit
+import MwoyeoCore
+import MwoyeoEngines
 import Observation
 import os
 
@@ -34,17 +36,22 @@ final class AppModel {
     private(set) var sessionTick = 0
 
     @ObservationIgnored let translator: TranslationService
+    /// Where added engines keep their API keys (the Keychain; memory only when `MWOYEO_MEMORY_SECRETS` is set, for captures).
+    @ObservationIgnored let secrets: any SecretStore
     @ObservationIgnored private var sessions: [UUID: RegionSession] = [:]
     @ObservationIgnored private var inpainter: Inpainter?
     @ObservationIgnored private let picker = RegionPicker()
     @ObservationIgnored private var picking = false
-    @ObservationIgnored private let defaults = UserDefaults.standard
+    /// The app's preferences; `MWOYEO_DEFAULTS_SUITE` names a scratch domain instead (the capture harness must not touch the real ones).
+    @ObservationIgnored private let defaults = ProcessInfo.processInfo.environment["MWOYEO_DEFAULTS_SUITE"].flatMap { UserDefaults(suiteName: $0) } ?? .standard
     @ObservationIgnored private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "app")
 
     private init() {
         let s = (defaults.data(forKey: "settings")).flatMap { try? JSONDecoder().decode(AppSettings.self, from: $0) } ?? AppSettings()
         settings = s
-        translator = TranslationService(settings: s)
+        let store: any SecretStore = ProcessInfo.processInfo.environment["MWOYEO_MEMORY_SECRETS"] != nil ? MemorySecrets() : KeychainSecrets()
+        secrets = store
+        translator = TranslationService(settings: s, secrets: store)
         regions = (defaults.data(forKey: "regions")).flatMap { try? JSONDecoder().decode([RegionConfig].self, from: $0) } ?? []
     }
 
@@ -70,7 +77,8 @@ final class AppModel {
         }
         Updates.shared.schedule(enabled: settings.checksForUpdates)
 
-        await translator.setIssueHandler { issue in Task { @MainActor in AppModel.shared.issue = issue } }
+        await translator.setIssueHandler { issue in Task { @MainActor in AppModel.shared.received(issue) } }
+        await translator.setRejectionHandler { id, fields in Task { @MainActor in AppModel.shared.learned(fields, for: id) } }
         await translator.prewarm()
         inpainter = await Task.detached(priority: .userInitiated) { Inpainter.load() }.value
         inpaintingAvailable = inpainter != nil
@@ -192,6 +200,56 @@ final class AppModel {
         sessions[config.id] = s
         s.setTranslationsVisible(translationsVisible)
         await s.start()
+    }
+
+    // MARK: - Engines
+
+    /// The added engine in use, nil for Apple.
+    var activeEngine: EngineConfig? { settings.activeEngineConfig }
+
+    /// Adds `engine` (its key, if any, is already in the Keychain) and switches to it.
+    func addEngine(_ engine: EngineConfig) {
+        settings.engines.append(engine)
+        settings.customEngineID = engine.id
+    }
+
+    func updateEngine(_ engine: EngineConfig) {
+        guard let i = settings.engines.firstIndex(where: { $0.id == engine.id }) else { return }
+        settings.engines[i] = engine
+    }
+
+    /// A copy under a new id, with its own (empty) key slot.
+    func duplicateEngine(_ id: UUID) {
+        guard let e = settings.engines.first(where: { $0.id == id }) else { return }
+        settings.engines.append(EngineConfig(name: String(localized: "\(e.name) copy"), kind: e.kind))
+    }
+
+    /// Removes the engine, its saved key and what it learned about its server.
+    func removeEngine(_ id: UUID) {
+        try? secrets.setSecret(nil, for: id)
+        settings.engineRejections[id] = nil
+        if settings.customEngineID == id { settings.customEngineID = nil }
+        settings.engines.removeAll { $0.id == id }
+    }
+
+    /// nil picks Apple.
+    func selectEngine(_ id: UUID?) {
+        settings.customEngineID = id
+    }
+
+    private func learned(_ fields: [String], for id: UUID) {
+        guard settings.engines.contains(where: { $0.id == id }) else { return }
+        let saved = fields.isEmpty ? nil : fields
+        if settings.engineRejections[id] != saved { settings.engineRejections[id] = saved }
+    }
+
+    /// Shows the issue in the menu panel, and once on every lens when an engine gave way to Apple.
+    func received(_ new: TranslationIssue?) {
+        let old = issue
+        issue = new
+        if case .engineUnavailable? = new, new != old {
+            for s in sessions.values { s.showNotice(new?.headline ?? "") }
+        }
     }
 
     // MARK: - Global actions

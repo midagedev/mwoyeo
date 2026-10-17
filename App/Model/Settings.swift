@@ -121,6 +121,9 @@ struct AppSettings: Codable, Equatable {
     var savesTranscripts = false
     var exportFolder = ("~/Documents/Mwoyeo" as NSString).expandingTildeInPath
 
+    /// The added engine in use; nil is Apple.
+    var activeEngineConfig: EngineConfig? { customEngineID.flatMap { id in engines.first { $0.id == id } } }
+
     var glossaryPairs: [(String, String)] {
         glossary.split(whereSeparator: \.isNewline).compactMap { line in
             let parts = line.split(separator: "=", maxSplits: 1).map { $0.trimmingCharacters(in: .whitespaces) }

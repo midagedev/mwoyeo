@@ -8,6 +8,9 @@ enum Entry {
         if CommandLine.arguments.dropFirst().first == "--render" {
             SelfTest.run(Array(CommandLine.arguments.dropFirst(2)))
         }
+        if CommandLine.arguments.dropFirst().first == "--capture-ui" {
+            UICapture.run(Array(CommandLine.arguments.dropFirst(2)))
+        }
         MwoyeoApp.main()
     }
 }

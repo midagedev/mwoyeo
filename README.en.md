@@ -24,7 +24,8 @@ brew install midagedev/tap/mwoyeo
 
 Mwoyeo reads the text under a lens, **erases it from the picture**, and paints the translation back in the same
 place, size and colour. It is not a popup or a subtitle bar: the screen simply reads in your language, and keeps
-reading as messages arrive and the page scrolls. Everything runs on your Mac; nothing on your screen is sent anywhere.
+reading as messages arrive and the page scrolls. By default everything runs on your Mac and nothing on your screen is
+sent anywhere. Only if you add a cloud translation engine yourself does the text a lens reads go to that engine.
 
 ## Install
 
@@ -46,11 +47,11 @@ notes and issue tracker.
 | **macOS** | 26.0 or later (translating without a pack and the *High fidelity* engine: 26.4 or later) |
 | **Mac** | Any Mac with Apple silicon (M1 or later) or MacBook Neo that runs macOS 26 or later. There is no Intel build. |
 | **Permission** | Screen Recording, nothing else: no Accessibility, no keyboard monitoring |
-| **Network** | None for translating. The only request is the daily update check, which you can turn off. |
+| **Network** | None for translating by default. The only request is the daily update check, which you can turn off. A cloud engine you add yourself is the one exception. |
 | **Disk** | About 20 MB for the app. Language packs (and Apple Intelligence's model, up to 8–14 GB) are downloaded and stored by macOS. |
 | **Displays** | Any number; a lens can go on any display |
 
-**What runs on device, and what it needs.** Everything runs on your Mac; the only question is which engine is there.
+**What runs on device, and what it needs.** With Apple's engines everything runs on your Mac; the only question is which engine is there.
 
 | Part | Needs |
 |---|---|
@@ -112,13 +113,69 @@ elsewhere, record a different one. The defaults stay clear of window managers su
 | ⌃⌥L | Add a lens (drag an area, or click to drop one; hold ⌥ to pin it to the screen) |
 | ⌃⌥O | Show the original / the translation |
 | none | Pause all lenses, Translate again (in the menu; give them keys in Settings if you like) |
+| none | Copy Original Text, Read Aloud, Save Lens Image (they act on the lens under the pointer, else the newest lens) |
+
+### Lens menu
+
+Right-click a lens's name tag to find everything you can do with that lens.
+
+- **Show Original**, **Copy Original Text**, **Copy Translation**: the two copy commands copy the text inside the lens
+  in reading order.
+- **Read Aloud**: speaks the translation with a system voice. If there is no voice for that language, add one in
+  System Settings › Accessibility › Spoken Content.
+- **Save Lens Image**: saves the lens as you see it, translation included, as a PNG.
+- **Remember Languages for (app name)**: shown on window lenses only. It ties the current language pair to that app,
+  and the pair switches by itself whenever that app is in front. Only one language pair is in use at a time, so the app
+  in front decides it for every lens. To forget an app, go to Settings › Translation › App profiles.
+
+## Translate an image
+
+Click the photo icon at the bottom of the menu bar panel (**Translate Image…**) to open the image window. Drop an image
+file on it, or paste one with ⌘V, and Mwoyeo erases the original text and paints the translation in, the same way a
+lens does. Copy the result as an image or as text, or save it.
+
+## Add another translation engine
+
+If Apple's translation is enough, you don't need to do anything. For more natural translations, add the engine you
+already use in Settings › Translation › **Add another engine…**.
+
+- **On this Mac:** Ollama, LM Studio, or a LibreTranslate or DeepLX that you run yourself. No key is needed and the
+  text never leaves your Mac.
+- **Cloud:** Gemini, OpenAI, Claude, DeepL, DeepSeek, OpenRouter, Groq, Qwen and others. Paste a key and pick a model,
+  and a test translation checks the connection right away. The key is stored only in the macOS Keychain.
+- **Connect your own:** an OpenAI-compatible server, an HTTP template written in a few lines, or a command that
+  exchanges JSON. Hand an engine's setup to someone else with **Copy Setup** and take one in with **Paste Setup**. The
+  key is never part of a setup.
+
+Once you add an engine, the menu bar panel gets an engine switcher. While the engine you added does not answer or its
+key is wrong, Apple's translation does the work instead and the panel tells you quietly. Under the engine list in
+Settings, a line shows the time to the first result and the share of translations taken straight from translation
+memory.
+
+> **If you choose a cloud engine, the text a lens reads goes to that engine's servers.** The screen where you add an
+> engine says where it goes. Only the text is sent, never a picture of your screen.
+
+A quick measurement of each engine (2026-10-17, M1 Pro, one batch of three lines each; the method and the full table
+are in [tools/engine-bench/RESULTS.md](tools/engine-bench/RESULTS.md)):
+
+| Engine | Model | Reply (median) | Quality (1–5) | Cost |
+|---|---|---|---|---|
+| Apple (default) | Translation framework | 0.15 s | 3.4 | Free |
+| DeepL | Free API | 0.88 s | 4.6 | Free tier |
+| Gemini | gemini-3.1-flash-lite | 1.27 s | 4.6 | Free tier |
+| Claude | claude-haiku-5-5 | 1.12 s | 4.6 | Paid |
+| OpenAI | gpt-5.6-luna | 1.35 s | 4.8 | Paid |
+| Ollama | translategemma:4b | 1.00 s | 3.6 | Free, on this Mac |
+
+Apple's translation is the fastest. Cloud engines take about a second longer, and in return give translations that
+follow the context.
 
 ## Settings
 
 | Tab | What you can change |
 |---|---|
-| General | Languages · **Display**: *Adaptive* (default: plain boxes while things move, a seamless rewrite once still), *Quick* (always boxes, least battery) or *Seamless* (always rewrites) · how often the screen is checked (4, 8 or 15 fps) · open at login |
-| Translation | **Engine**: *Automatic* (language pack if installed, Apple Intelligence otherwise), *High fidelity* (always Apple Intelligence: the most natural and the slowest) or *Glossary first* · language packs · **translation memory**: how many translations to keep for reuse (1,000, 5,000 or 20,000; in memory only, cleared when Mwoyeo quits) · a **glossary** of names, one `original = translation` per line |
+| General | Languages · **Display**: *Adaptive* (default: plain boxes while things move, a seamless rewrite once still), *Quick* (always boxes, least battery) or *Seamless* (always rewrites) · how often the screen is checked (4, 8 or 15 fps) · open at login · **Saving**: keep what each lens reads and its translation as Markdown and SRT transcripts, and the folder for transcripts and lens images (default `~/Documents/Mwoyeo`) |
+| Translation | **Engine**: *Automatic* (language pack if installed, Apple Intelligence otherwise), *High fidelity* (always Apple Intelligence: the most natural and the slowest) or *Glossary first* · language packs · **translation memory**: how many translations to keep for reuse (1,000, 5,000 or 20,000; in memory only, cleared when Mwoyeo quits) · a **glossary** of names, one `original = translation` per line · **Add another engine** · **App profiles** (shown only once you have remembered an app from the lens menu) |
 | Appearance | **Lens style**: *Glow*, *Subtle* (glows only while reading) or *Minimal* (a faint line; the name tag shows on hover) · font (default, rounded, serif) · box opacity · AI erasing on photos and artwork |
 
 ## Tips and troubleshooting
@@ -129,11 +186,12 @@ elsewhere, record a different one. The defaults stay clear of window managers su
 - **Nothing shows up after an update?** macOS sometimes asks for Screen Recording again. Check it in System Settings,
   then reopen Mwoyeo.
 - **Want to compare with the original?** Press ⌃⌥O to see the original, and again to go back.
-- **Privacy.** Mwoyeo reads only what is under a lens, never stores or sends it, and leaves its own overlays out of
-  what it captures. The only thing it ever asks the internet is GitHub's latest version number, once a day, and
-  you can turn that off in Settings › About. The check downloads a small file attached to the release, so GitHub's
-  download counts are the usage numbers: an install is counted once, use once a month, and nothing that could identify
-  your Mac is sent.
+- **Privacy.** Mwoyeo reads only what is under a lens and, by default, never stores or sends it. If you turn on saving,
+  it writes only to the folder you chose; if you add a cloud engine, the text a lens reads goes to that engine. It
+  leaves its own overlays out of what it captures. Beyond that, the only thing it ever asks the internet is GitHub's latest version
+  number, once a day, and you can turn that off in Settings › About. The check downloads a small file attached to the
+  release, so GitHub's download counts are the usage numbers: an install is counted once, use once a month, and nothing
+  that could identify your Mac is sent.
 
 ## Under the hood
 

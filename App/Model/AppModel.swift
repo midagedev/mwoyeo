@@ -99,7 +99,7 @@ final class AppModel {
         await translator.prewarm()
         inpainter = await Task.detached(priority: .userInitiated) { Inpainter.load() }.value
         inpaintingAvailable = inpainter != nil
-        Self.warmUpVision()
+        Self.warmUpVision(settings.sourceLanguage)
 
         if !settings.hasCompletedOnboarding || !hasScreenPermission {
             WindowPresenter.shared.showOnboarding()
@@ -131,14 +131,14 @@ final class AppModel {
     }
 
     /// The accurate text recognizer takes tens of seconds to load the first time; do it before the user needs it.
-    private static func warmUpVision() {
-        Task.detached(priority: .utility) { await loadVision() }
+    private static func warmUpVision(_ source: String) {
+        Task.detached(priority: .utility) { await loadVision(source: source) }
     }
 
-    /// One accurate read of a small drawn picture (Latin and CJK text), so that the text model is loaded when the first real
-    /// picture comes.
-    static func loadVision() async {
-        await TextRecognizer.warmUp()
+    /// The initialization of the text models for the source language ("auto": detected), so that they are loaded when the first
+    /// real picture comes (`TextRecognizer.warmUp`).
+    static func loadVision(source: String = "auto") async {
+        await TextRecognizer.warmUp(languages: source == "auto" ? [] : [Locale.Language(identifier: source)])
     }
 
     func recheckPermission() {

@@ -76,7 +76,12 @@ final class ImageTranslationModel {
             texts = ReadingOrder.sorted(snapshot?.texts ?? [], frame: \.frame)
             if let snapshot { await show(snapshot, of: still, generation: mine) }
             guard mine == generation else { return }
-            phase = .done(lines: texts.count)
+            // "No text found" would be wrong when the recognizer could not read at all.
+            if texts.isEmpty, let issue = app.issue, issue.isTextRecognition {
+                phase = .failed(issue.message)
+            } else {
+                phase = .done(lines: texts.count)
+            }
             onSettled?()
         }
     }

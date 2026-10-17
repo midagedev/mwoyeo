@@ -14,6 +14,19 @@ enum TranslationIssue: Error, Equatable, Sendable {
     case timedOut
     /// An added engine failed or timed out and Apple translates meanwhile. `reason` is the engine error's user message.
     case engineUnavailable(name: String, reason: String)
+    /// No text recognizer has answered yet for the source language (`language` is its identifier). macOS prepares them
+    /// slowly the first time; the notice ends when one answers.
+    case textRecognitionStarting(language: String)
+    /// None answered for three minutes (some Macs get stuck until restarted).
+    case textRecognitionStalled
+
+    /// Raised and ended by `TextRecognizer`, not by a translation.
+    var isTextRecognition: Bool {
+        switch self {
+        case .textRecognitionStarting, .textRecognitionStalled: true
+        default: false
+        }
+    }
 
     var message: String {
         switch self {
@@ -24,6 +37,9 @@ enum TranslationIssue: Error, Equatable, Sendable {
         case let .failed(why): String(localized: "Translation failed: \(why)")
         case .timedOut: String(localized: "Translation is taking too long. Trying again shortly.")
         case let .engineUnavailable(name, reason): String(localized: "\(name) unavailable · using Apple") + " — " + reason
+        case let .textRecognitionStarting(language):
+            String(localized: "macOS is still preparing text recognition for \(Languages.name(language)). This can take a minute.")
+        case .textRecognitionStalled: String(localized: "macOS text recognition isn't responding. Restarting the Mac usually fixes it.")
         }
     }
 

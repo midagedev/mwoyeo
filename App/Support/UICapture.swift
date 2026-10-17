@@ -198,6 +198,21 @@ enum UICapture {
             model.dismissIssue()
             check("only an engine notice can be dismissed", model.shownIssue == .timedOut)
             model.received(nil)
+
+            model.recognitionNotice(.textRecognitionStarting(language: "ja"))
+            check("the recognizer's notice shows", model.shownIssue == .textRecognitionStarting(language: "ja"))
+            check("it never tells the lenses", !AppModel.step(old: nil, new: .textRecognitionStalled, dismissed: nil).tellLenses)
+            model.recognitionNotice(.textRecognitionStalled)
+            model.received(nil)
+            check("a translation that went well does not end it", model.shownIssue == .textRecognitionStalled)
+            model.dismissIssue()
+            check("and it cannot be dismissed", model.shownIssue == .textRecognitionStalled)
+            model.recognitionNotice(nil)
+            check("only the recognizer ends it", model.shownIssue == nil)
+            model.received(a)
+            model.recognitionNotice(nil)
+            check("its end leaves another issue alone", model.shownIssue == a)
+            model.received(nil)
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
         }
 

@@ -1,4 +1,5 @@
 import AppKit
+import MwoyeoCore
 import SwiftUI
 
 @main
@@ -7,6 +8,11 @@ enum Entry {
         // `Mwoyeo --render in.png out.png` runs the pipeline on a still image (no permissions needed).
         if CommandLine.arguments.dropFirst().first == "--render" {
             SelfTest.run(Array(CommandLine.arguments.dropFirst(2)))
+        }
+        // `Mwoyeo --warm-vision [key]` is the child the app starts to load the Swift Vision models of a language set
+        // (default: detected languages; see `SwiftVisionWarm`).
+        if CommandLine.arguments.dropFirst().first == "--warm-vision" {
+            SwiftVisionWarm.runChild(key: CommandLine.arguments.dropFirst(2).first ?? SwiftVisionGate.anyLanguage)
         }
         if CommandLine.arguments.dropFirst().first == "--capture-ui" {
             UICapture.run(Array(CommandLine.arguments.dropFirst(2)))

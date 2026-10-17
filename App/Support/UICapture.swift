@@ -135,6 +135,8 @@ enum UICapture {
                 // The text recognizers take tens of seconds to load; the app does it at launch, so does this.
                 let loading = Date()
                 await AppModel.loadVision()
+                // The Swift models too (a child loads them), so that the picture is read as the app reads it once it is warm.
+                _ = await TextRecognizer.untilSwiftReady([Locale.Language(identifier: "ja")], seconds: 600)
                 print("\(name): recognizers loaded in \(String(format: "%.1f", Date().timeIntervalSince(loading))) s")
                 let picture = ImageTranslationModel()
                 let started = Date()

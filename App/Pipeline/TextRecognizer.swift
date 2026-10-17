@@ -199,24 +199,39 @@ enum TextRecognizer {
     private static func tag(_ m: Model) -> String { m == .swift ? "" : ".vn3" }
 
     /// On some Macs the Swift models never answer (a compile that hangs or crawls, `OCRHealth`) while the Objective-C
-    /// request still does. A read the Swift model does not answer in time goes down the ladder (`OCRFallback`): revision 3
-    /// of the Objective-C request (reads everything), then revision 2, then `.fast`, as far as each reads the languages.
-    /// `older` reads with one rung. Where none is left it throws `Stalled`. A slow model is never cancelled.
+    /// request still does, and a Swift request that is still loading also blocks the Objective-C one in the same process.
+    /// So the Swift models are asked here only once a child process has loaded them (`SwiftVisionWarm`); until then every
+    /// read goes down the ladder (`OCRFallback`): revision 3 of the Objective-C request (reads everything), then revision 2,
+    /// then `.fast`, as far as each reads the languages. A read the Swift model does not answer in time goes down the same
+    /// ladder. `older` reads with one rung. Where none is left it throws `Stalled`. A slow model is never cancelled.
     private static func accurate<T: Sendable>(_ languages: [Locale.Language], warmUp: Bool,
                                               newest work: @escaping @Sendable () async throws -> T,
                                               older read: @escaping @Sendable (OCRFallback) throws -> T) async throws -> T {
         let rungs = OCRFallback.ladder(requested: languages.compactMap(code), vision3: vision3Languages,
                                        revision2: revision2Languages, fast: fastLanguages)
-        switch swiftHealth.withLock({ $0.plan(canFallBack: !rungs.isEmpty, now: Trace.now) }) {
-        case .refuse:
-            throw stalled(languages, warmUp: warmUp)
-        case .fallback:
-            break
-        case let .run(seconds):
-            do {
-                return try await tracked(.swift, seconds, tellingAbout: rungs.isEmpty && !warmUp ? languages : nil, work)
-            } catch is Timeout {
-                if rungs.isEmpty { throw stalled(languages, warmUp: warmUp) }
+        let key = SwiftVisionWarm.key(languages)
+        var swiftReady = SwiftVisionWarm.isReady(key)
+        if !swiftReady {
+            Trace.count("ocr.swift.gated")
+            SwiftVisionWarm.need(key)
+            // Nothing else reads these languages: wait for the child like for a cold model.
+            if rungs.isEmpty {
+                try await waitForSwift(key, languages, warmUp: warmUp)
+                swiftReady = true
+            }
+        }
+        if swiftReady {
+            switch swiftHealth.withLock({ $0.plan(canFallBack: !rungs.isEmpty, now: Trace.now) }) {
+            case .refuse:
+                throw stalled(languages, warmUp: warmUp)
+            case .fallback:
+                break
+            case let .run(seconds):
+                do {
+                    return try await tracked(.swift, seconds, tellingAbout: rungs.isEmpty && !warmUp ? languages : nil, work)
+                } catch is Timeout {
+                    if rungs.isEmpty { throw stalled(languages, warmUp: warmUp) }
+                }
             }
         }
         for (i, rung) in rungs.enumerated() {
@@ -245,6 +260,22 @@ enum TextRecognizer {
             }
         }
         throw stalled(languages, warmUp: warmUp)
+    }
+
+    /// Waits until the child has loaded the Swift models of `key`: "still preparing" after `OCRHealth.lateAfter`, and after
+    /// `OCRHealth.coldWait` (what a cold model was given) it throws `Stalled` ("not responding"). The child keeps loading.
+    private static func waitForSwift(_ key: String, _ languages: [Locale.Language], warmUp: Bool) async throws {
+        let start = Trace.now
+        var told = false
+        while !SwiftVisionWarm.isReady(key) {
+            let waited = Trace.now - start
+            if waited >= OCRHealth.coldWait { throw stalled(languages, warmUp: warmUp, swiftKey: key) }
+            if !told, !warmUp, waited >= OCRHealth.lateAfter {
+                told = true
+                raise(preparing(languages))
+            }
+            try await Task.sleep(for: .milliseconds(500))
+        }
     }
 
     /// One request on a model that can stall, within `seconds`. `tellingAbout` is the languages to tell the user about
@@ -310,8 +341,8 @@ enum TextRecognizer {
         }
     }
 
-    /// Latin and CJK text, drawn here so that the probe needs no file.
-    private static let probePicture: CGImage? = {
+    /// Latin and CJK text, drawn here so that the probe (and the child that warms the Swift models) needs no file.
+    static let probePicture: CGImage? = {
         let w = 420, h = 80
         guard let ctx = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: 0,
                                   space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
@@ -357,7 +388,7 @@ enum TextRecognizer {
     }
 
     /// "ja", "zh-Hans": the language, and the script when it names one.
-    private static func code(_ l: Locale.Language) -> String? {
+    static func code(_ l: Locale.Language) -> String? {
         guard let c = l.languageCode?.identifier else { return nil }
         return l.script.map { "\(c)-\($0.identifier)" } ?? c
     }
@@ -379,6 +410,32 @@ enum TextRecognizer {
         for (level, revision, languages) in rungs where !languages.isEmpty {
             _ = try? await deadline { try visionRead(in: image, roi: nil, level: level, revision: revision, customWords: []) { _ in [] } }
         }
+    }
+
+    /// The Swift models for detected languages, at launch (and `--warm`): loaded by a child process (`SwiftVisionWarm`),
+    /// which this starts without waiting for it. Reads in a language ask for their own models, the same way.
+    static func prepareSwift() async {
+        let key = SwiftVisionGate.anyLanguage
+        if SwiftVisionWarm.isReady(key) { await preloadSwift(key: key) } else { SwiftVisionWarm.need(key) }
+    }
+
+    /// Waits (up to `seconds`) until a child has loaded the Swift models for `languages`, for scripted runs that want the Swift
+    /// path from the first read (`--render --warm`, the UI captures). False if they are still not loaded then.
+    static func untilSwiftReady(_ languages: [Locale.Language], seconds: Double) async -> Bool {
+        let key = SwiftVisionWarm.key(languages)
+        SwiftVisionWarm.need(key)
+        let end = Trace.now + seconds
+        while !SwiftVisionWarm.isReady(key), Trace.now < end { try? await Task.sleep(for: .milliseconds(250)) }
+        return SwiftVisionWarm.isReady(key)
+    }
+
+    /// Reads the drawn picture with the Swift models of `key`, in this process. Only once a child has loaded them, or the
+    /// load here would block the other recognizers.
+    static func preloadSwift(key: String) async {
+        guard let picture = probePicture else { return }
+        let languages = SwiftVisionWarm.languages(of: key)
+        _ = try? await lines(in: picture, languages: languages, fast: false, warmUp: true)
+        _ = try? await blocks(in: picture, languages: languages, warmUp: true)
     }
 
     // MARK: The notice
@@ -410,10 +467,13 @@ enum TextRecognizer {
     }
 
     /// A read nothing answers: "still preparing" until a model has been silent for three minutes, then "not responding".
-    private static func stalled(_ languages: [Locale.Language], warmUp: Bool) -> Stalled {
+    private static func stalled(_ languages: [Locale.Language], warmUp: Bool, swiftKey: String? = nil) -> Stalled {
         if !warmUp {
             let now = Trace.now
-            let age = [swiftHealth, vision3Health].compactMap { $0.withLock { $0.stalledFor(now: now) } }.max() ?? 0
+            var ages = [swiftHealth, vision3Health].compactMap { $0.withLock { $0.stalledFor(now: now) } }
+            // The child that loads the Swift models counts only for a read that only they can do.
+            if let swiftKey, let waited = SwiftVisionWarm.waiting(swiftKey, now: now) { ages.append(waited) }
+            let age = ages.max() ?? 0
             raise(age >= OCRHealth.giveUpAfter ? .textRecognitionStalled : preparing(languages))
         }
         return Stalled()

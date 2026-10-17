@@ -1,0 +1,1074 @@
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 0, "engine": "qwen3.5:2b", "score": 3, "why": "accurate but unnatural adverb"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 0, "engine": "translategemma:4b", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 0, "engine": "apple-low-latency", "score": 4, "why": "accurate but slightly less standard"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 0, "engine": "apple-high-fidelity", "score": 4, "why": "accurate but slightly less standard"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 0, "engine": "gpt-4o-mini", "score": 4, "why": "accurate but slightly less standard"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 0, "engine": "deepl", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural UI text"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural UI text"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 1, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and natural UI text"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 1, "engine": "deepl", "score": 5, "why": "accurate and natural UI text"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 1, "engine": "qwen3.5:2b", "score": 5, "why": "accurate and natural UI text"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 1, "engine": "apple-high-fidelity", "score": 5, "why": "accurate and natural UI text"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "natural but slightly more specific"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural UI text"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural UI text"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural UI text"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural UI text"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 1, "engine": "apple-low-latency", "score": 1, "why": "wrong meaning"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 2, "engine": "translategemma:4b", "score": 5, "why": "accurate and natural instruction"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 2, "engine": "gpt-4o-mini", "score": 4, "why": "accurate but slightly wordy"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 2, "engine": "deepl", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural instruction"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 2, "engine": "apple-low-latency", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 2, "engine": "qwen3.5:2b", "score": 3, "why": "understandable but unnatural phrasing"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 2, "engine": "apple-high-fidelity", "score": 4, "why": "accurate but slightly stiff"}
+{"judge": "openai", "pair": "en-ja", "batch": 0, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "very natural and expressive"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 0, "engine": "deepl", "score": 5, "why": "very natural and expressive"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "very natural and expressive"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 0, "engine": "apple-high-fidelity", "score": 3, "why": "accurate but too formal"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural slangy tone"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 0, "engine": "translategemma:4b", "score": 4, "why": "natural but adds 'really'"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 2, "why": "partly untranslated"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "natural and expressive"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "very natural and expressive"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 0, "engine": "gpt-4o-mini", "score": 2, "why": "too polite and stiff"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 0, "engine": "apple-low-latency", "score": 5, "why": "natural and expressive"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 1, "engine": "translategemma:4b", "score": 5, "why": "accurate and natural reaction"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 1, "engine": "apple-low-latency", "score": 2, "why": "実際に is unnatural here"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 1, "engine": "gpt-4o-mini", "score": 2, "why": "実際に is unnatural here"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural reaction"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "very natural and emphatic"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural reaction"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural reaction"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 1, "engine": "deepl", "score": 5, "why": "accurate and natural reaction"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "very natural colloquial tone"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 1, "engine": "apple-high-fidelity", "score": 4, "why": "natural but slightly stronger than source"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "very natural colloquial tone"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 2, "engine": "translategemma:4b", "score": 4, "why": "accurate but slightly formal"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 3, "why": "misses 'see you' nuance"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 3, "why": "too abbreviated"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 2, "engine": "gpt-4o-mini", "score": 4, "why": "accurate but a bit stiff"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 2, "engine": "apple-high-fidelity", "score": 3, "why": "adds 'again' nuance"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 2, "engine": "gpt-5.6-luna", "score": 4, "why": "natural and close"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 2, "engine": "gpt-5.4-mini", "score": 4, "why": "natural and close"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 2, "engine": "deepl", "score": 5, "why": "natural and accurate"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 2, "engine": "claude-haiku-5-5", "score": 4, "why": "natural and close"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 2, "engine": "apple-low-latency", "score": 2, "why": "omits 'tomorrow'"}
+{"judge": "openai", "pair": "en-ja", "batch": 1, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural and accurate"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 0, "engine": "apple-high-fidelity", "score": 4, "why": "accurate but slightly stiff"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 0, "engine": "apple-low-latency", "score": 4, "why": "accurate but role nuance shifted"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 0, "engine": "claude-haiku-5-5", "score": 3, "why": "changes address meaning"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 0, "engine": "translategemma:4b", "score": 3, "why": "quotation marks and awkward phrasing"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 0, "engine": "deepl", "score": 2, "why": "changes address meaning"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 0, "engine": "qwen3.5:2b", "score": 4, "why": "accurate but marked word order"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 0, "engine": "claude-sonnet-5-5", "score": 4, "why": "accurate but role nuance shifted"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 0, "engine": "gpt-5.4-mini", "score": 2, "why": "changes address meaning"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 1, "engine": "apple-high-fidelity", "score": 1, "why": "wrong meaning for lost"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 1, "engine": "gpt-5.6-luna", "score": 4, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "accurate but slightly stiff"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural tone"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural tone"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural tone"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 1, "engine": "qwen3.5:2b", "score": 2, "why": "too vague and softened"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 1, "engine": "deepl", "score": 3, "why": "unnatural phrasing"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 1, "engine": "gpt-4o-mini", "score": 4, "why": "accurate but less rough"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 1, "engine": "apple-low-latency", "score": 1, "why": "wrong meaning for lost"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "very natural rough tone"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 2, "engine": "gpt-4o-mini", "score": 4, "why": "accurate but slightly stronger nuance"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 2, "engine": "claude-sonnet-5-5", "score": 4, "why": "accurate but slightly stiff"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 2, "engine": "claude-haiku-5-5", "score": 4, "why": "accurate but slightly stiff"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 2, "engine": "gpt-5.4-mini", "score": 4, "why": "accurate but slightly stiff"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 2, "engine": "gpt-5.6-luna", "score": 4, "why": "accurate but stronger 'abduct' nuance"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 2, "engine": "qwen3.5:2b", "score": 4, "why": "accurate but wording less direct"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 2, "engine": "translategemma:4b", "score": 3, "why": "accurate but overly emphatic and quoted"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 2, "engine": "deepl", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 2, "engine": "apple-high-fidelity", "score": 4, "why": "accurate but slightly explanatory"}
+{"judge": "openai", "pair": "en-ja", "batch": 2, "line": 2, "engine": "apple-low-latency", "score": 4, "why": "accurate but more formal"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 0, "engine": "apple-high-fidelity", "score": 5, "why": "accurate and headline-like"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 0, "engine": "translategemma:4b", "score": 4, "why": "accurate but omits championship nuance"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 0, "engine": "apple-low-latency", "score": 3, "why": "understandable but awkward phrasing"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 0, "engine": "gpt-5.4-mini", "score": 4, "why": "natural but omits championship nuance"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and headline-like"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 0, "engine": "claude-haiku-5-5", "score": 4, "why": "natural but tense less headline-standard"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 0, "engine": "deepl", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "natural but omits championship nuance"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "natural but omits championship nuance"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 0, "engine": "claude-sonnet-5-5", "score": 4, "why": "natural but omits championship nuance"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 0, "engine": "gpt-5.6-luna", "score": 4, "why": "natural but omits championship nuance"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 1, "engine": "apple-high-fidelity", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 1, "engine": "apple-low-latency", "score": 4, "why": "accurate but less headline-like"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "accurate but 電池 is less natural"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 1, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 1, "engine": "deepl", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 1, "engine": "translategemma:4b", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 2, "engine": "apple-low-latency", "score": 4, "why": "accurate but not headline style"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 2, "engine": "apple-high-fidelity", "score": 3, "why": "understandable but awkward 据え置きしている"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 2, "engine": "deepl", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 2, "engine": "claude-haiku-5-5", "score": 4, "why": "natural but tense differs"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 2, "engine": "translategemma:4b", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural headline"}
+{"judge": "openai", "pair": "en-ja", "batch": 3, "line": 2, "engine": "gpt-5.4-mini", "score": 4, "why": "accurate but not headline style"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural and standard UI wording"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 0, "engine": "qwen3.5:2b", "score": 3, "why": "calque of permanently"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "natural and standard UI wording"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 0, "engine": "translategemma:4b", "score": 5, "why": "natural and standard UI wording"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 0, "engine": "apple-low-latency", "score": 4, "why": "acceptable but less common than 完全に"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "natural and standard UI wording"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 0, "engine": "apple-high-fidelity", "score": 4, "why": "acceptable but less common than 完全に"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "natural and standard UI wording"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural and standard UI wording"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "natural and standard UI wording"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 0, "engine": "gpt-4o-mini", "score": 4, "why": "acceptable but less common than 完全に"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 0, "engine": "deepl", "score": 5, "why": "natural and standard UI wording"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "standard navigation label"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "standard navigation label"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 1, "engine": "gpt-4o-mini", "score": 5, "why": "standard navigation label"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 1, "engine": "deepl", "score": 5, "why": "standard navigation label"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 1, "engine": "qwen3.5:2b", "score": 5, "why": "standard navigation label"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 1, "engine": "apple-high-fidelity", "score": 5, "why": "standard navigation label"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "acceptable but slightly wordy"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "standard navigation label"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "standard navigation label"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "standard navigation label"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "standard navigation label"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 1, "engine": "apple-low-latency", "score": 1, "why": "mistranslation (going home to house)"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 2, "engine": "translategemma:4b", "score": 5, "why": "natural UI instruction"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 2, "engine": "gpt-4o-mini", "score": 2, "why": "unnatural translation of your and must"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 2, "engine": "deepl", "score": 5, "why": "natural system requirement phrasing"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural UI instruction"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 2, "engine": "apple-low-latency", "score": 5, "why": "natural system requirement phrasing"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "natural system requirement phrasing"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "natural system requirement phrasing"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 2, "engine": "qwen3.5:2b", "score": 3, "why": "slightly stiff phrasing"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "natural system requirement phrasing"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "natural system requirement phrasing"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 2, "engine": "apple-high-fidelity", "score": 4, "why": "slightly wordy with 少なくとも"}
+{"judge": "gemini", "pair": "en-ja", "batch": 0, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural system requirement phrasing"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural casual text"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 0, "engine": "deepl", "score": 5, "why": "natural casual text"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "natural casual text"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 0, "engine": "apple-high-fidelity", "score": 2, "why": "stiff and overly formal"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural casual text"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 0, "engine": "translategemma:4b", "score": 4, "why": "slightly formal"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 3, "why": "untranslated omg"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "natural casual text"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "natural casual text"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 0, "engine": "gpt-4o-mini", "score": 2, "why": "stiff and polite register mismatch"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 0, "engine": "apple-low-latency", "score": 5, "why": "natural casual text"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 1, "engine": "translategemma:4b", "score": 5, "why": "natural shocked reaction"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 1, "engine": "apple-low-latency", "score": 3, "why": "overly polite and stiff '実際に'"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 1, "engine": "gpt-4o-mini", "score": 4, "why": "stiff '実際に'"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural informal reaction"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "very natural and casual"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "natural shocked reaction"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural informal reaction"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 1, "engine": "deepl", "score": 5, "why": "natural shocked reaction"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "very natural colloquial phrasing"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 1, "engine": "apple-high-fidelity", "score": 5, "why": "natural expression of disbelief"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "very natural colloquial phrasing"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 2, "engine": "translategemma:4b", "score": 3, "why": "overly formal for casual text abbreviation"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural casual tone"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "natural casual tone"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 2, "engine": "gpt-4o-mini", "score": 3, "why": "literal and register clash"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 2, "engine": "apple-high-fidelity", "score": 5, "why": "natural casual tone"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "natural casual tone"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "natural casual tone"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 2, "engine": "deepl", "score": 5, "why": "natural casual tone"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "natural casual tone"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 2, "engine": "apple-low-latency", "score": 4, "why": "omits 'tmrw'"}
+{"judge": "gemini", "pair": "en-ja", "batch": 1, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural casual tone"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 0, "engine": "apple-high-fidelity", "score": 4, "why": "mix of polite address and plain ending"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural fantasy/sci-fi line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 0, "engine": "apple-low-latency", "score": 5, "why": "natural fantasy line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 0, "engine": "claude-haiku-5-5", "score": 4, "why": "acceptable fantasy line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 0, "engine": "translategemma:4b", "score": 4, "why": "unnecessary quotes"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 0, "engine": "deepl", "score": 5, "why": "natural martial arts/fantasy line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 0, "engine": "qwen3.5:2b", "score": 3, "why": "awkward inverted word order"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural polite fantasy line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "natural fantasy/sci-fi line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "natural fantasy/sci-fi line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "natural martial arts/fantasy line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "natural fantasy/sci-fi line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 1, "engine": "apple-high-fidelity", "score": 1, "why": "mistranslated lost as defeated"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 1, "engine": "gpt-5.6-luna", "score": 4, "why": "good but misses 'or something'"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 1, "engine": "translategemma:4b", "score": 3, "why": "unnecessary quotes and misses 'or something'"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural and accurate colloquial dialogue"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural and accurate colloquial dialogue"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "natural and accurate colloquial dialogue"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 1, "engine": "qwen3.5:2b", "score": 1, "why": "unnatural and inaccurate tone"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 1, "engine": "deepl", "score": 3, "why": "grammatically awkward '迷子でもした'"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 1, "engine": "gpt-4o-mini", "score": 4, "why": "a bit gentle, misses 'or something'"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "natural and accurate colloquial dialogue"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 1, "engine": "apple-low-latency", "score": 1, "why": "mistranslated lost as defeated"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "natural but slightly deviates from 'or something'"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "natural dramatic line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "natural dramatic line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural dramatic line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural dramatic line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "natural dramatic line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "natural dramatic line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "natural dramatic line"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 2, "engine": "qwen3.5:2b", "score": 3, "why": "stiff phrasing"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 2, "engine": "translategemma:4b", "score": 4, "why": "unnecessary quotes and slight overtranslation"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 2, "engine": "deepl", "score": 4, "why": "overly explicit pronoun"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 2, "engine": "apple-high-fidelity", "score": 2, "why": "overly literal English calque"}
+{"judge": "gemini", "pair": "en-ja", "batch": 2, "line": 2, "engine": "apple-low-latency", "score": 3, "why": "overly literal English calque"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 0, "engine": "apple-high-fidelity", "score": 5, "why": "concise and natural headline"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 0, "engine": "translategemma:4b", "score": 4, "why": "simplified but natural"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 0, "engine": "apple-low-latency", "score": 3, "why": "too wordy and polite for headline"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "concise and natural headline"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "natural headline phrasing"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 0, "engine": "claude-haiku-5-5", "score": 4, "why": "ドラマチック is slightly less idiomatic than 劇的"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 0, "engine": "deepl", "score": 4, "why": "natural but full verb ending"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "concise and natural headline"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "concise and natural headline"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "concise and natural headline"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "concise and natural headline"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "natural headline style"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "natural headline style"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 1, "engine": "apple-high-fidelity", "score": 5, "why": "natural headline style"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 1, "engine": "apple-low-latency", "score": 3, "why": "polite ending in headline"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "natural headline style"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "電池 is acceptable but バッテリー is preferred"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 1, "engine": "gpt-4o-mini", "score": 5, "why": "natural headline style"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural headline style"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural headline style"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 1, "engine": "deepl", "score": 4, "why": "unnecessary comma"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 1, "engine": "translategemma:4b", "score": 5, "why": "natural headline style"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 2, "engine": "apple-low-latency", "score": 3, "why": "polite ending and progressive tense in headline"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "natural headline noun phrase"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 2, "engine": "apple-high-fidelity", "score": 2, "why": "grammatically awkward '据え置きしている'"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural headline noun phrase"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 2, "engine": "deepl", "score": 5, "why": "natural financial news style"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 2, "engine": "claude-haiku-5-5", "score": 4, "why": "natural financial news style"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural headline noun phrase"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 2, "engine": "translategemma:4b", "score": 5, "why": "natural headline noun phrase"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "natural headline noun phrase"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "natural headline noun phrase"}
+{"judge": "gemini", "pair": "en-ja", "batch": 3, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "natural headline noun phrase"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 0, "engine": "deepl", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 0, "engine": "translategemma:4b", "score": 2, "why": "의미가 반대로 들림"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 0, "engine": "apple-high-fidelity", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 0, "engine": "qwen3.5:2b", "score": 3, "why": "closing 의미 누락"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 0, "engine": "apple-low-latency", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 1, "engine": "qwen3.5:2b", "score": 4, "why": "자연스럽지만 UI톤 약간 김"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 1, "engine": "deepl", "score": 5, "why": "간결하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 1, "engine": "apple-high-fidelity", "score": 5, "why": "간결하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 1, "engine": "apple-low-latency", "score": 3, "why": "표현이 다소 어색함"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "무난하지만 약간 어색함"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "자연스럽지만 약간 장황함"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 1, "engine": "gpt-4o-mini", "score": 3, "why": "표현이 다소 어색함"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "간결하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "간결하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 2, "engine": "apple-high-fidelity", "score": 4, "why": "의미 정확하나 조금 풀어씀"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 2, "engine": "deepl", "score": 5, "why": "간결하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "간결하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 2, "engine": "apple-low-latency", "score": 5, "why": "간결하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 2, "engine": "translategemma:4b", "score": 5, "why": "간결하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "간결하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "간결하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "간결하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 2, "engine": "qwen3.5:2b", "score": 5, "why": "간결하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 0, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "간결하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "뉘앙스와 구어체 좋음"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "자연스럽지만 번역투 약간"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 0, "engine": "deepl", "score": 4, "why": "의미 맞지만 조금 장황함"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 3, "why": "추측 뉘앙스가 과함"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 0, "engine": "translategemma:4b", "score": 1, "why": "문장 미완성"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 0, "engine": "gpt-5.4-mini", "score": 3, "why": "뜻은 통하나 어색함"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 0, "engine": "apple-high-fidelity", "score": 2, "why": "원뜻과 어긋남"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 0, "engine": "apple-low-latency", "score": 2, "why": "원뜻과 어긋남"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "구어체로 매우 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 1, "engine": "deepl", "score": 4, "why": "정확하나 조금 딱딱함"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "자연스럽고 정확함"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "자연스럽고 정확함"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 1, "engine": "gpt-4o-mini", "score": 5, "why": "자연스럽고 정확함"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "정확하나 다소 길다"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 1, "engine": "apple-low-latency", "score": 5, "why": "자연스럽고 정확함"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 1, "engine": "claude-sonnet-5-5", "score": 3, "why": "hyped 의미가 다소 과장됨"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 1, "engine": "apple-high-fidelity", "score": 4, "why": "자연스럽지만 마침표 불필요"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "캐주얼하나 문체 제한적"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "자연스럽고 정확함"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "자연스럽지만 미묘하게 다름"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 2, "engine": "claude-haiku-5-5", "score": 3, "why": "끝맺음이 부자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "자연스럽고 정확함"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 2, "engine": "gpt-5.4-mini", "score": 3, "why": "가지러 어색함"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 2, "engine": "deepl", "score": 3, "why": "grab이 마시다로 바뀜"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 2, "engine": "apple-high-fidelity", "score": 3, "why": "grab이 마시다로 바뀜"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 2, "engine": "gpt-5.6-luna", "score": 2, "why": "문장이 부자연스럽고 시제 어색"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 2, "engine": "apple-low-latency", "score": 1, "why": "화자와 의미가 틀림"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 2, "engine": "translategemma:4b", "score": 2, "why": "높임과 의미가 어색함"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "자연스럽고 정확함"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "사 오다로 의미 약간 다름"}
+{"judge": "openai", "pair": "en-ko", "batch": 1, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "자연스럽고 정확함"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 0, "engine": "apple-high-fidelity", "score": 1, "why": "문장 성립 안 됨"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 0, "engine": "qwen3.5:2b", "score": 2, "why": "dare 의미 누락"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 2, "why": "중복과 표현 어색함"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "문체와 뉘앙스 적절"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 0, "engine": "gpt-5.4-mini", "score": 4, "why": "자연스럽지만 도전 뉘앙스 약함"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 0, "engine": "apple-low-latency", "score": 3, "why": "의미는 비슷하나 의역"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 0, "engine": "deepl", "score": 5, "why": "문체와 뉘앙스 적절"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 0, "engine": "gpt-5.6-luna", "score": 4, "why": "짧고 자연스럽지만 완전문 아님"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 0, "engine": "translategemma:4b", "score": 2, "why": "불필요하게 장황함"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 0, "engine": "gpt-4o-mini", "score": 1, "why": "비문에 가까움"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 1, "engine": "qwen3.5:2b", "score": 1, "why": "Captain 오역과 표현 오류"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "자연스럽지만 captain 불일치"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 1, "engine": "translategemma:4b", "score": 3, "why": "의미는 통하나 관용구 약함"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 1, "engine": "gpt-5.4-mini", "score": 4, "why": "자연스럽지만 captain 불일치"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 1, "engine": "claude-haiku-5-5", "score": 4, "why": "자연스럽지만 captain 불일치"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 1, "engine": "apple-low-latency", "score": 2, "why": "지지하다로 의미 약화"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 1, "engine": "deepl", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 1, "engine": "apple-high-fidelity", "score": 2, "why": "Captain 오역과 의미 약화"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 1, "engine": "gpt-4o-mini", "score": 4, "why": "자연스럽지만 captain 불일치"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "자연스럽지만 captain 불일치"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 1, "engine": "gpt-5.6-luna", "score": 4, "why": "자연스럽지만 captain 불일치"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 1, "engine": "claude-sonnet-5-5", "score": 4, "why": "자연스럽지만 captain 불일치"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 2, "engine": "apple-high-fidelity", "score": 4, "why": "무난하나 out of time 뉘앙스 약함"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "문맥상 매우 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 2, "engine": "translategemma:4b", "score": 3, "why": "sir 오역 가능성 큼"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 2, "engine": "claude-sonnet-5-5", "score": 4, "why": "정확하나 다소 직역"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 2, "why": "sir를 손님으로 한정"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 2, "engine": "deepl", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 2, "engine": "qwen3.5:2b", "score": 1, "why": "부자연스럽고 의미 오류"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 2, "engine": "gpt-5.4-mini", "score": 3, "why": "sir 오역 가능성 큼"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 3, "why": "sir 오역 가능성 큼"}
+{"judge": "openai", "pair": "en-ko", "batch": 2, "line": 2, "engine": "apple-low-latency", "score": 4, "why": "정확하나 다소 직역"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 0, "engine": "apple-low-latency", "score": 4, "why": "정확하나 기사체로는 덜 간결"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "정확하고 자연스러운 기사체"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 0, "engine": "gpt-5.4-mini", "score": 2, "why": "문장 끝이 부자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 0, "engine": "claude-sonnet-5-5", "score": 4, "why": "간결한 기사체이나 downtown 약함"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "간결하고 정확한 기사체"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 0, "engine": "gpt-4o-mini", "score": 4, "why": "정확하나 기사체로는 덜 간결"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 0, "engine": "apple-high-fidelity", "score": 3, "why": "조사 생략이 어색함"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 0, "engine": "deepl", "score": 5, "why": "의미 명확하고 기사체 적절"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "간결하고 정확한 기사체"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 0, "engine": "translategemma:4b", "score": 4, "why": "자연스럽지만 downtown 뉘앙스 약함"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 1, "engine": "gpt-4o-mini", "score": 3, "why": "분기별은 뜻이 다소 다름"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "자연스럽지만 reports 직역 아님"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 1, "engine": "apple-low-latency", "score": 5, "why": "정확하고 자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "간결한 기사체로 적절"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "순이익으로 의미가 좁아짐"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 1, "engine": "deepl", "score": 4, "why": "reports가 기록으로 바뀜"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "정확하고 자연스러운 기사체"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 1, "engine": "translategemma:4b", "score": 3, "why": "profit이 실적으로 바뀜"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "간결하고 정확한 기사체"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 1, "engine": "apple-high-fidelity", "score": 2, "why": "시제와 문체가 부자연스러움"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 2, "engine": "translategemma:4b", "score": 5, "why": "간결한 기사체로 적절"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 2, "engine": "gpt-5.4-mini", "score": 3, "why": "문장 끝이 어색함"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "간결하고 정확한 기사체"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 2, "engine": "gpt-4o-mini", "score": 4, "why": "정확하나 기사체로는 길다"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 2, "engine": "apple-low-latency", "score": 2, "why": "시제가 제목체와 맞지 않음"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 2, "engine": "deepl", "score": 3, "why": "현재진행형이 어색함"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "간결하나 across 뉘앙스 약함"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 2, "engine": "apple-high-fidelity", "score": 2, "why": "일반 현재라 제목체 어색"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "간결하고 정확한 기사체"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 2, "engine": "gpt-5.6-luna", "score": 4, "why": "정확하나 일반 문장체"}
+{"judge": "openai", "pair": "en-ko", "batch": 3, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "정확하나 다소 장황함"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and standard UI copy"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 0, "engine": "deepl", "score": 5, "why": "accurate and standard UI copy"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and standard UI copy"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and standard UI copy"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 0, "engine": "translategemma:4b", "score": 2, "why": "inverted meaning"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 0, "engine": "apple-high-fidelity", "score": 5, "why": "accurate and standard UI copy"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and standard UI copy"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 0, "engine": "qwen3.5:2b", "score": 3, "why": "omits 'before closing'"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and standard UI copy"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and standard UI copy"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 0, "engine": "apple-low-latency", "score": 5, "why": "accurate and standard UI copy"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and standard UI copy"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 1, "engine": "qwen3.5:2b", "score": 4, "why": "clear but slightly verbose"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 1, "engine": "deepl", "score": 5, "why": "concise and natural UI copy"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 1, "engine": "apple-high-fidelity", "score": 5, "why": "concise and natural UI copy"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 1, "engine": "apple-low-latency", "score": 4, "why": "acceptable but less common UI phrasing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "acceptable phrasing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "natural UI phrasing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 1, "engine": "gpt-4o-mini", "score": 4, "why": "acceptable phrasing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "standard UI string"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "standard UI string"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 2, "engine": "apple-high-fidelity", "score": 4, "why": "slightly wordy for a button/toggle"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 2, "engine": "deepl", "score": 5, "why": "standard UI string"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "standard UI string"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 2, "engine": "apple-low-latency", "score": 5, "why": "standard UI string"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 2, "engine": "translategemma:4b", "score": 5, "why": "standard UI string"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "standard UI string"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "standard UI string"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "standard UI string"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 2, "engine": "qwen3.5:2b", "score": 5, "why": "standard UI string"}
+{"judge": "gemini", "pair": "en-ko", "batch": 0, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "standard UI string"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "natural internet casual tone"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "a bit terse but understandable"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "natural phrasing and tone"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 0, "engine": "deepl", "score": 5, "why": "very natural colloquial expression"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural and conversational"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 0, "engine": "translategemma:4b", "score": 2, "why": "incomplete sentence"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 0, "engine": "gpt-5.4-mini", "score": 4, "why": "slightly unnatural ending"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 0, "engine": "apple-high-fidelity", "score": 2, "why": "awkward literal translation"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "very natural casual Korean"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 0, "engine": "apple-low-latency", "score": 2, "why": "awkward literal translation"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "very natural phrasing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 1, "engine": "deepl", "score": 4, "why": "a bit formal for slang"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "natural casual tone"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 1, "engine": "gpt-4o-mini", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 1, "engine": "translategemma:4b", "score": 3, "why": "overly stiff and literal"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 1, "engine": "apple-low-latency", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 1, "engine": "claude-sonnet-5-5", "score": 4, "why": "slightly awkward phrasing with '때문에'"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 1, "engine": "apple-high-fidelity", "score": 3, "why": "unnatural pronoun usage in casual text"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "perfect casual chat style"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "natural conversational tone"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural and idiomatic"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 2, "engine": "claude-haiku-5-5", "score": 4, "why": "slightly unnatural clause connection"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural chat phrasing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 2, "engine": "gpt-5.4-mini", "score": 3, "why": "awkward hanging clause"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 2, "engine": "deepl", "score": 4, "why": "overly polite for casual brb"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 2, "engine": "apple-high-fidelity", "score": 4, "why": "slightly loose translation of grabbing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 2, "engine": "gpt-5.6-luna", "score": 4, "why": "clunky progressive form"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 2, "engine": "apple-low-latency", "score": 2, "why": "incorrect imperative/person shift"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 2, "engine": "translategemma:4b", "score": 4, "why": "polite register clashes with brb abbreviation"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "natural chat expression"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "en-ko", "batch": 1, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "natural chat expression"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 0, "engine": "apple-high-fidelity", "score": 1, "why": "incoherent translation"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 0, "engine": "qwen3.5:2b", "score": 2, "why": "polite register ruins dramatic tone"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 2, "why": "awkward repetition of 감히"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "dramatic and natural rhetorical question"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "excellent archaic/dramatic register"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural dramatic phrasing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 0, "engine": "gpt-5.4-mini", "score": 4, "why": "accurate but slightly flat"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 0, "engine": "apple-low-latency", "score": 3, "why": "overly literal and polite"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 0, "engine": "deepl", "score": 5, "why": "accurate and fitting historical register"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 0, "engine": "gpt-5.6-luna", "score": 4, "why": "sentence feels slightly clipped"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 0, "engine": "translategemma:4b", "score": 2, "why": "unnatural literal translationese"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 0, "engine": "gpt-4o-mini", "score": 1, "why": "unusable word-for-word translation"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 1, "engine": "qwen3.5:2b", "score": 1, "why": "literal mistranslation of 'back' as '뒷면'"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "idiomatic, though '뒤를 봐주다' can mean patronage"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 1, "engine": "translategemma:4b", "score": 2, "why": "unnatural literal translation of back as political support"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 1, "engine": "gpt-5.4-mini", "score": 4, "why": "good informal military camaraderie tone"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 1, "engine": "claude-haiku-5-5", "score": 3, "why": "mismatched honorific '대장' and informal pronoun '자네'"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 1, "engine": "apple-low-latency", "score": 2, "why": "unnatural business-like support translation"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 1, "engine": "deepl", "score": 4, "why": "natural, assumes naval context"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 1, "engine": "apple-high-fidelity", "score": 2, "why": "poor choice of rank and literal '지지'"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 1, "engine": "gpt-4o-mini", "score": 4, "why": "natural but slightly softens the idiom"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "natural dialogue translation"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 1, "engine": "gpt-5.6-luna", "score": 4, "why": "natural dialogue translation"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 1, "engine": "claude-sonnet-5-5", "score": 4, "why": "acceptable interpretation of support"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 2, "engine": "apple-high-fidelity", "score": 3, "why": "'선생님' feels mismatched and '부족합니다' implies running low"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 2, "engine": "claude-haiku-5-5", "score": 3, "why": "'폐하' means Your Majesty, not sir"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 2, "engine": "gpt-4o-mini", "score": 4, "why": "acceptable customer/client context"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 2, "engine": "translategemma:4b", "score": 3, "why": "'부족합니다' means running low, not out of time"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 2, "engine": "gpt-5.6-luna", "score": 4, "why": "acceptable formal dialogue"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 2, "engine": "claude-sonnet-5-5", "score": 4, "why": "acceptable phrasing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "very natural service/polite context"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 2, "engine": "deepl", "score": 4, "why": "acceptable polite translation"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 2, "engine": "qwen3.5:2b", "score": 2, "why": "'상사' as direct address is unnatural"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "very natural for military/hierarchical dialogue"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "natural dialogue translation"}
+{"judge": "gemini", "pair": "en-ko", "batch": 2, "line": 2, "engine": "apple-low-latency", "score": 4, "why": "acceptable polite translation"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 0, "engine": "apple-low-latency", "score": 4, "why": "full sentence rather than headline"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural journalistic sentence"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 0, "engine": "gpt-5.4-mini", "score": 4, "why": "awkward headline style"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "concise and natural headline"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "concise and natural headline"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 0, "engine": "gpt-4o-mini", "score": 4, "why": "full sentence rather than headline"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 0, "engine": "apple-high-fidelity", "score": 4, "why": "slightly wordy headline"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 0, "engine": "deepl", "score": 5, "why": "clear and natural headline"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 0, "engine": "gpt-5.6-luna", "score": 4, "why": "full sentence rather than headline"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "flawless Korean news headline style"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 0, "engine": "translategemma:4b", "score": 4, "why": "acceptable headline style"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 1, "engine": "gpt-4o-mini", "score": 3, "why": "literal translation of 'reports' as '보고했습니다'"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 3, "why": "literal translation of 'reports' as '보고했습니다'"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 1, "engine": "gpt-5.6-luna", "score": 3, "why": "literal translation of 'reports' as '보고했습니다'"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 1, "engine": "apple-low-latency", "score": 3, "why": "literal '칩 제조업체' and '보고했습니다'"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "standard Korean financial headline style"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "very natural and precise financial headline"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 1, "engine": "deepl", "score": 5, "why": "natural financial headline"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "natural financial headline"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 1, "engine": "translategemma:4b", "score": 5, "why": "very natural financial headline"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "standard Korean financial headline style"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 1, "engine": "apple-high-fidelity", "score": 2, "why": "unnatural literal translationese"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 2, "engine": "translategemma:4b", "score": 3, "why": "awkward phrasing with '지역 전반의'"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 2, "engine": "gpt-5.4-mini", "score": 4, "why": "acceptable journalistic style"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "natural headline phrasing"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 2, "engine": "gpt-4o-mini", "score": 4, "why": "counter '개' is less natural than '편' for flights"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 2, "engine": "apple-low-latency", "score": 3, "why": "awkward translation of transitive delay verb"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 2, "engine": "deepl", "score": 4, "why": "acceptable news style"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "compressed but understandable headline"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 2, "engine": "apple-high-fidelity", "score": 4, "why": "acceptable full sentence headline"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "crisp and natural headline style"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "natural news sentence"}
+{"judge": "gemini", "pair": "en-ko", "batch": 3, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "clear, accurate and formal"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "translategemma:4b", "score": 4, "why": "accurate but slightly conversational"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "apple-low-latency", "score": 4, "why": "accurate but less polite-natural"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "apple-high-fidelity", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "deepl", "score": 5, "why": "accurate and natural UI wording"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "standard and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "standard and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "standard and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "standard and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "apple-low-latency", "score": 3, "why": "understandable but unnatural button style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "gpt-4o-mini", "score": 5, "why": "standard and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "deepl", "score": 5, "why": "standard and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "standard and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "standard and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "accurate but less standard phrasing"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "apple-high-fidelity", "score": 5, "why": "standard and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "apple-high-fidelity", "score": 3, "why": "understandable but awkward form"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "apple-low-latency", "score": 2, "why": "dictionary form unnatural for UI"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "translategemma:4b", "score": 5, "why": "accurate and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "deepl", "score": 5, "why": "accurate and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural UI label"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural casual tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "deepl", "score": 5, "why": "accurate and natural casual tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "apple-low-latency", "score": 4, "why": "accurate but slightly less colloquial"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural casual tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "gpt-5.4-mini", "score": 3, "why": "understandable but unnatural 오늘의"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural casual tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural casual tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural casual tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "apple-high-fidelity", "score": 4, "why": "accurate but slightly less colloquial"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "translategemma:4b", "score": 3, "why": "too broad and unnatural phrasing"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "gpt-4o-mini", "score": 3, "why": "understandable but unnatural 오늘의"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "qwen3.5:2b", "score": 2, "why": "party mistranslates drinking gathering"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "claude-sonnet-5-5", "score": 4, "why": "natural but それな nuance shifts"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural reply"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and very natural slang"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "natural but spelling is nonstandard"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "qwen3.5:2b", "score": 1, "why": "first phrase is mistranslated"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural reply"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural reply"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "apple-high-fidelity", "score": 2, "why": "awkward and inaccurate first phrase"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "apple-low-latency", "score": 5, "why": "accurate and natural reply"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "gpt-4o-mini", "score": 3, "why": "understandable but stiff"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "deepl", "score": 5, "why": "accurate and natural reply"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "accurate but ellipsis weakens tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "translategemma:4b", "score": 5, "why": "accurate and natural casual tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "apple-low-latency", "score": 2, "why": "register is inconsistent"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "deepl", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "gpt-4o-mini", "score": 4, "why": "accurate but slightly stiff"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "natural equivalent of 助かった"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "natural but slightly terse"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural equivalent of 助かった"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "apple-high-fidelity", "score": 3, "why": "meaning shifts to thanks for helping"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "qwen3.5:2b", "score": 3, "why": "accurate but too formal"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "natural equivalent of 助かった"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural equivalent of 助かった"}
+{"judge": "openai", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural workplace phrase"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "translategemma:4b", "score": 2, "why": "meaning shifts to asking understanding"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "qwen3.5:2b", "score": 1, "why": "meaning is wrong"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "apple-high-fidelity", "score": 4, "why": "accurate but less natural formula"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "accurate but less polite than source"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural workplace phrase"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "apple-low-latency", "score": 5, "why": "accurate and natural workplace phrase"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural workplace phrase"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural workplace phrase"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "deepl", "score": 4, "why": "natural but less fixed-expression nuance"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "accurate but less polite than source"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "gpt-4o-mini", "score": 4, "why": "accurate but less polite than source"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "deepl", "score": 5, "why": "accurate and natural dramatic tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "gpt-5.6-luna", "score": 4, "why": "accurate but slightly awkward"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "qwen3.5:2b", "score": 2, "why": "unnatural and wrong tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "apple-low-latency", "score": 4, "why": "accurate but misses emphatic nuance"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural dramatic tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "claude-haiku-5-5", "score": 4, "why": "accurate but rougher register"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 3, "why": "awkward and tone mismatch"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "accurate but misses 見せる nuance"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural dramatic tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "apple-high-fidelity", "score": 1, "why": "typo makes it unusable"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "gpt-4o-mini", "score": 4, "why": "accurate but misses emphatic nuance"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "claude-sonnet-5-5", "score": 4, "why": "accurate but spacing looks odd"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural villain tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and natural villain tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "gpt-5.4-mini", "score": 4, "why": "accurate but rougher nuance"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "qwen3.5:2b", "score": 1, "why": "incorrect meaning and punctuation"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "gpt-5.6-luna", "score": 2, "why": "grammar and tone are off"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural villain tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural villain tone"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "claude-sonnet-5-5", "score": 4, "why": "accurate but rougher nuance"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "apple-high-fidelity", "score": 3, "why": "understandable but too casual"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "apple-low-latency", "score": 3, "why": "understandable but too casual"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "translategemma:4b", "score": 3, "why": "understandable but too casual"}
+{"judge": "openai", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "deepl", "score": 3, "why": "too colloquial and added insult"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "gpt-4o-mini", "score": 4, "why": "accurate but slightly awkward noun choice"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural news style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "apple-high-fidelity", "score": 3, "why": "understandable but unnatural phrasing"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural news style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "deepl", "score": 5, "why": "accurate and natural wording"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "translategemma:4b", "score": 3, "why": "accurate but register changed to formal polite"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "qwen3.5:2b", "score": 3, "why": "understandable but subject phrasing less natural"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural news style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "apple-low-latency", "score": 3, "why": "redundant and polite style mismatch"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural news style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural news style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural wording"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "deepl", "score": 4, "why": "accurate but double 도 is awkward"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 3, "why": "understandable but double 도 is awkward"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "gpt-5.4-mini", "score": 2, "why": "grammatically awkward and less headline-like"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "gpt-4o-mini", "score": 3, "why": "understandable but double 도 is awkward"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "claude-haiku-5-5", "score": 3, "why": "understandable but double 도 is awkward"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 3, "why": "meaning roughly right but too colloquial"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "accurate but not headline style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "apple-high-fidelity", "score": 1, "why": "unnatural and incomplete"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "apple-low-latency", "score": 3, "why": "accurate but not headline style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural headline style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "gpt-5.6-luna", "score": 3, "why": "double 도 is awkward"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "qwen3.5:2b", "score": 3, "why": "accurate but unnatural double 도"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "deepl", "score": 5, "why": "accurate and natural headline style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural headline style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "qwen3.5:2b", "score": 1, "why": "contains untranslated Japanese"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "apple-low-latency", "score": 4, "why": "accurate but not concise headline style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural headline style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "translategemma:4b", "score": 4, "why": "accurate but less headline-like"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural headline style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "apple-high-fidelity", "score": 3, "why": "눈보라 changes meaning slightly"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural headline style"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "claude-haiku-5-5", "score": 4, "why": "accurate but sentence style not headline"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "gpt-4o-mini", "score": 3, "why": "교통 혼잡 is slightly off meaning"}
+{"judge": "openai", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural headline style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "translategemma:4b", "score": 2, "why": "too colloquial for a UI prompt"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "natural and standard UI copy"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural and standard UI copy"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "natural and standard UI copy"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "natural and standard UI copy"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "apple-low-latency", "score": 3, "why": "lacks standard honorific '시' for UI"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural and standard UI copy"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "apple-high-fidelity", "score": 5, "why": "natural and standard UI copy"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "natural and standard UI copy"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "natural and standard UI copy"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 0, "engine": "deepl", "score": 5, "why": "natural and standard UI copy"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "apple-low-latency", "score": 3, "why": "too verbose for a UI button"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "gpt-4o-mini", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "deepl", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "natural but '새 폴더' is more conventional"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 1, "engine": "apple-high-fidelity", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "apple-high-fidelity", "score": 3, "why": "unnecessary object particle for UI"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "apple-low-latency", "score": 2, "why": "plain dictionary form is awkward for UI"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "standard concise UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "standard concise UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "standard concise UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "translategemma:4b", "score": 5, "why": "standard concise UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "standard concise UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "deepl", "score": 5, "why": "standard concise UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "standard concise UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "standard concise UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 0, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "standard concise UI phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural casual tone"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "deepl", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "apple-low-latency", "score": 4, "why": "slightly formal negative form for casual chat"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "natural casual tone"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "gpt-5.4-mini", "score": 3, "why": "overly literal and stiff phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "natural casual tone"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural casual tone"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "apple-high-fidelity", "score": 4, "why": "slightly stiff phrasing for casual chat"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "translategemma:4b", "score": 3, "why": "'모임' misses the drinking nuance and phrasing is stiff"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "gpt-4o-mini", "score": 4, "why": "slightly stiff phrasing for casual chat"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 0, "engine": "qwen3.5:2b", "score": 3, "why": "'파티' is an unnatural translation for 飲み会"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural modern slang translation"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "natural conversational tone"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "perfect conversational agreement"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "'맞어' contains a minor spelling colloquialism"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "qwen3.5:2b", "score": 1, "why": "completely mistranslates the meaning"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "natural conversational tone"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural conversational tone"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "apple-high-fidelity", "score": 3, "why": "unnatural reaction in this context"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "apple-low-latency", "score": 5, "why": "natural conversational tone"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "gpt-4o-mini", "score": 3, "why": "awkward phrasing for agreeing casually"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "deepl", "score": 5, "why": "natural conversational tone"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "ellipsis slightly dampens the exclamation mark tone"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "translategemma:4b", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "apple-low-latency", "score": 2, "why": "inconsistent polite and casual speech levels"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "deepl", "score": 5, "why": "natural and expressive"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "gpt-4o-mini", "score": 4, "why": "slightly formal past ending in casual chat"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "very idiomatic translation of 助かった"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "a bit abrupt without '덕분에'"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "very idiomatic translation of 助かった"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "apple-high-fidelity", "score": 4, "why": "repetitive wording"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "qwen3.5:2b", "score": 4, "why": "accurate but overly polite for casual emoji text"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "very idiomatic translation of 助かった"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "very idiomatic translation of 助かった"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 1, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "standard and polite workplace phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "translategemma:4b", "score": 2, "why": "unnatural translation of お先に失礼します"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "qwen3.5:2b", "score": 2, "why": "awkward and unnatural phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "apple-high-fidelity", "score": 4, "why": "acceptable but '실례하겠습니다' is more natural"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 3, "why": "dropping '님' sounds awkward in Korean"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "standard and polite workplace phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "apple-low-latency", "score": 5, "why": "standard and polite workplace phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "standard and polite workplace phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "standard and polite workplace phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "deepl", "score": 5, "why": "very natural and idiomatic Korean expression"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 3, "why": "dropping '님' sounds awkward in Korean"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 0, "engine": "gpt-4o-mini", "score": 3, "why": "dropping '님' sounds awkward in Korean"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "deepl", "score": 5, "why": "natural and resolute dramatic tone"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "fits the dramatic determination well"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "qwen3.5:2b", "score": 2, "why": "literal and unnatural rendering of てみせる"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "apple-low-latency", "score": 4, "why": "omits the nuance of 〜抜いて"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "captures the solemn theatrical tone well"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "claude-haiku-5-5", "score": 4, "why": "pronoun '내가' doesn't match humble 'わたくし'"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "good nuance but slightly soft sentence ending"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "omits nuance of 〜抜いて"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "captures the solemn theatrical tone well"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "apple-high-fidelity", "score": 1, "why": "contains a critical typo '지키아내'"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "gpt-4o-mini", "score": 4, "why": "omits the nuance of 〜抜いて"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "'용사여' sounds respectful, not derogatory like '〜め'"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "gpt-4o-mini", "score": 4, "why": "'용사여' misses the derogatory nuance of '〜め'"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "well captured derogatory tone of villain"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "qwen3.5:2b", "score": 1, "why": "mistranslated and broken grammar"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "natural dramatic villain tone"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "'용사여' misses the derogatory nuance of '〜め'"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "claude-haiku-5-5", "score": 4, "why": "'용사여' misses the derogatory nuance of '〜め'"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "well captured derogatory tone of villain"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "apple-high-fidelity", "score": 3, "why": "too casual ('-어') and misses derogatory nuance"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "apple-low-latency", "score": 4, "why": "casual tone fits, but lacks strong villain flavor"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "translategemma:4b", "score": 4, "why": "casual tone fits, but lacks strong villain flavor"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 2, "line": 2, "engine": "deepl", "score": 5, "why": "very natural dramatic translation for '勇者め'"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "standard and natural news style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "claude-haiku-5-5", "score": 4, "why": "redundant expression '보조금 지원'"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "apple-high-fidelity", "score": 4, "why": "awkward particle '요금의 보조'"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "standard and natural news style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "deepl", "score": 5, "why": "natural news phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "translategemma:4b", "score": 4, "why": "sentence ending is conversational rather than headline/plain style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "qwen3.5:2b", "score": 4, "why": "conversational ending rather than plain news style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "standard and natural news style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "apple-low-latency", "score": 3, "why": "verbose and awkward news style phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "standard and natural news style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "standard and natural news style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "natural news phrasing"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "deepl", "score": 4, "why": "'봄에도' is slightly literal translationese"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "'봄에도' is slightly literal translationese"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "gpt-5.4-mini", "score": 4, "why": "grammatically awkward headline structure"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "gpt-4o-mini", "score": 3, "why": "mix of headline and declarative sentence"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "claude-haiku-5-5", "score": 3, "why": "full declarative sentence rather than concise headline"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "'봄에도' is literal, but concise"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "translategemma:4b", "score": 3, "why": "full polite sentence, not headline style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "apple-high-fidelity", "score": 2, "why": "unnatural ending '시작으로'"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "apple-low-latency", "score": 3, "why": "full polite sentence, not headline style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "very natural Korean headline phrasing for '〜にも'"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "gpt-5.6-luna", "score": 4, "why": "'봄에도' is slightly literal translationese"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 1, "engine": "qwen3.5:2b", "score": 3, "why": "full polite sentence, not headline style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "deepl", "score": 5, "why": "concise and natural headline style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural headline style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated Chinese characters left in text"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "apple-low-latency", "score": 3, "why": "full polite sentence instead of headline"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "concise and natural headline style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "translategemma:4b", "score": 3, "why": "full sentence rather than headline style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural headline style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "apple-high-fidelity", "score": 3, "why": "'눈보라' mistranslates '大雪' (폭설)"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural headline style"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "claude-haiku-5-5", "score": 4, "why": "full sentence rather than concise headline"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "gpt-4o-mini", "score": 3, "why": "awkward syntax with redundant past tense"}
+{"judge": "gemini", "pair": "ja-ko", "batch": 3, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "concise and natural headline style"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "translategemma:4b", "score": 4, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "adds confirmation naturally"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated Chinese"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "deepl", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "gpt-4o-mini", "score": 4, "why": "natural but spacing error"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "claude-sonnet-5-5", "score": 4, "why": "accurate but less emphatic"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "claude-haiku-5-5", "score": 4, "why": "accurate but less emphatic"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "gpt-5.6-luna", "score": 4, "why": "accurate but less emphatic"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "gpt-5.4-mini", "score": 4, "why": "accurate but less emphatic"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "deepl", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated Chinese"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "translategemma:4b", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated Chinese"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and polite"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "accurate but slightly terse"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "gpt-4o-mini", "score": 4, "why": "accurate but slightly terse"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "deepl", "score": 4, "why": "internet not network"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "translategemma:4b", "score": 4, "why": "accurate but slightly terse"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "gpt-5.6-luna", "score": 4, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "gpt-4o-mini", "score": 4, "why": "accurate and casual"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 1, "why": "untranslated Chinese"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "very natural and accurate"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated Chinese"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "translategemma:4b", "score": 3, "why": "meaning weakened"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "gpt-5.4-mini", "score": 4, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "very natural and accurate"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "deepl", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 3, "why": "omits laughing to death nuance"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "gpt-5.4-mini", "score": 4, "why": "accurate and expressive"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "gpt-4o-mini", "score": 1, "why": "wrong meaning"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "deepl", "score": 4, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "very natural equivalent"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "claude-sonnet-5-5", "score": 3, "why": "meaning shifted"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "claude-haiku-5-5", "score": 4, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated Chinese"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "translategemma:4b", "score": 3, "why": "too strong and different tone"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated Chinese"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "deepl", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "translategemma:4b", "score": 1, "why": "wrong food"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 3, "why": "food changed slightly"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "claude-haiku-5-5", "score": 4, "why": "natural but adds go eat"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and fitting tone"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "gpt-5.4-mini", "score": 4, "why": "accurate but less wuxia-like"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and fitting tone"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "claude-haiku-5-5", "score": 4, "why": "accurate but less wuxia-like"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "accurate but less wuxia-like"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "gpt-4o-mini", "score": 4, "why": "accurate but less wuxia-like"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "deepl", "score": 3, "why": "changes to realized mistake"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "claude-sonnet-5-5", "score": 3, "why": "changes to realized mistake"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated Chinese"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "translategemma:4b", "score": 4, "why": "natural but drops disciple wording"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "translategemma:4b", "score": 1, "why": "reverses subject and object"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and dramatic"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "gpt-4o-mini", "score": 2, "why": "awkwardly reverses politeness"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated Chinese"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "deepl", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and dramatic"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "claude-haiku-5-5", "score": 4, "why": "accurate but slightly softer"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "translategemma:4b", "score": 4, "why": "accurate and polite"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "deepl", "score": 4, "why": "natural but changes nuance"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "claude-sonnet-5-5", "score": 2, "why": "wrong verb choice"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "claude-haiku-5-5", "score": 2, "why": "wrong verb choice"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "natural but adds serve nuance"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "gpt-5.4-mini", "score": 4, "why": "period-style and fitting"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated Chinese"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "natural but adds serve nuance"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "deepl", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "claude-haiku-5-5", "score": 4, "why": "accurate but slightly abbreviated"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "gpt-4o-mini", "score": 4, "why": "accurate but slightly abbreviated"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "accurate but slightly abbreviated"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated Chinese"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "translategemma:4b", "score": 3, "why": "fragment and less natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "deepl", "score": 4, "why": "accurate but headline style"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "accurate but headline style"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated Chinese"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "deepl", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "gpt-5.4-mini", "score": 3, "why": "入冬 rendered too literally"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "gpt-4o-mini", "score": 3, "why": "less specific and awkward"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "translategemma:4b", "score": 1, "why": "wrong meaning"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "claude-haiku-5-5", "score": 3, "why": "入冬 rendered too literally"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "claude-sonnet-5-5", "score": 3, "why": "understandable but less natural"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated Chinese"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "gpt-5.6-luna", "score": 3, "why": "accurate but stiff"}
+{"judge": "openai", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "natural but less specific"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "translategemma:4b", "score": 5, "why": "natural UI text"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "deepl", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural UI text"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "natural UI text"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "natural UI text"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "natural UI text"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "gpt-4o-mini", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "deepl", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "translategemma:4b", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "standard UI phrasing"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "concise and natural UI text"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "concise and natural UI text"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "deepl", "score": 4, "why": "인터넷 instead of 네트워크"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 0, "line": 2, "engine": "translategemma:4b", "score": 5, "why": "concise and natural UI text"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "natural and expressive"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 1, "why": "untranslated"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "natural colloquial Korean"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "translategemma:4b", "score": 3, "why": "understated emotion"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "natural and expressive"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural colloquial Korean"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "deepl", "score": 5, "why": "natural colloquial Korean"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "slightly toned down"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "gpt-5.4-mini", "score": 3, "why": "unnatural idiom choice"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "gpt-4o-mini", "score": 2, "why": "mistranslates 服了"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "deepl", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "gpt-5.6-luna", "score": 4, "why": "acceptable idiom but slightly wordy"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "very natural colloquial phrasing"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural expression of frustration"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "natural and expressive"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "멘붕 slightly shifts the nuance"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "deepl", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "translategemma:4b", "score": 2, "why": "불고기 is wrong food"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "gpt-5.4-mini", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "샤브샤브 is localized adaptation"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "natural invitation phrasing"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "gpt-4o-mini", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 1, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "fits period genre style"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "fits period genre style"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "deepl", "score": 4, "why": "slightly stiff phrasing"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "claude-sonnet-5-5", "score": 4, "why": "slightly stiff phrasing"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 0, "engine": "translategemma:4b", "score": 5, "why": "natural and accurate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "translategemma:4b", "score": 2, "why": "wrong pronoun and overly polite"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "natural confrontation tone"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "dramatic and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "gpt-4o-mini", "score": 3, "why": "overly polite for this context"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "deepl", "score": 5, "why": "natural and concise"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "dramatic and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "dramatic and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "natural and expressive"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "natural colloquial tone"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "translategemma:4b", "score": 3, "why": "too modern and stiff"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "deepl", "score": 4, "why": "modern tone"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "claude-sonnet-5-5", "score": 5, "why": "matches historical drama tone"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "claude-haiku-5-5", "score": 5, "why": "matches historical drama tone"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "gpt-4o-mini", "score": 4, "why": "somewhat modern"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 4, "why": "modern hospitality tone"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "gpt-5.4-mini", "score": 4, "why": "나으리 shifts customer to nobleman"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "gpt-5.6-luna", "score": 5, "why": "polite and period-appropriate"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 2, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 4, "why": "modern hospitality tone"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "deepl", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "translategemma:4b", "score": 4, "why": "truncated headline style"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 0, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "claude-haiku-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "deepl", "score": 4, "why": "headline style without verb ending"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "translategemma:4b", "score": 4, "why": "headline style without verb ending"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "claude-sonnet-5-5", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "gpt-4o-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "gpt-5.4-mini", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 1, "engine": "gpt-5.6-luna", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "deepl", "score": 5, "why": "accurate and natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "gpt-5.4-mini", "score": 3, "why": "입동 is inaccurate for 入冬"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "gpt-4o-mini", "score": 4, "why": "다수 지역 is slightly stiff"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "gemini-3.5-flash-lite", "score": 5, "why": "accurate and very natural"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "translategemma:4b", "score": 2, "why": "겨울 이후 means after winter"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "claude-haiku-5-5", "score": 3, "why": "입동 is inaccurate for 入冬"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "claude-sonnet-5-5", "score": 3, "why": "입동 is inaccurate for 入冬"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "qwen3.5:2b", "score": 1, "why": "untranslated"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "gpt-5.6-luna", "score": 4, "why": "slightly literal phrasing"}
+{"judge": "gemini", "pair": "zh-Hans-ko", "batch": 3, "line": 2, "engine": "gemini-3.1-flash-lite", "score": 5, "why": "concise and natural"}

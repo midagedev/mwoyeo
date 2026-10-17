@@ -1,0 +1,29 @@
+{
+  "note": "Original lines written for this benchmark. Per pair: 12 lines = 4 batches of 3 (ui, chat, dialogue, headline).",
+  "pairs": {
+    "ja-ko": {"source": "ja", "target": "ko", "batches": [
+      ["設定を保存せずに閉じますか？", "新しいフォルダを作成", "通知をオフにする"],
+      ["今日の飲み会、ぶっちゃけ行きたくない😂", "それな！マジで眠すぎる〜", "ありがとう！助かったよ🙏"],
+      ["先輩、お先に失礼します。", "この城は、わたくしが守り抜いてみせる。", "……まだ終わってないぞ、勇者め。"],
+      ["政府は来月から電気料金の補助を再開すると発表した", "新型電池の量産、来年春にも開始へ", "東京都心で記録的な大雪、交通に乱れ"]
+    ]},
+    "en-ko": {"source": "en", "target": "ko", "batches": [
+      ["Save changes before closing?", "Sort by date modified", "Allow notifications"],
+      ["lol that meeting could've been an email 😭", "ngl I'm so hyped for the weekend", "brb, grabbing coffee ☕"],
+      ["You dare to stand before the king?", "Don't worry, Captain. I've got your back.", "I'm sorry, sir. We're out of time."],
+      ["City council approves new bike lanes downtown", "Chip maker reports record quarterly profit", "Storm delays hundreds of flights across the region"]
+    ]},
+    "en-ja": {"source": "en", "target": "ja", "batches": [
+      ["Delete this file permanently?", "Back to home", "Your password must be at least 8 characters"],
+      ["omg that's so cute 😍", "no way, you actually passed?!", "can't wait, see you tmrw!"],
+      ["Master, the enemy is approaching from the north.", "Hey kid, you lost or something?", "I won't let you take her away."],
+      ["Local team wins championship after dramatic overtime", "Researchers unveil battery that charges in five minutes", "Central bank holds interest rates steady"]
+    ]},
+    "zh-Hans-ko": {"source": "zh-Hans", "target": "ko", "batches": [
+      ["确定要退出登录吗？", "搜索历史记录", "网络连接失败，请重试"],
+      ["哈哈哈笑死我了😂", "我真的服了，又加班", "今晚一起吃火锅吧！"],
+      ["师父，弟子知错了。", "你以为这样就能赢我吗？", "这位客官，里面请！"],
+      ["国家队在决赛中以三比一获胜", "新能源汽车销量连续三个月增长", "多地迎来入冬以来首场降雪"]
+    ]}
+  }
+}

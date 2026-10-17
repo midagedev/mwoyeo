@@ -1,0 +1,12 @@
+{"engine": "gemini-3.8-flash", "model": "gemini-3.8-flash", "pair": "ja-ko", "batch": 0, "run": 0, "ms": 4145, "lines_out": 3, "error": null, "out": ["설정을 저장하지 않고 닫으시겠습니까?", "새 폴더 만들기", "알림 끄기"], "retries": 0}
+{"engine": "gemini-3.8-flash", "model": "gemini-3.8-flash", "pair": "ja-ko", "batch": 0, "run": 1, "ms": 2866, "lines_out": 3, "error": null, "out": ["설정을 저장하지 않고 닫으시겠습니까?", "새 폴더 만들기", "알림 끄기"], "retries": 0}
+{"engine": "gemini-3.8-flash", "model": "gemini-3.8-flash", "pair": "ja-ko", "batch": 0, "run": 2, "ms": 5925, "lines_out": 3, "error": null, "out": ["설정을 저장하지 않고 닫으시겠습니까?", "새 폴더 만들기", "알림 끄기"], "retries": 0}
+{"engine": "gemini-3.8-flash", "model": "gemini-3.8-flash", "pair": "ja-ko", "batch": 0, "run": 3, "ms": 2246, "lines_out": 3, "error": null, "out": ["설정을 저장하지 않고 닫으시겠습니까?", "새 폴더 만들기", "알림 끄기"], "retries": 0}
+{"engine": "gemini-3.8-flash", "model": "gemini-3.8-flash", "pair": "ja-ko", "batch": 1, "run": 1, "ms": 3563, "lines_out": 3, "error": null, "out": ["오늘 회식, 솔직히 가기 싫어😂", "인정! 진짜 너무 졸려~", "고마워! 살았다🙏"], "retries": 0}
+{"engine": "gemini-3.8-flash", "model": "gemini-3.8-flash", "pair": "ja-ko", "batch": 1, "run": 2, "ms": 3155, "lines_out": 3, "error": null, "out": ["오늘 회식, 솔직히 가기 싫다😂", "인정! 진짜 너무 졸려~", "고마워! 살았다🙏"], "retries": 0}
+{"engine": "gemini-3.8-flash", "model": "gemini-3.8-flash", "pair": "ja-ko", "batch": 1, "run": 3, "ms": 2177, "lines_out": 3, "error": null, "out": ["오늘 술자리, 솔직히 가기 싫어😂", "인정! 진짜 너무 졸려~", "고마워! 덕분에 살았어🙏"], "retries": 0}
+{"engine": "gemini-3.8-flash", "model": "gemini-3.8-flash", "pair": "ja-ko", "batch": 2, "run": 1, "ms": 2562, "lines_out": 3, "error": null, "out": ["선배님, 먼저 들어가 보겠습니다.", "이 성은 제가 끝까지 지켜내 보이겠습니다.", "……아직 끝나지 않았다, 용사 놈."], "retries": 0}
+{"engine": "gemini-3.8-flash", "model": "gemini-3.8-flash", "pair": "ja-ko", "batch": 2, "run": 2, "ms": null, "lines_out": null, "error": "HTTP 429", "out": null}
+{"engine": "gemini-3.8-flash", "model": "gemini-3.8-flash", "pair": "ja-ko", "batch": 2, "run": 3, "ms": 1833, "lines_out": 3, "error": "HTTP 429", "out": ["선배님, 먼저 들어가 보겠습니다.", "이 성은 제가 끝까지 지켜내 보이겠습니다.", "……아직 끝나지 않았다, 용사 놈."], "retries": 2}
+{"engine": "gemini-3.8-flash", "model": "gemini-3.8-flash", "pair": "ja-ko", "batch": 3, "run": 1, "ms": 3774, "lines_out": 3, "error": "HTTP 429", "out": ["정부는 다음 달부터 전기 요금 보조를 재개한다고 발표했다", "신형 배터리 양산, 내년 봄에라도 개시 예정", "도쿄 도심에 기록적인 폭설, 교통 혼잡"], "retries": 1}
+{"engine": "gemini-3.8-flash", "model": "gemini-3.8-flash", "pair": "ja-ko", "batch": 3, "run": 2, "ms": null, "lines_out": null, "error": "HTTP 429", "out": null}

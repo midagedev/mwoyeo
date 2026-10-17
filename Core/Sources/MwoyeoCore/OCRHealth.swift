@@ -1,8 +1,8 @@
 import Foundation
 
-/// Whether Vision's newest text model is answering. On some Macs it never does (its compiler service spins and the
-/// request hangs for good), and a hung request cannot be cancelled. This is the bookkeeping that notices, routes reads
-/// away from it, and notices when it answers again. Pure: callers pass `now` (any monotonic clock, in seconds) and do
+/// Whether Vision's newest text model (accurate revision 3 of `VNRecognizeTextRequest`) is answering. On some Macs it never
+/// does (its compiler service spins and the request hangs for good), and a hung request cannot be cancelled. This is the
+/// bookkeeping that notices, routes reads away from it, and notices when it answers again. Pure: callers pass `now` (any monotonic clock, in seconds) and do
 /// the work and the side effects.
 public struct OCRHealth: Sendable, Equatable {
     /// A request on the newest model that has not answered after this long is late: the next read does not queue behind it.

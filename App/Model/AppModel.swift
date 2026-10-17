@@ -135,18 +135,10 @@ final class AppModel {
         Task.detached(priority: .utility) { await loadVision() }
     }
 
-    /// Runs the recognizers once on a blank image, so their models are loaded when the first real picture comes. The
-    /// older ones go first: they are what a read falls back to while the newest model is still loading or stuck.
+    /// One accurate read of a small drawn picture (Latin and CJK text), so that the text model is loaded when the first real
+    /// picture comes.
     static func loadVision() async {
-        let ctx = CGContext(data: nil, width: 64, height: 32, bitsPerComponent: 8, bytesPerRow: 0,
-                            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
-        ctx?.setFillColor(.white)
-        ctx?.fill(CGRect(x: 0, y: 0, width: 64, height: 32))
-        if let img = ctx?.makeImage() {
-            await TextRecognizer.warmOlder(img)
-            _ = try? await TextRecognizer.lines(in: img, languages: [Locale.Language(identifier: "ja")], fast: false, warmUp: true)
-            _ = try? await TextRecognizer.blocks(in: img, languages: [], warmUp: true)
-        }
+        await TextRecognizer.warmUp()
     }
 
     func recheckPermission() {

@@ -148,7 +148,7 @@ Apple 翻译最快；云端引擎要多花一秒左右，换来的是结合上�
 | 环节 | 技术 |
 |---|---|
 | 捕捉 | ScreenCaptureKit：每个透镜一路流，排除 Mwoyeo 自己的叠加层，只在像素变化时输出帧 |
-| 文字识别 | Vision `RecognizeDocumentsRequest`（段落）和 `RecognizeTextRequest`（行、感兴趣区域） |
+| 文字识别 | Vision `VNRecognizeTextRequest`（行、感兴趣区域）；按位置和间距把行归为段落 |
 | 翻译 | Translation 框架：有语言包时用低延迟的语言包，没有时用高保真的 Apple Intelligence 模型 |
 | 按术语表翻译 | Foundation Models（设备端语言模型），可选 |
 | 擦除 | 纹理背景在 GPU 上用 Core ML 版 MI-GAN 做图像修复，纯色背景用快速扩散填充 |

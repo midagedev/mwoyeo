@@ -190,7 +190,7 @@ Apple 번역이 가장 빠르고, 클라우드 엔진은 1초 남짓 더 걸리�
 | 단계 | 기술 |
 |---|---|
 | 캡처 | ScreenCaptureKit. 렌즈마다 스트림 하나, Mwoyeo 오버레이는 제외, 픽셀이 바뀔 때만 프레임을 받아요 |
-| 글자 인식 | Vision `RecognizeDocumentsRequest`(문단), `RecognizeTextRequest`(줄, 관심 영역) |
+| 글자 인식 | Vision `VNRecognizeTextRequest`(줄, 관심 영역). 줄은 위치와 간격으로 문단에 묶습니다 |
 | 번역 | Translation 프레임워크. 저지연 언어 팩, 언어 팩이 없으면 Apple Intelligence 고품질 모델 |
 | 용어집 반영 번역 | Foundation Models(기기 안 언어 모델), 선택 |
 | 원문 지우기 | 무늬 있는 배경은 GPU에서 Core ML MI-GAN 인페인팅, 단색 배경은 빠른 확산 채우기 |

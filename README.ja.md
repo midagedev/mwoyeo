@@ -148,7 +148,7 @@ Apple翻訳がいちばん速く、クラウドエンジンは1秒ほど余計�
 | 段階 | 技術 |
 |---|---|
 | キャプチャ | ScreenCaptureKit（レンズごとに1ストリーム。Mwoyeo自身のオーバーレイは除外し、ピクセルが変わったときだけフレームを取得） |
-| テキスト認識 | Visionの`RecognizeDocumentsRequest`（段落）と`RecognizeTextRequest`（行、関心領域） |
+| テキスト認識 | Visionの`VNRecognizeTextRequest`（行、関心領域）。行は位置と間隔で段落にまとめます |
 | 翻訳 | Translationフレームワーク（低遅延の言語パック。言語パックがない場合は高品質なApple Intelligenceのモデル） |
 | 用語集に沿った翻訳 | オプションでFoundation Models（オンデバイスの言語モデル）を使用 |
 | 消去 | 模様のある背景はGPU上のCore ML MI-GANでインペインティング、平坦な背景は高速な拡散塗りつぶし |

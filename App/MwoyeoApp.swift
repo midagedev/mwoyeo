@@ -1,4 +1,5 @@
 import AppKit
+import MwoyeoCore
 import SwiftUI
 
 @main

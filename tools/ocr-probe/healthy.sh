@@ -1,14 +1,20 @@
 #!/bin/bash
-# Healthy-machine gate for the OCR fallback ladder (round ocr-stall). Needs the Bash sandbox off (headless --render), and a
-# quiet machine (no other --render running: the Neural Engine compiler service takes one compile at a time).
-#   build: cd /Users/hckim/repo/mwoyeo-wt-ocr && xcodegen generate && xcodebuild -scheme Mwoyeo -destination 'platform=macOS' \
-#          -derivedDataPath /tmp/ocr-stall/dd build
-#   run:   bash ocr-healthy.sh            (QUICK=1 skips the 200 s ja check)
-# One PASS/FAIL line per check, a summary line at the end. Outputs: /tmp/ocr-stall/healthy/*.out (stdout) and *.err (stderr).
-SP=${SP:?set SP to a folder holding in/chat.png (English chat) and in/vn.png (Japanese)}
+# Healthy-machine gate for the OCR fallback ladder (round ocr-stall) and the paragraph grouping (round ocr-vn). Needs the Bash
+# sandbox off (headless --render), and a quiet machine (no other --render running: the Neural Engine compiler service takes
+# one compile at a time).
+#   build: cd /Users/hckim/repo/mwoyeo-wt-ocrvn && xcodegen generate && xcodebuild -scheme Mwoyeo -destination 'platform=macOS' \
+#          -derivedDataPath /tmp/ocr-vn/dd build
+#   run:   SP=<dir with in/chat.png, in/vn.png, in/article.png, in/sub-mid.png> NEW=<binary> MAIN=<baseline binary> bash healthy.sh
+#          (QUICK=1 skips the 200 s ja check)
+# One PASS/FAIL line per check, a summary line at the end. Outputs: $OUT/*.out (stdout) and *.err (stderr), default /tmp/ocr-stall/healthy.
+# 2026-10-17 (ocr-vn): the app asks no Swift Vision request any more (they stall the whole process, tools/ocr-probe/inprocess.swift);
+# every read is the Objective-C VNRecognizeTextRequest, lines grouped into paragraphs by ParagraphGrouper. The checks of the child
+# warm-up (--warm-vision, --assume-vision-ready, slow-child, fail-child) and of the Swift path are gone; `stall` and `stall-vn` both
+# stall revision 3 now (checks 2 and 5), `slow:<ms>` makes revision 3 answer late (check 4).
+SP=${SP:?set SP to a folder holding in/chat.png (English chat), in/vn.png (Japanese), in/article.png and in/sub-mid.png (Japanese)}
 NEW=${NEW:-/tmp/ocr-stall/dd/Build/Products/Debug/Mwoyeo.app/Contents/MacOS/Mwoyeo}
 MAIN=${MAIN:-/tmp/mwoyeo-main/dd/Build/Products/Debug/Mwoyeo.app/Contents/MacOS/Mwoyeo}
-OUT=/tmp/ocr-stall/healthy
+OUT=${OUT:-/tmp/ocr-stall/healthy}
 mkdir -p "$OUT"
 fails=0
 
@@ -21,45 +27,50 @@ run() {
 }
 # Lines "    → text" that carry a translation.
 arrows() { local n z; n=$(grep -c '^    → ' "$1"); z=$(grep -c '^    → (no translation)' "$1"); echo $((n - z)); }
-# Sum of every ocr.fallback.<rung>=<n> in the work lines.
-fallback() { grep -o 'ocr\.fallback\.[a-z0-9]*=[0-9]*' "$1" | awk -F= '{s+=$2} END {print s+0}'; }
+# Sum of every ocr.fallback.<rung>=<n> in the work lines, for the rungs after the first (revision 2, fast).
+older() { grep -oE 'ocr\.fallback\.(rev2|fast)=[0-9]*' "$1" | awk -F= '{s+=$2} END {print s+0}'; }
 # First value of one counter anywhere in the output (0 if absent).
 count() { local v; v=$(grep -o "$2=[0-9]*" "$1" | head -1 | cut -d= -f2); echo "${v:-0}"; }
 verdict() { # <ok 0|1> <label> <detail>
     if [ "$1" = 0 ]; then echo "PASS $2 ($3)"; else echo "FAIL $2 ($3)"; fails=$((fails + 1)); fi
 }
 
-# Warm-up, not a check. The text models compile once per app binary (about half a minute each, the document recognizer
-# longer) and the compiler service takes one at a time; a run that exits mid-compile makes it start over. So let each
-# binary load them completely first: --warm (as the app does at launch), then stay alive while the Swift models finish.
-EXTRA="--warm --then wait120000" run w "$NEW" "" vn.png ja 600
-echo "warm-up new: $(cat $OUT/w.s) s  (stalled=$(count $OUT/w.out ocr.stalled) recovered=$(count $OUT/w.out ocr.recovered))"
-run mw "$MAIN" "" vn.png ja 400
-echo "warm-up main: $(cat $OUT/mw.s) s"
+# Warm-up, not a check. The text models compile once per app binary (up to a minute for revision 3) and the compiler service
+# takes one at a time; a run that exits mid-compile makes it start over. So let each binary load them completely first: --warm,
+# as the app does at launch.
+EXTRA="--warm" run w "$NEW" "" vn.png ja 600
+echo "warm-up new: $(cat $OUT/w.s) s  (stalled=$(count $OUT/w.out ocr.stalled.vn3) recovered=$(count $OUT/w.out ocr.recovered.vn3))"
 
+# Healthy: every read through revision 3, nothing older, no stall.
 run a "$NEW" "" chat.png en 90
-n=$(arrows "$OUT/a.out"); f=$(fallback "$OUT/a.out")
-[ "$n" -eq 29 ] && [ "$f" -eq 0 ]; verdict $? "1 chat.png en>ko, healthy: 29 arrows, ocr.fallback=0" "arrows=$n fallback=$f wall=$(cat $OUT/a.s)s"
+n=$(arrows "$OUT/a.out"); o=$(older "$OUT/a.out"); st=$(count "$OUT/a.out" ocr.stalled.vn3); b=$(count "$OUT/a.out" ocr.blocks)
+[ "$n" -ge 27 ] && [ "$o" -eq 0 ] && [ "$st" -eq 0 ] && [ "$b" -ge 1 ]; verdict $? "1 chat.png en>ko, healthy: >=27 arrows, ocr.fallback.rev2|fast=0, ocr.stalled.vn3=0, ocr.blocks>=1" "arrows=$n older=$o stalled=$st blocks-reads=$b wall=$(cat $OUT/a.s)s"
 
-# The Swift models never answer (the stall seen on macOS 27): the read goes to VNRecognizeTextRequest revision 3 after 8 s.
+# Revision 3 never answers (what the stalled Mac does; until 2026-10-17 `stall` meant the Swift models, now it is the same as
+# stall-vn): the read goes down the ladder to revision 2 after 8 s.
 run b "$NEW" stall chat.png en 90
-n=$(arrows "$OUT/b.out"); f=$(count "$OUT/b.out" ocr.fallback.vn3); st=$(count "$OUT/b.out" ocr.stalled)
-[ "$n" -ge 25 ] && [ "$f" -gt 0 ] && [ "$st" -ge 1 ]; verdict $? "2 chat.png en>ko, MWOYEO_FAKE_OCR=stall: >=25 arrows, ocr.fallback.vn3>0, ocr.stalled>=1" "arrows=$n vn3=$f stalled=$st wall=$(cat $OUT/b.s)s"
+n=$(arrows "$OUT/b.out"); f=$(count "$OUT/b.out" ocr.fallback.rev2); st=$(count "$OUT/b.out" ocr.stalled.vn3)
+[ "$n" -ge 25 ] && [ "$f" -gt 0 ] && [ "$st" -ge 1 ]; verdict $? "2 chat.png en>ko, MWOYEO_FAKE_OCR=stall: >=25 arrows, ocr.fallback.rev2>0, ocr.stalled.vn3>=1" "arrows=$n rev2=$f stalled=$st wall=$(cat $OUT/b.s)s"
 
-run c "$NEW" "" vn.png ja 90
-run m "$MAIN" "" vn.png ja 90
-n=$(arrows "$OUT/c.out"); nm=$(arrows "$OUT/m.out"); is=$(grep -c '^issue:' "$OUT/c.err")
-[ "$n" -eq "$nm" ] && [ "$n" -gt 0 ] && [ "$is" -eq 0 ]; verdict $? "3 vn.png ja>ko, healthy: same arrows as main, no issue" "arrows=$n main=$nm issues=$is wall=$(cat $OUT/c.s)s main-wall=$(cat $OUT/m.s)s"
-
-# Recovery: the Swift models answer 12 s late. The read goes to revision 3 at 8 s; the late answer ends the stall.
+# Recovery: revision 3 answers 12 s late. The read goes to revision 2 at 8 s; the late answer ends the stall.
 EXTRA="--then wait8000" run d "$NEW" slow:12000 chat.png en 90   # the wait keeps the process alive past the late answer
-n=$(arrows "$OUT/d.out"); st=$(count "$OUT/d.out" ocr.stalled); rc=$(count "$OUT/d.out" ocr.recovered)
-[ "$n" -ge 25 ] && [ "$st" -eq 1 ] && [ "$rc" -eq 1 ]; verdict $? "4 chat.png en>ko, MWOYEO_FAKE_OCR=slow:12000: >=25 arrows, ocr.stalled=1, ocr.recovered=1" "arrows=$n stalled=$st recovered=$rc wall=$(cat $OUT/d.s)s"
+n=$(arrows "$OUT/d.out"); st=$(count "$OUT/d.out" ocr.stalled.vn3); rc=$(count "$OUT/d.out" ocr.recovered.vn3)
+[ "$n" -ge 25 ] && [ "$st" -eq 1 ] && [ "$rc" -eq 1 ]; verdict $? "4 chat.png en>ko, MWOYEO_FAKE_OCR=slow:12000: >=25 arrows, ocr.stalled.vn3=1, ocr.recovered.vn3=1" "arrows=$n stalled=$st recovered=$rc wall=$(cat $OUT/d.s)s"
 
-# Revision 3 stalls too: the ladder goes on to revision 2 (English has one; Japanese has not).
+# Revision 3 stalls: the ladder goes on to revision 2 (English has one; Japanese has not).
 run e "$NEW" stall-vn chat.png en 90
 n=$(arrows "$OUT/e.out"); f=$(count "$OUT/e.out" ocr.fallback.rev2); st=$(count "$OUT/e.out" ocr.stalled.vn3)
 [ "$n" -ge 25 ] && [ "$f" -gt 0 ] && [ "$st" -ge 1 ]; verdict $? "5 chat.png en>ko, MWOYEO_FAKE_OCR=stall-vn: >=25 arrows, ocr.fallback.rev2>0, ocr.stalled.vn3>=1" "arrows=$n rev2=$f vn3-stalled=$st wall=$(cat $OUT/e.s)s"
+
+# Paragraphs (ParagraphGrouper): the three-line body paragraph of article.png is one block, and the two centred subtitle lines
+# of sub-mid.png are one block.
+if [ -f "$SP/in/article.png" ] && [ -f "$SP/in/sub-mid.png" ]; then
+    run p "$NEW" "" article.png ja 90
+    run q "$NEW" "" sub-mid.png ja 90
+    body=$(grep -c '^  .*海外のゲームや漫画.*おもしろいところ.*見比べるしかなかった' "$OUT/p.out")
+    sub=$(grep -c '^  .*今日はとても楽しかった.*また明日も一緒に遊ぼう' "$OUT/q.out"); sb=$(grep -c '^    → ' "$OUT/q.out")
+    [ "$body" -eq 1 ] && [ "$sub" -eq 1 ] && [ "$sb" -eq 1 ]; verdict $? "7 article.png ja>ko: the 3-line body is 1 block; sub-mid.png ja>ko: the 2 subtitle lines are 1 block" "body-blocks=$body subtitle-blocks=$sub sub-total-blocks=$sb arrows(article)=$(arrows "$OUT/p.out")"
+fi
 
 if [ -z "$QUICK" ]; then
     # Nothing else reads Japanese: it waits for revision 3 ("still preparing" after 8 s), and after 3 minutes says "not responding".
@@ -67,5 +78,14 @@ if [ -z "$QUICK" ]; then
     p=$(grep -c -e "^issue: macOS is still preparing text recognition for" -e "^issue: macOS가 아직" "$OUT/g.err"); r=$(grep -c -e "isn't responding" -e "응답하지 않아요" "$OUT/g.err"); w=$(cat "$OUT/g.s")
     [ "$p" -eq 1 ] && [ "$r" -eq 1 ] && [ "$w" -lt 290 ]; verdict $? "6 vn.png ja>ko, MWOYEO_FAKE_OCR=stall-vn: 'still preparing' line, then 'not responding' after 3 min, exits before max-wait" "preparing=$p not-responding=$r wall=${w}s"
 fi
+
+# Japanese, healthy: nothing else reads it, so every block is a revision 3 paragraph. Last, because MAIN (gated: its lines are read by
+# the same request, one block per line) starts a child process that loads the Swift models, which holds the compiler service.
+# The grouping gives no more blocks than main has lines, and not fewer than half.
+run c "$NEW" "" vn.png ja 90
+run mw "$MAIN" "" vn.png ja 400
+run m "$MAIN" "" vn.png ja 90
+n=$(arrows "$OUT/c.out"); nm=$(arrows "$OUT/m.out"); is=$(grep -c '^issue:' "$OUT/c.err")
+[ "$n" -gt 0 ] && [ "$n" -le "$nm" ] && [ $((2 * n)) -ge "$nm" ] && [ "$is" -eq 0 ]; verdict $? "3 vn.png ja>ko, healthy: arrows>0, <= main's one-per-line and >= half of it, no issue" "arrows=$n main=$nm issues=$is wall=$(cat $OUT/c.s)s main-wall=$(cat $OUT/m.s)s"
 
 echo "ocr-healthy: $([ $fails -eq 0 ] && echo ALL PASS || echo "$fails FAILED")"

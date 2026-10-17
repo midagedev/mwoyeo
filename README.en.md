@@ -200,7 +200,7 @@ Every stage uses Apple's on-device frameworks:
 | Stage | Technology |
 |---|---|
 | Capture | ScreenCaptureKit — one stream per lens, Mwoyeo's own overlays excluded, frames only when pixels change |
-| Text recognition | Vision `RecognizeDocumentsRequest` (paragraphs) and `RecognizeTextRequest` (lines, regions of interest) |
+| Text recognition | Vision `VNRecognizeTextRequest` (lines, regions of interest); lines are grouped into paragraphs by layout |
 | Translation | Translation framework — low-latency language packs, or the high-fidelity Apple Intelligence model without a pack |
 | Glossary-aware translation | Foundation Models (on-device language model), optional |
 | Erasing | Core ML MI-GAN inpainting on the GPU for textured backgrounds, a fast diffusion fill for flat ones |

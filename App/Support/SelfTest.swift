@@ -166,7 +166,12 @@ enum SelfTest {
 
     /// The work done since the last call: OCR requests, erases, engine calls.
     private static func printCounts(_ phase: String, _ pipeline: RegionPipeline? = nil) async {
-        var parts = Trace.takeCounts().sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }
+        var counts = Trace.takeCounts()
+        for key in ["translate.cancelled", "translate.wasted", "translate.lens_unserved"] where counts[key] == nil { counts[key] = 0 }
+        var parts = counts.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }
+        // How long text waited for its translation while in the lens (first seen there → translated).
+        let waits = (Trace.takeSamples()["translate.lens_wait_ms"] ?? []).sorted()
+        parts.append(waits.isEmpty ? "lens_wait=n/a" : String(format: "lens_wait_ms[p50=%.0f max=%.0f n=%d]", waits[waits.count / 2], waits[waits.count - 1], waits.count))
         if let pipeline { parts.append("parked=\(await pipeline.debugState().parked)") }
         print("work[\(phase)]: " + parts.joined(separator: " "))
     }
@@ -252,7 +257,7 @@ enum SelfTest {
         // Where each shown block sat on the page when first seen (page points), to measure drift from its text.
         var anchors: [UUID: (page: CGPoint, size: CGSize, scrolls: Bool)] = [:]
         var drifts: [CGFloat] = []
-        func shoot() throws {
+        func shoot() async throws {
             let w = Int(lens.width * scale), h = Int(lens.height * scale)
             guard let ctx = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: 0,
                                       space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue),
@@ -282,6 +287,7 @@ enum SelfTest {
                 }
             }
             drifts.append(drift)
+            let flight = await pipeline.debugState().flight
             guard let out = ctx.makeImage() else { return }
             let url = outdir.appendingPathComponent(String(format: "frame_%03d.png", frameIndex))
             if let dest = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil) {
@@ -289,8 +295,9 @@ enum SelfTest {
                 CGImageDestinationFinalize(dest)
             }
             frameIndex += 1
-            print(String(format: "frame %03d lens (%4.0f,%4.0f) capture (%4.0f,%4.0f %4.0f×%4.0f) blocks shown %d drift %.1f",
-                         frameIndex - 1, lens.minX, lens.minY, capture.minX, capture.minY, capture.width, capture.height, shown, drift))
+            print(String(format: "frame %03d lens (%4.0f,%4.0f) capture (%4.0f,%4.0f %4.0f×%4.0f) blocks shown %d drift %.1f flight [%@]",
+                         frameIndex - 1, lens.minX, lens.minY, capture.minX, capture.minY, capture.width, capture.height, shown, drift,
+                         flight.joined(separator: " ")))
         }
 
         // At rest: read and translate the start position completely.
@@ -304,14 +311,14 @@ enum SelfTest {
         }
         print("settled at start: \(ms(start)) ms")
         await printCounts("start")
-        try shoot()
+        try await shoot()
 
         if blink != nil {
             for i in 1 ... max(1, holdMs / 100) {
                 blinkFrame += 1
                 await feed()
                 try await Task.sleep(for: .milliseconds(100))
-                if i % 5 == 0 { try shoot() }
+                if i % 5 == 0 { try await shoot() }
             }
             await printCounts("blink")
         } else if scrolling {
@@ -323,7 +330,7 @@ enum SelfTest {
             if leg > 0 {
                 for _ in 0 ..< max(1, holdMs / 250) {
                     try await Task.sleep(for: .milliseconds(250))
-                    try shoot()
+                    try await shoot()
                 }
                 await printCounts("down")
             }
@@ -340,13 +347,16 @@ enum SelfTest {
                     }
                     await feed()
                     // The pointer (as RegionSession sees it) rests in the middle of the lens.
-                    for r in collector.drainReports() where r.area.contains(CGPoint(x: lens.midX, y: lens.midY)) {
+                    for r in collector.drainReports() {
+                        // As `RegionSession.scrolled`: every report steers the lead, only the lens's own area is learned from.
+                        await pipeline.setLead(CGVector(dx: 0, dy: r.shift < 0 ? 1 : -1))
+                        guard r.area.contains(CGPoint(x: lens.midX, y: lens.midY)) else { continue }
                         scrollArea = r.area
                         predictor.confirm(shift: Double(r.shift), from: r.from, to: r.to)
                     }
                 }
                 try await Task.sleep(for: .milliseconds(stepMs / sub))
-                try shoot()
+                try await shoot()
             }
             }
         } else {
@@ -354,20 +364,32 @@ enum SelfTest {
             wide = true
             await apply(Overscan.plan(lens: lens, capture: capture, wide: wide, allowResize: true, display: display))
             let from = lens.origin
+            // As `RegionSession` while dragging: the lead is the unit direction of the drag.
+            let len = hypot(to[0] - from.x, to[1] - from.y)
+            if len > 4 { await pipeline.setLead(CGVector(dx: (to[0] - from.x) / len, dy: (to[1] - from.y) / len)) }
             for i in 1...steps {
                 let f = CGFloat(i) / CGFloat(steps)
                 lens.origin = CGPoint(x: from.x + (to[0] - from.x) * f, y: from.y + (to[1] - from.y) * f)
                 await pipeline.setVisible(lens)
                 await apply(Overscan.plan(lens: lens, capture: capture, wide: wide, allowResize: false, display: display))
                 try await Task.sleep(for: .milliseconds(stepMs))
-                try shoot()
+                try await shoot()
             }
         }
-        // Dropped: keep watching while it settles into seamless.
+        // Dropped: the lead ends with the motion, then keep watching while it settles into seamless.
+        await pipeline.setLead(.zero)
         for _ in 0 ..< max(1, holdMs / 250) {
             try await Task.sleep(for: .milliseconds(250))
-            try shoot()
+            try await shoot()
         }
+        // Let the queue finish what the lens still shows, bounded by `--max-wait`.
+        let settleStart = Date(), maxWait = Double(option("--max-wait") ?? "120") ?? 120
+        while Date().timeIntervalSince(settleStart) < maxWait {
+            let state = await pipeline.debugState()
+            if !state.busy, !state.paused { break }
+            try await Task.sleep(for: .milliseconds(200))
+        }
+        print("settled at end: \(ms(settleStart)) ms")
         for (source, translation) in await pipeline.debugState().blocks {
             print("  \(source) → \(translation ?? "(no translation)")")
         }

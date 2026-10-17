@@ -34,6 +34,8 @@ struct TranslationOutcome: Sendable {
     var timedOut = false
     /// A group threw, timed out or returned nothing: the engine is in trouble, so the queue should rest.
     var batchFailed = false
+    /// The caller cancelled (the pipeline no longer wants the batch): not a failure, so no issue, strike or pause.
+    var cancelled = false
 }
 
 /// Streamed results, kept even if the call is abandoned at its deadline.
@@ -156,16 +158,23 @@ actor TranslationService {
         }
 
         for source in order {
+            if Task.isCancelled { outcome.cancelled = true; break }
             let items = groups[source]!
             let streamed = Streamed()
             let deliver: @Sendable (String, String) -> Void = { s, t in streamed.put(s, t); onResult?(s, t) }
             let space = cache.namespace
             var translated: [String: String] = [:]
-            var groupFailed = false
+            var groupFailed = false, groupCancelled = false
             switch await withDeadline(Self.deadline(items: items.count), { try await self.translateGroup(items, source: source, onResult: deliver) }) {
             case let .value(r):
                 translated = r
                 issueHandler?(nil)
+            case let .failed(error) where Task.isCancelled && error is CancellationError:
+                // Not a failure: what streamed in is kept; the session is dropped as after a timeout (its state is unknown).
+                translated = streamed.all
+                groupCancelled = true
+                outcome.cancelled = true
+                dropSessions(source: source)
             case let .failed(error):
                 translated = streamed.all
                 groupFailed = true
@@ -184,6 +193,7 @@ actor TranslationService {
                 outcome.translations[s] = t
                 if current { cache.store(t, for: s, in: space) }
             }
+            if groupCancelled { break }
             let missing = items.filter { translated[$0] == nil }
             if missing.count == items.count || groupFailed && !missing.isEmpty {
                 outcome.batchFailed = true
@@ -240,7 +250,9 @@ actor TranslationService {
         default:
             if mode.hasPrefix("slow:"), let ms = Int(mode.dropFirst(5)) { delay = ms }
         }
+        // A cancelled batch must not look like a success: the sleep returns at once on cancel, so check after it.
         try? await Task.sleep(for: .milliseconds(delay))
+        if Task.isCancelled { throw CancellationError() }
         var out: [String: String] = [:]
         for s in items {
             let t = "⟦\(target)⟧ " + s

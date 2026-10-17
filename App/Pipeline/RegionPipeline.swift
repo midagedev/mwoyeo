@@ -151,6 +151,22 @@ actor RegionPipeline {
     private var grayShiftX = ShiftAccumulator()
     private var grayShiftY = ShiftAccumulator()
     private var lastMotionNote: TimeInterval = 0
+    /// The batch now with the engine: what has come back, and whether it was cut short.
+    private struct Flight {
+        let id: Int
+        let batch: [String]
+        /// Sources whose result has streamed in.
+        var done: Set<String> = []
+        /// The batch before this one was cut because the lens was waiting: that rule stays quiet for this one.
+        let afterLensPreemption: Bool
+        let task: Task<TranslationOutcome, Never>
+        var cut: TranslationScheduling.Preemption?
+    }
+    private var flight: Flight?
+    private var flightID = 0
+    private var lastCutByLens = false
+    /// When a block that waits for translation was first seen inside the lens, to measure how long the lens waited.
+    private var lensSeen: [UUID: TimeInterval] = [:]
     private var onMotion: (@Sendable () -> Void)?
 
     /// Capture rect and the visible lens inside it, global Quartz points.
@@ -173,7 +189,13 @@ actor RegionPipeline {
     /// Called (at most twice a second) when content moves a lot: scrolling, page flips, animation.
     func setMotionHandler(_ h: @escaping @Sendable () -> Void) { onMotion = h }
     func setScrollHandler(_ h: @escaping @Sendable (ScrollReport) -> Void) { onScroll = h }
-    func setLead(_ v: CGVector) { lead = v }
+    func setLead(_ v: CGVector) {
+        guard v != lead else { return }
+        lead = v
+        reconsider()
+        // Text the old lead held back may be eligible now.
+        startQueue()
+    }
 
     func update(options new: PipelineOptions) {
         guard new != options else { return }
@@ -201,6 +223,8 @@ actor RegionPipeline {
         churn.reset()
         seamlessDone = false
         pending = []
+        lensSeen = [:]
+        lastCutByLens = false
         // A batch still running belongs to the old settings: its results are dropped, and a new queue may start.
         translationEpoch += 1
         translating = false
@@ -230,9 +254,12 @@ actor RegionPipeline {
     }
 
     /// For the headless self-test: whether work is pending, and what each block reads.
-    func debugState() -> (busy: Bool, translating: Bool, paused: Bool, parked: Int, blocks: [(String, String?)]) {
+    func debugState() -> (busy: Bool, translating: Bool, paused: Bool, parked: Int, blocks: [(String, String?)], flight: [String]) {
         (working || translating || settleTask != nil && !seamlessDone, translating, paused, strikes.parkedCount,
-         blocks.map { ($0.source, $0.translation) })
+         blocks.map { ($0.source, $0.translation) }, (flight?.batch ?? []).map { source in
+             let s = blocks.filter { $0.source == source }.map { TranslationScheduling.standing(of: $0.rect, lens: lensRect, lead: lead) }
+             return s.contains(.lens) ? "lens" : s.contains(.leading) ? "lead" : s.isEmpty ? "gone" : "other"
+         })
     }
 
     func ingest(_ frame: CapturedFrame) {
@@ -404,6 +431,7 @@ actor RegionPipeline {
     func setVisible(_ rect: CGRect) {
         if rect != visible { lensMoved = ProcessInfo.processInfo.systemUptime }
         visible = rect
+        reconsider()
     }
 
     /// Content that moved: everything (the capture moved over still content) or one scrolled area.
@@ -499,6 +527,7 @@ actor RegionPipeline {
             b.lines = b.lines.map { $0.offsetBy(dx: px, dy: py) }
             return b.rect.intersects(bounds) ? b : nil
         }
+        reconsider()
         if let base = baseGray {
             let step = CGFloat(lastStep)
             let gx = Int((px / step).rounded()), gy = Int((py / step).rounded())
@@ -526,6 +555,7 @@ actor RegionPipeline {
         unexplained = unexplained.map { m.apply(to: $0) }
         let bounds = CGRect(x: 0, y: 0, width: captureSize.width * scale, height: captureSize.height * scale)
         blocks = blocks.compactMap { m.apply(to: $0, bounds: bounds) }
+        reconsider()
         emit(animated: false)
     }
 
@@ -873,6 +903,11 @@ actor RegionPipeline {
                 pending.insert(blocks[i].source)
             }
         }
+        reconsider()
+        startQueue()
+    }
+
+    private func startQueue() {
         // While the queue rests, only the resume task starts it again.
         guard !paused, !translating, !pending.isEmpty else { return }
         translating = true
@@ -886,14 +921,28 @@ actor RegionPipeline {
         let epoch = translationEpoch
         while let batch = nextBatch() {
             let t = Trace.now
-            let outcome = await translator.translate(batch) { source, translated in
-                Task { await self.receive([source: translated], epoch: epoch) }
+            flightID += 1
+            let id = flightID, service = translator
+            // A task of its own, so a batch the lens no longer needs can be cancelled while this one awaits it.
+            let task = Task {
+                await service.translate(batch) { source, translated in
+                    Task { await self.streamed(source, translated, epoch: epoch, flight: id) }
+                }
             }
-            Trace.mark("translate ×\(batch.count)", since: t)
+            flight = Flight(id: id, batch: batch, afterLensPreemption: lastCutByLens, task: task)
+            reconsider()
+            let outcome = await task.value
+            if flight?.id == id {
+                lastCutByLens = flight?.cut == .lensWaiting
+                flight = nil
+            }
+            Trace.mark("translate ×\(batch.count)" + (outcome.cancelled ? " cancelled" : ""), since: t)
             // Settings changed meanwhile: `reset()` already cleared the queue state, and this result is for the old ones.
             guard epoch == translationEpoch else { return }
             receive(outcome.translations, epoch: epoch)
             for source in batch {
+                // A cut batch's unfinished sources stay queued; `nextBatch` drops those that left the screen.
+                if outcome.cancelled, outcome.translations[source] == nil { continue }
                 pending.remove(source)
                 if outcome.translations[source] != nil {
                     strikes.clear(source)
@@ -907,7 +956,8 @@ actor RegionPipeline {
                 rest(now: ProcessInfo.processInfo.systemUptime)
                 return
             }
-            backoff.success()
+            // A cancelled batch is not an answer from the engine: the backoff stays as it was.
+            if !outcome.cancelled { backoff.success() }
             // The overscan keeps translating quietly; "translating" is only what the lens is waiting for.
             if !working { setActivity(lensPending ? .translating : .idle) }
         }
@@ -937,6 +987,57 @@ actor RegionPipeline {
         fillTranslations()
     }
 
+    /// Cancels the running batch when nothing in it is worth finishing any more. Re-checked wherever blocks, lens, lead
+    /// or results change, never on a timer.
+    private func checkPreempt() {
+        guard let f = flight, f.cut == nil else { return }
+        let lens = lensRect
+        let standings = f.batch.filter { !f.done.contains($0) && translator.cached($0) == nil }.map { source -> TranslationScheduling.Standing in
+            let s = blocks.filter { $0.source == source && $0.translation == nil }
+                .map { TranslationScheduling.standing(of: $0.rect, lens: lens, lead: lead) }
+            return s.contains(.lens) ? .lens : s.contains(.leading) ? .leading : s.isEmpty ? .gone : .other
+        }
+        let batch = Set(f.batch)
+        let lensWaiting = blocks.contains { $0.translation == nil && $0.rect.intersects(lens) && pending.contains($0.source) && !batch.contains($0.source) }
+        guard let why = TranslationScheduling.preemption(unfinished: standings, lensWaiting: lensWaiting,
+                                                         afterLensPreemption: f.afterLensPreemption) else { return }
+        flight?.cut = why
+        Trace.count("translate.cancelled")
+        Trace.mark("translate cancelled (\(why)): \(standings)", since: Trace.now)
+        f.task.cancel()
+    }
+
+    private func reconsider() {
+        noteLens()
+        checkPreempt()
+    }
+
+    /// The visible lens in image pixels.
+    private var lensRect: CGRect {
+        CGRect(x: (visible.minX - origin.x) * scale, y: (visible.minY - origin.y) * scale,
+               width: visible.width * scale, height: visible.height * scale)
+    }
+
+    /// Measures the lens's wait: when text first stands in the lens untranslated, and when it is translated there or
+    /// leaves it (or the capture) without. Called wherever blocks, lens or translations change.
+    private func noteLens() {
+        let now = Trace.now, lens = lensRect
+        if !lensSeen.isEmpty {
+            let byID = Dictionary(blocks.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+            for (id, t0) in lensSeen {
+                guard let b = byID[id] else { lensSeen[id] = nil; Trace.count("translate.lens_unserved"); continue }
+                if b.translation != nil {
+                    lensSeen[id] = nil
+                    if b.rect.intersects(lens) { Trace.sample("translate.lens_wait_ms", (now - t0) * 1000) } else { Trace.count("translate.lens_unserved") }
+                } else if !b.rect.intersects(lens) {
+                    lensSeen[id] = nil
+                    Trace.count("translate.lens_unserved")
+                }
+            }
+        }
+        for b in blocks where b.translation == nil && lensSeen[b.id] == nil && b.rect.intersects(lens) { lensSeen[b.id] = now }
+    }
+
     private var lensPending: Bool {
         blocks.contains { $0.translation == nil && pending.contains($0.source) && priority($0.rect).0 == 0 }
     }
@@ -946,20 +1047,31 @@ actor RegionPipeline {
         pending.formIntersection(blocks.filter { $0.translation == nil }.map(\.source))
         guard !pending.isEmpty else { return nil }
         var seen = Set<String>()
-        let ordered = blocks.sorted { priority($0.rect) < priority($1.rect) }.map(\.source)
+        // Text motion has left far behind waits: `fillTranslations` re-queues it on every pass, and it is eligible again
+        // once the lead ends.
+        let lens = lensRect
+        let ordered = blocks.filter { !TranslationScheduling.isTrailing($0.rect, lens: lens, lead: lead) }
+            .sorted { priority($0.rect) < priority($1.rect) }.map(\.source)
             .filter { pending.contains($0) && seen.insert($0).inserted }
         return Array(ordered.prefix(3))
     }
 
     /// What the lens shows comes first, in reading order; then the overscan, nearest first.
     private func priority(_ r: CGRect) -> (Int, CGFloat) {
-        let lens = CGRect(x: (visible.minX - origin.x) * scale, y: (visible.minY - origin.y) * scale,
-                          width: visible.width * scale, height: visible.height * scale)
+        let lens = lensRect
         if r.intersects(lens) { return (0, r.minY) }
         let dx = max(lens.minX - r.maxX, r.minX - lens.maxX, 0), dy = max(lens.minY - r.maxY, r.minY - lens.maxY, 0)
         // Text on the side things are heading to (a dragged lens, content scrolling in) reaches the lens first.
         let side = CGVector(dx: r.midX < lens.minX ? -1 : r.midX > lens.maxX ? 1 : 0, dy: r.midY < lens.minY ? -1 : r.midY > lens.maxY ? 1 : 0)
         return (1, hypot(dx, dy) / (1 + max(0, side.dx * lead.dx + side.dy * lead.dy)))
+    }
+
+    /// One result streamed from the engine; counts it as wasted when its text left the capture meanwhile.
+    private func streamed(_ source: String, _ translated: String, epoch: Int, flight id: Int) {
+        guard epoch == translationEpoch else { return }
+        if flight?.id == id { flight?.done.insert(source) }
+        if !blocks.contains(where: { $0.source == source }) { Trace.count("translate.wasted") }
+        receive([source: translated], epoch: epoch)
     }
 
     private func receive(_ result: [String: String], epoch: Int) {
@@ -971,6 +1083,7 @@ actor RegionPipeline {
             blocks[i].image = nil
             changed = true
         }
+        reconsider()
         if changed {
             renderMissing()
             emit(animated: true)
@@ -1064,6 +1177,10 @@ enum Trace {
     private static let counters = OSAllocatedUnfairLock(initialState: [String: Int]())
     static func count(_ key: String, _ n: Int = 1) { counters.withLock { $0[key, default: 0] += n } }
     static func takeCounts() -> [String: Int] { counters.withLock { defer { $0 = [:] }; return $0 } }
+    /// Measured values (ms…), for the self-test to summarise.
+    private static let samples = OSAllocatedUnfairLock(initialState: [String: [Double]]())
+    static func sample(_ key: String, _ v: Double) { samples.withLock { $0[key, default: []].append(v) } }
+    static func takeSamples() -> [String: [Double]] { samples.withLock { defer { $0 = [:] }; return $0 } }
     static let dumpDirectory: URL? = ProcessInfo.processInfo.environment["MWOYEO_DUMP"].map { URL(fileURLWithPath: $0) }
 }
 

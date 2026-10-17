@@ -20044,6 +20044,146 @@
         }
       }
     },
+    "macOS is still preparing text recognition for %@. This can take a minute.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS가 아직 %@ 글자 인식을 준비하고 있어요. 1분쯤 걸릴 수 있어요."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOSはまだ%@の文字認識を準備しています。1分ほどかかることがあります。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 仍在准备%@文字识别，可能需要一分钟左右。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 仍在準備%@文字辨識，可能需要一分鐘左右。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS bereitet die Texterkennung für %@ noch vor. Das kann eine Minute dauern."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS prépare encore la reconnaissance de texte pour %@. Cela peut prendre une minute."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS aún está preparando el reconocimiento de texto para %@. Puede tardar un minuto."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS ещё готовит распознавание текста для языка %@. Это может занять около минуты."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O macOS ainda está preparando o reconhecimento de texto para %@. Isso pode levar um minuto."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS sta ancora preparando il riconoscimento del testo per %@. Può richiedere un minuto."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS ще готує розпізнавання тексту для мови %@. Це може тривати хвилину."
+          }
+        }
+      }
+    },
+    "macOS text recognition isn't responding. Restarting the Mac usually fixes it.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 글자 인식이 응답하지 않아요. Mac을 재시동하면 대개 해결돼요."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOSの文字認識が応答していません。Macを再起動すると多くの場合解決します。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 文字识别没有响应。重新启动 Mac 通常可以解决。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 文字辨識沒有回應。重新啟動 Mac 通常可以解決。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Texterkennung von macOS reagiert nicht. Ein Neustart des Mac behebt das meistens."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La reconnaissance de texte de macOS ne répond pas. Redémarrer le Mac règle généralement le problème."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El reconocimiento de texto de macOS no responde. Reiniciar el Mac suele solucionarlo."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Распознавание текста macOS не отвечает. Обычно помогает перезагрузка Mac."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O reconhecimento de texto do macOS não está respondendo. Reiniciar o Mac geralmente resolve."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il riconoscimento del testo di macOS non risponde. Di solito riavviare il Mac risolve il problema."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Розпізнавання тексту macOS не відповідає. Зазвичай допомагає перезавантаження Mac."
+          }
+        }
+      }
+    },
     "ok who stayed up for the patch notes last night": {
       "comment": "A chat message in the onboarding demo, translated casually like a gamer chat",
       "localizations": {

@@ -6,20 +6,15 @@ import UniformTypeIdentifiers
 
 /// Headless end-to-end run on a still image:
 ///   Mwoyeo --render in.png out.png [--src ja] [--tgt ko] [--mode fast|seamless] [--engine auto|translation|intelligence]
-///                                  [--no-inpaint] [--scale 2] [--then en,ko,style] [--then-early ms] [--max-wait s] [--warm] [--assume-vision-ready]
+///                                  [--no-inpaint] [--scale 2] [--then en,ko,style] [--then-early ms] [--max-wait s] [--warm]
 /// Prints what was read and translated, and writes the composited result. Exits when done.
 /// `--then-early ms` fires the `--then` steps `ms` after a translation batch is first in flight (a settings change
-/// mid-translation) and settles once at the end; `--max-wait s` is the settle ceiling (default 120); `--warm` loads the text
-/// models first, as the app does at launch, and waits for the Swift ones (the first run of a new binary compiles them, minutes in all;
-/// killing a run mid-compile restarts it).
-/// The Swift text models are asked in the run only after a child process (`Mwoyeo --warm-vision`) has loaded them, as in the app:
-/// the work counts show `ocr.swift.gated` (reads that went to the Objective-C request meanwhile) and `ocr.swift.ready`, and
-/// the run ends with a `swift-vision: ready=<keys>|- child=<pid>|none` line. `--assume-vision-ready` asks them at once, with no child.
-/// `MWOYEO_FAKE_OCR=slow-child:<ms>|fail-child` makes that child wait first, or fail (a Mac whose models compile slowly or not at all).
+/// mid-translation) and settles once at the end; `--max-wait s` is the settle ceiling (default 120); `--warm` waits for the text
+/// model first, as the app loads it at launch (the first run of a new binary compiles it, up to a minute; killing a run
+/// mid-compile restarts it).
 /// `MWOYEO_FAKE_ENGINE=hang|fail|fail-once|slow:<ms>` replaces the translation engine (see `TranslationService`).
-/// `MWOYEO_FAKE_OCR=stall|stall-vn|slow:<ms>` makes the Swift text models (and with `stall-vn` the Objective-C revision 3
-/// request too) never answer, or answer late (see `TextRecognizer`); the work counts then show `ocr.stalled`,
-/// `ocr.fallback.vn3|rev2|fast` and `ocr.recovered`.
+/// `MWOYEO_FAKE_OCR=stall|stall-vn|slow:<ms>` makes the text model (revision 3) never answer, or answer late (see
+/// `TextRecognizer`); the work counts then show `ocr.stalled.vn3`, `ocr.fallback.vn3|rev2|fast` and `ocr.recovered.vn3`.
 /// `--engine-config file.json` runs the pass through an added engine (an `EngineShare` file, as the app exports it) with
 /// the key from `MWOYEO_ENGINE_KEY` held in memory only; Apple stands in when the engine fails. It prints `engine: <name>
 /// <kind>`, `engine_ms` per phase, and at the end the issue count, the request fields the engine's server refused, and how
@@ -168,13 +163,9 @@ enum SelfTest {
         }
         await translator.setIssueHandler(report)
         TextRecognizer.setNoticeHandler(report)
-        // A render is a fresh process, the cold case: the Swift text models load in a child process (`SwiftVisionWarm`) and
-        // are asked here only once it has finished; until then the reads go through the Objective-C request. The child starts
-        // after the older recognizers are loaded, as at the app's launch (the compiler service takes one compile at a time).
-        // `--assume-vision-ready` asks them at once, for gates that exercise the Swift path.
-        let assumingReady = args.contains("--assume-vision-ready")
-        if assumingReady { SwiftVisionWarm.assumeReady() }
-        let loading = assumingReady ? nil : Task.detached(priority: .utility) { await AppModel.loadVision() }
+        // A render is a fresh process, the cold case: the text model loads in the background, as at the app's launch, and `--warm`
+        // waits for it.
+        let loading = Task.detached(priority: .utility) { await AppModel.loadVision() }
         let t0 = Date()
         let inpainter = settings.useInpaintingModel ? Inpainter.load() : nil
         print("inpainter: \(inpainter != nil ? "MI-GAN loaded (\(ms(t0)) ms)" : "none")")
@@ -185,14 +176,11 @@ enum SelfTest {
             return
         }
 
-        // `--warm`: load the text models first, as the app does at launch (a fresh binary compiles them once, minutes in all).
+        // `--warm`: load the text model first, as the app does at launch (a fresh binary compiles it once, up to a minute).
         if args.contains("--warm") {
             let w = Date()
-            if let loading { await loading.value } else { await AppModel.loadVision() }
-            // The Swift models of the source language too (a child loads them): this is what the app has by the time it is used.
-            let source = settings.sourceLanguage == "auto" ? [] : [Locale.Language(identifier: settings.sourceLanguage)]
-            let swift = await TextRecognizer.untilSwiftReady(source, seconds: 600)
-            print("warm-up: \(ms(w)) ms (swift models \(swift ? "ready" : "not ready"))")
+            await loading.value
+            print("warm-up: \(ms(w)) ms")
         }
         let still = StillTranslation(decoded, settings: settings, translator: translator, inpainter: inpainter)
         let pipeline = still.pipeline
@@ -259,7 +247,6 @@ enum SelfTest {
             print("  \(source)\n    → \(translation ?? "(no translation)")")
         }
         await printEngineSummary(translator, issues: issues, wasAdded: !settings.engines.isEmpty)
-        printVisionState()
 
         // Composite: original + overlay blocks, the same function the lens image uses.
         guard let out = still.composite(still.latest) else { throw Failure(description: "context") }
@@ -287,12 +274,6 @@ enum SelfTest {
 
     /// `engine_ms` of every phase so far, kept because each phase's report drains the samples.
     private nonisolated(unsafe) static var engineMs: [Double] = []
-
-    /// Which Swift text models (language keys) a child has loaded by now, and its pid while it still runs.
-    private static func printVisionState() {
-        let ready = SwiftVisionWarm.readyKeys.joined(separator: ",")
-        print("swift-vision: ready=\(ready.isEmpty ? "-" : ready) child=\(SwiftVisionWarm.childPID.map(String.init) ?? "none")")
-    }
 
     private static func printEngineSummary(_ translator: TranslationService, issues: Counter, wasAdded: Bool) async {
         print("issues=\(issues.value)")
@@ -546,6 +527,5 @@ enum SelfTest {
         print(String(format: "drift: mean %.1f pt, max %.1f pt, %d of %d frames over 2 pt", drifts.reduce(0, +) / CGFloat(max(1, drifts.count)),
                      drifts.max() ?? 0, drifts.filter { $0 > 2 }.count, drifts.count))
         await printEngineSummary(translator, issues: issues, wasAdded: !settings.engines.isEmpty)
-        printVisionState()
     }
 }

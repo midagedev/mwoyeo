@@ -1,8 +1,8 @@
 import Foundation
 
-/// A recognizer that can read when the newest one (the Swift `RecognizeTextRequest` and `RecognizeDocumentsRequest`) does
-/// not answer. On macOS 27 those models can stall (their compile hangs or crawls) while the Objective-C
-/// `VNRecognizeTextRequest` still answers: its accurate revision 3 reads everything the Swift models read, revision 2 a
+/// The recognizers the app reads with, through the Objective-C `VNRecognizeTextRequest` (the Swift requests are not used:
+/// they can stall the whole process, see tools/ocr-probe). On macOS 27 its newest model, accurate revision 3, can stall
+/// (its compile hangs or crawls) while the older ones still answer: revision 3 reads everything the app needs, revision 2 a
 /// handful of languages, `.fast` a few Latin ones. The ladder lists the rungs that read the languages, best first.
 public enum OCRFallback: Equatable, Sendable {
     /// Accurate revision 3 through the Objective-C request, restricted to these of its own identifiers. Empty: let it

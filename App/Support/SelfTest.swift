@@ -115,10 +115,6 @@ enum SelfTest {
             args.firstIndex(of: name).flatMap { $0 + 1 < args.count ? args[$0 + 1] : nil }
         }
         let input = URL(fileURLWithPath: args[0]), output = URL(fileURLWithPath: args[1])
-        guard let src = CGImageSourceCreateWithURL(input as CFURL, nil),
-              let decoded = CGImageSourceCreateImageAtIndex(src, 0, nil),
-              let rgba = RGBAImage(cgImage: decoded), let image = rgba.cgImage
-        else { throw Failure(description: "cannot read \(input.path)") }
 
         var settings = AppSettings()
         settings.sourceLanguage = option("--src") ?? "auto"
@@ -127,6 +123,26 @@ enum SelfTest {
         settings.engine = TranslationEngineChoice(rawValue: option("--engine") ?? "auto") ?? .auto
         settings.useInpaintingModel = !args.contains("--no-inpaint")
         let scale = CGFloat(Double(option("--scale") ?? "2") ?? 2)
+        guard let decoded = try? StillTranslation.decode(url: input, scale: scale) else { throw Failure(description: "cannot read \(input.path)") }
+        let image = decoded.image
+
+        // `--profile-app <bundleID>` renders as if that app were in front: its profile (from the app's saved settings, or
+        // `--profile <bundleID>=<src>:<tgt>`) lays over the languages above, as in the app.
+        if let app = option("--profile-app") {
+            if let saved = UserDefaults.standard.data(forKey: "settings").flatMap({ try? JSONDecoder().decode(AppSettings.self, from: $0) }) {
+                settings.appProfiles = saved.appProfiles
+            }
+            for (i, a) in args.enumerated() where a == "--profile" && i + 1 < args.count {
+                let kv = args[i + 1].split(separator: "=", maxSplits: 1).map(String.init), pair = (kv.last ?? "").split(separator: ":").map(String.init)
+                if kv.count == 2, pair.count == 2 {
+                    settings.appProfiles = AppProfiles.remembering(AppProfile(bundleID: kv[0], appName: kv[0], source: pair[0], target: pair[1]), in: settings.appProfiles)
+                }
+            }
+            let base = settings
+            settings = base.effective(frontmost: app)
+            print("profile: \(app) \(AppProfiles.profile(for: app, in: base.appProfiles) == nil ? "none (base kept)" : "applied") "
+                  + "\(base.sourceLanguage)>\(base.targetLanguage) → \(settings.sourceLanguage)>\(settings.targetLanguage)")
+        }
 
         var secrets = MemorySecrets()
         if let path = option("--engine-config") {
@@ -151,31 +167,18 @@ enum SelfTest {
             return
         }
 
-        let collector = Collector()
+        let still = StillTranslation(decoded, settings: settings, translator: translator, inpainter: inpainter)
+        let pipeline = still.pipeline
         let capture = CGRect(x: 0, y: 0, width: CGFloat(image.width) / scale, height: CGFloat(image.height) / scale)
-        let pipeline = RegionPipeline(options: PipelineOptions(settings), capture: capture, translator: translator, inpainter: inpainter,
-                                      onSnapshot: { collector.put($0) })
-        let gray = rgba.withBGRA { GrayImage(bgra: $0, width: rgba.width, height: rgba.height, bytesPerRow: rgba.width * 4, step: 4) }
         let start = Date()
-        func capturedFrame() -> CapturedFrame {
-            CapturedFrame(image: image, gray: gray, grayStep: 4, scale: scale, rect: capture, time: ProcessInfo.processInfo.systemUptime)
-        }
-        await pipeline.ingest(capturedFrame())
+        await still.ingest()
         let keeping = Keeping(settings: settings, option: option, args: args)
         let lensRect = lensOption(option, default: capture)
         var phase = 0.0
 
         // Wait for reading + translation to finish (or give up after `--max-wait`, 120 s by default).
         let maxWait = Double(option("--max-wait") ?? "120") ?? 120
-        func settle(from start: Date) async throws {
-            var lastChange = Date(), lastVersion = -1
-            while Date().timeIntervalSince(start) < maxWait {
-                try await Task.sleep(for: .milliseconds(200))
-                let state = await pipeline.debugState()
-                if let v = collector.latest?.version, v != lastVersion { lastVersion = v; lastChange = Date() }
-                if !state.busy, !state.paused, Date().timeIntervalSince(lastChange) > 0.6 { break }
-            }
-        }
+        func settle(from start: Date) async throws { try await still.settle(from: start, maxWait: maxWait) }
         // `--then en,ko,style`: change the settings as the user would (target language, or "style" = font and box
         // opacity), and report what each change costs.
         func applyThen(_ step: String) async {
@@ -184,7 +187,7 @@ enum SelfTest {
                 return
             }
             if step == "again" {
-                await pipeline.ingest(capturedFrame())   // the same screen read again: a held subtitle
+                await still.ingest()   // the same screen read again: a held subtitle
             } else if step == "style" {
                 settings.fontStyle = settings.fontStyle == .serif ? .system : .serif
                 settings.boxOpacity = settings.boxOpacity == 1 ? 0.94 : 1
@@ -209,12 +212,12 @@ enum SelfTest {
             try await settle(from: start)
             print("pipeline: \(ms(start)) ms")
             await printCounts("still", pipeline)
-            keeping.observe(collector.latest, lens: lensRect, time: phase)
+            keeping.observe(still.latest, lens: lensRect, time: phase)
         } else {
             try await settle(from: start)
             print("pipeline: \(ms(start)) ms")
             await printCounts("still", pipeline)
-            keeping.observe(collector.latest, lens: lensRect, time: phase)
+            keeping.observe(still.latest, lens: lensRect, time: phase)
             for step in steps {
                 let t = Date()
                 await applyThen(step)
@@ -222,7 +225,7 @@ enum SelfTest {
                 print("then \(step): \(ms(t)) ms")
                 await printCounts(step, pipeline)
                 phase += 1
-                keeping.observe(collector.latest, lens: lensRect, time: phase)
+                keeping.observe(still.latest, lens: lensRect, time: phase)
             }
         }
         for (source, translation) in await pipeline.debugState().blocks {
@@ -231,11 +234,10 @@ enum SelfTest {
         await printEngineSummary(translator, issues: issues, wasAdded: !settings.engines.isEmpty)
 
         // Composite: original + overlay blocks, the same function the lens image uses.
-        let layers = (collector.latest?.blocks ?? []).map { LensImage.Layer(frame: $0.frame, image: $0.image) }
-        guard let out = LensImage.composite(frame: image, scale: scale, layers: layers) else { throw Failure(description: "context") }
+        guard let out = still.composite(still.latest) else { throw Failure(description: "context") }
         do { try LensImage.writePNG(out, to: output) } catch { throw Failure(description: "cannot write \(output.path)") }
         print("wrote \(output.path)")
-        try keeping.finish(collector.latest, lens: lensRect, time: phase + 1)
+        try keeping.finish(still.latest, lens: lensRect, time: phase + 1)
     }
 
     private final class Counter: @unchecked Sendable {
@@ -510,14 +512,5 @@ enum SelfTest {
         print(String(format: "drift: mean %.1f pt, max %.1f pt, %d of %d frames over 2 pt", drifts.reduce(0, +) / CGFloat(max(1, drifts.count)),
                      drifts.max() ?? 0, drifts.filter { $0 > 2 }.count, drifts.count))
         await printEngineSummary(translator, issues: issues, wasAdded: !settings.engines.isEmpty)
-    }
-}
-
-private extension RGBAImage {
-    /// Temporarily exposes the pixels as BGRA (the capture format) for the gray downsampler.
-    func withBGRA<T>(_ body: (UnsafeRawPointer) -> T) -> T {
-        var bgra = pixels
-        for i in stride(from: 0, to: bgra.count, by: 4) { bgra.swapAt(i, i + 2) }
-        return bgra.withUnsafeBytes { body($0.baseAddress!) }
     }
 }

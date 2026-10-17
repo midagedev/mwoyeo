@@ -5,7 +5,6 @@ struct MenuPanel: View {
     @Environment(\.openSettings) private var openSettings
 
     var body: some View {
-        @Bindable var model = model
         VStack(alignment: .leading, spacing: 12) {
             header
             if let issue = model.issue {
@@ -19,7 +18,12 @@ struct MenuPanel: View {
             if case .available(let version, let page) = Updates.shared.state {
                 UpdateBanner(version: version) { NSWorkspace.shared.open(page) }
             }
-            LanguageBar(source: $model.settings.sourceLanguage, target: $model.settings.targetLanguage)
+            LanguageBar(source: Binding(get: { model.effectiveSettings.sourceLanguage }, set: { model.setLanguages(source: $0) }),
+                        target: Binding(get: { model.effectiveSettings.targetLanguage }, set: { model.setLanguages(target: $0) }))
+            if let profile = model.activeProfile {
+                Text("· \(profile.appName) profile").font(.caption2).foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity).padding(.top, -6)
+            }
             regionList
             addButton
             Divider().padding(.horizontal, -4)
@@ -109,6 +113,8 @@ struct MenuPanel: View {
                       systemImage: model.translationsVisible ? "eye" : "eye.slash")
             }
             .help(withShortcut(String(localized: "Hide translations and show the original"), .toggleOriginal))
+            Button { ImageTranslation.shared.chooseImage() } label: { Label("Translate Image…", systemImage: "photo") }
+                .help("Translate a picture from a file or the clipboard")
             Spacer()
             Button { open() } label: { Image(systemName: "gearshape") }
                 .help("Settings")

@@ -120,6 +120,19 @@ struct AppSettings: Codable, Equatable {
     // Saving: every lens writes what it reads to `exportFolder` while this is on; lens images go there when asked for.
     var savesTranscripts = false
     var exportFolder = ("~/Documents/Mwoyeo" as NSString).expandingTildeInPath
+    /// Languages (and engine) remembered per app; the app in front decides which applies (see `effective`).
+    var appProfiles: [AppProfile] = []
+
+    /// The settings that translate while the app `frontmost` is in front: this app's profile over the base choice.
+    func effective(frontmost: String?) -> AppSettings {
+        var s = self
+        let c = AppProfiles.effective(base: LanguageChoice(source: sourceLanguage, target: targetLanguage, customEngineID: customEngineID),
+                                      profiles: appProfiles, frontmost: frontmost, engines: Set(engines.map(\.id)))
+        s.sourceLanguage = c.source
+        s.targetLanguage = c.target
+        s.customEngineID = c.customEngineID
+        return s
+    }
 
     var glossaryPairs: [(String, String)] {
         glossary.split(whereSeparator: \.isNewline).compactMap { line in
@@ -155,6 +168,7 @@ struct AppSettings: Codable, Equatable {
         hasCompletedOnboarding = try c.decodeIfPresent(Bool.self, forKey: .hasCompletedOnboarding) ?? d.hasCompletedOnboarding
         savesTranscripts = try c.decodeIfPresent(Bool.self, forKey: .savesTranscripts) ?? d.savesTranscripts
         exportFolder = try c.decodeIfPresent(String.self, forKey: .exportFolder) ?? d.exportFolder
+        appProfiles = ((try? c.decodeIfPresent([Lossy<AppProfile>].self, forKey: .appProfiles)) ?? nil)?.compactMap(\.value) ?? d.appProfiles
     }
 }
 

@@ -53,6 +53,16 @@ public enum ChatTranslation {
         return nil
     }
 
+    /// The request body without the fields an engine is known to reject (the ones `withoutRejectedField` found earlier).
+    /// A body that is not a JSON object, or has none of them, comes back unchanged.
+    public static func withoutFields(_ body: Data, _ fields: Set<String>) -> Data {
+        guard !fields.isEmpty, var request = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
+              fields.contains(where: { request[$0] != nil })
+        else { return body }
+        for field in fields { request[field] = nil }
+        return encode(request)
+    }
+
     /// The instructions shared by every chat-style engine.
     static func systemPrompt(source: String?, target: String, glossary: [(String, String)]) -> String {
         var system = "Translate each line of the user's JSON into \(languageName(target))"

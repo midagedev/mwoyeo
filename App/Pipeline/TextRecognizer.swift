@@ -405,7 +405,8 @@ enum TextRecognizer {
     }
 
     private static func preparing(_ languages: [Locale.Language]) -> TranslationIssue {
-        .textRecognitionStarting(language: languages.first.flatMap(code) ?? "")
+        // The name the language bar uses: "ja", not "ja-Jpan" ("Japanese (Japanese)"); only Chinese needs its script.
+        .textRecognitionStarting(language: languages.first.flatMap { $0.languageCode?.identifier == "zh" ? code($0) : $0.languageCode?.identifier } ?? "")
     }
 
     /// A read nothing answers: "still preparing" until a model has been silent for three minutes, then "not responding".

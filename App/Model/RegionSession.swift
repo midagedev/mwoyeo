@@ -285,7 +285,23 @@ final class RegionSession {
         menu.addItem(read)
         menu.addItem(.separator())
         menu.addItem(ActionItem(String(localized: "Save Lens Image"), enabled: lastSnapshot?.frame != nil) { [weak self] in self?.saveLensImage() })
+        addProfileItems(to: menu)
         return menu
+    }
+
+    /// "Remember Languages for <App>" / "Forget …" for a lens that follows a window: the app's profile (AppProfiles.swift).
+    private func addProfileItems(to menu: NSMenu) {
+        guard let anchor = config.anchor, let app = AppModel.app(ofWindow: anchor.windowID) else { return }
+        let model = AppModel.shared, existing = model.profile(for: app.bundleID)
+        let now = AppProfile(bundleID: app.bundleID, appName: app.name, source: settings.sourceLanguage, target: settings.targetLanguage,
+                             customEngineID: settings.customEngineID)
+        menu.addItem(.separator())
+        if existing != now {
+            menu.addItem(ActionItem(String(localized: "Remember Languages for \(app.name)")) { model.remember(now) })
+        }
+        if existing != nil {
+            menu.addItem(ActionItem(String(localized: "Forget Languages for \(app.name)")) { model.forgetProfile(app.bundleID) })
+        }
     }
 
     // MARK: - Lens (drag / resize)

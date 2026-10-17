@@ -117,6 +117,28 @@ struct TranslationSettings: View {
                 set: { if let v = $0 { model.settings.engine = v; model.selectEngine(nil) } })
     }
 
+    /// Languages remembered per app (from a lens's menu); the group exists only once there is one.
+    private var appProfiles: some View {
+        Section {
+            ForEach(model.settings.appProfiles) { p in
+                LabeledContent {
+                    Button { model.forgetProfile(p.bundleID) } label: { Image(systemName: "minus.circle") }
+                        .buttonStyle(.borderless)
+                        .help("Forget languages for \(p.appName)")
+                } label: {
+                    VStack(alignment: .leading) {
+                        Text(p.appName)
+                        Text("\(Languages.name(p.source)) → \(Languages.name(p.target))").font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+            }
+        } header: {
+            Text("App profiles")
+        } footer: {
+            Text("The app in front picks the languages, one pair at a time.").font(.caption).foregroundStyle(.secondary)
+        }
+    }
+
     var body: some View {
         @Bindable var model = model
         Form {
@@ -178,6 +200,7 @@ struct TranslationSettings: View {
             } footer: {
                 Text("Language packs are stored on this Mac and translate quickly, even offline.").font(.caption).foregroundStyle(.secondary)
             }
+            if !model.settings.appProfiles.isEmpty { appProfiles }
             Section {
                 Picker("Keep up to", selection: $model.settings.cacheSize) {
                     ForEach([1000, 5000, 20000], id: \.self) { n in

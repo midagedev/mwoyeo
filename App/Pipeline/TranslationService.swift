@@ -235,6 +235,11 @@ actor TranslationService {
     /// about 2.6× the worst seen; slack enough for a loaded machine, short enough that a stall is noticed.
     private static func deadline(items: Int) -> Duration { .seconds(5 + 2 * items) }
 
+    /// An added engine answers over the network, and free tiers wander: Gemini's free 3.1-flash-lite took 1.3–4.3 s
+    /// for one line and missed 11 s for three twice (2026-10-17). 10 s + 2 s per item (16 s for 3 lines) keeps a slow
+    /// but working engine; one that stalls still falls back to Apple.
+    private static func addedEngineDeadline(items: Int) -> Duration { .seconds(10 + 2 * items) }
+
     /// Forgets the cached sessions for a language pair so the next call builds fresh ones.
     /// (`IntelligenceTranslator` keeps no session between calls: each request makes its own.)
     private func dropSessions(source: String) {
@@ -381,7 +386,9 @@ actor TranslationService {
             streamed.put(s, shown)
             onResult?(s, shown)
         }
-        let result = await withDeadline(Self.deadline(items: items.count)) {
+        let limit: Duration
+        if case .added = route { limit = Self.addedEngineDeadline(items: items.count) } else { limit = Self.deadline(items: items.count) }
+        let result = await withDeadline(limit) {
             try await self.translateGroup(items, source: source, via: route, onResult: deliver)
         }
         var a = Attempt(route: route, translated: streamed.all, status: .value)

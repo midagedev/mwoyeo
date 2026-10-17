@@ -15,11 +15,23 @@ final class AppModel {
             save()
             if settings.shortcuts != oldValue.shortcuts { HotKeys.shared.apply(settings.shortcuts) }
             if settings.checksForUpdates != oldValue.checksForUpdates { Updates.shared.schedule(enabled: settings.checksForUpdates) }
-            let s = settings
-            Task {
-                await translator.update(settings: s)
-                for session in sessions.values { await session.update(settings: s) }
-            }
+            pushSettings()
+        }
+    }
+
+    /// The app in front, other than Mwoyeo (see AppProfiles.swift); its profile, if any, lays over the base settings.
+    var frontmostBundleID: String? {
+        didSet { if frontmostBundleID != oldValue { pushSettings() } }
+    }
+
+    /// What translates now: the base settings with the frontmost app's profile over them.
+    var effectiveSettings: AppSettings { settings.effective(frontmost: frontmostBundleID) }
+
+    private func pushSettings() {
+        let s = effectiveSettings
+        Task {
+            await translator.update(settings: s)
+            for session in sessions.values { await session.update(settings: s) }
         }
     }
 
@@ -39,7 +51,7 @@ final class AppModel {
     /// Where added engines keep their API keys (the Keychain; memory only when `MWOYEO_MEMORY_SECRETS` is set, for captures).
     @ObservationIgnored let secrets: any SecretStore
     @ObservationIgnored private var sessions: [UUID: RegionSession] = [:]
-    @ObservationIgnored private var inpainter: Inpainter?
+    @ObservationIgnored private(set) var inpainter: Inpainter?
     @ObservationIgnored private let picker = RegionPicker()
     @ObservationIgnored private var picking = false
     /// The app's preferences; `MWOYEO_DEFAULTS_SUITE` names a scratch domain instead (the capture harness must not touch the real ones).
@@ -76,6 +88,8 @@ final class AppModel {
             MainActor.assumeIsolated { self?.sessions.values.forEach { $0.finishTranscript(wait: true) } }
         }
         Updates.shared.schedule(enabled: settings.checksForUpdates)
+        startWatchingFrontmostApp()
+        ImageTranslation.shared.openFromLaunchArguments()
 
         await translator.setIssueHandler { issue in Task { @MainActor in AppModel.shared.received(issue) } }
         await translator.setRejectionHandler { id, fields in Task { @MainActor in AppModel.shared.learned(fields, for: id) } }
@@ -187,7 +201,7 @@ final class AppModel {
 
     private func startSession(_ config: RegionConfig) async {
         guard sessions[config.id] == nil else { return }
-        let s = RegionSession(config: config, settings: settings, translator: translator, inpainter: inpainter)
+        let s = RegionSession(config: config, settings: effectiveSettings, translator: translator, inpainter: inpainter)
         s.onChange = { [weak self] in self?.sessionTick += 1 }
         s.onConfigChange = { [weak self] updated in
             guard let self, let i = regions.firstIndex(where: { $0.id == updated.id }) else { return }

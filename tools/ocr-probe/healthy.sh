@@ -7,10 +7,12 @@
 #   run:   SP=<dir with in/chat.png, in/vn.png, in/article.png, in/sub-mid.png> NEW=<binary> MAIN=<baseline binary> bash healthy.sh
 #          (QUICK=1 skips the 200 s ja check)
 # One PASS/FAIL line per check, a summary line at the end. Outputs: $OUT/*.out (stdout) and *.err (stderr), default /tmp/ocr-stall/healthy.
-# 2026-10-17 (ocr-vn): the app asks no Swift Vision request any more (they stall the whole process, tools/ocr-probe/inprocess.swift);
-# every read is the Objective-C VNRecognizeTextRequest, lines grouped into paragraphs by ParagraphGrouper. The checks of the child
+# 2026-10-17 (ocr-vn): the app asked no Swift Vision request (they seemed to stall the whole process, tools/ocr-probe/inprocess.swift);
+# every read was the Objective-C VNRecognizeTextRequest, lines grouped into paragraphs by ParagraphGrouper. The checks of the child
 # warm-up (--warm-vision, --assume-vision-ready, slow-child, fail-child) and of the Swift path are gone; `stall` and `stall-vn` both
 # stall revision 3 now (checks 2 and 5), `slow:<ms>` makes revision 3 answer late (check 4).
+# 2026-10-18 (vision-revive): the stall was a cold ANE compile, and the app loads the Swift document model itself at launch and
+# reads paragraphs with it once loaded. These checks run on that default; MWOYEO_OCR_PATH=vn (never a Swift model) must pass them too.
 SP=${SP:?set SP to a folder holding in/chat.png (English chat), in/vn.png (Japanese), in/article.png and in/sub-mid.png (Japanese)}
 NEW=${NEW:-/tmp/ocr-stall/dd/Build/Products/Debug/Mwoyeo.app/Contents/MacOS/Mwoyeo}
 MAIN=${MAIN:-/tmp/mwoyeo-main/dd/Build/Products/Debug/Mwoyeo.app/Contents/MacOS/Mwoyeo}

@@ -94,6 +94,7 @@ final class AppModel {
         ImageTranslation.shared.openFromLaunchArguments()
 
         await translator.setIssueHandler { issue in Task { @MainActor in AppModel.shared.received(issue) } }
+        TextRecognizer.setNoticeHandler { issue in Task { @MainActor in AppModel.shared.recognitionNotice(issue) } }
         await translator.setRejectionHandler { id, fields in Task { @MainActor in AppModel.shared.learned(fields, for: id) } }
         await translator.prewarm()
         inpainter = await Task.detached(priority: .userInitiated) { Inpainter.load() }.value
@@ -134,15 +135,17 @@ final class AppModel {
         Task.detached(priority: .utility) { await loadVision() }
     }
 
-    /// Runs both recognizers once on a blank image, so their models are loaded when the first real picture comes.
+    /// Runs the recognizers once on a blank image, so their models are loaded when the first real picture comes. The
+    /// older ones go first: they are what a read falls back to while the newest model is still loading or stuck.
     static func loadVision() async {
         let ctx = CGContext(data: nil, width: 64, height: 32, bitsPerComponent: 8, bytesPerRow: 0,
                             space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
         ctx?.setFillColor(.white)
         ctx?.fill(CGRect(x: 0, y: 0, width: 64, height: 32))
         if let img = ctx?.makeImage() {
-            _ = try? await TextRecognizer.lines(in: img, languages: [Locale.Language(identifier: "ja")], fast: false)
-            _ = try? await TextRecognizer.blocks(in: img, languages: [])
+            await TextRecognizer.warmOlder(img)
+            _ = try? await TextRecognizer.lines(in: img, languages: [Locale.Language(identifier: "ja")], fast: false, warmUp: true)
+            _ = try? await TextRecognizer.blocks(in: img, languages: [], warmUp: true)
         }
     }
 
@@ -290,8 +293,15 @@ final class AppModel {
         return (closed ? dismissed : nil, new != old && !closed)
     }
 
+    /// The text recognizer's notice, or its end. Only the recognizer ends it: a translation that went well says nothing
+    /// about reading.
+    func recognitionNotice(_ new: TranslationIssue?) {
+        if let new { received(new) } else if issue?.isTextRecognition == true { issue = nil }
+    }
+
     /// Shows the issue in the menu panel, and once on every lens when an engine gave way to Apple.
     func received(_ new: TranslationIssue?) {
+        if new == nil, issue?.isTextRecognition == true { return }
         let step = Self.step(old: issue, new: new, dismissed: dismissedIssue)
         issue = new
         dismissedIssue = step.dismissed

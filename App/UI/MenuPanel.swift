@@ -11,6 +11,8 @@ struct MenuPanel: View {
             if let issue = model.shownIssue {
                 if case .engineUnavailable = issue {
                     EngineNotice(headline: issue.headline, reason: issue.detail, useApple: { model.selectEngine(nil) }, dismiss: { model.dismissIssue() })
+                } else if issue.isTextRecognition {
+                    RecognitionNotice(message: issue.message)
                 } else {
                     IssueBanner(message: issue.message) { open() }
                 }
@@ -416,6 +418,22 @@ private struct EngineNotice: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         // The language bar's glass and corner radius (half its 30 pt height); a notice of two lines would turn a Capsule into a pill.
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+    }
+}
+
+/// The text recognizer is starting or stuck: a quiet line in the engine notice's glass, with nothing to press (no setting helps).
+private struct RecognitionNotice: View {
+    let message: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.circle").foregroundStyle(.secondary)
+            Text(message).font(.caption).fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
         .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 15, style: .continuous))
     }
 }

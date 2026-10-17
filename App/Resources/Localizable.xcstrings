@@ -10010,6 +10010,76 @@
         }
       }
     },
+    "Translation is taking too long. Trying again shortly.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "번역이 오래 걸리고 있습니다. 잠시 후 다시 시도합니다."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "翻訳に時間がかかっています。まもなくもう一度試します。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "翻译耗时过长，稍后将重试。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "翻譯耗時過長，稍後將重試。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Übersetzung dauert zu lange. Gleich wird es erneut versucht."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La traduction prend trop de temps. Nouvel essai dans un instant."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La traducción está tardando demasiado. Se volverá a intentar en breve."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перевод занимает слишком много времени. Скоро будет новая попытка."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A tradução está demorando demais. Uma nova tentativa será feita em instantes."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La traduzione sta richiedendo troppo tempo. Nuovo tentativo a breve."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переклад триває надто довго. Незабаром буде нова спроба."
+          }
+        }
+      }
+    },
     "Translation memory": {
       "localizations": {
         "ko": {

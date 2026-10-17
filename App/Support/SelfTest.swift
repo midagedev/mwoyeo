@@ -6,11 +6,15 @@ import UniformTypeIdentifiers
 
 /// Headless end-to-end run on a still image:
 ///   Mwoyeo --render in.png out.png [--src ja] [--tgt ko] [--mode fast|seamless] [--engine auto|translation|intelligence]
-///                                  [--no-inpaint] [--scale 2] [--then en,ko,style] [--then-early ms] [--max-wait s]
+///                                  [--no-inpaint] [--scale 2] [--then en,ko,style] [--then-early ms] [--max-wait s] [--warm]
 /// Prints what was read and translated, and writes the composited result. Exits when done.
 /// `--then-early ms` fires the `--then` steps `ms` after a translation batch is first in flight (a settings change
-/// mid-translation) and settles once at the end; `--max-wait s` is the settle ceiling (default 120).
+/// mid-translation) and settles once at the end; `--max-wait s` is the settle ceiling (default 120); `--warm` loads the text
+/// models first, as the app does at launch (the first run of a new binary compiles them, minutes in all; killing a run mid-compile restarts it).
 /// `MWOYEO_FAKE_ENGINE=hang|fail|fail-once|slow:<ms>` replaces the translation engine (see `TranslationService`).
+/// `MWOYEO_FAKE_OCR=stall|stall-vn|slow:<ms>` makes the Swift text models (and with `stall-vn` the Objective-C revision 3
+/// request too) never answer, or answer late (see `TextRecognizer`); the work counts then show `ocr.stalled`,
+/// `ocr.fallback.vn3|rev2|fast` and `ocr.recovered`.
 /// `--engine-config file.json` runs the pass through an added engine (an `EngineShare` file, as the app exports it) with
 /// the key from `MWOYEO_ENGINE_KEY` held in memory only; Apple stands in when the engine fails. It prints `engine: <name>
 /// <kind>`, `engine_ms` per phase, and at the end the issue count, the request fields the engine's server refused, and how
@@ -154,9 +158,11 @@ enum SelfTest {
         }
         let translator = TranslationService(settings: settings, secrets: secrets)
         let issues = Counter()
-        await translator.setIssueHandler { issue in
+        let report: @Sendable (TranslationIssue?) -> Void = { issue in
             if let issue { issues.bump(); FileHandle.standardError.write("issue: \(issue.message)\n".data(using: .utf8)!) }
         }
+        await translator.setIssueHandler(report)
+        TextRecognizer.setNoticeHandler(report)
         let t0 = Date()
         let inpainter = settings.useInpaintingModel ? Inpainter.load() : nil
         print("inpainter: \(inpainter != nil ? "MI-GAN loaded (\(ms(t0)) ms)" : "none")")
@@ -167,6 +173,12 @@ enum SelfTest {
             return
         }
 
+        // `--warm`: load the text models first, as the app does at launch (a fresh binary compiles them once, minutes in all).
+        if args.contains("--warm") {
+            let w = Date()
+            await AppModel.loadVision()
+            print("warm-up: \(ms(w)) ms")
+        }
         let still = StillTranslation(decoded, settings: settings, translator: translator, inpainter: inpainter)
         let pipeline = still.pipeline
         let capture = CGRect(x: 0, y: 0, width: CGFloat(image.width) / scale, height: CGFloat(image.height) / scale)

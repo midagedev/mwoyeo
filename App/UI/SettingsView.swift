@@ -111,10 +111,9 @@ struct TranslationSettings: View {
     @State private var removing: EngineConfig?
     private let intelligence = IntelligenceTranslator()
 
-    /// The built-in choice in use; nil while an added engine translates.
-    private var builtIn: Binding<TranslationEngineChoice?> {
-        Binding(get: { model.settings.activeEngineConfig == nil ? model.settings.engine : nil },
-                set: { if let v = $0 { model.settings.engine = v; model.selectEngine(nil) } })
+    /// The radio in use: an Apple choice, or an added engine.
+    private var selection: Binding<EngineSelection> {
+        Binding(get: { EngineSelection(model.settings) }, set: { model.select($0) })
     }
 
     /// Languages remembered per app (from a lens's menu); the group exists only once there is one.
@@ -143,20 +142,32 @@ struct TranslationSettings: View {
         @Bindable var model = model
         Form {
             Section("Translation engine") {
-                Picker("Engine", selection: builtIn) {
+                Picker("Engine", selection: selection) {
                     ForEach(TranslationEngineChoice.offered) { choice in
                         VStack(alignment: .leading) {
                             Text(choice.title)
                             Text(choice.detail).font(.caption).foregroundStyle(.secondary)
                         }
-                        .tag(Optional(choice))
+                        .tag(EngineSelection.builtIn(choice))
+                    }
+                    ForEach(model.settings.engines) { engine in
+                        AddedEngineLabel(engine: engine).tag(EngineSelection.added(engine.id))
                     }
                 }
                 .pickerStyle(.radioGroup)
-                ForEach(model.settings.engines) { engine in
-                    EngineRow(engine: engine, selected: model.settings.customEngineID == engine.id,
-                              select: { model.selectEngine(engine.id) },
-                              edit: { sheet = .edit(engine) }, remove: { removing = engine })
+                .contextMenu {
+                    ForEach(model.settings.engines) { engine in
+                        Section(engine.name) {
+                            Button("Edit…") { sheet = .edit(engine) }
+                            Button("Duplicate") { model.duplicateEngine(engine.id) }
+                            Button("Copy Setup") {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(EngineShare.encode(engine), forType: .string)
+                            }
+                            Divider()
+                            Button("Remove…", role: .destructive) { removing = engine }
+                        }
+                    }
                 }
                 Button { sheet = .add } label: {
                     HStack(spacing: 8) {
@@ -548,45 +559,22 @@ enum EngineSheetTarget: Identifiable {
     }
 }
 
-/// One added engine in the list: selectable like the built-in choices, with its measured time once there is one.
-private struct EngineRow: View {
+/// An added engine's radio label, laid out like the Apple choices: its name, then where it runs and its measured time.
+private struct AddedEngineLabel: View {
     @Environment(AppModel.self) private var model
     let engine: EngineConfig
-    let selected: Bool
-    let select: () -> Void
-    let edit: () -> Void
-    let remove: () -> Void
 
     var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: selected ? "largecircle.fill.circle" : "circle")
-                .foregroundStyle(selected ? Color.accentColor : .secondary)
-                .frame(width: 16)
-            VStack(alignment: .leading, spacing: 1) {
-                Text(engine.name)
-                Text(engine.subtitle).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
-            }
-            Spacer(minLength: 8)
+        VStack(alignment: .leading) {
+            Text(engine.name)
             TimelineView(.periodic(from: .now, by: 2)) { _ in
-                if let s = model.translator.measuredSeconds(for: engine.id) {
-                    Text(String(format: "~%.1f s", s)).font(.caption).monospacedDigit().foregroundStyle(.secondary)
-                }
+                Text(detail).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
             }
         }
-        .contentShape(Rectangle())
-        .onTapGesture(perform: select)
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
-        .contextMenu {
-            Button("Edit…", action: edit)
-            Button("Duplicate") { model.duplicateEngine(engine.id) }
-            Button("Copy Setup") {
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(EngineShare.encode(engine), forType: .string)
-            }
-            Divider()
-            Button("Remove…", role: .destructive, action: remove)
-        }
+    }
+
+    private var detail: String {
+        engine.subtitle + (model.translator.measuredSeconds(for: engine.id).map { String(format: " · ~%.1f s", $0) } ?? "")
     }
 }
 

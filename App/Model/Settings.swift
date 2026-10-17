@@ -33,6 +33,17 @@ enum TranslationEngineChoice: String, Codable, CaseIterable, Identifiable {
     }
 }
 
+/// One radio in Settings › Translation: an Apple choice or an added engine.
+enum EngineSelection: Hashable {
+    case builtIn(TranslationEngineChoice)
+    case added(UUID)
+
+    /// What translates now.
+    init(_ settings: AppSettings) {
+        self = settings.activeEngineConfig.map { .added($0.id) } ?? .builtIn(settings.engine)
+    }
+}
+
 enum RenderMode: String, Codable, CaseIterable, Identifiable {
     /// Fast boxes while content moves, seamless in-place rewrite once it is still.
     case adaptive

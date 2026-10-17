@@ -4,18 +4,32 @@ import MwoyeoEngines
 import SwiftUI
 
 /// Window captures of the engine UI, for checking a look without clicking through the app:
-///   Mwoyeo --capture-ui outdir scenario… [--mock http://host:port/v1] [--delay s]
+///   Mwoyeo --capture-ui outdir scenario… [--mock http://host:port/v1] [--delay s] [--image picture]
 /// Scenarios: translation-default, translation-engines, general-saving, menu-default, menu-switcher, menu-notice,
-/// sheet-pick, sheet-config, sheet-config-remote, lens-badge, lens-notice, lens-menu, add-flow (adds an engine through the sheet, prints
-/// where the key is). Run it with `MWOYEO_MEMORY_SECRETS=1` and `CFFIXED_USER_HOME=<empty dir>` so it touches neither
-/// the Keychain nor the real preferences. `--mock` is a tools/mock-openai server the sample translations go to.
+/// menu-profile, image-window and image-window-original (the Translate Image window on `--image`, translated through the
+/// mock, then with Show Original on; when the text recognizer reads nothing the picture stands in for its translation, which
+/// still shows the toggle's two states), sheet-pick, sheet-config, sheet-config-remote, lens-badge, lens-notice, lens-menu, add-flow (adds an
+/// engine through the sheet, prints where the key is), check-logic (prints PASS/FAIL for the engine selection and the
+/// engine notice's dismissal; no window). Run it with `MWOYEO_MEMORY_SECRETS=1` so it does not touch the Keychain. It keeps its
+/// preferences in a scratch suite of its own (deleted at exit; `MWOYEO_DEFAULTS_SUITE` names one to keep), never the app's real
+/// ones; `CFFIXED_USER_HOME` does not move those. `--mock` is a tools/mock-openai server the sample translations go to.
 enum UICapture {
     static func run(_ args: [String]) -> Never {
         setvbuf(stdout, nil, _IOLBF, 0)
+        // Scratch preferences (AppModel reads the suite when it is first used): a capture never writes the app's real ones.
+        // CFFIXED_USER_HOME does not move them. A suite named in the environment is kept.
+        let suite = "dev.midagedev.mwoyeo.capture-\(getpid())"
+        let ownSuite = ProcessInfo.processInfo.environment["MWOYEO_DEFAULTS_SUITE"] == nil
+        if ownSuite { setenv("MWOYEO_DEFAULTS_SUITE", suite, 1) }
         let app = NSApplication.shared
         app.setActivationPolicy(.accessory)
         Task { @MainActor in
             await Runner(args: args).go()
+            if ownSuite {
+                UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite)
+                // The preferences daemon leaves the emptied file behind, in the real home.
+                try? FileManager.default.removeItem(atPath: NSHomeDirectoryForUser(NSUserName())! + "/Library/Preferences/\(suite).plist")
+            }
             exit(0)
         }
         app.run()
@@ -29,7 +43,7 @@ enum UICapture {
             var names: [String] = [], skip = false
             for a in args.dropFirst() {
                 if skip { skip = false; continue }
-                if a == "--mock" || a == "--delay" || a == "--key" { skip = true; continue }
+                if a == "--mock" || a == "--delay" || a == "--key" || a == "--image" { skip = true; continue }
                 if a == "--keep-key" { continue }
                 names.append(a)
             }
@@ -72,7 +86,7 @@ enum UICapture {
         private func scenario(_ name: String) async {
             switch name {
             case "translation-default": await shoot(name, TranslationSettings(), CGSize(width: 560, height: 760))
-            case "general-saving": await shoot(name, GeneralSettings(), CGSize(width: 560, height: 520))
+            case "general-saving": await shoot(name, GeneralSettings(), CGSize(width: 560, height: 800))
             case "menu-default": await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
             case "translation-engines":
                 await seedEngines()
@@ -82,8 +96,18 @@ enum UICapture {
                 await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
             case "menu-notice":
                 await seedEngines()
+                model.selectEngine(model.settings.engines.first { $0.name == "Gemini" }?.id)
                 model.received(.engineUnavailable(name: "Gemini", reason: "The engine did not accept the key."))
                 await shoot(name, MenuPanel(), CGSize(width: 340, height: 400))
+            case "menu-profile":
+                model.settings.appProfiles = [AppProfile(bundleID: "com.apple.Safari", appName: "Safari", source: "ja", target: "en")]
+                model.frontmostBundleID = "com.apple.Safari"
+                await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
+                model.frontmostBundleID = nil
+                model.settings.appProfiles = []
+            case "image-window": await imageWindow(name, showOriginal: false)
+            case "image-window-original": await imageWindow(name, showOriginal: true)
+            case "check-logic": await checkLogic()
             case "sheet-pick": await shoot(name, EngineSheet(), CGSize(width: 480, height: 560))
             case "sheet-config":
                 let setup = EngineShare.encode(engine("Gemini", mock, "mock-model"))
@@ -99,6 +123,99 @@ enum UICapture {
             }
         }
 
+        private static var sample: ImageTranslationModel?
+
+        /// The Translate Image window on `--image`, once the translation has settled (translated once per run, shown both ways).
+        private func imageWindow(_ name: String, showOriginal: Bool) async {
+            guard let path = option("--image") else { print("\(name): needs --image <picture>"); return }
+            if Self.sample == nil {
+                // Apple's translation needs the app's own host window, which a capture has not: the sample goes through the
+                // mock (the local engine, ja → ko, as in the other scenarios).
+                await seedEngines()
+                // The text recognizers take tens of seconds to load; the app does it at launch, so does this.
+                let loading = Date()
+                await AppModel.loadVision()
+                print("\(name): recognizers loaded in \(String(format: "%.1f", Date().timeIntervalSince(loading))) s")
+                let picture = ImageTranslationModel()
+                let started = Date()
+                picture.open(url: URL(fileURLWithPath: path))
+                for _ in 0..<2000 where picture.phase == .working || picture.phase == .empty { try? await Task.sleep(for: .milliseconds(100)) }
+                print("\(name): \(picture.phase), \(picture.texts.count) lines in \(String(format: "%.1f", Date().timeIntervalSince(started))) s")
+                if picture.texts.isEmpty, let still = NSImage(contentsOf: URL(fileURLWithPath: path)) {
+                    // The text recognizer returned nothing (a busy Neural Engine): the toggle states are still worth a look.
+                    print("\(name): nothing was read, showing the picture as its own translation")
+                    picture.showSettled(still, lines: 0)
+                }
+                Self.sample = picture
+            }
+            guard let picture = Self.sample else { return }
+            picture.showOriginal = showOriginal
+            await shoot(name, ImageTranslationView(model: picture, onDrop: { _ in false }), CGSize(width: 1040, height: 760))
+        }
+
+        /// The engine group's selection and the engine notice's dismissal, without a window.
+        private func checkLogic() async {
+            var failed = 0
+            func check(_ what: String, _ ok: Bool) {
+                print("check-logic: \(ok ? "PASS" : "FAIL") \(what)")
+                if !ok { failed += 1 }
+            }
+            let cloud = engine("Gemini", "https://generativelanguage.googleapis.com/v1beta/openai/", "gemini-3.1-flash-lite")
+            let local = engine("Ollama", mock, "qwen3:8b")
+            model.settings.engines = [cloud, local]
+            model.selectEngine(nil)
+            check("no added engine in use reads as the Apple choice", EngineSelection(model.settings) == .builtIn(model.settings.engine))
+            model.select(.added(local.id))
+            check("picking an added engine selects it", model.settings.customEngineID == local.id && EngineSelection(model.settings) == .added(local.id))
+            model.select(.builtIn(.customModel))
+            check("picking an Apple choice leaves the added engine", model.settings.customEngineID == nil && model.settings.engine == .customModel
+                  && EngineSelection(model.settings) == .builtIn(.customModel))
+            model.settings.engines = []
+            model.settings.engine = .auto
+
+            let a = TranslationIssue.engineUnavailable(name: "Gemini", reason: "The engine did not accept the key.")
+            let b = TranslationIssue.engineUnavailable(name: "Ollama", reason: "It did not answer in time.")
+            model.received(nil)
+            model.received(a)
+            check("an engine issue shows", model.shownIssue == a)
+            model.dismissIssue()
+            check("dismissed: hidden, still the current issue", model.shownIssue == nil && model.issue == a)
+            model.received(a)
+            check("dismiss, then the same issue again: hidden", model.shownIssue == nil)
+            check("the same issue does not tell the lenses again", !AppModel.step(old: a, new: a, dismissed: a).tellLenses
+                  && !AppModel.step(old: nil, new: a, dismissed: a).tellLenses)
+            model.received(b)
+            check("a different issue shows", model.shownIssue == b)
+            check("a different issue tells the lenses once", AppModel.step(old: a, new: b, dismissed: a).tellLenses
+                  && !AppModel.step(old: b, new: b, dismissed: nil).tellLenses)
+            model.dismissIssue()
+            model.received(nil)
+            check("recovery clears the dismissed record", model.dismissedIssue == nil && model.shownIssue == nil)
+            model.received(b)
+            check("recovery, then the same issue: shown again", model.shownIssue == b)
+            check("and it tells the lenses again", AppModel.step(old: nil, new: b, dismissed: nil).tellLenses)
+            model.received(.timedOut)
+            model.dismissIssue()
+            check("only an engine notice can be dismissed", model.shownIssue == .timedOut)
+            model.received(nil)
+
+            model.recognitionNotice(.textRecognitionStarting(language: "ja"))
+            check("the recognizer's notice shows", model.shownIssue == .textRecognitionStarting(language: "ja"))
+            check("it never tells the lenses", !AppModel.step(old: nil, new: .textRecognitionStalled, dismissed: nil).tellLenses)
+            model.recognitionNotice(.textRecognitionStalled)
+            model.received(nil)
+            check("a translation that went well does not end it", model.shownIssue == .textRecognitionStalled)
+            model.dismissIssue()
+            check("and it cannot be dismissed", model.shownIssue == .textRecognitionStalled)
+            model.recognitionNotice(nil)
+            check("only the recognizer ends it", model.shownIssue == nil)
+            model.received(a)
+            model.recognitionNotice(nil)
+            check("its end leaves another issue alone", model.shownIssue == a)
+            model.received(nil)
+            print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+        }
+
         // MARK: capture
 
         private func shoot<V: View>(_ name: String, _ view: V, _ size: CGSize, wait: Double? = nil) async {
@@ -106,7 +223,9 @@ enum UICapture {
             w.title = name
             w.contentView = NSHostingView(rootView: view.environment(model))
             w.setFrameTopLeftPoint(NSPoint(x: 80, y: (NSScreen.main?.frame.height ?? 900) - 60))
-            w.orderFrontRegardless()
+            // Key and active, as the real window is: a native radio or toggle shows its accent colour only then.
+            NSApp.activate(ignoringOtherApps: true)
+            w.makeKeyAndOrderFront(nil)
             try? await Task.sleep(for: .seconds(wait ?? delay))
             await capture(window: w, as: name)
             w.orderOut(nil)

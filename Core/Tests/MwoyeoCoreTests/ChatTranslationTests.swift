@@ -93,6 +93,11 @@ import Testing
         }
     }
 
+    @Test func modelIDsDropGeminisModelsPrefix() throws {
+        let d = Data(#"{"data":[{"id":"models/gemini-3.8-flash"},{"id":"models/gemini-3.1-flash-lite"},{"id":"plain"}]}"#.utf8)
+        #expect(try ChatTranslation.modelIDs(d) == ["gemini-3.1-flash-lite", "gemini-3.8-flash", "plain"])
+    }
+
     @Test func modelIDsAreSorted() throws {
         let d = Data(#"{"object":"list","data":[{"id":"qwen3"},{"id":"gemma3"},{"id":"llama3"}]}"#.utf8)
         #expect(try ChatTranslation.modelIDs(d) == ["gemma3", "llama3", "qwen3"])

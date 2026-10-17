@@ -11,7 +11,7 @@ import Testing
     @Test func bodyShape() throws {
         let b = body()
         #expect(b["model"] as? String == "claude-x")
-        #expect(b["temperature"] as? Int == 0)
+        #expect(b["temperature"] == nil)
         #expect((b["system"] as? String)?.contains("Korean") == true)
         let m = b["messages"] as! [[String: String]]
         #expect(m.count == 1 && m[0]["role"] == "user")

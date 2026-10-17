@@ -8,6 +8,8 @@ public enum EnginePresets {
         public var hint: String
         public var needsKey: Bool
         public var keyURL: URL?
+        /// The model the app picks from the live model list when it is there (bench 2026-10-17).
+        public var suggestedModel: String? = nil
         /// A template: copy it with `instantiate()` to get a config with its own `id`.
         public var config: EngineConfig
 
@@ -16,8 +18,9 @@ public enum EnginePresets {
         }
     }
 
-    private static func chat(_ name: String, _ hint: String, _ base: String, key: String?, needsKey: Bool = true) -> Preset {
-        Preset(name: name, hint: hint, needsKey: needsKey, keyURL: key.flatMap(URL.init(string:)),
+    private static func chat(_ name: String, _ hint: String, _ base: String, key: String?, needsKey: Bool = true,
+                             suggested: String? = nil) -> Preset {
+        Preset(name: name, hint: hint, needsKey: needsKey, keyURL: key.flatMap(URL.init(string:)), suggestedModel: suggested,
                config: EngineConfig(name: name, kind: .openAICompatible(
                    baseURL: URL(string: base)!, model: "", thinking: .off, extraHeaders: [:])))
     }
@@ -25,11 +28,12 @@ public enum EnginePresets {
     public static let all: [Preset] = [
         // https://ai.google.dev/gemini-api/docs/openai
         chat("Gemini", "Free key at aistudio.google.com", "https://generativelanguage.googleapis.com/v1beta/openai/",
-             key: "https://aistudio.google.com/apikey"),
+             key: "https://aistudio.google.com/apikey", suggested: "gemini-3.1-flash-lite"),
         // https://api-docs.deepseek.com/
         chat("DeepSeek", "Low price per line", "https://api.deepseek.com", key: "https://platform.deepseek.com/api_keys"),
-        // verified: false (the OpenAI docs answered 403 to the fetch; https://api.openai.com/v1 is the long-standing base)
-        chat("OpenAI", "Your OpenAI API key", "https://api.openai.com/v1", key: "https://platform.openai.com/api-keys"),
+        // https://api.openai.com/v1/chat/completions answered 200 in the engine bench, 2026-10-17
+        chat("OpenAI", "Your OpenAI API key", "https://api.openai.com/v1", key: "https://platform.openai.com/api-keys",
+             suggested: "gpt-5.6-luna"),
         // https://openrouter.ai/docs/api-reference/overview
         chat("OpenRouter", "One key for many models", "https://openrouter.ai/api/v1", key: "https://openrouter.ai/keys"),
         // https://console.groq.com/docs/openai
@@ -42,9 +46,9 @@ public enum EnginePresets {
         chat("Ollama", "Runs on this Mac, no key", "http://localhost:11434/v1", key: nil, needsKey: false),
         // https://lmstudio.ai/docs/developer/openai-compat
         chat("LM Studio", "Runs on this Mac, no key", "http://localhost:1234/v1", key: nil, needsKey: false),
-        // verified: false for the key page; the base URL https://api.anthropic.com is the Messages API host
+        // https://api.anthropic.com/v1/messages answered in the engine bench, 2026-10-17 (the key page is verified: false)
         Preset(name: "Claude", hint: "Your Anthropic API key", needsKey: true,
-               keyURL: URL(string: "https://console.anthropic.com/settings/keys"),
+               keyURL: URL(string: "https://console.anthropic.com/settings/keys"), suggestedModel: "claude-haiku-5-5",
                config: EngineConfig(name: "Claude", kind: .anthropic(
                    baseURL: EngineKind.anthropicDefaultBaseURL, model: "", thinking: .off))),
         // https://developers.deepl.com/docs/getting-started/auth

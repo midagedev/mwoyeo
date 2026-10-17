@@ -13,6 +13,8 @@
 #   401         HTTP 401 with an OpenAI-style error body
 #   429         HTTP 429 with an OpenAI-style error body
 #   garbage     content "sure! here you go"
+#   strict      HTTP 400 when the body has `temperature` (OpenAI's real gpt-5-nano error, captured 2026-10-17) or
+#               `reasoning_effort` (same shape, message written by hand); else like ok. For the app's retry-without-field path.
 # <target> is read from the system prompt's "into X" phrase, or "T".
 # Each request logs one line to stderr: method, path, line count, mode, auth present/absent (never the value), and
 # thinking_off=yes when the JSON body carried any of reasoning_effort, reasoning, thinking, enable_thinking, think.
@@ -126,6 +128,12 @@ class Handler(BaseHTTPRequestHandler):
             return self.send_json(404, error_body("not found", "invalid_request_error", None))
         if MODE == "401":
             return self.send_json(401, error_body("Incorrect API key provided.", "invalid_request_error", "invalid_api_key"))
+        if MODE == "strict":
+            if "temperature" in req:
+                msg = "Unsupported value: 'temperature' does not support 0 with this model. Only the default (1) value is supported."
+                return self.send_json(400, {"error": {"message": msg, "type": "invalid_request_error", "param": "temperature", "code": "unsupported_value"}})
+            if "reasoning_effort" in req:
+                return self.send_json(400, {"error": {"message": "Unsupported parameter: 'reasoning_effort' is not supported with this model.", "type": "invalid_request_error", "param": "reasoning_effort", "code": "unsupported_parameter"}})
         if MODE == "429":
             return self.send_json(429, error_body("Rate limit reached.", "requests", "rate_limit_exceeded"))
         delay = 0.05

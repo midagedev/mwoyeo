@@ -3,14 +3,16 @@ import Testing
 @testable import MwoyeoCore
 
 @Suite struct ChatThinkingTests {
-    private func body(_ base: String?, _ thinking: Thinking = .off) -> [String: Any] {
-        let d = ChatTranslation.requestBody(lines: ["a"], source: nil, target: "ko", glossary: [], model: "m",
+    private func body(_ base: String?, _ thinking: Thinking = .off, model: String = "m") -> [String: Any] {
+        let d = ChatTranslation.requestBody(lines: ["a"], source: nil, target: "ko", glossary: [], model: model,
                                             baseURL: base.flatMap(URL.init(string:)), thinking: thinking)
         return try! JSONSerialization.jsonObject(with: d) as! [String: Any]
     }
 
-    @Test func geminiGetsReasoningEffortNone() {
-        #expect(body("https://generativelanguage.googleapis.com/v1beta/openai/")["reasoning_effort"] as? String == "none")
+    @Test func geminiGetsAnEffortLevelByModel() {
+        let base = "https://generativelanguage.googleapis.com/v1beta/openai/"
+        #expect(body(base, model: "gemini-2.5-flash")["reasoning_effort"] as? String == "none")
+        #expect(body(base, model: "gemini-3.1-flash-lite")["reasoning_effort"] as? String == "minimal")
     }
 
     @Test func openRouterGetsReasoningDisabled() {
@@ -39,6 +41,6 @@ import Testing
             #expect(Set(body(base).keys) == plain)
         }
         #expect(Set(body("https://api.deepseek.com", .provider).keys) == plain)
-        #expect(Set(body("https://generativelanguage.googleapis.com/v1beta/openai/", .provider).keys) == plain)
+        #expect(Set(body("https://generativelanguage.googleapis.com/v1beta/openai/", .provider, model: "gemini-3.1-flash-lite").keys) == plain)
     }
 }

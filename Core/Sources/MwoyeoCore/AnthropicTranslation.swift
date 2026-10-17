@@ -15,14 +15,18 @@ public enum AnthropicTranslation {
     }
 
     /// `thinking` is never sent: `.off` is the API's default (no thinking block), and `.provider` adds nothing.
+    /// `temperature` follows `ModelQuirks` (never for Claude).
     public static func requestBody(lines: [String], source: String?, target: String,
                                    glossary: [(String, String)], model: String, thinking: Thinking = .off) -> Data {
-        let body: [String: Any] = [
-            "model": model, "max_tokens": maxTokens(for: lines), "temperature": 0,
+        var body: [String: Any] = [
+            "model": model, "max_tokens": maxTokens(for: lines),
             "system": ChatTranslation.systemPrompt(source: source, target: target, glossary: glossary),
             "messages": [["role": "user", "content": ChatTranslation.userMessage(lines)]],
         ]
-        return (try? JSONSerialization.data(withJSONObject: body, options: [.withoutEscapingSlashes, .sortedKeys])) ?? Data()
+        let quirks = ModelQuirks.lookup(host: "api.anthropic.com", port: nil, model: model,
+                                        kind: .anthropic(baseURL: EngineKind.anthropicDefaultBaseURL, model: model, thinking: thinking))
+        if quirks.sendsTemperature { body["temperature"] = 0 }
+        return ChatTranslation.encode(body)
     }
 
     public static func parseTranslations(_ data: Data, count: Int) throws(ChatTranslationError) -> [String] {

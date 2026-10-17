@@ -9,38 +9,48 @@ public enum ChatTranslationError: Error, Equatable, Sendable {
 
 /// Pure protocol code for an OpenAI-compatible `/chat/completions` translation engine.
 public enum ChatTranslation {
-    /// `baseURL` picks the provider-specific "do not reason" field for `thinking == .off`; an unknown or missing host
-    /// gets nothing extra. Fields, each checked against the provider's doc on 2026-10-17:
-    /// - Gemini `reasoning_effort: "none"` (2.5 models only; 2.5 Pro and 3 cannot turn reasoning off):
-    ///   https://ai.google.dev/gemini-api/docs/openai
-    /// - OpenRouter `reasoning: {"enabled": false}`: https://openrouter.ai/docs/use-cases/reasoning-tokens
-    /// - Ollama `reasoning_effort: "none"` ("none" requests no thinking). Its `think` field is documented only for the
-    ///   Responses API, so it is not sent here: https://docs.ollama.com/api/openai-compatibility
-    /// - DeepSeek `thinking: {"type": "disabled"}`: https://api-docs.deepseek.com/guides/thinking_mode
-    /// - Qwen / DashScope `enable_thinking: false` (top level over plain HTTP; the doc names the parameter but shows no
-    ///   value): https://www.alibabacloud.com/help/en/model-studio/qwen-api-via-openai-chat-completions
-    /// Groq, OpenAI and LM Studio: nothing (no doc-confirmed field).
+    /// `ModelQuirks` picks the fields from the host and model id: `temperature` where the model takes it, and for
+    /// `thinking == .off` the provider's "do not reason" field (each rule's evidence is in `ModelQuirks`). An unknown
+    /// host or model gets `temperature: 0` and nothing extra; `.provider` sends no thinking field.
     public static func requestBody(lines: [String], source: String?, target: String,
                                    glossary: [(String, String)], model: String,
                                    baseURL: URL? = nil, thinking: Thinking = .off) -> Data {
         var body: [String: Any] = [
-            "model": model, "temperature": 0, "stream": false,
+            "model": model, "stream": false,
             "messages": [["role": "system", "content": systemPrompt(source: source, target: target, glossary: glossary)],
                          ["role": "user", "content": userMessage(lines)]],
         ]
-        if thinking == .off, let baseURL {
-            for (k, v) in thinkingOffFields(host: baseURL.host?.lowercased() ?? "", port: baseURL.port) { body[k] = v }
-        }
-        return (try? JSONSerialization.data(withJSONObject: body, options: [.withoutEscapingSlashes, .sortedKeys])) ?? Data()
+        let quirks = ModelQuirks.lookup(host: baseURL?.host ?? "", port: baseURL?.port, model: model,
+                                        kind: .openAICompatible(baseURL: baseURL ?? URL(fileURLWithPath: "/"), model: model,
+                                                                thinking: thinking, extraHeaders: [:]))
+        if quirks.sendsTemperature { body["temperature"] = 0 }
+        if thinking == .off { for (k, v) in quirks.thinkingOff { body[k] = v.json } }
+        return encode(body)
     }
 
-    static func thinkingOffFields(host: String, port: Int?) -> [String: Any] {
-        if host == "generativelanguage.googleapis.com" { return ["reasoning_effort": "none"] }
-        if host == "openrouter.ai" { return ["reasoning": ["enabled": false]] }
-        if host == "api.deepseek.com" { return ["thinking": ["type": "disabled"]] }
-        if (host.hasPrefix("dashscope") && host.hasSuffix(".aliyuncs.com")) || host.hasSuffix("maas.aliyuncs.com") { return ["enable_thinking": false] }
-        if host == "ollama.com" || (isOnThisMac(host: host) && port == 11434) { return ["reasoning_effort": "none"] }
-        return [:]
+    static func encode(_ body: [String: Any]) -> Data {
+        (try? JSONSerialization.data(withJSONObject: body, options: [.withoutEscapingSlashes, .sortedKeys])) ?? Data()
+    }
+
+    static let rejectableFields = ["temperature", "reasoning_effort", "reasoning", "thinking", "enable_thinking"]
+
+    /// For a 400 whose message names one of the fields we send, the request body without it and the field's name;
+    /// otherwise nil. The caller retries once and remembers the field per engine.
+    public static func withoutRejectedField(_ body: Data, errorBody: Data) -> (body: Data, field: String)? {
+        guard let root = try? JSONSerialization.jsonObject(with: errorBody) else { return nil }
+        let errors = (root as? [Any]) ?? [root]
+        let messages = errors.compactMap { e -> String? in
+            guard let err = (e as? [String: Any])?["error"] else { return nil }
+            return (err as? [String: Any])?["message"] as? String ?? err as? String
+        }
+        guard !messages.isEmpty, var request = try? JSONSerialization.jsonObject(with: body) as? [String: Any] else { return nil }
+        // `reasoning_effort` contains `reasoning`: take the longest match first.
+        for field in rejectableFields.sorted(by: { $0.count > $1.count })
+        where request[field] != nil && messages.contains(where: { $0.lowercased().contains(field) }) {
+            request[field] = nil
+            return (encode(request), field)
+        }
+        return nil
     }
 
     /// The instructions shared by every chat-style engine.
@@ -107,14 +117,14 @@ public enum ChatTranslation {
         host == "localhost" || host == "127.0.0.1" || host == "::1"
     }
 
-    /// Model ids from a `GET /models` response, sorted.
+    /// Model ids from a `GET /models` response, sorted, without Gemini's leading `models/`.
     public static func modelIDs(_ data: Data) throws(ChatTranslationError) -> [String] {
         guard let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw .malformed("response is not a JSON object")
         }
         if let m = (root["error"] as? [String: Any])?["message"] as? String { throw .server(m) }
         guard let items = root["data"] as? [[String: Any]] else { throw .malformed("no data array") }
-        return items.compactMap { $0["id"] as? String }.sorted()
+        return items.compactMap { ($0["id"] as? String).map { $0.hasPrefix("models/") ? String($0.dropFirst(7)) : $0 } }.sorted()
     }
 
     static func languageName(_ code: String) -> String {

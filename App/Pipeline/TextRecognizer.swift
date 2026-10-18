@@ -1,24 +1,9 @@
 import CoreGraphics
-import CoreText
 import Foundation
 import MwoyeoCore
 import NaturalLanguage
 import Vision
 import os
-
-/// One recognized line, in image pixels (top-left origin).
-struct OCRLine: Sendable {
-    var rect: CGRect
-    var text: String
-    /// Its words (CJK: characters) with their boxes, where Vision could place them.
-    var words: [OCRWord] = []
-}
-
-struct OCRWord: Sendable {
-    var rect: CGRect
-    /// Range in the line's `text`.
-    var range: Range<String.Index>
-}
 
 /// A paragraph: lines that read as one unit and should be translated together.
 struct OCRBlock: Sendable {
@@ -41,55 +26,9 @@ enum TextRecognizer {
     /// macOS 27 (the Swift document and text requests are used for paragraphs only, see `blocks`).
     private static func fastLines(in image: CGImage, roi: CGRect?, languages: [Locale.Language]) async throws -> [OCRLine] {
         let wanted = languages.compactMap(\.languageCode)
-        return try await deadline {
-            try visionRead(in: image, roi: roi, level: .fast, revision: nil, customWords: []) { req in
-                // Its identifiers look like "en-US"; match by language code.
-                let supported = (try? req.supportedRecognitionLanguages()) ?? []
-                return wanted.compactMap { w in supported.first { Locale.Language(identifier: $0).languageCode == w } }
-            }
-        }
-    }
-
-    /// The Objective-C recognizer, run to completion (the callers bound it). `languages` picks the identifiers to read
-    /// (empty: detect), given the request to ask.
-    private static func visionRead(in image: CGImage, roi: CGRect?, level: VNRequestTextRecognitionLevel, revision: Int?,
-                                   customWords: [String], languages: (VNRecognizeTextRequest) -> [String]) throws -> [OCRLine] {
-        let size = CGSize(width: image.width, height: image.height)
-        // A region with no pixel in the picture has no origin, and Vision traps on it (v1.0.0 crash report): no request.
-        guard let region = regionOfInterest(roi, in: size) else { return [] }
-        let req = VNRecognizeTextRequest()
-        req.recognitionLevel = level
-        if let revision { req.revision = revision }
-        req.usesLanguageCorrection = level == .accurate
-        req.customWords = customWords
-        let codes = languages(req)
-        if codes.isEmpty { req.automaticallyDetectsLanguage = true } else { req.recognitionLanguages = codes }
-        req.regionOfInterest = region
-        try VNImageRequestHandler(cgImage: image).perform([req])
-        return (req.results ?? []).compactMap { obs -> OCRLine? in
-            guard let c = obs.topCandidates(1).first, c.confidence >= 0.3 else { return nil }
-            let words = wordRanges(c.string).compactMap { r in
-                (try? c.boundingBox(for: r)).flatMap { $0 }.map { OCRWord(rect: pixelRect(unclip($0.boundingBox, from: region), in: size), range: r) }
-            }
-            return OCRLine(rect: pixelRect(unclip(obs.boundingBox, from: region), in: size), text: c.string, words: words)
-        }
-    }
-
-    /// Words split at spaces; CJK has none, so its words are single characters.
-    private static func wordRanges(_ s: String) -> [Range<String.Index>] {
-        var ranges: [Range<String.Index>] = []
-        var i = s.startIndex
-        while i < s.endIndex {
-            guard !s[i].isWhitespace else { i = s.index(after: i); continue }
-            let j = s[i...].firstIndex(where: \.isWhitespace) ?? s.endIndex
-            if s[i..<j].contains(where: isCJK) {
-                ranges += s[i..<j].indices.map { $0..<s.index(after: $0) }
-            } else {
-                ranges.append(i..<j)
-            }
-            i = j
-        }
-        return ranges
+        // Its identifiers look like "en-US"; match by language code.
+        let ids = wanted.compactMap { w in fastLanguages.first { Locale.Language(identifier: $0).languageCode == w } }
+        return try await deadline { try await exec(.fast, in: image, roi: roi, languages: ids).lines }
     }
 
     /// Paragraph-level recognition. Priority: Swift document model (`RecognizeDocumentsRequest`, once the gate says its model is
@@ -186,31 +125,7 @@ enum TextRecognizer {
     private static let documentDeadline: Double = 8
 
     private static func swiftBlocks(in image: CGImage, roi: CGRect?, languages: [Locale.Language], customWords: [String]) async throws -> [OCRBlock] {
-        var req = RecognizeDocumentsRequest()
-        req.textRecognitionOptions.customWords = customWords
-        if languages.isEmpty {
-            req.textRecognitionOptions.automaticallyDetectLanguage = true
-        } else {
-            req.textRecognitionOptions.recognitionLanguages = languages
-        }
-        let size = CGSize(width: image.width, height: image.height)
-        guard let region = regionOfInterest(roi, in: size) else { return [] }
-        req.regionOfInterest = NormalizedRect(normalizedRect: region)
-        var out: [OCRBlock] = []
-        for doc in try await req.perform(on: image) {
-            for paragraph in doc.document.paragraphs {
-                let lines = paragraph.lines.compactMap { obs -> OCRLine? in
-                    guard let c = obs.topCandidates(1).first, !c.string.isEmpty else { return nil }
-                    let words = wordRanges(c.string).compactMap { r in
-                        c.boundingBox(for: r).map { OCRWord(rect: pixelRect(unclip($0.boundingBox.cgRect, from: region), in: size), range: r) }
-                    }
-                    return OCRLine(rect: pixelRect(unclip(obs.boundingBox.cgRect, from: region), in: size), text: c.string, words: words)
-                }
-                guard !lines.isEmpty else { continue }
-                out.append(makeBlock(lines))
-            }
-        }
-        return out
+        try await exec(.doc, in: image, roi: roi, documentLanguages: languages, customWords: customWords).paragraphs.map(makeBlock)
     }
 
     struct Timeout: Error {}
@@ -294,7 +209,7 @@ enum TextRecognizer {
                                  customWords: [String]) async throws -> [OCRLine] {
         let rungs = OCRFallback.ladder(requested: languages.compactMap(code), vision3: vision3Languages,
                                        revision2: revision2Languages, fast: fastLanguages)
-        let read: @Sendable (OCRFallback) throws -> [OCRLine] = { try readRung($0, in: image, roi: roi, customWords: customWords) }
+        let read: @Sendable (OCRFallback) async throws -> [OCRLine] = { try await readRung($0, in: image, roi: roi, customWords: customWords) }
         for (i, rung) in rungs.enumerated() {
             let more = i < rungs.count - 1
             switch rung {
@@ -315,7 +230,7 @@ enum TextRecognizer {
                     // Named for the ladder (`ocr.fallback.<rung>`, as the scripts count it): every read counts its rung, the first too.
                     Trace.count("ocr.fallback.vn3")
                     do {
-                        return try await tracked(seconds, tellingAbout: more ? nil : languages) { try read(rung) }
+                        return try await tracked(seconds, tellingAbout: more ? nil : languages) { try await read(rung) }
                     } catch is Timeout {
                         if !more { throw stalled(languages) }
                     } catch where more && OCRHealth.programsNotReady(error) {
@@ -326,10 +241,10 @@ enum TextRecognizer {
                 }
             case .revision2:
                 Trace.count("ocr.fallback.rev2")
-                return try await deadline { try read(rung) }
+                return try await deadline { try await read(rung) }
             case .fast:
                 Trace.count("ocr.fallback.fast")
-                return try await deadline { try read(rung) }
+                return try await deadline { try await read(rung) }
             }
         }
         throw stalled(languages)
@@ -380,7 +295,7 @@ enum TextRecognizer {
     /// While stalled, one small picture goes to revision 3 every two minutes (and none while a request of the last two
     /// minutes is still loading), so that the notice and the fallback end when it answers again.
     private static func startProbing() {
-        guard let picture = probePicture, health.withLock({ $0.startProbing() }) else { return }
+        guard probePicture != nil, health.withLock({ $0.startProbing() }) else { return }
         Task.detached(priority: .utility) {
             while true {
                 try? await Task.sleep(for: .seconds(OCRHealth.probeEvery))
@@ -388,7 +303,7 @@ enum TextRecognizer {
                 guard let id = health.withLock({ $0.probeDue(now: Trace.now) ? $0.begin(now: Trace.now) : nil }) else { continue }
                 Trace.count("ocr.probe" + counterTag)
                 // Returns when the model does, if ever: the next probe waits for it.
-                _ = try? await observed(id) { try visionRead(in: picture, roi: nil, level: .accurate, revision: 3, customWords: []) { _ in [] } }
+                _ = try? await observed(id) { try await exec(.warmLines, in: nil, roi: nil) }
             }
         }
     }
@@ -426,14 +341,22 @@ enum TextRecognizer {
     }
 
     private static func perform(_ due: SwiftVisionGate.Due) async throws {
-        guard let picture = probePicture else { throw Stalled() }
+        guard probePicture != nil else { throw Stalled() }
         switch due.step {
         case .textModel:
             try await askingAgainWhileNotReady {
-                _ = try await tracked(OCRHealth.coldWait) {
-                    try visionRead(in: picture, roi: nil, level: .accurate, revision: 3, customWords: []) { _ in [] }
-                }
+                _ = try await tracked(OCRHealth.coldWait) { try await exec(.warmLines, in: nil, roi: nil) }
             }
+        case .documentModel where readsViaXPC:
+            // The Docs service compiles it, in its own process: no read of this one waits for the compile, as with the child.
+            gate.withLock { $0.childPhase(true) }
+            defer { gate.withLock { $0.childPhase(false) } }
+            try await askingAgainWhileNotReady {
+                _ = try await exec(.warmDoc, in: nil, roi: nil, documentLanguages: languages(of: due.key))
+            }
+        case .swiftTextModel where readsViaXPC:
+            // Nothing reads with `RecognizeTextRequest`: through the services the step has no model to load (R3 removes it).
+            break
         case .documentModel, .swiftTextModel:
             // The compile (80-90 s cold) runs in a child process, where no read of this process waits for it; the load here
             // afterwards finds the model in the system's cache (under 2 s). If no child can be started, it is loaded here.
@@ -472,7 +395,7 @@ enum TextRecognizer {
             break
         case .documentModel:
             try await askingAgainWhileNotReady {
-                _ = try await swiftBlocks(in: picture, roi: nil, languages: languages, customWords: [])
+                _ = try await exec(.warmDoc, in: nil, roi: nil, documentLanguages: languages)
             }
         case .swiftTextModel:
             var req = RecognizeTextRequest()
@@ -500,33 +423,8 @@ enum TextRecognizer {
         }
     }
 
-    /// Latin and CJK text, drawn here so that the probe and the warm-up need no file: a Latin line of 240 characters, a CJK line of
-    /// 80 and a short one, 24 pt. Revision 3 compiles a program per width of text line (line width over line height) on first
-    /// use, 30 to 65 s each on a Mac, and a program serves every narrower line. Measured 2026-10-17: a short line (aspect 9) left
-    /// the first read of the chat picture (aspect 45) 32 s cold, a line of aspect 82 (2486 × 52 px) made all of them (chat, article,
-    /// forum, ja, en, aspect 9 to 60) fast. So the warm-up picture carries the widest line a screen shows.
-    static let probePicture: CGImage? = {
-        let sentence = "the quick brown fox jumps over a lazy dog while reading text"
-        let latin = String(Array(repeating: sentence, count: 4).joined(separator: " ").prefix(240))
-        let cjk = String(Array(repeating: "今日はとても楽しかったねまた明日も一緒に遊ぼう海外のゲームや漫画まだ翻訳されていない最新の技術記事", count: 2).joined().prefix(80))
-        let font = CTFontCreateUIFontForLanguage(.system, 24, nil)
-        let lines = [latin, cjk, "Hello 世界 こんにちは"].map {
-            CTLineCreateWithAttributedString(NSAttributedString(
-                string: $0, attributes: [NSAttributedString.Key(kCTFontAttributeName as String): font as Any,
-                                         NSAttributedString.Key(kCTForegroundColorFromContextAttributeName as String): true]))
-        }
-        let w = Int(lines.map { CTLineGetBoundsWithOptions($0, []).width }.max() ?? 0) + 48, h = lines.count * 64 + 16
-        guard let ctx = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: 0,
-                                  space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
-        ctx.setFillColor(.white)
-        ctx.fill(CGRect(x: 0, y: 0, width: w, height: h))
-        ctx.setFillColor(.black)
-        for (i, line) in lines.enumerated() {
-            ctx.textPosition = CGPoint(x: 24, y: CGFloat(h - 64 * (i + 1)) + 10)
-            CTLineDraw(line, ctx)
-        }
-        return ctx.makeImage()
-    }()
+    /// The drawn warm-up picture (`VisionExec.probePicture`).
+    static var probePicture: CGImage? { VisionExec.probePicture }
 
     /// `MWOYEO_FAKE_OCR=stall` or `stall-vn` (revision 3 never answers, as on the stalled Mac: the reads go down the ladder to
     /// revision 2 and `.fast`) or `slow:<ms>` (revision 3 answers late), to exercise the fallback and the recovery on a healthy
@@ -577,11 +475,11 @@ enum TextRecognizer {
         return l.script.map { "\(c)-\($0.identifier)" } ?? c
     }
 
-    private static func readRung(_ rung: OCRFallback, in image: CGImage, roi: CGRect?, customWords: [String]) throws -> [OCRLine] {
+    private static func readRung(_ rung: OCRFallback, in image: CGImage, roi: CGRect?, customWords: [String]) async throws -> [OCRLine] {
         switch rung {
-        case let .vision3(ids): try visionRead(in: image, roi: roi, level: .accurate, revision: 3, customWords: customWords) { _ in ids }
-        case let .revision2(ids): try visionRead(in: image, roi: roi, level: .accurate, revision: 2, customWords: customWords) { _ in ids }
-        case let .fast(ids): try visionRead(in: image, roi: roi, level: .fast, revision: nil, customWords: []) { _ in ids }
+        case let .vision3(ids): try await exec(.rev3, in: image, roi: roi, languages: ids, customWords: customWords).lines
+        case let .revision2(ids): try await exec(.rev2, in: image, roi: roi, languages: ids, customWords: customWords).lines
+        case let .fast(ids): try await exec(.fast, in: image, roi: roi, languages: ids).lines
         }
     }
 
@@ -679,29 +577,55 @@ enum TextRecognizer {
         ReadTally(inTarget: verdicts.filter { $0 == .inTarget }.count, needing: verdicts.filter { $0 == .needs }.count, partial: partial)
     }
 
-    static func isCJK(_ c: Character) -> Bool {
-        c.unicodeScalars.contains { s in
-            (0x3040...0x30FF).contains(s.value) || (0x3400...0x9FFF).contains(s.value) ||
-                (0xF900...0xFAFF).contains(s.value) || (0xFF00...0xFFEF).contains(s.value) ||
-                (0x3000...0x303F).contains(s.value)
-        }
-    }
-
-    /// Region-of-interest-relative normalized box → image-relative normalized box.
-    private static func unclip(_ b: CGRect, from region: CGRect) -> CGRect {
-        CGRect(x: region.minX + b.minX * region.width, y: region.minY + b.minY * region.height,
-               width: b.width * region.width, height: b.height * region.height)
-    }
-
-    private static func pixelRect(_ n: CGRect, in size: CGSize) -> CGRect {
-        CGRect(x: n.minX * size.width, y: (1 - n.maxY) * size.height, width: n.width * size.width, height: n.height * size.height)
-    }
+    static func isCJK(_ c: Character) -> Bool { VisionExec.isCJK(c) }
 
     /// The region of interest for `roi` in image pixels (nil: the whole picture), or nil when no pixel of it lies in the picture
     /// (`VisionRegion`): the caller reads nothing, and the count says how often that happened.
     private static func regionOfInterest(_ roi: CGRect?, in size: CGSize) -> CGRect? {
-        guard let roi else { return CGRect(x: 0, y: 0, width: 1, height: 1) }
-        guard let r = VisionRegion.normalized(roi, in: size) else { Trace.count("ocr.roi.empty"); return nil }
-        return r
+        guard let region = VisionExec.regionOfInterest(roi, in: size) else { Trace.count("ocr.roi.empty"); return nil }
+        return region
+    }
+
+    // MARK: Where a read runs
+
+    /// `MWOYEO_READER=xpc` sends the reads to the reader services (`ReaderConnection`, the Lines and Docs processes of the app
+    /// bundle); otherwise Vision runs in this process, as it always did. Routing, health and the hint stay as they are: R3
+    /// makes the services the only path.
+    private static let readsViaXPC = ProcessInfo.processInfo.environment["MWOYEO_READER"] == "xpc"
+
+    /// `MWOYEO_TRACE_READS=1` prints the lines of every read (kind, size, region, then one record per line: text, rect, word
+    /// rects) on stderr: what `tools/ocr-probe/same-lines.py` compares between two runs.
+    private static let traceReads = ProcessInfo.processInfo.environment["MWOYEO_TRACE_READS"] != nil
+
+    /// One read of `kind`, here or in a service. The warm-up kinds take no picture. A region with no pixel in the picture reads
+    /// nothing, and does not cross to a service.
+    private static func exec(_ kind: ReadKind, in image: CGImage?, roi: CGRect?, languages: [String] = [], documentLanguages: [Locale.Language] = [],
+                             customWords: [String] = []) async throws -> VisionExec.Output {
+        let empty: VisionExec.Output = kind == .doc ? .paragraphs([]) : .lines([])
+        if let image, regionOfInterest(roi, in: CGSize(width: image.width, height: image.height)) == nil { return empty }
+        let out: VisionExec.Output
+        if readsViaXPC {
+            out = try await ReaderConnection.shared(ReaderRole.home(of: kind)).read(kind, image: image, roi: roi, languages: languages,
+                                                                                     documentLanguages: documentLanguages, customWords: customWords)
+        } else {
+            out = try await VisionExec.run(kind, image: image, roi: roi, languages: languages, documentLanguages: documentLanguages,
+                                           customWords: customWords)
+        }
+        if traceReads { printRead(kind, image: image, roi: roi, out) }
+        return out
+    }
+
+    private static func printRead(_ kind: ReadKind, image: CGImage?, roi: CGRect?, _ out: VisionExec.Output) {
+        func field(_ s: String) -> String { s.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\t", with: "\\t").replacingOccurrences(of: "\n", with: "\\n") }
+        func rect(_ r: CGRect) -> String { "\(r.minX)\t\(r.minY)\t\(r.width)\t\(r.height)" }
+        let size = image.map { "\($0.width)x\($0.height)" } ?? "probe"
+        var text = "[read]\t\(kind.rawValue)\tbegin\t\(size)\t\(roi.map { "\($0)" } ?? "-")\t\(out.lines.count)\n"
+        for (p, lines) in out.paragraphs.enumerated() {
+            for line in lines {
+                let words = line.words.map { "\($0.rect.minX),\($0.rect.minY),\($0.rect.width),\($0.rect.height)@\(line.text.utf8.distance(from: line.text.utf8.startIndex, to: $0.range.lowerBound))-\(line.text.utf8.distance(from: line.text.utf8.startIndex, to: $0.range.upperBound))" }
+                text += "[read]\t\(kind.rawValue)\tline\t\(p)\t\(rect(line.rect))\t\(field(line.text))\t\(words.joined(separator: ";"))\n"
+            }
+        }
+        FileHandle.standardError.write(text.data(using: .utf8)!)
     }
 }

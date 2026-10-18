@@ -8,15 +8,73 @@ options:
 configFiles:
   Debug: Config/Base.xcconfig
   Release: Config/Base.xcconfig
+settings:
+  base:
+    # The app's id. The reader services derive theirs from it (`<id>.reader.lines|docs`), and the app finds them by that name, so
+    # `xcodebuild … MWOYEO_APP_ID=<other id>` builds a re-identified app with its own re-identified services and caches.
+    MWOYEO_APP_ID: dev.midagedev.mwoyeo
+    # One version for the app and its services.
+    MARKETING_VERSION: "1.1.0"
+    CURRENT_PROJECT_VERSION: "2"
 packages:
   MwoyeoCore:
     path: Core
+targetTemplates:
+  # The two XPC services that run Vision outside the app (docs/design/recognition.md §4.2): one source directory, the role comes
+  # from each service's Info.plist. Hardened runtime on both; Developer ID builds carry no entitlements, a Mac App Store build
+  # signs them with Reader/Reader-MAS.entitlements (CODE_SIGN_ENTITLEMENTS=Reader/Reader-MAS.entitlements).
+  ReaderService:
+    type: xpc-service
+    platform: macOS
+    sources:
+      - path: Reader
+        excludes:
+          - "*.plist"
+          - "*.entitlements"
+      - path: Shared
+    dependencies:
+      - package: MwoyeoCore
+        product: MwoyeoCore
+    info:
+      path: Reader/${role}.plist
+      properties:
+        CFBundleDisplayName: Mwoyeo Reader (${role})
+        CFBundleName: MwoyeoReader-${role}
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSMinimumSystemVersion: "26.0"
+        MwoyeoReaderRole: ${role}
+        XPCService:
+          ServiceType: Application
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(MWOYEO_APP_ID).reader.${role}
+        PRODUCT_NAME: MwoyeoReader-${role}
+        SWIFT_VERSION: "5.0"
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: $(MWOYEO_SIGN_IDENTITY)
+        DEVELOPMENT_TEAM: $(MWOYEO_TEAM)
+        PROVISIONING_PROFILE_SPECIFIER: ""
+        OTHER_CODE_SIGN_FLAGS: --timestamp=none
+        CODE_SIGN_ENTITLEMENTS: Reader/Reader.entitlements
+        GENERATE_INFOPLIST_FILE: NO
+        DEAD_CODE_STRIPPING: YES
 targets:
+  MwoyeoReaderLines:
+    templates: [ReaderService]
+    templateAttributes:
+      role: lines
+  MwoyeoReaderDocs:
+    templates: [ReaderService]
+    templateAttributes:
+      role: docs
   Mwoyeo:
     type: application
     platform: macOS
     sources:
       - path: App
+      - path: Shared
       # MI-GAN (MIT), converted by tools/inpaint/convert_migan.sh; the app falls back to flat fill without it.
       - path: tools/inpaint/models/MIGAN_512.mlpackage
         optional: true
@@ -25,6 +83,11 @@ targets:
         product: MwoyeoCore
       - package: MwoyeoCore
         product: MwoyeoEngines
+      # Embedded in Mwoyeo.app/Contents/XPCServices, signed with the app.
+      - target: MwoyeoReaderLines
+        embed: true
+      - target: MwoyeoReaderDocs
+        embed: true
     info:
       path: App/Info.plist
       properties:
@@ -42,11 +105,9 @@ targets:
         NSScreenCaptureUsageDescription: "Mwoyeo reads the text under your lenses so it can translate it in place."
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.midagedev.mwoyeo
+        PRODUCT_BUNDLE_IDENTIFIER: $(MWOYEO_APP_ID)
         PRODUCT_NAME: Mwoyeo
         SWIFT_VERSION: "5.0"
-        MARKETING_VERSION: "1.1.0"
-        CURRENT_PROJECT_VERSION: "2"
         ENABLE_HARDENED_RUNTIME: YES
         CODE_SIGN_STYLE: Manual
         CODE_SIGN_IDENTITY: $(MWOYEO_SIGN_IDENTITY)

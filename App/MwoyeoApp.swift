@@ -21,6 +21,10 @@ enum Entry {
             let rest = CommandLine.arguments.dropFirst(2)
             SwiftVisionChild.runChild(step: rest.first ?? "", key: rest.dropFirst().first ?? SwiftVisionGate.anyLanguage)
         }
+        // `Mwoyeo --reader-check <scenario> …` exercises the reader services (see ReaderCheck).
+        if CommandLine.arguments.dropFirst().first == "--reader-check" {
+            ReaderCheck.run(Array(CommandLine.arguments.dropFirst(2)))
+        }
         if CommandLine.arguments.dropFirst().first == "--capture-ui" {
             UICapture.run(Array(CommandLine.arguments.dropFirst(2)))
         }

@@ -13,6 +13,13 @@ Per page (p1..p15, whole pages) and in total:
                       has at the smallest size). ellipsis: of those, the translations cut to fit and ended in "…" (D4).
   big_text            drawn body-like blocks (40 or more characters per source line) whose font size is over 1.3 times the
                       median of the page's body-like blocks (the `block:` lines of the render).
+  cross_col           pairs of blocks where one block's source rect holds at least half of the other's: a join of lines across
+                      a column gap (the author header of page 1: two columns' emails in one block) reaches over the block of the
+                      column between them. Listed in detail.txt.
+  debris              body text with OCR formula debris: translated blocks (paragraphs, not already in formula_translated) whose
+                      translation carries three or more one-letter Latin or Greek tokens, or a stray symbol from € ∈ ° × that the
+                      OCR made of a typeset sign ("W° € Be xx" on page 5 comes back as "Wo € IR 모델 × dx"). Reported for pages
+                      3-6; nothing fixes it yet (the inline-math round owns it). Listed in detail.txt.
 Per crop (p<N>-c1, p<N>-c2: top and bottom edge run through a line of text; p<N>-s1: left and right edge cut the words):
   edge_cut            translated blocks whose source lines touch the top or bottom edge of the crop (within 4 px, CaptureEdge.tolerance): a line cut
                       by the edge was read and drawn over.  near: the same within 8 px but not 4 (is 4 px too tight?).
@@ -30,6 +37,7 @@ VOWELS = set('aeiouyAEIOUY')
 BODY_CHARS = 40
 BIG = 1.3
 EDGE = 4   # CaptureEdge.tolerance
+CROSS = 0.5  # share of the smaller core that another core must cover for cross_col
 NEAR = 8   # a looser distance: lines cut by an edge whose box ends a few pixels short of it (tells whether EDGE is too tight)
 
 
@@ -105,12 +113,41 @@ def formula_translated(r, allow):
     return out
 
 
+DEBRIS_SYMBOLS = '€∈°×'
+ONE_LETTER = re.compile(r'(?<![\w])[A-Za-zΑ-Ωα-ω](?![\w])')
+
+
+def debris(r, flagged):
+    """Translated pairs whose translation shows OCR formula debris: 3+ one-letter tokens or a stray € ∈ ° ×."""
+    out = []
+    for s, t in r['pairs']:
+        if t == '(no translation)' or t == s or (s, t) in flagged:
+            continue
+        if len(ONE_LETTER.findall(t)) >= 3 or any(c in t for c in DEBRIS_SYMBOLS):
+            out.append((s, t))
+    return out
+
+
 def big_text(r):
     body = [b for b in r['blocks'] if b['chars'] / max(1, b['lines']) >= BODY_CHARS and b['size'] > 0]
     if len(body) < 3:
         return []
     med = statistics.median(b['size'] for b in body)
     return [b for b in body if b['size'] > BIG * med]
+
+
+def cross_column(r):
+    """Pairs of blocks whose source rects (cores) overlap by at least half of the smaller one's area."""
+    out = []
+    bs = r['blocks']
+    for i in range(len(bs)):
+        for j in range(i + 1, len(bs)):
+            a, b = bs[i]['core'], bs[j]['core']
+            w = min(a[0] + a[2], b[0] + b[2]) - max(a[0], b[0])
+            h = min(a[1] + a[3], b[1] + b[3]) - max(a[1], b[1])
+            if w > 0 and h > 0 and w * h >= CROSS * min(a[2] * a[3], b[2] * b[3]):
+                out.append((bs[i], bs[j]))
+    return out
 
 
 def edge_cut(r):
@@ -139,7 +176,9 @@ def main():
         bt = big_text(r)
         et, es, nr = edge_cut(r)
         km, kml = kept_math(out, n)
-        row = dict(r['layout'], formula=len(ft), math_kept=km, big=len(bt), edge=et, side=es, near=nr, ellipsis=sum(b['ellipsis'] for b in r['blocks']))
+        cx = cross_column(r)
+        db = debris(r, set(ft))
+        row = dict(r['layout'], formula=len(ft), math_kept=km, big=len(bt), cross=len(cx), debris=len(db), edge=et, side=es, near=nr, ellipsis=sum(b['ellipsis'] for b in r['blocks']))
         (pages if re.fullmatch(r'p\d+', n) else crops).append((n, row))
         for line in kml:
             detail.append(f'{n} math_heavy_kept: {line[:150]}')
@@ -147,12 +186,16 @@ def main():
             detail.append(f'{n} formula_translated: {s[:90]!r} -> {t[:60]!r}')
         for b in bt:
             detail.append(f'{n} big_text: size={b["size"]} {b["source"][:60]!r}')
+        for s, t in db:
+            detail.append(f'{n} debris: {s[:80]!r} -> {t[:80]!r}')
+        for a, b in cx:
+            detail.append(f'{n} cross_col: {a["source"][:40]!r} core={a["core"]} holds {b["source"][:40]!r} core={b["core"]}')
         for b in r['blocks']:
             if b['clipped']:
                 detail.append(f'{n} clipped{" ellipsis" if b["ellipsis"] else ""}: size={b["size"]} {b["source"][:60]!r}')
             if r['image'] and (b['core'][1] <= EDGE or b['core'][1] + b['core'][3] >= r['image'][1] - EDGE) and not re.fullmatch(r'p\d+', n):
                 detail.append(f'{n} edge_cut: core={b["core"]} {b["source"][:60]!r}')
-    cols = ['blocks', 'formula', 'math_kept', 'overlaps', 'spill', 'cut', 'clipped', 'ellipsis', 'big']
+    cols = ['blocks', 'formula', 'math_kept', 'overlaps', 'spill', 'cut', 'clipped', 'ellipsis', 'big', 'cross']
     print('page   ' + ' '.join(f'{c:>8}' for c in cols))
     total = dict.fromkeys(cols, 0)
     for n, row in pages:
@@ -164,8 +207,9 @@ def main():
             total[c] += row[c]
     print(f'{"TOTAL":<6} ' + ' '.join(f'{total[c]:>8}' for c in cols))
     p36 = sum(row['formula'] for n, row in pages if row and n in ('p3', 'p4', 'p5', 'p6'))
-    print(f'formula_translated pages 3-6: {p36}')
-    cc = ['blocks', 'formula', 'math_kept', 'edge', 'near', 'side', 'overlaps', 'spill', 'cut', 'clipped', 'ellipsis', 'big']
+    d36 = sum(row['debris'] for n, row in pages if row and n in ('p3', 'p4', 'p5', 'p6'))
+    print(f'formula_translated pages 3-6: {p36}   debris pages 3-6: {d36}')
+    cc = ['blocks', 'formula', 'math_kept', 'edge', 'near', 'side', 'overlaps', 'spill', 'cut', 'clipped', 'ellipsis', 'big', 'cross']
     print('crop   ' + ' '.join(f'{c:>8}' for c in cc))
     ctotal = dict.fromkeys(cc, 0)
     for n, row in crops:

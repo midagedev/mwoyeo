@@ -13,7 +13,9 @@ extension EngineConfig {
     /// Where requests go: a host, or the program's name.
     var endpointName: String {
         switch kind {
-        case let .openAICompatible(url, _, _, _), let .anthropic(url, _, _), let .deepL(url, _): url.host ?? url.absoluteString
+        case let .openAICompatible(url, _, _, _), let .anthropic(url, _, _): url.host ?? url.absoluteString
+        // Free or Pro is decided by the key, so both official hosts read as one name.
+        case let .deepL(url, _): DeepLTranslation.isOfficialHost(url) ? "deepl.com" : (url.host ?? url.absoluteString)
         case let .httpTemplate(t): URL(string: t.url)?.host ?? t.url
         case let .command(c): (c.executable as NSString).lastPathComponent
         }

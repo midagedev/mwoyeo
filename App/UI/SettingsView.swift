@@ -138,6 +138,18 @@ struct TranslationSettings: View {
         }
     }
 
+    /// One added engine's actions: the ⋯ button on its row and the right-click menu.
+    @ViewBuilder private func engineActions(_ engine: EngineConfig) -> some View {
+        Button("Edit…") { sheet = .edit(engine) }
+        Button("Duplicate") { model.duplicateEngine(engine.id) }
+        Button("Copy Setup") {
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(EngineShare.encode(engine), forType: .string)
+        }
+        Divider()
+        Button("Remove…", role: .destructive) { removing = engine }
+    }
+
     var body: some View {
         @Bindable var model = model
         Form {
@@ -151,22 +163,13 @@ struct TranslationSettings: View {
                         .tag(EngineSelection.builtIn(choice))
                     }
                     ForEach(model.settings.engines) { engine in
-                        AddedEngineLabel(engine: engine).tag(EngineSelection.added(engine.id))
+                        AddedEngineLabel(engine: engine) { engineActions(engine) }.tag(EngineSelection.added(engine.id))
                     }
                 }
                 .pickerStyle(.radioGroup)
                 .contextMenu {
                     ForEach(model.settings.engines) { engine in
-                        Section(engine.name) {
-                            Button("Edit…") { sheet = .edit(engine) }
-                            Button("Duplicate") { model.duplicateEngine(engine.id) }
-                            Button("Copy Setup") {
-                                NSPasteboard.general.clearContents()
-                                NSPasteboard.general.setString(EngineShare.encode(engine), forType: .string)
-                            }
-                            Divider()
-                            Button("Remove…", role: .destructive) { removing = engine }
-                        }
+                        Section(engine.name) { engineActions(engine) }
                     }
                 }
                 Button { sheet = .add } label: {
@@ -560,16 +563,27 @@ enum EngineSheetTarget: Identifiable {
 }
 
 /// An added engine's radio label, laid out like the Apple choices: its name, then where it runs and its measured time.
-private struct AddedEngineLabel: View {
+private struct AddedEngineLabel<Actions: View>: View {
     @Environment(AppModel.self) private var model
     let engine: EngineConfig
+    @ViewBuilder let actions: Actions
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(engine.name)
-            TimelineView(.periodic(from: .now, by: 2)) { _ in
-                Text(detail).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
+        HStack(spacing: 8) {
+            VStack(alignment: .leading) {
+                Text(engine.name).lineLimit(1).fixedSize(horizontal: true, vertical: false)
+                TimelineView(.periodic(from: .now, by: 2)) { _ in
+                    Text(detail).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
+                }
             }
+            Spacer(minLength: 0)
+            Menu { actions } label: { Image(systemName: "ellipsis.circle") }
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .foregroundStyle(.secondary)
+                .fixedSize()
+                .help("More actions for \(engine.name)")
+                .accessibilityLabel("More actions for \(engine.name)")
         }
     }
 

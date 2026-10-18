@@ -43,8 +43,8 @@ enum UICapture {
             var names: [String] = [], skip = false
             for a in args.dropFirst() {
                 if skip { skip = false; continue }
-                if a == "--mock" || a == "--delay" || a == "--key" || a == "--image" { skip = true; continue }
-                if a == "--keep-key" { continue }
+                if a == "--mock" || a == "--delay" || a == "--key" || a == "--image" || a == "--engine-name" { skip = true; continue }
+                if a == "--keep-key" || a == "--dump" { continue }
                 names.append(a)
             }
             return names
@@ -67,7 +67,7 @@ enum UICapture {
 
         /// A cloud engine and a local one (the local one points at the mock and has run a few batches).
         private func seedEngines() async {
-            let cloud = engine("Gemini", "https://generativelanguage.googleapis.com/v1beta/openai/", "gemini-3.1-flash-lite")
+            let cloud = engine(option("--engine-name") ?? "Gemini", "https://generativelanguage.googleapis.com/v1beta/openai/", "gemini-3.1-flash-lite")
             let local = engine("Ollama", mock, "qwen3:8b")
             model.settings.sourceLanguage = "ja"
             model.settings.targetLanguage = "ko"
@@ -91,6 +91,7 @@ enum UICapture {
             case "translation-engines":
                 await seedEngines()
                 await shoot(name, TranslationSettings(), CGSize(width: 560, height: 820))
+            case "engine-row-click": await engineRowClick()
             case "menu-switcher":
                 await seedEngines()
                 await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
@@ -214,6 +215,80 @@ enum UICapture {
             check("its end leaves another issue alone", model.shownIssue == a)
             model.received(nil)
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+        }
+
+        // MARK: synthetic clicks
+
+        private func views(_ root: NSView) -> [NSView] { [root] + root.subviews.flatMap { views($0) } }
+
+        /// A left click on `window` at `point` (window coordinates), sent to the window alone (the real pointer stays put).
+        private func click(_ window: NSWindow, at point: NSPoint) {
+            for type in [NSEvent.EventType.leftMouseDown, .leftMouseUp] {
+                guard let e = NSEvent.mouseEvent(with: type, location: point, modifierFlags: [], timestamp: ProcessInfo.processInfo.systemUptime,
+                                                 windowNumber: window.windowNumber, context: nil, eventNumber: 0, clickCount: 1, pressure: 1) else { continue }
+                window.sendEvent(e)
+            }
+        }
+
+        /// Whether the ⋯ button on an added engine's row opens its menu without changing the selection, and a click on the row selects it.
+        private func engineRowClick() async {
+            var failed = 0
+            func check(_ what: String, _ ok: Bool) {
+                print("engine-row-click: \(ok ? "PASS" : "FAIL") \(what)")
+                if !ok { failed += 1 }
+            }
+            await seedEngines()
+            model.select(.builtIn(.auto))
+            let apple = EngineSelection(model.settings)
+            let w = NSWindow(contentRect: NSRect(origin: .zero, size: CGSize(width: 560, height: 820)), styleMask: [.titled], backing: .buffered, defer: false)
+            let host = NSHostingView(rootView: TranslationSettings().environment(model))
+            w.contentView = host
+            w.setFrameTopLeftPoint(NSPoint(x: 80, y: (NSScreen.main?.frame.height ?? 900) - 60))
+            NSApp.activate(ignoringOtherApps: true)
+            w.makeKeyAndOrderFront(nil)
+            try? await Task.sleep(for: .seconds(delay))
+            let all = views(host)
+            if args.contains("--dump") {
+                func walk(_ v: NSView, _ d: Int) {
+                    print("  " + String(repeating: " ", count: d) + "\(type(of: v)) \(v.convert(v.bounds, to: nil)) title=\((v as? NSButton)?.title ?? "")")
+                    v.subviews.forEach { walk($0, d + 1) }
+                }
+                walk(host, 0)
+            }
+            // The rows' ⋯ buttons are popup buttons, top to bottom in the order of the engines: Gemini, Ollama.
+            let buttons = all.filter { String(describing: type(of: $0)).contains("PopupButton") }
+                .sorted { $0.convert($0.bounds, to: nil).maxY > $1.convert($1.bounds, to: nil).maxY }
+            let more = buttons.count == 2 ? buttons[1] : nil
+            check("the ⋯ buttons are found, one per added engine", buttons.count == 2)
+            let before = model.settings.customEngineID
+            nonisolated(unsafe) var opened = false
+            nonisolated(unsafe) var tracked: NSMenu?
+            let token = NotificationCenter.default.addObserver(forName: NSMenu.didBeginTrackingNotification, object: nil, queue: nil) { n in
+                opened = true
+                tracked = n.object as? NSMenu
+            }
+            if let more {
+                let r = more.convert(more.bounds, to: nil)
+                // The mouse-down blocks in menu tracking; a timer in common modes ends it.
+                let t = Timer(timeInterval: 0.6, repeats: false) { _ in tracked?.cancelTrackingWithoutAnimation() }
+                RunLoop.main.add(t, forMode: .common)
+                click(w, at: NSPoint(x: r.midX, y: r.midY))
+                t.invalidate()
+            }
+            NotificationCenter.default.removeObserver(token)
+            try? await Task.sleep(for: .milliseconds(300))
+            check("⋯ opens its menu", opened)
+            check("selection unchanged after ⋯", model.settings.customEngineID == before && EngineSelection(model.settings) == apple)
+            // Control: the row's own radio.
+            // The radio sits at the row's left edge, level with its ⋯ button.
+            if let more {
+                let r = more.convert(more.bounds, to: nil)
+                click(w, at: NSPoint(x: 38, y: r.midY))
+            }
+            try? await Task.sleep(for: .milliseconds(300))
+            check("clicking the row text selects it", model.settings.customEngineID == model.settings.engines.first { $0.name == "Ollama" }?.id)
+            w.orderOut(nil)
+            print("engine-row-click: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
         }
 
         // MARK: capture

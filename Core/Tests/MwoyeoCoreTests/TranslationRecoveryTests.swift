@@ -5,18 +5,30 @@ import Testing
 
 @Suite struct TranslationRecoveryTests {
     @Test func deadlineTimesOutEvenWhenTheWorkIgnoresCancellation() async {
-        // Parked on a continuation that nothing cancels; the test resumes it at the end.
+        // The work parks on a continuation that nothing cancels. The test itself resumes it at `workFinishes`, or at the end.
         let parked = Mutex<CheckedContinuation<Void, Never>?>(nil)
+        func release() { parked.withLock { c -> CheckedContinuation<Void, Never>? in defer { c = nil }; return c }?.resume() }
+        // 2026-10-19 (cleanup-113): the bound was 500 ms for a 200 ms deadline, and it flaked under load during the 1.1.2 release
+        // gates. Derivation: what this test blocks is a return that depends on the parked work (a withDeadline that waits for
+        // it, or that sleeps for a longer timeout), so the bound is the instant the work can finish, not a scheduler allowance
+        // on the deadline. The test releases the work at `workFinishes`: a version that waits for it returns at that instant or
+        // later, a correct one returns at the deadline plus wake-up latency. 4 s is 20x the deadline and leaves 3.8 s for the
+        // latency, against at most 0.63 s for the whole test with three busy loops per core. It costs time only when the code is
+        // broken. (The accuracy of the timer is not what this guards.)
+        let deadline = Duration.milliseconds(200)
+        let workFinishes = Duration.seconds(4)
+        let releaser = Task { try? await Task.sleep(for: workFinishes); release() }
+        defer { releaser.cancel() }
         let start = ContinuousClock.now
-        let r = await withDeadline(.milliseconds(200)) {
+        let r = await withDeadline(deadline) {
             await withCheckedContinuation { (c: CheckedContinuation<Void, Never>) in parked.withLock { $0 = c } }
             return 1
         }
         let elapsed = ContinuousClock.now - start
-        guard case .timedOut = r else { Issue.record("expected .timedOut, got \(r)"); return }
-        #expect(elapsed < .milliseconds(500))
+        #expect(elapsed < workFinishes, "withDeadline returned after \(elapsed), when the parked work could finish at \(workFinishes)")
+        guard case .timedOut = r else { Issue.record("expected .timedOut, got \(r)"); release(); return }
         #expect(elapsed >= .milliseconds(150))
-        parked.withLock { $0 }?.resume()
+        release()
     }
 
     @Test func deadlineReturnsTheValueWhenTheWorkIsFaster() async {

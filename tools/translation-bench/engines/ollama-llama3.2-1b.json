@@ -1,0 +1,1 @@
+{"name": "ollama-llama3.2-1b", "kind": "openAICompatible", "baseURL": "http://127.0.0.1:11434/v1", "model": "llama3.2:1b", "thinking": "off", "price": "local"}

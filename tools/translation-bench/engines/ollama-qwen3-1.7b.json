@@ -1,0 +1,1 @@
+{"name": "ollama-qwen3-1.7b", "kind": "openAICompatible", "baseURL": "http://127.0.0.1:11434/v1", "model": "qwen3:1.7b", "thinking": "off", "price": "local"}

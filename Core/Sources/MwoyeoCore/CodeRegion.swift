@@ -1,0 +1,268 @@
+import CoreGraphics
+import Foundation
+
+/// Code, terminal output, logs, config and diffs are not translated: they stay on screen as written. A block of text alone often does
+/// not show that it is code (the document read cuts a listing into one-line blocks, "end if" and "# ~/.ledgerrc" mean nothing by
+/// themselves), so this rule works on a region: the blocks of one read that sit together in one box, one indented run or one line-number
+/// gutter. It reads the text and the geometry only; no model, no per-language word list (a comment in any script is code because of
+/// where it sits). Measured in tools/keep-labels (docs/design/keep-boundary.md section 9).
+///
+/// Evidence is of two kinds. A *container* says the blocks belong together: a tint that differs from the frame's (a code box, a
+/// terminal), an indented run, a line-number gutter. *Text* features say what they hold: keywords, line ends `; { } ) ]`, symbols, a
+/// comment marker, a prompt, a hash-led line, diff marks, `key = value`. The container alone keeps nothing (a callout box, a bullet
+/// list and a table are containers of prose); the text alone keeps only when it is strong.
+public enum CodeRegion {
+    /// Why a block is kept. New kinds, apart from the math kinds of `ProtectedSpans.Kind`.
+    public enum Reason: String, Sendable, Equatable {
+        case code, terminal, log, config, diff
+    }
+
+    public struct Line: Sendable, Equatable {
+        public var text: String
+        public var rect: CGRect
+        public init(text: String, rect: CGRect) {
+            self.text = text
+            self.rect = rect
+        }
+    }
+
+    public struct Block: Sendable, Equatable {
+        public var text: String
+        public var rect: CGRect
+        /// The recognised lines of the block, top to bottom; empty = the block is one line.
+        public var lines: [Line]
+        /// The background the app computes for the block (`TextAppearance.backgroundColor`; the median over its lines).
+        public var background: RGBA
+
+        public init(text: String, rect: CGRect, lines: [Line] = [], background: RGBA) {
+            self.text = text
+            self.rect = rect
+            self.lines = lines
+            self.background = background
+        }
+    }
+
+    /// The constants, fitted on the dev sets of tools/keep-labels (cases k01 k03 k05 k07 k09 k11, papers 1706.03762 and 2401.10066).
+    enum K {
+        /// A block is tinted when its background differs from the frame's by this many levels in some channel.
+        static let tint = 6
+        /// Two stacked blocks are neighbours when the gap between them is at most this many line heights.
+        static let gap = 1.5
+        /// Side by side on one row: at most this many line heights apart.
+        static let rowGap = 3.0
+        /// A block is indented when its left edge lies this many line heights right of its column's margin.
+        static let indent = 0.75
+        /// The margin is looked for among blocks this many line heights above or below.
+        static let marginReach = 25.0
+        static let keywordCount = 1.5
+        static let keywordShare = 0.2
+        static let symbolShare = 0.15
+        static let lineEndShare = 0.4
+        /// A region of this many content blocks or more needs this share of them to show some text feature on their own.
+        static let denseFrom = 4
+        static let denseShare = 0.3
+    }
+
+    /// Per block of one read: the reason it is kept as written, or nil (today's rules decide). `frameBackground` is the dominant
+    /// background of the frame the blocks were read from.
+    public static func keep(blocks: [Block], frameBackground: RGBA) -> [Reason?] {
+        var infos = blocks.map { Info($0, frame: frameBackground) }
+        let n = infos.count
+        guard n > 0 else { return [] }
+        for i in 0..<n {
+            var margin = infos[i].x0
+            for c in infos where c.words >= 2 {
+                guard abs(c.midY - infos[i].midY) <= K.marginReach * infos[i].lineHeight,
+                      min(infos[i].x1, c.x1) > max(infos[i].x0, c.x0) else { continue }
+                margin = min(margin, c.x0)
+            }
+            infos[i].indented = infos[i].x0 - margin >= K.indent * infos[i].lineHeight
+        }
+
+        var parent = Array(0..<n)
+        func find(_ i: Int) -> Int {
+            var i = i
+            while parent[i] != i { parent[i] = parent[parent[i]]; i = parent[i] }
+            return i
+        }
+        for i in 0..<n {
+            for j in (i + 1)..<max(i + 1, n) where Info.linked(infos[i], infos[j]) { parent[find(i)] = find(j) }
+        }
+        var groups: [Int: [Int]] = [:]
+        for i in 0..<n { groups[find(i), default: []].append(i) }
+
+        var out = [Reason?](repeating: nil, count: n)
+        for members in groups.values {
+            guard let reason = verdict(members.map { infos[$0] }) else { continue }
+            for i in members { out[i] = reason }
+        }
+        return out
+    }
+
+    // MARK: - Geometry
+
+    struct Info {
+        var lines: [String]
+        var x0, y0, x1, y1, lineHeight: Double
+        var tinted: Bool
+        var background: RGBA
+        var words: Int
+        var gutter: Bool
+        var indented = false
+
+        var midY: Double { (y0 + y1) / 2 }
+
+        init(_ b: Block, frame: RGBA) {
+            lines = b.lines.isEmpty ? [b.text] : b.lines.map(\.text)
+            x0 = b.rect.minX; y0 = b.rect.minY; x1 = b.rect.maxX; y1 = b.rect.maxY
+            let heights = (b.lines.isEmpty ? [b.rect.height] : b.lines.map(\.rect.height)).sorted()
+            lineHeight = max(1, heights[heights.count / 2])
+            tinted = Info.delta(b.background, frame) >= K.tint
+            background = b.background
+            words = b.text.split(whereSeparator: \.isWhitespace).count
+            let joined = lines.joined(separator: " ")
+            gutter = joined.wholeMatch(of: /\s*\d{1,3}\s*[:.]?\s*/) != nil || (lines.first?.firstMatch(of: /^\s*\d{1,3}:\s*\S/) != nil)
+        }
+
+        static func delta(_ a: RGBA, _ b: RGBA) -> Int {
+            max(abs(Int(a.r) - Int(b.r)), abs(Int(a.g) - Int(b.g)), abs(Int(a.b) - Int(b.b)))
+        }
+
+        /// Neighbours (stacked within 1.5 line heights, or side by side on one row) that share a tint, an indent or a gutter.
+        static func linked(_ a: Info, _ c: Info) -> Bool {
+            let lh = min(a.lineHeight, c.lineHeight)
+            let vgap = max(c.y0 - a.y1, a.y0 - c.y1)
+            let sameRow = min(a.y1, c.y1) - max(a.y0, c.y0) > 0.5 * lh
+            let hgap = max(c.x0 - a.x1, a.x0 - c.x1)
+            let overlapX = min(a.x1, c.x1) > max(a.x0, c.x0)
+            let near = (vgap <= K.gap * lh && !sameRow && overlapX) || (sameRow && hgap <= K.rowGap * lh)
+            guard near else { return false }
+            if a.tinted && c.tinted && delta(a.background, c.background) <= K.tint { return true }
+            if a.indented && c.indented { return true }
+            return ((a.gutter || c.gutter) && sameRow) || (a.gutter && c.gutter)
+        }
+    }
+
+    // MARK: - Text evidence
+
+    static let strongKeywords: Set<String> = [
+        "const", "let", "var", "func", "function", "def", "elif", "else", "end", "return", "import", "class", "while", "print", "console",
+        "async", "await", "struct", "enum", "fn", "lambda", "include", "void", "bool", "char", "fi", "done", "echo", "null", "nil",
+        "undefined", "typeof", "instanceof", "switch", "catch", "except", "raise", "throw", "extends", "implements", "namespace",
+        "typedef", "println", "printf",
+    ]
+    /// Words of prose as well: they count only beside a strong keyword.
+    static let weakKeywords: Set<String> = ["for", "if", "in", "to", "do", "then", "from", "true", "false"]
+
+    struct Features {
+        var keyword = false, lineEnd = false, symbol = false, comment = false, prompt = false
+        var log = false, diff = false, assignment = false
+
+        /// Evidence that holds by itself in a container.
+        var strong: Int { [keyword, lineEnd, comment, prompt, log, diff].filter { $0 }.count }
+        var all: Int { strong + [symbol, assignment].filter { $0 }.count }
+    }
+
+    static func features(of lines: [String], tinted: Bool) -> Features {
+        var f = Features()
+        let text = lines.joined(separator: " ")
+        let tokens = text.matches(of: /[A-Za-z_][A-Za-z0-9_]*/).map { $0.output.lowercased() }
+        let strongCount = tokens.filter { strongKeywords.contains($0) }.count
+        let weakCount = tokens.filter { weakKeywords.contains($0) }.count
+        f.keyword = strongCount >= 1 && Double(strongCount) + 0.5 * Double(weakCount) >= K.keywordCount
+            && Double(strongCount + weakCount) / Double(tokens.count) >= K.keywordShare
+
+        let ends = lines.compactMap { l -> Character? in
+            let t = l.trimmingCharacters(in: .whitespacesAndNewlines)
+            return t.last
+        }
+        if !ends.isEmpty {
+            let hits = ends.filter { ";{})]".contains($0) }.count
+            f.lineEnd = Double(hits) / Double(ends.count) >= K.lineEndShare && ends.contains { ";{}".contains($0) }
+        }
+
+        let ascii = text.unicodeScalars.filter { $0.value >= 33 && $0.value < 127 }
+        if ascii.count >= 6 {
+            let symbols = ascii.filter { "{}[]()<>=;/\\|&*+~^$#@_".unicodeScalars.contains($0) }.count
+            f.symbol = Double(symbols) / Double(ascii.count) >= K.symbolShare
+        }
+
+        f.comment = lines.contains { isCommentLine($0) || hasCommentAfterCode($0) }
+        f.prompt = lines.contains(where: isPrompt)
+        let logLines = lines.filter(isLogLine).count
+        f.log = logLines >= 1 && lines.contains(where: { isHashLine($0) }) || logLines >= 2
+        let plus = lines.filter { $0.firstMatch(of: /^\s*\+\s?\S/) != nil }.count
+        let minus = lines.filter { $0.firstMatch(of: /^\s*-\s?\S/) != nil }.count
+        // A line starting with + or - is also a displayed equation or a list: marks count as a diff only inside a tinted view.
+        f.diff = lines.contains { $0.firstMatch(of: /^\s*@@/) != nil } || (tinted && plus >= 1 && minus >= 1)
+        f.assignment = lines.contains { $0.wholeMatch(of: /\s*[\w.\-\[\]]*[A-Za-z_][\w.\-\[\]]*\s*(?:=|:=|\+=|-=)\s*(?:"[^"]*"|'[^']*'|\S+)\s*[;,]?\s*/) != nil }
+        return f
+    }
+
+    static func isCommentLine(_ l: String) -> Bool {
+        l.firstMatch(of: /^\s*(?:\/\/|\/\*|\*\/|--\s|#\s|#!|▶)/) != nil
+    }
+
+    /// `x = f(y) # comment`, `a;// note`, `mid ← lo ▶ note`: a marker after something that looks like code.
+    static func hasCommentAfterCode(_ l: String) -> Bool {
+        guard let m = l.firstMatch(of: /\s(?:#|\/\/|▶)\s*\S|[)\]}」;](?:#|\/\/|▶)\s*\S|\S▶\s*\S/) else { return false }
+        let left = l[l.startIndex..<m.range.lowerBound]
+        let marker = l[m.range]
+        if marker.contains("▶") { return !left.trimmingCharacters(in: .whitespaces).isEmpty }
+        return left.contains { "=←→(){};[]（）<>+*/".contains($0) }
+    }
+
+    static func isPrompt(_ l: String) -> Bool {
+        l.firstMatch(of: /^\s*\$\s+\S/) != nil
+            || l.firstMatch(of: /^\s*\S+@\S+\s+\S+\s%\s+\S/) != nil                         // zsh's default: "dev@mbp ~ % ls"
+            || l.firstMatch(of: /^\s*❯\s*\S/) != nil
+            || l.firstMatch(of: /^\s*\S{0,40}[@:：~\/～]\S{0,40}[$#%]\s+\S/) != nil
+            || l.firstMatch(of: /^\s*PS\s?\S*>\s*\S/) != nil
+            || l.firstMatch(of: /^\s*>>>\s+\S/) != nil
+    }
+
+    static func isHashLine(_ l: String) -> Bool {
+        guard let m = l.firstMatch(of: /^\s*([0-9a-f]{7,12})\s+\S/) else { return false }
+        return m.output.1.contains { $0.isNumber }
+    }
+
+    /// A line of a log: a git log line, a timestamp or level prefix, a traceback frame.
+    static func isLogLine(_ l: String) -> Bool {
+        isHashLine(l)
+            || l.firstMatch(of: /^\s*\[?\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/) != nil
+            || l.firstMatch(of: /^\s*\[?(?:INFO|WARN|WARNING|ERROR|DEBUG|TRACE|FATAL)\b/) != nil
+            || l.firstMatch(of: /^\s*(?:Traceback|File\s+")/) != nil
+    }
+
+    // MARK: - The verdict of a region
+
+    /// A long region needs text evidence (a feature, or a keyword) in a share of its blocks, so one stray `end` or `;` in a page-wide indented run keeps nothing.
+    /// Gutter blocks (line numbers) carry no text and are left out of the count.
+    static func hasDensity(_ members: [Info], tinted: Bool) -> Bool {
+        let content = members.filter { !$0.gutter }
+        guard content.count >= K.denseFrom else { return true }
+        let withEvidence = content.filter { m in
+            features(of: m.lines, tinted: tinted).all >= 1
+                || m.lines.joined(separator: " ").matches(of: /[A-Za-z_][A-Za-z0-9_]*/).contains { strongKeywords.contains($0.output.lowercased()) }
+        }.count
+        return Double(withEvidence) / Double(content.count) >= K.denseShare
+    }
+
+    static func verdict(_ members: [Info]) -> Reason? {
+        let tinted = members.contains { $0.tinted }
+        let f = features(of: members.flatMap(\.lines), tinted: tinted)
+        let container = tinted || (members.count > 1 && members.allSatisfy { $0.indented || $0.gutter })
+        let weak = f.all - f.strong
+        let keeps = (tinted && (f.strong >= 1 || weak >= 2))
+            || (container && f.strong >= 1)
+            || (members.count > 1 && f.strong >= 1 && f.all >= 2)
+            || f.prompt
+            || f.strong >= 2
+        guard keeps, hasDensity(members, tinted: tinted) else { return nil }
+        if f.prompt { return .terminal }
+        if f.diff { return .diff }
+        if f.log { return .log }
+        if f.assignment && !f.keyword && !f.lineEnd { return .config }
+        return .code
+    }
+}

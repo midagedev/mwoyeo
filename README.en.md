@@ -187,11 +187,16 @@ Every setting is also a JSON file, so you (or Claude Code) can change one withou
 where it is (`~/Library/Application Support/Mwoyeo/settings.json`), and Settings › General has an *Open* button for it.
 
 - Mwoyeo watches the file and applies a saved change within a second; the Settings window and the file always agree.
-- `settings.schema.json` next to it describes every key, its allowed values and its limits. Editors that read JSON Schema
-  complete and check the keys.
-- `Mwoyeo --check-settings [path]` prints `settings.json:<line>: <message>` for each problem (an unknown key with the
-  closest known one, a wrong type or value, invalid JSON) or `ok`, and exits 1 when there are problems. A wrong key keeps its
-  value and the rest still applies; a file that is not JSON is left alone until it parses.
+- `settings.schema.json` next to it describes every key, its allowed values and its limits, inside lists (engines, app
+  profiles) too. Editors that read JSON Schema complete and check the keys. `Mwoyeo --settings-schema` prints it.
+- `Mwoyeo --check-settings [path]` prints `ok`, or one line per problem and exits 1:
+  `settings.json:14: engines[0].thinking: "maybe" is not allowed; use one of off, provider; ignored`. A line is
+  `<line>: <path>: <what is wrong>; <what happened>`, with the exact line and JSON path of nested values. An unknown key
+  comes with the closest known one.
+- *keeping the current value*: the whole setting is wrong and is not applied. *ignored*: one optional field of an item is
+  wrong; the item applies. *dropped*: one value of a list is left out; the rest apply. A file that is not JSON is left
+  alone until it parses.
+- [docs/settings-for-agents.md](docs/settings-for-agents.md) explains the file to an agent.
 - API keys for added engines are never in the file; they stay in the Keychain.
 
 **Translation log.** Set `"savesTranscripts": true` to have every lens write what it read and its translation to

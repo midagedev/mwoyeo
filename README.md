@@ -177,8 +177,11 @@ Apple 번역이 가장 빠르고, 클라우드 엔진은 1초 남짓 더 걸리�
 모든 설정은 JSON 파일로도 있어서, 클릭하지 않고 직접(또는 Claude Code에게 시켜서) 바꿀 수 있어요. 파일 위치는 `~/Library/Application Support/Mwoyeo/settings.json`이고, `Mwoyeo --settings-path`로 확인하거나 설정 › 일반의 *열기* 버튼으로 열 수 있어요.
 
 - 파일을 저장하면 1초 안에 바로 적용돼요. 설정 창과 파일은 늘 같은 내용이에요.
-- 옆에 있는 `settings.schema.json`에 키마다 설명과 고를 수 있는 값, 범위가 적혀 있어요. JSON Schema를 읽는 편집기라면 키를 자동 완성하고 검사해 줘요.
-- `Mwoyeo --check-settings [경로]`는 문제마다 `settings.json:<줄>: <내용>`을 출력하고(모르는 키는 가장 비슷한 키를 알려 줘요), 문제가 없으면 `ok`를 출력해요. 문제가 있으면 종료 코드 1로 끝나요. 잘못된 키는 원래 값을 그대로 두고 나머지만 적용하며, JSON이 깨진 파일은 고칠 때까지 건드리지 않아요.
+- 옆에 있는 `settings.schema.json`에 키마다 설명과 고를 수 있는 값, 범위가 적혀 있어요. 목록 안의 항목(엔진, 앱별 설정)도 마찬가지예요. JSON Schema를 읽는 편집기라면 키를 자동 완성하고 검사해 줘요. `Mwoyeo --settings-schema`로 스키마를 바로 출력할 수도 있어요.
+- `Mwoyeo --check-settings [경로]`는 문제가 없으면 `ok`를 출력해요. 문제가 있으면 하나에 한 줄씩 출력하고 종료 코드 1로 끝나요. 예: `settings.json:14: engines[0].thinking: "maybe" is not allowed; use one of off, provider; ignored`
+- 한 줄은 `<줄>: <경로>: <무엇이 틀렸나>; <어떻게 했나>` 순서예요. 목록 안의 값도 정확한 줄 번호와 경로(`engines[0].thinking`)로 알려 주고, 모르는 키에는 가장 비슷한 키를 알려 줘요.
+- 끝부분은 셋 중 하나예요. `keeping the current value`는 설정 전체가 잘못돼 원래 값을 그대로 둔다는 뜻이에요. `ignored`는 항목 안의 선택 값 하나만 무시하고 항목은 적용한다는 뜻이고, `dropped`는 목록에서 그 값 하나만 빼고 나머지를 적용한다는 뜻이에요. JSON이 깨진 파일은 고칠 때까지 건드리지 않아요.
+- 에이전트에게 맡길 때 알아 둘 내용은 [docs/settings-for-agents.md](docs/settings-for-agents.md)에 있어요.
 - 추가한 엔진의 API 키는 파일에 들어가지 않고 키체인에만 있어요.
 
 **번역 로그.** `"savesTranscripts": true`로 두면 렌즈마다 읽은 원문과 번역을 `<exportFolder>/Transcripts`에 남겨요(기본은 Markdown과 SRT). `transcriptFormats`에 `"jsonl"`을 더하면 번역된 줄마다 JSON 한 줄씩, 생기는 즉시 덧붙여요.

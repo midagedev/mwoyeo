@@ -1,0 +1,10 @@
+{
+ "entities": [
+  {"name": "林远", "dst": "린위안", "gender": "male", "role": "general manager", "speaks_to": {"林夏": "반말", "周姨": "해요체"}},
+  {"name": "林夏", "dst": "린시아", "gender": "female", "role": "his younger sister, tea blender", "speaks_to": {"林远": "반말", "周姨": "해요체"}},
+  {"name": "周姨", "dst": "저우 이모", "gender": "female", "role": "family friend, accountant", "speaks_to": {"林远": "해요체", "林夏": "반말"}}
+ ],
+ "document": {"title": "林记茶庄", "domain": "family tea business drama", "summary": "siblings clash over a cheap blend order"},
+ "window": {"title": "林记茶庄 第12集", "app": "VLC", "category": "Entertainment"},
+ "terms": [{"src": "毛茶", "dst": "모차"}, {"src": "拼配", "dst": "블렌딩"}]
+}

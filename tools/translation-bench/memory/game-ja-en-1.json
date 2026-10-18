@@ -1,0 +1,11 @@
+{
+ "entities": [
+  {"name": "ヒカル", "gender": "female", "role": "apprentice detective"},
+  {"name": "薫", "reading": "かおる", "gender": "male", "role": "senior detective"},
+  {"name": "アキラ", "gender": "female", "role": "police inspector"},
+  {"name": "ユキ", "gender": "male", "role": "client, shop heir"}
+ ],
+ "document": {"title": "雨音探偵録", "domain": "detective visual novel", "summary": "a stolen pocket watch in a rainy harbor town"},
+ "window": {"title": "雨音探偵録", "app": "雨音探偵録", "category": "Games"},
+ "terms": [{"src": "先輩", "dst": "boss"}, {"src": "事務所", "dst": "Bureau"}, {"src": "時計", "dst": "watch"}]
+}

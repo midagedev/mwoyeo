@@ -1,0 +1,11 @@
+{
+ "entities": [
+  {"name": "Thorne", "dst": "쏜", "gender": "female", "role": "ship's captain", "speaks_to": {"Rook": "해요체", "Dex": "반말"}},
+  {"name": "Rook", "dst": "루크", "gender": "female", "role": "engineer", "speaks_to": {"Thorne": "합쇼체", "Dex": "반말"}},
+  {"name": "Dex", "gender": "male", "role": "cargo hand", "speaks_to": {"Thorne": "합쇼체", "Rook": "반말"}},
+  {"name": "Pell", "gender": "male", "role": "ship's doctor"}
+ ],
+ "document": {"title": "Low Orbit Blues", "domain": "sci-fi comedy, cargo ship crew", "summary": "a dying freezer full of wedding cheese"},
+ "window": {"title": "Low Orbit Blues S2E4", "app": "VLC", "category": "Entertainment"},
+ "terms": [{"src": "Captain", "dst": "선장"}, {"src": "Marigold", "dst": "메리골드"}]
+}

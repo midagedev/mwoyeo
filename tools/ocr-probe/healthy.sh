@@ -5,7 +5,7 @@
 #   build: cd /Users/hckim/repo/mwoyeo-wt-ocrvn && xcodegen generate && xcodebuild -scheme Mwoyeo -destination 'platform=macOS' \
 #          -derivedDataPath /tmp/ocr-vn/dd build
 #   run:   SP=<dir with in/chat.png, in/vn.png, in/article.png, in/sub-mid.png> NEW=<binary> MAIN=<baseline binary> bash healthy.sh
-#          (QUICK=1 skips the 200 s ja check)
+#          (QUICK=1 skips the 200 s ja check; PARAGRAPHS_ONLY=1 runs checks 7 and 7b alone, for a FAIL-first on another build)
 # One PASS/FAIL line per check, a summary line at the end. Outputs: $OUT/*.out (stdout) and *.err (stderr), default /tmp/ocr-stall/healthy.
 # 2026-10-17 (ocr-vn): the app asked no Swift Vision request (they seemed to stall the whole process, tools/ocr-probe/inprocess.swift);
 # every read was the Objective-C VNRecognizeTextRequest, lines grouped into paragraphs by ParagraphGrouper. The checks of the child
@@ -13,6 +13,8 @@
 # stall revision 3 now (checks 2 and 5), `slow:<ms>` makes revision 3 answer late (check 4).
 # 2026-10-18 (vision-revive): the stall was a cold ANE compile, and the app loads the Swift document model itself at launch and
 # reads paragraphs with it once loaded. These checks run on that default; MWOYEO_OCR_PATH=vn (never a Swift model) must pass them too.
+# 2026-10-19 (cleanup-113): document reads moved to the Docs XPC service in 1.1.2 (design recognition.md §6, R3-lite). Check 7 is re-pinned
+# to MWOYEO_OCR_PATH=vn (see there); 7b is new.
 SP=${SP:?set SP to a folder holding in/chat.png (English chat), in/vn.png (Japanese), in/article.png and in/sub-mid.png (Japanese)}
 NEW=${NEW:-/tmp/ocr-stall/dd/Build/Products/Debug/Mwoyeo.app/Contents/MacOS/Mwoyeo}
 MAIN=${MAIN:-/tmp/mwoyeo-main/dd/Build/Products/Debug/Mwoyeo.app/Contents/MacOS/Mwoyeo}
@@ -21,10 +23,10 @@ mkdir -p "$OUT"
 fails=0
 
 # run <name> <binary> <fake-ocr or ""> <image> <src> <max-wait>: stdout to $OUT/<name>.out, stderr to .err, wall seconds to .s.
-# EXTRA adds arguments.
+# EXTRA adds arguments; OCRPATH sets MWOYEO_OCR_PATH (vn: never ask the Docs service).
 run() {
     local t0=$SECONDS
-    MWOYEO_FAKE_OCR="$3" "$2" --render "$SP/in/$4" "$OUT/$1.png" --src "$5" --tgt ko --max-wait "$6" $EXTRA > "$OUT/$1.out" 2> "$OUT/$1.err" < /dev/null
+    env ${OCRPATH:+MWOYEO_OCR_PATH=$OCRPATH} MWOYEO_FAKE_OCR="$3" "$2" --render "$SP/in/$4" "$OUT/$1.png" --src "$5" --tgt ko --max-wait "$6" $EXTRA > "$OUT/$1.out" 2> "$OUT/$1.err" < /dev/null
     echo $((SECONDS - t0)) > "$OUT/$1.s"
 }
 # Lines "    → text" that carry a translation.
@@ -36,6 +38,35 @@ count() { local v; v=$(grep -o "$2=[0-9]*" "$1" | head -1 | cut -d= -f2); echo "
 verdict() { # <ok 0|1> <label> <detail>
     if [ "$1" = 0 ]; then echo "PASS $2 ($3)"; else echo "FAIL $2 ($3)"; fails=$((fails + 1)); fi
 }
+
+# Paragraphs. Check 7 (ParagraphGrouper): the three-line body paragraph of article.png is one block, and the two centred subtitle lines
+# of sub-mid.png are one block.
+# 2026-10-19 (cleanup-113), re-pin. Until 1.1.1 the render read these pictures before the in-process document model was loaded, so
+# the grouper answered them. Since 1.1.2 the Docs service answers from its cache a few seconds into the run, the lens reads once more
+# when it is ready (reader.reread=1), and the picture ends up with the document model's paragraphs: measured on 1.1.2 (default path and
+# MWOYEO_OCR_PATH=swift both) sub-mid.png is 2 blocks, not 1, so the old check read FAIL (body-blocks=1 subtitle-blocks=0
+# sub-total-blocks=2). The check was never about the document model; it guards the grouper, so it asks for the grouper alone:
+# MWOYEO_OCR_PATH=vn never asks Docs (TextRecognizer.ocrPath, DocsHost route), and the check also requires ocr.blocks.swift=0, so a
+# switch that stopped working fails the check instead of lending it the document model's answer. The documented split of centred
+# subtitle lines on the document path (ParagraphReader.swift ReaderDecider picks it for subtitles) is not asserted here.
+# FAIL-first: PARAGRAPHS_ONLY=1 NEW=<a build without ParagraphGrouper, v1.0.4> prints FAIL 7 (subtitle-blocks=0 sub-total-blocks=2).
+# Check 7b: on the shipped default path the body is one block whichever reader answers (VN grouper or document model); docs-reads
+# says which ones did (ocr.blocks.swift).
+paragraphs() {
+    [ -f "$SP/in/article.png" ] && [ -f "$SP/in/sub-mid.png" ] || return 0
+    OCRPATH=vn run p "$1" "" article.png ja 90
+    OCRPATH=vn run q "$1" "" sub-mid.png ja 90
+    local body sub sb sw
+    body=$(grep -c '^  .*海外のゲームや漫画.*おもしろいところ.*見比べるしかなかった' "$OUT/p.out")
+    sub=$(grep -c '^  .*今日はとても楽しかった.*また明日も一緒に遊ぼう' "$OUT/q.out"); sb=$(grep -c '^    → ' "$OUT/q.out")
+    sw=$(( $(count "$OUT/p.out" ocr.blocks.swift) + $(count "$OUT/q.out" ocr.blocks.swift) ))
+    [ "$body" -eq 1 ] && [ "$sub" -eq 1 ] && [ "$sb" -eq 1 ] && [ "$sw" -eq 0 ]; verdict $? "7 article.png ja>ko, MWOYEO_OCR_PATH=vn: the 3-line body is 1 block; sub-mid.png ja>ko: the 2 subtitle lines are 1 block; no document read" "body-blocks=$body subtitle-blocks=$sub sub-total-blocks=$sb docs-reads=$sw arrows(article)=$(arrows "$OUT/p.out")"
+    run pd "$1" "" article.png ja 90
+    body=$(grep -c '^  .*海外のゲームや漫画.*おもしろいところ.*見比べるしかなかった' "$OUT/pd.out")
+    [ "$body" -eq 1 ]; verdict $? "7b article.png ja>ko, default path: the 3-line body is 1 block, whichever reader answers" "body-blocks=$body docs-reads=$(count "$OUT/pd.out" ocr.blocks.swift) arrows=$(arrows "$OUT/pd.out")"
+}
+
+[ -n "$PARAGRAPHS_ONLY" ] && { paragraphs "$NEW"; echo "ocr-healthy (paragraphs only): $([ $fails -eq 0 ] && echo ALL PASS || echo "$fails FAILED")"; exit $fails; }
 
 # Warm-up, not a check. The text models compile once per app binary (up to a minute for revision 3) and the compiler service
 # takes one at a time; a run that exits mid-compile makes it start over. So let each binary load them completely first: --warm,
@@ -79,15 +110,7 @@ run y "$NEW" e5rt:3 article.png ja 300
 n=$(arrows "$OUT/y.out"); f=$(count "$OUT/y.out" ocr.failed_pass.transient)
 [ "$n" -ge 10 ] && [ "$f" -ge 1 ]; verdict $? "9 article.png ja>ko, MWOYEO_FAKE_OCR=e5rt:3: a pass failed on programs not ready, then >=10 arrows" "arrows=$n notready-passes=$f wall=$(cat $OUT/y.s)s"
 
-# Paragraphs (ParagraphGrouper): the three-line body paragraph of article.png is one block, and the two centred subtitle lines
-# of sub-mid.png are one block.
-if [ -f "$SP/in/article.png" ] && [ -f "$SP/in/sub-mid.png" ]; then
-    run p "$NEW" "" article.png ja 90
-    run q "$NEW" "" sub-mid.png ja 90
-    body=$(grep -c '^  .*海外のゲームや漫画.*おもしろいところ.*見比べるしかなかった' "$OUT/p.out")
-    sub=$(grep -c '^  .*今日はとても楽しかった.*また明日も一緒に遊ぼう' "$OUT/q.out"); sb=$(grep -c '^    → ' "$OUT/q.out")
-    [ "$body" -eq 1 ] && [ "$sub" -eq 1 ] && [ "$sb" -eq 1 ]; verdict $? "7 article.png ja>ko: the 3-line body is 1 block; sub-mid.png ja>ko: the 2 subtitle lines are 1 block" "body-blocks=$body subtitle-blocks=$sub sub-total-blocks=$sb arrows(article)=$(arrows "$OUT/p.out")"
-fi
+paragraphs "$NEW"
 
 if [ -z "$QUICK" ]; then
     # Nothing else reads Japanese: it waits for revision 3 ("still preparing" after 8 s), and after 3 minutes says "not responding".

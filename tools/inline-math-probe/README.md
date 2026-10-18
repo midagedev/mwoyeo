@@ -1,0 +1,28 @@
+# inline-math-probe
+Measures whether the plan to draw an inline formula as the original pixels (design: `InlineMath.spans` → the union of Vision's word boxes → a crop of the frame) has crops to draw: word boxes that miss sub/superscript ink, cut glyphs, or take in a neighbour line. Nothing in `App/` or `Core/` changes; the probe links `MwoyeoCore` for `InlineMath` and `ParagraphGrouper`.
+
+`run.sh <out dir> [bench dir]` does it all (build, read, measure, mutants, cross-check, locate). Pieces:
+- `read <out> <page.png>…` (target `read`, no code of ours linked, so rebuilding `probe` keeps its Neural Engine compile cache): VN accurate revision 3 lines and `RecognizeDocumentsRequest` paragraphs, parameters copied from `Shared/VisionExec.swift`, saved as `<out>/<vn|docs>-<page>.json` (words with Character offsets). Needs the Bash sandbox off. A new binary's first read compiles the networks: VN 228 s, then the document model 236 s on the 2026-10-19 machine (load 38); later pages take 1-3 s (a figure page's first document read compiled again: 147 s).
+- `probe measure --ocr <dir> --pages <dir> [--names p3,p4] [--mutate shrink|grow] [--pad N] [--tol N] [--out <dir>] [--sens] [-v]`: blocks as the app builds them (`TextRecognizer.makeBlock`; VN lines through `ParagraphGrouper`), `InlineMath.spans`, each span's word boxes → a crop, the metrics, the ink-grown box, a TSV of every span and two montages (failures; clean controls). One summary line per page and path.
+- `probe dump --ocr --pages --page p3 --path vn --text "N = 6"`: one crop as text ('#' ink in the crop, 'o' ink outside, '+' border), for checking a measure by eye.
+- `crosscheck.py <tsv> <pages> <ocr dir>`: an independent numpy implementation of (a), (c) and the strict (b); 0 disagreements on 159 spans over three page scales.
+- `probe locate <bench dir>`: the verbatim locate rate (design §3: the span's text found in the translation with spaces ignored, in order, only when it occurs as often as in the source) from paper-bench `.out` pairs. `probe blocks` + `tools/apple-translation-probe/batch.swift` + `probe locate-json` do the same on the prose blocks of our own OCR text.
+
+## Measures (per single-line span; ink = gray < 170 of 255, 8-connected components)
+- Crop = union of the span's word boxes, the trailing `.,;:!?` that `InlineMath` trims cut off by the trim below.
+- Whose a component is: the span's line owns it when that line is the nearest (centroid to the line's middle) of the lines that share its columns, and it is no longer than 3 or taller than 2.5 line heights (a table rule is nobody's).
+- (a) own components cut by the crop border (≥ `--tol` pixels outside, default 1). `strict-a` counts neighbours' cut components too.
+- (b) the share of the span's ink that lies outside the box within ±0.6 line heights, over the columns of the box, counting parts that nearly touch (ink dilated by 2 px; the strict-connected share is in the TSV).
+- (c) neighbour-line intrusion: components the span's line does not own, with ≥ 4 pixels in the crop.
+- (d) the trim: the rightmost ink components (grouped by x overlap) as small as the punctuation character the text says follows (`.` `,` ≤ 0.35 line height, `:` `;` ≤ 0.6, `!` `?` ≤ 0.9, all ≤ 0.5 wide) are cut off; it fails when a glyph is too big for its character or overlaps the span's last glyph sideways.
+- Clean: (a) = 0, (b) < 5 %, (c) = 0. The ink-grown box starts from the crop and takes in the span line's components it cuts (when ≥ 65 % of their ink is inside) and those that nearly touch and lie within its width, at most 0.25 line heights sideways and 0.6 up or down, never past the trailing punctuation; refused beyond that. `grown-masked` counts the grown boxes that pass (a) and (b) alone: what a draw of the span's own components only (a mask, not the rectangle) would keep.
+
+## 2026-10-19 (m0-inline-crops): paper 1706.03762, pages at 2.67x (`tools/paper-bench/pages.sh`)
+Span counts are small: `InlineMath` finds 17 (VN) and 14 (Docs) spans on p3-p6, 31 and 24 on p1-p15, because OCR garbles most formulas ("√dk" read "vid"). FAIL-first (p3-p6, VN / Docs): the −30 % height box drops clean 76 % / 64 % → 0 % / 7 %; the box grown 1.3 line heights into the next line raises (c) failures 1 / 2 → 16 / 13 spans.
+| | base box clean | ink-grown clean | grown, own components only (a, b) |
+|---|---|---|---|
+| p3-p6 VN (n=17) | 76 % [52-90] | 94 % [73-98] | 100 % |
+| p3-p6 Docs (n=14) | 64 % [38-83] | 86 % [60-95] | 100 % |
+| p1-p15 VN (n=31) | 74 % [56-86] | 90 % [75-96] | 100 % |
+| p1-p15 Docs (n=24) | 71 % [50-85] | 88 % [68-95] | 100 % |
+Brackets: 95 % Wilson interval. Scale sweep on p3-p7 (VN / Docs, base → grown): 2.0x 59 → 81 % / 64 → 82 %; 2.67x 72 → 90 % / 68 → 86 %; 3.5x 45 → 79 % / 58 → 85 %. A fixed pad around the word boxes only trades (a) for (c), the lines being tight (p1-p15, VN / Docs, base 74 / 71 %: 1 px 77 / 71 %, 2 px 71 / 75 %; on p3-p6 3 px gives 65 / 50 %). The word boxes missed no sub/superscript ink at 2.67x (b = 0 on all 55 spans); the failures are boxes 3-8 px tighter than the glyphs (parenthesis tops, descenders, digit bowls: a) and neighbour ink inside boxes that already reach into the next line or table row (c). Trim: 7/7 (VN) and 5/5 (Docs) spans with trailing punctuation trimmed. Locate rate: 38/40 spans (95 %) on our own OCR prose blocks, Apple Translation low-latency and high-fidelity alike (failures: a sentence-initial capital "i=1" → "I=1", "k = n" → "K = n" in ll; "warmup_steps" and "Multihead(Q, K, V)" translated in hf); 3/4 on the lead's paper-bench pairs (the 4th: a garbled OCR token). One paper, one page rasterization: real lens captures (subpixel text, tinted backgrounds) are not covered.

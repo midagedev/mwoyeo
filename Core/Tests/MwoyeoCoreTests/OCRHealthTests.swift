@@ -120,4 +120,49 @@ import Testing
         _ = stall(&h, at: 500, now: 508)
         do { let r = h.startProbing(); #expect(r) }
     }
+
+    // MARK: programs not ready (vision-setup, 2026-10-18)
+
+    /// The line the user's Mac logged on every revision 3 read for about 90 s after a long cold compile.
+    private let logged = "e5rtError(\"e5rt_execution_stream_operation_create_precompiled_compute_operation_with_options call failed\", 13)"
+
+    private struct Logged: Error, CustomStringConvertible { let description: String }
+
+    @Test func theLoggedE5rtErrorIsProgramsNotReady() {
+        #expect(H.programsNotReady(description: logged))
+        #expect(H.programsNotReady(Logged(description: logged)))
+        #expect(!H.programsNotReady(Logged(description: "Error Domain=com.apple.vis Code=9 \"timeout\"")))
+        #expect(!H.programsNotReady(CancellationError()))
+    }
+
+    @Test func notReadySendsReadsDownTheLadderForFiveSecondsThenAsksAgain() {
+        var h = H()
+        let id = h.begin(now: 100)
+        h.notReady(id, now: 101)
+        #expect(h.isNotReady)
+        #expect(h.plan(canFallBack: true, now: 102) == .fallback)
+        #expect(h.plan(canFallBack: true, now: 105.9) == .fallback)
+        #expect(h.plan(canFallBack: true, now: 106) == .run(seconds: 8))
+        // Nothing older to read: it is asked at once, as before (the error then reaches the caller).
+        #expect(h.plan(canFallBack: false, now: 102) == .run(seconds: 180))
+        // Not a stall: no probe, no refusal.
+        #expect(!h.stalled && !h.probeDue(now: 500))
+    }
+
+    @Test func anAnswerEndsNotReadyAndAFailingRetryStartsTheFiveSecondsAgain() {
+        var h = H()
+        h.notReady(h.begin(now: 0), now: 1)
+        h.notReady(h.begin(now: 6), now: 7)
+        #expect(h.plan(canFallBack: true, now: 8) == .fallback)
+        h.answered(h.begin(now: 12))
+        #expect(!h.isNotReady)
+        #expect(h.plan(canFallBack: true, now: 13) == .run(seconds: 8))
+    }
+
+    @Test func notReadyDoesNotMakeALoadLookLate() {
+        var h = H()
+        let id = h.begin(now: 0)
+        h.notReady(id, now: 1)
+        #expect(h.plan(canFallBack: true, now: 20) == .run(seconds: 8))
+    }
 }

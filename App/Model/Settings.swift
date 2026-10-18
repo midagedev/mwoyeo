@@ -98,6 +98,13 @@ enum LensStyle: String, Codable, CaseIterable, Identifiable {
     }
 }
 
+/// A file the translation log is written as.
+enum TranscriptFileFormat: String, Codable, CaseIterable {
+    case markdown, srt
+    /// One JSON object per translated line (see `TranscriptFormat.jsonlLine`), for `tail -f` and scripts.
+    case jsonl
+}
+
 struct AppSettings: Codable, Equatable {
     /// BCP-47 identifier, or "auto" to detect per line.
     var sourceLanguage = "auto"
@@ -131,6 +138,8 @@ struct AppSettings: Codable, Equatable {
     // Saving: every lens writes what it reads to `exportFolder` while this is on; lens images go there when asked for.
     var savesTranscripts = false
     var exportFolder = ("~/Documents/Mwoyeo" as NSString).expandingTildeInPath
+    /// The files the translation log is written as (settings.json only: no row in Settings).
+    var transcriptFormats: [TranscriptFileFormat] = [.markdown, .srt]
     /// Languages (and engine) remembered per app; the app in front decides which applies (see `effective`).
     var appProfiles: [AppProfile] = []
     /// How text is cut into paragraphs, unless an app's profile says otherwise.
@@ -184,6 +193,7 @@ struct AppSettings: Codable, Equatable {
         hasCompletedOnboarding = try c.decodeIfPresent(Bool.self, forKey: .hasCompletedOnboarding) ?? d.hasCompletedOnboarding
         savesTranscripts = try c.decodeIfPresent(Bool.self, forKey: .savesTranscripts) ?? d.savesTranscripts
         exportFolder = try c.decodeIfPresent(String.self, forKey: .exportFolder) ?? d.exportFolder
+        transcriptFormats = ((try? c.decodeIfPresent([Lossy<TranscriptFileFormat>].self, forKey: .transcriptFormats)) ?? nil)?.compactMap(\.value) ?? d.transcriptFormats
         appProfiles = ((try? c.decodeIfPresent([Lossy<AppProfile>].self, forKey: .appProfiles)) ?? nil)?.compactMap(\.value) ?? d.appProfiles
         paragraphReader = (try? c.decodeIfPresent(ParagraphReader.self, forKey: .paragraphReader)) ?? d.paragraphReader
     }

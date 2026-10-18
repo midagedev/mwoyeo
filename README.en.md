@@ -178,6 +178,36 @@ follow the context.
 | Translation | **Engine**: *Automatic* (language pack if installed, Apple Intelligence otherwise), *High fidelity* (always Apple Intelligence: the most natural and the slowest) or *Glossary first* · language packs · **translation memory**: how many translations to keep for reuse (1,000, 5,000 or 20,000; in memory only, cleared when Mwoyeo quits) · a **glossary** of names, one `original = translation` per line · **Add another engine** · **App profiles** (shown only once you have remembered an app from the lens menu) |
 | Appearance | **Lens style**: *Glow*, *Subtle* (glows only while reading) or *Minimal* (a faint line; the name tag shows on hover) · font (default, rounded, serif) · box opacity · AI erasing on photos and artwork |
 
+### Settings file
+
+Every setting is also a JSON file, so you (or Claude Code) can change one without clicking: `Mwoyeo --settings-path` prints
+where it is (`~/Library/Application Support/Mwoyeo/settings.json`), and Settings › General has an *Open* button for it.
+
+- Mwoyeo watches the file and applies a saved change within a second; the Settings window and the file always agree.
+- `settings.schema.json` next to it describes every key, its allowed values and its limits. Editors that read JSON Schema
+  complete and check the keys.
+- `Mwoyeo --check-settings [path]` prints `settings.json:<line>: <message>` for each problem (an unknown key with the
+  closest known one, a wrong type or value, invalid JSON) or `ok`, and exits 1 when there are problems. A wrong key keeps its
+  value and the rest still applies; a file that is not JSON is left alone until it parses.
+- API keys for added engines are never in the file; they stay in the Keychain.
+
+**Translation log.** Set `"savesTranscripts": true` to have every lens write what it read and its translation to
+`<exportFolder>/Transcripts` (Markdown and SRT by default). Add `"jsonl"` to `transcriptFormats` for one JSON line per
+translated line, appended as it happens:
+
+```json
+"savesTranscripts": true,
+"transcriptFormats": ["markdown", "srt", "jsonl"]
+```
+
+```sh
+tail -f ~/Documents/Mwoyeo/Transcripts/*.jsonl
+# {"time":"2026-10-18T10:52:02.030+09:00","lens":"Chat","app":"com.example.app","source":"auto","target":"ko","engine":"apple","original":"こんにちは","translation":"안녕하세요"}
+```
+
+To change a setting, ask Claude Code: *"Make the lens frame subtle and translate into Japanese."* It reads the schema,
+edits the two keys and runs `--check-settings`.
+
 ## Tips and troubleshooting
 
 - **Stuck on "Translating…"?** Usually the language pack is missing; download it in Settings › Translation. The very

@@ -126,6 +126,11 @@ final class TranscriptWriter: @unchecked Sendable {
     private let lens: String
     private let sourceCode: String
     private let targetCode: String
+    private let formats: Set<TranscriptFileFormat>
+    private let engine: String
+    /// The languages as set ("auto" stays "auto"), for the JSON lines.
+    private let sourceSetting: String
+    private var app: String?
     private let started: Date
     private let onError: @Sendable () -> Void
     private var recorder = TranscriptRecorder()
@@ -137,13 +142,23 @@ final class TranscriptWriter: @unchecked Sendable {
     private var failed = false
 
     /// `directory` is where the files go; `sourceCode` names the source SRT ("auto" becomes "source").
-    init(directory: URL, lens: String, sourceCode: String, targetCode: String, started: Date = Date(), onError: @escaping @Sendable () -> Void) {
+    /// `formats` are the files written; `engine` is "apple" or the added engine's name (for the JSON lines).
+    init(directory: URL, lens: String, sourceCode: String, targetCode: String, formats: [TranscriptFileFormat] = [.markdown, .srt],
+         engine: String = "apple", started: Date = Date(), onError: @escaping @Sendable () -> Void) {
         self.directory = directory
+        self.formats = Set(formats)
+        self.engine = engine
+        self.sourceSetting = sourceCode
         self.lens = lens
         self.sourceCode = sourceCode == "auto" ? "source" : sourceCode
         self.targetCode = targetCode
         self.started = started
         self.onError = onError
+    }
+
+    /// The bundle ID of the app in the lens, for the JSON lines that follow.
+    func setApp(_ bundleID: String?) {
+        queue.async { self.app = bundleID }
     }
 
     func observe(time: TimeInterval, lines: [TranscriptRecorder.Observed]) {
@@ -172,10 +187,18 @@ final class TranscriptWriter: @unchecked Sendable {
         guard !entries.isEmpty || cuesChanged else { return }
         do {
             for e in entries {
-                try append(TranscriptFormat.markdownEntry(e, start: started, timeZone: .current), to: file("md"),
-                           header: TranscriptFormat.markdownHeader(lens: lens, date: started, timeZone: .current))
+                if formats.contains(.markdown) {
+                    try append(TranscriptFormat.markdownEntry(e, start: started, timeZone: .current), to: file("md"),
+                               header: TranscriptFormat.markdownHeader(lens: lens, date: started, timeZone: .current))
+                }
+                if formats.contains(.jsonl) {
+                    // Appended and closed per line, so `tail -f` follows it.
+                    try append(TranscriptFormat.jsonlLine(time: started.addingTimeInterval(e.time), timeZone: .current, lens: lens, app: app,
+                                                          source: sourceSetting, target: targetCode, engine: engine,
+                                                          original: e.source, translation: e.translation), to: file("jsonl"))
+                }
             }
-            if cuesChanged {
+            if cuesChanged, formats.contains(.srt) {
                 try writeSRT(.source, to: file("\(sourceCode).srt"))
                 try writeSRT(.translation, to: file("\(targetCode).srt"))
             }
@@ -188,7 +211,10 @@ final class TranscriptWriter: @unchecked Sendable {
 
     /// `<lens name> <date time>.<ext>`, chosen on the first write so a lens reopened in the same minute gets its own files.
     private func file(_ ext: String) -> URL {
-        if base == nil { base = LensExport.freeBase(in: directory, "\(LensExport.fileName(lens)) \(LensExport.stamp(started))", ext: "md") }
+        if base == nil {
+            let probe = formats.contains(.markdown) ? "md" : formats.contains(.jsonl) ? "jsonl" : "\(targetCode).srt"
+            base = LensExport.freeBase(in: directory, "\(LensExport.fileName(lens)) \(LensExport.stamp(started))", ext: probe)
+        }
         return base!.appendingPathExtension(ext)
     }
 

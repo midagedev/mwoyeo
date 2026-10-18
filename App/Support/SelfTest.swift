@@ -32,7 +32,8 @@ import UniformTypeIdentifiers
 /// 100 ms; the work it causes is printed.
 ///
 /// Keeping what the lens read (both modes; the lens is the whole capture unless `--lens x,y,w,h` — points in the image — is given):
-///   `--transcript dir` writes the lens's transcript (Markdown + two SRTs) into `dir`, with fake times in `--render` runs
+///   `--transcript dir` writes the lens's transcript (Markdown + two SRTs) into `dir`, with fake times in `--render` runs;
+///   `--transcript-formats markdown,srt,jsonl` picks the files (jsonl: one JSON line per translated line);
 ///   (one second per phase; `--then again` re-reads the same frame, a held subtitle);
 ///   `--save-lens out.png` writes the lens image (the app's "Save Lens Image");
 ///   `--copy` prints the original and translation lines the lens's copy actions would put on the pasteboard.
@@ -72,8 +73,10 @@ enum SelfTest {
 
         init(settings: AppSettings, option: (String) -> String?, args: [String]) {
             writer = option("--transcript").map {
-                TranscriptWriter(directory: URL(fileURLWithPath: $0), lens: "Lens", sourceCode: settings.sourceLanguage,
-                                 targetCode: settings.targetLanguage, onError: { FileHandle.standardError.write("error: transcript write failed\n".data(using: .utf8)!) })
+                let formats = option("--transcript-formats").map { $0.split(separator: ",").compactMap { TranscriptFileFormat(rawValue: String($0)) } }
+                    ?? settings.transcriptFormats
+                return TranscriptWriter(directory: URL(fileURLWithPath: $0), lens: "Lens", sourceCode: settings.sourceLanguage,
+                                 targetCode: settings.targetLanguage, formats: formats, engine: settings.activeEngineConfig?.name ?? "apple", onError: { FileHandle.standardError.write("error: transcript write failed\n".data(using: .utf8)!) })
             }
             saveTo = option("--save-lens").map { URL(fileURLWithPath: $0) }
             copies = args.contains("--copy")

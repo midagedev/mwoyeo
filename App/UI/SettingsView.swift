@@ -83,8 +83,26 @@ struct GeneralSettings: View {
             } header: {
                 Text("Saving")
             }
+            Section {
+                LabeledContent("Settings file") {
+                    Button("Open") { model.openSettingsFile() }
+                    Button("Show in Finder") { model.showSettingsFile() }
+                }
+                .buttonStyle(.borderless)
+                if let note = issueNote {
+                    Text(note).font(.caption).foregroundStyle(.secondary)
+                }
+            }
         }
         .formStyle(.grouped)
+    }
+
+    /// The first problem found in settings.json, and how many more there are; nil while there is none.
+    private var issueNote: String? {
+        guard let first = model.settingsIssues.first else { return nil }
+        let text = first.line.map { String(localized: "Line \($0): \(first.message)") } ?? first.message
+        let more = model.settingsIssues.count - 1
+        return more > 0 ? String(localized: "\(text) · \(more) more") : text
     }
 
     private func chooseFolder() {

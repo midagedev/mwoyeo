@@ -9,7 +9,8 @@ import SwiftUI
 /// models for the language and reads the picture in this process every half second until every step is done, printing each
 /// read's latency and the steps as they change (what a lens sees during a cold compile; no window).
 /// Scenarios: menu-init-running, menu-init-failed, menu-init-done (the panel during the initialization of the text
-/// models, from a gate of its own, no real recognition), translation-default, translation-packs, translation-packs-auto, translation-engines, general-saving, menu-default, menu-switcher, menu-notice,
+/// models, from a gate of its own, no real recognition), general-settings-file and general-settings-file-issue (Settings › General with
+/// settings.json clean, then with problems in it; the file is a scratch one, `MWOYEO_SETTINGS_FILE` names it), translation-default, translation-packs, translation-packs-auto, translation-engines, general-saving, menu-default, menu-switcher, menu-notice,
 /// menu-profile, image-window and image-window-original (the Translate Image window on `--image`, translated through the
 /// mock, then with Show Original on; when the text recognizer reads nothing the picture stands in for its translation, which
 /// still shows the toggle's two states), sheet-pick, sheet-config, sheet-config-remote, lens-badge, lens-notice, lens-menu, add-flow (adds an
@@ -25,10 +26,15 @@ enum UICapture {
         let suite = "dev.midagedev.mwoyeo.capture-\(getpid())"
         let ownSuite = ProcessInfo.processInfo.environment["MWOYEO_DEFAULTS_SUITE"] == nil
         if ownSuite { setenv("MWOYEO_DEFAULTS_SUITE", suite, 1) }
+        // Likewise the settings file: the real one in Application Support is never read or written by a capture.
+        let scratchDir = NSTemporaryDirectory() + "mwoyeo-capture-\(getpid())"
+        let ownFile = ProcessInfo.processInfo.environment["MWOYEO_SETTINGS_FILE"] == nil
+        if ownFile { setenv("MWOYEO_SETTINGS_FILE", scratchDir + "/settings.json", 1) }
         let app = NSApplication.shared
         app.setActivationPolicy(.accessory)
         Task { @MainActor in
             await Runner(args: args).go()
+            if ownFile { try? FileManager.default.removeItem(atPath: scratchDir) }
             if ownSuite {
                 UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite)
                 // The preferences daemon leaves the emptied file behind, in the real home.
@@ -100,6 +106,8 @@ enum UICapture {
                                               AppProfile(bundleID: "com.example.vn", appName: "Visual Novel", source: "ja", target: "en", paragraphReader: .lineGrouping)]
                 await shoot(name, TranslationSettings(), CGSize(width: 560, height: 1300))
                 model.settings.appProfiles = []
+            case "general-settings-file": await settingsFileShot(name, withIssues: false)
+            case "general-settings-file-issue": await settingsFileShot(name, withIssues: true)
             case "general-saving": await shoot(name, GeneralSettings(), CGSize(width: 560, height: 800))
             case "menu-default": await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
             case "translation-engines":
@@ -232,6 +240,19 @@ enum UICapture {
             await shoot(name, ImageTranslationView(model: picture, onDrop: { _ in false }), CGSize(width: 1040, height: 760))
         }
 
+        /// General settings after a person or an agent saved settings.json: untouched, or with an unknown key and a wrong value.
+        private func settingsFileShot(_ name: String, withIssues: Bool) async {
+            let url = model.settingsFile.url
+            var text = String(decoding: SettingsFileFormat.render(model.settings), as: UTF8.self)
+            if withIssues {
+                text = text.replacingOccurrences(of: "\"lensStyle\"", with: "\"lenStyle\"")
+                    .replacingOccurrences(of: "\"cacheSize\": \(model.settings.cacheSize)", with: "\"cacheSize\": \"big\"")
+            }
+            try? Data(text.utf8).write(to: url, options: .atomic)
+            model.settingsFileChanged()
+            await shoot(name, GeneralSettings(), CGSize(width: 560, height: 800))
+        }
+
         /// The engine group's selection and the engine notice's dismissal, without a window.
         private func checkLogic() async {
             var failed = 0
@@ -292,6 +313,7 @@ enum UICapture {
             model.recognitionNotice(nil)
             check("its end leaves another issue alone", model.shownIssue == a)
             model.received(nil)
+            failed += SettingsFileChecks.run(model)
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
         }
 

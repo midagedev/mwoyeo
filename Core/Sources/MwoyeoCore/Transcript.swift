@@ -127,6 +127,24 @@ public enum TranscriptFormat {
         return "\(index)\n\(srtTime(start)) --> \(srtTime(end))\n\(text)\n\n"
     }
 
+    /// One line of the JSON Lines log: an object per translated line, keys in this order, no line break inside. `app` is the
+    /// bundle ID of the app in the lens (null when unknown); `engine` is "apple" or an added engine's name.
+    public static func jsonlLine(time: Date, timeZone: TimeZone, lens: String, app: String?, source: String, target: String,
+                                 engine: String, original: String, translation: String) -> String {
+        let f = ISO8601DateFormatter()
+        f.timeZone = timeZone
+        f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let fields: [(String, String?)] = [("time", f.string(from: time)), ("lens", lens), ("app", app), ("source", source), ("target", target),
+                                           ("engine", engine), ("original", original), ("translation", translation)]
+        let body = fields.map { "\(json($0.0)):\($0.1.map(json) ?? "null")" }.joined(separator: ",")
+        return "{\(body)}\n"
+    }
+
+    private static func json(_ s: String) -> String {
+        guard let d = try? JSONEncoder().encode(s) else { return "\"\"" }
+        return String(decoding: d, as: UTF8.self).replacingOccurrences(of: "\\/", with: "/")
+    }
+
     static func srtTime(_ t: TimeInterval) -> String {
         let ms = Int((t * 1000).rounded())
         return String(format: "%02d:%02d:%02d,%03d", ms / 3_600_000, ms / 60_000 % 60, ms / 1000 % 60, ms % 1000)

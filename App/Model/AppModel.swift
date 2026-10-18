@@ -12,7 +12,7 @@ final class AppModel {
     var settings: AppSettings {
         didSet {
             guard settings != oldValue else { return }
-            save()
+            saveSettings()
             if settings.shortcuts != oldValue.shortcuts { HotKeys.shared.apply(settings.shortcuts) }
             if settings.checksForUpdates != oldValue.checksForUpdates { Updates.shared.schedule(enabled: settings.checksForUpdates) }
             pushSettings()
@@ -36,8 +36,11 @@ final class AppModel {
     }
 
     private(set) var regions: [RegionConfig] = [] {
-        didSet { save() }
+        didSet { saveRegions() }
     }
+
+    /// What is wrong in settings.json as last read (empty when nothing is); Settings › General shows the first.
+    private(set) var settingsIssues: [SettingsFileIssue] = []
 
     private(set) var translationsVisible = true
     private(set) var isPaused = false
@@ -52,6 +55,11 @@ final class AppModel {
     @ObservationIgnored let translator: TranslationService
     /// Where added engines keep their API keys (the Keychain; memory only when `MWOYEO_MEMORY_SECRETS` is set, for captures).
     @ObservationIgnored let secrets: any SecretStore
+    /// settings.json, the source of truth of `settings`; the preferences keep a copy for a downgrade.
+    @ObservationIgnored let settingsFile = SettingsFileStore()
+    /// True while a reload from the file is applied: the file already says it, so it is not written back.
+    @ObservationIgnored private var applyingFile = false
+    @ObservationIgnored private var loggedIssues: [SettingsFileIssue] = []
     @ObservationIgnored private var sessions: [UUID: RegionSession] = [:]
     @ObservationIgnored private(set) var inpainter: Inpainter?
     @ObservationIgnored private let picker = RegionPicker()
@@ -61,18 +69,47 @@ final class AppModel {
     @ObservationIgnored private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "app")
 
     private init() {
-        let s = (defaults.data(forKey: "settings")).flatMap { try? JSONDecoder().decode(AppSettings.self, from: $0) } ?? AppSettings()
+        let saved = (defaults.data(forKey: "settings")).flatMap { try? JSONDecoder().decode(AppSettings.self, from: $0) } ?? AppSettings()
+        let s = settingsFile.startup(fallback: saved)
         settings = s
+        settingsIssues = settingsFile.issues
         let store: any SecretStore = ProcessInfo.processInfo.environment["MWOYEO_MEMORY_SECRETS"] != nil ? MemorySecrets() : KeychainSecrets()
         secrets = store
         translator = TranslationService(settings: s, secrets: store)
         regions = (defaults.data(forKey: "regions")).flatMap { try? JSONDecoder().decode([RegionConfig].self, from: $0) } ?? []
+        // The preferences' copy follows the file (a downgrade keeps the settings); the file itself is not touched here.
+        if s != saved, let d = try? JSONEncoder().encode(s) { defaults.set(d, forKey: "settings") }
     }
 
-    private func save() {
+    /// The preferences get the whole settings (a downgrade to a version before the file keeps them); the file gets its keys.
+    private func saveSettings() {
         if let d = try? JSONEncoder().encode(settings) { defaults.set(d, forKey: "settings") }
+        guard !applyingFile else { return }
+        settingsFile.save(settings)
+        settingsIssues = settingsFile.issues
+    }
+
+    private func saveRegions() {
         if let d = try? JSONEncoder().encode(regions) { defaults.set(d, forKey: "regions") }
     }
+
+    /// settings.json changed on disk: its valid keys apply as a change in Settings would (lenses, engine and shortcuts follow).
+    func settingsFileChanged() {
+        let result = settingsFile.fileChanged(current: settings)
+        settingsIssues = settingsFile.issues
+        if let first = settingsIssues.first, settingsIssues != loggedIssues {
+            loggedIssues = settingsIssues
+            log.notice("settings file: \(self.settingsIssues.count) issue(s), first at line \(first.line ?? 0): \(first.message, privacy: .public)")
+        }
+        guard let result else { return }
+        applyingFile = true
+        settings = result.settings
+        applyingFile = false
+        if !result.changed.isEmpty { log.notice("settings reloaded: \(result.changed.joined(separator: ", "), privacy: .public)") }
+    }
+
+    func openSettingsFile() { NSWorkspace.shared.open(settingsFile.url) }
+    func showSettingsFile() { NSWorkspace.shared.activateFileViewerSelecting([settingsFile.url]) }
 
     // MARK: - Lifecycle
 
@@ -85,6 +122,7 @@ final class AppModel {
         HotKeys.shared.setHandler(.copyOriginal) { [weak self] in self?.lensForShortcut()?.copyOriginal() }
         HotKeys.shared.setHandler(.readAloud) { [weak self] in self?.lensForShortcut()?.toggleReadAloud() }
         HotKeys.shared.apply(settings.shortcuts)
+        settingsFile.startWatching { [weak self] in self?.settingsFileChanged() }
         // Transcripts written so far are closed before the app goes.
         NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.sessions.values.forEach { $0.finishTranscript(wait: true) } }

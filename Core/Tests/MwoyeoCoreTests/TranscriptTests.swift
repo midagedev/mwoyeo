@@ -147,4 +147,22 @@ import Testing
         #expect(cues(ev).map(\.source) == words)
         #expect(entries(ev).map(\.source) == words)
     }
+
+    @Test func jsonlLineIsOneObjectWithTheAgreedKeys() throws {
+        let utc = TimeZone(identifier: "UTC")!
+        let line = TranscriptFormat.jsonlLine(time: Date(timeIntervalSince1970: 1_760_000_000.123), timeZone: utc, lens: "Chat", app: "com.example.app",
+                                              source: "ja", target: "ko", engine: "apple", original: "こんにちは\n\"世界\"/", translation: "안녕\n\"세계\"")
+        #expect(line.hasSuffix("}\n") && line.dropLast().contains("\n") == false)
+        #expect(line.hasPrefix("{\"time\":\"2025-10-09T08:53:20.123Z\",\"lens\":\"Chat\",\"app\":\"com.example.app\",\"source\":\"ja\",\"target\":\"ko\",\"engine\":\"apple\",\"original\":"))
+        let object = try #require(try JSONSerialization.jsonObject(with: Data(line.utf8)) as? [String: Any])
+        #expect(object["original"] as? String == "こんにちは\n\"世界\"/" && object["translation"] as? String == "안녕\n\"세계\"")
+        #expect(object.count == 8)
+    }
+
+    @Test func jsonlLineHasNullWhenTheAppIsUnknown() throws {
+        let line = TranscriptFormat.jsonlLine(time: Date(timeIntervalSince1970: 0), timeZone: TimeZone(identifier: "Asia/Seoul")!, lens: "L", app: nil,
+                                              source: "auto", target: "en", engine: "Ollama", original: "a", translation: "b")
+        let object = try #require(try JSONSerialization.jsonObject(with: Data(line.utf8)) as? [String: Any])
+        #expect(object["app"] is NSNull && object["time"] as? String == "1970-01-01T09:00:00.000+09:00")
+    }
 }

@@ -62,6 +62,7 @@ final class RegionSession {
     private var transcript: TranscriptWriter?
     private var transcriptBegan: TimeInterval = 0
     private var transcriptTimer: Timer?
+    private var transcriptAppChecked: TimeInterval = 0
 
     /// Hands the pipeline's snapshots to the session once it exists (the pipeline is built inside `init`).
     @MainActor private final class SnapshotTap { var handler: ((OverlaySnapshot) -> Void)? }
@@ -141,7 +142,8 @@ final class RegionSession {
         let before = self.settings
         self.settings = settings
         if !settings.savesTranscripts || settings.exportFolder != before.exportFolder
-            || settings.sourceLanguage != before.sourceLanguage || settings.targetLanguage != before.targetLanguage {
+            || settings.sourceLanguage != before.sourceLanguage || settings.targetLanguage != before.targetLanguage
+            || settings.transcriptFormats != before.transcriptFormats || settings.activeEngineConfig?.id != before.activeEngineConfig?.id {
             finishTranscript()
         }
         chrome.setDetail(Self.languagePair(settings), badge: settings.activeEngineConfig?.badgeSymbol)
@@ -273,13 +275,20 @@ final class RegionSession {
         let now = ProcessInfo.processInfo.systemUptime
         if transcript == nil {
             transcriptBegan = now
+            transcriptAppChecked = 0
             transcript = TranscriptWriter(directory: LensExport.transcriptsFolder(settings.exportFolder), lens: config.name,
                                           sourceCode: settings.sourceLanguage, targetCode: settings.targetLanguage,
+                                          formats: settings.transcriptFormats, engine: settings.activeEngineConfig?.name ?? "apple",
                                           onError: { [weak self] in Task { @MainActor in self?.chrome.flash(String(localized: "Couldn’t save transcript"), seconds: 4) } })
             // A line that stays put makes no snapshots; looking again keeps it one line instead of many.
             let t = Timer(timeInterval: 1, repeats: true) { [weak self] _ in Task { @MainActor in self?.observeTranscript() } }
             RunLoop.main.add(t, forMode: .common)
             transcriptTimer = t
+        }
+        // Which app is in the lens changes rarely; looking costs a window list, so not on every snapshot.
+        if now - transcriptAppChecked > 5, settings.transcriptFormats.contains(.jsonl) {
+            transcriptAppChecked = now
+            transcript?.setApp(AppModel.readerContext(for: config).bundleID)
         }
         transcript?.observe(time: now - transcriptBegan, lines: LensText.observed(s, lens: config.rect))
     }

@@ -286,10 +286,11 @@ public enum TranslationFilter {
 
     /// Text that is read as written in any language and must stay on screen as it is: a shell prompt with its command
     /// ("$ npm run build"), a standalone time or date stamp ("10:42 AM", "2026-10-14"), a URL or bare domain, a
-    /// fragment of a formula (`isFormula`) and an identifier written in camelCase (`isIdentifier`).
+    /// fragment of a formula (`isFormula`), an identifier written in camelCase (`isIdentifier`) and prose that is mostly
+    /// inline mathematics (`isMathHeavy`).
     public static func isLiteral(_ text: String) -> Bool {
         let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        return matchesLiteralPattern(t) || isFormula(t) || isIdentifier(t)
+        return matchesLiteralPattern(t) || isFormula(t) || isIdentifier(t) || isMathHeavy(t)
     }
 
     static func matchesLiteralPattern(_ text: String) -> Bool {
@@ -330,6 +331,27 @@ public enum TranslationFilter {
         FormulaScan(text.trimmingCharacters(in: .whitespacesAndNewlines)).isFormula
     }
 
+    /// A block of prose that is mostly inline mathematics ("Where the projections are parameter matrices WQ ∈ R dmodel × dk, WK ∈ …",
+    /// read off a typeset page as "W° € Be xx, WK € Raux, WY € Eden xed and WO E RhdXdm"): the engine copies the symbols as they
+    /// come (Apple Translation changed none in 26 sentences) and the garbling is the recognizer's, so a translation only
+    /// sets garbled symbols between a few translated words, where the original has them typeset. It stays as written.
+    /// Decided from the share of the block's letters and digits that are mathematics (`MathShare`): at least `mathShareLimit` of
+    /// them, with two or more signs of mathematics in it. Measured on the paper bench (page 5): the garbled blocks stand at 0.38
+    /// and 0.45, a sentence that opens with a formula ("dk = dv = dmodel/h = 64. Due to the reduced …") at 0.21 and below.
+    public static func isMathHeavy(_ text: String) -> Bool {
+        let m = MathShare(text.trimmingCharacters(in: .whitespacesAndNewlines))
+        return m.supported && m.signs >= mathSignLimit && m.characters >= 20 && m.share >= mathShareLimit
+    }
+
+    /// The share of a block's letters and digits that are mathematics, and its signs of mathematics.
+    public static func mathShare(of text: String) -> (share: Double, signs: Int) {
+        let m = MathShare(text.trimmingCharacters(in: .whitespacesAndNewlines))
+        return (m.share, m.signs)
+    }
+
+    static let mathShareLimit = 0.30
+    static let mathSignLimit = 2
+
     /// One identifier written in camelCase with an inner capital ("MatMul", "SoftMax", "ReLU", "LayerNorm"): a name from
     /// code or a figure, or a brand ("YouTube"). A single plain word ("Scale", "Linear") is not one, and neither is a
     /// brand run into Japanese ("YouTubeで見る").
@@ -352,7 +374,7 @@ public enum TranslationFilter {
 /// The letters, digits and signs of one line, as `TranslationFilter.isFormula` reads them. A run is a stretch of
 /// letters, digits and `_` (an apostrophe between two letters stays in it); everything else is a sign.
 private struct FormulaScan {
-    private enum Script { case latin, greek, cyrillic, math }
+    fileprivate enum Script { case latin, greek, cyrillic, math }
 
     private var letters = 0
     private var proseWords = 0       // words that are not operands
@@ -373,9 +395,9 @@ private struct FormulaScan {
     /// Consonant-only words that are chat, not symbols; a capital in them does not make them a formula.
     private static let consonantWords: Set<String> = ["wtf", "brb", "lmk", "tbh", "smh", "fml", "btw", "tbd", "nvm", "pls", "thx", "ppl",
                                                        "hmm", "hm", "mmm", "mm", "mhm", "kk", "shh", "brr", "grr", "psst"]
-    private static let vowels = Set("aeiouyıøæœаеёиоуыэюяіїєαεηιουω")
+    fileprivate static let vowels = Set("aeiouyıøæœаеёиоуыэюяіїєαεηιουω")
 
-    private static func script(_ v: UInt32) -> Script? {
+    fileprivate static func script(_ v: UInt32) -> Script? {
         switch v {
         case 0xB5, 0x370...0x3FF, 0x1F00...0x1FFF: .greek  // µ is the micro sign, a Latin-1 letter that is a Greek mu
         case 0..<0x2B0, 0x1E00...0x1EFF: .latin
@@ -385,7 +407,7 @@ private struct FormulaScan {
         }
     }
 
-    private static func isMathSign(_ v: UInt32) -> Bool {
+    fileprivate static func isMathSign(_ v: UInt32) -> Bool {
         switch v {
         case 0x3D, 0x5E, 0xB1, 0xB2, 0xB3, 0xB9, 0xD7, 0xF7: true  // = ^ ± ² ³ ¹ × ÷
         case 0x2070...0x209F, 0x2190...0x21FF, 0x2200...0x22FF: true // super and subscripts, arrows, mathematical operators
@@ -544,6 +566,136 @@ private struct FormulaScan {
         if onlyAtoms && (digitLetter || (capsCluster && !digit)) { return true }
         // A short Cyrillic fragment beside a slash or bracket: a "√dk" read as "/ак".
         return cyrillic && !latin && !greek && letters <= 3 && bracket
+    }
+}
+
+/// What part of one block is mathematics, as `TranslationFilter.isMathHeavy` reads it. The block's letters and digits are
+/// counted in two kinds, apart from the neutral ones that count in neither:
+/// - prose: a word of three letters or more with a vowel and no inner capital ("projections"), not standing beside a sign;
+/// - mathematics: a sign (`=`, `∈`, `×`, `^`, a super or subscript, and `€` for what the recognizer reads `∈` as), a variable of
+///   one letter (not "a" and "I"), a run of consonants ("dk", "xx") or with an inner capital ("EdEn", "xEd"), a name with `_`, a
+///   number beside a sign, any word beside a sign ("Raux" after `€`, "model" in "R model × dx"), and a mark the recognizer reads
+///   for a superscript (`°`, `®`) right after such a variable ("W°").
+/// Neutral are numbers, names of letters with digits or capitals alone ("K80", "LSTM", "2016"), two-letter words, punctuation,
+/// arrows, and marks after a word ("Parmar®", "Jones†"). A `€` next to a number is a price. Latin, Greek and Cyrillic only: a
+/// block with any other script is not read.
+private struct MathShare {
+    private var prose = 0, math = 0
+    private(set) var signs = 0
+    private(set) var supported = true
+
+    var characters: Int { prose + math }
+    var share: Double { characters > 0 ? Double(math) / Double(characters) : 0 }
+
+    private enum Token {
+        /// An operator, relation or the `€` read for `∈`: its neighbours are its operands.
+        case sign
+        /// A mark read for a superscript, and whether it touches the token before it.
+        case mark(attached: Bool)
+        case run(letters: Int, digits: Int, shape: Shape)
+        case punctuation
+    }
+
+    private enum Shape { case lone, aOrI, underscore, digitsOnly, mixed, caps, twoLetters, consonants, capitalInside, plain }
+
+    private static func isOperator(_ v: UInt32) -> Bool { FormulaScan.isMathSign(v) && !(0x2190...0x21FF).contains(v) }
+    private static func isCurrency(_ v: UInt32) -> Bool { [0xA2, 0xA3, 0xA5, 0x20AC].contains(v) }
+    private static func isMark(_ v: UInt32) -> Bool { [0xA9, 0xAE, 0xB0].contains(v) }
+
+    init(_ text: String) {
+        let s = Array(text.decomposedStringWithCanonicalMapping.unicodeScalars)
+        let isLetter = { (v: Unicode.Scalar) in CharacterSet.letters.contains(v) }
+        let isCombining = { (v: Unicode.Scalar) in (0x300...0x36F).contains(v.value) }
+        let isDigit = { (v: Unicode.Scalar) in CharacterSet.decimalDigits.contains(v) }
+        let isRunScalar = { (v: Unicode.Scalar) in v == "_" || isCombining(v) || isDigit(v) || isLetter(v) }
+        let isSpace = { (v: Unicode.Scalar) in CharacterSet.whitespacesAndNewlines.contains(v) }
+        /// The nearest scalar on either side of `i` that is not a space.
+        func solid(_ i: Int, step: Int) -> Unicode.Scalar? {
+            var k = i + step
+            while s.indices.contains(k), isSpace(s[k]) { k += step }
+            return s.indices.contains(k) ? s[k] : nil
+        }
+
+        var tokens: [Token] = []
+        var i = 0
+        while i < s.count {
+            let v = s[i]
+            if isSpace(v) { i += 1; continue }
+            guard isRunScalar(v) else {
+                if Self.isOperator(v.value) {
+                    tokens.append(.sign)
+                } else if Self.isCurrency(v.value) {
+                    // A price: a number on either side, spaces aside.
+                    let price = [solid(i, step: -1), solid(i, step: 1)].contains { $0.map(isDigit) ?? false }
+                    tokens.append(price ? .punctuation : .sign)
+                } else if Self.isMark(v.value) {
+                    tokens.append(.mark(attached: i > 0 && !isSpace(s[i - 1])))
+                } else {
+                    tokens.append(.punctuation)
+                }
+                i += 1
+                continue
+            }
+            var j = i + 1
+            while j < s.count {
+                if isRunScalar(s[j]) { j += 1 }
+                else if s[j] == "'" || s[j] == "\u{2019}", j + 1 < s.count, isLetter(s[j - 1]), isLetter(s[j + 1]) { j += 1 }
+                else { break }
+            }
+            var letters: [Unicode.Scalar] = [], digits = 0, underscore = false
+            for c in s[i..<j] where !isCombining(c) {
+                if isDigit(c) { digits += 1 } else if c == "_" { underscore = true } else if isLetter(c) { letters.append(c) }
+            }
+            i = j
+            var scripts = Set<FormulaScan.Script>()
+            for c in letters {
+                guard let script = FormulaScan.script(c.value) else { supported = false; return }
+                scripts.insert(script)
+            }
+            let lower = { (c: Unicode.Scalar) in CharacterSet.lowercaseLetters.contains(c) }
+            let upper = { (c: Unicode.Scalar) in CharacterSet.uppercaseLetters.contains(c) }
+            let vowel = letters.contains { c in String(c).lowercased().first.map { FormulaScan.vowels.contains($0) } ?? false }
+            let inner = zip(letters, letters.dropFirst()).contains { lower($0) && upper($1) }
+            let shape: Shape
+            if letters.isEmpty { shape = digits > 0 ? .digitsOnly : .plain }
+            else if underscore { shape = .underscore }
+            else if digits > 0 { shape = .mixed }
+            else if letters.count == 1 {
+                // Words of one letter in Cyrillic ("и", "в") and the article "a" and the pronoun "I" are not variables.
+                shape = scripts == [.cyrillic] || "aAI".unicodeScalars.contains(letters[0]) ? .aOrI : .lone
+            }
+            else if inner { shape = .capitalInside }
+            else if letters.allSatisfy(upper) { shape = .caps }
+            else if !vowel { shape = .consonants }
+            else if letters.count == 2 { shape = .twoLetters }
+            else { shape = .plain }
+            tokens.append(.run(letters: letters.count, digits: digits, shape: shape))
+        }
+
+        // Neighbours are the tokens before and after, punctuation aside.
+        let core = tokens.filter { if case .punctuation = $0 { return false } else { return true } }
+        func isSign(_ k: Int) -> Bool { if case .sign = core[k] { return true } else { return false } }
+        for (k, token) in core.enumerated() {
+            switch token {
+            case .punctuation: break
+            case .sign:
+                signs += 1
+                math += 1
+            case let .mark(attached):
+                // "W°", "QW®": a superscript read as a mark after a variable; after a word ("Parmar®") it is a footnote mark.
+                guard attached, k > 0, case let .run(_, _, shape) = core[k - 1], [.lone, .caps, .consonants, .capitalInside, .underscore, .mixed].contains(shape) else { break }
+                signs += 1
+                math += 1
+            case let .run(letters, digits, shape):
+                let beside = (k > 0 && isSign(k - 1)) || (k + 1 < core.count && isSign(k + 1))
+                let size = letters + digits
+                switch shape {
+                case .digitsOnly, .aOrI, .mixed, .caps, .twoLetters: if beside { math += size }
+                case .lone, .underscore, .consonants, .capitalInside: math += size
+                case .plain: if beside { math += size } else { prose += size }
+                }
+            }
+        }
     }
 }
 

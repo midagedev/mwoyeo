@@ -649,7 +649,12 @@ enum TextRecognizer {
     static func verdict(_ text: String, target: String) -> Verdict {
         guard text.unicodeScalars.contains(where: { CharacterSet.letters.contains($0) }) else { return .literal }
         if TranslationFilter.isLiteral(text) {
-            if TranslationFilter.isFormula(text) || TranslationFilter.isIdentifier(text) { Trace.count("ocr.kept.formula") }
+            if TranslationFilter.isFormula(text) || TranslationFilter.isIdentifier(text) {
+                Trace.count("ocr.kept.formula")
+            } else if TranslationFilter.isMathHeavy(text) {
+                Trace.count("ocr.kept.math")
+                Trace.mark("kept math \(TranslationFilter.mathShare(of: text)): \(text.prefix(100))", since: Trace.now)
+            }
             return .literal
         }
         let targetCode = Locale.Language(identifier: target).languageCode?.identifier

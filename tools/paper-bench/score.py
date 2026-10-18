@@ -7,6 +7,8 @@ Per page (p1..p15, whole pages) and in total:
                       arguments, "Attention(Q, K, V)") and are not a body sentence: a source with six or more prose words (a run
                       of three letters or more with a vowel), or one that allow.txt lists, is a sentence that holds one formula
                       and is rightly translated.
+  math_heavy_kept     blocks left as written because they are mostly inline mathematics (`TranslationFilter.isMathHeavy`, D5): the
+                      render's `ocr.kept.math`; the blocks are listed in detail.txt from the trace for review.
   overlaps/spill/cut/clipped  the sums of the render's `layout:` line (clipped: a translation that needs more room than its patch
                       has at the smallest size). ellipsis: of those, the translations cut to fit and ended in "…" (D4).
   big_text            drawn body-like blocks (40 or more characters per source line) whose font size is over 1.3 times the
@@ -78,6 +80,21 @@ def parse(path):
     return r
 
 
+def kept_math(out, name):
+    """The blocks the render left as written because they are mostly inline mathematics (D5): the `ocr.kept.math` count of the
+    render's work line, and the `kept math` lines of its trace (.err) for review."""
+    count = 0
+    for ln in open(os.path.join(out, name + '.out'), encoding='utf-8', errors='replace'):
+        m = re.search(r'ocr\.kept\.math=(\d+)', ln)
+        if m:
+            count = int(m.group(1))
+    lines = []
+    err = os.path.join(out, name + '.err')
+    if os.path.exists(err):
+        lines = [ln.split('[trace] ', 1)[1].rsplit(' ms', 1)[0] for ln in open(err, encoding='utf-8', errors='replace') if '[trace] kept math' in ln]
+    return count, lines
+
+
 def formula_translated(r, allow):
     out = []
     for s, t in r['pairs']:
@@ -121,8 +138,11 @@ def main():
         ft = formula_translated(r, allow)
         bt = big_text(r)
         et, es, nr = edge_cut(r)
-        row = dict(r['layout'], formula=len(ft), big=len(bt), edge=et, side=es, near=nr, ellipsis=sum(b['ellipsis'] for b in r['blocks']))
+        km, kml = kept_math(out, n)
+        row = dict(r['layout'], formula=len(ft), math_kept=km, big=len(bt), edge=et, side=es, near=nr, ellipsis=sum(b['ellipsis'] for b in r['blocks']))
         (pages if re.fullmatch(r'p\d+', n) else crops).append((n, row))
+        for line in kml:
+            detail.append(f'{n} math_heavy_kept: {line[:150]}')
         for s, t in ft:
             detail.append(f'{n} formula_translated: {s[:90]!r} -> {t[:60]!r}')
         for b in bt:
@@ -132,7 +152,7 @@ def main():
                 detail.append(f'{n} clipped{" ellipsis" if b["ellipsis"] else ""}: size={b["size"]} {b["source"][:60]!r}')
             if r['image'] and (b['core'][1] <= EDGE or b['core'][1] + b['core'][3] >= r['image'][1] - EDGE) and not re.fullmatch(r'p\d+', n):
                 detail.append(f'{n} edge_cut: core={b["core"]} {b["source"][:60]!r}')
-    cols = ['blocks', 'formula', 'overlaps', 'spill', 'cut', 'clipped', 'ellipsis', 'big']
+    cols = ['blocks', 'formula', 'math_kept', 'overlaps', 'spill', 'cut', 'clipped', 'ellipsis', 'big']
     print('page   ' + ' '.join(f'{c:>8}' for c in cols))
     total = dict.fromkeys(cols, 0)
     for n, row in pages:
@@ -145,7 +165,7 @@ def main():
     print(f'{"TOTAL":<6} ' + ' '.join(f'{total[c]:>8}' for c in cols))
     p36 = sum(row['formula'] for n, row in pages if row and n in ('p3', 'p4', 'p5', 'p6'))
     print(f'formula_translated pages 3-6: {p36}')
-    cc = ['blocks', 'formula', 'edge', 'near', 'side', 'overlaps', 'spill', 'cut', 'clipped', 'ellipsis', 'big']
+    cc = ['blocks', 'formula', 'math_kept', 'edge', 'near', 'side', 'overlaps', 'spill', 'cut', 'clipped', 'ellipsis', 'big']
     print('crop   ' + ' '.join(f'{c:>8}' for c in cc))
     ctotal = dict.fromkeys(cc, 0)
     for n, row in crops:

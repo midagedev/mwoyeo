@@ -1,0 +1,12 @@
+How do I flatten a nested array in JavaScript?
+Asked 5 months ago Viewed 18k times (optional)
+Answer
+Since ES2019 you can call Array.prototype.flat(). Pass a depth when the nesting is deeper than one level. (inline: Array.prototype.flat())
+const nested = [1, [2, [3, [4]]]]; (keep)
+// flatten every level at once (keep)
+const flat = nested.flat(Infinity); (keep)
+console.log(flat); // [1, 2, 3, 4] (keep)
+On an older runtime, install a polyfill first.
+$ npm install core-js (keep)
+Avoid concat here, because it only removes one level. (inline: concat)
+Share Edit Follow

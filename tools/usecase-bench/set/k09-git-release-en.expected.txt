@@ -1,0 +1,11 @@
+Release checklist for ledgerline 0.5
+Before you tag the release, read the last commits and confirm that the changelog link works.
+$ git log --oneline -4 (keep:cmd)
+a3f9c21 Fix rounding of negative balances (keep:log)
+7be04d2 Add the month filter to the report (keep:log)
+c19e8a0 Bump the parser to 2.3.1 (keep:log)
+e4410bf Merge pull request #212 from dana/docs-typo (keep:log)
+The rounding fix landed in commit a3f9c21. The discussion is at https://example.org/ledgerline/pull/212. (inline: a3f9c21 ; https://example.org/ledgerline/pull/212)
+Tagging
+Press Ctrl+Shift+P to open the command palette and run the tag command. (inline: Ctrl+Shift+P)
+Open in browser Copy link Report a problem

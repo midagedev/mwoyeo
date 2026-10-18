@@ -1,0 +1,16 @@
+프로젝트: 쇼핑몰 앱
+파일
+Cart.swift (keep)
+Item.swift (keep)
+Pay.swift (keep)
+// 장바구니 합계를 계산한다. (keep)
+func total(items: [Item]) -> Int { (keep)
+var sum = 0 (keep)
+var sum: Int = 0 (keep)
+for item in items { sum += item.price } (keep)
+// 할인은 결제 단계에서 적용한다. (keep)
+return sum (keep)
+} (keep)
+변경 사항 2건
+커밋 메시지를 입력하세요
+줄 14, 열 9 저장되지 않은 변경 있음

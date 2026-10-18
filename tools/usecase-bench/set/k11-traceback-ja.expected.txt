@@ -1,0 +1,10 @@
+実行時エラーの調べ方
+次の出力は、main.py の 42 行目で例外が出たことを示しています。 (inline: main.py)
+Traceback (most recent call last): (keep:log)
+File "app/main.py", line 42, in run (keep:log)
+user = cache["user"] (keep:log)
+KeyError: 'user' (keep:log)
+キーが無いかもしれないときは、get() を使うと None が返ります。 (inline: get() ; None)
+user = cache.get("user") (keep)
+環境変数 APP_ENV を設定すると、ログの詳細度が変わります。 (inline: APP_ENV)
+この記事を共有する 編集する

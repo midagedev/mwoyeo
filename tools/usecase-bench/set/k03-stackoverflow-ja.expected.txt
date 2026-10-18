@@ -1,0 +1,10 @@
+グループごとの合計を新しい列に入れるには
+質問日 2026年3月4日 閲覧 1.2万回 (optional)
+回答
+groupby と transform を組み合わせると、元の行を減らさずに合計を付けられます。 (inline: groupby ; transform)
+df["total"] = df.groupby("shop")["price"].transform("sum") (keep)
+print(df["total"].tolist()) (keep)
+実行すると、次のように店ごとの合計が各行に入ります。
+[30, 30, 70, 70] (keep:log)
+agg を使うと行数が変わるので、この場合は向いていません。 (inline: agg)
+この回答を共有する フォローする 編集する

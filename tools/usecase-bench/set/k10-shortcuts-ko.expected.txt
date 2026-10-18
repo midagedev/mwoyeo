@@ -1,0 +1,12 @@
+키보드 단축키
+새 파일 만들기
+Cmd+N (keep:hotkey)
+파일 안에서 찾기
+Cmd+F (keep:hotkey)
+프로젝트 전체 검색
+Cmd+Shift+F (keep:hotkey)
+터미널 열기
+Ctrl+Shift+T (keep:hotkey)
+단축키를 바꾸려면 설정 폴더의 keybindings.json 파일을 편집하세요. (inline: keybindings.json)
+~/.config/editor/keybindings.json (keep:path)
+기본값으로 되돌리기 저장

@@ -1,0 +1,13 @@
+算法 1 在有序数组中查找目标值。每一轮把搜索区间缩小一半，因此耗时与 n 的对数成正比。 (inline: n)
+算法 1 二分查找
+Input: A[1..n]; x (keep:math)
+Output: i (keep:math)
+lo ← 1, hi ← n (keep:math)
+while lo ≤ hi do (keep)
+mid ← ⌊(lo + hi) / 2⌋ ▷ 取中点 (keep)
+if A[mid] = x then return mid (keep)
+else if A[mid] < x then lo ← mid + 1 (keep)
+else hi ← mid − 1 (keep)
+end while (keep)
+return 0 ▷ 未找到 (keep)
+当数组中没有目标值时，算法返回 0。

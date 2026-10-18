@@ -39,3 +39,15 @@ s06-player-controls	subtitles	en	960	540
 s07-karaoke-ja	subtitles	ja	960	540
 s08-sub-en-busy-outline	subtitles	en	960	540
 s09-sub-ko-bright-1line	subtitles	ko	960	540
+k01-readme-en	code	en	860	720
+k02-readme-ko	code	ko	860	720
+k03-stackoverflow-ja	code	ja	900	560
+k04-stackoverflow-en	code	en	900	560
+k05-terminal-zh	code	zh-Hans	860	420
+k06-ide-diff-ko	code	ko	960	560
+k07-algorithm-en	code	en	860	620
+k08-algorithm-zh	code	zh-Hans	860	560
+k09-git-release-en	code	en	900	600
+k10-shortcuts-ko	code	ko	860	520
+k11-traceback-ja	code	ja	900	600
+k12-docker-zh	code	zh-Hans	860	640

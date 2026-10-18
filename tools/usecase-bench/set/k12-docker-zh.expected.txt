@@ -1,0 +1,10 @@
+用 Docker 运行本地服务
+先确认已安装 Docker 24 以上版本，然后在项目目录运行下面的命令。
+$ docker compose up -d (keep:cmd)
+服务启动后，用浏览器打开 http://localhost:8080 查看页面，端口可以用 --port 参数修改。 (inline: http://localhost:8080 ; --port)
+services: (keep)
+web: (keep)
+image: shop/web:1.4 (keep)
+ports: ["8080:80"] (keep)
+如果出现 permission denied，请在命令前加上 sudo。 (inline: permission denied ; sudo)
+分享这篇文章 编辑

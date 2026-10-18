@@ -64,6 +64,14 @@ run e "$NEW" stall-vn chat.png en 90
 n=$(arrows "$OUT/e.out"); f=$(count "$OUT/e.out" ocr.fallback.rev2); st=$(count "$OUT/e.out" ocr.stalled.vn3)
 [ "$n" -ge 25 ] && [ "$f" -gt 0 ] && [ "$st" -ge 1 ]; verdict $? "5 chat.png en>ko, MWOYEO_FAKE_OCR=stall-vn: >=25 arrows, ocr.fallback.rev2>0, ocr.stalled.vn3>=1" "arrows=$n rev2=$f vn3-stalled=$st wall=$(cat $OUT/e.s)s"
 
+# Programs not ready (2026-10-18, vision-setup): revision 3 throws e5rtError twenty times (what a Mac logs for ~90 s after a long cold
+# compile). The reads fall down the ladder in the same call (revision 2 for English): every block still translates, the pass never
+# fails, and the log has no "document OCR failed" line (that was the message of an ended pass).
+since=$(date '+%Y-%m-%d %H:%M:%S')
+run x "$NEW" e5rt chat.png en 90
+n=$(arrows "$OUT/x.out"); f=$(count "$OUT/x.out" ocr.fallback.notready); ft=$(/usr/bin/log show --start "$since" --predicate 'eventMessage CONTAINS "document OCR failed"' 2>/dev/null | grep -c 'document OCR failed:')
+[ "$n" -ge 27 ] && [ "$ft" -eq 0 ]; verdict $? "8 chat.png en>ko, MWOYEO_FAKE_OCR=e5rt: >=27 arrows (29 on revision 3, 30 on revision 2), no 'document OCR failed'" "arrows=$n notready-fallbacks=$f failed-lines=$ft wall=$(cat $OUT/x.s)s"
+
 # Paragraphs (ParagraphGrouper): the three-line body paragraph of article.png is one block, and the two centred subtitle lines
 # of sub-mid.png are one block.
 if [ -f "$SP/in/article.png" ] && [ -f "$SP/in/sub-mid.png" ]; then

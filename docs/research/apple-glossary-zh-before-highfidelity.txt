@@ -1,0 +1,83 @@
+strategy=highFidelity target=zh-Hans glossary spans marker only
+[1] mid+2 spans=["tokens", "model"]
+  SRC We split the text into tokens before feeding it to the model.
+  OLD 我们在将文本输入模型之前将其拆分为词元。  (1/2)
+  NEW 我们在将文本输入模型之前将其拆分为词元。  (1/2) RUNS=["1:模型", "0:词元"]
+  RAW 我们在将文本输入模型之前将其拆分为词元。 UNRESOLVED=["tokens", "model"]
+   UNRESOLVED[tokens] UNRESOLVED[model]
+[2] mid spans=["loss"]
+  SRC The loss drops quickly during the first epoch.
+  OLD 在第一个时代损失会迅速下降。  (0/1)
+  NEW 在第一个时代损失会迅速下降。  (0/1) RUNS=["0:损失"]
+  RAW 在第一个时代损失会迅速下降。 UNRESOLVED=["loss"]
+   UNRESOLVED[loss]
+[3] mid spans=["layer"]
+  SRC Each layer normalizes its input.
+  OLD 每个层都会对其输入进行归一化。  (0/1)
+  NEW 每个层都会对其输入进行归一化。  (0/1) RUNS=["0:层"]
+  RAW 每个层都会对其输入进行归一化。 UNRESOLVED=["layer"]
+   UNRESOLVED[layer]
+[4] mid spans=["encoder"]
+  SRC We freeze the encoder and train only the decoder.
+  OLD 我们冻结编码器，只训练解码器。  (0/1)
+  NEW 我们冻结编码器，只训练解码器。  (0/1) RUNS=["0:编码器"]
+  RAW 我们冻结编码器，只训练解码器。 UNRESOLVED=["encoder"]
+   UNRESOLVED[encoder]
+[5] mid spans=["gradient"]
+  SRC Clip the gradient before the update step.
+  OLD 在更新步骤之前剪辑渐变。  (0/1)
+  NEW 在更新步骤之前剪辑渐变。  (0/1) RUNS=["0:渐变"]
+  RAW 在更新步骤之前剪辑渐变。 UNRESOLVED=["gradient"]
+   UNRESOLVED[gradient]
+[6] mid spans=["dataset"]
+  SRC The dataset contains ten thousand images.
+  OLD 该数据集包含一万张图像。  (0/1)
+  NEW 该数据集包含一万张图像。  (0/1) RUNS=["0:数据集"]
+  RAW 该数据集包含一万张图像。 UNRESOLVED=["dataset"]
+   UNRESOLVED[dataset]
+[7] mid spans=["Aldric"]
+  SRC Aldric walked into the hall and greeted the queen.
+  OLD 奥尔德里克走进了大厅，向女王问好。  (1/1)
+  NEW 奥尔德里克走进了大厅，向女王问好。  (1/1) RUNS=["0:Aldric"]
+  RAW Aldric走进了大厅，向女王问好。
+   CUT[Aldric→奥尔德里克|cut]
+[8] mid spans=["Eldoria"]
+  SRC Many travelers have heard of Eldoria.
+  OLD 许多旅行者都听说过埃尔多里亚。  (1/1)
+  NEW 许多旅行者都听说过埃尔多里亚。  (1/1) RUNS=["0:Eldoria"]
+  RAW 许多旅行者都听说过Eldoria。
+   CUT[Eldoria→埃尔多里亚|cut]
+[9] initial spans=["Tokens"]
+  SRC Tokens are mapped to vectors by a lookup table.
+  OLD 令牌通过查找表映射到向量中。  (0/1)
+  NEW 令牌通过查找表映射到向量中。  (0/1) RUNS=["0:令牌"]
+  RAW 令牌通过查找表映射到向量中。 UNRESOLVED=["Tokens"]
+   UNRESOLVED[Tokens]
+[10] initial spans=["Loss"]
+  SRC Loss is computed over the whole batch.
+  OLD 损失是在整个批次上计算的。  (0/1)
+  NEW 损失是在整个批次上计算的。  (0/1) RUNS=["0:损失"]
+  RAW 损失是在整个批次上计算的。 UNRESOLVED=["Loss"]
+   UNRESOLVED[Loss]
+[11] initial+2 spans=["Model", "layers"]
+  SRC Model size grows with the number of layers.
+  OLD 模型的尺寸随层数增加而增加。  (0/2)
+  NEW 模型的尺寸随层数增加而增加。  (0/2) RUNS=["0:模型", "1:层"]
+  RAW 模型的尺寸随层数增加而增加。 UNRESOLVED=["Model", "layers"]
+   UNRESOLVED[Model] UNRESOLVED[layers]
+[12] initial spans=["Aldric"]
+  SRC Aldric said nothing for a long while.
+  OLD aldric很久没有说话了。  (0/1)
+  NEW 奥尔德里克很久没有说话了。  (1/1) RUNS=["0:Aldric"]
+  RAW Aldric很久没有说话了。
+   CUT[Aldric→奥尔德里克|cut]
+SUMMARY strategy=hf target=zh-Hans sentences=12 spans=14
+SUMMARY old: glossary target present 3/14 (term survived untranslated 3, engine chose the target itself 1), sentences fully honoured 2/12
+SUMMARY new: glossary target present 4/14, sentences fully honoured 3/12, unresolved spans 11
+SUMMARY particle: engine particles after replaced term 0, wrong form before the rule 0, after 0
+SUMMARY classes: cut=3 unresolved=11
+SUMMARY classes[initial]: cut=1 unresolved=2
+SUMMARY classes[initial+2]: unresolved=2
+SUMMARY classes[mid]: cut=2 unresolved=5
+SUMMARY classes[mid+2]: unresolved=2
+SUMMARY time (s for the 12 sentences, one round): plain batch 7.96, attributed one after another 10.18

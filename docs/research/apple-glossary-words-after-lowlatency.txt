@@ -1,0 +1,271 @@
+strategy=lowLatency target=ko renderings of each term asked alone:
+LOOKUP assessment → [평가된 가치] usable=평가된 가치 10 ms
+LOOKUP result → [결과] usable=결과 13 ms
+LOOKUP effect → [효과] usable=효과 9 ms
+LOOKUP meeting → [회의] usable=회의 9 ms
+LOOKUP camera → [카메라] usable=카메라 9 ms
+LOOKUP cat → [고양이] usable=고양이 16 ms
+LOOKUP child → [아이] usable=아이 9 ms
+LOOKUP expert → [전문가] usable=전문가 9 ms
+LOOKUP speed → [속도] usable=속도 10 ms
+LOOKUP temperature → [발열 상태] usable=발열 상태 12 ms
+LOOKUP accuracy → [정확] usable=정확 9 ms
+LOOKUP route → [노선] usable=노선 9 ms
+LOOKUP country → [나라] usable=나라 10 ms
+LOOKUP definition → [명확하게 함] usable=명확하게 함 10 ms
+LOOKUP department → [한 구분] usable=한 구분 10 ms
+LOOKUP map → [지도] usable=지도 9 ms
+LOOKUP idea → [아이디어] usable=아이디어 9 ms
+LOOKUP writer → [작가] usable=작가 9 ms
+LOOKUP apple → [사과] usable=사과 9 ms
+LOOKUP density → [밀도] usable=밀도 9 ms
+strategy=lowLatency target=ko glossary spans marker only
+[1] P spans=["assessment"]
+  SRC The assessment was clear and fair.
+  OLD 평가가 명확하고 공정했습니다.  (0/1)
+  NEW 검증이 명확하고 공정했습니다.  (1/1) RUNS=["0:평가가"]
+  RAW 평가가 명확하고 공정했습니다. PARTICLE[검증+가 ]
+   CUT[평가→검증|right]
+[2] B spans=["assessment"]
+  SRC Read the assessment report.
+  OLD 평가 보고서를 읽으십시오.  (0/1)
+  NEW 검증 보고서를 읽으십시오.  (1/1) RUNS=["0:평가 "]
+  RAW 평가 보고서를 읽으십시오.
+   CUT[평가→검증|right]
+[3] P spans=["result"]
+  SRC The result matches our expectation.
+  OLD 결과가 우리의 기대에 부합합니다.  (0/1)
+  NEW 산출물이 우리의 기대에 부합합니다.  (1/1) RUNS=["0:결과가 "]
+  RAW 결과가 우리의 기대에 부합합니다. PARTICLE[산출물+가 ]
+   CUT[결과→산출물|right]
+[4] B spans=["result"]
+  SRC Save the result table.
+  OLD 결과 테이블을 저장하십시오.  (0/1)
+  NEW 산출물 테이블을 저장하십시오.  (1/1) RUNS=["0:결과 "]
+  RAW 결과 테이블을 저장하십시오.
+   CUT[결과→산출물|right]
+[5] P spans=["effect"]
+  SRC The effect lasts for several hours.
+  OLD 그 효과는 몇 시간 동안 지속됩니다.  (0/1)
+  NEW 그 영향은 몇 시간 동안 지속됩니다.  (1/1) RUNS=["0:효과는 "]
+  RAW 그 효과는 몇 시간 동안 지속됩니다. PARTICLE[영향+는 ]
+   CUT[효과→영향|right]
+[6] B spans=["effect"]
+  SRC We measured the effect size.
+  OLD 우리는 효과 크기를 측정했습니다.  (0/1)
+  NEW 우리는 영향 크기를 측정했습니다.  (1/1) RUNS=["0:효과 "]
+  RAW 우리는 효과 크기를 측정했습니다.
+   CUT[효과→영향|right]
+[7] P spans=["meeting"]
+  SRC The meeting starts at nine.
+  OLD 회의는 아홉 시에 시작합니다.  (0/1)
+  NEW 미팅은 아홉 시에 시작합니다.  (1/1) RUNS=["0:회의는 "]
+  RAW 회의는 아홉 시에 시작합니다. PARTICLE[미팅+는 ]
+   CUT[회의→미팅|right]
+[8] B spans=["meeting"]
+  SRC Open the meeting notes.
+  OLD 회의록을 열어 주세요.  (0/1)
+  NEW 미팅을 열어 주세요.  (1/1) RUNS=["0:회의록을"]
+  RAW 회의록을 열어 주세요.
+   CUT[회의록→미팅|long]
+[9] P spans=["camera"]
+  SRC The camera supports night mode.
+  OLD 카메라는 야간 모드를 지원합니다.  (0/1)
+  NEW 캠은 야간 모드를 지원합니다.  (1/1) RUNS=["0:카메라는"]
+  RAW 카메라는 야간 모드를 지원합니다. PARTICLE[캠+는 ]
+   CUT[카메라→캠|right]
+[10] B spans=["camera"]
+  SRC Open the camera app.
+  OLD 카메라 앱을 여세요.  (0/1)
+  NEW 캠 앱을 여세요.  (1/1) RUNS=["0:카메라 "]
+  RAW 카메라 앱을 여세요.
+   CUT[카메라→캠|right]
+[11] P spans=["cat"]
+  SRC The cat sleeps on the sofa.
+  OLD 그 고양이는 소파에서 잡니다.  (0/1)
+  NEW 그 냥이는 소파에서 잡니다.  (1/1) RUNS=["0:고양이는"]
+  RAW 그 고양이는 소파에서 잡니다.
+   CUT[고양이→냥이|right]
+[12] B spans=["cat"]
+  SRC Visit the cat cafe.
+  OLD 고양이 카페를 방문하세요.  (0/1)
+  NEW 냥이 카페를 방문하세요.  (1/1) RUNS=["0:고양이 "]
+  RAW 고양이 카페를 방문하세요.
+   CUT[고양이→냥이|right]
+[13] P spans=["child"]
+  SRC The child plays in the garden.
+  OLD 그 아이는 정원에서 놀고 있습니다.  (0/1)
+  NEW 그 꼬마는 정원에서 놀고 있습니다.  (1/1) RUNS=["0:아이는 "]
+  RAW 그 아이는 정원에서 놀고 있습니다.
+   CUT[아이→꼬마|right]
+[14] B spans=["child"]
+  SRC Turn on the child lock.
+  OLD 어린이 잠금을 켜십시오.  (0/1)
+  NEW 꼬마가 잠금을 켜십시오.  (1/1) RUNS=["0:어린이 "]
+  RAW 어린이 잠금을 켜십시오. PARTICLE[꼬마+이 ]
+   CUT[어린→꼬마|short]
+[15] P spans=["expert"]
+  SRC The expert reviewed the draft.
+  OLD 전문가가 초안을 검토했습니다.  (0/1)
+  NEW 달인이 초안을 검토했습니다.  (1/1) RUNS=["0:전문가가 "]
+  RAW 전문가가 초안을 검토했습니다. PARTICLE[달인+가 ]
+   CUT[전문가→달인|right]
+[16] B spans=["expert"]
+  SRC Ask the expert panel.
+  OLD 전문가 패널에게 문의하십시오.  (0/1)
+  NEW 달인 패널에게 문의하십시오.  (1/1) RUNS=["0:전문가 "]
+  RAW 전문가 패널에게 문의하십시오.
+   CUT[전문가→달인|right]
+[17] P spans=["speed"]
+  SRC The speed of the train is constant.
+  OLD 열차의 속도는 일정합니다.  (0/1)
+  NEW 열차의 스피드는 일정합니다.  (1/1) RUNS=["0:속도는"]
+  RAW 열차의 속도는 일정합니다.
+   CUT[속도→스피드|right]
+[18] B spans=["speed"]
+  SRC Check the speed limit.
+  OLD 속도 제한을 확인하십시오.  (0/1)
+  NEW 스피드 제한을 확인하십시오.  (1/1) RUNS=["0:속도 "]
+  RAW 속도 제한을 확인하십시오.
+   CUT[속도→스피드|right]
+[19] P spans=["temperature"]
+  SRC The temperature drops at night.
+  OLD 밤에 온도가 떨어집니다.  (0/1)
+  NEW 밤에 기온이 떨어집니다.  (1/1) RUNS=["0:온도가 "]
+  RAW 밤에 온도가 떨어집니다. PARTICLE[기온+가 ]
+   CUT[온도→기온|right]
+[20] B spans=["temperature"]
+  SRC Set the temperature sensor.
+  OLD 온도 센서를 설정하십시오.  (0/1)
+  NEW 기온 센서를 설정하십시오.  (1/1) RUNS=["0:온도 "]
+  RAW 온도 센서를 설정하십시오.
+   CUT[온도→기온|right]
+[21] P spans=["accuracy"]
+  SRC The accuracy improves with more data.
+  OLD 데이터가 많아지면 정확도가 향상됩니다.  (0/1)
+  NEW 데이터가 많아지면 정밀도가 향상됩니다.  (1/1) RUNS=["0:정확도가"]
+  RAW 데이터가 많아지면 정확도가 향상됩니다.
+   CUT[정확도→정밀도|right]
+[22] B spans=["accuracy"]
+  SRC Report the accuracy score.
+  OLD 정확도 점수를 보고하십시오.  (0/1)
+  NEW 정밀도도 점수를 보고하십시오.  (1/1) RUNS=["0:정확도 "]
+  RAW 정확도 점수를 보고하십시오.
+   CUT[정확→정밀도|short]
+[23] P spans=["route"]
+  SRC The route goes along the river.
+  OLD 그 경로는 강을 따라 진행됩니다.  (0/1)
+  NEW 그 루트는 강을 따라 진행됩니다.  (1/1) RUNS=["0:경로는"]
+  RAW 그 경로는 강을 따라 진행됩니다.
+   CUT[경로→루트|right]
+[24] B spans=["route", "map"]
+  SRC Plan the route map.
+  OLD 경로 지도를 계획하십시오.  (0/2)
+  NEW 루트 맵을 계획하십시오.  (2/2) RUNS=["0:경로 ", "1:지도를 "]
+  RAW 경로 지도를 계획하십시오. PARTICLE[맵+를 ]
+   CUT[경로→루트|right] CUT[지도→맵|right]
+[25] P spans=["country"]
+  SRC The country joined the union in 1995.
+  OLD 그 나라는 1995년에 연합에 가입했습니다.  (0/1)
+  NEW 그 지역은 1995년에 연합에 가입했습니다.  (1/1) RUNS=["0:나라는"]
+  RAW 그 나라는 1995년에 연합에 가입했습니다. PARTICLE[지역+는 ]
+   CUT[나라→지역|right]
+[26] B spans=["country"]
+  SRC Pick the country code.
+  OLD 국가 코드를 선택하십시오.  (0/1)
+  NEW 지역 코드를 선택하십시오.  (1/1) RUNS=["0:국가 "]
+  RAW 국가 코드를 선택하십시오.
+   CUT[국가→지역|right]
+[27] P spans=["definition"]
+  SRC The definition is too broad.
+  OLD 정의가 너무 넓습니다.  (0/1)
+  NEW 뜻풀이가 너무 넓습니다.  (1/1) RUNS=["0:정의가"]
+  RAW 정의가 너무 넓습니다.
+   CUT[정의→뜻풀이|right]
+[28] B spans=["definition"]
+  SRC Update the definition list.
+  OLD 정의 목록을 업데이트하십시오.  (0/1)
+  NEW 뜻풀이 목록을 업데이트하십시오.  (1/1) RUNS=["0:정의 "]
+  RAW 정의 목록을 업데이트하십시오.
+   CUT[정의→뜻풀이|right]
+[29] P spans=["department"]
+  SRC The department hired three engineers.
+  OLD 그 부서는 세 명의 엔지니어를 고용했습니다.  (0/1)
+  NEW 그 부문은 세 명의 엔지니어를 고용했습니다.  (1/1) RUNS=["0:부서는 "]
+  RAW 그 부서는 세 명의 엔지니어를 고용했습니다. PARTICLE[부문+는 ]
+   CUT[부서→부문|right]
+[30] B spans=["department"]
+  SRC Open the department page.
+  OLD 부서 페이지를 엽니다.  (0/1)
+  NEW 부문 페이지를 엽니다.  (1/1) RUNS=["0:부서 "]
+  RAW 부서 페이지를 엽니다.
+   CUT[부서→부문|right]
+[31] P spans=["map"]
+  SRC The map shows every trail.
+  OLD 지도는 모든 트레일을 보여줍니다.  (0/1)
+  NEW 맵은 모든 트레일을 보여줍니다.  (1/1) RUNS=["0:지도는"]
+  RAW 지도는 모든 트레일을 보여줍니다. PARTICLE[맵+는 ]
+   CUT[지도→맵|right]
+[32] B spans=["map"]
+  SRC Open the map view.
+  OLD 지도 보기를 엽니다.  (0/1)
+  NEW 맵 보기를 엽니다.  (1/1) RUNS=["0:지도 "]
+  RAW 지도 보기를 엽니다.
+   CUT[지도→맵|right]
+[33] P spans=["idea"]
+  SRC The idea came from a customer.
+  OLD 그 아이디어는 고객으로부터 나왔습니다.  (0/1)
+  NEW 그 발상은 고객으로부터 나왔습니다.  (1/1) RUNS=["0:아이디어는"]
+  RAW 그 아이디어는 고객으로부터 나왔습니다. PARTICLE[발상+는 ]
+   CUT[아이디어→발상|right]
+[34] B spans=["idea"]
+  SRC Pin it to the idea board.
+  OLD 아이디어 보드에 고정해 주세요.  (0/1)
+  NEW 발상 보드에 고정해 주세요.  (1/1) RUNS=["0:아이디어 "]
+  RAW 아이디어 보드에 고정해 주세요.
+   CUT[아이디어→발상|right]
+[35] P spans=["writer"]
+  SRC The writer thanked her editor.
+  OLD 작가는 그녀의 편집자에게 감사를 표했습니다.  (0/1)
+  NEW 저자는 그녀의 편집자에게 감사를 표했습니다.  (1/1) RUNS=["0:작가는"]
+  RAW 작가는 그녀의 편집자에게 감사를 표했습니다.
+   CUT[작가→저자|right]
+[36] B spans=["writer"]
+  SRC Contact the writer team.
+  OLD 작가 팀에 연락하십시오.  (0/1)
+  NEW 저자 팀에 연락하십시오.  (1/1) RUNS=["0:작가 "]
+  RAW 작가 팀에 연락하십시오.
+   CUT[작가→저자|right]
+[37] P spans=["apple"]
+  SRC The apple fell from the tree.
+  OLD 사과가 나무에서 떨어졌습니다.  (0/1)
+  NEW 애플이 나무에서 떨어졌습니다.  (1/1) RUNS=["0:사과가"]
+  RAW 사과가 나무에서 떨어졌습니다. PARTICLE[애플+가 ]
+   CUT[사과→애플|right]
+[38] B spans=["apple"]
+  SRC Bake the apple pie.
+  OLD 사과 파이를 구워 주세요.  (0/1)
+  NEW 애플 파이를 구워 주세요.  (1/1) RUNS=["0:사과 "]
+  RAW 사과 파이를 구워 주세요.
+   CUT[사과→애플|right]
+[39] P spans=["density"]
+  SRC The density increases with pressure.
+  OLD 밀도는 압력이 증가함에 따라 증가합니다.  (0/1)
+  NEW 농도는 압력이 증가함에 따라 증가합니다.  (1/1) RUNS=["0:밀도는"]
+  RAW 밀도는 압력이 증가함에 따라 증가합니다.
+   CUT[밀도→농도|right]
+[40] B spans=["density"]
+  SRC Plot the density curve.
+  OLD 밀도 곡선을 플롯하십시오.  (0/1)
+  NEW 농도 곡선을 플롯하십시오.  (1/1) RUNS=["0:밀도 "]
+  RAW 밀도 곡선을 플롯하십시오.
+   CUT[밀도→농도|right]
+SUMMARY strategy=ll target=ko sentences=40 spans=41
+SUMMARY old: glossary target present 0/41 (term survived untranslated 0, engine chose the target itself 0), sentences fully honoured 0/40
+SUMMARY new: glossary target present 41/41, sentences fully honoured 40/40, unresolved spans 0
+SUMMARY particle: engine particles after replaced term 23, wrong form before the rule 14, after 0
+SUMMARY classes: right=38 short=2 long=1  (garbled = short+long = 3, wrong particle after a wrong cut 0)
+SUMMARY classes[B]: right=18 short=2 long=1
+SUMMARY classes[P]: right=20
+SUMMARY renderings: terms asked 20, usable 20, spans whose cut word is the rendering asked alone 27/41, lookup ms mean 10 max 16
+SUMMARY time (s for the 40 sentences, one round): plain batch 0.81, attributed one after another 2.69

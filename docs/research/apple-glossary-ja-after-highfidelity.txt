@@ -1,0 +1,97 @@
+strategy=highFidelity target=ja renderings of each term asked alone:
+LOOKUP token → [トークン] usable=トークン 438 ms
+LOOKUP model → [モデル] usable=モデル 386 ms
+LOOKUP loss → [損失] usable=損失 373 ms
+LOOKUP layer → [層] usable=層 381 ms
+LOOKUP encoder → [エンコーダー] usable=エンコーダー 1302 ms
+LOOKUP gradient → [グラデーション] usable=グラデーション 1313 ms
+LOOKUP dataset → [データセット] usable=データセット 1255 ms
+LOOKUP attention head → [注意ヘッド] usable=注意ヘッド 1335 ms
+LOOKUP Aldric → [アルドリック] usable=アルドリック 1333 ms
+LOOKUP Eldoria → [エルドリア] usable=エルドリア 1288 ms
+LOOKUP embedding → [埋め込み] usable=埋め込み 1258 ms
+LOOKUP softmax → [ソフトマックス] usable=ソフトマックス 1238 ms
+strategy=highFidelity target=ja glossary spans marker only
+[1] mid+2 spans=["tokens", "model"]
+  SRC We split the text into tokens before feeding it to the model.
+  OLD 私たちはテキストをモデルに与える前にトークンに分割します。  (0/2)
+  NEW 私たちはテキストを型式に与える前に記号に分割します。  (2/2) RUNS=["1:モデル", "0:トークン"]
+  RAW 私たちはテキストをモデルに与える前にトークンに分割します。
+   CUT[モデル→型式|cut] CUT[トークン→記号|cut]
+[2] mid spans=["loss"]
+  SRC The loss drops quickly during the first epoch.
+  OLD 損失は最初のエポックの間は急速に減少します。  (0/1)
+  NEW ロスは最初のエポックの間は急速に減少します。  (1/1) RUNS=["0:損失"]
+  RAW 損失は最初のエポックの間は急速に減少します。
+   CUT[損失→ロス|cut]
+[3] mid spans=["layer"]
+  SRC Each layer normalizes its input.
+  OLD 各レイヤーは入力を正規化します。  (0/1)
+  NEW 各レイヤーは入力を正規化します。  (0/1) RUNS=["0:レイヤー"]
+  RAW 各レイヤーは入力を正規化します。 UNRESOLVED=["layer"]
+   UNRESOLVED[layer]
+[4] mid spans=["encoder"]
+  SRC We freeze the encoder and train only the decoder.
+  OLD エンコーダーは凍結させ、デコーダーだけを訓練します。  (0/1)
+  NEW 符号器は凍結させ、デコーダーだけを訓練します。  (1/1) RUNS=["0:エンコーダー"]
+  RAW エンコーダーは凍結させ、デコーダーだけを訓練します。
+   CUT[エンコーダー→符号器|cut]
+[5] mid spans=["gradient"]
+  SRC Clip the gradient before the update step.
+  OLD 更新ステップの前にグラデーションをクリップします。  (0/1)
+  NEW 更新ステップの前に傾きをクリップします。  (1/1) RUNS=["0:グラデーション"]
+  RAW 更新ステップの前にグラデーションをクリップします。
+   CUT[グラデーション→傾き|cut]
+[6] mid spans=["dataset"]
+  SRC The dataset contains ten thousand images.
+  OLD このデータセットには1万枚の画像が含まれています。  (0/1)
+  NEW このデータ集には1万枚の画像が含まれています。  (1/1) RUNS=["0:データセット"]
+  RAW このデータセットには1万枚の画像が含まれています。
+   CUT[データセット→データ集|cut]
+[7] mid spans=["Aldric"]
+  SRC Aldric walked into the hall and greeted the queen.
+  OLD アルドリックはホールに入って女王に挨拶した。  (0/1)
+  NEW アルドリクはホールに入って女王に挨拶した。  (1/1) RUNS=["0:アルドリック"]
+  RAW アルドリックはホールに入って女王に挨拶した。
+   CUT[アルドリック→アルドリク|cut]
+[8] mid spans=["Eldoria"]
+  SRC Many travelers have heard of Eldoria.
+  OLD 多くの旅行者はエルドリアのことを聞いたことがある。  (1/1)
+  NEW 多くの旅行者はエルドリアのことを聞いたことがある。  (1/1) RUNS=["0:エルドリア"]
+  RAW 多くの旅行者はエルドリアのことを聞いたことがある。
+   CUT[エルドリア→エルドリア|cut]
+[9] initial spans=["Tokens"]
+  SRC Tokens are mapped to vectors by a lookup table.
+  OLD トークンはルックアップテーブルによってベクトルにマッピングされます。  (0/1)
+  NEW 記号はルックアップテーブルによってベクトルにマッピングされます。  (1/1) RUNS=["0:トークン"]
+  RAW トークンはルックアップテーブルによってベクトルにマッピングされます。
+   CUT[トークン→記号|cut]
+[10] initial spans=["Loss"]
+  SRC Loss is computed over the whole batch.
+  OLD 損失は全バッチで計算されます。  (0/1)
+  NEW ロスは全バッチで計算されます。  (1/1) RUNS=["0:損失"]
+  RAW 損失は全バッチで計算されます。
+   CUT[損失→ロス|cut]
+[11] initial+2 spans=["Model", "layers"]
+  SRC Model size grows with the number of layers.
+  OLD モデルサイズはレイヤーの数に応じて大きくなります。  (0/2)
+  NEW 型式サイズはレイヤーの数に応じて大きくなります。  (1/2) RUNS=["0:モデル", "1:レイヤー"]
+  RAW モデルサイズはレイヤーの数に応じて大きくなります。 UNRESOLVED=["layers"]
+   CUT[モデル→型式|cut] UNRESOLVED[layers]
+[12] initial spans=["Aldric"]
+  SRC Aldric said nothing for a long while.
+  OLD アルドリックはしばらく何も言わなかった。  (0/1)
+  NEW アルドリクはしばらく何も言わなかった。  (1/1) RUNS=["0:アルドリック"]
+  RAW アルドリックはしばらく何も言わなかった。
+   CUT[アルドリック→アルドリク|cut]
+SUMMARY strategy=hf target=ja sentences=12 spans=14
+SUMMARY old: glossary target present 1/14 (term survived untranslated 0, engine chose the target itself 1), sentences fully honoured 1/12
+SUMMARY new: glossary target present 12/14, sentences fully honoured 10/12, unresolved spans 2
+SUMMARY particle: engine particles after replaced term 0, wrong form before the rule 0, after 0
+SUMMARY classes: cut=12 unresolved=2
+SUMMARY classes[initial]: cut=3
+SUMMARY classes[initial+2]: cut=1 unresolved=1
+SUMMARY classes[mid]: cut=6 unresolved=1
+SUMMARY classes[mid+2]: cut=2
+SUMMARY renderings: terms asked 12, usable 12, spans whose cut word is the rendering asked alone 12/14, lookup ms mean 992 max 1335
+SUMMARY time (s for the 12 sentences, one round): plain batch 9.90, attributed one after another 18.28

@@ -31,6 +31,34 @@ import Testing
         #expect(s.hint() == .preparingRecognition)
     }
 
+    // MARK: the lens's own wait for a reader (R2 reader-core, 2026-10-18)
+
+    @Test func recognitionNotRespondingSitsBetweenThePackAndAlreadyIn() {
+        // priority: screen > pack > recognition > already-in
+        var s = LensSignals(recognition: .notResponding, alreadyInTarget: "en")
+        #expect(s.hint() == .recognitionNotResponding)
+        s.missingPack = ja
+        #expect(s.hint() == .downloadPack(ja))
+        s.missingPack = nil
+        s.screen = .notAllowed
+        #expect(s.hint() == .allowScreenRecording)
+        #expect(LensSignals(recognition: .notResponding, alreadyInTarget: "en").hint() != .alreadyInTarget(target: "en"))
+    }
+
+    @Test func theLensOwnWaitSaysMoreThanTheAppsSetup() {
+        #expect(LensSignals(recognition: .preparing).hint() == .preparingRecognition)
+        #expect(LensSignals(recognitionPreparing: true, recognition: .notResponding).hint() == .recognitionNotResponding)
+        #expect(LensSignals(recognitionPreparing: true, recognition: .restartApp).hint() == .restartToFinish)
+        #expect(LensSignals(recognitionPreparing: true).hint() == .preparingRecognition)     // the app-wide flag still works alone
+        #expect(LensSignals(recognition: .restartApp).hint()?.action == .restart)
+    }
+
+    @Test func aWaitSaysNothingOnceTheLensShowsTranslations() {
+        for wait in [RecognitionWait.preparing, .notResponding, .restartApp] {
+            #expect(LensSignals(recognition: wait, showsTranslations: true).hint() == nil, "\(wait)")
+        }
+    }
+
     @Test func alreadyInComesLast() {
         #expect(LensSignals(alreadyInTarget: "ko").hint() == .alreadyInTarget(target: "ko"))
     }
@@ -66,6 +94,7 @@ import Testing
         #expect(LensHint.restartToFinish.action == .restart)
         #expect(LensHint.downloadPack(ja).action == .downloadPack(ja))
         #expect(LensHint.preparingRecognition.action == nil)
+        #expect(LensHint.recognitionNotResponding.action == nil)
         #expect(LensHint.alreadyInTarget(target: "en").action == nil)
     }
 
@@ -73,6 +102,7 @@ import Testing
         #expect(LensHint.allowScreenRecording.showsTabAlways)
         #expect(LensHint.downloadPack(ja).showsTabAlways)
         #expect(LensHint.preparingRecognition.showsTabAlways)
+        #expect(LensHint.recognitionNotResponding.showsTabAlways)
         #expect(!LensHint.alreadyInTarget(target: "en").showsTabAlways)
     }
 

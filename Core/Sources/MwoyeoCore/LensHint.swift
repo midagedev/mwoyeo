@@ -41,6 +41,8 @@ public enum LensHint: Equatable, Sendable {
     case downloadPack(PackPair)
     /// The text recognizer is compiling its models the first time (65 to 119 s on a new build).
     case preparingRecognition
+    /// A recognition worker was stuck for minutes, was restarted, and was stuck again (`RecognitionWait.notResponding`).
+    case recognitionNotResponding
     /// Everything the lens read is already in the target language (`target` is its code).
     case alreadyInTarget(target: String)
 
@@ -56,7 +58,7 @@ public enum LensHint: Equatable, Sendable {
         case .allowScreenRecording: .openScreenRecordingSettings
         case .restartToFinish: .restart
         case let .downloadPack(pair): .downloadPack(pair)
-        case .preparingRecognition, .alreadyInTarget: nil
+        case .preparingRecognition, .recognitionNotResponding, .alreadyInTarget: nil
         }
     }
 
@@ -83,8 +85,11 @@ public struct LensSignals: Equatable, Sendable {
     public var screen = Screen.fine
     /// The pack the translator is missing for this lens's pair.
     public var missingPack: PackPair?
-    /// The text recognizer is in its first-time setup (the menu panel's "Preparing text recognition…").
+    /// The text recognizer is in its first-time setup (the menu panel's "Preparing text recognition…"). App-wide; the lens's own
+    /// state is `recognition`, which says more and wins over it.
     public var recognitionPreparing = false
+    /// What this lens's own read waits for (`ReadWait.hint`): no reader ready, none responding, or the worker switched off.
+    public var recognition: RecognitionWait?
     /// The lens shows something translated: it is evidently working, so waiting for the setup needs no line, and some text
     /// was not in the target language after all.
     public var showsTranslations = false
@@ -92,16 +97,18 @@ public struct LensSignals: Equatable, Sendable {
     public var alreadyInTarget: String?
 
     public init(screen: Screen = .fine, missingPack: PackPair? = nil, recognitionPreparing: Bool = false,
-                showsTranslations: Bool = false, alreadyInTarget: String? = nil) {
+                recognition: RecognitionWait? = nil, showsTranslations: Bool = false, alreadyInTarget: String? = nil) {
         self.screen = screen
         self.missingPack = missingPack
         self.recognitionPreparing = recognitionPreparing
+        self.recognition = recognition
         self.showsTranslations = showsTranslations
         self.alreadyInTarget = alreadyInTarget
     }
 
     /// The line for the pill: Screen Recording first (nothing works without it), then the language pack (what stops every
-    /// translation), then the setup (it ends by itself), then "already in" (news, not a fault); nil when all is well.
+    /// translation), then recognition (the lens's own wait for a reader, else the app's first-time setup: both end by themselves
+    /// except "not responding" and "restart"), then "already in" (news, not a fault); nil when all is well.
     public func hint() -> LensHint? {
         switch screen {
         case .notAllowed: return .allowScreenRecording
@@ -109,7 +116,15 @@ public struct LensSignals: Equatable, Sendable {
         case .fine: break
         }
         if let missingPack { return .downloadPack(missingPack) }
-        if recognitionPreparing, !showsTranslations { return .preparingRecognition }
+        if !showsTranslations {
+            switch recognition {
+            case .notResponding: return .recognitionNotResponding
+            // A worker that is switched off for this run: the one thing to do is the restart the Screen Recording grant also needs.
+            case .restartApp: return .restartToFinish
+            case .preparing: return .preparingRecognition
+            case nil: if recognitionPreparing { return .preparingRecognition }
+            }
+        }
         if let alreadyInTarget, !showsTranslations { return .alreadyInTarget(target: alreadyInTarget) }
         return nil
     }

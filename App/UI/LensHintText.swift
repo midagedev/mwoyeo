@@ -9,6 +9,7 @@ enum LensHintText {
         case .restartToFinish: String(localized: "Restart Mwoyeo to finish")
         case let .downloadPack(pair): downloadPack(pair)
         case .preparingRecognition: String(localized: "Preparing text recognition — first time only")
+        case .recognitionNotResponding: String(localized: "Text recognition isn’t responding")
         case let .alreadyInTarget(target): String(localized: "Already in \(Languages.name(target))")
         }
     }

@@ -18419,6 +18419,22 @@
         }
       }
     },
+    "Text recognition isn’t responding": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Text recognition isn’t responding"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Text recognition isn’t responding"
+          }
+        }
+      }
+    },
     "Text seen again is shown from memory instead of being translated again. It is kept only while Mwoyeo runs and is never written to disk.": {
       "localizations": {
         "ko": {

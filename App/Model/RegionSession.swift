@@ -435,6 +435,7 @@ final class RegionSession {
         case .restartToFinish: "restart"
         case .downloadPack: "pack"
         case .preparingRecognition: "preparing"
+        case .recognitionNotResponding: "not-responding"
         case .alreadyInTarget: "already"
         }
     }

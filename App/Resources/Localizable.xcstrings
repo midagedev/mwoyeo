@@ -21089,14 +21089,68 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Translation is slow (%@) — retrying"
+            "state": "translated",
+            "value": "번역이 느려요 (%@) — 다시 시도하는 중"
           }
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Translation is slow (%@) — retrying"
+            "state": "translated",
+            "value": "翻訳に時間がかかっています(%@)— 再試行中"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "翻译较慢（%@）— 正在重试"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "翻譯較慢（%@）— 正在重試"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Übersetzung ist langsam (%@) – neuer Versuch"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La traduction est lente (%@) — nouvel essai"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La traducción va lenta (%@) — reintentando"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перевод идёт медленно (%@) — повтор"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A tradução está lenta (%@) — tentando de novo"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La traduzione è lenta (%@) — nuovo tentativo"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переклад повільний (%@) — повторна спроба"
           }
         }
       }
@@ -21175,14 +21229,68 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Translation isn’t answering (%@)"
+            "state": "translated",
+            "value": "번역이 응답하지 않아요 (%@)"
           }
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Translation isn’t answering (%@)"
+            "state": "translated",
+            "value": "翻訳が応答していません(%@)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "翻译没有响应（%@）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "翻譯沒有回應（%@）"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Übersetzung antwortet nicht (%@)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La traduction ne répond pas (%@)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La traducción no responde (%@)"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перевод не отвечает (%@)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A tradução não está respondendo (%@)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La traduzione non risponde (%@)"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переклад не відповідає (%@)"
           }
         }
       }

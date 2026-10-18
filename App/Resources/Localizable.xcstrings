@@ -5524,6 +5524,76 @@
         }
       }
     },
+    "Document layout": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "문서 레이아웃"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文書レイアウト"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文档版式"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文件版面"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dokumentlayout"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mise en page du document"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diseño del documento"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Макет документа"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Layout do documento"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Layout del documento"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Макет документа"
+          }
+        }
+      }
+    },
     "Download": {
       "localizations": {
         "ko": {
@@ -7065,72 +7135,72 @@
         }
       }
     },
-    "Forget languages for %@": {
+    "Forget This App": {
       "localizations": {
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ 언어 설정 지우기"
+            "value": "이 앱 설정 지우기"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ の言語設定を消去"
+            "value": "このアプリの設定を削除"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "忘记 %@ 的语言"
+            "value": "忘记此应用"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "忘記 %@ 的語言"
+            "value": "忘記此 App"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sprachen für %@ vergessen"
+            "value": "Diese App vergessen"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Oublier les langues pour %@"
+            "value": "Oublier cette app"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Olvidar idiomas de %@"
+            "value": "Olvidar esta app"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Забыть языки для %@"
+            "value": "Забыть это приложение"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Esquecer idiomas de %@"
+            "value": "Esquecer este app"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dimentica le lingue per %@"
+            "value": "Dimentica questa app"
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Забути мови для %@"
+            "value": "Забути цю програму"
           }
         }
       }
@@ -9094,6 +9164,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "Лінзи й далі працюють із простішим розпізнаванням."
+          }
+        }
+      }
+    },
+    "Line grouping": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "줄 묶기"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "行のまとまり"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按行分组"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按行分組"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeilen gruppieren"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regroupement des lignes"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agrupar líneas"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Группировка строк"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agrupar linhas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raggruppa righe"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Групування рядків"
           }
         }
       }
@@ -11482,6 +11622,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "Читання абзаців"
+          }
+        }
+      }
+    },
+    "Paragraphs": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "문단 나누기"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "段落の区切り"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "段落划分"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "段落劃分"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Absätze"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paragraphes"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Párrafos"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Абзацы"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parágrafos"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paragrafi"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Абзаци"
           }
         }
       }

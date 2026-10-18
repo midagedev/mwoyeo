@@ -28,7 +28,7 @@ enum Entry {
         if CommandLine.arguments.dropFirst().first == "--capture-ui" {
             UICapture.run(Array(CommandLine.arguments.dropFirst(2)))
         }
-        if let first = CommandLine.arguments.dropFirst().first, first == "--settings-path" || first == "--check-settings" {
+        if let first = CommandLine.arguments.dropFirst().first, first == "--settings-path" || first == "--settings-schema" || first == "--check-settings" {
             SettingsFileCommand.run(Array(CommandLine.arguments.dropFirst()))
         }
         MwoyeoApp.main()

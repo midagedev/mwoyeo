@@ -6,7 +6,7 @@ enum FieldStep: Equatable {
     case index(Int)
 }
 
-/// `appProfiles[2].entries[0].gender`: the path an issue names, and what `JSONLines` finds the line of.
+/// `appProfiles[2].paragraphReader`: the path an issue names, and what `JSONLines` finds the line of.
 struct FieldPath: Equatable {
     var steps: [FieldStep] = []
 

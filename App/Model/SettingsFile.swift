@@ -62,7 +62,7 @@ struct SettingSpec {
         .init(key: "transcriptFormats", kind: .choiceList(TranscriptFileFormat.allCases.map(\.rawValue)),
               doc: "Files of the translation log: markdown, srt, and jsonl (one JSON line per translated line with time, lens, app, source, target, engine, original and translation, added as it happens so tail -f works)."),
         .init(key: "appProfiles", kind: .appProfiles,
-              doc: "Languages, engine and paragraph reader remembered per app; the app in front decides which applies. Easier to set from a lens's menu. A profile can also carry a note for the translator, names and terms with their translations, and a context override for that app.",
+              doc: "Languages, engine and paragraph reader remembered per app; the app in front decides which applies. Easier to set from a lens's menu.",
               examples: SettingExamples.appProfiles),
         .init(key: "paragraphReader", kind: .choice(ParagraphReader.allCases.map(\.rawValue)),
               doc: "How text is cut into paragraphs: automatic, documentLayout (the macOS document model) or lineGrouping (the app's own line rules)."),
@@ -160,7 +160,7 @@ extension FieldKind {
             ]),
         ]))
 
-    /// What the app remembers per app. The memory fields (note, entries, context) are all optional.
+    /// What the app remembers per app.
     static let appProfiles: FieldKind = .list(.object([
         FieldSpec("bundleID", .string, "Bundle identifier of the app.", required: true, example: "com.example.chat"),
         FieldSpec("appName", .string, "The app's name, for display.", example: "Example Chat"),
@@ -168,28 +168,6 @@ extension FieldKind {
         FieldSpec("target", .choice(Languages.targets), "Target language code.", required: true, example: "en"),
         FieldSpec("customEngineID", .idOrNull, "Engine for this app; null keeps the base choice."),
         FieldSpec("paragraphReader", .choice(ParagraphReader.allCases.map(\.rawValue)), "Paragraph reader for this app; left out follows the default."),
-        FieldSpec("note", .text(maxLength: 500),
-                  "A note for the translator about this app: who is talking, the setting, the register. Up to 500 characters.",
-                  example: "Casual chat between two friends. Keep it informal and short."),
-        FieldSpec("entries", .list(.object([
-            FieldSpec("src", .text(minLength: 1), "The name or term as it is written in the text.", required: true, example: "田中"),
-            FieldSpec("dst", .text(minLength: 1), "How it is translated.", required: true, example: "Tanaka"),
-            FieldSpec("kind", .choice(["person", "place", "term", "org"]), "What it is.", example: "person"),
-            FieldSpec("gender", .choice(["f", "m", "n"]), "For a person: f, m or n (neutral), so pronouns and agreement come out right.", example: "m"),
-            FieldSpec("note", .text(maxLength: 40), "A short hint about it, up to 40 characters.", example: "the speaker's older colleague"),
-            FieldSpec("reading", .string, "How src is pronounced, such as the kana of a kanji name.", example: "たなか"),
-            FieldSpec("addressing", .list(.object([
-                FieldSpec("to", .text(minLength: 1), "Who is being spoken to, as written in that entry's src.", required: true, example: "Hana"),
-                FieldSpec("register", .choice(["casual", "polite", "formal", "honorific"]), "How this person speaks to them.", required: true, example: "polite"),
-            ]), dropsBad: true), "How this person speaks to others: one row per listener."),
-        ]), maxItems: 40, dropsBad: true),
-                  "Names and terms of this app with their translations, up to 40 rows. A bad row is reported and dropped; the rest apply."),
-        FieldSpec("context", .object([
-            FieldSpec("mode", .choice(["off", "nearby", "conversation"]),
-                      "How much surrounding text goes along with each line: off (none), nearby (the lines around it on screen) or conversation (also the lines read before).",
-                      example: "nearby"),
-            FieldSpec("previousLines", .integer(0...8), "How many earlier lines go along, 0 to 8.", example: 3),
-        ]), "Context for this app's translations. A field left out keeps the default."),
     ]))
 }
 
@@ -201,19 +179,9 @@ enum SettingExamples {
         [["kind": "deepL", "name": "DeepL", "baseURL": "https://api.deepl.com", "formality": "prefer_more"] as [String: Any]],
     ]
 
-    /// One profile with a note, two entries that carry addressing, and a context override.
+    /// One profile that sets the languages and the paragraph reader for an app.
     static let appProfiles: [Any] = [
-        [[
-            "bundleID": "com.example.chat", "appName": "Example Chat", "source": "ja", "target": "en", "paragraphReader": "lineGrouping",
-            "note": "Casual chat between two friends. Keep it informal and short.",
-            "entries": [
-                ["src": "田中", "dst": "Tanaka", "kind": "person", "gender": "m", "note": "the speaker's older colleague", "reading": "たなか",
-                 "addressing": [["to": "Hana", "register": "polite"]]] as [String: Any],
-                ["src": "花", "dst": "Hana", "kind": "person", "gender": "f",
-                 "addressing": [["to": "Tanaka", "register": "casual"]]] as [String: Any],
-            ],
-            "context": ["mode": "nearby", "previousLines": 3] as [String: Any],
-        ] as [String: Any]],
+        [["bundleID": "com.example.chat", "appName": "Example Chat", "source": "ja", "target": "en", "paragraphReader": "lineGrouping"] as [String: Any]],
     ]
 }
 

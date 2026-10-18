@@ -536,8 +536,21 @@ It runs `<copy>/Contents/MacOS/Mwoyeo --render p13.png out.png --src en --tgt ko
   - `SwiftVisionChild.swift`; `SwiftVisionGate.swift` and its tests; the `--warm-vision` entry (`MwoyeoApp.swift:18-23`);
   - in `TextRecognizer.swift`: `deadline`, `tracked`, `observed`, `startProbing`, `warmUp`/`runSteps`/`perform`/`askingAgainWhileNotReady`/`loadSwiftModel`, gate/publish, `Timeout`/`Stalled` (R3 for doc, R5 for all), the fakes (move to the worker as `MWOYEO_FAKE_READER`);
   - `OCRHealth` probe fields; the `ReadBackoff` transient branch;
-  - the "Language reader" step title;
+  - the "Language reader" step title (removed from the strings 2026-10-19);
   - the stale notes listed in G25 (the memory note ane-ocr-stall is the lead's).
+
+### Status after 1.1.2 (2026-10-19)
+
+- R0, R1, R2 and R3-lite are on main (`857ce95`). Only document recognition runs in the Docs XPC service.
+- Lines are still read in the app process. A fresh install compiles revision 3 there for about 64 s, in the GUI.
+- The Lines service measured 138–177 MB warm, against the 80 MB budget of §4.16. The user decided (2026-10-19): it exits after about 60 s idle (full R3).
+- `DocsHost` never recycles a stuck Docs service. It logs the `recycle` events of `WorkerHealth` and does not act on them.
+- Reader-cold (`tools/ocr-probe/reader-cold.sh`): the longest silence was 3.0 s against the gate of 8 s. On the base `b1f39a5` it was 9 s.
+- Bench rule: OCR output depends on the per-bundle-id e5rt cache, so compare benches only at one fixed scratch `MWOYEO_APP_ID`.
+- What remains:
+  - full R3: move Lines to XPC;
+  - the recycle of a stuck Docs service;
+  - R6, R7 and R8.
 
 ## 7. The 1.1.2 recommendation
 

@@ -6,7 +6,7 @@ import UniformTypeIdentifiers
 
 /// Headless end-to-end run on a still image:
 ///   Mwoyeo --render in.png out.png [--src ja] [--tgt ko] [--mode fast|seamless] [--engine auto|translation|intelligence]
-///                                  [--no-inpaint] [--scale 2] [--then en,ko,style] [--then-early ms] [--max-wait s] [--warm]
+///                                  [--glossary "term=translation;…"] [--no-inpaint] [--scale 2] [--then en,ko,style] [--then-early ms] [--max-wait s] [--warm]
 /// Prints what was read and translated, and writes the composited result. Exits when done.
 /// `--then-early ms` fires the `--then` steps `ms` after a translation batch is first in flight (a settings change
 /// mid-translation) and settles once at the end; `--max-wait s` is the settle ceiling (default 120); `--warm` waits for the text
@@ -133,6 +133,8 @@ enum SelfTest {
         settings.renderMode = option("--mode") == "fast" ? .fast : .seamless
         settings.engine = TranslationEngineChoice(rawValue: option("--engine") ?? "auto") ?? .auto
         settings.useInpaintingModel = !args.contains("--no-inpaint")
+        // `--glossary "co-op=협력;raid=레이드"` sets the glossary (one `term=translation` per `;`).
+        if let g = option("--glossary") { settings.glossary = g.replacingOccurrences(of: ";", with: "\n") }
         // `--reader automatic|documentLayout|lineGrouping` is the global choice; `--lens-app <bundleID> [--lens-category <type>]`
         // renders as if that app were in the lens (what automatic reads from the app).
         settings.paragraphReader = option("--reader").flatMap(ParagraphReader.init(rawValue:)) ?? .automatic

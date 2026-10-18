@@ -620,24 +620,110 @@ actor TranslationService {
                                   preferredStrategy: strategy == .highFidelity ? .highFidelity : .lowLatency)
     }
 
-    /// Batch request whose responses arrive one by one, in order.
+    /// Batch request whose responses arrive one by one, in order. A source with protected spans goes as a request of its own,
+    /// all at once with the batch: a batch response carries no attributed text (measured 2026-10-18), so it could not say where
+    /// the spans came back.
     private func stream(_ items: [String], through session: TranslationSession,
                         onResult: @escaping @Sendable (String, String) -> Void) async throws -> [String: String] {
-        let requests = items.enumerated().map { TranslationSession.Request(sourceText: $1, clientIdentifier: String($0)) }
+        let pairs = settings.glossaryPairs
+        let marked = protectedSpans(for: items, pairs: pairs)
+        let plain = items.filter { marked[$0] == nil }
+        let requests = plain.enumerated().map { TranslationSession.Request(sourceText: $1, clientIdentifier: String($0)) }
+        func batch() async throws -> [String: String] {
+            var out: [String: String] = [:]
+            for try await r in session.translate(batch: requests) {
+                guard let id = r.clientIdentifier, let i = Int(id), i < plain.count else { continue }
+                let t = Self.applyGlossary(TranslationCleanup.restoreSourceTokens(r.targetText, source: plain[i]), source: plain[i], pairs: pairs)
+                out[plain[i]] = t
+                onResult(plain[i], t)
+            }
+            return out
+        }
+        // No span in the group (the usual case): the batch alone, as before spans existed.
+        guard !marked.isEmpty else { return try await batch() }
+        Trace.count("translate.marked", marked.count)
         var out: [String: String] = [:]
-        for try await r in session.translate(batch: requests) {
-            guard let id = r.clientIdentifier, let i = Int(id), i < items.count else { continue }
-            let t = applyGlossary(TranslationCleanup.restoreSourceTokens(r.targetText, source: items[i]), source: items[i])
-            out[items[i]] = t
-            onResult(items[i], t)
+        try await withThrowingTaskGroup(of: [String: String].self) { group in
+            if #available(macOS 26.4, *) {
+                for (source, plan) in marked {
+                    group.addTask {
+                        let t: String
+                        do {
+                            t = try await self.translateMarked(source, plan, pairs: pairs, through: session)
+                        } catch is CancellationError {
+                            throw CancellationError()
+                        } catch {
+                            // An attributed request that fails costs the line its glossary terms, never its translation.
+                            Trace.count("translate.marked_failed")
+                            let r = try await session.translate(source)
+                            t = Self.applyGlossary(TranslationCleanup.restoreSourceTokens(r.targetText, source: source), source: source, pairs: pairs)
+                        }
+                        onResult(source, t)
+                        return [source: t]
+                    }
+                }
+            }
+            if !requests.isEmpty { group.addTask { try await batch() } }
+            for try await part in group { out.merge(part) { $1 } }
         }
         return out
     }
 
-    /// Apple Translation has no glossary; enforce entries whose source term survived untranslated.
-    private func applyGlossary(_ translated: String, source: String) -> String {
+    /// What is carried through Apple Translation untouched or replaced afterwards, per source: the glossary terms found in it,
+    /// and the formulas behind `MWOYEO_INLINE_MATH=1` (until the drawing of them lands). Needs macOS 26.4, where a request can
+    /// carry attributes; before it every source goes as plain text, as it always did, and so does one with no span.
+    private func protectedSpans(for items: [String], pairs: [(String, String)]) -> [String: ProtectedSpans] {
+        guard #available(macOS 26.4, *), !pairs.isEmpty || Self.inlineMath else { return [:] }
+        var plans: [String: ProtectedSpans] = [:]
+        for s in items {
+            var found = ProtectedSpans.glossarySpans(in: s, pairs: pairs)
+            if Self.inlineMath { found += InlineMath.spans(in: s) }
+            let plan = ProtectedSpans(source: s, spans: found)
+            if !plan.isEmpty { plans[s] = plan }
+        }
+        return plans
+    }
+
+    /// `MWOYEO_INLINE_MATH=1` marks formulas as well as glossary terms.
+    private static let inlineMath = ProcessInfo.processInfo.environment["MWOYEO_INLINE_MATH"] == "1"
+
+    /// One source with its spans marked. Glossary terms carry a marker only: `skipsTranslation` is ignored for words by the
+    /// language pack, and high fidelity honours it but writes pieces of its own rendering beside the forced word ("손실실은").
+    /// So the run of a term is the engine's rendering and its particle, and the glossary target takes the rendering's place.
+    /// A span that did not come back once stays as the engine wrote it, and its term is left to `applyGlossary`.
+    @available(macOS 26.4, *)
+    private nonisolated func translateMarked(_ source: String, _ plan: ProtectedSpans, pairs: [(String, String)],
+                                             through session: TranslationSession) async throws -> String {
+        let response = try await session.translate(plan.attributedSource())
+        guard let attributed = response.attributedTargetText else {
+            Trace.count("translate.marked_plain")
+            return Self.applyGlossary(TranslationCleanup.restoreSourceTokens(response.targetText, source: source), source: source, pairs: pairs)
+        }
+        let (text, runs) = ProtectedSpans.answer(attributed)
+        let resolution = plan.resolve(target: text, runs: runs)
+        let pending = Set(resolution.unresolved.compactMap { span -> String? in if case let .glossary(t) = span.kind { t } else { nil } })
+        let handled = Set(plan.spans.compactMap { span -> String? in if case let .glossary(t) = span.kind, !pending.contains(t) { t } else { nil } })
+        if !resolution.unresolved.isEmpty { Trace.count("translate.span_unresolved", resolution.unresolved.count) }
+        // Same length as what it replaces (`restoreSourceTokens` only changes case), so the formulas' ranges hold.
+        let t = Self.applyGlossary(TranslationCleanup.restoreSourceTokens(resolution.text, source: source), source: source, pairs: pairs, skipping: handled)
+        if TranslationCheck.displayForm(t) == t, t.count == resolution.text.count { placements.put(source, t, resolution.math) }
+        return t
+    }
+
+    /// Where the formulas of `translated` (the translation `translate` returned for `source`) stand in it, in the order of the
+    /// source; empty when it had none, or `translated` is not what was recorded. For the pipeline that draws them.
+    nonisolated func inlineMath(source: String, translated: String) -> [ProtectedSpans.Resolved] {
+        placements.math(source, translated)
+    }
+
+    private nonisolated let placements = MathPlacements()
+
+    /// Apple Translation has no glossary; enforce entries whose source term survived untranslated. `skipping`: targets of terms
+    /// whose spans were all resolved.
+    private nonisolated static func applyGlossary(_ translated: String, source: String, pairs: [(String, String)],
+                                                  skipping handled: Set<String> = []) -> String {
         var t = translated
-        for (s, d) in settings.glossaryPairs where source.contains(s) {
+        for (s, d) in pairs where source.contains(s) && !handled.contains(d) {
             t = t.replacingOccurrences(of: s, with: d)
         }
         return t
@@ -685,6 +771,19 @@ private final class Arrivals: @unchecked Sendable {
             defer { last = t; count += 1 }
             return (t - last, count == 0)
         }
+    }
+}
+
+/// Where the formulas stand in the translation last made for a source (see `TranslationService.inlineMath`). Few: only the lines
+/// on screen are asked for.
+private final class MathPlacements: @unchecked Sendable {
+    private let lock = NSLock()
+    private let lru = LRUCache<String, (translated: String, math: [ProtectedSpans.Resolved])>(capacity: 300)
+    func put(_ source: String, _ translated: String, _ math: [ProtectedSpans.Resolved]) {
+        lock.withLock { lru[source] = math.isEmpty ? nil : (translated, math) }
+    }
+    func math(_ source: String, _ translated: String) -> [ProtectedSpans.Resolved] {
+        lock.withLock { lru[source].flatMap { $0.translated == translated ? $0.math : nil } ?? [] }
     }
 }
 

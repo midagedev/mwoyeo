@@ -10,6 +10,9 @@ final class SettingsFileStore {
     private(set) var issues: [SettingsFileIssue] = []
     /// The bytes last written by the app or last read from the file; an event that finds the same bytes is our own echo.
     private var lastSeen: Data?
+    /// The file on disk has problems a person typed: the next save copies it to settings.json.broken first. Only a read
+    /// of the file sets it (the "was replaced" notice in `issues` must not copy the repaired file over the typed one).
+    private var needsBackup = false
     private var dirSource: DispatchSourceFileSystemObject?
     private var fileSource: DispatchSourceFileSystemObject?
     private var pending: DispatchWorkItem?
@@ -44,6 +47,7 @@ final class SettingsFileStore {
         lastSeen = data
         let result = SettingsFileCheck.read(data, over: fallback)
         issues = result.issues
+        needsBackup = !result.issues.isEmpty
         return result.settings
     }
 
@@ -55,7 +59,8 @@ final class SettingsFileStore {
         let data = SettingsFileFormat.render(settings)
         guard data != lastSeen else { return }
         var notice: [SettingsFileIssue] = []
-        if !issues.isEmpty, FileManager.default.fileExists(atPath: url.path) {
+        if needsBackup, FileManager.default.fileExists(atPath: url.path) {
+            needsBackup = false
             try? FileManager.default.removeItem(at: brokenURL)
             do {
                 try FileManager.default.copyItem(at: url, to: brokenURL)
@@ -90,6 +95,7 @@ final class SettingsFileStore {
             // Deleted: written again from what the app holds.
             lastSeen = nil
             issues = []
+            needsBackup = false
             save(current)
             return nil
         }
@@ -97,6 +103,7 @@ final class SettingsFileStore {
         lastSeen = data
         let result = SettingsFileCheck.read(data, over: current)
         issues = result.issues
+        needsBackup = !result.issues.isEmpty
         return result.parsed ? result : nil
     }
 

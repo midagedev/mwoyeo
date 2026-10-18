@@ -118,6 +118,10 @@ enum SettingsFileChecks {
         check("…then writes the file, and the issue says so",
               SettingsFileCheck.read((try? Data(contentsOf: migrated)) ?? Data(), over: AppSettings()).settings == current
               && store.issues.count == 1 && store.issues[0].message.contains("settings.json.broken"))
+        current.boxOpacity = 0.8
+        store.save(current)
+        check("a second change keeps the broken copy as typed and clears the notice",
+              text(brokenCopy) == edited && store.issues.isEmpty)
         try? FileManager.default.removeItem(at: migrated)
         _ = store.fileChanged(current: current)
         check("a deleted file is written again", FileManager.default.fileExists(atPath: migrated.path))

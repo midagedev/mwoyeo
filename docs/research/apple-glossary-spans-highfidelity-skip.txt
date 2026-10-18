@@ -1,0 +1,106 @@
+strategy=highFidelity glossary spans skip translation + marker
+[1] mid+2 spans=["tokens", "model"]
+  SRC We split the text into tokens before feeding it to the model.
+  OLD 우리는 모델에 입력하기 전에 텍스트를 토큰으로 분할합니다.  (2/2)
+  NEW 우리는 모델에 입력하기 전에 텍스트를 토큰으로 분할합니다.  (2/2) RUNS=["1:model", "0:tokens"]
+  RAW 우리는 model에 입력하기 전에 텍스트를 tokens으로 분할합니다.
+[2] mid spans=["loss"]
+  SRC The loss drops quickly during the first epoch.
+  OLD 첫 번째 시대 동안 손실은 빠르게 감소한다.  (1/1)
+  NEW 첫 번째 시대 동안 손실실은 빠르게 감소한다.  (1/1) RUNS=["0:loss"]
+  RAW 첫 번째 시대 동안 loss실은 빠르게 감소한다.
+[3] mid spans=["layer"]
+  SRC Each layer normalizes its input.
+  OLD 각 레이어는 입력값을 정상화합니다.  (0/1)
+  NEW 각 계층 입력값을 정상화합니다.  (1/1) RUNS=["0:layer"]
+  RAW 각 layer 입력값을 정상화합니다.
+[4] mid spans=["encoder"]
+  SRC We freeze the encoder and train only the decoder.
+  OLD 우리는 인코더를 얼리고 디코더만 훈련합니다.  (1/1)
+  NEW 우리는 인코더를 얼리고 디코더만 훈련합니다.  (1/1) RUNS=["0:encoder"]
+  RAW 우리는 encoder를 얼리고 디코더만 훈련합니다.
+[5] mid spans=["gradient"]
+  SRC Clip the gradient before the update step.
+  OLD 업데이트 단계 전에 그라데이션을 클립합니다.  (0/1)
+  NEW 업데이트 단계 전에 그래디언트를 클립합니다.  (1/1) RUNS=["0:gradient"]
+  RAW 업데이트 단계 전에 gradient을 클립합니다. PARTICLE[그래디언트+을 ]
+[6] mid spans=["dataset"]
+  SRC The dataset contains ten thousand images.
+  OLD 데이터셋에는 1만 개의 이미지가 포함되어 있습니다.  (1/1)
+  NEW 데이터데이터셋에는 1만 개의 이미지가 포함되어 있습니다.  (1/1) RUNS=["0:dataset"]
+  RAW 데이터dataset에는 1만 개의 이미지가 포함되어 있습니다.
+[7] mid spans=["Aldric"]
+  SRC Aldric walked into the hall and greeted the queen.
+  OLD 알드리크는 홀로 걸어들어와 여왕을 인사했다.  (0/1)
+  NEW 알드릭 홀로 걸어들어와 여왕을 인사했다.  (1/1) RUNS=["0:Aldric"]
+  RAW Aldric 홀로 걸어들어와 여왕을 인사했다.
+[8] mid spans=["Eldoria"]
+  SRC Many travelers have heard of Eldoria.
+  OLD 많은 여행객들이 엘도리아에 대해 들어봤다.  (1/1)
+  NEW 많은 여행객들이 엘도리아에 대해 들어봤다.  (1/1) RUNS=["0:Eldoria"]
+  RAW 많은 여행객들이 Eldoria에 대해 들어봤다.
+[9] initial spans=["Tokens"]
+  SRC Tokens are mapped to vectors by a lookup table.
+  OLD 토큰은 조회 테이블에 의해 벡터로 매핑됩니다.  (1/1)
+  NEW 토큰은 조회 테이블에 의해 벡터로 매핑됩니다.  (1/1) RUNS=["0:Tokens"]
+  RAW Tokens은 조회 테이블에 의해 벡터로 매핑됩니다.
+[10] initial spans=["Loss"]
+  SRC Loss is computed over the whole batch.
+  OLD 손실은 전체 배치에 대해 계산됩니다.  (1/1)
+  NEW 손실실은 전체 배치에 대해 계산됩니다.  (1/1) RUNS=["0:Loss"]
+  RAW Loss실은 전체 배치에 대해 계산됩니다.
+[11] initial+2 spans=["Model", "layers"]
+  SRC Model size grows with the number of layers.
+  OLD 모델 크기는 층의 수에 따라 증가합니다.  (1/2)
+  NEW 모델 크기는 계층의 수에 따라 증가합니다.  (2/2) RUNS=["0:Model", "1:layers"]
+  RAW Model 크기는 layers의 수에 따라 증가합니다.
+[12] initial spans=["Aldric"]
+  SRC Aldric said nothing for a long while.
+  OLD 알드리크는 오랫동안 아무 말도 하지 않았다.  (0/1)
+  NEW 알드릭 오랫동안 아무 말도 하지 않았다.  (1/1) RUNS=["0:Aldric"]
+  RAW Aldric 오랫동안 아무 말도 하지 않았다.
+[13] initial+2 spans=["Embedding", "encoder"]
+  SRC Embedding vectors are shared between the encoder and the decoder.
+  OLD 인코더와 디코더 사이에서 임베딩 벡터가 공유됩니다.  (2/2)
+  NEW 인코더와 디코더 사이에서 임베딩 벡터가 공유됩니다.  (2/2) RUNS=["1:encoder", "0:Embedding"]
+  RAW encoder와 디코더 사이에서 Embedding 벡터가 공유됩니다.
+[14] plural spans=["layers", "encoders"]
+  SRC These layers share the same weights as the encoders.
+  OLD 이러한 층들은 인코더와 동일한 가중치를 공유합니다.  (1/2)
+  NEW 이러한 계층 인코더와 동일한 가중치를 공유합니다.  (2/2) RUNS=["0:layers", "1:encoders"]
+  RAW 이러한 layers encoders와 동일한 가중치를 공유합니다.
+[15] plural+2 spans=["datasets", "gradients"]
+  SRC All datasets were shuffled, and the gradients were averaged.
+  OLD 모든 데이터셋은 섞였고, 경사도들은 평균화되었다.  (1/2)
+  NEW 모든 데이터셋은 섞였고, 그래디언트들은 평균화되었다.  (2/2) RUNS=["0:datasets", "1:gradients"]
+  RAW 모든 datasets은 섞였고, gradients들은 평균화되었다.
+[16] plural+2 spans=["models", "softmax"]
+  SRC Both models use softmax over the logits.
+  OLD 두 모델 모두 로짓에 대해 소프트맥스를 사용한다.  (2/2)
+  NEW 두 모델 모두 로짓에 대해 소프트맥스 사용한다.  (2/2) RUNS=["0:models", "1:softmax"]
+  RAW 두 models 모두 로짓에 대해 softmax 사용한다.
+[17] two+3 spans=["model", "loss", "token"]
+  SRC The model assigns a loss to every token.
+  OLD 모델은 모든 토큰에 손실을 할당합니다.  (3/3)
+  NEW 모델은 모든 토큰에 손실실을 할당합니다.  (3/3) RUNS=["0:model", "2:token", "1:loss"]
+  RAW model은 모든 token에 loss실을 할당합니다.
+[18] two spans=["Aldric", "Eldoria"]
+  SRC Aldric rode from Eldoria to the northern keep.
+  OLD 알드리크는 엘도리아에서 북쪽 요새로 말을 타고 갔다.  (1/2)
+  NEW 알드릭 엘도리아에서 북쪽 요새로 말을 타고 갔다.  (2/2) RUNS=["0:Aldric", "1:Eldoria"]
+  RAW Aldric Eldoria에서 북쪽 요새로 말을 타고 갔다.
+[19] two+3 spans=["encoder", "attention head", "embedding"]
+  SRC After the encoder, each attention head reads the embedding.
+  OLD 인코더 이후, 각 주의 헤드는 임베딩을 읽는다.  (2/3)
+  NEW 인인코더 이후, 각 어텐션 헤드 임베딩을 읽는다.  (3/3) RUNS=["0:encoder", "1:attention head", "2:embedding"]
+  RAW 인encoder 이후, 각 attention head embedding을 읽는다.
+[20] two+3 spans=["softmax", "attention head", "loss"]
+  SRC We apply softmax to the attention head scores, and the loss follows.
+  OLD 우리는 주의력 헤드 점수에 소프트맥스를 적용하고, 손실은 그 뒤를 따른다.  (2/3)
+  NEW 우리는 어텐션 헤드 점수에 소프트맥스 적용하고, 손실 그 뒤를 따른다.  (3/3) RUNS=["1:attention head", "0:softmax", "2:loss"]
+  RAW 우리는 attention head 점수에 softmax 적용하고, loss 그 뒤를 따른다.
+SUMMARY strategy=hf sentences=20 spans=33
+SUMMARY old: glossary target present 23/33 (term survived untranslated 0, engine chose the target itself 23), sentences fully honoured 10/20
+SUMMARY new: glossary target present 33/33, sentences fully honoured 20/20, unresolved spans 0
+SUMMARY particle: engine particles after replaced term 9, wrong form before the rule 1, after 0
+SUMMARY time (s for the 20 sentences, two rounds): plain batch 17.71,19.07, attributed one after another 29.83,27.68, attributed at once 19.31,18.51

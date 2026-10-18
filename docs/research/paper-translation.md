@@ -64,6 +64,21 @@ given a marker attribute (`link = math:N`) comes back **unchanged, in place, car
   whitespace normalisation; the rest is translated text.
 - Grammar stays natural (the engine sees the span text), unlike placeholders.
 
+Measured next with words (round apple-spans, 2026-10-18; `tools/apple-translation-probe/glossary-spans.swift`, outputs
+`apple-glossary-spans-*.txt`), which corrects the above for anything the engine can translate:
+
+- A `translate(batch:)` response has no `attributedTargetText` (nor `attributedSourceText`); only `translate(_: AttributedString)`
+  returns it. A source with spans goes as its own request; at once with the others it costs the same wall time as the batch
+  (high fidelity 18.4-18.9 s against 17.9-19.2 s for 20 lines), one after another 1.2 times (low latency) to 1.5 times (high fidelity).
+- `skipsTranslation` is ignored for words by the language pack: the marker comes back on the engine's own rendering plus the
+  particle it attached ("토큰으로", "데이터 세트에는"). High fidelity honours it, but writes pieces of its own rendering beside the
+  forced word in 11 of 20 lines ("손실실은", "데이터데이터셋에는", "인encoder") and drops particles ("알드릭 홀로"). Symbols were
+  never affected (nothing to translate), so the six paper sentences above were not a test of it.
+- So a glossary term gets a marker and no skip: the run is the engine's rendering, and the glossary target replaces the word
+  before the particle. 33 terms in 20 lines: honoured 33/33 in both strategies (post-hoc `applyGlossary`: 25 and 23, nearly all
+  because the engine chose the same word). The particle the engine chose for its own word was wrong for the target 3 of 22 times
+  (low latency) and 5 of 20 (high fidelity); `KoreanParticle` fits it (0 wrong).
+
 This is Apple's equivalent of DeepL's `tag_handling=xml` + `ignore_tags` ("placeholder tags are placed next to the
 translation of the words that precede or follow them", developers.deepl.com/docs/translate/translating-xml), and of the
 learned tag placement that Hanneman & Dinu (WMT 2020, "How Should Markup Tags Be Translated?") found better than
@@ -78,6 +93,7 @@ detag-and-project.
    original image (cropped from the frame by `VNRecognizedText.boundingBox(for:)`) as an inline attachment scaled to the
    text size. Fallback to text when a span does not come back exactly once. DeepL: `<m>` + `ignore_tags`; OpenAI-
    compatible engines: the same tags with an instruction, checked once each. Requires macOS 26.4 for Apple; earlier: text.
-3. Same mechanism, other uses: protect glossary terms in Apple Translation (skip span → replace the run with the glossary
-   target) instead of the post-hoc `applyGlossary`; protect URLs, code and names instead of `restoreSourceTokens`.
+3. Same mechanism, other uses: glossary terms in Apple Translation (marker, replace the run with the glossary target; done in
+   1.1.2, `ProtectedSpans`) instead of the post-hoc `applyGlossary`, which stays for a span that does not come back once;
+   protect URLs, code and names instead of `restoreSourceTokens`.
 4. Later: a page-image regression set beyond one paper (DoTA, IBEM pages); "…" with the full text on hover.

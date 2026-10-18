@@ -101,6 +101,8 @@ actor TranslationService {
     private var fingerprints: [UUID: String] = [:]
     private var rejectionsReported: [UUID: Set<String>] = [:]
     private var enginesSynced = false
+    /// The threads, memory and usage of every app served under context (RAM only; `ContextBook`). Off never touches it.
+    private var contexts = ContextBook()
     /// The one store of how fast each engine and language pair is (and how often a line was already in memory): the
     /// scheduler's `expectedSeconds`, the logs' `paceStats` and the engine list's speed line all read it.
     private nonisolated let pace = PaceStats()
@@ -173,6 +175,9 @@ actor TranslationService {
         guard let data = try? enc.encode(e), var obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return "0" }
         obj["id"] = nil
         obj["name"] = nil
+        // What an engine may be sent besides the lines is not its identity: the Off path's namespace, and what the client learned about its
+        // server, must not move when the user turns context on or off.
+        obj["context"] = nil
         let canonical = (try? JSONSerialization.data(withJSONObject: obj, options: [.sortedKeys, .withoutEscapingSlashes])) ?? Data()
         var h: UInt64 = 0xcbf29ce484222325
         for b in canonical { h = (h ^ UInt64(b)) &* 0x100000001b3 }
@@ -323,7 +328,20 @@ actor TranslationService {
     /// Translates `texts` (in the given order — callers pass reading order so results fill the screen top to
     /// bottom). `onResult` fires as each one lands. Every engine call runs under a deadline; what streamed in before
     /// it hit is kept.
-    func translate(_ texts: [String], onResult: (@Sendable (String, String) -> Void)? = nil) async -> TranslationOutcome {
+    ///
+    /// `context` is the document the lens covers. With none, or when the settings leave context Off for its app and engine, or when
+    /// the engine is Apple Translation or Foundation Models, the code below runs as it always did. Where context is On the call takes
+    /// `translateWithContext`; Apple Translation with the user's pinned terms takes `translateWithPins` (see `ContextPlan`).
+    func translate(_ texts: [String], context: LensContext? = nil,
+                   onResult: (@Sendable (String, String) -> Void)? = nil) async -> TranslationOutcome {
+        if let context, let plan = contextPlan(for: context) {
+            switch plan {
+            case let .engine(engine, options, profile):
+                return await translateWithContext(texts, engine: engine, options: options, profile: profile, lens: context, onResult: onResult)
+            case let .applePins(entries):
+                return await translateWithPins(texts, entries: entries, onResult: onResult)
+            }
+        }
         var outcome = TranslationOutcome()
         var todo: [String] = []
         var seen = Set<String>()
@@ -589,12 +607,14 @@ actor TranslationService {
 
     /// Headless-harness engine, chosen by `MWOYEO_FAKE_ENGINE`: `hang` never returns and ignores cancellation, `fail`
     /// always throws, `fail-once` throws on the first call then behaves like `slow:100`, `slow:<ms>` waits, then returns
-    /// "⟦<target>⟧ " + source for every item, streaming each one.
+    /// "⟦<target>⟧ " + source for every item, streaming each one. `drop:<text>` is like `slow:100`, but the answer lacks <text>
+    /// (an Apple that dropped a pinned term).
     private func fakeEngine(_ mode: String, _ items: [String],
                             onResult: @escaping @Sendable (String, String) -> Void) async throws -> [String: String] {
         fakeCalls += 1
         let target = settings.targetLanguage
         var delay = 100
+        var dropped: String?
         switch mode {
         case "hang":
             // Parked for good (kept alive so the runtime does not report a leaked continuation).
@@ -606,13 +626,14 @@ actor TranslationService {
             if fakeCalls == 1 { throw TranslationIssue.failed("fake engine") }
         default:
             if mode.hasPrefix("slow:"), let ms = Int(mode.dropFirst(5)) { delay = ms }
+            if mode.hasPrefix("drop:") { dropped = String(mode.dropFirst(5)) }
         }
         // A cancelled batch must not look like a success: the sleep returns at once on cancel, so check after it.
         try? await Task.sleep(for: .milliseconds(delay))
         if Task.isCancelled { throw CancellationError() }
         var out: [String: String] = [:]
         for s in items {
-            let t = "⟦\(target)⟧ " + s
+            let t = "⟦\(target)⟧ " + (dropped.map { s.replacingOccurrences(of: $0, with: "") } ?? s)
             out[s] = t
             onResult(s, t)
         }
@@ -790,6 +811,261 @@ actor TranslationService {
     }
 }
 
+// MARK: - Context
+
+/// Sources whose answer from Apple lacked a pinned term, noted from the streaming callbacks (which run on any task).
+private final class HeldSources: @unchecked Sendable {
+    private let lock = NSLock()
+    private var set = Set<String>()
+    func put(_ s: String) { lock.withLock { _ = set.insert(s) } }
+}
+
+/// The translation paths that carry a document's context (design §2, §8, §9). Each runs only for a call that came with a
+/// `LensContext` and a `ContextPlan`; a call without one never gets here. No screen text, transcript or memory row is logged,
+/// counted or saved by anything below: they live in `contexts` (RAM) and in the request body, and nowhere else.
+extension TranslationService {
+    /// What this call does with its context, or nil for today's path. `ContextPlan.decide` holds the rules.
+    private func contextPlan(for lens: LensContext) -> ContextPlan? {
+        let engine = activeEngine
+        var rests = false
+        if engine != nil, case .apple = route() { rests = true }
+        return ContextPlan.decide(settings: settings, engine: engine, engineRests: rests,
+                                  profile: AppProfiles.profile(for: lens.bundleID, in: settings.appProfiles))
+    }
+
+    // MARK: the added engine, with the document's context
+
+    /// The added engine's call under context: the thread of this lens is found, resumed or started (and reset as the signals ask),
+    /// lookups and stores use the namespace of this thread and this memory (design §8.1), and each group's request carries the card,
+    /// the note and names, and the lines before and after. A group the engine fails or misses its deadline goes the old way (Apple takes
+    /// it while the engine rests). The same health bookkeeping as the old path: the engine's cooldown, the lens's events, the issue.
+    private func translateWithContext(_ texts: [String], engine: EngineConfig, options: MwoyeoCore.ContextOptions, profile: AppProfile?,
+                                      lens: LensContext, onResult: (@Sendable (String, String) -> Void)?) async -> TranslationOutcome {
+        var outcome = TranslationOutcome()
+        let space = cache.namespace
+        let target = settings.targetLanguage
+        let pass = contexts.begin(lens, profile: profile, pair: LanguagePair(settings.sourceLanguage, target), engineID: engine.id.uuidString,
+                                  now: ProcessInfo.processInfo.systemUptime)
+        let scoped = ContextNamespace.make(base: space, key: pass.key, fingerprint: pass.fingerprint)
+
+        var todo: [String] = [], needing: [String] = []
+        var seen = Set<String>()
+        let cjkSource = ["ja", "zh-Hans", "zh-Hant", "ko"].contains(pageLanguage ?? "")
+        for t in texts where seen.insert(t).inserted {
+            if !TranslationFilter.needsTranslation(t, cjkSource: cjkSource) {
+                outcome.translations[t] = t
+                onResult?(t, t)
+            } else if let hit = cache.value(for: t, in: scoped) {
+                pace.recordLookup(hit: true)
+                needing.append(t)
+                outcome.translations[t] = hit
+                onResult?(t, hit)
+            } else {
+                pace.recordLookup(hit: false)
+                needing.append(t)
+                todo.append(t)
+            }
+        }
+        // The lines of this call join the thread when it is over, in the order they were asked for, cache hits included (§8.1).
+        defer {
+            contexts.observe(lens, key: pass.key, lines: needing.map { ($0, outcome.translations[$0]) }, now: ProcessInfo.processInfo.systemUptime)
+        }
+        guard !todo.isEmpty else { return outcome }
+
+        var order: [String] = []
+        var groups: [String: [String]] = [:]
+        for t in todo {
+            let language = sourceLanguage(for: t)
+            if groups[language] == nil { order.append(language) }
+            groups[language, default: []].append(t)
+        }
+        var results: [TranslationEvent.Group] = []
+        defer { if !results.isEmpty { tell(TranslationEvent(groups: results)) } }
+        for source in order {
+            if Task.isCancelled { outcome.cancelled = true; break }
+            let items = groups[source]!
+            let run = await attemptWithContext(items, source: source, engine: engine, options: options, lens: lens, pass: pass, onResult: onResult)
+            switch run.status {
+            case .value:
+                engineRecovered(engine)
+                if engineIssue == nil { issueHandler?(nil) }
+            case .cancelled:
+                outcome.cancelled = true
+                dropSessions(source: source)
+            case let .failed(error):
+                engineFailed(engine, reason: (error as? EngineError)?.localizedMessage ?? error.localizedDescription, after: error,
+                             appleSpace: Self.namespace(settings, engine: nil))
+            case .timedOut:
+                engineFailed(engine, reason: String(localized: "The engine did not answer in time."), after: nil,
+                             appleSpace: Self.namespace(settings, engine: nil))
+            }
+            await reportRejections(engine)
+            // What the engine gave is kept; a group it failed goes the old way, where Apple takes it while the engine rests.
+            let translated = run.translated
+            let current = cache.namespace == space
+            for (s, t) in translated {
+                outcome.translations[s] = t
+                if current { cache.store(t, for: s, in: scoped) }
+            }
+            if !run.isOK && !run.isCancelled {
+                let rest = items.filter { translated[$0] == nil }
+                if !rest.isEmpty {
+                    let again = await translate(rest, onResult: onResult)
+                    outcome.translations.merge(again.translations) { $1 }
+                    outcome.failed.formUnion(again.failed)
+                    outcome.timedOut = outcome.timedOut || again.timedOut
+                    outcome.batchFailed = outcome.batchFailed || again.batchFailed
+                    outcome.cancelled = outcome.cancelled || again.cancelled
+                }
+                if outcome.cancelled { break }
+                continue
+            }
+            if run.isCancelled { break }
+            if !translated.isEmpty {
+                results.append(TranslationEvent.Group(route: TranslationRoute(source: source, target: target, engineID: engine.id, engineName: engine.name),
+                                                      kind: .answered))
+            }
+            if items.allSatisfy({ translated[$0] == nil }) { outcome.batchFailed = true }
+            let struck = StrikeRule.struck(items: items, translated: translated, groupFailed: false)
+            if !struck.isEmpty { Trace.count("translate.struck", struck.count) }
+            outcome.failed.formUnion(struck)
+        }
+        return outcome
+    }
+
+    /// One group through the added engine under context, under the engine deadline: what `attempt` does for an engine, with the
+    /// context request in place of the plain one. Pace is learned from the engine's output only, as there.
+    private func attemptWithContext(_ items: [String], source: String, engine: EngineConfig, options: MwoyeoCore.ContextOptions, lens: LensContext,
+                                    pass: ContextBook.Pass, onResult: (@Sendable (String, String) -> Void)?) async -> Attempt {
+        if !enginesSynced { await syncEngines() }
+        let streamed = Streamed()
+        let slot = Self.paceSlot(settings, engine: engine)
+        let started = ProcessInfo.processInfo.systemUptime
+        let arrivals = Arrivals(since: started)
+        let book = pace
+        let deliver: @Sendable (String, String) -> Void = { s, t in
+            let shown = TranslationCheck.displayForm(t)
+            streamed.put(s, shown)
+            let (delta, isFirst) = arrivals.next(at: ProcessInfo.processInfo.systemUptime)
+            book.record(delta, isFirst: isFirst, slot: slot)
+            onResult?(s, shown)
+        }
+        let result = await withDeadline(Self.addedEngineDeadline(items: items.count)) {
+            try await self.contextGroup(items, source: source, engine: engine, options: options, lens: lens, pass: pass, onResult: deliver)
+        }
+        var a = Attempt(route: .added(engine), translated: streamed.all, status: .value)
+        defer { pace.finish(slot: slot, total: ProcessInfo.processInfo.systemUptime - started, ok: a.isOK, cancelled: a.isCancelled) }
+        switch result {
+        case let .value(r):
+            a.translated = r.mapValues(TranslationCheck.displayForm)
+        case let .failed(error) where Task.isCancelled && error is CancellationError,
+             let .failed(error) where (error as? EngineError) == .cancelled:
+            a.status = .cancelled
+        case let .failed(error):
+            a.status = .failed(error)
+        case .timedOut:
+            a.status = .timedOut
+        }
+        return a
+    }
+
+    /// The engine call itself. It prints no item (the old path's `engine ←` trace line stays the only place screen text can reach
+    /// stderr, and only under MWOYEO_TRACE).
+    private func contextGroup(_ items: [String], source: String, engine: EngineConfig, options: MwoyeoCore.ContextOptions, lens: LensContext,
+                              pass: ContextBook.Pass, onResult: @escaping @Sendable (String, String) -> Void) async throws -> [String: String] {
+        Trace.count("translate.requests")
+        Trace.count("translate.texts", items.count)
+        Trace.count("translate.context")
+        let glossary = settings.glossaryPairs
+        let request = contexts.request(lens, pass: pass, items: items, source: source == "und" ? nil : source, target: settings.targetLanguage,
+                                       glossary: glossary)
+        let clock = ContinuousClock()
+        let start = clock.now
+        let reply = try await client.translate(request, options: options, engine: engine)
+        Trace.sample("translate.engine_ms", Double(Int((clock.now - start) / .milliseconds(1))))
+        guard reply.lines.count == items.count else { throw EngineError.countMismatch(expected: items.count, got: reply.lines.count) }
+        var out: [String: String] = [:]
+        for (s, raw) in zip(items, reply.lines) {
+            let t = TranslationCheck.displayForm(raw)
+            if TranslationCheck.isUntranslated(source: s, translation: t, target: settings.targetLanguage) {
+                Trace.count("translate.untranslated")
+                continue
+            }
+            out[s] = t
+            onResult(s, t)
+        }
+        let used = RequestLayout.selectedRows(request: request, options: options, kind: .engine(engine.kind))
+        contexts.finish(lens, items: items, reply: reply, used: used, options: options, glossary: glossary)
+        return out
+    }
+
+    // MARK: Apple Translation, with the user's pinned names and terms
+
+    /// Apple Translation follows the names the user pinned for this app by getting them in the source text (design §7a, §9; off
+    /// unless `appleUsesPinnedTerms`). The old path translates the changed texts, so its cache is keyed by them: a changed entry is a new
+    /// key. An answer that lacks a pinned target is asked again as the text stood, so a line is never worse than it was. Apple takes no
+    /// context, so nothing else of the app's memory is used.
+    private func translateWithPins(_ texts: [String], entries: [MemoryEntry],
+                                   onResult: (@Sendable (String, String) -> Void)?) async -> TranslationOutcome {
+        var pre: [String: ApplePreinsertion] = [:]
+        var sources: [String: [String]] = [:]
+        var sent: [String] = []
+        var seen = Set<String>()
+        for t in texts where seen.insert(t).inserted {
+            let p = ApplePreinsertion.insert(into: t, entries: entries, appleUsesPinnedTerms: true)
+            if !p.isEmpty { pre[t] = p }
+            if sources[p.text] == nil { sent.append(p.text) }
+            sources[p.text, default: []].append(t)
+        }
+        // An answer that lacks a target is not shown: the retry below shows the plain one.
+        let held = HeldSources()
+        let first = await translate(sent) { [pre, sources] text, translation in
+            for s in sources[text] ?? [text] {
+                if let p = pre[s], !p.answerHoldsTargets(translation) { held.put(s); continue }
+                onResult?(s, translation)
+            }
+        }
+        var outcome = TranslationOutcome()
+        var rejected: [String] = []
+        for (text, translation) in first.translations {
+            for s in sources[text] ?? [text] {
+                if let p = pre[s], !p.answerHoldsTargets(translation) { rejected.append(s) } else { outcome.translations[s] = translation }
+            }
+        }
+        outcome.failed = Set(first.failed.flatMap { sources[$0] ?? [$0] })
+        outcome.timedOut = first.timedOut
+        outcome.batchFailed = first.batchFailed
+        outcome.cancelled = first.cancelled
+        guard !rejected.isEmpty, !first.cancelled else { return outcome }
+        Trace.count("translate.pins_rejected", rejected.count)
+        let again = await translate(texts.filter(Set(rejected).contains), onResult: onResult)
+        outcome.translations.merge(again.translations) { $1 }
+        outcome.failed.formUnion(again.failed)
+        outcome.timedOut = outcome.timedOut || again.timedOut
+        outcome.batchFailed = outcome.batchFailed || again.batchFailed
+        outcome.cancelled = outcome.cancelled || again.cancelled
+        return outcome
+    }
+
+    // MARK: what the rest of the app reads and does with the context (the learned-memory file and the stats view, the referents)
+
+    /// What the context path used for each app since launch: requests, tokens (cached ones counted), resets by reason. Numbers only.
+    func contextUsage() -> [String: ContextUsage] { contexts.apps.mapValues(\.usage) }
+
+    func contextUsage(for bundleID: String) -> ContextUsage { contexts.usage(for: bundleID) }
+
+    /// The app's learned rows (RAM only), including those waiting for a second sighting.
+    func learnedRows(for bundleID: String) -> [ContextMemory.LearnedRecord] { contexts.learned(for: bundleID) }
+
+    func forgetLearned(for bundleID: String) { contexts.forgetLearned(bundleID) }
+
+    /// "Start fresh" for the app's current thread: the transcript and the referents go, and the namespace generation moves on.
+    func startFresh(for bundleID: String) { contexts.startFresh(bundleID) }
+
+    /// Who the pronouns mean in the app's current document (`ContextThread.setReferents`).
+    func setReferents(_ list: [Referent], for bundleID: String) { contexts.setReferents(list, for: bundleID) }
+}
+
 /// Arrival times of one call's results.
 private final class Arrivals: @unchecked Sendable {
     private let lock = NSLock()
@@ -846,6 +1122,10 @@ private final class Memory: @unchecked Sendable {
             guard let stand, ProcessInfo.processInfo.systemUptime < stand.until else { return nil }
             return lru[Self.key(text, stand.space)]
         }
+    }
+    /// For a namespace of the caller's choosing (a call under context has one of its own); no fallback place is read.
+    func value(for text: String, in namespace: String) -> String? {
+        lock.withLock { lru[Self.key(text, namespace)] }
     }
     func store(_ translation: String, for text: String, in namespace: String) {
         lock.withLock {

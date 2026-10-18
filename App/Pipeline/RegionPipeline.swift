@@ -1274,6 +1274,18 @@ actor RegionPipeline {
         startQueue()
     }
 
+    /// The document this lens covers (its app, category and confirmed window title), once the session read its window; nil while the
+    /// settings cannot put context on. Set by `RegionSession`; screen text is not in it.
+    private var lensContext: LensContext?
+
+    func setLensContext(_ c: LensContext?) { lensContext = c }
+
+    /// The context of one batch: the lens's window with the lines around the batch on screen, put in reading order by their rects.
+    /// nil when no window was read, and the batch goes the old way.
+    private func documentContext(around batch: [String]) -> LensContext? {
+        lensContext?.around(batch, lines: blocks.map { ContextNeighbours.Line(source: $0.source, rect: $0.rect) })
+    }
+
     private func startQueue() {
         // While the queue rests, only the resume task starts it again.
         guard !paused, !translating, !pending.isEmpty else { return }
@@ -1290,9 +1302,10 @@ actor RegionPipeline {
             let t = Trace.now
             flightID += 1
             let id = flightID, service = translator
+            let context = documentContext(around: batch)
             // A task of its own, so a batch the lens no longer needs can be cancelled while this one awaits it.
             let task = Task {
-                await service.translate(batch) { source, translated in
+                await service.translate(batch, context: context) { source, translated in
                     Task { await self.streamed(source, translated, epoch: epoch, flight: id) }
                 }
             }

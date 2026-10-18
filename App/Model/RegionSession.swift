@@ -37,6 +37,11 @@ final class RegionSession {
     private var hiddenByOcclusion = false
     /// Frames reach the pipeline only while the lens is uncovered (`ReadingGate`); they arrive on the capture's queue.
     private let readingGate = OSAllocatedUnfairLock(initialState: ReadingGate())
+    /// The window under the lens is read a few times a second (`SampleGate`), and only while the settings could put context on:
+    /// its app, category and confirmed title go to the pipeline for the translator (`LensWatch`, `LensContext`).
+    private let sampleGate = OSAllocatedUnfairLock(initialState: SampleGate())
+    private let lensWatch = LensWatch()
+    private var contextWanted = false
     /// Why the capture failed, if it did (`CaptureFailure`); the hint says what to do about a refused one.
     private var captureFailure: CaptureFailure?
     /// "Already in <language>" waits for two reads that agree (`TargetLanguageStreak`).
@@ -127,16 +132,42 @@ final class RegionSession {
         let tap = SnapshotTap()
         pipeline = RegionPipeline(options: PipelineOptions(settings, lensApp: AppModel.readerContext(for: config)), capture: capture, translator: translator,
                                   inpainter: inpainter, onSnapshot: { snapshot in Task { @MainActor in panel.apply(snapshot); tap.handler?(snapshot) } })
-        let gate = readingGate
-        capturer.onFrame = { [pipeline] frame in
+        let gate = readingGate, sampling = sampleGate
+        capturer.onFrame = { [pipeline, weak self] frame in
             // Covered: the capture shows the window above, whose text is not the user's to have translated (or sent away).
             guard gate.withLock({ $0.admitsFrames }) else { Trace.count("lens.dropped.occluded"); return }
+            if sampling.withLock({ $0.admit(now: ProcessInfo.processInfo.systemUptime) }) { Task { @MainActor in self?.sampleWindow() } }
             Task { await pipeline.ingest(frame) }
         }
         capturer.onStop = { [weak self] error in Task { @MainActor in self?.captureStopped(error) } }
         wireChrome()
         tap.handler = { [weak self] in self?.received($0) }
         chrome.onHintAction = { [weak self] in self?.performHint() }
+        setContextWanted(ContextPlan.needsWindow(settings))
+    }
+
+    /// Whether the window under the lens is read at all (`ContextPlan.needsWindow`). Off reads nothing and hands the pipeline nothing,
+    /// so a translation goes the old way.
+    private func setContextWanted(_ wanted: Bool) {
+        guard wanted != contextWanted else { return }
+        contextWanted = wanted
+        sampleGate.withLock { $0.enabled = wanted }
+        if !wanted {
+            lensWatch.reset()
+            Task { [pipeline] in await pipeline.setLensContext(nil) }
+        }
+    }
+
+    /// A capture pass that is due: reads the window the lens covers and hands the pipeline the document it shows.
+    private func sampleWindow() {
+        defer { sampleGate.withLock { $0.finish() } }
+        guard contextWanted else { return }
+        let read = lensWatch.sample(config: config, now: ProcessInfo.processInfo.systemUptime)
+        if let context = read.context {
+            Task { [pipeline] in await pipeline.setLensContext(context) }
+        } else if read.gone {
+            Task { [pipeline] in await pipeline.setLensContext(nil) }
+        }
     }
 
     func start() async {
@@ -221,6 +252,7 @@ final class RegionSession {
     func update(settings: AppSettings) async {
         let before = self.settings
         self.settings = settings
+        setContextWanted(ContextPlan.needsWindow(settings))
         if !settings.savesTranscripts || settings.exportFolder != before.exportFolder
             || settings.sourceLanguage != before.sourceLanguage || settings.targetLanguage != before.targetLanguage
             || settings.transcriptFormats != before.transcriptFormats || settings.activeEngineConfig?.id != before.activeEngineConfig?.id {

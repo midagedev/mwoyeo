@@ -53,7 +53,8 @@ verdict() { # <ok 0|1> <label> <detail>
 # Check 7b: on the shipped default path the body is one block whichever reader answers (VN grouper or document model); docs-reads
 # says which ones did (ocr.blocks.swift).
 paragraphs() {
-    [ -f "$SP/in/article.png" ] && [ -f "$SP/in/sub-mid.png" ] || return 0
+    # A missing picture is a FAIL, not a skip: with SP one level off, this check used to vanish and the run still read ALL PASS.
+    [ -f "$SP/in/article.png" ] && [ -f "$SP/in/sub-mid.png" ] || { verdict 1 "7 inputs" "missing $SP/in/article.png or $SP/in/sub-mid.png"; return 0; }
     OCRPATH=vn run p "$1" "" article.png ja 90
     OCRPATH=vn run q "$1" "" sub-mid.png ja 90
     local body sub sb sw

@@ -1,0 +1,20 @@
+{
+ "content": [
+  {
+   "text": "{\"t\":[{\"id\":0,\"text\":\"안녕하세요\"},{\"id\":1,\"text\":\"앨리스가 왔다\"}],\"terms\":[{\"src\":\"アリス\",\"dst\":\"앨리스\",\"kind\":\"person\",\"gender\":\"f\"}]}",
+   "type": "text"
+  }
+ ],
+ "id": "msg_fixture",
+ "model": "claude-haiku-5-5",
+ "role": "assistant",
+ "stop_reason": "end_turn",
+ "stop_sequence": null,
+ "type": "message",
+ "usage": {
+  "cache_creation_input_tokens": 1536,
+  "cache_read_input_tokens": 0,
+  "input_tokens": 75,
+  "output_tokens": 57
+ }
+}

@@ -57,4 +57,106 @@ import Testing
         #expect(AppProfiles.paragraphReader(base: .lineGrouping, profiles: [jaEn], app: jaEn.bundleID) == .lineGrouping)
         #expect(AppProfiles.paragraphReader(base: .lineGrouping, profiles: [p], app: nil) == .lineGrouping)
     }
+
+    // MARK: the memory (note and entries)
+
+    private func sorted(_ p: AppProfile) throws -> String {
+        let enc = JSONEncoder()
+        enc.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return String(decoding: try enc.encode(p), as: UTF8.self)
+    }
+
+    @Test func aProfileSavedBeforeTheMemoryDecodesAndEncodesUnchanged() throws {
+        let old = #"{"appName":"A","bundleID":"a.b","paragraphReader":"lineGrouping","source":"ja","target":"en"}"#
+        let p = try JSONDecoder().decode(AppProfile.self, from: Data(old.utf8))
+        #expect(p == AppProfile(bundleID: "a.b", appName: "A", source: "ja", target: "en", paragraphReader: .lineGrouping))
+        #expect(p.note == "" && p.entries.isEmpty)
+        // Saved again, no new keys appear until there is a memory.
+        #expect(try sorted(p) == old)
+    }
+
+    @Test func noteAndEntriesRoundTrip() throws {
+        let p = AppProfile(bundleID: "a.b", appName: "A", source: "ja", target: "ko", note: "Close friends, banmal.",
+                           entries: [CtxFix.alice, CtxFix.tanaka])
+        let back = try JSONDecoder().decode(AppProfile.self, from: JSONEncoder().encode(p))
+        #expect(back == p)
+        #expect(back.note == "Close friends, banmal." && back.entries == [CtxFix.alice, CtxFix.tanaka])
+        #expect(ContextMemory(profile: back).user == back.entries && ContextMemory(profile: back).note == back.note)
+        #expect(p.memoryFingerprint == back.memoryFingerprint && p.memoryFingerprint != jaEn.memoryFingerprint)
+    }
+
+    @Test func entriesAreCappedAtFortyAndTheNoteAtFiveHundred() throws {
+        let many = (0..<60).map { MemoryEntry(src: "k\($0)", dst: "v\($0)") }
+        var p = AppProfile(bundleID: "a.b", appName: "A", source: "ja", target: "en", note: String(repeating: "x", count: 900), entries: many)
+        #expect(p.entries.count == 40 && p.entries.last?.src == "k39" && p.note.count == 500)
+        p.entries.append(MemoryEntry(src: "extra", dst: "x"))
+        p.note += "more"
+        #expect(p.entries.count == 40 && p.note.count == 500)
+        // The same caps on the way in from a file.
+        let json = try JSONEncoder().encode(AppProfile(bundleID: "a.b", appName: "A", source: "ja", target: "en"))
+        var raw = try JSONSerialization.jsonObject(with: json) as! [String: Any]
+        raw["note"] = String(repeating: "y", count: 800)
+        raw["entries"] = many.map { ["src": $0.src, "dst": $0.dst] }
+        let decoded = try JSONDecoder().decode(AppProfile.self, from: JSONSerialization.data(withJSONObject: raw))
+        #expect(decoded.entries.count == 40 && decoded.note.count == 500)
+    }
+
+    @Test func aBadEntryIsSkippedNotTheProfile() throws {
+        let json = #"{"bundleID":"a.b","source":"ja","target":"en","note":7,"entries":[{"src":"a","dst":"b"},{"src":"no dst"},"junk",{"src":"c","dst":"d","origin":"learned","uses":9},{"src":"A","dst":"dup"},{"src":"e","dst":"f","kind":"future"}]}"#
+        let p = try JSONDecoder().decode(AppProfile.self, from: Data(json.utf8))
+        #expect(p.bundleID == "a.b" && p.source == "ja" && p.note == "")
+        // Kept: a→b, c→d and e→f. Skipped: the entry without dst, the junk, the duplicate src. `origin` and `uses` are not
+        // settings-file keys: they are not read, and what comes from a file is a user entry.
+        #expect(p.entries.map(\.src) == ["a", "c", "e"] && p.entries.allSatisfy { $0.origin == .user && $0.uses == 0 })
+        #expect(p.entries[2].kind == .term)
+        // Learned entries are never kept on a profile, even when put there in code.
+        let q = AppProfile(bundleID: "a.b", appName: "A", source: "ja", target: "en",
+                           entries: [MemoryEntry(src: "x", dst: "y", origin: .learned), MemoryEntry(src: "z", dst: "w")])
+        #expect(q.entries.map(\.src) == ["z"])
+    }
+
+    // MARK: the settings-file shape (design §10)
+
+    @Test func theCapsArePublicConstantsOnTheTypeTheAppEncodes() {
+        #expect(AppProfile.maxEntries == 40 && AppProfile.maxNoteLength == 500)
+        #expect(MemoryEntry.maxEntryNote == 40 && MemoryEntry.maxName == 80 && MemoryEntry.maxAddressing == 4)
+        let p = AppProfile(bundleID: "a.b", appName: "A", source: "ja", target: "en", note: String(repeating: "n", count: 501),
+                           entries: (0..<41).map { MemoryEntry(src: "k\($0)", dst: "v\($0)", note: String(repeating: "e", count: 41)) })
+        #expect(p.note.count == AppProfile.maxNoteLength && p.entries.count == AppProfile.maxEntries)
+        #expect(p.entries.allSatisfy { $0.note.count == MemoryEntry.maxEntryNote })
+        // The same caps on the way in, for the entry note and an addressing target.
+        let json = #"{"bundleID":"a.b","entries":[{"src":"a","dst":"b","note":"\#(String(repeating: "e", count: 90))","addressing":[{"to":"\#(String(repeating: "t", count: 200))","register":"polite"}]}]}"#
+        let back = try? JSONDecoder().decode(AppProfile.self, from: Data(json.utf8))
+        #expect(back?.entries.first?.note.count == MemoryEntry.maxEntryNote)
+        #expect(back?.entries.first?.addressing.first?.to.count == MemoryEntry.maxName)
+    }
+
+    /// Round S1's validator rejects any other key, so what this type encodes is exactly this list.
+    @Test func theEncodedKeysAreTheOnesTheSettingsFileSpecs() throws {
+        let entry = MemoryEntry(src: "アリス", dst: "앨리스", kind: .person, gender: .f, note: "20s, shy", reading: "ありす",
+                                origin: .user, uses: 7, lastSeen: Date(timeIntervalSince1970: 1_700_000_000),
+                                addressing: [Addressing(to: "ボブ", register: .casual)])
+        let full = AppProfile(bundleID: "a.b", appName: "A", source: "ja", target: "ko", customEngineID: UUID(), paragraphReader: .lineGrouping,
+                              note: "Close friends.", entries: [entry])
+        let root = try JSONSerialization.jsonObject(with: JSONEncoder().encode(full)) as! [String: Any]
+        #expect(Set(root.keys) == ["bundleID", "appName", "source", "target", "customEngineID", "paragraphReader", "note", "entries"])
+        let e = try #require((root["entries"] as? [[String: Any]])?.first)
+        #expect(Set(e.keys) == ["src", "dst", "kind", "gender", "note", "reading", "addressing"])
+        let a = try #require((e["addressing"] as? [[String: Any]])?.first)
+        #expect(Set(a.keys) == ["to", "register"])
+        // The enums are strings.
+        #expect(e["kind"] as? String == "person" && e["gender"] as? String == "f" && a["register"] as? String == "casual")
+        #expect(root["paragraphReader"] is String && root["customEngineID"] is String)
+        // Nil and empty are omitted, not written as null or "".
+        let bare = AppProfile(bundleID: "a.b", appName: "A", source: "ja", target: "ko", entries: [MemoryEntry(src: "x", dst: "y")])
+        let small = try JSONSerialization.jsonObject(with: JSONEncoder().encode(bare)) as! [String: Any]
+        #expect(Set(small.keys) == ["bundleID", "appName", "source", "target", "entries"])
+        #expect(Set(try #require((small["entries"] as? [[String: Any]])?.first).keys) == ["src", "dst", "kind"])
+        // What was written reads back as the same entry (the runtime-only fields start over).
+        let back = try JSONDecoder().decode(AppProfile.self, from: JSONEncoder().encode(full))
+        var expected = entry
+        expected.uses = 0
+        expected.lastSeen = nil
+        #expect(back.entries == [expected] && back.note == full.note)
+    }
 }

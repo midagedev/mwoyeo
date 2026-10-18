@@ -31,47 +31,58 @@ public actor EngineClient {
 
     // MARK: translate
 
+    /// Today's call, kept as a wrapper: the context layout with `ContextOptions.off`, which sends exactly the old body.
     public func translate(_ lines: [String], source: String?, target: String, glossary: [(String, String)],
                           engine: EngineConfig) async throws(EngineError) -> [String] {
         if lines.isEmpty { return [] }
+        let request = ContextRequest(items: lines, source: source, target: target, glossary: glossary)
+        return try await translate(request, options: .off, engine: engine).lines
+    }
+
+    /// The context-aware call: the body comes from `RequestLayout` (stable parts first), and the reply carries the lines in
+    /// item order, the `terms` the model reported and the token usage (cached tokens included). An HTTP template or a
+    /// command engine gets the lines only. No text is logged.
+    public func translate(_ request: ContextRequest, options: ContextOptions,
+                          engine: EngineConfig) async throws(EngineError) -> TranslationReply {
+        let lines = request.items
+        if lines.isEmpty { return TranslationReply(lines: []) }
         if Task.isCancelled { throw .cancelled }
+        let source = request.source, target = request.target
         switch engine.kind {
-        case let .openAICompatible(baseURL, model, thinking, extraHeaders):
+        case let .openAICompatible(baseURL, _, _, extraHeaders):
             let key = try key(for: engine, required: !ChatTranslation.isOnThisMac(baseURL))
-            let body = ChatTranslation.requestBody(lines: lines, source: source, target: target, glossary: glossary,
-                                                   model: model, baseURL: baseURL, thinking: thinking)
+            let body = RequestLayout.body(kind: engine.kind, request: request, options: options)
             var headers = ["Content-Type": "application/json"]
             if let key { headers["Authorization"] = "Bearer \(key)" }
             for (k, v) in extraHeaders { headers[k] = v.replacingOccurrences(of: "{{key}}", with: key ?? "") }
             return try await chat(engine, url: try endpoint(baseURL, "/chat/completions"), headers: headers, body: body,
-                                  count: lines.count, key: key) { d, n throws(ChatTranslationError) in try ChatTranslation.parseTranslations(d, count: n) }
-        case let .anthropic(baseURL, model, thinking):
+                                  count: lines.count, key: key) { d, n throws(ChatTranslationError) in try ChatTranslation.parseReply(d, count: n) }
+        case let .anthropic(baseURL, _, _):
             let key = try key(for: engine, required: true)
-            let body = AnthropicTranslation.requestBody(lines: lines, source: source, target: target, glossary: glossary,
-                                                        model: model, thinking: thinking)
+            let body = RequestLayout.body(kind: engine.kind, request: request, options: options)
             var headers = AnthropicTranslation.headers()
             headers["x-api-key"] = key
             return try await chat(engine, url: try endpoint(baseURL, AnthropicTranslation.path), headers: headers, body: body,
-                                  count: lines.count, key: key) { d, n throws(ChatTranslationError) in try AnthropicTranslation.parseTranslations(d, count: n) }
-        case let .deepL(baseURL, formality):
+                                  count: lines.count, key: key) { d, n throws(ChatTranslationError) in try AnthropicTranslation.parseReply(d, count: n) }
+        case let .deepL(baseURL, _):
             let key = try key(for: engine, required: true)
-            let body = DeepLTranslation.requestBody(lines: lines, source: source, target: target, formality: formality)
+            let body = RequestLayout.body(kind: engine.kind, request: request, options: options)
             let headers = ["Content-Type": "application/json", "Authorization": "DeepL-Auth-Key \(key ?? "")"]
             let base = DeepLTranslation.resolvedBaseURL(baseURL, key: key)
             return try await chat(engine, url: try endpoint(base, DeepLTranslation.path), headers: headers, body: body,
-                                  count: lines.count, key: key) { d, n throws(ChatTranslationError) in try DeepLTranslation.parseTranslations(d, count: n) }
+                                  count: lines.count, key: key) { d, n throws(ChatTranslationError) in try DeepLTranslation.parseReply(d, count: n) }
         case let .httpTemplate(template):
-            return try await httpTemplate(template, engine: engine, lines: lines, source: source, target: target)
+            return TranslationReply(lines: try await httpTemplate(template, engine: engine, lines: lines, source: source, target: target))
         case let .command(spec):
             let reply = try await CommandRunner.run(spec, input: CommandEngine.encodeRequest(lines: lines, source: source, target: target),
                                                     scrub: Scrubber(key: nil))
-            return try mapped { () throws(ChatTranslationError) in try CommandEngine.decodeResponse(reply, count: lines.count) }
+            return TranslationReply(lines: try mapped { () throws(ChatTranslationError) in try CommandEngine.decodeResponse(reply, count: lines.count) })
         }
     }
 
     /// OpenAI-style, Anthropic and DeepL calls: one POST, and on a 400 that names a field we sent, one retry without it.
     private func chat(_ engine: EngineConfig, url: URL, headers: [String: String], body: Data, count: Int, key: String?,
-                      parse: (Data, Int) throws(ChatTranslationError) -> [String]) async throws(EngineError) -> [String] {
+                      parse: (Data, Int) throws(ChatTranslationError) -> TranslationReply) async throws(EngineError) -> TranslationReply {
         let scrub = Scrubber(key: key)
         var body = ChatTranslation.withoutFields(body, rejections[engine.id] ?? [])
         var reply = try await post(url, headers: headers, body: body, scrub: scrub)

@@ -1,0 +1,21 @@
+{
+ "choices": [
+  {
+   "finish_reason": "stop",
+   "index": 0,
+   "message": {
+    "content": "{\"t\":[{\"id\":0,\"text\":\"안녕하세요\"},{\"id\":1,\"text\":\"앨리스가 왔다\"}],\"terms\":[{\"src\":\"アリス\",\"dst\":\"앨리스\",\"kind\":\"person\",\"gender\":\"f\"}]}",
+    "role": "assistant"
+   }
+  }
+ ],
+ "created": 1760000001,
+ "id": "chatcmpl-fixture2",
+ "model": "qwen3.5",
+ "object": "chat.completion",
+ "usage": {
+  "completion_tokens": 48,
+  "prompt_tokens": 311,
+  "total_tokens": 359
+ }
+}

@@ -1,0 +1,28 @@
+{
+ "choices": [
+  {
+   "finish_reason": "stop",
+   "index": 0,
+   "message": {
+    "content": "{\"t\":[{\"id\":0,\"text\":\"안녕하세요\"},{\"id\":1,\"text\":\"앨리스가 왔다\"}],\"terms\":[{\"src\":\"アリス\",\"dst\":\"앨리스\",\"kind\":\"person\",\"gender\":\"f\"}]}",
+    "role": "assistant"
+   }
+  }
+ ],
+ "created": 1760000000,
+ "id": "chatcmpl-fixture",
+ "model": "gpt-5.6-luna",
+ "object": "chat.completion",
+ "usage": {
+  "completion_tokens": 57,
+  "completion_tokens_details": {
+   "reasoning_tokens": 0
+  },
+  "prompt_tokens": 1190,
+  "prompt_tokens_details": {
+   "audio_tokens": 0,
+   "cached_tokens": 1024
+  },
+  "total_tokens": 1247
+ }
+}

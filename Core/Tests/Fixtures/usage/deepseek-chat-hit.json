@@ -1,0 +1,23 @@
+{
+ "choices": [
+  {
+   "finish_reason": "stop",
+   "index": 0,
+   "message": {
+    "content": "{\"t\":[{\"id\":0,\"text\":\"안녕하세요\"},{\"id\":1,\"text\":\"앨리스가 왔다\"}],\"terms\":[{\"src\":\"アリス\",\"dst\":\"앨리스\",\"kind\":\"person\",\"gender\":\"f\"}]}",
+    "role": "assistant"
+   }
+  }
+ ],
+ "created": 1760000002,
+ "id": "fixture3",
+ "model": "deepseek-chat",
+ "object": "chat.completion",
+ "usage": {
+  "completion_tokens": 40,
+  "prompt_cache_hit_tokens": 512,
+  "prompt_cache_miss_tokens": 88,
+  "prompt_tokens": 600,
+  "total_tokens": 640
+ }
+}

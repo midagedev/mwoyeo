@@ -20,11 +20,37 @@ public enum ChatTranslation {
             "messages": [["role": "system", "content": systemPrompt(source: source, target: target, glossary: glossary)],
                          ["role": "user", "content": userMessage(lines)]],
         ]
+        addQuirkFields(&body, model: model, baseURL: baseURL, thinking: thinking)
+        return encode(body)
+    }
+
+    /// `temperature` and the thinking-off fields `ModelQuirks` has for this host and model.
+    private static func addQuirkFields(_ body: inout [String: Any], model: String, baseURL: URL?, thinking: Thinking) {
         let quirks = ModelQuirks.lookup(host: baseURL?.host ?? "", port: baseURL?.port, model: model,
                                         kind: .openAICompatible(baseURL: baseURL ?? URL(fileURLWithPath: "/"), model: model,
                                                                 thinking: thinking, extraHeaders: [:]))
         if quirks.sendsTemperature { body["temperature"] = 0 }
         if thinking == .off { for (k, v) in quirks.thinkingOff { body[k] = v.json } }
+    }
+
+    /// The context layout (design §4): the rules, the card and the user's note in the system message, and the volatile
+    /// last message as the user message. `prompt_cache_key` (the thread's hashed key) and `store: false` go only to
+    /// api.openai.com (`ModelQuirks.acceptsPromptCache`); a server that rejects them anyway loses them through
+    /// `withoutRejectedField`.
+    static func contextRequestBody(_ p: RequestLayout.Prepared, request: ContextRequest, model: String, baseURL: URL?,
+                                   thinking: Thinking) -> Data {
+        let rules = RequestLayout.rules(source: request.source, target: request.target, glossary: p.glossary, wantsTerms: p.wantsTerms)
+        let system = p.cardNote.isEmpty ? rules : rules + "\n\n" + p.cardNote
+        var body: [String: Any] = [
+            "model": model, "stream": false,
+            "messages": [["role": "system", "content": system],
+                         ["role": "user", "content": RequestLayout.lastMessage(items: request.items, p)]],
+        ]
+        addQuirkFields(&body, model: model, baseURL: baseURL, thinking: thinking)
+        if ModelQuirks.acceptsPromptCache(host: baseURL?.host ?? "") {
+            body["store"] = false
+            if let key = request.threadKey { body["prompt_cache_key"] = key }
+        }
         return encode(body)
     }
 
@@ -32,7 +58,10 @@ public enum ChatTranslation {
         (try? JSONSerialization.data(withJSONObject: body, options: [.withoutEscapingSlashes, .sortedKeys])) ?? Data()
     }
 
-    static let rejectableFields = ["temperature", "reasoning_effort", "reasoning", "thinking", "enable_thinking"]
+    /// The fields a 400 may name and we can then drop. `prompt_cache_key` and `store` are OpenAI's (a local server answers
+    /// them with a 400); `context`, `custom_instructions` and `formality` are DeepL's (design §8.6).
+    static let rejectableFields = ["temperature", "reasoning_effort", "reasoning", "thinking", "enable_thinking",
+                                   "prompt_cache_key", "store", "context", "custom_instructions", "formality"]
 
     /// For a 400 whose message names one of the fields we send, the request body without it and the field's name;
     /// otherwise nil. The caller retries once and remembers the field per engine.
@@ -40,7 +69,8 @@ public enum ChatTranslation {
         guard let root = try? JSONSerialization.jsonObject(with: errorBody) else { return nil }
         let errors = (root as? [Any]) ?? [root]
         let messages = errors.compactMap { e -> String? in
-            guard let err = (e as? [String: Any])?["error"] else { return nil }
+            // DeepL answers `{"message": "…"}` without an `error` key.
+            guard let err = (e as? [String: Any])?["error"] else { return (e as? [String: Any])?["message"] as? String }
             return (err as? [String: Any])?["message"] as? String ?? err as? String
         }
         guard !messages.isEmpty, var request = try? JSONSerialization.jsonObject(with: body) as? [String: Any] else { return nil }
@@ -83,6 +113,11 @@ public enum ChatTranslation {
     }
 
     public static func parseTranslations(_ data: Data, count: Int) throws(ChatTranslationError) -> [String] {
+        try parseReply(data, count: count).lines
+    }
+
+    /// The translations, the `terms` the model reported, and the usage of one `/chat/completions` reply.
+    public static func parseReply(_ data: Data, count: Int) throws(ChatTranslationError) -> TranslationReply {
         guard let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw .malformed("response is not a JSON object")
         }
@@ -95,26 +130,13 @@ public enum ChatTranslation {
               let content = (first["message"] as? [String: Any])?["content"] as? String
         else { throw .malformed("no choices[0].message.content") }
 
-        return try translations(fromContent: content, count: count)
+        let r = try ContextReply.parse(content: content, count: count)
+        return TranslationReply(lines: r.lines, terms: r.terms, usage: TokenUsage.openAI(root))
     }
 
-    /// The `{"translations": [...]}` (or bare array) inside a model's text reply.
+    /// The `{"t": [...]}`, `{"translations": [...]}` (or bare array) inside a model's text reply, as lines.
     static func translations(fromContent content: String, count: Int) throws(ChatTranslationError) -> [String] {
-        let json = extractJSON(content)
-        guard let jsonData = json.data(using: .utf8),
-              let value = try? JSONSerialization.jsonObject(with: jsonData)
-        else { throw .malformed("content has no JSON") }
-        let list: [String]
-        if let obj = value as? [String: Any] {
-            guard let t = obj["translations"] as? [String] else { throw .malformed("translations is not an array of strings") }
-            list = t
-        } else if let arr = value as? [String] {
-            list = arr
-        } else {
-            throw .malformed("unexpected JSON shape")
-        }
-        guard list.count == count else { throw .countMismatch(expected: count, got: list.count) }
-        return list
+        try ContextReply.parse(content: content, count: count).lines
     }
 
     /// True only for `localhost`, `127.0.0.1` and `::1`; a `.local` host is another machine.

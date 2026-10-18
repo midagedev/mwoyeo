@@ -87,10 +87,12 @@ public enum StrikeRule {
 }
 
 /// How long the lens waits before reading a region again after a recognition pass failed: 1 s, doubling per consecutive
-/// failure, capped at 30 s. Ended by a successful pass or a change of geometry/language (`reset()`).
+/// failure, capped at 5 s (a lens is idle 5 s at most once recognition works again). A transient failure (programs not
+/// ready after a compile, a timeout) waits 1 s and does not count. Ended by a successful pass or a change of
+/// geometry/language (`reset()`).
 public struct ReadBackoff: Sendable, Equatable {
     public static let base: TimeInterval = 1
-    public static let cap: TimeInterval = 30
+    public static let cap: TimeInterval = 5
 
     public private(set) var failures = 0
     private var until: TimeInterval?
@@ -98,7 +100,11 @@ public struct ReadBackoff: Sendable, Equatable {
     public init() {}
 
     @discardableResult
-    public mutating func failure(now: TimeInterval) -> TimeInterval {
+    public mutating func failure(now: TimeInterval, transient: Bool = false) -> TimeInterval {
+        if transient {
+            until = now + Self.base
+            return Self.base
+        }
         let wait = min(Self.cap, Self.base * pow(2, Double(min(failures, 10))))
         failures += 1
         until = now + wait

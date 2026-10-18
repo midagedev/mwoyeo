@@ -782,7 +782,7 @@ actor RegionPipeline {
             Trace.mark("fast: OCR failed \(error)", since: t)
             // A stuck request is retried; any other failure would just fail again on the same pixels.
             if !(error is TextRecognizer.Timeout) {
-                noteReadFailure()
+                noteReadFailure(error)
                 _ = finishPass(start, frame: frame)
             }
             return
@@ -857,7 +857,7 @@ actor RegionPipeline {
             log.error("document OCR failed: \(String(describing: error), privacy: .public)")
             Trace.mark("seamless: OCR failed \(error)", since: t)
             if error is TextRecognizer.Timeout { return false }
-            noteReadFailure()
+            noteReadFailure(error)
             _ = finishPass(start, frame: frame)
             return true
         }
@@ -900,9 +900,12 @@ actor RegionPipeline {
         return true
     }
 
-    private func noteReadFailure() {
-        let wait = readBackoff.failure(now: ProcessInfo.processInfo.systemUptime)
-        Trace.count("ocr.failed_pass")
+    /// A failed pass delays the next read (`ReadBackoff`); "programs not ready" is a transient of the system's recognizer
+    /// (OCRHealth) and only waits a second, so the minute of it after an update or a heavy compile does not pile up.
+    private func noteReadFailure(_ error: Error) {
+        let transient = OCRHealth.programsNotReady(error)
+        let wait = readBackoff.failure(now: ProcessInfo.processInfo.systemUptime, transient: transient)
+        Trace.count(transient ? "ocr.failed_pass.notready" : "ocr.failed_pass")
         Trace.mark("ocr: failed pass \(readBackoff.failures), next read in \(Int(wait)) s", since: Trace.now)
     }
 

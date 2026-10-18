@@ -44,14 +44,26 @@ import Testing
     @Test func readBackoffDoublesAndResets() {
         var r = ReadBackoff()
         var waits: [TimeInterval] = []
-        for _ in 0..<7 { waits.append(r.failure(now: 50)) }
-        #expect(waits == [1, 2, 4, 8, 16, 30, 30])
-        #expect(r.isWaiting(now: 79.9) && !r.isWaiting(now: 80))
-        #expect(abs((r.remaining(now: 70) ?? 0) - 10) < 1e-9)
+        for _ in 0..<5 { waits.append(r.failure(now: 50)) }
+        // Capped at 5 s: once recognition works again, a lens is idle 5 s at most (it was 30, 2026-10-18).
+        #expect(waits == [1, 2, 4, 5, 5])
+        #expect(r.isWaiting(now: 54.9) && !r.isWaiting(now: 55))
+        #expect(abs((r.remaining(now: 52) ?? 0) - 3) < 1e-9)
         r.success()
         #expect(!r.isWaiting(now: 50) && r.remaining(now: 50) == nil)
         #expect(r.failure(now: 0) == 1)
         r.reset()
         #expect(r.failures == 0 && !r.isWaiting(now: 0))
+    }
+
+    /// A transient error (programs not ready after a compile, a timeout) is retried in 1 s and never builds up the wait:
+    /// otherwise the minute of e5rt errors after an update would leave the lens idle long after recognition is back.
+    @Test func transientReadFailuresDoNotBuildUp() {
+        var r = ReadBackoff()
+        for _ in 0..<20 { #expect(r.failure(now: 0, transient: true) == 1) }
+        #expect(r.failures == 0)
+        #expect(r.failure(now: 0) == 1)
+        #expect(r.failure(now: 0, transient: true) == 1)
+        #expect(r.failure(now: 0) == 2)
     }
 }

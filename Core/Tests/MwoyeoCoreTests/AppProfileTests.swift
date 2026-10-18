@@ -37,4 +37,24 @@ import Testing
         let p = try JSONDecoder().decode(AppProfile.self, from: Data(#"{"bundleID":"a.b","future":1}"#.utf8))
         #expect(p.bundleID == "a.b" && p.appName == "a.b" && p.source == "auto" && p.customEngineID == nil)
     }
+
+    @Test func readerDecodesAsInheritWhenMissingOrUnknown() throws {
+        let old = try JSONDecoder().decode(AppProfile.self, from: Data(#"{"bundleID":"a.b","source":"ja","target":"en"}"#.utf8))
+        #expect(old.paragraphReader == nil)
+        let future = try JSONDecoder().decode(AppProfile.self, from: Data(#"{"bundleID":"a.b","paragraphReader":"somethingNew"}"#.utf8))
+        #expect(future.paragraphReader == nil && future.bundleID == "a.b")
+        let set = try JSONDecoder().decode(AppProfile.self, from: Data(#"{"bundleID":"a.b","paragraphReader":"lineGrouping"}"#.utf8))
+        #expect(set.paragraphReader == .lineGrouping)
+    }
+
+    @Test func readerRoundTripsAndProfileOverridesBase() throws {
+        let p = AppProfile(bundleID: "a.b", appName: "A", source: "ja", target: "en", paragraphReader: .documentLayout)
+        let back = try JSONDecoder().decode(AppProfile.self, from: JSONEncoder().encode(p))
+        #expect(back == p)
+        #expect(AppProfiles.paragraphReader(base: .automatic, profiles: [p], app: "a.b") == .documentLayout)
+        // An app without a profile, a profile without a choice, and no app at all keep the default.
+        #expect(AppProfiles.paragraphReader(base: .lineGrouping, profiles: [p], app: "c.d") == .lineGrouping)
+        #expect(AppProfiles.paragraphReader(base: .lineGrouping, profiles: [jaEn], app: jaEn.bundleID) == .lineGrouping)
+        #expect(AppProfiles.paragraphReader(base: .lineGrouping, profiles: [p], app: nil) == .lineGrouping)
+    }
 }

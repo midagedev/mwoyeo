@@ -1,0 +1,7 @@
+$ npm run build
+> app@1.2.0 build
+> vite build
+warning: chunk size exceeds 500 kB after minification
+error: could not resolve "./missing-module" from src/main.ts
+Build finished in 4.82s
+$ _

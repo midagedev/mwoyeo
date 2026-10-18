@@ -9,6 +9,12 @@ enum Entry {
         if CommandLine.arguments.dropFirst().first == "--render" {
             SelfTest.run(Array(CommandLine.arguments.dropFirst(2)))
         }
+        // `Mwoyeo --warm-vision <step> <key>` is the child the app starts to compile one Swift Vision model of a language set
+        // (`SwiftVisionChild`).
+        if CommandLine.arguments.dropFirst().first == "--warm-vision" {
+            let rest = CommandLine.arguments.dropFirst(2)
+            SwiftVisionChild.runChild(step: rest.first ?? "", key: rest.dropFirst().first ?? SwiftVisionGate.anyLanguage)
+        }
         if CommandLine.arguments.dropFirst().first == "--capture-ui" {
             UICapture.run(Array(CommandLine.arguments.dropFirst(2)))
         }

@@ -49,3 +49,28 @@ extension AppModel {
         return (bundleID, app.localizedName ?? w.appName)
     }
 }
+
+/// What the paragraph reader knows about the app a lens covers.
+extension AppModel {
+    /// The app under a lens: the window it follows, else the topmost window under its centre.
+    static func readerContext(for config: RegionConfig) -> ReaderContext {
+        let app: (bundleID: String, name: String)?
+        if let anchor = config.anchor {
+            app = Self.app(ofWindow: anchor.windowID)
+        } else if let w = WindowInfo.onScreen().first(where: { $0.bounds.contains(CGPoint(x: config.rect.midX, y: config.rect.midY)) }),
+                  let running = NSRunningApplication(processIdentifier: w.pid), let id = running.bundleIdentifier {
+            app = (id, running.localizedName ?? w.appName)
+        } else {
+            app = nil
+        }
+        guard let app else { return ReaderContext() }
+        return ReaderContext(bundleID: app.bundleID, category: category(ofApp: app.bundleID))
+    }
+
+    /// `LSApplicationCategoryType` from the app's Info.plist; nil when the app has none or the plist cannot be read (the decider
+    /// then goes by the bundle ID and the layout).
+    static func category(ofApp bundleID: String) -> String? {
+        guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID) else { return nil }
+        return Bundle(url: url)?.object(forInfoDictionaryKey: "LSApplicationCategoryType") as? String
+    }
+}

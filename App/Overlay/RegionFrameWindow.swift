@@ -9,6 +9,9 @@ final class RegionFrameWindow: NSPanel {
     /// Room around the region for the glow and the grab band.
     static let margin: CGFloat = 18
     static let tabHeight: CGFloat = 26
+    /// What the name tag takes beside the region: the gap to the region, its height, and room for its shadow (blur 8) so the
+    /// window edge does not cut it.
+    static let tabExtra: CGFloat = 6 + tabHeight + 8
 
     /// Live drag: the region's new AppKit frame.
     var onMove: ((NSRect) -> Void)?
@@ -21,10 +24,11 @@ final class RegionFrameWindow: NSPanel {
     var onContextMenu: (() -> NSMenu?)?
 
     private let chrome: FrameChromeView
+    private var tabPosition = LensTabPosition.topLeading
 
     init(region: NSRect, name: String) {
         chrome = FrameChromeView(name: name)
-        super.init(contentRect: Self.windowFrame(for: region), styleMask: [.borderless, .nonactivatingPanel],
+        super.init(contentRect: Self.windowFrame(for: region, position: .topLeading), styleMask: [.borderless, .nonactivatingPanel],
                    backing: .buffered, defer: false)
         isOpaque = false
         backgroundColor = .clear
@@ -41,18 +45,21 @@ final class RegionFrameWindow: NSPanel {
 
     override var canBecomeKey: Bool { false }
 
-    static func windowFrame(for region: NSRect) -> NSRect {
-        NSRect(x: region.minX - margin, y: region.minY - margin,
-               width: region.width + 2 * margin, height: region.height + margin + tabHeight + 6)
+    /// The window around `region`: the margin on every side, and room for the name tag above it or below it.
+    static func windowFrame(for region: NSRect, position: LensTabPosition) -> NSRect {
+        let below = position.isBottom ? tabExtra : margin
+        return NSRect(x: region.minX - margin, y: region.minY - below,
+                      width: region.width + 2 * margin, height: region.height + margin + tabExtra)
     }
 
     var regionFrame: NSRect {
-        NSRect(x: frame.minX + Self.margin, y: frame.minY + Self.margin,
-               width: frame.width - 2 * Self.margin, height: frame.height - Self.margin - Self.tabHeight - 6)
+        let below = tabPosition.isBottom ? Self.tabExtra : Self.margin
+        return NSRect(x: frame.minX + Self.margin, y: frame.minY + below,
+                      width: frame.width - 2 * Self.margin, height: frame.height - Self.margin - Self.tabExtra)
     }
 
     func setRegion(_ r: NSRect) {
-        setFrame(Self.windowFrame(for: r), display: true)
+        setFrame(Self.windowFrame(for: r, position: tabPosition), display: true)
     }
 
     func setName(_ name: String) { chrome.name = name }
@@ -68,7 +75,21 @@ final class RegionFrameWindow: NSPanel {
     /// Window lens (true) or screen lens.
     func setFollowing(_ on: Bool) { chrome.following = on }
 
-    func setStyle(_ style: LensStyle) { chrome.style = style }
+    func setAppearance(_ s: AppSettings) {
+        setAppearance(style: s.lensStyle, tint: s.lensTint, tabVisibility: s.lensTabVisibility, tabPosition: s.lensTabPosition)
+    }
+
+    /// How the lens looks. A new tag position moves the window around the region, never the region.
+    func setAppearance(style: LensStyle, tint: LensTint, tabVisibility: LensTabVisibility, tabPosition: LensTabPosition) {
+        let region = regionFrame
+        let moved = tabPosition != self.tabPosition
+        self.tabPosition = tabPosition
+        chrome.tabPosition = tabPosition
+        chrome.tabVisibility = tabVisibility
+        chrome.tint = tint
+        chrome.style = style
+        if moved { setRegion(region) }
+    }
 
     /// Showing the original: the ring turns grey, the pill says so, and a sweep marks the switch.
     func setOriginal(_ on: Bool) { chrome.original = on }
@@ -89,6 +110,12 @@ private final class FrameChromeView: NSView {
     var original = false { didSet { if original != oldValue { applyStyle(); sweep() } } }
     var following = false { didSet { if following != oldValue { needsDisplay = true; updateToolTip() } } }
     var style = LensStyle.glow { didSet { if style != oldValue { applyStyle() } } }
+    var tint = LensTint.spectrum { didSet { if tint != oldValue { applyStyle() } } }
+    var tabVisibility = LensTabVisibility.automatic { didSet { if tabVisibility != oldValue { needsDisplay = true; updateToolTip() } } }
+    var tabPosition = LensTabPosition.topLeading {
+        didSet { if tabPosition != oldValue { needsLayout = true; needsDisplay = true; updateToolTip() } }
+    }
+    private var accentObserver: NSObjectProtocol?
     /// A short message that takes the place of the pill's second line.
     private var notice: String? { didSet { needsDisplay = true } }
     private var noticeTimer: Timer?
@@ -112,19 +139,15 @@ private final class FrameChromeView: NSView {
     // rasterized, so the window server draws them once: a spinning gradient was redrawn every display frame and took
     // the window server from about 25 % to 90 % CPU, enough to make a dragged lens stutter. Reading shows as the glow
     // breathing, an opacity change the compositor does on the cached image.
+    // The mask sits on the gradient, never on the rasterized container: a container that is both rasterized and masked
+    // is drawn at full opacity whatever its `opacity` (macOS 27), and a mask beside the blur cuts the blur back to the
+    // stroke's hard edge. Together they made the glow an opaque band that hid the ring (tools/lens-look/profile.py).
     private let ring = CALayer(), ringMask = CAShapeLayer(), ringGradient = CAGradientLayer()
     private let glow = CALayer(), glowMask = CAShapeLayer(), glowGradient = CAGradientLayer()
     private let sweepClip = CALayer(), sweepMask = CAShapeLayer(), sweepLayer = CAGradientLayer()
 
-    private static let colors: [CGColor] = [
-        NSColor(srgbRed: 1.00, green: 0.62, blue: 0.04, alpha: 1), // orange
-        NSColor(srgbRed: 1.00, green: 0.22, blue: 0.37, alpha: 1), // pink
-        NSColor(srgbRed: 0.75, green: 0.35, blue: 0.95, alpha: 1), // purple
-        NSColor(srgbRed: 0.37, green: 0.36, blue: 0.90, alpha: 1), // indigo
-        NSColor(srgbRed: 0.39, green: 0.82, blue: 1.00, alpha: 1), // cyan
-        NSColor(srgbRed: 1.00, green: 0.62, blue: 0.04, alpha: 1),
-    ].map(\.cgColor)
-    private static let greys: [CGColor] = [0.95, 0.6, 0.85, 0.55, 0.95].map { NSColor(white: $0, alpha: 1).cgColor }
+    /// Around the ring: the tint, or the greys for the faint style and while showing the original.
+    private var ringColors: [CGColor] { (style == .minimal || original ? LensTint.mono : tint).colors.map(\.cgColor) }
 
     init(name: String) {
         self.name = name
@@ -133,19 +156,17 @@ private final class FrameChromeView: NSView {
         layerUsesCoreImageFilters = true
         for (container, mask, gradient) in [(glow, glowMask, glowGradient), (ring, ringMask, ringGradient)] {
             gradient.type = .conic
-            gradient.colors = Self.colors
             gradient.startPoint = CGPoint(x: 0.5, y: 0.5)
             gradient.endPoint = CGPoint(x: 0.5, y: 0)
             mask.fillColor = nil
             mask.strokeColor = NSColor.black.cgColor
-            container.mask = mask
+            gradient.mask = mask
             container.shouldRasterize = true
             container.addSublayer(gradient)
             layer?.addSublayer(container)
         }
-        ringMask.lineWidth = 2.5
-        glowMask.lineWidth = 10
-        glow.filters = [CIFilter(name: "CIGaussianBlur", parameters: [kCIInputRadiusKey: 9])!]
+        glowMask.lineWidth = 4
+        glow.filters = [CIFilter(name: "CIGaussianBlur", parameters: [kCIInputRadiusKey: 6])!]
         sweepLayer.colors = [NSColor.white.withAlphaComponent(0).cgColor, NSColor.white.withAlphaComponent(0.22).cgColor,
                              NSColor.white.withAlphaComponent(0).cgColor]
         sweepLayer.startPoint = CGPoint(x: 0, y: 0.5)
@@ -154,15 +175,26 @@ private final class FrameChromeView: NSView {
         sweepClip.mask = sweepMask
         sweepClip.addSublayer(sweepLayer)
         layer?.addSublayer(sweepClip)
+        // The accent tint follows the system accent colour.
+        accentObserver = NotificationCenter.default.addObserver(forName: NSColor.systemColorsDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { if self?.tint == .accent { self?.applyStyle() } }
+        }
         applyStyle()
     }
+
+    deinit { accentObserver.map(NotificationCenter.default.removeObserver) }
 
     private func applyStyle() {
         CATransaction.begin()
         CATransaction.setAnimationDuration(0.35)
-        for gradient in [ringGradient, glowGradient] { gradient.colors = style == .minimal || original ? Self.greys : Self.colors }
+        for gradient in [ringGradient, glowGradient] { gradient.colors = ringColors }
         CATransaction.commit()
-        ringMask.lineWidth = style == .glow ? 2.5 : 1.5
+        ringMask.lineWidth = switch style {
+        case .glow, .corners: 1.5
+        case .subtle, .minimal: 1.0
+        }
+        for mask in [ringMask, glowMask] { mask.lineCap = style == .corners ? .round : .butt }
+        needsLayout = true
         updateGlow()
         needsDisplay = true
     }
@@ -186,21 +218,31 @@ private final class FrameChromeView: NSView {
     // MARK: - Geometry (view coordinates, y up)
 
     private var regionRect: NSRect {
-        NSRect(x: RegionFrameWindow.margin, y: RegionFrameWindow.margin,
+        NSRect(x: RegionFrameWindow.margin, y: tabPosition.isBottom ? RegionFrameWindow.tabExtra : RegionFrameWindow.margin,
                width: bounds.width - 2 * RegionFrameWindow.margin,
-               height: bounds.height - RegionFrameWindow.margin - RegionFrameWindow.tabHeight - 6)
+               height: bounds.height - RegionFrameWindow.margin - RegionFrameWindow.tabExtra)
     }
 
     private var strong: Bool { emphasized || hovering || drag != nil }
-    /// Minimal lenses show their name tag only under the pointer.
-    private var showsTab: Bool { style != .minimal || strong || notice != nil }
+    /// A notice always shows the tag; otherwise the setting decides (automatic: minimal lenses show it only under the pointer).
+    private var showsTab: Bool {
+        if strong || notice != nil { return true }
+        switch tabVisibility {
+        case .automatic: return style != .minimal
+        case .always: return true
+        case .onHover: return false
+        }
+    }
 
     private var tabRect: NSRect {
         let title = (name as NSString).size(withAttributes: [.font: Self.titleFont]).width
         let longest = [detail, notice ?? ""].max { $0.count < $1.count } ?? ""
         let sub = longest.isEmpty ? 0 : (longest as NSString).size(withAttributes: [.font: Self.detailFont]).width + 10 + (badge == nil ? 0 : 14)
         let w = min(regionRect.width, title + sub + 40 + 20 + (strong ? 22 : 0))
-        return NSRect(x: regionRect.minX, y: regionRect.maxY + 6, width: max(72, w), height: RegionFrameWindow.tabHeight)
+        let width = max(72, w)
+        return NSRect(x: tabPosition.isTrailing ? regionRect.maxX - width : regionRect.minX,
+                      y: tabPosition.isBottom ? regionRect.minY - 6 - RegionFrameWindow.tabHeight : regionRect.maxY + 6,
+                      width: width, height: RegionFrameWindow.tabHeight)
     }
 
     private var closeRect: NSRect {
@@ -229,15 +271,18 @@ private final class FrameChromeView: NSView {
         super.layout()
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        let path = CGPath(roundedRect: regionRect.insetBy(dx: -1, dy: -1), cornerWidth: radius, cornerHeight: radius, transform: nil)
+        let outline = regionRect.insetBy(dx: -1, dy: -1)
+        let path = style == .corners ? Self.brackets(in: outline, radius: radius)
+            : CGPath(roundedRect: outline, cornerWidth: radius, cornerHeight: radius, transform: nil)
         let diagonal = hypot(bounds.width, bounds.height)
         for (container, mask, gradient) in [(glow, glowMask, glowGradient), (ring, ringMask, ringGradient)] {
             container.frame = bounds
-            mask.frame = bounds
-            mask.path = path
             // A square big enough to cover the ring, centred on the lens.
             gradient.bounds = CGRect(x: 0, y: 0, width: diagonal, height: diagonal)
             gradient.position = CGPoint(x: regionRect.midX, y: regionRect.midY)
+            // The mask lives in the gradient's coordinates; this frame puts the path back in the view's.
+            mask.frame = CGRect(origin: CGPoint(x: -gradient.frame.minX, y: -gradient.frame.minY), size: bounds.size)
+            mask.path = path
             container.rasterizationScale = window?.backingScaleFactor ?? 2
         }
         sweepClip.frame = bounds
@@ -248,6 +293,32 @@ private final class FrameChromeView: NSView {
         CATransaction.commit()
     }
 
+    /// Four corner brackets: each a quarter arc of `radius` with a straight arm along both sides, min(18, a quarter of the
+    /// side) long, kept clear of the neighbouring bracket on a small lens.
+    private static func brackets(in r: NSRect, radius: CGFloat) -> CGPath {
+        let arm = { (side: CGFloat) in max(0, min(18, side * 0.25, side / 2 - radius - 2)) }
+        let ax = arm(r.width), ay = arm(r.height)
+        let p = CGMutablePath()
+        // Each corner, walked from the end of one arm to the end of the other (y up).
+        p.move(to: CGPoint(x: r.minX, y: r.minY + radius + ay))
+        p.addLine(to: CGPoint(x: r.minX, y: r.minY + radius))
+        p.addArc(tangent1End: CGPoint(x: r.minX, y: r.minY), tangent2End: CGPoint(x: r.minX + radius, y: r.minY), radius: radius)
+        p.addLine(to: CGPoint(x: r.minX + radius + ax, y: r.minY))
+        p.move(to: CGPoint(x: r.maxX - radius - ax, y: r.minY))
+        p.addLine(to: CGPoint(x: r.maxX - radius, y: r.minY))
+        p.addArc(tangent1End: CGPoint(x: r.maxX, y: r.minY), tangent2End: CGPoint(x: r.maxX, y: r.minY + radius), radius: radius)
+        p.addLine(to: CGPoint(x: r.maxX, y: r.minY + radius + ay))
+        p.move(to: CGPoint(x: r.maxX, y: r.maxY - radius - ay))
+        p.addLine(to: CGPoint(x: r.maxX, y: r.maxY - radius))
+        p.addArc(tangent1End: CGPoint(x: r.maxX, y: r.maxY), tangent2End: CGPoint(x: r.maxX - radius, y: r.maxY), radius: radius)
+        p.addLine(to: CGPoint(x: r.maxX - radius - ax, y: r.maxY))
+        p.move(to: CGPoint(x: r.minX + radius + ax, y: r.maxY))
+        p.addLine(to: CGPoint(x: r.minX + radius, y: r.maxY))
+        p.addArc(tangent1End: CGPoint(x: r.minX, y: r.maxY), tangent2End: CGPoint(x: r.minX, y: r.maxY - radius), radius: radius)
+        p.addLine(to: CGPoint(x: r.minX, y: r.maxY - radius - ay))
+        return p
+    }
+
     /// Calm at rest; brighter under the pointer, and breathing while reading or translating.
     /// Subtle glows only while reading; minimal never does.
     private func updateGlow() {
@@ -256,12 +327,12 @@ private final class FrameChromeView: NSView {
         switch style {
         case .glow:
             ring.opacity = busy || strong ? 1 : 0.8
-            glow.opacity = busy ? 0.95 : strong ? 0.75 : 0.45
-        case .subtle:
+            glow.opacity = busy ? 0.95 : strong ? 0.7 : 0.35
+        case .subtle, .corners:
             ring.opacity = busy || strong ? 1 : 0.7
             glow.opacity = busy ? 0.7 : strong ? 0.3 : 0
         case .minimal:
-            ring.opacity = strong ? 0.9 : busy ? 0.6 : 0.35
+            ring.opacity = strong ? 0.9 : busy ? 0.6 : 0.45
             glow.opacity = strong ? 0.25 : 0
         }
         CATransaction.commit()
@@ -441,7 +512,7 @@ private final class FrameChromeView: NSView {
         pill.stroke()
 
         let dot = NSRect(x: tab.minX + 11, y: tab.midY - 4.5, width: 9, height: 9)
-        NSGradient(colors: (original ? Self.greys : Self.colors).prefix(4).compactMap { NSColor(cgColor: $0) })?
+        NSGradient(colors: Array((original ? LensTint.mono : tint).colors.prefix(4)))?
             .draw(in: NSBezierPath(ovalIn: dot), angle: busy ? 90 : -45)
 
         var x = dot.maxX + 8
@@ -451,7 +522,7 @@ private final class FrameChromeView: NSView {
                    options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])
         x += title.size().width + 10
         if original || !detail.isEmpty || notice != nil, x < tab.maxX - 50 {
-            let sub = NSAttributedString(string: notice ?? (original ? String(localized: "Original") : busy ? String(localized: "Translating…") : detail),
+            let sub = NSAttributedString(string: notice ?? (original ? String(localized: "Original") : detail),
                                          attributes: [.font: Self.detailFont, .foregroundColor: NSColor.white.withAlphaComponent(0.6)])
             // An added engine's mark: a cloud for a remote one, a Mac for one on this Mac.
             if let badge, notice == nil, !original,

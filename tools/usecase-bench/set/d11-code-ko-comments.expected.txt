@@ -1,0 +1,6 @@
+// 사용자가 로그인했는지 확인한다.
+func isLoggedIn() -> Bool {
+guard let token = store.token else { return false }
+// 토큰이 만료되었으면 로그아웃 상태로 본다.
+return !token.isExpired
+}

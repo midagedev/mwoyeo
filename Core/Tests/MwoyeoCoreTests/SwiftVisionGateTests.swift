@@ -165,4 +165,22 @@ import Testing
         g.retry()
         #expect(!g.shouldShowProgress(now: 10_001))
     }
+
+    @Test func aCompileInAChildBlocksNothingInThisProcess() {
+        var g = G()
+        g.want("ja")
+        g.started(G.Due(key: "ja", step: .textModel), now: 0)
+        g.finished(failure: nil, now: 1)
+        g.started(G.Due(key: "ja", step: .documentModel), now: 1)
+        #expect(g.isSwiftCompiling)
+        g.childPhase(true)
+        #expect(g.inChild && !g.isSwiftCompiling)
+        g.childPhase(false)
+        #expect(g.isSwiftCompiling)
+        g.childPhase(true)
+        g.finished(failure: nil, now: 90)
+        #expect(!g.inChild)
+        g.childPhase(true)                  // nothing running: nothing to move
+        #expect(!g.inChild)
+    }
 }

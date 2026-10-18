@@ -8,8 +8,8 @@ enum Brand {
         Color(red: 0.39, green: 0.82, blue: 1.00), Color(red: 1.00, green: 0.62, blue: 0.04),
     ]
 
-    static func ring(_ angle: Angle = .zero) -> AngularGradient {
-        AngularGradient(colors: spectrum, center: .center, angle: angle)
+    static func ring(_ angle: Angle = .zero, tint: LensTint = .spectrum) -> AngularGradient {
+        AngularGradient(colors: tint == .spectrum ? spectrum : tint.colors.map { Color(nsColor: $0) }, center: .center, angle: angle)
     }
 }
 
@@ -21,6 +21,7 @@ struct LensRing: View {
     var spinning = false
     var active = true
     var period: Double = 2.4
+    var tint = LensTint.spectrum
 
     var body: some View {
         TimelineView(.animation(paused: !spinning)) { t in
@@ -28,9 +29,9 @@ struct LensRing: View {
             let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
             ZStack {
                 if active, glow > 0 {
-                    shape.stroke(Brand.ring(angle), lineWidth: lineWidth * 2.5).blur(radius: glow).opacity(0.7)
+                    shape.stroke(Brand.ring(angle, tint: tint), lineWidth: lineWidth * 2.5).blur(radius: glow).opacity(0.7)
                 }
-                shape.stroke(active ? AnyShapeStyle(Brand.ring(angle)) : AnyShapeStyle(.tertiary), lineWidth: lineWidth)
+                shape.stroke(active ? AnyShapeStyle(Brand.ring(angle, tint: tint)) : AnyShapeStyle(.tertiary), lineWidth: lineWidth)
             }
         }
     }

@@ -5,10 +5,16 @@ import SwiftUI
 
 /// Window captures of the engine UI, for checking a look without clicking through the app:
 ///   Mwoyeo --capture-ui outdir scenario… [--mock http://host:port/v1] [--delay s] [--image picture]
-/// Scenarios: translation-default, translation-engines, general-saving, menu-default, menu-switcher, menu-notice,
+/// `vision-reads [--src ja] [--image picture] [--for seconds]` is a probe, not a capture: it starts the initialization of the text
+/// models for the language and reads the picture in this process every half second until every step is done, printing each
+/// read's latency and the steps as they change (what a lens sees during a cold compile; no window).
+/// Scenarios: menu-init-running, menu-init-failed, menu-init-done (the panel during the initialization of the text
+/// models, from a gate of its own, no real recognition), translation-default, translation-packs, translation-packs-auto, translation-engines, general-saving, menu-default, menu-switcher, menu-notice,
 /// menu-profile, image-window and image-window-original (the Translate Image window on `--image`, translated through the
 /// mock, then with Show Original on; when the text recognizer reads nothing the picture stands in for its translation, which
-/// still shows the toggle's two states), sheet-pick, sheet-config, sheet-config-remote, lens-badge, lens-notice, lens-menu, add-flow (adds an
+/// still shows the toggle's two states), appearance (Settings › Appearance), lens-gallery (every lens style in every tint on a dark and
+/// a light backdrop: one PNG each, lens-<style>-<tint>-<dark|light>.png, and a grid per backdrop), lens-tab-positions (the name tag
+/// in its four places, one carrying a notice), lens-reading (the default glow while the lens reads), sheet-pick, sheet-config, sheet-config-remote, lens-badge, lens-notice, lens-menu, add-flow (adds an
 /// engine through the sheet, prints where the key is), check-logic (prints PASS/FAIL for the engine selection and the
 /// engine notice's dismissal; no window). Run it with `MWOYEO_MEMORY_SECRETS=1` so it does not touch the Keychain. It keeps its
 /// preferences in a scratch suite of its own (deleted at exit; `MWOYEO_DEFAULTS_SUITE` names one to keep), never the app's real
@@ -43,8 +49,8 @@ enum UICapture {
             var names: [String] = [], skip = false
             for a in args.dropFirst() {
                 if skip { skip = false; continue }
-                if a == "--mock" || a == "--delay" || a == "--key" || a == "--image" { skip = true; continue }
-                if a == "--keep-key" { continue }
+                if a == "--mock" || a == "--delay" || a == "--key" || a == "--image" || a == "--engine-name" { skip = true; continue }
+                if a == "--keep-key" || a == "--dump" { continue }
                 names.append(a)
             }
             return names
@@ -67,7 +73,7 @@ enum UICapture {
 
         /// A cloud engine and a local one (the local one points at the mock and has run a few batches).
         private func seedEngines() async {
-            let cloud = engine("Gemini", "https://generativelanguage.googleapis.com/v1beta/openai/", "gemini-3.1-flash-lite")
+            let cloud = engine(option("--engine-name") ?? "Gemini", "https://generativelanguage.googleapis.com/v1beta/openai/", "gemini-3.1-flash-lite")
             let local = engine("Ollama", mock, "qwen3:8b")
             model.settings.sourceLanguage = "ja"
             model.settings.targetLanguage = "ko"
@@ -86,11 +92,22 @@ enum UICapture {
         private func scenario(_ name: String) async {
             switch name {
             case "translation-default": await shoot(name, TranslationSettings(), CGSize(width: 560, height: 760))
+            case "translation-packs", "translation-packs-auto":
+                // The language packs section: the chosen pair alone (ja → ko), or the installed pairs while the source is automatic.
+                model.settings.sourceLanguage = name == "translation-packs" ? "ja" : "auto"
+                model.settings.targetLanguage = "ko"
+                await shoot(name, TranslationSettings(), CGSize(width: 560, height: 1300))
+            case "translation-profiles":
+                model.settings.appProfiles = [AppProfile(bundleID: "com.apple.Safari", appName: "Safari", source: "ja", target: "en"),
+                                              AppProfile(bundleID: "com.example.vn", appName: "Visual Novel", source: "ja", target: "en", paragraphReader: .lineGrouping)]
+                await shoot(name, TranslationSettings(), CGSize(width: 560, height: 1300))
+                model.settings.appProfiles = []
             case "general-saving": await shoot(name, GeneralSettings(), CGSize(width: 560, height: 800))
             case "menu-default": await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
             case "translation-engines":
                 await seedEngines()
                 await shoot(name, TranslationSettings(), CGSize(width: 560, height: 820))
+            case "engine-row-click": await engineRowClick()
             case "menu-switcher":
                 await seedEngines()
                 await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
@@ -105,6 +122,11 @@ enum UICapture {
                 await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
                 model.frontmostBundleID = nil
                 model.settings.appProfiles = []
+            case "menu-init-running", "menu-init-failed", "menu-init-done":
+                MenuPanel.fakeSetup = Self.fakeGate(String(name.dropFirst(10)))
+                await shoot(name, MenuPanel(), CGSize(width: 340, height: 460))
+                MenuPanel.fakeSetup = nil
+            case "vision-reads": await visionReads()
             case "image-window": await imageWindow(name, showOriginal: false)
             case "image-window-original": await imageWindow(name, showOriginal: true)
             case "check-logic": await checkLogic()
@@ -115,11 +137,76 @@ enum UICapture {
             case "sheet-config-remote":
                 let setup = EngineShare.encode(engine("Gemini", "https://gemini.example.invalid/v1beta/openai/", "gemini-3.1-flash-lite"))
                 await shoot(name, EngineSheet(autopilot: .init(setup: setup, key: "sk-test-capture")), CGSize(width: 480, height: 560), wait: 5)
+            case "appearance": await shoot(name, AppearanceSettings(), CGSize(width: 560, height: 520))
+            case "lens-gallery": await lensGallery()
+            case "lens-tab-positions": await lensTabPositions()
+            case "lens-reading":
+                await lensShot("lens-reading", dark: false, busy: true)
+                await lensShot("lens-reading-dark", dark: true, busy: true)
             case "lens-badge": await lens(name, badge: "cloud", notice: nil)
             case "lens-notice": await lens(name, badge: "cloud", notice: "Gemini unavailable · using Apple")
             case "lens-menu": await lens(name, badge: nil, notice: nil, menu: true)
             case "add-flow": await addFlow()
             default: print("unknown scenario \(name)")
+            }
+        }
+
+        /// A gate in the middle of the initialization, on a clock of its own: the text reader done in 34 s, then the paragraph reader
+        /// running for 46 s (`running`), failed (`failed`), or done too with the last step finished a second ago (`done`).
+        private static func fakeGate(_ state: String) -> (gate: SwiftVisionGate, now: TimeInterval) {
+            let t: TimeInterval = 1000
+            var g = SwiftVisionGate()
+            g.want("auto")
+            func step(_ s: SwiftVisionGate.Step, from: TimeInterval, to: TimeInterval?, failure: String? = nil) {
+                g.started(SwiftVisionGate.Due(key: "auto", step: s), now: t - from)
+                if let to { g.finished(failure: failure, now: t - to) }
+            }
+            step(.textModel, from: 90, to: 56)
+            switch state {
+            case "failed": step(.documentModel, from: 56, to: 10, failure: "the helper process ended with status 1")
+            case "done":
+                step(.documentModel, from: 56, to: 12)
+                step(.swiftTextModel, from: 12, to: 1)
+            default: step(.documentModel, from: 56, to: nil)
+            }
+            return (g, t)
+        }
+
+        /// Reads during the initialization: the latency of each read in this process while the steps run (the child compiles meanwhile).
+        private func visionReads() async {
+            let language = option("--src") ?? "ja"
+            let limit = Double(option("--for") ?? "400") ?? 400
+            let picture: CGImage? = option("--image").flatMap { NSImage(contentsOf: URL(fileURLWithPath: $0))?.cgImage(forProposedRect: nil, context: nil, hints: nil) } ?? TextRecognizer.probePicture
+            guard let picture else { print("vision-reads: no picture"); return }
+            let t0 = Trace.now
+            func at() -> String { String(format: "%6.1f", Trace.now - t0) }
+            Task.detached(priority: .utility) { await AppModel.loadVision(source: language) }
+            var shown = ""
+            var n = 0
+            while Trace.now - t0 < limit {
+                let gate = TextRecognizer.setupState
+                let steps = SwiftVisionGate.Step.allCases.map { "\($0.rawValue)=\(gate.steps[$0].map(Self.describe) ?? "?")" }.joined(separator: " ")
+                if steps != shown { shown = steps; print("[\(at())] steps: \(steps) child=\(gate.inChild)") }
+                if gate.running == nil, gate.allReady, !gate.steps.values.contains(.pending), n > 0 { break }
+                let began = Trace.now
+                n += 1
+                do {
+                    let blocks = try await TextRecognizer.blocks(in: picture, languages: [Locale.Language(identifier: language)])
+                    print("[\(at())] read \(n): \(blocks.count) blocks in \(Int((Trace.now - began) * 1000)) ms")
+                } catch {
+                    print("[\(at())] read \(n): failed \(error) in \(Int((Trace.now - began) * 1000)) ms")
+                }
+                try? await Task.sleep(for: .milliseconds(500))
+            }
+            print("[\(at())] vision-reads: end, \(n) reads, \(TextRecognizer.setupState.steps.map { "\($0.key.rawValue)=\(Self.describe($0.value))" }.sorted().joined(separator: " "))")
+        }
+
+        private static func describe(_ s: SwiftVisionGate.StepState) -> String {
+            switch s {
+            case .pending: "pending"
+            case .running: "running"
+            case let .done(seconds): String(format: "done(%.1fs)", seconds)
+            case let .failed(m): "failed(\(m))"
             }
         }
 
@@ -213,7 +300,106 @@ enum UICapture {
             model.recognitionNotice(nil)
             check("its end leaves another issue alone", model.shownIssue == a)
             model.received(nil)
+
+            // The lens window around a region, for each place of the name tag.
+            let region = NSRect(x: 200, y: 300, width: 360, height: 200), moved = NSRect(x: 80, y: 120, width: 250, height: 90)
+            let lens = RegionFrameWindow(region: region, name: "Safari")
+            var places = region
+            for position in LensTabPosition.allCases {
+                lens.setAppearance(style: .glow, tint: .spectrum, tabVisibility: .automatic, tabPosition: position)
+                let kept = lens.regionFrame == region && lens.frame == RegionFrameWindow.windowFrame(for: region, position: position)
+                lens.setRegion(moved)
+                let after = lens.regionFrame == moved
+                lens.setRegion(region)
+                places = lens.regionFrame
+                check("lens window round-trips the region for \(position.rawValue)", kept && after && places == region)
+            }
+
+            // Settings saved before the lens looks existed, and a tint this build does not know.
+            var saved = (try? JSONSerialization.jsonObject(with: JSONEncoder().encode(AppSettings()))) as? [String: Any] ?? [:]
+            for key in ["lensTint", "lensTabVisibility", "lensTabPosition"] { saved[key] = nil }
+            let old = (try? JSONSerialization.data(withJSONObject: saved)).flatMap { try? JSONDecoder().decode(AppSettings.self, from: $0) }
+            check("settings without the new keys decode to the defaults", old == AppSettings())
+            saved["lensTint"] = "neon"
+            saved["lensStyle"] = "corners"
+            let unknown = (try? JSONSerialization.data(withJSONObject: saved)).flatMap { try? JSONDecoder().decode(AppSettings.self, from: $0) }
+            check("unknown tint decodes to spectrum", unknown?.lensTint == .spectrum && unknown?.lensStyle == .corners)
+            check("the corners style sits between subtle and minimal", LensStyle.allCases == [.glow, .subtle, .corners, .minimal])
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+        }
+
+        // MARK: synthetic clicks
+
+        private func views(_ root: NSView) -> [NSView] { [root] + root.subviews.flatMap { views($0) } }
+
+        /// A left click on `window` at `point` (window coordinates), sent to the window alone (the real pointer stays put).
+        private func click(_ window: NSWindow, at point: NSPoint) {
+            for type in [NSEvent.EventType.leftMouseDown, .leftMouseUp] {
+                guard let e = NSEvent.mouseEvent(with: type, location: point, modifierFlags: [], timestamp: ProcessInfo.processInfo.systemUptime,
+                                                 windowNumber: window.windowNumber, context: nil, eventNumber: 0, clickCount: 1, pressure: 1) else { continue }
+                window.sendEvent(e)
+            }
+        }
+
+        /// Whether the ⋯ button on an added engine's row opens its menu without changing the selection, and a click on the row selects it.
+        private func engineRowClick() async {
+            var failed = 0
+            func check(_ what: String, _ ok: Bool) {
+                print("engine-row-click: \(ok ? "PASS" : "FAIL") \(what)")
+                if !ok { failed += 1 }
+            }
+            await seedEngines()
+            model.select(.builtIn(.auto))
+            let apple = EngineSelection(model.settings)
+            let w = NSWindow(contentRect: NSRect(origin: .zero, size: CGSize(width: 560, height: 820)), styleMask: [.titled], backing: .buffered, defer: false)
+            let host = NSHostingView(rootView: TranslationSettings().environment(model))
+            w.contentView = host
+            w.setFrameTopLeftPoint(NSPoint(x: 80, y: (NSScreen.main?.frame.height ?? 900) - 60))
+            NSApp.activate(ignoringOtherApps: true)
+            w.makeKeyAndOrderFront(nil)
+            try? await Task.sleep(for: .seconds(delay))
+            let all = views(host)
+            if args.contains("--dump") {
+                func walk(_ v: NSView, _ d: Int) {
+                    print("  " + String(repeating: " ", count: d) + "\(type(of: v)) \(v.convert(v.bounds, to: nil)) title=\((v as? NSButton)?.title ?? "")")
+                    v.subviews.forEach { walk($0, d + 1) }
+                }
+                walk(host, 0)
+            }
+            // The rows' ⋯ buttons are popup buttons, top to bottom in the order of the engines: Gemini, Ollama.
+            let buttons = all.filter { String(describing: type(of: $0)).contains("PopupButton") }
+                .sorted { $0.convert($0.bounds, to: nil).maxY > $1.convert($1.bounds, to: nil).maxY }
+            let more = buttons.count == 2 ? buttons[1] : nil
+            check("the ⋯ buttons are found, one per added engine", buttons.count == 2)
+            let before = model.settings.customEngineID
+            nonisolated(unsafe) var opened = false
+            nonisolated(unsafe) var tracked: NSMenu?
+            let token = NotificationCenter.default.addObserver(forName: NSMenu.didBeginTrackingNotification, object: nil, queue: nil) { n in
+                opened = true
+                tracked = n.object as? NSMenu
+            }
+            if let more {
+                let r = more.convert(more.bounds, to: nil)
+                // The mouse-down blocks in menu tracking; a timer in common modes ends it.
+                let t = Timer(timeInterval: 0.6, repeats: false) { _ in tracked?.cancelTrackingWithoutAnimation() }
+                RunLoop.main.add(t, forMode: .common)
+                click(w, at: NSPoint(x: r.midX, y: r.midY))
+                t.invalidate()
+            }
+            NotificationCenter.default.removeObserver(token)
+            try? await Task.sleep(for: .milliseconds(300))
+            check("⋯ opens its menu", opened)
+            check("selection unchanged after ⋯", model.settings.customEngineID == before && EngineSelection(model.settings) == apple)
+            // Control: the row's own radio.
+            // The radio sits at the row's left edge, level with its ⋯ button.
+            if let more {
+                let r = more.convert(more.bounds, to: nil)
+                click(w, at: NSPoint(x: 38, y: r.midY))
+            }
+            try? await Task.sleep(for: .milliseconds(300))
+            check("clicking the row text selects it", model.settings.customEngineID == model.settings.engines.first { $0.name == "Ollama" }?.id)
+            w.orderOut(nil)
+            print("engine-row-click: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
         }
 
         // MARK: capture
@@ -254,7 +440,7 @@ enum UICapture {
             page.level = .normal
             page.orderFrontRegardless()
             let lens = RegionFrameWindow(region: region, name: "Safari")
-            lens.setStyle(.glow)
+            lens.setAppearance(style: .glow, tint: .spectrum, tabVisibility: .automatic, tabPosition: .topLeading)
             lens.setFollowing(true)
             lens.setDetail("English → Korean", badge: badge)
             lens.orderFrontRegardless()
@@ -283,6 +469,81 @@ enum UICapture {
             print("wrote \(path)")
             lens.orderOut(nil)
             page.orderOut(nil)
+        }
+
+        /// A lens (360 × 200) in one look over a plain dark or light backdrop; returns the PNG's path.
+        @discardableResult
+        private func lensShot(_ name: String, style: LensStyle = .glow, tint: LensTint = .spectrum, position: LensTabPosition = .topLeading,
+                              dark: Bool, busy: Bool = false, emphasized: Bool = false, notice: String? = nil, wait: Double = 0.5) async -> String {
+            let screen = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1512, height: 982)
+            let region = NSRect(x: 200, y: screen.height - 520, width: 360, height: 200)
+            let page = NSWindow(contentRect: region.insetBy(dx: -40, dy: -70).offsetBy(dx: 0, dy: -10), styleMask: [.borderless], backing: .buffered, defer: false)
+            page.backgroundColor = NSColor(white: dark ? 0.12 : 0.96, alpha: 1)
+            page.level = .normal
+            page.orderFrontRegardless()
+            let lens = RegionFrameWindow(region: region, name: "Safari")
+            // The pointer of whoever uses the screen must not hover the lens: hovering brightens it.
+            lens.ignoresMouseEvents = true
+            lens.setAppearance(style: style, tint: tint, tabVisibility: .automatic, tabPosition: position)
+            lens.setFollowing(true)
+            lens.setDetail("English → Korean")
+            lens.setBusy(busy)
+            lens.orderFrontRegardless()
+            lens.setEmphasized(emphasized)
+            if let notice { lens.flash(notice, seconds: 30) }
+            try? await Task.sleep(for: .seconds(wait))
+            let r = page.frame
+            let path = out.appendingPathComponent("\(name).png").path
+            run("/usr/sbin/screencapture", ["-x", "-R", "\(Int(r.minX)),\(Int(screen.height - r.maxY)),\(Int(r.width)),\(Int(r.height))", path])
+            print("wrote \(path)")
+            lens.orderOut(nil)
+            page.orderOut(nil)
+            return path
+        }
+
+        /// Every style in every tint, on both backdrops, and a grid of each backdrop (styles across, tints down).
+        private func lensGallery() async {
+            for dark in [true, false] {
+                var rows: [[String]] = []
+                for tint in LensTint.allCases {
+                    var row: [String] = []
+                    for style in LensStyle.allCases {
+                        row.append(await lensShot("lens-\(style.rawValue)-\(tint.rawValue)-\(dark ? "dark" : "light")", style: style, tint: tint, dark: dark))
+                    }
+                    rows.append(row)
+                }
+                writeGrid("lens-gallery-\(dark ? "dark" : "light")", rows)
+            }
+        }
+
+        /// The name tag in each of its four places; the last carries a notice.
+        private func lensTabPositions() async {
+            for (i, position) in LensTabPosition.allCases.enumerated() {
+                await lensShot("lens-tab-\(position.rawValue)", position: position, dark: false, emphasized: i != 1,
+                               notice: i == 3 ? "Copied" : nil)
+            }
+        }
+
+        /// The captures in `rows` laid side by side at one point per pixel (the captures themselves are twice that).
+        private func writeGrid(_ name: String, _ rows: [[String]]) {
+            let images = rows.map { $0.map { NSImage(contentsOfFile: $0) } }
+            guard let first = images.first?.first ?? nil else { return }
+            let cell = first.size
+            let w = Int(cell.width) * (rows.first?.count ?? 0), h = Int(cell.height) * rows.count
+            guard let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: w, pixelsHigh: h, bitsPerSample: 8, samplesPerPixel: 4,
+                                             hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0),
+                  let context = NSGraphicsContext(bitmapImageRep: rep) else { return }
+            NSGraphicsContext.saveGraphicsState()
+            NSGraphicsContext.current = context
+            for (y, row) in images.enumerated() {
+                for (x, image) in row.enumerated() {
+                    image?.draw(in: NSRect(x: CGFloat(x) * cell.width, y: CGFloat(rows.count - 1 - y) * cell.height, width: cell.width, height: cell.height))
+                }
+            }
+            NSGraphicsContext.restoreGraphicsState()
+            let path = out.appendingPathComponent("\(name).png").path
+            try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))
+            print("wrote \(path)")
         }
 
         /// The add flow end to end: the sheet pastes a setup and a key, runs the sample and adds the engine.

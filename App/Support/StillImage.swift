@@ -73,19 +73,21 @@ final class StillTranslation: @unchecked Sendable {
     private let gray: GrayImage
     private let capture: CGRect
     private let held = Latest()
+    private let lensApp: ReaderContext
 
     /// The newest snapshot: the blocks translated so far.
     var latest: OverlaySnapshot? { held.value }
 
     /// `onSnapshot` hears every snapshot as it is made (the window shows the picture filling in).
-    init(_ d: Decoded, settings: AppSettings, translator: TranslationService, inpainter: Inpainter?,
+    init(_ d: Decoded, settings: AppSettings, translator: TranslationService, inpainter: Inpainter?, lensApp: ReaderContext = ReaderContext(),
          onSnapshot: (@Sendable (OverlaySnapshot) -> Void)? = nil) {
         image = d.image
         scale = d.scale
         capture = CGRect(x: 0, y: 0, width: CGFloat(d.image.width) / d.scale, height: CGFloat(d.image.height) / d.scale)
         gray = d.rgba.withBGRA { GrayImage(bgra: $0, width: d.rgba.width, height: d.rgba.height, bytesPerRow: d.rgba.width * 4, step: 4) }
         let held = held
-        pipeline = RegionPipeline(options: PipelineOptions(settings), capture: capture, translator: translator, inpainter: inpainter,
+        self.lensApp = lensApp
+        pipeline = RegionPipeline(options: PipelineOptions(settings, lensApp: lensApp), capture: capture, translator: translator, inpainter: inpainter,
                                   onSnapshot: { held.put($0); onSnapshot?($0) })
     }
 
@@ -95,7 +97,7 @@ final class StillTranslation: @unchecked Sendable {
                                             time: ProcessInfo.processInfo.systemUptime))
     }
 
-    func update(settings: AppSettings) async { await pipeline.update(options: PipelineOptions(settings)) }
+    func update(settings: AppSettings) async { await pipeline.update(options: PipelineOptions(settings, lensApp: lensApp)) }
 
     /// Waits until reading and translating are done and the snapshots stop changing, or `maxWait` seconds after `start`.
     func settle(from start: Date, maxWait: Double) async throws {

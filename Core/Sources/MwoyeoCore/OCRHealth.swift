@@ -13,6 +13,17 @@ public struct OCRHealth: Sendable, Equatable {
     public static let coldWait: TimeInterval = giveUpAfter
     /// While stalled, one small image goes to the newest model this often to see whether it answers again.
     public static let probeEvery: TimeInterval = 120
+    /// A read that found the newest model's programs not ready (`programsNotReady`) goes to the older recognizers, and the newest
+    /// model is asked again no sooner than this (the same ladder and clock as a stall; there is no second backoff).
+    public static let notReadyRetryEvery: TimeInterval = 5
+
+    /// The error says the neural engine programs are not ready yet. Seen on a real Mac for about 90 s after a long cold compile,
+    /// on every read of revision 3: `e5rtError("e5rt_execution_stream_operation_create_precompiled_compute_operation_with_options
+    /// call failed", 13)`. A transient: the model works again by itself. Classified by `String(describing:)`, which is what the log
+    /// shows (the `localizedDescription` of that error is generic).
+    public static func programsNotReady(_ error: Error) -> Bool { programsNotReady(description: String(describing: error)) }
+
+    public static func programsNotReady(description: String) -> Bool { description.contains("e5rtError") }
 
     public enum Plan: Equatable, Sendable {
         /// Ask the newest model and give up after `seconds`.
@@ -30,6 +41,8 @@ public struct OCRHealth: Sendable, Equatable {
     /// True while a task is probing a stalled model; a stall that starts meanwhile joins it instead of starting another.
     public private(set) var probing = false
     private var stalledSince: TimeInterval?
+    /// When the newest model last said its programs are not ready, until it answers.
+    private var notReadyAt: TimeInterval?
     private var running: [Int: TimeInterval] = [:]
     private var issued = 0
 
@@ -38,6 +51,8 @@ public struct OCRHealth: Sendable, Equatable {
     /// What to do with a read that an older recognizer can (`canFallBack`) or cannot read.
     public func plan(canFallBack: Bool, now: TimeInterval) -> Plan {
         let late = running.values.min().map { now - $0 > Self.lateAfter } ?? false
+        let notReady = notReadyAt.map { now - $0 < Self.notReadyRetryEvery } ?? false
+        if canFallBack, notReady { return .fallback }
         if stalled || late {
             if canFallBack { return .fallback }
             if stalled { return .refuse }
@@ -59,12 +74,23 @@ public struct OCRHealth: Sendable, Equatable {
         if let started = running[id] { running = running.filter { $0.value > started } }
         running[id] = nil
         warm = true
+        notReadyAt = nil
         defer { stalled = false; stalledSince = nil }
         return stalled
     }
 
     /// The request threw before it was answered: the model did not hang on it, so health is unchanged.
     public mutating func failed(_ id: Int) { running[id] = nil }
+
+    /// The request threw "programs not ready" (`programsNotReady`): the model did not hang, it is not ready yet. Reads go to the
+    /// older recognizers for `notReadyRetryEvery`; the next read after that asks it again, and an answer ends this.
+    public mutating func notReady(_ id: Int, now: TimeInterval) {
+        running[id] = nil
+        notReadyAt = now
+    }
+
+    /// The newest model said its programs are not ready and has not answered since.
+    public var isNotReady: Bool { notReadyAt != nil }
 
     /// Request `id` missed its deadline; it keeps running. Returns true if this starts a stall (not one already counted).
     /// The stall dates from when that request started.

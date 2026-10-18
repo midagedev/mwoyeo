@@ -79,6 +79,84 @@
           }
         }
       }
+    },
+    "NSLocalNetworkUsageDescription": {
+      "comment": "Privacy prompt for the local network",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mwoyeo connects to a translation server on your network only if you add one as an engine."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mwoyeo connects to a translation server on your network only if you add one as an engine."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mwoyeo connects to a translation server on your network only if you add one as an engine."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mwoyeo connects to a translation server on your network only if you add one as an engine."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mwoyeo connects to a translation server on your network only if you add one as an engine."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mwoyeo connects to a translation server on your network only if you add one as an engine."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mwoyeo connects to a translation server on your network only if you add one as an engine."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mwoyeo connects to a translation server on your network only if you add one as an engine."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mwoyeo connects to a translation server on your network only if you add one as an engine."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mwoyeo connects to a translation server on your network only if you add one as an engine."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mwoyeo connects to a translation server on your network only if you add one as an engine."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mwoyeo connects to a translation server on your network only if you add one as an engine."
+          }
+        }
+      }
     }
   }
 }

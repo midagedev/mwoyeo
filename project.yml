@@ -5,14 +5,20 @@ options:
   deploymentTarget:
     macOS: "26.0"
   createIntermediateGroups: true
+# MAS is the Mac App Store flavour of the same targets: Release-like, the Swift condition `MAS`, sandbox, its own bundle id
+# (Config/MAS.xcconfig; `scripts/mas.sh`, scheme Mwoyeo-MAS). Debug and Release are the DMG flavour.
+configs:
+  Debug: debug
+  Release: release
+  MAS: release
 configFiles:
   Debug: Config/Base.xcconfig
   Release: Config/Base.xcconfig
+  MAS: Config/MAS.xcconfig
 settings:
   base:
-    # The app's id. The reader services derive theirs from it (`<id>.reader.lines|docs`), and the app finds them by that name, so
-    # `xcodebuild … MWOYEO_APP_ID=<other id>` builds a re-identified app with its own re-identified services and caches.
-    MWOYEO_APP_ID: dev.midagedev.mwoyeo
+    # MWOYEO_APP_ID (the app's id; the reader services derive theirs from it), the signing identity and the entitlements files are
+    # in Config/Base.xcconfig and Config/MAS.xcconfig: a setting here would win over the xcconfig of a configuration.
     # One version for the app and its services.
     MARKETING_VERSION: "1.1.0"
     CURRENT_PROJECT_VERSION: "2"
@@ -57,7 +63,7 @@ targetTemplates:
         DEVELOPMENT_TEAM: $(MWOYEO_TEAM)
         PROVISIONING_PROFILE_SPECIFIER: ""
         OTHER_CODE_SIGN_FLAGS: --timestamp=none
-        CODE_SIGN_ENTITLEMENTS: Reader/Reader.entitlements
+        CODE_SIGN_ENTITLEMENTS: $(MWOYEO_READER_ENTITLEMENTS)
         GENERATE_INFOPLIST_FILE: NO
         DEAD_CODE_STRIPPING: YES
         # The document read (`RecognizeDocumentsRequest`) is compiled into the services only: the app cannot run one (`VisionExec`).
@@ -105,6 +111,10 @@ targets:
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
         NSScreenCaptureUsageDescription: "Mwoyeo reads the text under your lenses so it can translate it in place."
+        # Only HTTPS to a host the person typed in; no encryption of our own.
+        ITSAppUsesNonExemptEncryption: false
+        # An engine the person added may be a server on their network (Ollama, LM Studio on another Mac).
+        NSLocalNetworkUsageDescription: "Mwoyeo connects to a translation server on your network only if you add one as an engine."
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(MWOYEO_APP_ID)
@@ -114,11 +124,37 @@ targets:
         CODE_SIGN_STYLE: Manual
         CODE_SIGN_IDENTITY: $(MWOYEO_SIGN_IDENTITY)
         DEVELOPMENT_TEAM: $(MWOYEO_TEAM)
-        PROVISIONING_PROFILE_SPECIFIER: ""
+        PROVISIONING_PROFILE_SPECIFIER: $(MWOYEO_PROFILE)
         # Local builds skip the timestamp server; scripts/release.sh signs with --timestamp for notarization.
         OTHER_CODE_SIGN_FLAGS: --timestamp=none
-        CODE_SIGN_ENTITLEMENTS: App/Mwoyeo.entitlements
+        CODE_SIGN_ENTITLEMENTS: $(MWOYEO_APP_ENTITLEMENTS)
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         GENERATE_INFOPLIST_FILE: NO
         DEAD_CODE_STRIPPING: YES
         COREML_CODEGEN_LANGUAGE: None
+# Defining any scheme turns off the generated ones, so the app's own is written out.
+schemes:
+  Mwoyeo:
+    build:
+      targets:
+        Mwoyeo: all
+    run:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+  Mwoyeo-MAS:
+    build:
+      targets:
+        Mwoyeo: all
+    run:
+      config: MAS
+    profile:
+      config: MAS
+    analyze:
+      config: MAS
+    archive:
+      config: MAS

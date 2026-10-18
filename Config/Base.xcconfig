@@ -5,6 +5,13 @@
 //   MWOYEO_TEAM = ABCDE12345
 MWOYEO_SIGN_IDENTITY = -
 MWOYEO_TEAM =
+MWOYEO_PROFILE =
+
+// The app's id. The reader services derive theirs from it (`<id>.reader.lines|docs`), and the app finds them by that name, so
+// `xcodebuild … MWOYEO_APP_ID=<other id>` builds a re-identified app with its own re-identified services and caches.
+MWOYEO_APP_ID = dev.midagedev.mwoyeo
+MWOYEO_APP_ENTITLEMENTS = App/Mwoyeo.entitlements
+MWOYEO_READER_ENTITLEMENTS = Reader/Reader.entitlements
 #include? "Local.xcconfig"
 
 // Extract localizable strings for the string catalog (xcstringstool sync).

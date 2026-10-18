@@ -1,0 +1,16 @@
+// The Mac App Store flavour: the same targets, Release-like, built with `-configuration MAS` (scheme Mwoyeo-MAS, scripts/mas.sh).
+// Credentials never live here: the identity and the profile come in as variables (scripts/mas.sh checks them).
+//   MWOYEO_SIGN_IDENTITY   "Apple Distribution: Name (TEAMID)"   (an ad-hoc `-` signs a smoke build)
+//   MWOYEO_TEAM            TEAMID
+//   MWOYEO_PROFILE         the name of the Mac App Store provisioning profile of MWOYEO_APP_ID
+#include "Base.xcconfig"
+
+MWOYEO_APP_ID = dev.midagedev.mwoyeo.appstore
+MWOYEO_APP_ENTITLEMENTS = App/Mwoyeo-MAS.entitlements
+MWOYEO_READER_ENTITLEMENTS = Reader/Reader-MAS.entitlements
+MWOYEO_SIGN_IDENTITY = Apple Distribution
+
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) MAS
+ENABLE_APP_SANDBOX = YES
+// Only the entitlements of the files above: no injected get-task-allow.
+CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO

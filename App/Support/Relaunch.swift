@@ -8,7 +8,11 @@ enum Relaunch {
     /// The first argument of the new process; the next is the pid of the one it replaces.
     private static let flag = "--relaunched"
     /// What the new process takes over: the files a scripted run or a capture points at.
+    #if MAS
+    private static let carried = ["MWOYEO_SETTINGS_FILE", "MWOYEO_TRACE"]
+    #else
     private static let carried = ["MWOYEO_SETTINGS_FILE", "MWOYEO_DEFAULTS_SUITE", "MWOYEO_MEMORY_SECRETS", "MWOYEO_TRACE"]
+    #endif
     private static let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "app")
 
     /// Opens a new instance of this app, then quits this one once the system has started it.
@@ -19,7 +23,9 @@ enum Relaunch {
         // LaunchServices hands the new process this one's environment with these laid over it, so a preview is turned off by name
         // (a preview that relaunches would relaunch itself for ever).
         var environment = ProcessInfo.processInfo.environment.filter { carried.contains($0.key) }
+        #if !MAS
         environment["MWOYEO_PREVIEW"] = ""
+        #endif
         config.environment = environment
         NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: config) { app, error in
             if let error {

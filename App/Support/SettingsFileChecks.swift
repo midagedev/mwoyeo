@@ -1,3 +1,4 @@
+#if !MAS
 import Foundation
 import MwoyeoCore
 
@@ -1018,3 +1019,4 @@ enum SettingsFileChecks {
     /// What the reader thread of `command` collected; read only after it has signalled.
     private final class Output: @unchecked Sendable { var data = Data() }
 }
+#endif

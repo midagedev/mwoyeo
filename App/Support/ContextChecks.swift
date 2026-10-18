@@ -1,3 +1,4 @@
+#if !MAS
 import AppKit
 import MwoyeoCore
 import MwoyeoEngines
@@ -600,3 +601,4 @@ private enum Golden {
         ],
     ]
 }
+#endif

@@ -11,17 +11,23 @@ import SwiftUI
 @main
 enum Entry {
     static func main() {
+        #if !MAS
         // `Mwoyeo --render in.png out.png` runs the pipeline on a still image (no permissions needed).
         if CommandLine.arguments.dropFirst().first == "--render" {
             SelfTest.run(Array(CommandLine.arguments.dropFirst(2)))
         }
+        #endif
+        #if !MAS
         // `Mwoyeo --reader-check <scenario> …` exercises the reader services (see ReaderCheck).
         if CommandLine.arguments.dropFirst().first == "--reader-check" {
             ReaderCheck.run(Array(CommandLine.arguments.dropFirst(2)))
         }
+        #endif
+        #if !MAS
         if CommandLine.arguments.dropFirst().first == "--capture-ui" {
             UICapture.run(Array(CommandLine.arguments.dropFirst(2)))
         }
+        #endif
         if let first = CommandLine.arguments.dropFirst().first, first == "--settings-path" || first == "--settings-schema" || first == "--check-settings" {
             SettingsFileCommand.run(Array(CommandLine.arguments.dropFirst()))
         }
@@ -76,6 +82,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // `MWOYEO_PREVIEW=menu|onboarding` shows that window on launch, for screenshots. `pack` does what a lens's "Download <language>"
         // does (Settings on Translation, the pack's download for ja → en: nothing to ask for when it is installed), `relaunch` what
         // its "Restart Mwoyeo" does; both after 3 s, for gates.
+        #if !MAS
         switch ProcessInfo.processInfo.environment["MWOYEO_PREVIEW"] {
         case "menu": Task { @MainActor in WindowPresenter.shared.showMenuPreview() }
         case "onboarding": Task { @MainActor in WindowPresenter.shared.showOnboarding() }
@@ -91,6 +98,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         default: break
         }
+        #endif
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

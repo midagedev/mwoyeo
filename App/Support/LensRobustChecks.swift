@@ -1,3 +1,4 @@
+#if !MAS
 import AppKit
 import MwoyeoCore
 
@@ -354,3 +355,4 @@ enum LensRobustChecks {
         print("wrote \(url.path)")
     }
 }
+#endif

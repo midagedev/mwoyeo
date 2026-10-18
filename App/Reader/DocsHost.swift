@@ -171,9 +171,11 @@ actor DocsHost {
         // The stream exists before anything is sent: a late listener missed events in R1's first fakes run.
         let events = connection.events()
         Task { [self] in for await event in events { await connectionEvent(event) } }
+        #if !MAS
         SelfTest.register(inFlight: { await DocsHost.shared.inFlight },
                           readerReady: { await DocsHost.shared.isReady },
                           statsLines: { await DocsHost.shared.statsLines() })
+        #endif
     }
 
     // MARK: Reading

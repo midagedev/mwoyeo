@@ -1199,7 +1199,12 @@ actor RegionPipeline {
 
         TextEraser.fillEnclosedHoles(&mask, width: rect.width, height: rect.height)
         let flat = masks.allSatisfy(\.1.appearance.isFlatBackground)
-        if ProcessInfo.processInfo.environment["MWOYEO_ERASE_ONLY"] == "mask" {
+        #if MAS
+        let maskOnly = false
+        #else
+        let maskOnly = ProcessInfo.processInfo.environment["MWOYEO_ERASE_ONLY"] == "mask"
+        #endif
+        if maskOnly {
             for i in mask.indices where mask[i] != 0 { patch.set(x: i % rect.width, y: i / rect.width, RGBA(255, 0, 0)) }
         } else if !flat, options.useInpainting, let inpainter {
             do {
@@ -1629,7 +1634,11 @@ enum Trace {
     static func takeSamples() -> [String: [Double]] { samples.withLock { defer { $0 = [:] }; return $0 } }
     /// `MWOYEO_TRACE_LINES` adds the recognized lines of every automatic reader decision to the trace (tools/usecase-bench/tune.sh).
     static let lineDump = enabled && ProcessInfo.processInfo.environment["MWOYEO_TRACE_LINES"] != nil
+    #if MAS
+    static let dumpDirectory: URL? = nil
+    #else
     static let dumpDirectory: URL? = ProcessInfo.processInfo.environment["MWOYEO_DUMP"].map { URL(fileURLWithPath: $0) }
+    #endif
 }
 
 extension Array {

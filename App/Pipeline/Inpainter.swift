@@ -33,9 +33,11 @@ final class Inpainter: @unchecked Sendable {
         let name = "MIGAN_512"
         var candidates: [URL] = []
         if let u = Bundle.main.url(forResource: name, withExtension: "mlmodelc") { candidates.append(u) }
+        #if !MAS
         if let support = try? FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false) {
             candidates.append(support.appendingPathComponent("Mwoyeo/Models/\(name).mlmodelc"))
         }
+        #endif
         return candidates.first { FileManager.default.fileExists(atPath: $0.path) }.map { Inpainter(url: $0, side: 512) }
     }
 

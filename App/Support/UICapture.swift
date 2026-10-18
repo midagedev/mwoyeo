@@ -1,3 +1,4 @@
+#if !MAS
 import AppKit
 import MwoyeoCore
 import MwoyeoEngines
@@ -731,3 +732,4 @@ enum UICapture {
         }
     }
 }
+#endif

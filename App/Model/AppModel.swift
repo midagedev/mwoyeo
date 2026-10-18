@@ -14,7 +14,9 @@ final class AppModel {
             guard settings != oldValue else { return }
             saveSettings()
             if settings.shortcuts != oldValue.shortcuts { HotKeys.shared.apply(settings.shortcuts) }
+            #if !MAS
             if settings.checksForUpdates != oldValue.checksForUpdates { Updates.shared.schedule(enabled: settings.checksForUpdates) }
+            #endif
             pushSettings()
         }
     }
@@ -73,7 +75,11 @@ final class AppModel {
     /// While a lens asks to allow Screen Recording: looks at the grant once a second, so that the lens moves on the moment it is given.
     @ObservationIgnored private var grantClock: Timer?
     /// The app's preferences; `MWOYEO_DEFAULTS_SUITE` names a scratch domain instead (the capture harness must not touch the real ones).
+    #if MAS
+    @ObservationIgnored private let defaults = UserDefaults.standard
+    #else
     @ObservationIgnored private let defaults = ProcessInfo.processInfo.environment["MWOYEO_DEFAULTS_SUITE"].flatMap { UserDefaults(suiteName: $0) } ?? .standard
+    #endif
     @ObservationIgnored private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "app")
 
     private init() {
@@ -91,7 +97,11 @@ final class AppModel {
         }
         settings = s
         settingsIssues = settingsFile.issues
+        #if MAS
+        let store: any SecretStore = KeychainSecrets()
+        #else
         let store: any SecretStore = ProcessInfo.processInfo.environment["MWOYEO_MEMORY_SECRETS"] != nil ? MemorySecrets() : KeychainSecrets()
+        #endif
         secrets = store
         translator = TranslationService(settings: s, secrets: store)
         regions = (defaults.data(forKey: "regions")).flatMap { try? JSONDecoder().decode([RegionConfig].self, from: $0) } ?? []
@@ -165,9 +175,13 @@ final class AppModel {
             MainActor.assumeIsolated { self?.sessions.values.forEach { $0.finishTranscript(wait: true) } }
         }
         displayWatcher = DisplayWatcher { [weak self] event in self?.displaysChanged(event) }
+        #if !MAS
         Updates.shared.schedule(enabled: settings.checksForUpdates)
+        #endif
         startWatchingFrontmostApp()
+        #if !MAS
         ImageTranslation.shared.openFromLaunchArguments()
+        #endif
 
         await translator.setIssueHandler { issue in Task { @MainActor in AppModel.shared.received(issue) } }
         TextRecognizer.setNoticeHandler { issue in Task { @MainActor in AppModel.shared.recognitionNotice(issue) } }
@@ -189,6 +203,7 @@ final class AppModel {
         if hasScreenPermission {
             for r in regions where r.isEnabled { await startSession(r) }
         }
+        #if !MAS
         // `--add-region x,y,w,h` (global points, top-left origin): place a lens without picking, for scripted demos.
         let args = CommandLine.arguments
         if let i = args.firstIndex(of: "--add-region"), i + 1 < args.count, hasScreenPermission {
@@ -210,6 +225,7 @@ final class AppModel {
                 }
             }
         }
+        #endif
     }
 
     /// The accurate text recognizer takes tens of seconds to load the first time; do it before the user needs it.

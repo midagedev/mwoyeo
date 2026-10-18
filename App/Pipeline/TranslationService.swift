@@ -561,9 +561,11 @@ actor TranslationService {
         if case let .added(engine) = route {
             return try await translateViaEngine(engine, items, source: source, onResult: onResult)
         }
+        #if !MAS
         if let fake = ProcessInfo.processInfo.environment["MWOYEO_FAKE_ENGINE"] {
             return try await fakeEngine(fake, items, onResult: onResult)
         }
+        #endif
         if settings.engine == .customModel {
             if intelligence.isAvailable {
                 return try await intelligence.translate(items, source: source == "und" ? nil : source, target: settings.targetLanguage,

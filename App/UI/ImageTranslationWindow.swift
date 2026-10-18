@@ -325,6 +325,7 @@ final class ImageTranslation: NSObject, NSWindowDelegate {
         window = nil
     }
 
+    #if !MAS
     // MARK: Debug launch (screenshots and gates)
 
     /// `-translateImage <path>` opens the window with that picture. With `-translateImageOut <dir>` it also writes
@@ -366,4 +367,5 @@ final class ImageTranslation: NSObject, NSWindowDelegate {
         shot("window-original.png")
         exit(0)
     }
+    #endif
 }

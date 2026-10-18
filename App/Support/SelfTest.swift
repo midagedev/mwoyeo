@@ -1,3 +1,4 @@
+#if !MAS
 import AppKit
 import ImageIO
 import MwoyeoCore
@@ -991,3 +992,4 @@ extension SelfTest {
         }
     }
 }
+#endif

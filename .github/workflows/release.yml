@@ -93,6 +93,9 @@ jobs:
         run: |
           gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" --title "Mwoyeo $VERSION" --generate-notes
           gh release upload "$GITHUB_REF_NAME" build/release/Mwoyeo-"$VERSION"-arm64.dmg --clobber
+          # The same image without a version, so releases/latest/download/Mwoyeo-arm64.dmg always means the newest.
+          cp build/release/Mwoyeo-"$VERSION"-arm64.dmg build/release/Mwoyeo-arm64.dmg
+          gh release upload "$GITHUB_REF_NAME" build/release/Mwoyeo-arm64.dmg --clobber
           # What the app's update check downloads; their download counts are the usage numbers (scripts/stats.py).
           mkdir -p build/counters
           printf '{"version":"%s","page":"https://github.com/%s/releases/tag/%s"}\n' "$VERSION" "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" > build/counters/version.json

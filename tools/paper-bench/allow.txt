@@ -1,0 +1,8 @@
+# Sources of arXiv 1706.03762 that hold a sign of mathematics and are body sentences: rightly translated, so not counted in
+# score.py's formula_translated. One entry per line, a lowercase fragment of the source as the OCR reads it (whitespace folded);
+# a source with six or more prose words is allowed without being listed. Reviewed 2026-10-18 on the v1.1.1 baseline renders:
+# each entry is prose with a formula inside it, and its translation keeps the formula.
+of continuous representations z = (
+dropout rate
+layers, produce outputs of dimension dmodel
+params ×10

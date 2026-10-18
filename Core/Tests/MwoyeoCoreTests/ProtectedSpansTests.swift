@@ -70,7 +70,7 @@ import Testing
         let g = [("network", "네트워크"), ("neural network", "신경망")]
         #expect(terms("A neural network is a network.", g) == ["neural network", "network"])
         let spans = ProtectedSpans.glossarySpans(in: "A neural network", pairs: g)
-        #expect(spans.count == 1 && spans[0].kind == .glossary(target: "신경망", term: "neural network"))
+        #expect(spans.count == 1 && spans[0].kind == .glossary(target: "신경망"))
     }
 
     @Test func aTermInAScriptWithoutSpacesMatchesWhereverItStands() {
@@ -238,131 +238,6 @@ import Testing
         #expect(one.resolved.map(\.was) == ["레이어"] && one.resolved.map(\.text) == ["계층"])
     }
 
-    // Runs as the engine wrote them (tools/apple-translation-probe/glossary-spans.swift `words`, en>ko, low latency, 2026-10-18; the
-    // `hf` ones are the bare span). A rendering that itself ends in 가/과/도/의/이/라 is the whole word, not word + particle:
-    // the cut used to leave "평" and "가" and put the particle for the target after the stump ("검증이").
-    @Test func aRenderingThatEndsInAParticleLookingSyllableIsNotCutInsideTheWord() {
-        let g = [("assessment", "검증"), ("result", "산출물"), ("effect", "영향"), ("speed", "스피드"), ("temperature", "기온"),
-                 ("route", "루트"), ("definition", "뜻풀이"), ("map", "맵"), ("writer", "저자"), ("apple", "애플"), ("density", "농도")]
-        // (source, engine's target, the marked run, wanted)
-        let cases: [(String, String, String, String)] = [
-            ("Read the assessment report.", "평가 보고서를 읽으십시오.", "평가 ", "검증 보고서를 읽으십시오."),
-            ("Save the result table.", "결과 테이블을 저장하십시오.", "결과 ", "산출물 테이블을 저장하십시오."),
-            ("We measured the effect size.", "우리는 효과 크기를 측정했습니다.", "효과 ", "우리는 영향 크기를 측정했습니다."),
-            ("Check the speed limit.", "속도 제한을 확인하십시오.", "속도 ", "스피드 제한을 확인하십시오."),
-            ("Set the temperature sensor.", "온도 센서를 설정하십시오.", "온도 ", "기온 센서를 설정하십시오."),
-            ("Update the definition list.", "정의 목록을 업데이트하십시오.", "정의 ", "뜻풀이 목록을 업데이트하십시오."),
-            ("Open the map view.", "지도 보기를 엽니다.", "지도 ", "맵 보기를 엽니다."),
-            ("Contact the writer team.", "작가 팀에 연락하십시오.", "작가 ", "저자 팀에 연락하십시오."),
-            ("Bake the apple pie.", "사과 파이를 구워 주세요.", "사과 ", "애플 파이를 구워 주세요."),
-            ("Plot the density curve.", "밀도 곡선을 플롯하십시오.", "밀도 ", "농도 곡선을 플롯하십시오."),
-            // the run is the bare span (high fidelity): the particle stands outside it
-            ("The assessment was clear.", "평가가 명확했습니다.", "평가", "검증이 명확했습니다."),
-            ("The route goes along the river.", "경로는 강을 따라 갑니다.", "경로", "루트는 강을 따라 갑니다."),
-            // a real particle after such a rendering is still cut
-            ("The assessment was clear and fair.", "평가가 명확하고 공정했습니다.", "평가가", "검증이 명확하고 공정했습니다."),
-            ("The result matches.", "결과가 일치합니다.", "결과가 ", "산출물이 일치합니다."),
-            ("The speed is constant.", "속도는 일정합니다.", "속도는", "스피드는 일정합니다."),
-            ("The temperature drops.", "온도가 떨어집니다.", "온도가 ", "기온이 떨어집니다."),
-        ]
-        for (source, target, run, want) in cases {
-            let r = glossary(source, g).resolve(target: target, runs: runs([run]))
-            #expect(r.text == want, "\(run) in \(target)")
-            #expect(r.unresolved.isEmpty, "\(run) in \(target)")
-        }
-    }
-
-    // Nouns whose last syllable looks like a particle and whose first syllables look like a word of their own (카메|라, 고양|이, 어린|이,
-    // 정확|도): the run cannot say, so the engine's rendering of the term asked alone does (probe `words`, 2026-10-18).
-    @Test func theEnginesRenderingAskedAloneSaysWhereTheWordEnds() {
-        let g = [("camera", "캠"), ("cat", "냥이"), ("child", "꼬마"), ("accuracy", "정밀도"), ("country", "지역"), ("meeting", "미팅"), ("layer", "계층"),
-                 ("token", "기호")]
-        let asked = ["camera": "카메라", "cat": "고양이", "child": "어린이", "accuracy": "정확도", "country": "나라", "meeting": "회의", "layer": "레이어",
-                     "token": "토큰"]
-        // (source, engine's target, the marked run, wanted)
-        let cases: [(String, String, String, String)] = [
-            ("Open the camera app.", "카메라 앱을 여세요.", "카메라 ", "캠 앱을 여세요."),
-            ("The camera supports night mode.", "카메라는 야간 모드를 지원합니다.", "카메라는", "캠은 야간 모드를 지원합니다."),
-            ("Visit the cat cafe.", "고양이 카페를 방문하세요.", "고양이 ", "냥이 카페를 방문하세요."),
-            ("The cat sleeps.", "고양이는 잡니다.", "고양이는", "냥이는 잡니다."),
-            ("Turn on the child lock.", "어린이 잠금을 켜십시오.", "어린이 ", "꼬마 잠금을 켜십시오."),
-            ("Report the accuracy score.", "정확도 점수를 보고하십시오.", "정확도 ", "정밀도 점수를 보고하십시오."),
-            ("The country joined the union.", "나라는 연합에 가입했습니다.", "나라는", "지역은 연합에 가입했습니다."),
-            // high fidelity: the run is the bare rendering
-            ("The camera supports night mode.", "카메라는 야간 모드를 지원합니다.", "카메라", "캠은 야간 모드를 지원합니다."),
-            // a copula the engine put in the run (constructed): it stays
-            ("This is a token.", "이것은 토큰입니다.", "토큰입니다", "이것은 기호입니다."),
-            // the particle that follows takes the target's sound
-            ("The layer is thin.", "레이어가 얇습니다.", "레이어가", "계층이 얇습니다."),
-        ]
-        for (source, target, run, want) in cases {
-            let r = glossary(source, g).resolve(target: target, runs: runs([run]), renderings: asked)
-            #expect(r.text == want, "\(run) in \(target)")
-            #expect(r.unresolved.isEmpty && r.resolved.map(\.cut) == [.rendering], "\(run) in \(target)")
-        }
-        // the engine merged the next word into the run ("meeting notes" → 회의록): the word is the run's, as without a rendering
-        let merged = glossary("Open the meeting notes.", g).resolve(target: "회의록을 열어 주세요.", runs: runs(["회의록을"]), renderings: asked)
-        #expect(merged.text == "미팅을 열어 주세요." && merged.resolved.map(\.cut) == [.look])
-        // a rendering that is only the front of the word in the run ("정확" asked alone, "정확도가" in the sentence) does not cut it short
-        let front = glossary("The accuracy improves.", g).resolve(target: "정확도가 향상됩니다.", runs: runs(["정확도가"]), renderings: ["accuracy": "정확"])
-        #expect(front.text == "정밀도가 향상됩니다." && front.resolved.map(\.cut) == [.look])
-        // a run that does not start with the rendering is cut from how it looks, as before
-        let other = glossary("Open the camera app.", g).resolve(target: "렌즈 앱을 여세요.", runs: runs(["렌즈 "]), renderings: asked)
-        #expect(other.text == "캠 앱을 여세요." && other.resolved.map(\.cut) == [.look])
-        // and a term nothing was asked for is too
-        let none = glossary("Open the camera app.", g).resolve(target: "카메라 앱을 여세요.", runs: runs(["카메라 "]))
-        #expect(none.resolved.map(\.was) == ["카메"])
-    }
-
-    @Test func aRenderingOutsideKoreanFindsTheWordToo() {
-        // en>ja low latency and en>zh-Hans high fidelity, 2026-10-18 (apple-glossary-{ja,zh}-after-*.txt): the run is the engine's
-        // word, and the particle after it stands outside; without a rendering nothing but a kept term was ever resolved
-        let ja = glossary("We split the text into tokens before feeding it to the model.", [("token", "記号"), ("model", "型式")])
-        let r = ja.resolve(target: "テキストをトークンに分割し、モデルに入力します。", runs: runs(["トークン", "モデル"]),
-                           renderings: ["token": "トークン", "model": "モデル"])
-        #expect(r.text == "テキストを記号に分割し、型式に入力します。" && r.resolved.map(\.cut) == [.rendering, .rendering] && r.unresolved.isEmpty)
-        #expect(ja.resolve(target: "テキストをトークンに分割し、モデルに入力します。", runs: runs(["トークン", "モデル"])).unresolved.count == 2)
-        let zh = glossary("Model size grows with the number of layers.", [("model", "范式"), ("layer", "阶层")])
-        #expect(zh.resolve(target: "模型的尺寸随层数增加而增加。", runs: runs(["模型", "层"]), renderings: ["model": "模型", "layer": "层"]).text
-                == "范式的尺寸随阶层数增加而增加。")
-        // the engine wrote a word the rendering asked alone does not start: left to `applyGlossary`
-        #expect(zh.resolve(target: "模型的尺寸随层数增加而增加。", runs: runs(["模型", "层"]), renderings: ["model": "模型", "layer": "图层"]).unresolved.map(\.text) == ["layers"])
-    }
-
-    @Test func aGlossarySpanKeepsTheTermItWasFoundAs() {
-        let spans = ProtectedSpans.glossarySpans(in: "Tokens are not tokenizers. A token is.", pairs: [("token", "토큰")])
-        #expect(spans.map(\.kind) == [.glossary(target: "토큰", term: "token"), .glossary(target: "토큰", term: "token")])
-        // the terms a request asks the engine about: each once, in source order, formulas left out
-        let plan = ProtectedSpans(source: "Tokens and layers: a token in a layer, dk.",
-                                  spans: ProtectedSpans.glossarySpans(in: "Tokens and layers: a token in a layer, dk.", pairs: [("token", "토큰"), ("layer", "계층")])
-                                      + [(40..<42, .math(id: 0))])
-        #expect(plan.glossaryTerms == ["token", "layer"])
-    }
-
-    @Test func aOneSyllableNounBeforeAParticleThatCanEndANounLosesTheParticleWhenNoRenderingIsKnown() {
-        // The cost of not cutting 회|의: high fidelity wrote 층 for "layers" (apple-glossary-spans-highfidelity-marker.txt, sentence 11),
-        // and 층의 reads like 회의, so the run is replaced whole and the target comes without 의. Readable; cutting 회|의 is not.
-        let p = glossary("Model size grows with the number of layers.", [("layer", "계층")])
-        #expect(p.resolve(target: "모델 크기는 층의 수에 따라 증가합니다.", runs: [.init(marker: 0, text: "층의")]).text == "모델 크기는 계층 수에 따라 증가합니다.")
-        // with the rendering known it is cut
-        #expect(p.resolve(target: "모델 크기는 층의 수에 따라 증가합니다.", runs: [.init(marker: 0, text: "층의")], renderings: ["layer": "층"]).text
-                == "모델 크기는 계층의 수에 따라 증가합니다.")
-    }
-
-    @Test func aRenderingIsWhatTheEngineWroteForTheTermAloneWithoutItsClosingPunctuation() {
-        #expect(ProtectedSpans.usableRendering("카메라", ofTerm: "camera") == "카메라")
-        #expect(ProtectedSpans.usableRendering(" 카메라.\n", ofTerm: "camera") == "카메라")
-        #expect(ProtectedSpans.usableRendering("데이터 세트", ofTerm: "dataset") == "데이터 세트")
-        #expect(ProtectedSpans.usableRendering("トークン。", ofTerm: "token") == "トークン")
-        // not a rendering: the engine kept the term (the span-text rule handles it), said nothing, or wrote a paragraph
-        #expect(ProtectedSpans.usableRendering("Camera", ofTerm: "camera") == nil)
-        #expect(ProtectedSpans.usableRendering("soft max", ofTerm: "softmax") == nil)
-        #expect(ProtectedSpans.usableRendering(" . ", ofTerm: "camera") == nil)
-        #expect(ProtectedSpans.usableRendering("", ofTerm: "camera") == nil)
-        #expect(ProtectedSpans.usableRendering("카메라\n사진기", ofTerm: "camera") == nil)
-        #expect(ProtectedSpans.usableRendering(String(repeating: "카메라 ", count: 20), ofTerm: "camera") == nil)
-    }
-
     @Test func aRunWithOnlyOneWordOfTheTargetIsLeftAlone() {
         // lowLatency put "어텐션" outside the run of "attention head": replacing "헤드" would say it twice
         let p = glossary("We apply softmax to the attention head scores.", [("attention head", "어텐션 헤드")])
@@ -447,33 +322,6 @@ import Testing
         }
         // never empty: a lone particle-looking syllable is the word
         #expect(KoreanParticle.wordEnd(in: "이") == 1 && KoreanParticle.wordEnd(in: "") == 0)
-    }
-
-    @Test func aBareRenderingThatEndsLikeAParticleIsTheWholeWord() {
-        // nouns whose last syllable is also a particle: with nothing after them the syllable belongs to the word
-        for word in ["평가", "결과", "효과", "회의", "사이", "아이", "속도", "온도", "지도", "경로", "작가", "사과", "나라", "밀도", "정의", "학과",
-                     "전문가", "아이디어"] {
-            for run in [word, word + " ", word + ".", word + ","] {
-                let end = KoreanParticle.wordEnd(in: run)
-                #expect(String(Array(run)[..<end]) == word, "\(run)")
-            }
-        }
-        // a particle after one of them is cut as before, and so is a plural 들 and a particle that cannot end a noun
-        for (run, word) in [("평가는", "평가"), ("결과가", "결과"), ("결과와", "결과"), ("효과를 ", "효과"), ("회의에서", "회의"), ("회의의", "회의"),
-                            ("속도로", "속도"), ("평가도", "평가"), ("고양이가", "고양이"), ("카메라를", "카메라"), ("나라들은", "나라")] {
-            let end = KoreanParticle.wordEnd(in: run)
-            #expect(String(Array(run)[..<end]) == word, "\(run)")
-        }
-    }
-
-    @Test func onlyWhatMayFollowAWordIsATail() {
-        for rest in ["", " ", ".", "는", " 는 ", "가", "의", "도", "들은", "들", "에서는", "로는", "이도", "가도", "으로", "입니다", "이다", "예요", "에게는 "] {
-            #expect(KoreanParticle.isTail(rest), "\(rest)")
-        }
-        // the front of a longer word, or particles in an order no sentence has
-        for rest in ["도가", "도는", "록을", "파이를", "맨은", "화", "라이브러리", "가능", "나눈"] {
-            #expect(!KoreanParticle.isTail(rest), "\(rest)")
-        }
     }
 
     @Test func agreesTellsWhetherTheParticleFits() {

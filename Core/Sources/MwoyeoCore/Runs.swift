@@ -34,6 +34,10 @@ public enum StyleRuns {
             let sa = strokes.count { $0.color.distance(to: a.color) < 60 }, sb = strokes.count { $0.color.distance(to: b.color) < 60 }
             return (sa, a.ink) < (sb, b.ink)
         }) else {
+            // A bold or haloed CJK glyph fills its box like a shape does ("君" in a glowing title), but it is text.
+            if text.unicodeScalars.contains(where: TranslationFilter.isCJK) {
+                return Token(text: text, minX: minX, maxX: maxX, color: mine.max { $0.ink < $1.ink }?.color, solid: false)
+            }
             return Token(text: text, minX: CGFloat(mine[0].minX), maxX: CGFloat(mine[mine.count - 1].maxX), color: nil, solid: true)
         }
         func foreign(_ c: InkCluster) -> Bool { c.solid || c.color.distance(to: main.color) > 60 }
@@ -97,11 +101,14 @@ public enum LabelRule {
         public var rect: CGRect
         public var text: String
         public var color: RGBA
+        /// Height of one line of the text; `rect.height` when the item is a single line.
+        public var lineHeight: CGFloat
 
-        public init(rect: CGRect, text: String, color: RGBA) {
+        public init(rect: CGRect, text: String, color: RGBA, lineHeight: CGFloat? = nil) {
             self.rect = rect
             self.text = text
             self.color = color
+            self.lineHeight = lineHeight ?? rect.height
         }
     }
 
@@ -123,7 +130,30 @@ public enum LabelRule {
                 out.insert(i)
             }
         }
+        for (i, a) in items.enumerated() where !out.contains(i) && isNameTag(a) {
+            let h = a.lineHeight
+            if items.indices.contains(where: { j in
+                let b = items[j], gap = b.rect.minY - a.rect.maxY
+                let aligned = b.rect.minX < a.rect.maxX + 3 * h && b.rect.maxX > a.rect.minX - 3 * h
+                return j != i && gap > -0.3 * h && gap < 2.5 * h && aligned && b.rect.midY > a.rect.midY
+                    && b.text.count > a.text.count && a.lineHeight <= 1.15 * b.lineHeight && a.color.distance(to: b.color) > 60
+            }) {
+                out.insert(i)
+            }
+        }
         return out
+    }
+
+    /// A name above a message bubble or a dialogue box: one to three CJK words on a line of their own. Names in
+    /// Latin script come back from the engine as they went in; a CJK name does not ("민지" → "The intellect of
+    /// the people").
+    static func isNameTag(_ a: Item) -> Bool {
+        let t = a.text.trimmingCharacters(in: .whitespaces)
+        guard a.rect.height <= 1.6 * a.lineHeight, t.count <= 8, t.split(separator: " ").count <= 3,
+              t.unicodeScalars.contains(where: TranslationFilter.isCJK),
+              !t.contains(where: { "。、，．！？!?,.~…:：".contains($0) }), !t.unicodeScalars.contains(where: CharacterSet.decimalDigits.contains)
+        else { return false }
+        return true
     }
 
     static func isWordShaped(_ text: String) -> Bool {

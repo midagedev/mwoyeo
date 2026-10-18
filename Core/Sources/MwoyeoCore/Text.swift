@@ -174,6 +174,21 @@ public enum TextFitter {
         return lo
     }
 
+    /// CoreText breaks Hangul between any two syllables (it treats them like ideographs) and ignores
+    /// `lineBreakStrategy`, so "노스필드" can wrap as "노스필/드". A word joiner between two syllables of one word
+    /// forbids the break there; a word longer than the line still breaks, as CoreText falls back to any position.
+    public static func keepingWordsTogether(_ text: String) -> String {
+        var out = String.UnicodeScalarView()
+        var prevHangul = false
+        for u in text.unicodeScalars {
+            let hangul = (0xAC00...0xD7A3).contains(u.value)
+            if hangul, prevHangul { out.append("\u{2060}") }
+            out.append(u)
+            prevHangul = hangul
+        }
+        return String(out)
+    }
+
     /// Size CoreText needs to lay out `string` wrapped at `width`.
     public static func measure(_ string: NSAttributedString, width: CGFloat) -> CGSize {
         let setter = CTFramesetterCreateWithAttributedString(string)
@@ -238,6 +253,7 @@ public enum TranslationCleanup {
 public enum TranslationFilter {
     /// `cjkSource`: the source (configured, or the page's dominant language) is Japanese, Chinese or Korean.
     public static func needsTranslation(_ text: String, cjkSource: Bool) -> Bool {
+        if isLiteral(text) { return false }
         let scalars = text.unicodeScalars
         if cjkSource { return scalars.contains(where: isCJK) }
         guard scalars.contains(where: { CharacterSet.letters.contains($0) }) else { return false }
@@ -247,6 +263,24 @@ public enum TranslationFilter {
         if !t.contains(" "), t.range(of: #"[0-9_./]"#, options: .regularExpression) != nil { return false }
         return true
     }
+
+    /// Text that is read as written in any language and must stay on screen as it is: a shell prompt with its command
+    /// ("$ npm run build"), a standalone time or date stamp ("10:42 AM", "2026-10-14") and a URL or bare domain.
+    public static func isLiteral(_ text: String) -> Bool {
+        let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return literalPatterns.contains { t.range(of: $0, options: [.regularExpression, .caseInsensitive]) != nil }
+    }
+
+    private static let literalPatterns = [
+        #"^[$%❯]\s+\S"#, // shell prompt + command ("$ ls", "% make"); "# general" is a channel, "» Read more" a link
+        #"^[\w.-]*[@:~/][\w.@~:/-]*[$#%]\s+\S"#, // "user@host:~$ ls": a host or path before the sigil, so "C# is" and "50% off" are text
+        #"^\d{1,2}:\d{2}(:\d{2})?\s*([ap]\.?m\.?)?$"#, // 10:42, 10:42 AM, 22:15:03
+        #"^(오전|오후|午前|午後|上午|下午)\s*\d{1,2}:\d{2}$"#,
+        #"^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}(\s+\d{1,2}:\d{2}(:\d{2})?\s*([ap]\.?m\.?)?)?$"#, // 2026-10-14 [10:42]
+        #"^\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}(\s+\d{1,2}:\d{2}(:\d{2})?\s*([ap]\.?m\.?)?)?$"#, // 14/10/2026
+        #"^(https?://|ftp://|www\.)\S+$"#,
+        #"^[a-z0-9][a-z0-9-]*(\.[a-z0-9-]+)*\.(com|org|net|io|dev|app|ai|co|kr|jp|cn|uk|de|fr|edu|gov|me|tv|us)(/\S*)?$"#,
+    ]
 
     static func isCJK(_ s: Unicode.Scalar) -> Bool {
         switch s.value {
@@ -268,5 +302,57 @@ public enum LineAlignment {
         let centreSpread = (centres.max() ?? 0) - (centres.min() ?? 0)
         let leftSpread = (lefts.max() ?? 0) - (lefts.min() ?? 0)
         return centreSpread <= tol && leftSpread > 2 * tol
+    }
+}
+
+/// Vertical text (tategaki, manga balloons) is not read yet: its columns are tall and narrow where lines of
+/// horizontal text are wide and short. Decided from the boxes a text-rectangle detector reports.
+public enum VerticalText {
+    /// True when at least three boxes are at least 2.2 times taller than wide and they are at least 60 % of
+    /// all boxes: a lone "I" or a narrow icon does not make a page vertical.
+    public static func isVertical(_ boxes: [CGRect]) -> Bool {
+        let usable = boxes.filter { $0.width > 4 && $0.height > 4 }
+        let tall = usable.filter { $0.height >= 2.2 * $0.width }
+        return tall.count >= 3 && Double(tall.count) >= 0.6 * Double(usable.count)
+    }
+}
+
+/// Whether two neighbouring lines of one block are set in different sizes (a heading over body text). An OCR line
+/// box follows the letters it holds — ascenders and descenders make the same font's boxes differ by 1.35 times
+/// ("A new processor design … their" 50 px, "price, according …" 37 px, both 12.6 px per character) — so Latin
+/// text is compared by the advance per character, which only the font size sets. Han, kana and hangul are
+/// squares as wide as the font is tall, and their boxes are compared as they are.
+public enum LineSize {
+    public struct Line: Sendable {
+        public var height: CGFloat
+        public var width: CGFloat
+        public var text: String
+
+        public init(height: CGFloat, width: CGFloat, text: String) {
+            self.height = height
+            self.width = width
+            self.text = text
+        }
+
+        var characters: Int { text.count }
+        var isCJK: Bool { text.unicodeScalars.filter(TranslationFilter.isCJK).count * 2 >= max(1, characters) }
+        var advance: CGFloat { width / CGFloat(max(1, characters)) }
+    }
+
+    public static func differ(_ a: Line, _ b: Line) -> Bool {
+        let heights = max(a.height, b.height) / max(1, min(a.height, b.height))
+        if a.isCJK != b.isCJK || (a.isCJK && b.isCJK) { return heights > 1.3 }
+        guard min(a.characters, b.characters) >= 12 else { return heights > 1.5 }
+        // Both measures must agree: a justified line's advance moves by 25 % on its own (1.26 on the magazine page).
+        return max(a.advance, b.advance) / max(0.1, min(a.advance, b.advance)) > 1.25 && heights > 1.2
+    }
+}
+
+/// A line that opens with a note or list marker starts its own paragraph even when the line before it is full:
+/// footnotes "2 The authors …" and "3 Corresponding author.", references "[4] K. He …", bullets.
+public enum ParagraphMarker {
+    public static func startsItem(_ line: String) -> Bool {
+        let t = line.trimmingCharacters(in: .whitespaces)
+        return t.range(of: #"^(\[\d{1,3}\]\s*\S|\d{1,2}\s+\p{Lu}\p{Ll}|[•·▪◦‣]\s*\S|[*†‡§]\s*\p{Lu})"#, options: .regularExpression) != nil
     }
 }

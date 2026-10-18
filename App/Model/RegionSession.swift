@@ -86,6 +86,7 @@ final class RegionSession {
 
     func start() async {
         await pipeline.setActivityHandler { [weak self] a in Task { @MainActor in self?.setActivity(a) } }
+        await pipeline.setNoticeHandler { [weak self] text in Task { @MainActor in self?.showNotice(text) } }
         await pipeline.setMotionHandler { [weak self] in Task { @MainActor in self?.noteMotion() } }
         await pipeline.setScrollHandler { [weak self] r in Task { @MainActor in self?.scrolled(r) } }
         panel.prediction = { [weak self] since, now in self?.predictedScroll(since: since, now: now) }

@@ -146,7 +146,7 @@ enum BlockRenderer {
             .paragraphStyle: para,
             NSAttributedString.Key(kCTLanguageAttributeName as String): language,
         ]
-        return NSAttributedString(string: text, attributes: attributes)
+        return NSAttributedString(string: TextFitter.keepingWordsTogether(text), attributes: attributes)
     }
 
     /// Stroke density stands in for font weight: bold text covers more of its line box.

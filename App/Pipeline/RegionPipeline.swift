@@ -114,6 +114,9 @@ actor RegionPipeline {
     private let inpainter: Inpainter?
     private let onSnapshot: @Sendable (OverlaySnapshot) -> Void
     private var onActivity: (@Sendable (RegionActivity) -> Void)?
+    private var onNotice: (@Sendable (String) -> Void)?
+    /// The last read found vertical text, and said so: the notice is shown once per such text, not per pass.
+    private var verticalNoticed = false
     private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "pipeline")
 
     private var options: PipelineOptions
@@ -198,6 +201,7 @@ actor RegionPipeline {
         self.onSnapshot = onSnapshot
     }
 
+    func setNoticeHandler(_ h: @escaping @Sendable (String) -> Void) { onNotice = h }
     func setActivityHandler(_ h: @escaping @Sendable (RegionActivity) -> Void) { onActivity = h }
     /// Called (at most twice a second) when content moves a lot: scrolling, page flips, animation.
     func setMotionHandler(_ h: @escaping @Sendable () -> Void) { onMotion = h }
@@ -642,6 +646,10 @@ actor RegionPipeline {
             if !(error is TextRecognizer.Timeout) { _ = finishPass(start, frame: frame) }
             return
         }
+        if holdsVerticalText(found) {
+            _ = finishPass(start, frame: frame)
+            return
+        }
         found = splitByStyle(found, in: frame.image)
         Trace.mark("fast: OCR \(Int(dirty.width))×\(Int(dirty.height))px → \(found.count) blocks", since: t)
         let fresh = found.filter { ocr in
@@ -711,6 +719,12 @@ actor RegionPipeline {
             return true
         }
         Trace.mark("seamless: document OCR (\(found.count) blocks)", since: t); t = Trace.now
+        if holdsVerticalText(found) {
+            guard finishPass(start, frame: frame) != nil else { return true }
+            blocks = []
+            emit(animated: false)
+            return true
+        }
         found = splitByStyle(found, in: frame.image)
             .filter { TextRecognizer.needsTranslation($0.text, target: options.targetLanguage) }
         guard let full = RGBAImage(cgImage: frame.image) else { return true }
@@ -742,6 +756,19 @@ actor RegionPipeline {
         return true
     }
 
+    /// Vertical text (tategaki, manga balloons) is not read yet: its lines come back as tall narrow boxes. Nothing on
+    /// such a frame is translated or erased, and the lens says so once per such text.
+    private func holdsVerticalText(_ found: [OCRBlock]) -> Bool {
+        let tall = VerticalText.isVertical(found.flatMap(\.lines).filter { $0.text.count >= 2 }.map(\.rect))
+        Trace.mark("vertical: \(tall)", since: Trace.now)
+        if tall, !verticalNoticed {
+            verticalNoticed = true
+            onNotice?(String(localized: "Vertical text isn't supported yet"))
+        }
+        if !tall { verticalNoticed = false }
+        return tall
+    }
+
     /// The document reader groups lines by layout alone, so a chat message and the next sender's name, or a post
     /// title and its body, can land in one paragraph. Split wherever the text colour or size changes — first within
     /// a line (a name, a badge and a timestamp read as one line each become their own block, icons in front of text
@@ -759,19 +786,25 @@ actor RegionPipeline {
             }
             return parts.filter { !$0.isEmpty }.flatMap { lines -> [OCRBlock] in
                 guard lines.count > 1 else { return [TextRecognizer.makeBlock(lines)] }
-                let styles = lines.map { (color: appearance(of: $0.rect, in: image).textColor, height: $0.rect.height) }
+                let styles = lines.map { (color: appearance(of: $0.rect, in: image).textColor, size: LineSize.Line(height: $0.rect.height, width: $0.rect.width, text: $0.text)) }
+                if Trace.enabled {
+                    Trace.mark("sizes: " + lines.map { l in "h\(Int(l.rect.height)) w\(Int(l.rect.width)) n\(l.text.count) '\(l.text.prefix(14))'" }.joined(separator: " ; "), since: Trace.now)
+                }
                 var groups: [[OCRLine]] = [[lines[0]]]
                 for i in 1..<lines.count {
                     let a = styles[i - 1], b = styles[i]
-                    let sizeJump = max(a.height, b.height) / max(1, min(a.height, b.height)) > 1.3
-                    if a.color.distance(to: b.color) > 60 || sizeJump { groups.append([]) }
+                    if a.color.distance(to: b.color) > 60 || LineSize.differ(a.size, b.size) || ParagraphMarker.startsItem(lines[i].text) { groups.append([]) }
                     groups[groups.count - 1].append(lines[i])
                 }
                 return groups.map(TextRecognizer.makeBlock)
             }
         }
-        let items = split.map { LabelRule.Item(rect: $0.rect, text: $0.text, color: appearance(of: $0.lines[0].rect, in: image).textColor) }
+        let items = split.map { LabelRule.Item(rect: $0.rect, text: $0.text, color: appearance(of: $0.lines[0].rect, in: image).textColor,
+                                                 lineHeight: $0.lines[0].rect.height) }
         let labels = LabelRule.labels(items)
+        if Trace.enabled {
+            Trace.mark("items: " + items.enumerated().map { "\($0.offset)\(labels.contains($0.offset) ? "*" : "") '\($0.element.text.prefix(10))' \(Int($0.element.rect.minX)),\(Int($0.element.rect.minY)) \(Int($0.element.rect.width))x\(Int($0.element.rect.height)) lh\(Int($0.element.lineHeight)) c\($0.element.color.r),\($0.element.color.g),\($0.element.color.b)" }.joined(separator: " ; "), since: Trace.now)
+        }
         return split.indices.filter { !labels.contains($0) }.map { split[$0] }
     }
 

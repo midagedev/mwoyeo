@@ -51,7 +51,7 @@
 - Window: via search summary of Apple docs/forums (WebSearch, page text not fetched): 4,096 tokens, counted across instructions, prompts and outputs of a session; error exceededContextWindowSize; InfoQ reports iOS 26.4 added SystemLanguageModel.contextSize and tokenCount(for:) https://infoq.com/news/2026/03/apple-foundation-models-context [secondary].
 - Does a long-lived session keep KV state so only new tokens are processed: [unverified]. The session does keep a transcript that is resent as context (that is why the window fills). TN3193 body could not be fetched; Transcript-based rebuilding is from memory [unverified].
 
-## Cost model (script: /private/tmp/claude-501/-Users-hckim-repo-mwoyeo/ff63668f-512b-4dfe-84da-f8969db15ac2/scratchpad/cost.py)
+## Cost model (script: docs/research/translation/cost-model.py)
 Assumptions: 200 requests, 75 new input tokens and 75 output tokens each, a turn adds 150 transcript tokens, 1k prefix. Cents per session; list prices above. Gemini* = 3.1 Flash-Lite, implicit cache needs 4,096 so rows assume the cache works (optimistic; with a 1k prefix and C=2k it would not).
 | scenario | gpt-5.4-nano | gpt-6-luna | Haiku 5.5 | Gem 3.1 FL* |
 | today (100-tok sys, no history) | 2.58 | 1.10 | 1.10 | 3.13 |

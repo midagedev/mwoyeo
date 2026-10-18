@@ -15,6 +15,9 @@ or an estimate ([U]).
 | memory-and-window-metadata.md | Editable memory: evidence, schemas, UX precedents, OS window metadata, size budgets, privacy |
 | apple-translation.md | The Apple Translation API surface (macOS 26/27), context-concatenation and input-shaping probes |
 | apple-probe/ | The probe source (ctx.swift), the predictions written before the runs, and the raw outputs (ll/hf = low latency / high fidelity; d = previous-line concat, s = shaping) |
+| terms-beyond-glossary.md | (Korean) Ways beyond a glossary to keep names and terms: NLTagger NER, transliteration, spell-check probes on this Mac, and tools' practice |
+| terms-probe/ | The three OS-query probes behind it (NLTagger schemes, NER on 14 sentences, StringTransform + NSSpellChecker) |
+| cost-model.py | The cost model script behind caching-and-cost.md |
 
 The bench that measures these choices lives in tools/translation-bench/. Its sequences, memory sheets, probes and run
 outputs are kept in the repo, with a manifest per run (engine, model, date, commit).

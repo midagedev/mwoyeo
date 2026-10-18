@@ -241,16 +241,25 @@ import MwoyeoCore
     @Test func cancellingAHungRequestReturnsPromptly() async throws {
         let (server, client, engine) = try setup("hang", kind: openAI)
         defer { server.stop() }
+        // 2026-10-19 (t3a1-context-settings): the bound was 300 ms from the cancel, and it flaked under load (load average 30 to 44
+        // during the 1.1.2 release gates). Derivation: what this test blocks is a cancel that does not reach the HTTP task, so the
+        // caller waits for the hung request. That request cannot answer (the mock sleeps an hour); the first moment it can return
+        // on its own is the transport's silence limit (`timeoutIntervalForRequest`, 30 s), as a timeout error, not `.cancelled`.
+        // So the bound is that instant, measured from before the request existed: a waiting version returns at or after it, a
+        // correct one returns when the task is cancelled plus wake-up latency, ms of work against 30 s. It costs time only when
+        // the code is broken. (The speed of a cancel is not what this guards.)
+        let silenceLimit = Duration.seconds(EngineTransport.session.configuration.timeoutIntervalForRequest)
+        let launched = ContinuousClock.now
         let task = Task { () -> EngineError? in
             do throws(EngineError) { _ = try await run(client, engine); return nil } catch { return error }
         }
         for _ in 0..<100 where server.count("POST") == 0 { try await Task.sleep(for: .milliseconds(30)) }
         #expect(server.count("POST") == 1)
-        let start = ContinuousClock.now
         task.cancel()
         let result = await task.value
+        let elapsed = ContinuousClock.now - launched
         #expect(result == EngineError.cancelled)
-        #expect(ContinuousClock.now - start < .milliseconds(300))
+        #expect(elapsed < silenceLimit, "the cancel returned after \(elapsed); the hung request could time out on its own at \(silenceLimit)")
         #expect(await client.learnedRejections(for: engine.id).isEmpty)
         #expect(server.count("POST") == 1)  // no retry after cancel
     }

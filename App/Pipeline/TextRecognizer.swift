@@ -631,7 +631,11 @@ enum TextRecognizer {
 
     /// Text worth translating: has letters, and is not already in the target language.
     static func needsTranslation(_ text: String, target: String) -> Bool {
-        guard text.unicodeScalars.contains(where: { CharacterSet.letters.contains($0) }), !TranslationFilter.isLiteral(text) else { return false }
+        guard text.unicodeScalars.contains(where: { CharacterSet.letters.contains($0) }) else { return false }
+        if TranslationFilter.isLiteral(text) {
+            if TranslationFilter.isFormula(text) || TranslationFilter.isIdentifier(text) { Trace.count("ocr.kept.formula") }
+            return false
+        }
         let targetCode = Locale.Language(identifier: target).languageCode?.identifier
         // Hangul is unambiguous; for other targets ask NaturalLanguage, but only trust confident answers.
         if targetCode == "ko" {

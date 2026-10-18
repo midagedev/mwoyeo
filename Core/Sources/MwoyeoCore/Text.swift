@@ -265,8 +265,14 @@ public enum TranslationFilter {
     }
 
     /// Text that is read as written in any language and must stay on screen as it is: a shell prompt with its command
-    /// ("$ npm run build"), a standalone time or date stamp ("10:42 AM", "2026-10-14") and a URL or bare domain.
+    /// ("$ npm run build"), a standalone time or date stamp ("10:42 AM", "2026-10-14"), a URL or bare domain, a
+    /// fragment of a formula (`isFormula`) and an identifier written in camelCase (`isIdentifier`).
     public static func isLiteral(_ text: String) -> Bool {
+        let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return matchesLiteralPattern(t) || isFormula(t) || isIdentifier(t)
+    }
+
+    static func matchesLiteralPattern(_ text: String) -> Bool {
         let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
         return literalPatterns.contains { t.range(of: $0, options: [.regularExpression, .caseInsensitive]) != nil }
     }
@@ -282,12 +288,203 @@ public enum TranslationFilter {
         #"^[a-z0-9][a-z0-9-]*(\.[a-z0-9-]+)*\.(com|org|net|io|dev|app|ai|co|kr|jp|cn|uk|de|fr|edu|gov|me|tv|us)(/\S*)?$"#,
     ]
 
+    /// A figure label or a formula the page typesets as symbols ("K", "QKT", "N×", "O(n² · d)",
+    /// "Attention(Q, K,V) = softmax"): no sentence is in it, so the engine can only invent one ("K" came back as "1천")
+    /// and the overlay would paint text over the typeset symbols. Decided from the letters, not from a list of
+    /// examples. A body line that holds one formula ("i=1 9iki, has mean 0 and variance dk.") is not this: it has words.
+    ///
+    /// A formula has letters of Latin, Greek or Cyrillic only, and
+    /// - one letter in all ("K", "-)V", "(a)", "O(1)"); or
+    /// - no prose word and a sign of mathematics: a symbol, a Greek letter used as one, `_` in a name, a call `name(…)`, or
+    ///   one run mixing Latin and Cyrillic (a sign misread by OCR); or
+    /// - no prose word and every part of it a letter, a digit-letter run or a consonant-only run ("x1 x2", "QKT", "Nx"),
+    ///   so that "ok", "OK", "Hi!", "Go to 3D", "Q&A" and "WTF" are text.
+    /// A prose word is a run of three letters or more with a vowel ("has"), or a contraction, that is not an operand.
+    /// Operands are the name of a call whose arguments are variables ("Sublayer(x)"), the name of any call when the line
+    /// holds an `=`, and the words inside such a call or lowercase beside an `=` ("headi = Attention(Q)"): a word that
+    /// is capital-first ("Mode = Fast") stays prose. One prose word is the label of a typeset line when the rest holds
+    /// an `=` and twice its letters ("where headi = Attention(QWQ i, …)").
+    public static func isFormula(_ text: String) -> Bool {
+        FormulaScan(text.trimmingCharacters(in: .whitespacesAndNewlines)).isFormula
+    }
+
+    /// One identifier written in camelCase with an inner capital ("MatMul", "SoftMax", "ReLU", "LayerNorm"): a name from
+    /// code or a figure, or a brand ("YouTube"). A single plain word ("Scale", "Linear") is not one, and neither is a
+    /// brand run into Japanese ("YouTubeで見る").
+    public static func isIdentifier(_ text: String) -> Bool {
+        let core = text.trimmingCharacters(in: CharacterSet.letters.inverted)
+        let scalars = Array(core.unicodeScalars)
+        guard scalars.count >= 3, scalars.allSatisfy({ CharacterSet.letters.contains($0) && !isCJK($0) }) else { return false }
+        return zip(scalars, scalars.dropFirst()).contains { CharacterSet.lowercaseLetters.contains($0) && CharacterSet.uppercaseLetters.contains($1) }
+    }
+
     static func isCJK(_ s: Unicode.Scalar) -> Bool {
         switch s.value {
         case 0x3040...0x30FF, 0x3400...0x4DBF, 0x4E00...0x9FFF, 0xF900...0xFAFF, 0xFF66...0xFF9D, // kana, han, half-width kana
              0x1100...0x11FF, 0x3130...0x318F, 0xAC00...0xD7AF: true                                 // hangul
         default: false
         }
+    }
+}
+
+/// The letters, digits and signs of one line, as `TranslationFilter.isFormula` reads them. A run is a stretch of
+/// letters, digits and `_` (an apostrophe between two letters stays in it); everything else is a sign.
+private struct FormulaScan {
+    private enum Script { case latin, greek, cyrillic, math }
+
+    private var letters = 0
+    private var proseWords = 0       // words that are not operands
+    private var proseLetters = 0
+    private var relation = false     // an `=` or a comparison somewhere in the line
+    private var sign = false         // a sign of mathematics: symbol, Greek letter, `_`, a call, mixed Latin and Cyrillic
+    private var digitLetter = false  // a run holding both ("x1", "9iki")
+    private var capsCluster = false  // a consonant-only run with a capital ("QKT", "Nx")
+    private var onlyAtoms = true     // no run of two or more letters with a vowel in it, apart from digits
+    private var digit = false
+    private var latin = false, greek = false, cyrillic = false
+    private var bracket = false      // a slash, bar, bracket, comparison or arithmetic sign
+    private var supported = true     // every letter is Latin, Greek or Cyrillic
+
+    /// Consonant-only words that are chat, not symbols; a capital in them does not make them a formula.
+    private static let consonantWords: Set<String> = ["wtf", "brb", "lmk", "tbh", "smh", "fml", "btw", "tbd", "nvm", "pls", "thx", "ppl",
+                                                       "hmm", "hm", "mmm", "mm", "mhm", "kk", "shh", "brr", "grr", "psst"]
+    private static let vowels = Set("aeiouyıøæœаеёиоуыэюяіїєαεηιουω")
+
+    private static func script(_ v: UInt32) -> Script? {
+        switch v {
+        case 0xB5, 0x370...0x3FF, 0x1F00...0x1FFF: .greek  // µ is the micro sign, a Latin-1 letter that is a Greek mu
+        case 0..<0x2B0, 0x1E00...0x1EFF: .latin
+        case 0x400...0x52F: .cyrillic
+        case 0x1D400...0x1D7FF: .math
+        default: nil
+        }
+    }
+
+    private static func isMathSign(_ v: UInt32) -> Bool {
+        switch v {
+        case 0x3D, 0x5E, 0xB1, 0xB2, 0xB3, 0xB9, 0xD7, 0xF7: true  // = ^ ± ² ³ ¹ × ÷
+        case 0x2070...0x209F, 0x2190...0x21FF, 0x2200...0x22FF: true // super and subscripts, arrows, mathematical operators
+        default: false
+        }
+    }
+
+    private static func isRelation(_ v: UInt32) -> Bool { [0x3D, 0x2208, 0x2248, 0x2260, 0x2261, 0x2264, 0x2265].contains(v) }
+    private static let bracketSigns = Set("/\\|<>[]{}()+*~".unicodeScalars)
+
+    init(_ text: String) {
+        let s = Array(text.decomposedStringWithCanonicalMapping.unicodeScalars)
+        relation = s.contains { Self.isRelation($0.value) }
+        let isLetter = { (v: Unicode.Scalar) in CharacterSet.letters.contains(v) }
+        let isMark = { (v: Unicode.Scalar) in (0x300...0x36F).contains(v.value) }
+        let isDigit = { (v: Unicode.Scalar) in CharacterSet.decimalDigits.contains(v) }
+        let isRunScalar = { (v: Unicode.Scalar) in v == "_" || isMark(v) || isDigit(v) || isLetter(v) }
+        func neighbour(from i: Int, step: Int) -> Unicode.Scalar? {
+            var k = i + step
+            while s.indices.contains(k), CharacterSet.whitespacesAndNewlines.contains(s[k]) { k += step }
+            return s.indices.contains(k) ? s[k] : nil
+        }
+
+        /// A call's arguments are plain variables: one letter at most in each run, at least one letter ("Sublayer(x)").
+        func argumentsAreVariables(_ open: Int) -> Bool {
+            var depth = 0, run = 0, widest = 0
+            for k in open..<s.count where !isMark(s[k]) {
+                if s[k] == "(" { depth += 1 } else if s[k] == ")" { depth -= 1; if depth == 0 { break } }
+                run = isLetter(s[k]) ? run + 1 : 0
+                widest = max(widest, run)
+            }
+            return widest == 1
+        }
+
+        var openParens: [Bool] = []  // per open "(": is a call's name right before it, and are its words operands
+        var callOpensAt = -1, callExempt = false
+        var i = 0
+        while i < s.count {
+            let v = s[i]
+            guard isRunScalar(v) else {
+                if Self.bracketSigns.contains(v) { bracket = true }
+                if v == "(" {
+                    openParens.append(i == callOpensAt && callExempt)
+                } else if v == ")" {
+                    _ = openParens.popLast()
+                } else if Self.isMathSign(v.value) {
+                    sign = true
+                }
+                i += 1
+                continue
+            }
+            var j = i + 1
+            var contraction = false
+            while j < s.count {
+                if isRunScalar(s[j]) { j += 1 }
+                else if s[j] == "'" || s[j] == "\u{2019}", j + 1 < s.count, isLetter(s[j - 1]), isLetter(s[j + 1]) { contraction = true; j += 1 }
+                else { break }
+            }
+
+            var count = 0, digits = 0, underscore = false, vowel = false, capital = false, camel = false
+            var scripts = Set<Script>()
+            var previousLower = false
+            let run = s[i..<j]
+            for c in run where !isMark(c) {
+                if isDigit(c) { digits += 1 }
+                else if c == "_" { underscore = true }
+                else if isLetter(c) {
+                    guard let script = Self.script(c.value) else { supported = false; return }
+                    scripts.insert(script)
+                    count += 1
+                    let lower = CharacterSet.lowercaseLetters.contains(c), upper = CharacterSet.uppercaseLetters.contains(c)
+                    if let l = String(c).lowercased().first, Self.vowels.contains(l) { vowel = true }
+                    if upper { capital = true; if previousLower { camel = true } }
+                    previousLower = lower
+                }
+            }
+            letters += count
+            if digits > 0 { digit = true }
+            if underscore { sign = true }
+            i = j
+            guard count > 0 else { continue }
+
+            let lettersOnly = digits == 0 && !underscore
+            let plural = { () -> Bool in
+                let tail = String(String.UnicodeScalarView(s[j...].prefix(4)))
+                return tail.hasPrefix("(s)") || tail.hasPrefix("(es)")
+            }
+            let call = j < s.count && s[j] == "(" && isLetter(s[run.startIndex]) && !plural()
+            let word = lettersOnly && scripts.count == 1 && !scripts.contains(.math) && (contraction || (count >= 3 && vowel))
+            if call {
+                sign = true
+                callOpensAt = j
+                callExempt = relation || camel || !word || argumentsAreVariables(j)
+            }
+            if digits > 0 { digitLetter = true }
+            if scripts.contains(.math) { sign = true }
+            if scripts.contains(.greek) { greek = true; if count == 1 || scripts.count > 1 || !lettersOnly { sign = true } }
+            if scripts.contains(.cyrillic) { cyrillic = true }
+            if scripts.contains(.latin) { latin = true }
+            if scripts.contains(.latin) && scripts.contains(.cyrillic) { sign = true }
+
+            if word {
+                let beside = [neighbour(from: run.startIndex, step: -1), neighbour(from: run.endIndex - 1, step: 1)]
+                    .contains { $0.map { Self.isRelation($0.value) } ?? false }
+                let lowerFirst = CharacterSet.lowercaseLetters.contains(s[run.startIndex])
+                let operand = (call && callExempt) || openParens.contains(true) || (relation && lowerFirst && beside)
+                if !operand { proseWords += 1; proseLetters += count }
+            }
+            if lettersOnly && count >= 2 && vowel == false && capital && !Self.consonantWords.contains(String(String.UnicodeScalarView(run.filter { !isMark($0) })).lowercased()) {
+                capsCluster = true
+            }
+            if count >= 2 && lettersOnly && vowel { onlyAtoms = false }
+        }
+    }
+
+    var isFormula: Bool {
+        guard supported, letters > 0 else { return false }
+        if letters == 1 { return true }
+        // A lone word of prose among many symbols ("where headi = Attention(QWQ i, …)") is the label of a typeset line.
+        if proseWords > 1 || (proseWords == 1 && !(relation && letters - proseLetters >= 2 * proseLetters)) { return false }
+        if sign { return true }
+        if onlyAtoms && (digitLetter || (capsCluster && !digit)) { return true }
+        // A short Cyrillic fragment beside a slash or bracket: a "√dk" read as "/ак".
+        return cyrillic && !latin && !greek && letters <= 3 && bracket
     }
 }
 

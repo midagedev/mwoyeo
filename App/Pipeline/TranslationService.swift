@@ -110,7 +110,7 @@ actor TranslationService {
     private var engineIssue: TranslationIssue?
 
     private struct Cooldown {
-        var backoff = RetryBackoff()
+        var backoff = HealthyBackoff()
         var until: TimeInterval = 0
     }
 
@@ -388,7 +388,10 @@ actor TranslationService {
                 outcome.batchFailed = true
             }
             // Some of the group came back and these did not: the engine skipped them.
-            if missing.count < items.count { outcome.failed.formUnion(missing) }
+            // Also a group that came back all unchanged with no error (`StrikeRule`).
+            let struck = StrikeRule.struck(items: items, translated: translated, groupFailed: groupFailed)
+            if !struck.isEmpty { Trace.count("translate.struck", struck.count) }
+            outcome.failed.formUnion(struck)
         }
         return outcome
     }
@@ -463,7 +466,12 @@ actor TranslationService {
 
     /// The engine answered: its cooldown and issue end, and Apple's stand-in entries stop being served.
     private func engineRecovered(_ e: EngineConfig) {
-        cooldowns[e.id] = nil
+        // The cooldown has ended, but its steps stay until the engine has been healthy for a window.
+        if var c = cooldowns[e.id] {
+            c.backoff.success(now: ProcessInfo.processInfo.systemUptime)
+            c.until = 0
+            cooldowns[e.id] = c
+        }
         cache.clearFallback()
         pace.clearFallback()
         if engineIssue != nil { engineIssue = nil; issueHandler?(nil) }

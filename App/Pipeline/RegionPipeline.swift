@@ -156,6 +156,8 @@ actor RegionPipeline {
     private var resumeTask: Task<Void, Never>?
     private var backoff = RetryBackoff()
     private var strikes = SourceStrikes()
+    /// Consecutive failed recognition passes: the next read waits, whatever the pixels do.
+    private var readBackoff = ReadBackoff()
     private var version = 0
     private var scale: CGFloat = 2
     private var activity = RegionActivity.idle
@@ -297,6 +299,7 @@ actor RegionPipeline {
         pauseID += 1
         backoff.reset()
         strikes.reset()
+        readBackoff.reset()
     }
 
     /// Re-translate everything currently on screen (e.g. after the user downloads a language pack).
@@ -455,6 +458,8 @@ actor RegionPipeline {
     private func run() async {
         while let frame = latest {
             let now = ProcessInfo.processInfo.systemUptime
+            // A pixel change inside the backoff waits for its end (the timer below kicks again).
+            if readBackoff.isWaiting(now: now) { Trace.count("ocr.backoff_wait"); break }
             let stale = staleness(for: frame)
             // Seamless mode re-reads on change only, and a tile that stopped animating changed while it was left out.
             if options.renderMode == .seamless, seamlessDone, stale.change?.isUnchanged == false { seamlessDone = false }
@@ -480,6 +485,7 @@ actor RegionPipeline {
         }
         // An animation that stops sends no more frames: look again once its tiles count as still.
         if latest != nil, let c = churn.coolsIn(at: now) { wait = min(wait ?? .infinity, c + 0.05) }
+        if latest != nil, let r = readBackoff.remaining(now: now) { wait = r + 0.05 }
         if let wait {
             settleTask?.cancel()
             settleTask = Task { [weak self] in
@@ -576,6 +582,7 @@ actor RegionPipeline {
             }
             lensMoved = now
             lastVisibleChange = now
+            readBackoff.reset()
         }
         visible = rect
         reconsider()
@@ -662,6 +669,7 @@ actor RegionPipeline {
         origin = rect.origin
         captureSize = rect.size
         geometryEpoch += 1
+        readBackoff.reset()
         churn.reset()
         lastChange = ProcessInfo.processInfo.systemUptime
         seamlessDone = false
@@ -773,9 +781,13 @@ actor RegionPipeline {
             log.error("fast OCR failed: \(String(describing: error), privacy: .public)")
             Trace.mark("fast: OCR failed \(error)", since: t)
             // A stuck request is retried; any other failure would just fail again on the same pixels.
-            if !(error is TextRecognizer.Timeout) { _ = finishPass(start, frame: frame) }
+            if !(error is TextRecognizer.Timeout) {
+                noteReadFailure()
+                _ = finishPass(start, frame: frame)
+            }
             return
         }
+        readBackoff.success()
         if holdsVerticalText(found) {
             _ = finishPass(start, frame: frame)
             return
@@ -845,9 +857,11 @@ actor RegionPipeline {
             log.error("document OCR failed: \(String(describing: error), privacy: .public)")
             Trace.mark("seamless: OCR failed \(error)", since: t)
             if error is TextRecognizer.Timeout { return false }
+            noteReadFailure()
             _ = finishPass(start, frame: frame)
             return true
         }
+        readBackoff.success()
         Trace.mark("seamless: document OCR (\(found.count) blocks)", since: t); t = Trace.now
         if holdsVerticalText(found) {
             guard finishPass(start, frame: frame) != nil else { return true }
@@ -884,6 +898,12 @@ actor RegionPipeline {
         Trace.mark("seamless: render", since: t)
         emit(animated: true)
         return true
+    }
+
+    private func noteReadFailure() {
+        let wait = readBackoff.failure(now: ProcessInfo.processInfo.systemUptime)
+        Trace.count("ocr.failed_pass")
+        Trace.mark("ocr: failed pass \(readBackoff.failures), next read in \(Int(wait)) s", since: Trace.now)
     }
 
     /// Vertical text (tategaki, manga balloons) is not read yet: its lines come back as tall narrow boxes. Nothing on

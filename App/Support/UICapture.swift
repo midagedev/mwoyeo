@@ -9,7 +9,7 @@ import SwiftUI
 /// models for the language and reads the picture in this process every half second until every step is done, printing each
 /// read's latency and the steps as they change (what a lens sees during a cold compile; no window).
 /// Scenarios: menu-init-running, menu-init-failed, menu-init-done (the panel during the initialization of the text
-/// models, from a gate of its own, no real recognition), translation-default, translation-engines, general-saving, menu-default, menu-switcher, menu-notice,
+/// models, from a gate of its own, no real recognition), translation-default, translation-packs, translation-packs-auto, translation-engines, general-saving, menu-default, menu-switcher, menu-notice,
 /// menu-profile, image-window and image-window-original (the Translate Image window on `--image`, translated through the
 /// mock, then with Show Original on; when the text recognizer reads nothing the picture stands in for its translation, which
 /// still shows the toggle's two states), sheet-pick, sheet-config, sheet-config-remote, lens-badge, lens-notice, lens-menu, add-flow (adds an
@@ -90,6 +90,11 @@ enum UICapture {
         private func scenario(_ name: String) async {
             switch name {
             case "translation-default": await shoot(name, TranslationSettings(), CGSize(width: 560, height: 760))
+            case "translation-packs", "translation-packs-auto":
+                // The language packs section: the chosen pair alone (ja → ko), or the installed pairs while the source is automatic.
+                model.settings.sourceLanguage = name == "translation-packs" ? "ja" : "auto"
+                model.settings.targetLanguage = "ko"
+                await shoot(name, TranslationSettings(), CGSize(width: 560, height: 1300))
             case "translation-profiles":
                 model.settings.appProfiles = [AppProfile(bundleID: "com.apple.Safari", appName: "Safari", source: "ja", target: "en"),
                                               AppProfile(bundleID: "com.example.vn", appName: "Visual Novel", source: "ja", target: "en", paragraphReader: .lineGrouping)]

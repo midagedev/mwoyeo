@@ -109,6 +109,8 @@ struct TranslationSettings: View {
     @State private var cached = 0
     @State private var sheet: EngineSheetTarget?
     @State private var removing: EngineConfig?
+    /// The active added engine's speed, polled; nil (no row at all) until it has enough batches.
+    @State private var speed: SpeedSummary?
     private let intelligence = IntelligenceTranslator()
 
     /// The radio in use: an Apple choice, or an added engine.
@@ -146,10 +148,9 @@ struct TranslationSettings: View {
                         }
                         Divider()
                         Button("Forget This App", role: .destructive) { model.forgetProfile(p.bundleID) }
-                    } label: { Image(systemName: "ellipsis.circle") }
+                    } label: { Image(nsImage: .moreActions) }
                         .menuStyle(.borderlessButton)
                         .menuIndicator(.hidden)
-                        .foregroundStyle(.secondary)
                         .fixedSize()
                         .help("More actions for \(p.appName)")
                         .accessibilityLabel("More actions for \(p.appName)")
@@ -213,13 +214,19 @@ struct TranslationSettings: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                if let e = model.settings.activeEngineConfig { SpeedLine(engine: e) }
+                if let speed { SpeedLine(summary: speed) }
                 LabeledContent("Apple Intelligence") {
                     if let why = intelligence.unavailableReason {
                         Label(why, systemImage: "xmark.circle").foregroundStyle(.secondary)
                     } else {
                         Label("Available · on device", systemImage: "checkmark.seal.fill").foregroundStyle(.green)
                     }
+                }
+            }
+            .task(id: model.settings.activeEngineConfig?.id) {
+                while !Task.isCancelled {
+                    speed = model.settings.activeEngineConfig.flatMap { model.translator.speedSummary(for: $0.id) }
+                    try? await Task.sleep(for: .seconds(2))
                 }
             }
             .sheet(item: $sheet) { target in
@@ -235,7 +242,7 @@ struct TranslationSettings: View {
                 Text("Its saved key is deleted from the Keychain.")
             }
             Section {
-                LanguagePacksView(target: model.settings.targetLanguage) {
+                LanguagePacksView(source: model.settings.sourceLanguage, target: model.settings.targetLanguage) {
                     Task { await model.languagePacksChanged() }
                 }
             } header: {
@@ -289,33 +296,27 @@ struct TranslationSettings: View {
     }
 }
 
+/// The pack the lenses use now (the chosen pair; none while the source is automatic) and "All Languages" with the installed
+/// count, holding every pair: the section is one or two rows, not one per language.
 struct LanguagePacksView: View {
+    let source: String
     let target: String
     var onChange: () -> Void
     @State private var status: [String: LanguageAvailability.Status] = [:]
     @State private var downloading: TranslationSession.Configuration?
+    @State private var showsAll = false
 
     private var sources: [String] { Languages.sources.dropFirst().filter { $0 != target } }
+    private var shown: [String] { source == "auto" || source == target ? [] : [source] }
+    private var installed: Int { sources.filter { status[$0] == .installed }.count }
 
     var body: some View {
-        ForEach(sources, id: \.self) { source in
-            LabeledContent {
-                switch status[source] {
-                case .installed?:
-                    Label("Installed", systemImage: "checkmark.circle.fill").foregroundStyle(.green).labelStyle(.titleAndIcon)
-                case .supported?:
-                    Button("Download") {
-                        downloading = TranslationSession.Configuration(source: Locale.Language(identifier: source),
-                                                                       target: Locale.Language(identifier: target))
-                    }
-                    .disabled(downloading != nil)
-                case nil:
-                    ProgressView().controlSize(.small)
-                default:
-                    Text("Not supported").foregroundStyle(.secondary)
-                }
-            } label: {
-                Text(verbatim: "\(Languages.name(source)) → \(Languages.name(target))")
+        ForEach(shown, id: \.self) { row($0) }
+        DisclosureGroup(isExpanded: $showsAll) {
+            ForEach(sources, id: \.self) { row($0) }
+        } label: {
+            LabeledContent("All Languages") {
+                if !status.isEmpty { Text("\(installed) installed").foregroundStyle(.secondary) }
             }
         }
         .task(id: target) { await reload() }
@@ -325,6 +326,27 @@ struct LanguagePacksView: View {
             await MainActor.run { downloading = nil }
             await reload()
             await MainActor.run { onChange() }
+        }
+    }
+
+    private func row(_ source: String) -> some View {
+        LabeledContent {
+            switch status[source] {
+            case .installed?:
+                Label("Installed", systemImage: "checkmark.circle.fill").foregroundStyle(.green).labelStyle(.titleAndIcon)
+            case .supported?:
+                Button("Download") {
+                    downloading = TranslationSession.Configuration(source: Locale.Language(identifier: source),
+                                                                   target: Locale.Language(identifier: target))
+                }
+                .disabled(downloading != nil)
+            case nil:
+                ProgressView().controlSize(.small)
+            default:
+                Text("Not supported").foregroundStyle(.secondary)
+            }
+        } label: {
+            Text(verbatim: "\(Languages.name(source)) → \(Languages.name(target))")
         }
     }
 
@@ -606,10 +628,9 @@ private struct AddedEngineLabel<Actions: View>: View {
                 }
             }
             Spacer(minLength: 0)
-            Menu { actions } label: { Image(systemName: "ellipsis.circle") }
+            Menu { actions } label: { Image(nsImage: .moreActions) }
                 .menuStyle(.borderlessButton)
                 .menuIndicator(.hidden)
-                .foregroundStyle(.secondary)
                 .fixedSize()
                 .help("More actions for \(engine.name)")
                 .accessibilityLabel("More actions for \(engine.name)")
@@ -623,16 +644,11 @@ private struct AddedEngineLabel<Actions: View>: View {
 
 /// "First result 0.3 s · 62% from memory", for the engine in use once it has run a few batches.
 private struct SpeedLine: View {
-    @Environment(AppModel.self) private var model
-    let engine: EngineConfig
+    let summary: SpeedSummary
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 2)) { _ in
-            if let s = model.translator.speedSummary(for: engine.id) {
-                Text("First result \(String(format: "%.1f", s.seconds)) s · \(Int((s.fromMemory * 100).rounded()))% from memory")
-                    .font(.caption).foregroundStyle(.secondary)
-            }
-        }
+        Text("First result \(String(format: "%.1f", summary.seconds)) s · \(Int((summary.fromMemory * 100).rounded()))% from memory")
+            .font(.caption).foregroundStyle(.secondary)
     }
 }
 
@@ -644,4 +660,13 @@ extension ParagraphReader {
         case .lineGrouping: String(localized: "Line grouping")
         }
     }
+}
+
+extension NSImage {
+    /// The ⋯ of a row's menu in the secondary label colour: a borderless menu button draws a template image in the primary
+    /// colour whatever the SwiftUI style says, so the colour is in the image (vision verdict, 2026-10-18).
+    static let moreActions: NSImage = {
+        let symbol = NSImage(systemSymbolName: "ellipsis.circle", accessibilityDescription: nil) ?? NSImage()
+        return symbol.withSymbolConfiguration(.init(paletteColors: [.secondaryLabelColor])) ?? symbol
+    }()
 }

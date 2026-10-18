@@ -1,0 +1,8 @@
+{
+ "entities": [
+  {"name": "十河", "reading": "そごう", "gender": "male", "role": "section chief", "speaks_to": {"日向": "해요체"}},
+  {"name": "日向", "reading": "ひゅうが", "gender": "female", "role": "junior employee", "speaks_to": {"十河": "합쇼체"}}
+ ],
+ "window": {"title": "営業二課 チャット", "app": "Microsoft Teams", "category": "Business"},
+ "terms": [{"src": "稟議", "dst": "품의"}, {"src": "納期", "dst": "납품일"}]
+}

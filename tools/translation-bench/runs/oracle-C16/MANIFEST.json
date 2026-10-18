@@ -1,0 +1,287 @@
+{
+ "manifest_version": 1,
+ "run": "oracle-C16",
+ "kind": "oracle",
+ "note": "not model output: a scorer self-check. The oracle engine replays each line's reference translation (ref), so every probe must pass (100 %); it checks that the scorer and the corpus agree and gives the size accounting of the condition's request without a model. Produced by round t1-translation-bench at 12:22:28-30Z on 2026-10-18, BEFORE the oracle engine took today's real system prompt (Engines.swift edit about 25 s later): its 'stable' tokens (1.6 for A) count a placeholder system prompt and understate the system prompt; use the oracle-<cond>-r2 run for token accounting. Preserved by round t1b-bench-finish; the bench-run binary of the run was rebuilt since and is not hashed.",
+ "date": "2026-10-18T12:22:30Z",
+ "seconds": 0.108006375,
+ "preserved": "2026-10-18T20:57:02Z",
+ "condition": "C16",
+ "layout": "reference",
+ "jobs": 1,
+ "batch_size": 3,
+ "sequences": [
+  "chat-en-ko-1",
+  "chat-ja-ko-1",
+  "chat-ja-ko-2",
+  "chat-ko-en-1",
+  "chat-zh-ko-1",
+  "docs-en-ko-1",
+  "docs-ja-en-1",
+  "docs-ko-en-1",
+  "game-ja-en-1",
+  "game-ja-ko-1",
+  "game-zh-en-1",
+  "subs-en-ko-1",
+  "subs-ja-ko-1",
+  "subs-zh-ko-1"
+ ],
+ "command": "/tmp/t1/build/debug/bench-run run --engine engines/oracle.json --condition C16 --out /tmp/t1/out/oracle-C16 --root .",
+ "command_cwd": "tools/translation-bench",
+ "env": {},
+ "engine": {
+  "config_file": "engines/oracle.json",
+  "config": {
+   "name": "oracle",
+   "kind": "oracle"
+  },
+  "name": "oracle",
+  "kind": "oracle"
+ },
+ "model": {
+  "name": "oracle"
+ },
+ "machine": {
+  "chip": "Apple M1 Pro",
+  "memory_bytes": 34359738368,
+  "macos": "27.0",
+  "kernel": "27.0.0",
+  "ollama": "0.34.2"
+ },
+ "source": {
+  "git_head": "93e6accf994af3bfb03c1161e125129fc160ef37",
+  "tree": "uncommitted tools/translation-bench tree",
+  "runner_sha256": "0707687cb3916e1b781fb0ab4773b8d8933ba7dbba510b0d03cc723a84cd9f49",
+  "runner_files": {
+   "runner/Package.swift": "ac91cbe8e51384f9c33fb8628503fcf4bbe27e49fad22bf6a42142b6a2cda3d0",
+   "runner/Sources/BenchKit/AppleFM.swift": "de33c0f1c71a93c519e168e94b14fb087f33ed4ac5801630489c2e943302bcc7",
+   "runner/Sources/BenchKit/Conditions.swift": "afe0d547d2f72fc354c59dd2482a6b48e9a35794130e8c86a0e0d7374edfb19f",
+   "runner/Sources/BenchKit/Engines.swift": "73dcf7022e55020be2f0273a164e10d39ee7def59e4bb41f83eecab779e3ab55",
+   "runner/Sources/BenchKit/Models.swift": "65df04afdd6a966d8c34516926da39e6c67b3fd3c194e1de4d2be2b55f912a84",
+   "runner/Sources/BenchKit/Replay.swift": "df4f69e32e3599bb97f50dab2d6c95fd79a5aaa01aa12764d756c7cd29dd1757",
+   "runner/Sources/BenchKit/Run.swift": "f45f3a4cd463d1599330de75695c6b1e338472c143b9a9cf1928ba71d09bee85",
+   "runner/Sources/BenchKit/Tokens.swift": "47e42221ff5d864969aaec67481bd28df855072b6404148a747808463674765c",
+   "runner/Sources/bench-run/main.swift": "c2760a1fecb810a28354bfc88842cfd7b8f8ba187d2f780751697f4df3616d65"
+  },
+  "runner_files_modified_after_run_start": [
+   "runner/Sources/BenchKit/Engines.swift"
+  ],
+  "binary": null
+ },
+ "corpus": {
+  "sequences": 14,
+  "sha256": "847a7533bd39c68dc0ce00d820d681623ae5fe07f60fcc5e2f23ad0fd05e797e",
+  "files": {
+   "sequences/chat-en-ko-1.json": "ab2522d85a9284fed420b7119cf79a1226642a40767da2404af84ddf1f5f22af",
+   "sequences/chat-ja-ko-1.json": "b74884821f398ba7e3e026775a9a24769cc19fea185b6b4ded3b36384be784bb",
+   "sequences/chat-ja-ko-2.json": "aa48e5aca75ef20b2b4a35fb960e5d6a4f6e0f7ea9dba47230e8fc74ed9eaeac",
+   "sequences/chat-ko-en-1.json": "f27cd057e207469171daea3bc5913a8b4c1f0c1de0041c7dccf13a6d29a93a03",
+   "sequences/chat-zh-ko-1.json": "520efa62f044f69fd91f76fb9b5f08d2dc3fe227396601516c1a796402da2ece",
+   "sequences/docs-en-ko-1.json": "ec358a53efe04a4c6d6a49aa046304644252baaf790aa38948b09af6f5cb8b39",
+   "sequences/docs-ja-en-1.json": "7187571247fbe808e9847b84fe9e6834254799ce0df77f3d9fe3abdb09b7a94c",
+   "sequences/docs-ko-en-1.json": "6c57a34fdb7c6bd53126e91b2bfff9f685fd2e287e6b8642a0a59318e407bcfa",
+   "sequences/game-ja-en-1.json": "7d613a1d3b3a91e80dfd13ef58e95d15980c5b4195a8da9756ba06f77ab1014d",
+   "sequences/game-ja-ko-1.json": "b366ef17a1469ef4b909e80433a110158bbd154d9257fda408b8a3f410e2b045",
+   "sequences/game-zh-en-1.json": "58a535be9cfe908a746e069da4ed2c39dacb8a6b2f2bd14d026b628343019e3c",
+   "sequences/subs-en-ko-1.json": "7b78d9972ab5457b243ac265f703100271d9065cda7c121eb90c0e8b1a169455",
+   "sequences/subs-ja-ko-1.json": "da693acbfeb29e0bdd24ab706acafa05943cd9028d815ad4617dedeae9ee3b70",
+   "sequences/subs-zh-ko-1.json": "8b34d6b9c79bf01452849f32cb06736245dc7d19776f9b46e43d8e13b37fda0d",
+   "memory/chat-en-ko-1.json": "322827e31b64e8d5c581353c4a588036dc025688f2f20b18657f08da042b13a8",
+   "memory/chat-ja-ko-1.json": "abcebe2b0decec51bbd5d879afdae59a276a5df93179d53276ed60e3ff79d37b",
+   "memory/chat-ja-ko-2.json": "8d50017af5e0dceae10086d289c846859e67c04d9093599df496d2a74da3d457",
+   "memory/chat-ko-en-1.json": "4d6feb7de587d0d64ebf68f363da8326abe21635e53dff3a69548d4bb2c06328",
+   "memory/chat-zh-ko-1.json": "0ff748323d17cd8406696a839d5f12f8a0dfaf03ab324c6dc2d0d182658fc827",
+   "memory/docs-en-ko-1.json": "63833d5430f264a93ed03987578cc456d2ec3f27cc55bef1a8a01b08816dee0e",
+   "memory/docs-ja-en-1.json": "17eaa7aa97e3b4c55098c01f469e6e94a3ebcf761e934da96583904212c5494f",
+   "memory/docs-ko-en-1.json": "51f4027da3c1ed58f82c729f3e3ef66cac8b39bee02d6d8d4d31571f6de75605",
+   "memory/game-ja-en-1.json": "e65de61cdbee29bdd2e2f35766cc4078bce79f8999b7953f68f7dd56d75962f4",
+   "memory/game-ja-ko-1.json": "87aae7b2243710256d82cf8d7c4480340a91143e93b583cb658418ca880e87f3",
+   "memory/game-zh-en-1.json": "4923e1695087c88fe14800d2aa6cb63efe8f7c042b924372dd7d5b5d2af36630",
+   "memory/subs-en-ko-1.json": "c7d32fb1da465200eff0b8ec86b387989a0c67007d27e27a253cd8e0d4721b93",
+   "memory/subs-ja-ko-1.json": "d8ab961cdae446aa9f23a0fd1fc150d88e6dd1194cb8664337a15a85fa1cf6d6",
+   "memory/subs-zh-ko-1.json": "1027c30cb867a9af6f1b4b76edc139b0f493b7b7616a1d4f88eb28276b5112d0",
+   "prices.json": "e82b780c604b5296a69c8962e67b9626d0b9610ff57193960a0442389dcd7add"
+  },
+  "snapshot": "_corpus/847a7533bd39c68d",
+  "files_modified_after_run_start": [],
+  "probes": 312
+ },
+ "score_summary": [
+  "== run C16 | oracle oracle | jobs=1 | 14 sequences, 252 requests",
+  "probes 312: 312 correct = 100.0%",
+  "  by evidence: memory 126/126 100.0%  lines 133/133 100.0%  none 53/53 100.0%",
+  "  by type:     name 107/107 100.0%  pronoun 53/53 100.0%  register 25/25 100.0%  speech_level 22/22 100.0%  term 105/105 100.0%",
+  "  by distance: 1-2 32/32 100.0%  3-4 28/28 100.0%  5-8 26/26 100.0%  9-16 30/30 100.0%  17+ 17/17 100.0%",
+  "  by pair:     en>ko 100.0%  ja>en 100.0%  ja>ko 100.0%  ko>en 100.0%  zh>en 100.0%  zh>ko 100.0%",
+  "speech level: 249 lines judged, 249 match the speaker's level = 100.0%, 0 mixed, 0 of 38 speaker-level groups inconsistent",
+  "carry-over: 0 repeated wrong forms after 0 probes that followed a wrong form; 0 fail streaks in 82 chances",
+  "failed attempts 0, fallback lines 0, empty lines 0",
+  "latency ms: p50 0 p95 0",
+  "tokens: in 75662 (mean 300.2: stable 54.8 + history 198.6 + volatile 46.7; shared prefix with the previous request 171.7; user memory 0.0) out 10291 (mean 40.8) cached 0",
+  "cost estimate: no price for this model"
+ ],
+ "score": {
+  "condition": "C16",
+  "engine": "oracle",
+  "model": "oracle",
+  "jobs": 1,
+  "sequences": 14,
+  "requests": 252,
+  "probes": {
+   "n": 312,
+   "ok": 312,
+   "by": {
+    "memory": [
+     126,
+     126
+    ],
+    "lines": [
+     133,
+     133
+    ],
+    "none": [
+     53,
+     53
+    ]
+   },
+   "type": {
+    "name": [
+     107,
+     107
+    ],
+    "pronoun": [
+     53,
+     53
+    ],
+    "register": [
+     25,
+     25
+    ],
+    "speech_level": [
+     22,
+     22
+    ],
+    "term": [
+     105,
+     105
+    ]
+   },
+   "pair": {
+    "en>ko": [
+     68,
+     68
+    ],
+    "ja>en": [
+     44,
+     44
+    ],
+    "ja>ko": [
+     87,
+     87
+    ],
+    "ko>en": [
+     44,
+     44
+    ],
+    "zh>en": [
+     23,
+     23
+    ],
+    "zh>ko": [
+     46,
+     46
+    ]
+   },
+   "kind": {
+    "chat": [
+     110,
+     110
+    ],
+    "docs": [
+     66,
+     66
+    ],
+    "game": [
+     67,
+     67
+    ],
+    "subtitles": [
+     69,
+     69
+    ]
+   },
+   "distance": {
+    "1-2": [
+     32,
+     32
+    ],
+    "3-4": [
+     28,
+     28
+    ],
+    "5-8": [
+     26,
+     26
+    ],
+    "9-16": [
+     30,
+     30
+    ],
+    "17+": [
+     17,
+     17
+    ]
+   }
+  },
+  "speech": {
+   "scored": 249,
+   "match": 249,
+   "mixed": 0,
+   "speakers": 38,
+   "inconsistent_speakers": 0
+  },
+  "carry": {
+   "repeat_same": 0,
+   "after_wrong": 0,
+   "fail_streak": 0,
+   "streak_chances": 82
+  },
+  "attempts_failed": 0,
+  "fallback_lines": 0,
+  "failed_lines": 0,
+  "latency": {
+   "p50": 0.0,
+   "p95": 0.0
+  },
+  "tokens": {
+   "in": 75662,
+   "out": 10291,
+   "cached": 0,
+   "mean_in": 300.24603174603175,
+   "mean_out": 40.83730158730159,
+   "stable": 54.833928571428764,
+   "history": 198.63341269841277,
+   "volatile": 46.71238095238096,
+   "lcp": 171.69464285714315,
+   "memory": 0.0
+  },
+  "cost_usd": null
+ },
+ "files": {
+  "chat-en-ko-1.json": "753686dfd5b336b4e75f1c565fefa93953c672997be67719d30738542bb87e12",
+  "chat-ja-ko-1.json": "931f1d88c575a6949b6e6f25517a5fdf043814e0c8e14e9f4749a30b1603996e",
+  "chat-ja-ko-2.json": "e0554e830bde5e9986827bc69718fe60592c273117590ca10d40b9a76a269658",
+  "chat-ko-en-1.json": "efd9553059e5a37963333f8e867093fbb3b10225ed5c2d1653a2dd0b5a98b2c6",
+  "chat-zh-ko-1.json": "980793bffdec94c7e90e38eb21328193b8d67f3820c5294392be7740a6bf5b6f",
+  "docs-en-ko-1.json": "37718cd30c637c6c7a97f0c432a491d3d74fa00addbdc41e84c1b836373efaf7",
+  "docs-ja-en-1.json": "971514e9d469f0189244f8f63eae8177e5cde5aaf51a20a3a9d448d9cf18c6c9",
+  "docs-ko-en-1.json": "77c249d184e669df791bd466263ac9ac86c5a57abdc1a1ad46b98b4915249bcf",
+  "game-ja-en-1.json": "4ad7daafabba9b86504644e1bb7404f7427e9bea2594546252e2b3028bb91614",
+  "game-ja-ko-1.json": "14fea16296e809b183a43a5a27dea6f89c34e77fbb85ac6932655f71ca0cc198",
+  "game-zh-en-1.json": "363f40e2dc41134b7839f647c7c5533410d775a71b010d151d8a461f3c81769e",
+  "meta.json": "585740cf742e052e1cc1c791eebd6abe29f1671cc9d9ebd509ef5370821c8009",
+  "subs-en-ko-1.json": "19761ed48403c56c014225caafcef0f7c81d30cad8df494eb9d62cbc25934497",
+  "subs-ja-ko-1.json": "f87250925bff9affc7d79a45cfb837de5c4e3b8796fb557c7e7a4801e4b74c71",
+  "subs-zh-ko-1.json": "3ff3385722a15f119183ebf760f1d1c990c1cc27ce99318ab189696a7065451e"
+ }
+}

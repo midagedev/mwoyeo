@@ -1,0 +1,15 @@
+{
+  "batch_size" : 3,
+  "condition" : "A",
+  "engine" : "ollama-qwen3-1.7b",
+  "jobs" : 1,
+  "kind" : "openAICompatible",
+  "layout" : "reference",
+  "model" : "qwen3:1.7b",
+  "price" : "local",
+  "seconds" : 12.756879584,
+  "sequences" : [
+    "chat-ja-ko-1"
+  ],
+  "started" : "2026-10-18T12:17:22Z"
+}

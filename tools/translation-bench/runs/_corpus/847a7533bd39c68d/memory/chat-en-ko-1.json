@@ -1,0 +1,9 @@
+{
+ "entities": [
+  {"name": "Gareth", "reading": "GAIR-eth", "dst": "개러스", "gender": "male", "role": "landlord", "speaks_to": {"Siobhan": "해요체", "Rory": "해요체"}},
+  {"name": "Siobhan", "reading": "shi-VAWN", "dst": "시본", "gender": "female", "role": "tenant", "speaks_to": {"Gareth": "합쇼체", "Rory": "반말"}},
+  {"name": "Rory", "reading": "ROH-ree", "dst": "로리", "gender": "male", "role": "tenant", "speaks_to": {"Gareth": "해요체", "Siobhan": "반말"}}
+ ],
+ "window": {"title": "14 Maple St", "app": "WhatsApp", "category": "Social Networking"},
+ "terms": [{"src": "council tax", "dst": "카운슬 택스"}]
+}

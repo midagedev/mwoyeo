@@ -1,0 +1,5 @@
+{
+ "document": {"title": "Pocket Git tutorial", "domain": "version control (Git)", "summary": "beginner tutorial on branches and teamwork"},
+ "window": {"title": "Learn by doing - Pocket Git", "app": "Safari", "category": "Utilities"},
+ "terms": [{"src": "Pocket Git", "dst": "포켓 깃"}, {"src": "repository", "dst": "저장소"}, {"src": "working tree", "dst": "작업 디렉터리"}, {"src": "stash", "dst": "임시 저장"}]
+}

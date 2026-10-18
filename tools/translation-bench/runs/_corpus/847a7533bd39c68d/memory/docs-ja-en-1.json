@@ -1,0 +1,5 @@
+{
+ "document": {"title": "Memotto User Guide", "domain": "note-taking app", "summary": "manual for a team note app, with examples"},
+ "window": {"title": "はじめに - メモット ヘルプ", "app": "Safari", "category": "Utilities"},
+ "terms": [{"src": "メモット", "dst": "Memotto"}, {"src": "ワークスペース", "dst": "Space"}, {"src": "履歴", "dst": "Revisions"}, {"src": "付箋", "dst": "Sticky"}]
+}

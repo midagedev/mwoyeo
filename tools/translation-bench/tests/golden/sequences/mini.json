@@ -1,0 +1,27 @@
+{
+ "id": "mini", "kind": "chat", "source": "ja", "target": "ko",
+ "title": "golden mini sequence for the scorer tests",
+ "lines": [
+  {"id": 1, "speaker": "Mina", "text": "海、今日は早いですね。", "ref": "카이, 오늘은 일찍 왔네요."},
+  {"id": 2, "speaker": "海", "text": "ああ、合宿の準備があってさ。", "ref": "응, 엠티 준비할 게 있어서."},
+  {"id": 3, "speaker": "Mina", "text": "手伝いますよ。", "ref": "도와드릴게요."},
+  {"id": 4, "speaker": "海", "text": "助かる。ネットを張ってくれ。", "ref": "고마워. 네트 좀 쳐 줘."},
+  {"id": 5, "speaker": "Mina", "text": "湊(そう)さんは来ましたか?", "ref": "소우 씨는 왔어요?"},
+  {"id": 6, "speaker": "海", "text": "まだ。昨日、風邪をひいたって言ってた。", "ref": "아직. 어제 감기 걸렸다고 했어."},
+  {"id": 7, "speaker": "Mina", "text": "海は心配じゃないんですか?", "ref": "카이는 걱정 안 돼요?"},
+  {"id": 8, "speaker": "海", "text": "湊は丈夫だから平気だ。", "ref": "소우는 튼튼하니까 괜찮아."},
+  {"id": 9, "speaker": "Mina", "text": "お兄ちゃんにも聞いてみます。", "ref": "오빠한테도 물어볼게요."},
+  {"id": 10, "speaker": "海", "text": "そうしてくれ。", "ref": "그렇게 해 줘."}
+ ],
+ "screens": [[1, 2, 3, 4], [2, 3, 4, 5, 6, 7], [5, 6, 7, 8, 9, 10]],
+ "probes": [
+  {"id": "pA", "type": "name", "line": 1, "by": "memory", "mem": ["entities.海.reading"], "evidence": ["かい"], "key": "ent:海", "check": {"any": ["카이"], "none": ["바다"]}},
+  {"id": "pB", "type": "term", "line": 2, "by": "memory", "mem": ["terms.合宿"], "evidence": ["엠티"], "key": "term:合宿", "check": {"any": ["엠티"], "none": ["합숙"]}},
+  {"id": "pD", "type": "speech_level", "line": 3, "by": "memory", "mem": ["entities.Mina.speaks_to"], "evidence": ["해요체"], "check": {"level": "haeyo"}},
+  {"id": "pC", "type": "register", "line": 4, "by": "memory", "mem": ["window.title"], "evidence": ["テニス"], "key": "reg:ネット", "check": {"any": ["네트"], "none": ["인터넷"]}},
+  {"id": "pI", "type": "name", "line": 7, "by": "memory", "mem": ["entities.海.reading"], "evidence": ["かい"], "key": "ent:海", "check": {"any": ["카이"], "none": ["바다"]}},
+  {"id": "pE", "type": "name", "line": 8, "by": "lines", "need": [5], "evidence": ["湊(そう)"], "key": "ent:湊", "check": {"any": ["소우"], "none": ["미나토"]}},
+  {"id": "pG", "type": "pronoun", "line": 9, "by": "memory", "mem": ["entities.Mina.gender"], "evidence": ["female"], "check": {"any": ["오빠"], "none": ["형"]}},
+  {"id": "pH", "type": "speech_level", "line": 10, "by": "none", "check": {"level": "banmal"}}
+ ]
+}

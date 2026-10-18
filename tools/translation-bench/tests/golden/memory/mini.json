@@ -1,0 +1,30 @@
+{
+ "entities": [
+  {
+   "name": "Mina",
+   "gender": "female",
+   "speaks_to": {
+    "海": "해요체"
+   }
+  },
+  {
+   "name": "海",
+   "reading": "かい",
+   "gender": "male",
+   "speaks_to": {
+    "Mina": "반말"
+   }
+  }
+ ],
+ "window": {
+  "title": "テニス部",
+  "app": "LINE",
+  "category": "Social Networking"
+ },
+ "terms": [
+  {
+   "src": "合宿",
+   "dst": "엠티"
+  }
+ ]
+}

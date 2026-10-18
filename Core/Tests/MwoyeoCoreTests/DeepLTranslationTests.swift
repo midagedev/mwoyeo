@@ -22,4 +22,29 @@ import Testing
             try DeepLTranslation.parseTranslations(Data(reply.utf8), count: 3)
         }
     }
+
+    // Engines saved as "DeepL Free" or "DeepL Pro" keep working: only the host and the key matter here.
+    private static let pro = URL(string: "https://api.deepl.com")!
+    private static let free = URL(string: "https://api-free.deepl.com")!
+
+    @Test func aFxKeyGoesToTheFreeHost() {
+        #expect(DeepLTranslation.resolvedBaseURL(Self.pro, key: "abc-123:fx") == Self.free)
+        #expect(DeepLTranslation.resolvedBaseURL(Self.free, key: "abc-123:fx") == Self.free)
+    }
+
+    @Test func otherKeysGoToTheProHost() {
+        #expect(DeepLTranslation.resolvedBaseURL(Self.pro, key: "abc-123") == Self.pro)
+        #expect(DeepLTranslation.resolvedBaseURL(Self.free, key: "abc-123") == Self.pro)
+        #expect(DeepLTranslation.resolvedBaseURL(Self.free, key: nil) == Self.pro)
+    }
+
+    @Test func whitespaceAroundTheKeyIsIgnored() {
+        #expect(DeepLTranslation.resolvedBaseURL(Self.pro, key: "  abc:fx\n") == Self.free)
+    }
+
+    @Test func aProxyHostIsKept() {
+        let proxy = URL(string: "https://deepl.example.com/relay")!
+        #expect(DeepLTranslation.resolvedBaseURL(proxy, key: "abc:fx") == proxy)
+        #expect(DeepLTranslation.resolvedBaseURL(proxy, key: "abc") == proxy)
+    }
 }

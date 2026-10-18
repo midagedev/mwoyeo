@@ -57,7 +57,8 @@ public actor EngineClient {
             let key = try key(for: engine, required: true)
             let body = DeepLTranslation.requestBody(lines: lines, source: source, target: target, formality: formality)
             let headers = ["Content-Type": "application/json", "Authorization": "DeepL-Auth-Key \(key ?? "")"]
-            return try await chat(engine, url: try endpoint(baseURL, DeepLTranslation.path), headers: headers, body: body,
+            let base = DeepLTranslation.resolvedBaseURL(baseURL, key: key)
+            return try await chat(engine, url: try endpoint(base, DeepLTranslation.path), headers: headers, body: body,
                                   count: lines.count, key: key) { d, n throws(ChatTranslationError) in try DeepLTranslation.parseTranslations(d, count: n) }
         case let .httpTemplate(template):
             return try await httpTemplate(template, engine: engine, lines: lines, source: source, target: target)
@@ -151,7 +152,8 @@ public actor EngineClient {
         case .openAICompatible, .anthropic:
             _ = try? await models(engine)
         case let .deepL(baseURL, _):
-            await head(baseURL.absoluteString)
+            let key = try? secrets.secret(for: engine.id)
+            await head(DeepLTranslation.resolvedBaseURL(baseURL, key: key).absoluteString)
         case let .httpTemplate(t):
             await head(t.url)
         case .command:

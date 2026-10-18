@@ -7276,73 +7276,73 @@
         }
       }
     },
-    "Free key from deepl.com/pro-api; the key ends in :fx": {
+    "Free or Pro key from deepl.com/pro-api": {
       "extractionState": "manual",
       "localizations": {
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "deepl.com/pro-api의 무료 키, 키가 :fx로 끝남"
+            "value": "deepl.com/pro-api의 무료 또는 Pro 키"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "deepl.com/pro-apiの無料キー（末尾が:fx）"
+            "value": "deepl.com/pro-apiの無料またはProキー"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "deepl.com/pro-api 的免费密钥，以 :fx 结尾"
+            "value": "deepl.com/pro-api 的免费或 Pro 密钥"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "deepl.com/pro-api 的免費金鑰，以 :fx 結尾"
+            "value": "deepl.com/pro-api 的免費或 Pro 金鑰"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kostenloser Schlüssel von deepl.com/pro-api; er endet auf :fx"
+            "value": "Kostenloser oder Pro-Schlüssel von deepl.com/pro-api"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Clé gratuite de deepl.com/pro-api ; elle se termine par :fx"
+            "value": "Clé gratuite ou Pro de deepl.com/pro-api"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Clave gratuita de deepl.com/pro-api; termina en :fx"
+            "value": "Clave gratuita o Pro de deepl.com/pro-api"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Бесплатный ключ с deepl.com/pro-api; оканчивается на :fx"
+            "value": "Бесплатный или Pro-ключ с deepl.com/pro-api"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Chave gratuita de deepl.com/pro-api; termina em :fx"
+            "value": "Chave gratuita ou Pro de deepl.com/pro-api"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Chiave gratuita da deepl.com/pro-api; finisce con :fx"
+            "value": "Chiave gratuita o Pro da deepl.com/pro-api"
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Безкоштовний ключ з deepl.com/pro-api; закінчується на :fx"
+            "value": "Безкоштовний або Pro-ключ з deepl.com/pro-api"
           }
         }
       }
@@ -9448,6 +9448,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "Модель"
+          }
+        }
+      }
+    },
+    "More actions for %@": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 더 보기"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@のその他の操作"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 的更多操作"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 的更多動作"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weitere Aktionen für %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus d’actions pour %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más acciones para %@"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Другие действия для %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mais ações para %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altre azioni per %@"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Інші дії для %@"
           }
         }
       }
@@ -20105,77 +20175,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ваш ключ API Anthropic"
-          }
-        }
-      }
-    },
-    "Your DeepL Pro key": {
-      "extractionState": "manual",
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "내 DeepL Pro 키"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自分のDeepL Proキー"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的 DeepL Pro 密钥"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的 DeepL Pro 金鑰"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dein DeepL-Pro-Schlüssel"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Votre clé DeepL Pro"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tu clave de DeepL Pro"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ваш ключ DeepL Pro"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sua chave do DeepL Pro"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La tua chiave DeepL Pro"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ваш ключ DeepL Pro"
           }
         }
       }

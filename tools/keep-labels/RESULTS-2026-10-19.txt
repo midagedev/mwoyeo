@@ -1,0 +1,240 @@
+labels: 2255 blocks of 15 papers / cases
+
+LABEL COUNTS
+  papers dev   doc blocks 826 ({'either': 270, 'keep': 86, 'mixed': 195, 'none': 52, 'translate': 223}), noletter 161
+               words {'either': 1585, 'none': 91, 'translate': 6791, 'keep': 1337}; keep words by reason {'math': 1317, 'url': 9, 'path': 8, 'id': 2, 'code': 1}
+               keep spans 527 by reason {'math': 509, 'url': 9, 'path': 7, 'id': 2}; near-negative words 925: translate 265, either 651, keep 9
+  papers hold  doc blocks 278 ({'either': 33, 'keep': 52, 'mixed': 70, 'none': 45, 'translate': 78}), noletter 47
+               words {'either': 435, 'none': 114, 'translate': 4781, 'keep': 492}; keep words by reason {'math': 492}
+               keep spans 182 by reason {'math': 182}; near-negative words 478: translate 182, either 296, keep 0
+  cases dev    doc blocks 76 ({'either': 5, 'keep': 41, 'mixed': 12, 'none': 1, 'translate': 17}), noletter 7
+               words {'translate': 362, 'keep': 257, 'either': 84, 'none': 15}; keep words by reason {'log': 96, 'cmd': 66, 'code': 45, 'id': 13, 'path': 9, 'config': 9, 'math': 7, 'lineno': 6, 'flag': 2, 'url': 2, 'hash': 1, 'hotkey': 1}
+               keep spans 57 by reason {'log': 13, 'code': 10, 'id': 8, 'cmd': 7, 'lineno': 6, 'math': 4, 'config': 3, 'path': 2, 'flag': 1, 'hash': 1, 'url': 1, 'hotkey': 1}; near-negative words 13: translate 5, either 7, keep 1
+  cases hold   doc blocks 92 ({'either': 1, 'keep': 54, 'mixed': 8, 'none': 2, 'translate': 27}), noletter 16
+               words {'either': 40, 'translate': 249, 'keep': 222, 'none': 9}; keep words by reason {'code': 144, 'math': 18, 'id': 13, 'cmd': 13, 'lineno': 12, 'path': 10, 'flag': 6, 'hotkey': 4, 'diffmark': 1, 'url': 1}
+               keep spans 65 by reason {'code': 27, 'lineno': 12, 'id': 7, 'path': 6, 'hotkey': 4, 'cmd': 3, 'math': 3, 'diffmark': 1, 'url': 1, 'flag': 1}; near-negative words 18: translate 3, either 15, keep 0
+  papers dev   vn  blocks 615 ({'either': 164, 'keep': 55, 'mixed': 137, 'none': 96, 'translate': 163}), noletter 73
+               words {'translate': 6781, 'either': 1573, 'none': 143, 'keep': 1257}; keep words by reason {'math': 1237, 'url': 8, 'path': 6, 'id': 4, 'code': 2}
+               keep spans 516 by reason {'math': 501, 'url': 7, 'path': 5, 'id': 3}; near-negative words 911: translate 266, either 638, keep 7
+  papers hold  vn  blocks 236 ({'either': 32, 'keep': 51, 'mixed': 57, 'none': 60, 'translate': 36}), noletter 46
+               words {'translate': 4743, 'either': 441, 'keep': 518, 'none': 140}; keep words by reason {'math': 517, 'path': 1}
+               keep spans 183 by reason {'math': 183}; near-negative words 474: translate 179, either 294, keep 1
+  cases dev    vn  blocks 57 ({'either': 2, 'keep': 25, 'mixed': 12, 'translate': 18}), noletter 4
+               words {'translate': 362, 'keep': 398, 'either': 86, 'none': 23}; keep words by reason {'code': 137, 'log': 122, 'cmd': 92, 'id': 14, 'path': 9, 'config': 9, 'math': 7, 'lineno': 3, 'flag': 2, 'hash': 1, 'url': 1, 'hotkey': 1}
+               keep spans 41 by reason {'log': 10, 'id': 7, 'code': 7, 'cmd': 4, 'math': 3, 'lineno': 3, 'path': 2, 'flag': 1, 'config': 1, 'hash': 1, 'url': 1, 'hotkey': 1}; near-negative words 12: translate 5, either 7, keep 0
+  cases hold   vn  blocks 75 ({'either': 1, 'keep': 36, 'mixed': 9, 'none': 3, 'translate': 26}), noletter 13
+               words {'either': 39, 'translate': 249, 'keep': 240, 'none': 8}; keep words by reason {'code': 168, 'math': 17, 'id': 14, 'cmd': 13, 'path': 8, 'lineno': 8, 'flag': 6, 'hotkey': 4, 'diffmark': 1, 'url': 1}
+               keep spans 48 by reason {'code': 13, 'lineno': 8, 'id': 7, 'path': 6, 'math': 4, 'hotkey': 4, 'cmd': 3, 'diffmark': 1, 'url': 1, 'flag': 1}; near-negative words 18: translate 3, either 15, keep 0
+
+TODAY'S RULES ON THE KEEP BOUNDARY: (a) words (b) spans (c) blocks (d) the two costly errors
+  [papers dev, read doc]
+    (a) words      P 0.91 [0.88,0.93]  R 0.39 [0.36,0.42]  (tp 511 fp 51 fn 798)
+        precision by decider: block 0.88 [0.84,0.90] (tp 358 fp 51), span 1.00 [0.98,1.00] (tp 153 fp 0)
+        recall by reason: math 0.39 [0.36,0.42] n=1289, url 0.89 [0.56,0.98] n=9, path 0.12 [0.02,0.47] n=8, id 0.00 [0.00,0.66] n=2, code 1.00 [0.21,1.00] n=1
+    (b) spans      exact-boundary F1 0.26  (P 0.66 R 0.16; truth 511, predicted 125, exact 83, overlapped 137, missed 374)   edge error over overlapped spans: mean 3.83 words, exact 83, <=1 97, >=3 33
+        exact by reason: math 76/493, url 7/9, path 0/7, id 0/2
+    (c) block keep P 0.85 [0.75,0.92]  R 0.76 [0.65,0.84]  (tp 53 fp 9 fn 17)   [truth keep = keep words and no translate word]
+        near-pure   P 0.87 [0.77,0.93]  R 0.75 [0.64,0.84]  (tp 54 fp 8 fn 18)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 798 of 1309 keep words; spans fully kept 104, partly 33, lost 374
+        spans lost or partly by reason: math 364+33/493, url 1+0/9, path 7+0/7, id 2+0/2
+        translate->kept: 51 of 6791 translate words kept by: block 51; translate/mixed blocks kept whole: {'mixed': 8, 'translate': 1}; by shape: plain prose word 49, single 2
+  [papers hold, read doc]
+    (a) words      P 0.95 [0.90,0.97]  R 0.32 [0.28,0.37]  (tp 150 fp 8 fn 312)
+        precision by decider: block 0.93 [0.86,0.96] (tp 99 fp 8), span 1.00 [0.93,1.00] (tp 51 fp 0)
+        recall by reason: math 0.32 [0.28,0.37] n=462
+    (b) spans      exact-boundary F1 0.38  (P 0.81 R 0.25; truth 174, predicted 53, exact 43, overlapped 52, missed 122)   edge error over overlapped spans: mean 0.79 words, exact 43, <=1 43, >=3 7
+        exact by reason: math 43/174
+    (c) block keep P 0.90 [0.74,0.96]  R 0.59 [0.44,0.72]  (tp 26 fp 3 fn 18)   [truth keep = keep words and no translate word]
+        near-pure   P 0.90 [0.74,0.96]  R 0.58 [0.43,0.71]  (tp 26 fp 3 fn 19)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 312 of 462 keep words; spans fully kept 45, partly 7, lost 122
+        spans lost or partly by reason: math 122+7/174
+        translate->kept: 8 of 4781 translate words kept by: block 8; translate/mixed blocks kept whole: {'mixed': 1, 'translate': 2}; by shape: plain prose word 8
+  [cases dev, read doc]
+    (a) words      P 0.91 [0.84,0.95]  R 0.40 [0.34,0.47]  (tp 97 fp 10 fn 143)
+        precision by decider: block 0.90 [0.83,0.95] (tp 93 fp 10), span 1.00 [0.51,1.00] (tp 4 fp 0)
+        recall by reason: log 0.65 [0.54,0.74] n=85, cmd 0.27 [0.18,0.39] n=66, code 0.31 [0.20,0.46] n=45, id 0.08 [0.01,0.33] n=13, path 0.00 [0.00,0.30] n=9, config 0.67 [0.35,0.88] n=9, math 0.00 [0.00,0.35] n=7, flag 0.00 [0.00,0.66] n=2, url 1.00 [0.34,1.00] n=2, hash 1.00 [0.21,1.00] n=1, hotkey 0.00 [0.00,0.79] n=1
+    (b) spans      exact-boundary F1 0.56  (P 0.91 R 0.40; truth 50, predicted 22, exact 20, overlapped 23, missed 27)   edge error over overlapped spans: mean 1.17 words, exact 20, <=1 20, >=3 3
+        exact by reason: log 10/12, code 3/10, id 1/8, cmd 4/7, math 0/4, config 2/3, path 0/2, flag 0/1, hash 0/1, url 0/1, hotkey 0/1
+    (c) block keep P 0.95 [0.76,0.99]  R 0.56 [0.39,0.71]  (tp 19 fp 1 fn 15)   [truth keep = keep words and no translate word]
+        near-pure   P 0.95 [0.76,0.99]  R 0.56 [0.39,0.71]  (tp 19 fp 1 fn 15)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 143 of 240 keep words; spans fully kept 22, partly 1, lost 27
+        spans lost or partly by reason: log 2+0/12, code 6+1/10, id 7+0/8, cmd 3+0/7, math 4+0/4, config 1+0/3, path 2+0/2, flag 1+0/1, hash 0+0/1, url 0+0/1, hotkey 1+0/1
+        translate->kept: 10 of 362 translate words kept by: block 10; translate/mixed blocks kept whole: {'mixed': 1}; by shape: plain prose word 10
+  [cases hold, read doc]
+    (a) words      P 1.00 [0.97,1.00]  R 0.58 [0.51,0.64]  (tp 120 fp 0 fn 88)
+        precision by decider: block 1.00 [0.97,1.00] (tp 119 fp 0), span 1.00 [0.21,1.00] (tp 1 fp 0)
+        recall by reason: code 0.52 [0.44,0.60] n=143, math 1.00 [0.82,1.00] n=18, id 0.08 [0.01,0.33] n=13, cmd 1.00 [0.77,1.00] n=13, path 0.90 [0.60,0.98] n=10, flag 0.00 [0.00,0.39] n=6, hotkey 1.00 [0.51,1.00] n=4, url 0.00 [0.00,0.79] n=1
+    (b) spans      exact-boundary F1 0.77  (P 1.00 R 0.63; truth 51, predicted 32, exact 32, overlapped 32, missed 19)   edge error over overlapped spans: mean 0.00 words, exact 32, <=1 32, >=3 0
+        exact by reason: code 16/26, id 1/7, path 5/6, hotkey 4/4, cmd 3/3, math 3/3, url 0/1, flag 0/1
+    (c) block keep P 1.00 [0.89,1.00]  R 0.78 [0.62,0.88]  (tp 31 fp 0 fn 9)   [truth keep = keep words and no translate word]
+        near-pure   P 1.00 [0.89,1.00]  R 0.78 [0.62,0.88]  (tp 31 fp 0 fn 9)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 88 of 208 keep words; spans fully kept 32, partly 0, lost 19
+        spans lost or partly by reason: code 10+0/26, id 6+0/7, path 1+0/6, hotkey 0+0/4, cmd 0+0/3, math 0+0/3, url 1+0/1, flag 1+0/1
+        translate->kept: 0 of 249 translate words kept by: ; by shape: 
+  [papers dev, read vn]
+    (a) words      P 0.72 [0.68,0.76]  R 0.28 [0.26,0.31]  (tp 339 fp 129 fn 860)
+        precision by decider: block 0.56 [0.51,0.62] (tp 167 fp 129), span 1.00 [0.98,1.00] (tp 172 fp 0)
+        recall by reason: math 0.28 [0.26,0.31] n=1179, url 0.12 [0.02,0.47] n=8, path 0.17 [0.03,0.56] n=6, id 0.00 [0.00,0.49] n=4, code 0.50 [0.09,0.91] n=2
+    (b) spans      exact-boundary F1 0.21  (P 0.64 R 0.12; truth 507, predicted 98, exact 63, overlapped 99, missed 408)   edge error over overlapped spans: mean 2.87 words, exact 63, <=1 77, >=3 15
+        exact by reason: math 63/492, url 0/7, path 0/5, id 0/3
+    (c) block keep P 0.90 [0.74,0.97]  R 0.59 [0.44,0.72]  (tp 27 fp 3 fn 19)   [truth keep = keep words and no translate word]
+        near-pure   P 0.90 [0.74,0.97]  R 0.59 [0.44,0.72]  (tp 27 fp 3 fn 19)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 860 of 1199 keep words; spans fully kept 69, partly 30, lost 408
+        spans lost or partly by reason: math 394+30/492, url 6+0/7, path 5+0/5, id 3+0/3
+        translate->kept: 129 of 6780 translate words kept by: block 129; translate/mixed blocks kept whole: {'mixed': 3}; by shape: plain prose word 127, single 1, hyphen 1
+  [papers hold, read vn]
+    (a) words      P 0.90 [0.85,0.93]  R 0.40 [0.36,0.45]  (tp 206 fp 24 fn 303)
+        precision by decider: block 0.87 [0.81,0.91] (tp 155 fp 24), span 1.00 [0.93,1.00] (tp 51 fp 0)
+        recall by reason: math 0.41 [0.36,0.45] n=508, path 0.00 [0.00,0.79] n=1
+    (b) spans      exact-boundary F1 0.38  (P 0.74 R 0.25; truth 179, predicted 61, exact 45, overlapped 58, missed 121)   edge error over overlapped spans: mean 1.59 words, exact 45, <=1 47, >=3 11
+        exact by reason: math 45/179
+    (c) block keep P 0.78 [0.62,0.88]  R 0.60 [0.45,0.72]  (tp 28 fp 8 fn 19)   [truth keep = keep words and no translate word]
+        near-pure   P 0.81 [0.65,0.90]  R 0.58 [0.44,0.71]  (tp 29 fp 7 fn 21)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 303 of 509 keep words; spans fully kept 50, partly 8, lost 121
+        spans lost or partly by reason: math 121+8/179
+        translate->kept: 24 of 4743 translate words kept by: block 24; translate/mixed blocks kept whole: {'translate': 5, 'mixed': 3}; by shape: plain prose word 24
+  [cases dev, read vn]
+    (a) words      P 0.96 [0.92,0.98]  R 0.60 [0.55,0.64]  (tp 228 fp 10 fn 154)
+        precision by decider: block 0.96 [0.92,0.98] (tp 224 fp 10), span 1.00 [0.51,1.00] (tp 4 fp 0)
+        recall by reason: code 0.77 [0.70,0.84] n=137, log 0.90 [0.83,0.94] n=109, cmd 0.13 [0.08,0.21] n=92, id 0.07 [0.01,0.31] n=14, path 0.00 [0.00,0.30] n=9, config 1.00 [0.70,1.00] n=9, math 0.00 [0.00,0.35] n=7, flag 0.00 [0.00,0.66] n=2, hash 1.00 [0.21,1.00] n=1, url 1.00 [0.21,1.00] n=1, hotkey 0.00 [0.00,0.79] n=1
+    (b) spans      exact-boundary F1 0.50  (P 0.87 R 0.35; truth 37, predicted 15, exact 13, overlapped 16, missed 21)   edge error over overlapped spans: mean 1.62 words, exact 13, <=1 13, >=3 3
+        exact by reason: log 8/9, id 1/7, code 2/7, cmd 1/4, math 0/3, path 0/2, flag 0/1, config 1/1, hash 0/1, url 0/1, hotkey 0/1
+    (c) block keep P 0.92 [0.67,0.99]  R 0.57 [0.37,0.76]  (tp 12 fp 1 fn 9)   [truth keep = keep words and no translate word]
+        near-pure   P 0.92 [0.67,0.99]  R 0.57 [0.37,0.76]  (tp 12 fp 1 fn 9)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 154 of 382 keep words; spans fully kept 15, partly 1, lost 21
+        spans lost or partly by reason: log 1+0/9, id 6+0/7, code 4+1/7, cmd 3+0/4, math 3+0/3, path 2+0/2, flag 1+0/1, config 0+0/1, hash 0+0/1, url 0+0/1, hotkey 1+0/1
+        translate->kept: 10 of 362 translate words kept by: block 10; translate/mixed blocks kept whole: {'mixed': 1}; by shape: plain prose word 10
+  [cases hold, read vn]
+    (a) words      P 1.00 [0.96,1.00]  R 0.39 [0.33,0.46]  (tp 90 fp 0 fn 140)
+        precision by decider: block 1.00 [0.95,1.00] (tp 80 fp 0), span 1.00 [0.72,1.00] (tp 10 fp 0)
+        recall by reason: code 0.29 [0.23,0.37] n=167, math 0.94 [0.73,0.99] n=17, id 0.07 [0.01,0.31] n=14, cmd 1.00 [0.77,1.00] n=13, path 0.88 [0.53,0.98] n=8, flag 0.00 [0.00,0.39] n=6, hotkey 1.00 [0.51,1.00] n=4, url 0.00 [0.00,0.79] n=1
+    (b) spans      exact-boundary F1 0.69  (P 0.91 R 0.55; truth 38, predicted 23, exact 21, overlapped 22, missed 16)   edge error over overlapped spans: mean 1.50 words, exact 21, <=1 21, >=3 1
+        exact by reason: code 5/12, id 1/7, path 5/6, math 3/4, hotkey 4/4, cmd 3/3, url 0/1, flag 0/1
+    (c) block keep P 1.00 [0.84,1.00]  R 0.77 [0.58,0.89]  (tp 20 fp 0 fn 6)   [truth keep = keep words and no translate word]
+        near-pure   P 1.00 [0.84,1.00]  R 0.77 [0.58,0.89]  (tp 20 fp 0 fn 6)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 140 of 230 keep words; spans fully kept 21, partly 1, lost 16
+        spans lost or partly by reason: code 6+1/12, id 6+0/7, path 1+0/6, math 1+0/4, hotkey 0+0/4, cmd 0+0/3, url 1+0/1, flag 1+0/1
+        translate->kept: 0 of 249 translate words kept by: ; by shape: 
+
+BLOCK PURITY, KEEP-MASS SPLIT, REGION FIT (all blocks, noletter included)
+  read doc
+    source       blocks pure keep pure transl  mixed  purity   keep words: in pure-keep blocks / in mixed blocks (of which near-pure >= 0.9)   region fit (whole / split / merged)
+    papers dev      504        86         223    195    0.61   421 (0.31) / 916 (0.69) (47)   24 / 13 / 32  of 69 read regions (24 not read at all)
+    papers hold     200        52          78     70    0.65   224 (0.46) / 268 (0.54) (11)   8 / 5 / 12  of 25 read regions (8 not read at all)
+    cases dev        70        41          17     12    0.83   226 (0.88) / 31 (0.12) (0)   3 / 6 / 0  of 9 read regions (0 not read at all)
+    cases hold       89        54          27      8    0.91   194 (0.87) / 28 (0.13) (0)   8 / 5 / 0  of 13 read regions (0 not read at all)
+    keep words by reason, share in pure-keep blocks vs inside mixed blocks (inline spans among translated text):
+      papers dev   math 414/903, url 7/2, path 0/8, id 0/2, code 0/1
+      papers hold  math 224/268
+      cases dev    log 96/0, cmd 64/2, code 45/0, id 1/12, config 9/0, path 0/9, math 5/2, lineno 6/0, flag 0/2, url 0/2, hash 0/1, hotkey 0/1
+      cases hold   code 137/7, math 18/0, cmd 13/0, id 0/13, lineno 12/0, path 9/1, flag 0/6, hotkey 4/0, diffmark 1/0, url 0/1
+      mixed example, papers dev: 1706.03762-p1-doc-15 keep 1 translate 2 (url): University of Toronto aidan@cs.toronto.edu
+      mixed example, papers dev: 2401.10066-p10-doc-4 keep 1 translate 10 (math): Lemma 11 tells us that the eigenvalues of A remain unchanged after
+      mixed example, papers dev: 2401.10066-p4-doc-14 keep 7 translate 7 (math): On the other hand, wo p, vo p € H(?), with I inner product
+      mixed example, papers hold: 2310.06142-p1-doc-3 keep 4 translate 1 (math): 'Deparment of Physics and Astronomy, Texas AGM University, College Station, Texas 77843, U
+      mixed example, papers hold: 2310.06142-p3-doc-28 keep 1 translate 21 (math): (ii) The QFI related to the bimodal squeezed input state coincides with a Fock state QFI f
+      mixed example, papers hold: 2310.06142-p5-doc-32 keep 2 translate 7 (math): The variance A No is displayed in Appendix B Eq. (B6)
+      mixed example, cases dev: k01-readme-en-doc-1 keep 2 translate 21 (id): ledger line reads plain text journals and prints the balance of every account. It needs no
+      mixed example, cases dev: k03-stackoverflow-ja-doc-9 keep 1 translate 24 (id): agg を使うと行数が変わるので、この場合は向いていません。
+      mixed example, cases dev: k09-git-release-en-doc-6 keep 1 translate 11 (hotkey): Press Ctrl+Shift+P to open the command palette and run the tag command.
+      mixed example, cases hold: k02-readme-ko-doc-1 keep 1 translate 11 (id): pixelmint 은 파이썬으로 이미지를 그리고 저장하는 작은 라이브러리입니다. 외부 패키지가 필요하지 않습니다.
+      mixed example, cases hold: k02-readme-ko-doc-6 keep 2 translate 8 (id): Canvas 객체를 만들고 fiLL() 로 색을 채운 뒤 저장하면 됩니다.
+      mixed example, cases hold: k10-shortcuts-ko-doc-9 keep 1 translate 6 (path): 단축키를 바꾸려면 설정 폴더의 Keybindings.json 파일을 편집하세요.
+  read vn
+    source       blocks pure keep pure transl  mixed  purity   keep words: in pure-keep blocks / in mixed blocks (of which near-pure >= 0.9)   region fit (whole / split / merged)
+    papers dev      355        55         163    137    0.61   277 (0.22) / 980 (0.78) (0)   19 / 9 / 41  of 69 read regions (24 not read at all)
+    papers hold     144        51          36     57    0.60   193 (0.37) / 325 (0.63) (52)   11 / 6 / 13  of 30 read regions (3 not read at all)
+    cases dev        55        25          18     12    0.78   367 (0.92) / 31 (0.08) (0)   6 / 3 / 0  of 9 read regions (0 not read at all)
+    cases hold       71        36          26      9    0.87   210 (0.88) / 30 (0.12) (0)   10 / 3 / 0  of 13 read regions (0 not read at all)
+    keep words by reason, share in pure-keep blocks vs inside mixed blocks (inline spans among translated text):
+      papers dev   math 274/963, url 0/8, path 0/6, id 2/2, code 1/1
+      papers hold  math 193/324, path 0/1
+      cases dev    code 137/0, log 122/0, cmd 90/2, id 1/13, config 9/0, path 0/9, math 5/2, lineno 3/0, flag 0/2, hash 0/1, url 0/1, hotkey 0/1
+      cases hold   code 161/7, math 16/1, id 0/14, cmd 13/0, path 7/1, lineno 8/0, flag 0/6, hotkey 4/0, diffmark 1/0, url 0/1
+      mixed example, papers dev: 1706.03762-p1-vn-11 keep 1 translate 1 (url): Illia Polosukhin* ‡ illia.polosukhin@gmail.com
+      mixed example, papers dev: 2401.10066-p1-vn-0 keep 1 translate 9 (math): IP continuity of eigenprojections for 2-d Dirichlet Laplacians under perturbations of the 
+      mixed example, papers dev: 2401.10066-p4-vn-1 keep 5 translate 2 (math): A(s) ≤ B (s) for all s.
+      mixed example, papers hold: 2310.06142-p1-vn-1 keep 19 translate 258 (math): Jiaxuan Wang, 1, 2 Ruynet. L. de Matos Filho, Girish S. Agarwal, 1, 2,4 and Luiz Davidovic
+      mixed example, papers hold: 2310.06142-p3-vn-32 keep 1 translate 79 (math): This interesting result stems from the perfect correla-tion of photon numbers of probe and
+      mixed example, papers hold: 2310.06142-p5-vn-48 keep 9 translate 1 (math): âout = âin (cosh' rV1 - a - sinh? r)
+      mixed example, cases dev: k01-readme-en-vn-1 keep 1 translate 17 (id): ledgerline reads plain text journals and prints the balance of every account. It needs no 
+      mixed example, cases dev: k03-stackoverflow-ja-vn-8 keep 3 translate 24 (id): aggを使うと行数が変わるので、この場合は向いていません。
+      mixed example, cases dev: k09-git-release-en-vn-5 keep 1 translate 11 (hotkey): Press Ctrl+Shift+P to open the command palette and run the tag command.
+      mixed example, cases hold: k02-readme-ko-vn-1 keep 2 translate 11 (id): pixe Lmint 은 파이썬으로 이미지를 그리고 저장하는 작은 라이브러리입니다. 외부 패키지가 필요하지 않습니다.
+      mixed example, cases hold: k04-stackoverflow-en-vn-3 keep 4 translate 15 (id): Since ES2019 you can call Array. prototype. flat () . Pass a depth when the nesting is dee
+      mixed example, cases hold: k10-shortcuts-ko-vn-9 keep 1 translate 6 (path): 단축키를 바꾸려면 설정 폴더의 keybindings.json 파일을 편집하세요.
+
+WHERE THE MISSES CLUSTER
+  [papers dev, read doc] keep words the rules translate, by reason and shape:
+    math       788: single letter 246 (f. f. W i); other 214 ((J1,..., J.n) = (21,); plain word run (IP, softmax) 104 (he, dmodel IN vid,); weak operator (- / *) 68 (/h -oc) vorode- -)
+    path         7: weak operator (- / *) 7 (abs/1409.0473, abs/1703.03906, abs/1406.1078, ahs/1412.3555,)
+    id           2: other 2 (1705.03122v2, 1610.10099v2,)
+    url          1: other 1 (aidan@cs.toronto.edu)
+  [papers dev, read doc] translate words the rules keep, by mechanism and shape:
+    block  plain prose word     49  e.g. where Where are parameter matrices and
+    block  single                2  e.g. a a
+  [papers hold, read doc] keep words the rules translate, by reason and shape:
+    math       312: other 92 (= (X). (X) I'); single letter 79 (X. N I H); plain word run (IP, softmax) 68 (of and AGM USA); weak operator (- / *) 32 (- 1/ / /)
+  [papers hold, read doc] translate words the rules keep, by mechanism and shape:
+    block  plain prose word      8  e.g. where is the squeezing parameter, with
+  [cases dev, read doc] keep words the rules translate, by reason and shape:
+    cmd         48: single letter 32 (d e v m); other 7 (~ $ . .); plain word run (IP, softmax) 3 (make test go); garbled symbol / CJK text 3 (： ： ～)
+    code        31: plain word run (IP, softmax) 21 (for to do if); single letter 6 (i n I G); garbled symbol / CJK text 2 (‹ •); bare number 1 (2)
+    log         30: plain word run (IP, softmax) 20 (Fix rounding of negative); other 5 (a3f9c21 7be04d2 c19e8a0 e4410bf); single letter 2 (修 改); garbled symbol / CJK text 1 (：)
+    id          12: plain word run (IP, softmax) 7 (ledger line groupby transform); single letter 3 (g e t); garbled symbol / CJK text 2 (（ ）)
+    path         9: single letter 6 (m a i n); weak operator (- / *) 2 (~/. -); plain word run (IP, softmax) 1 (ledgerrc)
+    math         7: single letter 3 (d G n.); plain word run (IP, softmax) 2 (Input: Output:); bare operand (dk, x1) 1 (b1,); other 1 (...,)
+    config       3: other 1 (#); weak operator (- / *) 1 (~/.); plain word run (IP, softmax) 1 (ledgerrc)
+    flag         2: weak operator (- / *) 2 (--month 2026-09)
+    hotkey       1: other 1 (Ctrl+Shift+P)
+  [cases dev, read doc] translate words the rules keep, by mechanism and shape:
+    block  plain prose word     10  e.g. The rounding fix landed in commit
+  [cases hold, read doc] keep words the rules translate, by reason and shape:
+    code        68: single letter 18 (C I l o); garbled symbol / CJK text 17 (캔버스를 만든다 흰색으로 채운다); other 12 (= 480) # C.fiLL("#ffffff")#); plain word run (IP, softmax) 10 (const nested flatten every)
+    id          12: plain word run (IP, softmax) 7 (pixelmint Canvas pytest Array.); single letter 4 (s u d o); other 1 (())
+    flag         6: single letter 4 (p o r t); weak operator (- / *) 2 (- -)
+    path         1: other 1 (Keybindings.json)
+    url          1: weak operator (- / *) 1 (http://Localhost:8080)
+  whole-block keep by the keep share of the block, read doc, papers (all) and cases (all)
+    keep share [0.00,0.01):  347 blocks, kept whole    3 (0.01)
+    keep share [0.01,0.15):  112 blocks, kept whole    0 (0.00)
+    keep share [0.15,0.30):   65 blocks, kept whole    2 (0.03)
+    keep share [0.30,0.50):   51 blocks, kept whole    0 (0.00)
+    keep share [0.50,0.70):   34 blocks, kept whole    4 (0.12)
+    keep share [0.70,0.90):   18 blocks, kept whole    3 (0.17)
+    keep share [0.90,1.00):  191 blocks, kept whole  130 (0.68)
+
+PER PAPER / CASE
+  per paper / case, read doc: keep words found (recall), translate words kept by mistake, exact keep spans
+    1706.03762             papers dev   keep words  242 found 0.45 | translate words 4283 kept  19 | keep spans 121 exact  35
+    2310.06142             papers hold  keep words  462 found 0.32 | translate words 4781 kept   8 | keep spans 174 exact  43
+    2401.10066             papers dev   keep words 1067 found 0.38 | translate words 2508 kept  32 | keep spans 390 exact  48
+    k01-readme-en          cases dev    keep words   26 found 0.58 | translate words   63 kept   0 | keep spans   8 exact   3
+    k02-readme-ko          cases hold   keep words   26 found 0.50 | translate words   41 kept   0 | keep spans   9 exact   4
+    k03-stackoverflow-ja   cases dev    keep words   10 found 0.70 | translate words  116 kept   0 | keep spans   5 exact   2
+    k04-stackoverflow-en   cases hold   keep words   33 found 0.24 | translate words   40 kept   0 | keep spans   7 exact   2
+    k05-terminal-zh        cases dev    keep words   69 found 0.29 | translate words    0 kept   0 | keep spans  11 exact   8
+    k06-ide-diff-ko        cases hold   keep words   44 found 0.80 | translate words   16 kept   0 | keep spans  11 exact   9
+    k07-algorithm-en       cases dev    keep words   42 found 0.07 | translate words   44 kept   0 | keep spans  12 exact   0
+    k08-algorithm-zh       cases hold   keep words   70 found 0.69 | translate words   56 kept   0 | keep spans   9 exact   7
+    k09-git-release-en     cases dev    keep words   36 found 0.22 | translate words   48 kept  10 | keep spans   5 exact   1
+    k10-shortcuts-ko       cases hold   keep words    6 found 0.83 | translate words   22 kept   0 | keep spans   6 exact   5
+    k11-traceback-ja       cases dev    keep words   57 found 0.77 | translate words   91 kept   0 | keep spans   9 exact   6
+    k12-docker-zh          cases hold   keep words   29 found 0.38 | translate words   74 kept   0 | keep spans   9 exact   5
+
+DECISION (precision and recall both >= 0.95 on the hold-out -> defer the model for the slice; else train for the band; n < 20: thin)
+  [papers hold, read doc] word precision 0.95; recall by reason (precision is of all kept words, one number for every slice):
+    math      R 0.32 (n=462)  -> train for the band
+    spans: exact-boundary F1 0.38 -> train for the band   (keep-boundary.md section 5 asks F1 >= 0.90 for a model)
+    whole-block keep: P 0.90 R 0.59 -> train for the band
+  [cases hold, read doc] word precision 1.00; recall by reason (precision is of all kept words, one number for every slice):
+    code      R 0.52 (n=143)  -> train for the band
+    math      R 1.00 (n=18, thin)  -> defer
+    id        R 0.08 (n=13, thin)  -> train for the band
+    cmd       R 1.00 (n=13, thin)  -> defer
+    path      R 0.90 (n=10, thin)  -> train for the band
+    flag      R 0.00 (n=6, thin)  -> train for the band
+    hotkey    R 1.00 (n=4, thin)  -> defer
+    url       R 0.00 (n=1, thin)  -> train for the band
+    spans: exact-boundary F1 0.77 -> train for the band   (keep-boundary.md section 5 asks F1 >= 0.90 for a model)
+    whole-block keep: P 1.00 R 0.78 -> train for the band

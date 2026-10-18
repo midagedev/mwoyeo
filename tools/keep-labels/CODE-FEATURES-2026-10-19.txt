@@ -1,0 +1,55 @@
+READ doc: 24 pure-keep blocks the rules translate (of 74 pure-keep blocks)
+  k01-readme-en-doc-7            config  caught by: indent,tint                  indent=1.8 mono=None lineend=0.0 keyword=0.0 tint=9  | # ~/. ledgerrc
+  k02-readme-ko-doc-8            code    caught by: tint                         indent=1.5 mono=None lineend=0.0 keyword=0.0 tint=9  | C = Canvas(640, 480) # 캔버스를 만든다
+  k02-readme-ko-doc-9            code    caught by: indent,tint                  indent=1.5 mono=None lineend=0.0 keyword=0.0 tint=9  | C.fiLL("#ffffff")# 흰색으로 채운다
+  k04-stackoverflow-en-doc-4     code    caught by: indent,lineend,keyword,tint  indent=1.7 mono=0.075 lineend=1.0 keyword=0.5 tint=9  | const nested = [1, 12, [3, [4]]]];
+  k04-stackoverflow-en-doc-5     code    caught by: indent,mono,tint             indent=1.7 mono=0.025 lineend=0.0 keyword=0.0 tint=9  | // flatten every level at once
+  k04-stackoverflow-en-doc-7     code    caught by: indent,lineend,keyword,tint  indent=1.8 mono=0.078 lineend=1.0 keyword=0.33 tint=9  | console. log(flat); // [1, 2, 3, 4]
+  k05-terminal-zh-doc-12         cmd     caught by: tint                         indent=0.0 mono=None lineend=0.0 keyword=0.0 tint=225  | devembp：～/shop$ # 先同步依赖再构建
+  k05-terminal-zh-doc-4          log     caught by: indent,tint                  indent=6.0 mono=None lineend=0.0 keyword=0 tint=225  | 修改：
+  k05-terminal-zh-doc-6          cmd     caught by: tint                         indent=0.0 mono=None lineend=0.0 keyword=0.0 tint=225  | devembp：~/shop$ go test./..・
+  k06-ide-diff-ko-doc-14         code    caught by: indent,tint                  indent=19.6 mono=None lineend=0.0 keyword=0 tint=23  | // 장바구니 합계를 계산한다.
+  k06-ide-diff-ko-doc-20         code    caught by: indent,tint                  indent=23.2 mono=None lineend=0.0 keyword=0 tint=23  | // 할인은 결제 단계에서 적용한다.
+  k07-algorithm-en-doc-11        id      caught by: indent,keyword               indent=7.0 mono=None lineend=0.0 keyword=1.0 tint=0  | else
+  k07-algorithm-en-doc-13        code    caught by: indent                       indent=8.0 mono=0.097 lineend=0.0 keyword=0.0 tint=0  | open a new group with li
+  k07-algorithm-en-doc-15        code    caught by: indent,keyword               indent=5.9 mono=None lineend=0.0 keyword=1.0 tint=0  | end if
+  k07-algorithm-en-doc-17        code    caught by: indent,keyword               indent=1.7 mono=None lineend=0.0 keyword=1.0 tint=0  | end for
+  k07-algorithm-en-doc-18        code    caught by: keyword                      indent=0.2 mono=None lineend=0.0 keyword=0.5 tint=0  | 10: return G
+  k07-algorithm-en-doc-2         math    caught by: keyword                      indent=0.0 mono=0.148 lineend=0.0 keyword=0.25 tint=0  | Input: b1, ..., In; t
+  k07-algorithm-en-doc-3         math    caught by: none                         indent=0.2 mono=None lineend=0.0 keyword=0.0 tint=0  | Output: G
+  k07-algorithm-en-doc-4         code    caught by: keyword                      indent=0.0 mono=None lineend=0.0 keyword=0.6 tint=0  | 2: for i ‹ 2 to n do
+  k07-algorithm-en-doc-8         code    caught by: indent,keyword               indent=6.5 mono=None lineend=0.0 keyword=0.33 tint=0  | if d < T • height(lj) then
+  k07-algorithm-en-doc-9         code    caught by: indent                       indent=8.0 mono=0.086 lineend=0.0 keyword=0.12 tint=0  | append I to the last group of G
+  k08-algorithm-zh-doc-11        code    caught by: indent                       indent=4.4 mono=None lineend=0.0 keyword=0.0 tint=0  | mid ← I（lo+hi）/2」 ▶ 取中点
+  k08-algorithm-zh-doc-16        code    caught by: indent,keyword               indent=3.0 mono=None lineend=0.0 keyword=1.0 tint=0  | return0 ▶ 未找到
+  k09-git-release-en-doc-3       log     caught by: indent,tint                  indent=1.5 mono=0.075 lineend=0.0 keyword=0.09 tint=225  | a3f9c21 Fix rounding of negative balances 7be0
+  feature         caught/24   false fires of the feature on pure-translate blocks / on mixed blocks
+  indent       17/24      4/44  0/20
+  mono          1/24      1/44  0/20
+  lineend       2/24      0/44  0/20
+  keyword      10/24      2/44  1/20
+  tint         12/24      5/44  0/20
+  any of the five: 23/24; none: 1; any feature on pure-translate blocks: 9/44; the two cheapest, tint or keyword: 20/24
+READ vn: 15 pure-keep blocks the rules translate (of 47 pure-keep blocks)
+  k02-readme-ko-vn-7             code    caught by: indent,tint                  indent=1.6 mono=0.085 lineend=0.25 keyword=0.15 tint=9  | from pixelmint import Canvas C = Canvas(640, 4
+  k04-stackoverflow-en-vn-4      code    caught by: indent,lineend,keyword,tint  indent=1.8 mono=0.079 lineend=0.75 keyword=0.2 tint=9  | const nested = |1, 12, 13, [4]]]]; // flatten 
+  k05-terminal-zh-vn-0           cmd     caught by: tint                         indent=0.3 mono=0.088 lineend=0.0 keyword=0.0 tint=225  | devcmbp：~/shop$ git status位于分支 main您分支与上游分支'or
+  k05-terminal-zh-vn-1           log     caught by: indent,tint                  indent=6.0 mono=None lineend=0.0 keyword=0 tint=225  | 修改：
+  k05-terminal-zh-vn-3           cmd     caught by: tint                         indent=0.0 mono=0.084 lineend=0.0 keyword=0.05 tint=225  | devembp：~/shop$ go test ./..・OK FAIL shop/pay 
+  k06-ide-diff-ko-vn-4           code    caught by: indent,tint                  indent=24.6 mono=0.08 lineend=0.0 keyword=0.17 tint=23  | // 장바구니 합계를 계산한다. func total(items: [Item]) ->
+  k06-ide-diff-ko-vn-8           code    caught by: indent,mono,keyword,tint     indent=28.1 mono=0.052 lineend=0.2 keyword=0.36 tint=23  | var sum = 0 var sum: Int = 0 for item in items
+  k07-algorithm-en-vn-10         code    caught by: keyword                      indent=0.0 mono=None lineend=0.0 keyword=1.0 tint=0  | 9: end for
+  k07-algorithm-en-vn-11         code    caught by: keyword                      indent=0.0 mono=None lineend=0.0 keyword=0.5 tint=0  | 10: return G
+  k07-algorithm-en-vn-2          math    caught by: keyword                      indent=0.0 mono=0.127 lineend=0.0 keyword=0.2 tint=0  | Input: 11, ..., In; T Output: G
+  k07-algorithm-en-vn-3          code    caught by: lineend,keyword              indent=0.0 mono=None lineend=0.5 keyword=0.5 tint=0  | 1: G < [|&¡]] 2: for i ‹ 2 to n do
+  k07-algorithm-en-vn-7          code    caught by: indent,keyword               indent=6.0 mono=None lineend=0.0 keyword=0.33 tint=0  | if d < T • height(lj) then
+  k07-algorithm-en-vn-8          code    caught by: indent,keyword               indent=5.9 mono=0.113 lineend=0.0 keyword=0.24 tint=0  | append li to the last group of G else open a n
+  k08-algorithm-zh-vn-12         code    caught by: indent                       indent=3.0 mono=None lineend=0.0 keyword=0.0 tint=0  | returnO ▶ 未找到
+  k08-algorithm-zh-vn-7          code    caught by: indent,keyword               indent=4.6 mono=0.136 lineend=0.0 keyword=0.32 tint=0  | mid← L（lo +hi）/2」 ▶ 取中点if A［mid］=x then return
+  feature         caught/15   false fires of the feature on pure-translate blocks / on mixed blocks
+  indent        9/15      4/44  0/21
+  mono          1/15      1/44  0/21
+  lineend       2/15      0/44  0/21
+  keyword       9/15      2/44  1/21
+  tint          7/15      5/44  0/21
+  any of the five: 15/15; none: 0; any feature on pure-translate blocks: 9/44; the two cheapest, tint or keyword: 14/15

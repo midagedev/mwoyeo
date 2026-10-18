@@ -1,0 +1,5 @@
+# 1706.03762 carries arXiv's non-exclusive licence, not a Creative Commons one: its labels hold the paper's OCR text, so they are
+# regenerated locally from the arXiv id (make-labels.sh) and never committed.
+labels/1706.03762.*
+# logs of regen.sh beside the default labels dir
+labels.*.log

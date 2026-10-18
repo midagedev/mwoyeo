@@ -5,6 +5,9 @@ struct MenuPanel: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openSettings) private var openSettings
 
+    /// `--capture-ui` shows the initialization state from a gate of its own (no real recognition).
+    nonisolated(unsafe) static var fakeSetup: (gate: SwiftVisionGate, now: TimeInterval)?
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             header
@@ -17,6 +20,7 @@ struct MenuPanel: View {
                     IssueBanner(message: issue.message) { open() }
                 }
             }
+            SetupIssue()
             if !model.hasScreenPermission {
                 IssueBanner(message: String(localized: "Mwoyeo needs Screen Recording permission."), action: String(localized: "Allow…")) {
                     WindowPresenter.shared.showOnboarding()
@@ -51,7 +55,7 @@ struct MenuPanel: View {
             AppGlyph(size: 32)
             VStack(alignment: .leading, spacing: 1) {
                 Text("Mwoyeo").font(.system(.headline, design: .rounded))
-                Text(statusLine).font(.caption).foregroundStyle(.secondary).contentTransition(.opacity)
+                StatusLine(base: statusLine)
             }
             Spacer()
             Button {

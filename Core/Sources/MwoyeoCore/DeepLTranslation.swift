@@ -4,6 +4,23 @@ import Foundation
 public enum DeepLTranslation {
     public static let path = "/v2/translate"
 
+    static let proHost = "api.deepl.com"
+    static let freeHost = "api-free.deepl.com"
+
+    /// True for the two official DeepL hosts, where the key decides which one is called.
+    public static func isOfficialHost(_ url: URL) -> Bool {
+        let host = url.host?.lowercased()
+        return host == proHost || host == freeHost
+    }
+
+    /// The base URL to call. On an official DeepL host the key decides: a key ending in `:fx` is a Free key and goes to
+    /// `api-free.deepl.com`, any other goes to `api.deepl.com`. A proxy host is kept as configured.
+    public static func resolvedBaseURL(_ configured: URL, key: String?) -> URL {
+        guard isOfficialHost(configured) else { return configured }
+        let free = key?.trimmingCharacters(in: .whitespacesAndNewlines).hasSuffix(":fx") ?? false
+        return URL(string: "https://" + (free ? freeHost : proHost)) ?? configured
+    }
+
     public static func requestBody(lines: [String], source: String?, target: String, formality: String?) -> Data {
         var body: [String: Any] = ["text": lines, "target_lang": upper(target)]
         if let source { body["source_lang"] = upper(source) }

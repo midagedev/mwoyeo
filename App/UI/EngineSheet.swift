@@ -145,7 +145,7 @@ struct EngineSheet: View {
     }
 
     private static let localNames = ["Ollama", "LM Studio", "LibreTranslate", "DeepLX"]
-    private static let cloudNames = ["Gemini", "OpenAI", "Claude", "DeepSeek", "OpenRouter", "Groq", "Qwen (Alibaba Cloud)", "DeepL Free", "DeepL Pro"]
+    private static let cloudNames = ["Gemini", "OpenAI", "Claude", "DeepSeek", "OpenRouter", "Groq", "Qwen (Alibaba Cloud)", "DeepL"]
     private static func preset(_ name: String) -> EnginePresets.Preset? { EnginePresets.all.first { $0.name == name } }
 
     private enum Custom { case server, template, command }

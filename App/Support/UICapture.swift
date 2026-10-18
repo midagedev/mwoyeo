@@ -5,7 +5,11 @@ import SwiftUI
 
 /// Window captures of the engine UI, for checking a look without clicking through the app:
 ///   Mwoyeo --capture-ui outdir scenario… [--mock http://host:port/v1] [--delay s] [--image picture]
-/// Scenarios: translation-default, translation-engines, general-saving, menu-default, menu-switcher, menu-notice,
+/// `vision-reads [--src ja] [--image picture] [--for seconds]` is a probe, not a capture: it starts the initialization of the text
+/// models for the language and reads the picture in this process every half second until every step is done, printing each
+/// read's latency and the steps as they change (what a lens sees during a cold compile; no window).
+/// Scenarios: menu-init-running, menu-init-failed, menu-init-done (the panel during the initialization of the text
+/// models, from a gate of its own, no real recognition), translation-default, translation-engines, general-saving, menu-default, menu-switcher, menu-notice,
 /// menu-profile, image-window and image-window-original (the Translate Image window on `--image`, translated through the
 /// mock, then with Show Original on; when the text recognizer reads nothing the picture stands in for its translation, which
 /// still shows the toggle's two states), sheet-pick, sheet-config, sheet-config-remote, lens-badge, lens-notice, lens-menu, add-flow (adds an
@@ -43,8 +47,8 @@ enum UICapture {
             var names: [String] = [], skip = false
             for a in args.dropFirst() {
                 if skip { skip = false; continue }
-                if a == "--mock" || a == "--delay" || a == "--key" || a == "--image" { skip = true; continue }
-                if a == "--keep-key" { continue }
+                if a == "--mock" || a == "--delay" || a == "--key" || a == "--image" || a == "--engine-name" { skip = true; continue }
+                if a == "--keep-key" || a == "--dump" { continue }
                 names.append(a)
             }
             return names
@@ -67,7 +71,7 @@ enum UICapture {
 
         /// A cloud engine and a local one (the local one points at the mock and has run a few batches).
         private func seedEngines() async {
-            let cloud = engine("Gemini", "https://generativelanguage.googleapis.com/v1beta/openai/", "gemini-3.1-flash-lite")
+            let cloud = engine(option("--engine-name") ?? "Gemini", "https://generativelanguage.googleapis.com/v1beta/openai/", "gemini-3.1-flash-lite")
             let local = engine("Ollama", mock, "qwen3:8b")
             model.settings.sourceLanguage = "ja"
             model.settings.targetLanguage = "ko"
@@ -96,6 +100,7 @@ enum UICapture {
             case "translation-engines":
                 await seedEngines()
                 await shoot(name, TranslationSettings(), CGSize(width: 560, height: 820))
+            case "engine-row-click": await engineRowClick()
             case "menu-switcher":
                 await seedEngines()
                 await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
@@ -110,6 +115,11 @@ enum UICapture {
                 await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
                 model.frontmostBundleID = nil
                 model.settings.appProfiles = []
+            case "menu-init-running", "menu-init-failed", "menu-init-done":
+                MenuPanel.fakeSetup = Self.fakeGate(String(name.dropFirst(10)))
+                await shoot(name, MenuPanel(), CGSize(width: 340, height: 460))
+                MenuPanel.fakeSetup = nil
+            case "vision-reads": await visionReads()
             case "image-window": await imageWindow(name, showOriginal: false)
             case "image-window-original": await imageWindow(name, showOriginal: true)
             case "check-logic": await checkLogic()
@@ -125,6 +135,65 @@ enum UICapture {
             case "lens-menu": await lens(name, badge: nil, notice: nil, menu: true)
             case "add-flow": await addFlow()
             default: print("unknown scenario \(name)")
+            }
+        }
+
+        /// A gate in the middle of the initialization, on a clock of its own: the text reader done in 34 s, then the paragraph reader
+        /// running for 46 s (`running`), failed (`failed`), or done too with the last step finished a second ago (`done`).
+        private static func fakeGate(_ state: String) -> (gate: SwiftVisionGate, now: TimeInterval) {
+            let t: TimeInterval = 1000
+            var g = SwiftVisionGate()
+            g.want("auto")
+            func step(_ s: SwiftVisionGate.Step, from: TimeInterval, to: TimeInterval?, failure: String? = nil) {
+                g.started(SwiftVisionGate.Due(key: "auto", step: s), now: t - from)
+                if let to { g.finished(failure: failure, now: t - to) }
+            }
+            step(.textModel, from: 90, to: 56)
+            switch state {
+            case "failed": step(.documentModel, from: 56, to: 10, failure: "the helper process ended with status 1")
+            case "done":
+                step(.documentModel, from: 56, to: 12)
+                step(.swiftTextModel, from: 12, to: 1)
+            default: step(.documentModel, from: 56, to: nil)
+            }
+            return (g, t)
+        }
+
+        /// Reads during the initialization: the latency of each read in this process while the steps run (the child compiles meanwhile).
+        private func visionReads() async {
+            let language = option("--src") ?? "ja"
+            let limit = Double(option("--for") ?? "400") ?? 400
+            let picture: CGImage? = option("--image").flatMap { NSImage(contentsOf: URL(fileURLWithPath: $0))?.cgImage(forProposedRect: nil, context: nil, hints: nil) } ?? TextRecognizer.probePicture
+            guard let picture else { print("vision-reads: no picture"); return }
+            let t0 = Trace.now
+            func at() -> String { String(format: "%6.1f", Trace.now - t0) }
+            Task.detached(priority: .utility) { await AppModel.loadVision(source: language) }
+            var shown = ""
+            var n = 0
+            while Trace.now - t0 < limit {
+                let gate = TextRecognizer.setupState
+                let steps = SwiftVisionGate.Step.allCases.map { "\($0.rawValue)=\(gate.steps[$0].map(Self.describe) ?? "?")" }.joined(separator: " ")
+                if steps != shown { shown = steps; print("[\(at())] steps: \(steps) child=\(gate.inChild)") }
+                if gate.running == nil, gate.allReady, !gate.steps.values.contains(.pending), n > 0 { break }
+                let began = Trace.now
+                n += 1
+                do {
+                    let blocks = try await TextRecognizer.blocks(in: picture, languages: [Locale.Language(identifier: language)])
+                    print("[\(at())] read \(n): \(blocks.count) blocks in \(Int((Trace.now - began) * 1000)) ms")
+                } catch {
+                    print("[\(at())] read \(n): failed \(error) in \(Int((Trace.now - began) * 1000)) ms")
+                }
+                try? await Task.sleep(for: .milliseconds(500))
+            }
+            print("[\(at())] vision-reads: end, \(n) reads, \(TextRecognizer.setupState.steps.map { "\($0.key.rawValue)=\(Self.describe($0.value))" }.sorted().joined(separator: " "))")
+        }
+
+        private static func describe(_ s: SwiftVisionGate.StepState) -> String {
+            switch s {
+            case .pending: "pending"
+            case .running: "running"
+            case let .done(seconds): String(format: "done(%.1fs)", seconds)
+            case let .failed(m): "failed(\(m))"
             }
         }
 
@@ -219,6 +288,80 @@ enum UICapture {
             check("its end leaves another issue alone", model.shownIssue == a)
             model.received(nil)
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+        }
+
+        // MARK: synthetic clicks
+
+        private func views(_ root: NSView) -> [NSView] { [root] + root.subviews.flatMap { views($0) } }
+
+        /// A left click on `window` at `point` (window coordinates), sent to the window alone (the real pointer stays put).
+        private func click(_ window: NSWindow, at point: NSPoint) {
+            for type in [NSEvent.EventType.leftMouseDown, .leftMouseUp] {
+                guard let e = NSEvent.mouseEvent(with: type, location: point, modifierFlags: [], timestamp: ProcessInfo.processInfo.systemUptime,
+                                                 windowNumber: window.windowNumber, context: nil, eventNumber: 0, clickCount: 1, pressure: 1) else { continue }
+                window.sendEvent(e)
+            }
+        }
+
+        /// Whether the ⋯ button on an added engine's row opens its menu without changing the selection, and a click on the row selects it.
+        private func engineRowClick() async {
+            var failed = 0
+            func check(_ what: String, _ ok: Bool) {
+                print("engine-row-click: \(ok ? "PASS" : "FAIL") \(what)")
+                if !ok { failed += 1 }
+            }
+            await seedEngines()
+            model.select(.builtIn(.auto))
+            let apple = EngineSelection(model.settings)
+            let w = NSWindow(contentRect: NSRect(origin: .zero, size: CGSize(width: 560, height: 820)), styleMask: [.titled], backing: .buffered, defer: false)
+            let host = NSHostingView(rootView: TranslationSettings().environment(model))
+            w.contentView = host
+            w.setFrameTopLeftPoint(NSPoint(x: 80, y: (NSScreen.main?.frame.height ?? 900) - 60))
+            NSApp.activate(ignoringOtherApps: true)
+            w.makeKeyAndOrderFront(nil)
+            try? await Task.sleep(for: .seconds(delay))
+            let all = views(host)
+            if args.contains("--dump") {
+                func walk(_ v: NSView, _ d: Int) {
+                    print("  " + String(repeating: " ", count: d) + "\(type(of: v)) \(v.convert(v.bounds, to: nil)) title=\((v as? NSButton)?.title ?? "")")
+                    v.subviews.forEach { walk($0, d + 1) }
+                }
+                walk(host, 0)
+            }
+            // The rows' ⋯ buttons are popup buttons, top to bottom in the order of the engines: Gemini, Ollama.
+            let buttons = all.filter { String(describing: type(of: $0)).contains("PopupButton") }
+                .sorted { $0.convert($0.bounds, to: nil).maxY > $1.convert($1.bounds, to: nil).maxY }
+            let more = buttons.count == 2 ? buttons[1] : nil
+            check("the ⋯ buttons are found, one per added engine", buttons.count == 2)
+            let before = model.settings.customEngineID
+            nonisolated(unsafe) var opened = false
+            nonisolated(unsafe) var tracked: NSMenu?
+            let token = NotificationCenter.default.addObserver(forName: NSMenu.didBeginTrackingNotification, object: nil, queue: nil) { n in
+                opened = true
+                tracked = n.object as? NSMenu
+            }
+            if let more {
+                let r = more.convert(more.bounds, to: nil)
+                // The mouse-down blocks in menu tracking; a timer in common modes ends it.
+                let t = Timer(timeInterval: 0.6, repeats: false) { _ in tracked?.cancelTrackingWithoutAnimation() }
+                RunLoop.main.add(t, forMode: .common)
+                click(w, at: NSPoint(x: r.midX, y: r.midY))
+                t.invalidate()
+            }
+            NotificationCenter.default.removeObserver(token)
+            try? await Task.sleep(for: .milliseconds(300))
+            check("⋯ opens its menu", opened)
+            check("selection unchanged after ⋯", model.settings.customEngineID == before && EngineSelection(model.settings) == apple)
+            // Control: the row's own radio.
+            // The radio sits at the row's left edge, level with its ⋯ button.
+            if let more {
+                let r = more.convert(more.bounds, to: nil)
+                click(w, at: NSPoint(x: 38, y: r.midY))
+            }
+            try? await Task.sleep(for: .milliseconds(300))
+            check("clicking the row text selects it", model.settings.customEngineID == model.settings.engines.first { $0.name == "Ollama" }?.id)
+            w.orderOut(nil)
+            print("engine-row-click: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
         }
 
         // MARK: capture

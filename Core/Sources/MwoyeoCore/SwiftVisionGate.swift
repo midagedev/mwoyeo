@@ -36,6 +36,7 @@ public struct SwiftVisionGate: Sendable, Equatable {
     public struct Due: Sendable, Equatable {
         public var key: String
         public var step: Step
+        public init(key: String, step: Step) { self.key = key; self.step = step }
     }
 
     /// The key of a read that detects the language.
@@ -49,6 +50,8 @@ public struct SwiftVisionGate: Sendable, Equatable {
     private var lastDone: TimeInterval?
     /// The step that runs, nil if none.
     public private(set) var running: Due?
+    /// The running Swift step is being compiled by a child process (the app's own executable), not in this process.
+    public private(set) var inChild = false
 
     public init() {}
 
@@ -76,9 +79,13 @@ public struct SwiftVisionGate: Sendable, Equatable {
         return true
     }
 
-    /// A Swift step (a model that may be compiling) runs now. VN revision 3 reads in the same process wait for it, so a read
-    /// that has an older recognizer for its language goes there meanwhile.
-    public var isSwiftCompiling: Bool { running.map { $0.step != .textModel } ?? false }
+    /// A Swift step (a model that may be compiling) runs in this process now. VN revision 3 reads in the same process wait for it,
+    /// so a read that has an older recognizer for its language goes there meanwhile. While a child compiles it, nothing in this
+    /// process waits (the same read in another process answered in 0.3 s).
+    public var isSwiftCompiling: Bool { !inChild && (running.map { $0.step != .textModel } ?? false) }
+
+    /// The running step's compile moves to a child process (`true`) or is back in this process (`false`).
+    public mutating func childPhase(_ on: Bool) { inChild = on && running != nil }
 
     /// The step to run now, if any: nothing runs (a running step is never stacked on, however long it takes), and the first
     /// pending step of the first key whose earlier steps are done. A key with a failed step waits for `retry()`.
@@ -100,6 +107,7 @@ public struct SwiftVisionGate: Sendable, Equatable {
     /// The step is being started. Call before the work runs: it can end before the caller has seen it return.
     public mutating func started(_ due: Due, now: TimeInterval) {
         running = due
+        inChild = false
         states[due.key]?[due.step] = .running(since: now)
     }
 
@@ -107,6 +115,7 @@ public struct SwiftVisionGate: Sendable, Equatable {
     public mutating func finished(failure: String?, now: TimeInterval) {
         guard let due = running else { return }
         running = nil
+        inChild = false
         if let failure {
             states[due.key]?[due.step] = .failed(failure)
         } else if case let .running(since) = states[due.key]?[due.step] {

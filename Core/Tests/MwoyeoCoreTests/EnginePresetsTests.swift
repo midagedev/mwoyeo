@@ -5,7 +5,7 @@ import Testing
 @Suite struct EnginePresetsTests {
     @Test func theListHasEveryPlannedPreset() {
         #expect(EnginePresets.all.map(\.name) == ["Gemini", "DeepSeek", "OpenAI", "OpenRouter", "Groq", "Qwen (Alibaba Cloud)", "Ollama",
-                                                  "LM Studio", "Claude", "DeepL Free", "DeepL Pro", "LibreTranslate", "DeepLX"])
+                                                  "LM Studio", "Claude", "DeepL", "LibreTranslate", "DeepLX"])
         #expect(Set(EnginePresets.all.map(\.name)).count == EnginePresets.all.count)
     }
 

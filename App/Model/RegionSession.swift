@@ -43,6 +43,10 @@ final class RegionSession {
     private var wideMargins = false
     private var lastMotion: TimeInterval = 0
     private var calmTimer: Timer?
+    /// The dot and glow follow translating only, settled by `BusyDebounce`; notices pass `NoticeGate`.
+    private var busyDebounce = BusyDebounce()
+    private var busyTimer: Timer?
+    private var noticeGate = NoticeGate()
     /// Where things are heading (-1…1 per axis): the lens while dragged, new content while the page scrolls.
     private var lead = CGVector.zero
     private var lastLens: (rect: CGRect, time: TimeInterval)?
@@ -112,6 +116,8 @@ final class RegionSession {
         trackTimer = nil
         calmTimer?.invalidate()
         calmTimer = nil
+        busyTimer?.invalidate()
+        busyTimer = nil
         mouseMonitors.forEach { NSEvent.removeMonitor($0) }
         mouseMonitors = []
         finishTranscript()
@@ -122,7 +128,10 @@ final class RegionSession {
     }
 
     /// A quiet line on the lens's pill for a few seconds.
-    func showNotice(_ text: String, seconds: TimeInterval = 6) { chrome.flash(text, seconds: seconds) }
+    func showNotice(_ text: String, seconds: TimeInterval = 6) {
+        guard noticeGate.allow(text, now: ProcessInfo.processInfo.systemUptime) else { return }
+        chrome.flash(text, seconds: seconds)
+    }
 
     private static func languagePair(_ s: AppSettings) -> String {
         "\(s.sourceLanguage == "auto" ? String(localized: "Auto") : Languages.name(s.sourceLanguage)) → \(Languages.name(s.targetLanguage))"
@@ -185,8 +194,19 @@ final class RegionSession {
     private func setActivity(_ a: RegionActivity) {
         guard a != activity else { return }
         activity = a
-        chrome.setBusy(a != .idle)
+        settleBusy()
         onChange?()
+    }
+
+    private func settleBusy() {
+        let now = ProcessInfo.processInfo.systemUptime
+        chrome.setBusy(busyDebounce.update(activity == .translating, now: now))
+        busyTimer?.invalidate()
+        busyTimer = nil
+        guard let due = busyDebounce.nextChange else { return }
+        busyTimer = Timer.scheduledTimer(withTimeInterval: max(0, due - now), repeats: false) { [weak self] _ in
+            MainActor.assumeIsolated { self?.settleBusy() }
+        }
     }
 
     private func captureStopped(_ error: Error?) {

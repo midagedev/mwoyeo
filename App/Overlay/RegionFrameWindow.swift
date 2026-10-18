@@ -451,7 +451,7 @@ private final class FrameChromeView: NSView {
                    options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])
         x += title.size().width + 10
         if original || !detail.isEmpty || notice != nil, x < tab.maxX - 50 {
-            let sub = NSAttributedString(string: notice ?? (original ? String(localized: "Original") : busy ? String(localized: "Translating…") : detail),
+            let sub = NSAttributedString(string: notice ?? (original ? String(localized: "Original") : detail),
                                          attributes: [.font: Self.detailFont, .foregroundColor: NSColor.white.withAlphaComponent(0.6)])
             // An added engine's mark: a cloud for a remote one, a Mac for one on this Mac.
             if let badge, notice == nil, !original,

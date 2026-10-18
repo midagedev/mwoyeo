@@ -37,8 +37,8 @@ import MwoyeoCore
         try await translateOnce("claude", preset: "Claude", model: "claude-haiku-5-5", keyVar: "MWOYEO_CLAUDE_API_KEY")
     }
 
-    @Test func liveDeepLFree() async throws {
-        try await translateOnce("deepl-free", preset: "DeepL Free", model: "", keyVar: "DEEPL_API_KEY")
+    @Test func liveDeepL() async throws {
+        try await translateOnce("deepl", preset: "DeepL", model: "", keyVar: "DEEPL_API_KEY")
     }
 
     @Test func liveSecondCallReusesTheConnection() async throws {

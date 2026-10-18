@@ -18423,14 +18423,68 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Text recognition isn’t responding"
+            "state": "translated",
+            "value": "글자 인식이 응답하지 않아요"
           }
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Text recognition isn’t responding"
+            "state": "translated",
+            "value": "文字認識が応答していません"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文字识别没有响应"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文字辨識沒有回應"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Texterkennung reagiert nicht"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La reconnaissance du texte ne répond pas"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El reconocimiento de texto no responde"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Распознавание текста не отвечает"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O reconhecimento de texto não está respondendo"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il riconoscimento del testo non risponde"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Розпізнавання тексту не відповідає"
           }
         }
       }

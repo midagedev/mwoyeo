@@ -123,23 +123,64 @@ enum SettingsFileChecks {
               misspeltRead.issues == [SettingsFileIssue(line: 5, message: "unknown key appProfiles[0].paragraphReadr (did you mean paragraphReader?)")])
         check("nested unknown key: the rest of the profile applies",
               misspeltRead.settings.appProfiles.map(\.bundleID) == ["com.example.app"] && misspeltRead.settings.appProfiles.first?.target == "en")
-        // The per-app memory fields (note, entries, context) are not kept by the app yet, so each is an unknown key.
-        let withNote = """
+        // The per-app memory (note, entries, context) is kept by the app (design §10), so the file may carry it. The limits
+        // are the Core constants, never a second copy of the numbers.
+        let badGender = """
         {
           "appProfiles": [
             {
               "bundleID": "com.example.app",
-              "note": "x",
               "source": "ja",
-              "target": "en"
+              "target": "en",
+              "entries": [
+                {
+                  "src": "田中",
+                  "dst": "Tanaka",
+                  "gender": "x"
+                }
+              ]
             }
           ]
         }
         """
-        let noteRead = SettingsFileCheck.read(Data(withNote.utf8), over: changed)
-        check("a profile's note is an unknown key: reported with its path and line, and the profile still applies",
-              noteRead.issues == [SettingsFileIssue(line: 5, message: "unknown key appProfiles[0].note")]
-              && noteRead.settings.appProfiles.map(\.bundleID) == ["com.example.app"] && noteRead.settings.appProfiles.first?.target == "en")
+        let allowedGenders = Gender.allCases.map(\.rawValue).joined(separator: ", ")
+        let genderRead = SettingsFileCheck.read(Data(badGender.utf8), over: changed)
+        check("nested enum: entries[0].gender \"x\" is reported with its path, its line and the allowed values; the entry still applies",
+              genderRead.issues == [SettingsFileIssue(line: 11, message: "appProfiles[0].entries[0].gender: \"x\" is not allowed; use one of \(allowedGenders); ignored")]
+              && genderRead.settings.appProfiles.first?.entries.map(\.src) == ["田中"] && genderRead.settings.appProfiles.first?.entries.first?.gender == nil)
+        let capped: [String: Any] = ["appProfiles": [["bundleID": "com.example.app", "source": "ja", "target": "en",
+                                                    "note": String(repeating: "a", count: AppProfile.maxNoteLength + 1),
+                                                    "entries": (0...AppProfile.maxEntries).map { ["src": "s\($0)", "dst": "d\($0)"] }]]]
+        let cappedText = SettingsFileFormat.pretty(capped) + "\n"
+        let cappedRead = SettingsFileCheck.read(Data(cappedText.utf8), over: changed)
+        check("caps: a note one character over and one entry too many are reported at their lines",
+              cappedRead.issues.sorted { ($0.line ?? 0) < ($1.line ?? 0) } == [
+                  SettingsFileIssue(line: lineNumber(of: "\"entries\"", in: cappedText),
+                                    message: "appProfiles[0].entries: \(AppProfile.maxEntries + 1) items; the limit is \(AppProfile.maxEntries); the first \(AppProfile.maxEntries) apply"),
+                  SettingsFileIssue(line: lineNumber(of: "\"note\"", in: cappedText),
+                                    message: "appProfiles[0].note: \(AppProfile.maxNoteLength + 1) characters; the limit is \(AppProfile.maxNoteLength); ignored"),
+              ].sorted { ($0.line ?? 0) < ($1.line ?? 0) })
+        var memoryAtCap = capped
+        memoryAtCap["appProfiles"] = [["bundleID": "com.example.app", "source": "ja", "target": "en", "note": String(repeating: "a", count: AppProfile.maxNoteLength),
+                                 "entries": (0..<AppProfile.maxEntries).map { ["src": "s\($0)", "dst": "d\($0)"] }]]
+        let atCapRead = SettingsFileCheck.read(Data((SettingsFileFormat.pretty(memoryAtCap) + "\n").utf8), over: changed)
+        check("caps: exactly the note limit and the entry limit are fine, and all of them apply",
+              atCapRead.issues.isEmpty && atCapRead.settings.appProfiles.first?.entries.count == AppProfile.maxEntries
+              && atCapRead.settings.appProfiles.first?.note.count == AppProfile.maxNoteLength)
+        let rowCaps: [String: Any] = ["appProfiles": [["bundleID": "com.example.app", "source": "ja", "target": "en", "entries": [[
+            "src": "田中", "dst": "Tanaka", "note": String(repeating: "n", count: MemoryEntry.maxEntryNote + 1),
+            "addressing": (0...MemoryEntry.maxAddressing).map { ["to": "p\($0)", "register": "casual"] },
+        ] as [String: Any]]]]]
+        let rowCapsText = SettingsFileFormat.pretty(rowCaps) + "\n"
+        let rowCapsRead = SettingsFileCheck.read(Data(rowCapsText.utf8), over: changed)
+        check("caps: an entry's note over its limit and a fifth addressing row are reported at their lines",
+              rowCapsRead.issues.sorted { ($0.line ?? 0) < ($1.line ?? 0) } == [
+                  SettingsFileIssue(line: lineNumber(of: "\"addressing\"", in: rowCapsText),
+                                    message: "appProfiles[0].entries[0].addressing: \(MemoryEntry.maxAddressing + 1) items; the limit is \(MemoryEntry.maxAddressing); the first \(MemoryEntry.maxAddressing) apply"),
+                  SettingsFileIssue(line: lineNumber(of: "\"note\"", in: rowCapsText),
+                                    message: "appProfiles[0].entries[0].note: \(MemoryEntry.maxEntryNote + 1) characters; the limit is \(MemoryEntry.maxEntryNote); ignored"),
+              ].sorted { ($0.line ?? 0) < ($1.line ?? 0) }
+              && rowCapsRead.settings.appProfiles.first?.entries.first?.addressing.count == MemoryEntry.maxAddressing)
         let badThinking = """
         {
           "engines": [
@@ -239,6 +280,139 @@ enum SettingsFileChecks {
               SettingsFileFormat.pretty(agentObject) + "\n" == agentFile + "\n")
         let afterAgent = SettingsFileCheck.read(SettingsFileFormat.render(agent.settings), over: AppSettings())
         check("agent-written file: settings → file → settings is stable", afterAgent.settings == agent.settings && afterAgent.issues.isEmpty)
+        // The default path: a file as 1.1.2 wrote it (the agent fixture above is main's own, a profile with no memory fields) is read
+        // and saved again as the same bytes. The app adds no key to a profile that has no memory.
+        let v112 = SettingsFileFormat.render(agent.settings)
+        let v112Read = SettingsFileCheck.read(v112, over: AppSettings())
+        let v112Object = (try? JSONSerialization.jsonObject(with: v112)) as? [String: Any] ?? [:]
+        let v112Profile = v112Read.settings.appProfiles.first
+        check("1.1.2 file, no memory fields: read and saved again it is the same bytes, the fixture's profile comes out as written, and no memory key appears",
+              v112Read.issues.isEmpty && SettingsFileFormat.render(v112Read.settings) == v112
+              && (v112Object["appProfiles"] as? NSArray)?.isEqual(to: agentObject["appProfiles"] as? [Any] ?? []) == true
+              && v112Profile?.note == "" && v112Profile?.entries.isEmpty == true && v112Profile?.context == nil
+              && ["\"note\"", "\"entries\"", "\"context\""].allSatisfy { !String(decoding: v112, as: UTF8.self).contains($0) })
+
+        // An agent's memory for an app, written the way docs/settings-for-agents.md shows it: a note, two entries that carry
+        // addressing, and a context override. It reads without an issue, the schema describes every field, and the file text is
+        // the app's own format.
+        let memoryFile = """
+        {
+          "appProfiles": [
+            {
+              "appName": "Example Chat",
+              "bundleID": "com.example.chat",
+              "context": {
+                "mode": "nearby",
+                "previousLines": 3
+              },
+              "entries": [
+                {
+                  "addressing": [
+                    {
+                      "register": "polite",
+                      "to": "Hana"
+                    }
+                  ],
+                  "dst": "Tanaka",
+                  "gender": "m",
+                  "kind": "person",
+                  "note": "the speaker's older colleague",
+                  "reading": "たなか",
+                  "src": "田中"
+                },
+                {
+                  "addressing": [
+                    {
+                      "register": "casual",
+                      "to": "Tanaka"
+                    }
+                  ],
+                  "dst": "Hana",
+                  "gender": "f",
+                  "kind": "person",
+                  "src": "花"
+                }
+              ],
+              "note": "Casual chat between two friends. Keep it informal and short.",
+              "paragraphReader": "lineGrouping",
+              "source": "ja",
+              "target": "en"
+            }
+          ]
+        }
+        """
+        let memory = SettingsFileCheck.read(Data(memoryFile.utf8), over: AppSettings())
+        let memoryObject = (try? JSONSerialization.jsonObject(with: Data(memoryFile.utf8))) as? [String: Any] ?? [:]
+        let memoryProfile = memory.settings.appProfiles.first
+        check("memory fields: a valid file reads without issues, the app keeps all three, and the schema describes every field in it",
+              memory.issues.isEmpty && memoryProfile?.bundleID == "com.example.chat" && memoryProfile?.paragraphReader == .lineGrouping
+              && memoryProfile?.note == "Casual chat between two friends. Keep it informal and short."
+              && memoryProfile?.entries.map(\.src) == ["田中", "花"] && memoryProfile?.entries.first?.addressing == [Addressing(to: "Hana", register: .polite)]
+              && memoryProfile?.entries.first?.reading == "たなか" && memoryProfile?.entries.first?.gender == .m
+              && memoryProfile?.context == AppContextOverride(mode: .nearby, previousLines: 3)
+              && describedByTheSchema(memoryObject["appProfiles"] ?? [], agentSchema?["appProfiles"] as? [String: Any] ?? [:]))
+        check("memory fields: the file text is the app's own format, so a reload leaves it as written",
+              SettingsFileFormat.pretty(memoryObject) + "\n" == memoryFile + "\n")
+        let afterMemory = SettingsFileCheck.read(SettingsFileFormat.render(memory.settings), over: AppSettings())
+        check("memory fields: settings → file → settings is stable", afterMemory.settings == memory.settings && afterMemory.issues.isEmpty)
+        // One rule for a context in a file: the validator and the Core decode give the same `AppProfile.context` for the same
+        // profile text, out-of-range, fractional, wrong-typed, missing and unknown values included (the validator is the contract:
+        // a `previousLines` it ignores is the default, never a clamp).
+        let contextTexts = [
+            #"{"mode":"conversation","previousLines":12}"#, #"{"mode":"conversation","previousLines":9}"#, #"{"mode":"conversation","previousLines":-1}"#,
+            #"{"mode":"conversation","previousLines":5.5}"#, #"{"mode":"conversation","previousLines":"many"}"#, #"{"mode":"conversation","previousLines":true}"#,
+            #"{"mode":"conversation","previousLines":null}"#, #"{"mode":"conversation","previousLines":0}"#, #"{"mode":"conversation","previousLines":8}"#,
+            #"{"mode":"conversation"}"#, #"{"mode":"nearby","previousLines":6}"#, #"{"mode":"off"}"#,
+            #"{"previousLines":3}"#, #"{"mode":"full","previousLines":3}"#, #"{}"#,
+        ]
+        let contextAgreement = contextTexts.map { context -> (text: String, viaFile: AppContextOverride?, direct: AppContextOverride?) in
+            let file = #"{"appProfiles":[{"bundleID":"com.example.ctx","source":"ja","target":"en","context":\#(context)}]}"#
+            let viaFile = SettingsFileCheck.read(Data(file.utf8), over: AppSettings()).settings.appProfiles.first?.context
+            let profileObject = ((try? JSONSerialization.jsonObject(with: Data(file.utf8))) as? [String: Any])?["appProfiles"] as? [[String: Any]]
+            let direct = profileObject?.first.flatMap { try? JSONSerialization.data(withJSONObject: $0) }
+                .flatMap { try? JSONDecoder().decode(AppProfile.self, from: $0) }?.context
+            return (context, viaFile, direct)
+        }
+        for row in contextAgreement where row.viaFile != row.direct {
+            print("check-logic: context \(row.text): the file check gives \(String(describing: row.viaFile)), the Core decode \(String(describing: row.direct))")
+        }
+        check("a context in a file reads the same through the file check and through a direct Core decode, in every case that disagreed before",
+              contextAgreement.allSatisfy { $0.viaFile == $0.direct }
+              && contextAgreement[0].viaFile == AppContextOverride(mode: .conversation, previousLines: AppContextOverride.defaultPreviousLines)
+              && contextAgreement[8].viaFile == AppContextOverride(mode: .conversation, previousLines: AppContextOverride.maxPreviousLines)
+              && contextAgreement[12].viaFile == nil && contextAgreement[14].viaFile == nil)
+        // The save path: the app starts on this file, a change is made in Settings, and the app's own writer saves it. The note,
+        // the entries with their addressing and the context must come out the same (1.1.2 re-saved the file from AppSettings
+        // and dropped them).
+        let saveFolder = dir.appendingPathComponent("memory-save")
+        try? FileManager.default.createDirectory(at: saveFolder, withIntermediateDirectories: true)
+        let saveURL = saveFolder.appendingPathComponent("settings.json")
+        try? Data(memoryFile.utf8).write(to: saveURL)
+        let saveStore = SettingsFileStore(url: saveURL)
+        var started = saveStore.startup(fallback: AppSettings())
+        started.boxOpacity = 0.9
+        saveStore.save(started)
+        let savedRead = SettingsFileCheck.read((try? Data(contentsOf: saveURL)) ?? Data(), over: AppSettings())
+        let savedObject = (try? JSONSerialization.jsonObject(with: Data(text(saveURL).utf8))) as? [String: Any] ?? [:]
+        let savedProfile = savedRead.settings.appProfiles.first
+        check("memory fields survive the app's save: start on the file, change a setting, save, read again; the note, entries with addressing and context are the same",
+              savedRead.issues.isEmpty && started.boxOpacity == 0.9 && savedRead.settings.boxOpacity == 0.9
+              && savedProfile?.note == memoryProfile?.note && savedProfile?.entries == memoryProfile?.entries && savedProfile?.context == memoryProfile?.context
+              && memoryProfile?.note.isEmpty == false && memoryProfile?.entries.count == 2 && memoryProfile?.context != nil
+              && (savedObject["appProfiles"] as? NSArray)?.isEqual(to: memoryObject["appProfiles"] as? [Any] ?? []) == true)
+        // Every value of the enums, the most rows, the most addressing and the longest conversation come back as they went in.
+        let everyEntry = EntryKind.allCases.flatMap { kind in Gender.allCases.map { gender in
+            MemoryEntry(src: "\(kind)-\(gender)", dst: "d", kind: kind, gender: gender, note: String(repeating: "n", count: MemoryEntry.maxEntryNote),
+                        reading: "r", addressing: Register.allCases.map { Addressing(to: "to-\($0)", register: $0) }) } }
+        var everyValue = AppSettings()
+        everyValue.appProfiles = [AppProfile(bundleID: "com.example.every", appName: "Every", source: "ja", target: "ko", note: String(repeating: "n", count: AppProfile.maxNoteLength),
+                                             entries: everyEntry, context: AppContextOverride(mode: .conversation, previousLines: AppContextOverride.maxPreviousLines)),
+                                  AppProfile(bundleID: "com.example.off", appName: "Off", source: "auto", target: "en", context: AppContextOverride(mode: .off, previousLines: 0))]
+        let everyValueRead = SettingsFileCheck.read(SettingsFileFormat.render(everyValue), over: AppSettings())
+        check("memory fields: every enum value, the largest note, entry and addressing sets and both ends of the context survive settings → file → settings",
+              everyValueRead.settings == everyValue && everyValueRead.issues.isEmpty
+              && everyValueRead.settings.appProfiles.first?.entries.count == EntryKind.allCases.count * Gender.allCases.count
+              && everyValueRead.settings.appProfiles.first?.entries.allSatisfy { $0.addressing.count == Register.allCases.count } == true)
 
         // Lines and what applies
         let minified = SettingsFileCheck.read(Data("{\"engines\":[{\"name\":\"x\",\"kind\":\"command\",\"command\":{\"executable\":\"/bin/x\",\"arguements\":[]}}],\"lenStyle\":1}".utf8), over: changed)
@@ -267,6 +441,41 @@ enum SettingsFileChecks {
         check("a bad optional field of an engine is left out, the rest of the engine applies",
               engineProblems.count == 1 && engineKept?.first?["thinking"] == nil
               && engineKept?.first?["name"] as? String == "C" && engineKept?.first?["model"] as? String == "m")
+        let spreadMemory = SettingsFileCheck.read(Data("""
+        {
+          "appProfiles": [
+            { "bundleID": "a", "source": "ja", "target": "en" },
+            {
+              "bundleID": "b",
+              "source": "ja",
+              "target": "en",
+              "entries": [
+                { "src": "x", "dst": "y" },
+                { "src": "x", "dst": "y", "kind": "company" },
+                { "dst": "y" }
+              ],
+              "context": { "previousLines": 3 }
+            }
+          ]
+        }
+        """.utf8), over: changed)
+        check("lines: a bad entry field is on its own line, an entry without src is dropped, a context without a mode is left out",
+              spreadMemory.issues.map(\.line) == [10, 11, 13] && spreadMemory.issues[0].message.hasPrefix("appProfiles[1].entries[1].kind:")
+              && spreadMemory.issues[1].message == "appProfiles[1].entries[2]: missing \"src\"; dropped"
+              && spreadMemory.issues[2].message == "appProfiles[1].context: missing \"mode\"; ignored"
+              && spreadMemory.settings.appProfiles.map(\.bundleID) == ["a", "b"] && spreadMemory.settings.appProfiles.last?.context == nil
+              && spreadMemory.settings.appProfiles.last?.entries.map(\.src) == ["x"])
+        var rowProblems: [FieldProblem] = []
+        let rowKept = SettingSpec.spec(for: "appProfiles")?.kind.read((try? JSONSerialization.jsonObject(with: Data("""
+        [{"bundleID": "a", "source": "ja", "target": "en", "entries": [
+          {"src": "1", "dst": "1", "gender": "x", "addressing": [{"to": "p", "register": "polite"}, {"to": "q", "register": "rude"}]},
+          {"src": "2"},
+          {"src": "3", "dst": "3"}]}]
+        """.utf8))) ?? [], at: FieldPath(steps: [.key("appProfiles")]), fallout: .keep, problems: &rowProblems) as? [[String: Any]]
+        let keptEntries = rowKept?.first?["entries"] as? [[String: Any]]
+        check("a bad field is left out, a bad row is dropped, the rest of the profile applies",
+              rowProblems.count == 3 && keptEntries?.map { $0["src"] as? String ?? "" } == ["1", "3"]
+              && keptEntries?.first?["gender"] == nil && (keptEntries?.first?["addressing"] as? [[String: Any]])?.count == 1)
         check("a bad required field of a profile keeps the current profiles, as before",
               SettingsFileCheck.read(Data("{\"appProfiles\": [{\"bundleID\": 7, \"source\": \"ja\", \"target\": \"en\"}]}".utf8), over: changed).settings == changed)
         check("an engine's unknown field is left out and the engine applies",
@@ -302,18 +511,56 @@ enum SettingsFileChecks {
         let schemaObject = (try? JSONSerialization.jsonObject(with: SettingsSchema.data())) as? [String: Any]
         let profile = at(schemaObject, "properties", "appProfiles", "items")
         let engineItem = at(schemaObject, "properties", "engines", "items")
-        check("schema: nested objects are closed, with enums and the uuid format",
+        let entryItem = at(profile, "properties", "entries", "items")
+        let addressingItem = at(entryItem, "properties", "addressing", "items")
+        check("schema: nested objects are closed, with enums, ranges, length and item caps from the Core types, and the uuid format",
               at(profile, "additionalProperties") as? Bool == false && at(engineItem, "additionalProperties") as? Bool == false
+              && at(entryItem, "additionalProperties") as? Bool == false && at(addressingItem, "additionalProperties") as? Bool == false
+              && at(profile, "properties", "context", "additionalProperties") as? Bool == false
               && at(profile, "properties", "source", "enum") as? [String] == Languages.sources
               && at(profile, "properties", "paragraphReader", "enum") as? [String] == ParagraphReader.allCases.map(\.rawValue)
               && at(engineItem, "properties", "thinking", "enum") as? [String] == ["off", "provider"]
+              && at(entryItem, "properties", "kind", "enum") as? [String] == EntryKind.allCases.map(\.rawValue)
+              && at(entryItem, "properties", "gender", "enum") as? [String] == Gender.allCases.map(\.rawValue)
+              && at(addressingItem, "properties", "register", "enum") as? [String] == Register.allCases.map(\.rawValue)
+              && at(profile, "properties", "context", "properties", "mode", "enum") as? [String] == AppContextOverride.Mode.allCases.map(\.rawValue)
+              && at(profile, "properties", "context", "properties", "previousLines", "minimum") as? Int == 0
+              && at(profile, "properties", "context", "properties", "previousLines", "maximum") as? Int == AppContextOverride.maxPreviousLines
+              && at(profile, "properties", "context", "properties", "previousLines", "default") as? Int == AppContextOverride.defaultPreviousLines
+              && at(profile, "properties", "context", "required") as? [String] == ["mode"]
+              && at(profile, "properties", "note", "maxLength") as? Int == AppProfile.maxNoteLength
+              && at(profile, "properties", "entries", "maxItems") as? Int == AppProfile.maxEntries
+              && at(entryItem, "properties", "note", "maxLength") as? Int == MemoryEntry.maxEntryNote
+              && at(entryItem, "properties", "src", "maxLength") as? Int == MemoryEntry.maxName
+              && at(entryItem, "properties", "addressing", "maxItems") as? Int == MemoryEntry.maxAddressing
+              && at(entryItem, "required") as? [String] == ["src", "dst"] && at(addressingItem, "required") as? [String] == ["to", "register"]
               && at(profile, "properties", "customEngineID", "format") as? String == "uuid"
               && at(profile, "required") as? [String] == ["bundleID", "source", "target"])
-        // A field the schema describes but AppProfile does not keep would vanish at the app's next save of the file.
-        let keptProfile = AppProfile(bundleID: "a", appName: "A", source: "ja", target: "en", customEngineID: engine.id, paragraphReader: .lineGrouping)
-        let keptKeys = ((try? JSONSerialization.jsonObject(with: JSONEncoder().encode(keptProfile))) as? [String: Any]).map { Set($0.keys) }
-        check("schema: a profile has exactly the fields AppProfile keeps",
-              keptKeys != nil && Set((at(profile, "properties") as? [String: Any] ?? [:]).keys) == keptKeys)
+        // The schema's fields against the app's, at every level (the failure mode: the schema describes a field the app drops
+        // on save, or the app keeps a field the schema never mentions). The app's keys are those a fully populated value
+        // encodes; a new field of a Core type that this value leaves empty is caught by AppProfileTests, which compares the
+        // same encoded keys with the type's CodingKeys.
+        let populated = AppProfile(
+            bundleID: "a", appName: "A", source: "ja", target: "en", customEngineID: engine.id, paragraphReader: .lineGrouping, note: "n",
+            entries: [MemoryEntry(src: "s", dst: "d", kind: .person, gender: .f, note: "n", reading: "r",
+                                  addressing: [Addressing(to: "t", register: .polite)])],
+            context: AppContextOverride(mode: .conversation, previousLines: 5))
+        let populatedKeys = (try? JSONSerialization.jsonObject(with: JSONEncoder().encode(populated))) as? [String: Any] ?? [:]
+        let populatedEntry = (populatedKeys["entries"] as? [[String: Any]])?.first ?? [:]
+        let populatedAddressing = (populatedEntry["addressing"] as? [[String: Any]])?.first ?? [:]
+        func schemaKeys(_ object: Any?) -> Set<String> { Set((at(object, "properties") as? [String: Any] ?? [:]).keys) }
+        let levels: [(name: String, app: Set<String>, schema: Set<String>)] = [
+            ("appProfiles[]", Set(populatedKeys.keys), schemaKeys(profile)),
+            ("appProfiles[].entries[]", Set(populatedEntry.keys), schemaKeys(entryItem)),
+            ("appProfiles[].entries[].addressing[]", Set(populatedAddressing.keys), schemaKeys(addressingItem)),
+            ("appProfiles[].context", Set((populatedKeys["context"] as? [String: Any] ?? [:]).keys), schemaKeys(at(profile, "properties", "context"))),
+        ]
+        for level in levels {
+            check("schema: \(level.name) has exactly the fields the app keeps", !level.app.isEmpty && level.app == level.schema)
+            if level.app != level.schema {
+                print("check-logic: \(level.name): only the app keeps \(level.app.subtracting(level.schema).sorted()); only the schema describes \(level.schema.subtracting(level.app).sorted())")
+            }
+        }
         func undocumented(_ node: Any?, _ path: String) -> [String] {
             guard let object = node as? [String: Any] else { return [] }
             var missing: [String] = []
@@ -329,9 +576,12 @@ enum SettingsFileChecks {
         let undocumentedProperties = undocumented(schemaObject, "")
         check("schema: every property, nested ones too, has a description", undocumentedProperties.isEmpty)
         if !undocumentedProperties.isEmpty { print("check-logic: without a description: \(undocumentedProperties)") }
-        check("schema: engines and appProfiles carry examples",
+        check("schema: engines and appProfiles carry examples, the profile one with a note, two entries with addressing and a context",
               ((at(schemaObject, "properties", "engines", "examples") as? [Any])?.count ?? 0) >= 1
-              && ((at(schemaObject, "properties", "appProfiles", "examples") as? [[[String: Any]]])?.first?.first?["bundleID"] as? String) == "com.example.chat")
+              && ((at(schemaObject, "properties", "appProfiles", "examples") as? [[[String: Any]]])?.first?.first).map { p in
+                  p["bundleID"] as? String == "com.example.chat" && p["note"] is String && (p["entries"] as? [[String: Any]])?.count == 2
+                  && (p["entries"] as? [[String: Any]])?.allSatisfy { ($0["addressing"] as? [Any])?.isEmpty == false } == true && p["context"] != nil
+              } == true)
         let badExamples = SettingSpec.all.flatMap { spec in
             spec.examples.compactMap { example -> String? in
                 var problems: [FieldProblem] = []
@@ -443,6 +693,20 @@ enum SettingsFileChecks {
         check("an edit of the file applies to the app and is not written back",
               model.settings.lensStyle == .minimal && model.settings.checksForUpdates == false && text(url) == appEdit
               && model.settingsIssues.isEmpty)
+        // The same through the model: a file with the memory fields is applied, a change in Settings saves the file, and the
+        // memory is still in it (the 1.1.2 save dropped it).
+        let profilesBefore = model.settings.appProfiles
+        try? Data(memoryFile.utf8).write(to: url, options: .atomic)
+        model.settingsFileChanged()
+        let appliedProfile = model.settings.appProfiles.first
+        model.settings.lensStyle = .subtle
+        let resaved = (try? JSONSerialization.jsonObject(with: Data(text(url).utf8))) as? [String: Any]
+        check("the memory fields apply to the app and a change in Settings keeps them in the file",
+              model.settingsIssues.isEmpty && appliedProfile?.note == memoryProfile?.note && appliedProfile?.entries == memoryProfile?.entries
+              && appliedProfile?.context == memoryProfile?.context && appliedProfile?.context != nil
+              && text(url).contains("\"lensStyle\": \"subtle\"")
+              && (resaved?["appProfiles"] as? NSArray)?.isEqual(to: memoryObject["appProfiles"] as? [Any] ?? []) == true)
+        model.settings.appProfiles = profilesBefore
         model.settings.checksForUpdates = true
         model.settings.lensStyle = .glow
         return failed

@@ -62,7 +62,7 @@ struct SettingSpec {
         .init(key: "transcriptFormats", kind: .choiceList(TranscriptFileFormat.allCases.map(\.rawValue)),
               doc: "Files of the translation log: markdown, srt, and jsonl (one JSON line per translated line with time, lens, app, source, target, engine, original and translation, added as it happens so tail -f works)."),
         .init(key: "appProfiles", kind: .appProfiles,
-              doc: "Languages, engine and paragraph reader remembered per app; the app in front decides which applies. Easier to set from a lens's menu.",
+              doc: "Languages, engine and paragraph reader remembered per app; the app in front decides which applies. Easier to set from a lens's menu. A profile can also carry a note for the translator, names and terms with their translations, and a context override for that app; the app keeps these but does not use them to translate yet.",
               examples: SettingExamples.appProfiles),
         .init(key: "paragraphReader", kind: .choice(ParagraphReader.allCases.map(\.rawValue)),
               doc: "How text is cut into paragraphs: automatic, documentLayout (the macOS document model) or lineGrouping (the app's own line rules)."),
@@ -160,7 +160,24 @@ extension FieldKind {
             ]),
         ]))
 
-    /// What the app remembers per app.
+    /// One name or term of an app's memory. The keys, enums and limits are those of `MemoryEntry` and `Addressing`: a field
+    /// this row lacks would be dropped at the app's next save, and `SettingsFileChecks` fails when the two differ.
+    private static let appEntries: FieldKind = .list(.object([
+        FieldSpec("src", .text(maxLength: MemoryEntry.maxName, minLength: 1), "The name or term as it is written in the text.", required: true, example: "田中"),
+        FieldSpec("dst", .text(maxLength: MemoryEntry.maxName, minLength: 1), "How it is translated.", required: true, example: "Tanaka"),
+        FieldSpec("kind", .choice(EntryKind.allCases.map(\.rawValue)), "What it is. Left out, term.", example: "person"),
+        FieldSpec("gender", .choice(Gender.allCases.map(\.rawValue)), "For a person: f, m or n (neutral), so pronouns and agreement come out right.", example: "m"),
+        FieldSpec("note", .text(maxLength: MemoryEntry.maxEntryNote), "A short hint about it, up to \(MemoryEntry.maxEntryNote) characters.", example: "the speaker's older colleague"),
+        FieldSpec("reading", .text(maxLength: MemoryEntry.maxName), "How src is pronounced, such as the kana of a kanji name.", example: "たなか"),
+        FieldSpec("addressing", .list(.object([
+            FieldSpec("to", .text(maxLength: MemoryEntry.maxName, minLength: 1), "Who is being spoken to, as written in that entry's src.", required: true, example: "Hana"),
+            FieldSpec("register", .choice(Register.allCases.map(\.rawValue)), "How this person speaks to them.", required: true, example: "polite"),
+        ]), maxItems: MemoryEntry.maxAddressing, dropsBad: true),
+                  "How this person speaks to others: one row per listener, up to \(MemoryEntry.maxAddressing)."),
+    ]), maxItems: AppProfile.maxEntries, dropsBad: true)
+
+    /// What the app remembers per app. The memory fields (note, entries, context) are all optional; their limits are the
+    /// constants of the Core types that keep them (`AppProfile`, `MemoryEntry`, `AppContextOverride`), never a second copy.
     static let appProfiles: FieldKind = .list(.object([
         FieldSpec("bundleID", .string, "Bundle identifier of the app.", required: true, example: "com.example.chat"),
         FieldSpec("appName", .string, "The app's name, for display.", example: "Example Chat"),
@@ -168,6 +185,19 @@ extension FieldKind {
         FieldSpec("target", .choice(Languages.targets), "Target language code.", required: true, example: "en"),
         FieldSpec("customEngineID", .idOrNull, "Engine for this app; null keeps the base choice."),
         FieldSpec("paragraphReader", .choice(ParagraphReader.allCases.map(\.rawValue)), "Paragraph reader for this app; left out follows the default."),
+        FieldSpec("note", .text(maxLength: AppProfile.maxNoteLength),
+                  "A note for the translator about this app: who is talking, the setting, the register. Up to \(AppProfile.maxNoteLength) characters.",
+                  example: "Casual chat between two friends. Keep it informal and short."),
+        FieldSpec("entries", appEntries,
+                  "Names and terms of this app with their translations, up to \(AppProfile.maxEntries) rows. A bad row is reported and dropped; the rest apply. A second row with the same src is left out."),
+        FieldSpec("context", .object([
+            FieldSpec("mode", .choice(AppContextOverride.Mode.allCases.map(\.rawValue)),
+                      "How much surrounding text goes along with each line: off (none), nearby (the lines around it on screen) or conversation (also the lines read before).",
+                      required: true, example: "nearby"),
+            FieldSpec("previousLines", .integer(0...AppContextOverride.maxPreviousLines),
+                      "How many earlier lines go along in conversation mode, 0 to \(AppContextOverride.maxPreviousLines).",
+                      example: 3, default: AppContextOverride.defaultPreviousLines),
+        ]), "Context for this app's translations. Left out, the app follows the default, which is off."),
     ]))
 }
 
@@ -179,9 +209,19 @@ enum SettingExamples {
         [["kind": "deepL", "name": "DeepL", "baseURL": "https://api.deepl.com", "formality": "prefer_more"] as [String: Any]],
     ]
 
-    /// One profile that sets the languages and the paragraph reader for an app.
+    /// One profile with a note, two entries that carry addressing, and a context override.
     static let appProfiles: [Any] = [
-        [["bundleID": "com.example.chat", "appName": "Example Chat", "source": "ja", "target": "en", "paragraphReader": "lineGrouping"] as [String: Any]],
+        [[
+            "bundleID": "com.example.chat", "appName": "Example Chat", "source": "ja", "target": "en", "paragraphReader": "lineGrouping",
+            "note": "Casual chat between two friends. Keep it informal and short.",
+            "entries": [
+                ["src": "田中", "dst": "Tanaka", "kind": "person", "gender": "m", "note": "the speaker's older colleague", "reading": "たなか",
+                 "addressing": [["to": "Hana", "register": "polite"]]] as [String: Any],
+                ["src": "花", "dst": "Hana", "kind": "person", "gender": "f",
+                 "addressing": [["to": "Tanaka", "register": "casual"]]] as [String: Any],
+            ],
+            "context": ["mode": "nearby", "previousLines": 3] as [String: Any],
+        ] as [String: Any]],
     ]
 }
 

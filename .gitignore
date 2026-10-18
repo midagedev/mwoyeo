@@ -7,3 +7,4 @@ Config/Local.xcconfig
 .test.log
 .build.log
 .claude/
+__pycache__/

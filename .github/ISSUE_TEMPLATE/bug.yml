@@ -1,0 +1,34 @@
+name: 버그 신고 · Bug report
+description: 렌즈가 비어 있거나, 번역이 이상하거나, 앱이 멈췄을 때 · An empty lens, a wrong translation, a hang
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        한국어로 써도 되고 영어로 써도 돼요. · Korean or English is fine.
+        화면 내용이 개인 정보라면 스크린숏은 가리고 올려 주세요. · Blur anything private in screenshots.
+  - type: textarea
+    id: what
+    attributes:
+      label: 무슨 일이 있었나요? · What happened?
+      description: 무엇을 했고, 무엇을 기대했고, 실제로 무엇이 보였는지 · What you did, what you expected, what you saw
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Mwoyeo 버전과 macOS 버전 · Mwoyeo and macOS versions
+      description: 설정 › 정보, 그리고  메뉴 › 이 Mac에 관하여 · Settings › About, and  menu › About This Mac
+      placeholder: Mwoyeo 1.1.1, macOS 26.4, M2
+    validations:
+      required: true
+  - type: input
+    id: pair
+    attributes:
+      label: 언어와 번역 엔진 · Languages and engine
+      placeholder: 일본어 → 한국어, Apple
+  - type: textarea
+    id: screen
+    attributes:
+      label: 스크린숏 · Screenshots
+      description: 렌즈가 보이게 찍어 주시면 가장 빨리 고칠 수 있어요 · A capture with the lens in it helps most

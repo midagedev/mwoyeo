@@ -353,6 +353,7 @@ enum UICapture {
             failed += await firstRunChecks()
             failed += SettingsFileChecks.run(model)
             failed += await LensRobustChecks.run(model)
+            failed += await ContextChecks.run()
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
         }
 

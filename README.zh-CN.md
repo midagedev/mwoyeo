@@ -20,7 +20,10 @@
 brew install midagedev/tap/mwoyeo
 ```
 
-<p align="center"><img src="docs/media/hero.zh-CN.gif" width="600" alt="一个小透镜罩在韩语聊天上，只有透镜下的文字原地变成中文。拖动透镜，经过的地方马上翻译；滚动聊天，翻译也紧跟着。最后按 ⌃⌥O，圆环变灰，显示原文。"></p>
+<p align="center">免费 · 开源(MIT) · macOS 26 及以上 · Apple 芯片(M1 及以上) · <a href="https://github.com/midagedev/mwoyeo/releases/latest/download/Mwoyeo-arm64.dmg">直接下载磁盘映像</a></p>
+
+<p align="center"><img src="docs/media/hero.zh-CN.gif" width="600" alt="一个小透镜罩在韩语聊天上，只有透镜下的文字原地变成中文。把透镜拖上去再拖回来，经过的地方马上翻译。"><br>
+<sub><a href="docs/media/hero.zh-CN.full.gif">观看 20 秒完整演示（含滚动、显示原文）</a></sub></p>
 
 Mwoyeo 会识别透镜下的文字，**把原文从画面上抹掉**，再按原来的位置、大小和颜色写上译文。没有弹窗，也没有字幕条，屏幕上直接就是中文（或你设定的其他语言）；新消息进来、页面滚动，翻译也一直跟着走。默认情况下，所有处理都在 Mac 本地完成，屏幕上的内容不会发往任何地方。只有当你自己添加云端翻译引擎时，透镜读到的文字才会发送给该引擎。
 
@@ -30,7 +33,7 @@ Mwoyeo 会识别透镜下的文字，**把原文从画面上抹掉**，再按原
 brew install midagedev/tap/mwoyeo
 ```
 
-也可以到 [Releases](https://github.com/midagedev/mwoyeo/releases/latest) 下载磁盘映像，把 Mwoyeo 拖进“应用程序”文件夹。App 已签名并经过公证。
+也可以直接[下载磁盘映像](https://github.com/midagedev/mwoyeo/releases/latest/download/Mwoyeo-arm64.dmg)，把 Mwoyeo 拖进“应用程序”文件夹。App 已签名并经过公证。
 
 Mwoyeo 每天会到 GitHub 检查一次新版本，有更新时菜单里会提示。用 `brew upgrade mwoyeo` 更新，或者下载新的磁盘映像即可。在“设置 › 关于”里可以手动检查更新、关闭自动检查，也能找到发布说明和问题反馈页面的链接。
 

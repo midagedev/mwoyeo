@@ -20,7 +20,10 @@ Put a lens over a chat, a feed or a game. The original text disappears and the t
 brew install midagedev/tap/mwoyeo
 ```
 
-<p align="center"><img src="docs/media/hero.en.gif" width="600" alt="A small lens over a Korean chat: only the text under it turns English, in place. Dragged around, it translates whatever it passes over; the chat scrolls and the translation keeps up; ⌃⌥O greys the ring and shows the original."></p>
+<p align="center">Free · open source (MIT) · macOS 26 or later · Apple silicon (M1 or later) · <a href="https://github.com/midagedev/mwoyeo/releases/latest/download/Mwoyeo-arm64.dmg">Download the disk image</a></p>
+
+<p align="center"><img src="docs/media/hero.en.gif" width="600" alt="A small lens over a Korean chat: only the text under it turns English, in place. Dragged up and back down, it translates wherever it goes."><br>
+<sub><a href="docs/media/hero.en.full.gif">Watch the full 20-second demo (scrolling, showing the original)</a></sub></p>
 
 Mwoyeo reads the text under a lens, **erases it from the picture**, and paints the translation back in the same
 place, size and colour. It is not a popup or a subtitle bar: the screen simply reads in your language, and keeps
@@ -33,7 +36,7 @@ sent anywhere. Only if you add a cloud translation engine yourself does the text
 brew install midagedev/tap/mwoyeo
 ```
 
-Or download the disk image from [Releases](https://github.com/midagedev/mwoyeo/releases/latest) and drag Mwoyeo to
+Or download [the disk image](https://github.com/midagedev/mwoyeo/releases/latest/download/Mwoyeo-arm64.dmg) and drag Mwoyeo to
 Applications. The app is signed and notarized.
 
 Mwoyeo checks GitHub once a day for a new version and says so in its menu. Update with `brew upgrade mwoyeo`, or

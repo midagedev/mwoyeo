@@ -20,7 +20,10 @@
 brew install midagedev/tap/mwoyeo
 ```
 
-<p align="center"><img src="docs/media/hero.ja.gif" width="600" alt="韓国語のチャットに小さなレンズを重ねると、その下の文字だけがその場で日本語になります。レンズを動かすと通った場所がすぐ翻訳され、スクロールしても翻訳がついてきます。最後に⌃⌥Oでリングがグレーになり、原文が表示されます。"></p>
+<p align="center">無料 · オープンソース(MIT) · macOS 26 以降 · Apple silicon(M1 以降) · <a href="https://github.com/midagedev/mwoyeo/releases/latest/download/Mwoyeo-arm64.dmg">ディスクイメージをダウンロード</a></p>
+
+<p align="center"><img src="docs/media/hero.ja.gif" width="600" alt="韓国語のチャットに小さなレンズを重ねると、その下の文字だけがその場で日本語になります。レンズを上に動かして戻すと、通った場所がすぐ翻訳されます。"><br>
+<sub><a href="docs/media/hero.ja.full.gif">20秒のデモ全編を見る(スクロール、原文表示を含む)</a></sub></p>
 
 Mwoyeoはレンズの下にある文字を読み取り、**元の文字を画面から消して**、同じ位置に同じ大きさと色で訳文を描き直します。ポップアップや字幕バーとは違い、画面そのものが日本語で読めるようになります。新しいメッセージが届いても、ページをスクロールしても、そのまま読み続けられます。デフォルトの設定では処理はすべてMacの中で完結し、画面の内容が外部に送られることはありません。クラウド翻訳エンジンを自分で追加したときに限り、レンズが読み取った文字がそのエンジンに送られます。
 
@@ -30,7 +33,7 @@ Mwoyeoはレンズの下にある文字を読み取り、**元の文字を画面
 brew install midagedev/tap/mwoyeo
 ```
 
-または[Releases](https://github.com/midagedev/mwoyeo/releases/latest)からディスクイメージをダウンロードし、Mwoyeoをアプリケーションフォルダにドラッグしてください。署名済みで、Appleの公証も受けています。
+または[ディスクイメージ](https://github.com/midagedev/mwoyeo/releases/latest/download/Mwoyeo-arm64.dmg)をダウンロードし、Mwoyeoをアプリケーションフォルダにドラッグしてください。署名済みで、Appleの公証も受けています。
 
 Mwoyeoは1日1回GitHubで新しいバージョンを確認し、見つかればメニューでお知らせします。アップデートするには`brew upgrade mwoyeo`を実行するか、新しいディスクイメージをダウンロードしてください。手動での確認や自動確認のオン/オフ、リリースノートと問題報告ページへのリンクは設定 › 情報にあります。
 

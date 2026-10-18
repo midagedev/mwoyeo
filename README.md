@@ -20,7 +20,10 @@
 brew install midagedev/tap/mwoyeo
 ```
 
-<p align="center"><img src="docs/media/hero.ko.gif" width="600" alt="일본어 채팅 한가운데 작은 렌즈. 렌즈 아래 글자만 그 자리에서 한국어로 바뀌어요. 렌즈를 끌고 다니면 지나가는 곳마다 바로 번역되고 스크롤해도 번역이 따라와요. 마지막에 ⌃⌥O를 누르면 링이 회색으로 바뀌며 원문이 보여요."></p>
+<p align="center">무료 · 오픈소스(MIT) · macOS 26 이상 · Apple silicon(M1 이상) · <a href="https://github.com/midagedev/mwoyeo/releases/latest/download/Mwoyeo-arm64.dmg">디스크 이미지 바로 받기</a></p>
+
+<p align="center"><img src="docs/media/hero.ko.gif" width="600" alt="일본어 채팅 한가운데 작은 렌즈. 렌즈 아래 글자만 그 자리에서 한국어로 바뀌어요. 렌즈를 위로 끌었다가 다시 내리면 지나가는 곳마다 바로 번역돼요."><br>
+<sub><a href="docs/media/hero.ko.full.gif">20초 전체 데모 보기 (스크롤, 원문 보기 포함)</a></sub></p>
 
 번역 팝업도, 화면 아래 자막 줄도 없어요. Mwoyeo는 렌즈 아래 글자를 읽어서 **화면에서 지우고** 같은 자리에 같은
 크기와 색으로 번역을 다시 써요. 그래서 원래 한국어로 된 화면을 보는 것처럼 읽히고 새 메시지가 올라오거나
@@ -33,7 +36,7 @@ brew install midagedev/tap/mwoyeo
 brew install midagedev/tap/mwoyeo
 ```
 
-Homebrew를 안 쓴다면 [Releases](https://github.com/midagedev/mwoyeo/releases/latest)에서 디스크 이미지를 받아
+Homebrew를 안 쓴다면 [디스크 이미지](https://github.com/midagedev/mwoyeo/releases/latest/download/Mwoyeo-arm64.dmg)를 받아
 Mwoyeo를 응용 프로그램 폴더로 옮기면 돼요. Apple 공증을 받은 앱이에요.
 
 새 버전은 Mwoyeo가 하루에 한 번 GitHub에서 확인하고 나오면 메뉴에서 알려 줘요. `brew upgrade mwoyeo`를 실행하거나

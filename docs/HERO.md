@@ -74,6 +74,7 @@ ffmpeg -ss 1 -t 20 -i take.mov \
 [v][c0]overlay=(W-w)/2:H-h-50:enable='between(t,0.3,3.0)'[a];[a][c1]overlay=(W-w)/2:H-h-50:enable='between(t,3.1,8.9)'[b];\
 [b][c2]overlay=(W-w)/2:H-h-50:enable='between(t,9.0,15.9)'[c];[c][c3]overlay=(W-w)/2:H-h-50:enable='gte(t,16.0)',format=yuv420p" \
   -c:v libx264 -crf 16 cut.mp4
+# README hero: the first 8.6 s of the GIF (lens up and back; a clean loop); the full take is hero.<lang>.full.gif
 ffmpeg -i cut.mp4 -vf "fps=12,scale=600:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse=dither=sierra2_4a" \
   docs/media/hero.ko.gif
 ```

@@ -72,6 +72,13 @@ run x "$NEW" e5rt chat.png en 90
 n=$(arrows "$OUT/x.out"); f=$(count "$OUT/x.out" ocr.fallback.notready); ft=$(/usr/bin/log show --start "$since" --predicate 'eventMessage CONTAINS "document OCR failed"' 2>/dev/null | grep -c 'document OCR failed:')
 [ "$n" -ge 27 ] && [ "$ft" -eq 0 ]; verdict $? "8 chat.png en>ko, MWOYEO_FAKE_OCR=e5rt: >=27 arrows (29 on revision 3, 30 on revision 2), no 'document OCR failed'" "arrows=$n notready-fallbacks=$f failed-lines=$ft wall=$(cat $OUT/x.s)s"
 
+# A pass that fails on "programs not ready" (2026-10-18, rc 1.1.1): Japanese has no revision 2, so revision 3's e5rtError ends the
+# pass. It must leave the still picture unread and read it again after the 1 s backoff; before, the frame counted as read and a
+# still lens stayed empty until its pixels changed (measured on 7ad1e24: 0 arrows; fixed: 19).
+run y "$NEW" e5rt:3 article.png ja 300
+n=$(arrows "$OUT/y.out"); f=$(count "$OUT/y.out" ocr.failed_pass.notready)
+[ "$n" -ge 10 ] && [ "$f" -ge 1 ]; verdict $? "9 article.png ja>ko, MWOYEO_FAKE_OCR=e5rt:3: a pass failed on programs not ready, then >=10 arrows" "arrows=$n notready-passes=$f wall=$(cat $OUT/y.s)s"
+
 # Paragraphs (ParagraphGrouper): the three-line body paragraph of article.png is one block, and the two centred subtitle lines
 # of sub-mid.png are one block.
 if [ -f "$SP/in/article.png" ] && [ -f "$SP/in/sub-mid.png" ]; then

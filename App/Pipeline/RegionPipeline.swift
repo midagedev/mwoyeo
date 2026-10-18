@@ -780,11 +780,9 @@ actor RegionPipeline {
         } catch {
             log.error("fast OCR failed: \(String(describing: error), privacy: .public)")
             Trace.mark("fast: OCR failed \(error)", since: t)
-            // A stuck request is retried; any other failure would just fail again on the same pixels.
-            if !(error is TextRecognizer.Timeout) {
-                noteReadFailure(error)
-                _ = finishPass(start, frame: frame)
-            }
+            // A stuck request is retried, and so is a transient (after its backoff); any other failure would just fail again
+            // on the same pixels.
+            if !(error is TextRecognizer.Timeout), noteReadFailure(error) { _ = finishPass(start, frame: frame) }
             return
         }
         readBackoff.success()
@@ -857,7 +855,7 @@ actor RegionPipeline {
             log.error("document OCR failed: \(String(describing: error), privacy: .public)")
             Trace.mark("seamless: OCR failed \(error)", since: t)
             if error is TextRecognizer.Timeout { return false }
-            noteReadFailure(error)
+            guard noteReadFailure(error) else { return false }
             _ = finishPass(start, frame: frame)
             return true
         }
@@ -901,12 +899,15 @@ actor RegionPipeline {
     }
 
     /// A failed pass delays the next read (`ReadBackoff`); "programs not ready" is a transient of the system's recognizer
-    /// (OCRHealth) and only waits a second, so the minute of it after an update or a heavy compile does not pile up.
-    private func noteReadFailure(_ error: Error) {
+    /// (OCRHealth) and only waits a second, so the minute of it after an update or a heavy compile does not pile up. True when
+    /// the frame counts as read (a lasting failure: the same pixels would fail again); a transient leaves it unread, so a still
+    /// picture is read again once the backoff ends instead of staying empty until something on it changes.
+    private func noteReadFailure(_ error: Error) -> Bool {
         let transient = OCRHealth.programsNotReady(error)
         let wait = readBackoff.failure(now: ProcessInfo.processInfo.systemUptime, transient: transient)
         Trace.count(transient ? "ocr.failed_pass.notready" : "ocr.failed_pass")
         Trace.mark("ocr: failed pass \(readBackoff.failures), next read in \(Int(wait)) s", since: Trace.now)
+        return !transient
     }
 
     /// Vertical text (tategaki, manga balloons) is not read yet: its lines come back as tall narrow boxes. Nothing on

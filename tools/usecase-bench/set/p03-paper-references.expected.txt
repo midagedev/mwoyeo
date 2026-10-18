@@ -1,0 +1,7 @@
+References
+[1] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. Kaiser, and I. Polosukhin. Attention is all you need. In Advances in Neural Information Processing Systems, pages 5998-6008, 2017.
+[2] K. He, X. Zhang, S. Ren, and J. Sun. Deep residual learning for image recognition. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 770-778, 2016.
+[3] R. Smith. An overview of the Tesseract OCR engine. In Ninth International Conference on Document Analysis and Recognition, volume 2, pages 629-633, 2007.
+[4] Y. Baek, B. Lee, D. Han, S. Yun, and H. Lee. Character region awareness for text detection. In CVPR, pages 9365-9374, 2019.
+2 The authors contributed equally to this work.
+3 Corresponding author.

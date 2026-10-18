@@ -116,18 +116,47 @@ struct TranslationSettings: View {
         Binding(get: { EngineSelection(model.settings) }, set: { model.select($0) })
     }
 
+    /// The paragraph reader remembered for one app; nil follows the default (Automatic).
+    private func readerChoice(for p: AppProfile) -> Binding<ParagraphReader?> {
+        Binding(get: { model.profile(for: p.bundleID)?.paragraphReader },
+                set: { choice in
+                    guard var updated = model.profile(for: p.bundleID) else { return }
+                    updated.paragraphReader = choice
+                    model.remember(updated)
+                })
+    }
+
+    /// The languages, and the paragraph reader only when it is not the automatic one.
+    private func profileDetail(_ p: AppProfile) -> String {
+        let pair = "\(Languages.name(p.source)) → \(Languages.name(p.target))"
+        guard let reader = p.paragraphReader, reader != .automatic else { return pair }
+        return "\(pair) · \(reader.title)"
+    }
+
     /// Languages remembered per app (from a lens's menu); the group exists only once there is one.
     private var appProfiles: some View {
         Section {
             ForEach(model.settings.appProfiles) { p in
                 LabeledContent {
-                    Button { model.forgetProfile(p.bundleID) } label: { Image(systemName: "minus.circle") }
-                        .buttonStyle(.borderless)
-                        .help("Forget languages for \(p.appName)")
+                    // The rarely needed choices stay behind ⋯, as on the added engine rows.
+                    Menu {
+                        Picker("Paragraphs", selection: readerChoice(for: p)) {
+                            Text("Automatic").tag(ParagraphReader?.none)
+                            ForEach(ParagraphReader.allCases.filter { $0 != .automatic }, id: \.self) { Text($0.title).tag(ParagraphReader?.some($0)) }
+                        }
+                        Divider()
+                        Button("Forget This App", role: .destructive) { model.forgetProfile(p.bundleID) }
+                    } label: { Image(systemName: "ellipsis.circle") }
+                        .menuStyle(.borderlessButton)
+                        .menuIndicator(.hidden)
+                        .foregroundStyle(.secondary)
+                        .fixedSize()
+                        .help("More actions for \(p.appName)")
+                        .accessibilityLabel("More actions for \(p.appName)")
                 } label: {
                     VStack(alignment: .leading) {
                         Text(p.appName)
-                        Text("\(Languages.name(p.source)) → \(Languages.name(p.target))").font(.caption).foregroundStyle(.secondary)
+                        Text(profileDetail(p)).font(.caption).foregroundStyle(.secondary)
                     }
                 }
             }
@@ -589,6 +618,16 @@ private struct SpeedLine: View {
                 Text("First result \(String(format: "%.1f", s.seconds)) s · \(Int((s.fromMemory * 100).rounded()))% from memory")
                     .font(.caption).foregroundStyle(.secondary)
             }
+        }
+    }
+}
+
+extension ParagraphReader {
+    var title: String {
+        switch self {
+        case .automatic: String(localized: "Automatic")
+        case .documentLayout: String(localized: "Document layout")
+        case .lineGrouping: String(localized: "Line grouping")
         }
     }
 }

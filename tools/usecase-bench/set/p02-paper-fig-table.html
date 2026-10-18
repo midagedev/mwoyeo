@@ -1,0 +1,15 @@
+<!doctype html><meta charset=utf-8><style>body{margin:0;background:#fff;color:#111;font:13px/1.35 "Times New Roman",Times,serif}
+.pg{padding:46px 52px;width:860px;box-sizing:border-box}
+h1{font-size:22px;text-align:center;margin:0 0 8px;line-height:1.2}.au{text-align:center;font-size:13px;margin:4px 0}
+.ab{margin:14px 30px;font-size:12px}.cols{column-count:2;column-gap:26px;text-align:justify;hyphens:manual}
+h2{font-size:14px;margin:10px 0 4px}p{margin:0 0 7px}.eq{text-align:center;margin:8px 0;font-style:italic}
+.cap{font-size:11.5px;margin:4px 0 10px}.fn{font-size:10.5px;border-top:1px solid #000;margin-top:10px;padding-top:4px;width:40%}
+table{border-collapse:collapse;font-size:12px;margin:6px auto}td,th{padding:3px 10px;border-top:1px solid #000;border-bottom:1px solid #000;text-align:center}
+.ref{font-size:11.5px;padding-left:22px;text-indent:-22px;margin-bottom:5px}</style><div class=pg><div class=cols><h2>4. Experiments</h2>
+<p>Figure 2 shows the latency of each stage on a typical page. Recognition dominates, while grouping adds less than one millisecond.</p>
+<div style="height:150px;border:1px solid #444;background:linear-gradient(90deg,#ddd 0 20%,#999 20% 55%,#555 55% 70%,#bbb 70%);position:relative"><span style="position:absolute;left:8px;top:6px;font:11px Helvetica">OCR</span><span style="position:absolute;left:30%;top:6px;font:11px Helvetica;color:#fff">Translate</span><span style="position:absolute;left:62%;top:6px;font:11px Helvetica;color:#fff">Draw</span></div>
+<div class=cap><b>Figure 2.</b> Latency breakdown per stage for a news article page.</div>
+<p>Table 1 lists accuracy on three data sets. Our grouper improves paragraph F1 on every set.</p>
+<table><tr><th>Method</th><th>News</th><th>Chat</th><th>Papers</th></tr><tr><td>Baseline</td><td>0.81</td><td>0.74</td><td>0.69</td></tr><tr><td>Ours</td><td>0.93</td><td>0.88</td><td>0.85</td></tr></table>
+<div class=cap><b>Table 1.</b> Paragraph F1 on three data sets.</div>
+<h2>5. Conclusion</h2><p>We showed that a simple layout rule is enough to translate a whole page in under a second.</p></div></div>

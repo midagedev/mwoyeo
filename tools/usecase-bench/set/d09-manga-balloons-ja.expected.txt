@@ -1,0 +1,5 @@
+まだ起きないの？
+あと五分だけ…
+遅刻するよ！
+わかったってば
+(each balloon is one unit; reading order right to left, top to bottom)

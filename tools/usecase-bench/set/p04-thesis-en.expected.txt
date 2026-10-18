@@ -1,0 +1,6 @@
+Chapter 3. Related Work
+3.1 Optical character recognition
+Early systems relied on hand-crafted features and template matching, which limited them to a small number of fonts. Neural approaches replaced these features with learned representations and now reach human accuracy on clean print.
+However, text in games and video differs from print in several ways: fonts are stylized, backgrounds are noisy, and lines are often very short. These properties motivate the layout-aware grouping we propose in Chapter 4.
+3.2 Machine translation
+Neural machine translation translates whole sentences, so the quality of a translation depends on whether a sentence reaches the model intact.

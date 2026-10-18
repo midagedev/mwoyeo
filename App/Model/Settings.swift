@@ -133,6 +133,8 @@ struct AppSettings: Codable, Equatable {
     var exportFolder = ("~/Documents/Mwoyeo" as NSString).expandingTildeInPath
     /// Languages (and engine) remembered per app; the app in front decides which applies (see `effective`).
     var appProfiles: [AppProfile] = []
+    /// How text is cut into paragraphs, unless an app's profile says otherwise.
+    var paragraphReader = ParagraphReader.automatic
 
     /// The settings that translate while the app `frontmost` is in front: this app's profile over the base choice.
     func effective(frontmost: String?) -> AppSettings {
@@ -183,6 +185,7 @@ struct AppSettings: Codable, Equatable {
         savesTranscripts = try c.decodeIfPresent(Bool.self, forKey: .savesTranscripts) ?? d.savesTranscripts
         exportFolder = try c.decodeIfPresent(String.self, forKey: .exportFolder) ?? d.exportFolder
         appProfiles = ((try? c.decodeIfPresent([Lossy<AppProfile>].self, forKey: .appProfiles)) ?? nil)?.compactMap(\.value) ?? d.appProfiles
+        paragraphReader = (try? c.decodeIfPresent(ParagraphReader.self, forKey: .paragraphReader)) ?? d.paragraphReader
     }
 }
 

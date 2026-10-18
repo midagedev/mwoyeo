@@ -1,0 +1,11 @@
+4. Experiments
+Figure 2 shows the latency of each stage on a typical page. Recognition dominates, while grouping adds less than one millisecond.
+OCR Translate Draw (figure labels, optional)
+Figure 2. Latency breakdown per stage for a news article page.
+Table 1 lists accuracy on three data sets. Our grouper improves paragraph F1 on every set.
+Method News Chat Papers (table header row)
+Baseline 0.81 0.74 0.69 (row)
+Ours 0.93 0.88 0.85 (row)
+Table 1. Paragraph F1 on three data sets.
+5. Conclusion
+We showed that a simple layout rule is enough to translate a whole page in under a second.

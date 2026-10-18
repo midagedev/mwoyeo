@@ -86,6 +86,11 @@ enum UICapture {
         private func scenario(_ name: String) async {
             switch name {
             case "translation-default": await shoot(name, TranslationSettings(), CGSize(width: 560, height: 760))
+            case "translation-profiles":
+                model.settings.appProfiles = [AppProfile(bundleID: "com.apple.Safari", appName: "Safari", source: "ja", target: "en"),
+                                              AppProfile(bundleID: "com.example.vn", appName: "Visual Novel", source: "ja", target: "en", paragraphReader: .lineGrouping)]
+                await shoot(name, TranslationSettings(), CGSize(width: 560, height: 1300))
+                model.settings.appProfiles = []
             case "general-saving": await shoot(name, GeneralSettings(), CGSize(width: 560, height: 800))
             case "menu-default": await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
             case "translation-engines":

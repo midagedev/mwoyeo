@@ -94,29 +94,86 @@ enum TextRecognizer {
     /// Paragraph-level recognition. Priority: Swift document model (`RecognizeDocumentsRequest`, once the gate says its model is
     /// loaded for these languages) > VN revision 3 + `ParagraphGrouper` > revision 2 > `.fast` > issue (`accurate`). A document read
     /// that has not answered in `documentDeadline` falls back to VN for that read, and the key waits for a retry (`SwiftVisionGate.missed`).
-    static func blocks(in image: CGImage, roi: CGRect? = nil, languages: [Locale.Language], customWords: [String] = []) async throws -> [OCRBlock] {
+    /// `plan` says which paragraph reader the lens wants (`ParagraphReader`): `lineGrouping` never asks the document model, and
+    /// `automatic` reads the lines with VN first and lets `ReaderDecider` pick from their layout.
+    static func blocks(in image: CGImage, roi: CGRect? = nil, languages: [Locale.Language], customWords: [String] = [],
+                       plan: ReaderPlan? = nil) async throws -> [OCRBlock] {
         Trace.count("ocr.blocks")
         let key = key(languages)
-        if ocrPath != .vn {
+        let wanted: ParagraphReader = switch ocrPath {
+        case .vn: .lineGrouping
+        case .swift: .documentLayout
+        case nil: plan?.setting ?? .automatic
+        }
+        var read: [OCRLine]?
+        if wanted != .lineGrouping {
             if gate.withLock({ $0.want(key) }) { publishAndRun() }
             if gate.withLock({ $0.isReady(key) }) {
-                do {
-                    let found = try await deadline(seconds: documentDeadline) { try await swiftBlocks(in: image, roi: roi, languages: languages, customWords: customWords) }
-                    Trace.count("ocr.blocks.swift")
-                    Trace.count("ocr.blocks.lines", found.reduce(0) { $0 + $1.lines.count })
-                    return found
-                } catch is Timeout {
-                    Trace.count("ocr.swift.missed")
-                    log.error("document recognition did not answer in \(Int(documentDeadline)) s, reading with VN")
-                    gate.withLock { $0.missed(key) }
-                    publish()
-                } catch {
-                    log.error("document recognition failed: \(String(describing: error), privacy: .public), reading with VN")
+                var reader = wanted
+                // Automatic with the document model already held: its own lines are the layout evidence, so the frame is read
+                // once, not twice (VN first cost ~0.2 s more per subtitle frame, usecase-bench 2026-10-18).
+                if wanted == .automatic, let plan, plan.held == .documentLayout {
+                    let t = Trace.now
+                    do {
+                        let found = try await deadline(seconds: documentDeadline) { try await swiftBlocks(in: image, roi: roi, languages: languages, customWords: customWords) }
+                        let lines = found.flatMap(\.lines)
+                        let (_, why) = plan.decide(lines: lines.map(\.rect), texts: lines.map(\.text),
+                                                   size: CGSize(width: image.width, height: image.height), partial: roi != nil)
+                        Trace.count("ocr.reader.auto.held")
+                        Trace.mark(why + " (document lines)", since: t)
+                        Trace.count("ocr.blocks.swift")
+                        Trace.count("ocr.blocks.lines", lines.count)
+                        return found
+                    } catch is Timeout {
+                        Trace.count("ocr.swift.missed")
+                        log.error("document recognition did not answer in \(Int(documentDeadline)) s, reading with VN")
+                        gate.withLock { $0.missed(key) }
+                        publish()
+                    } catch {
+                        log.error("document recognition failed: \(String(describing: error), privacy: .public), reading with VN")
+                    }
+                    reader = .lineGrouping
+                } else if wanted == .automatic {
+                    let t = Trace.now
+                    // VN not answering must not stop the read: the document model does not need its lines.
+                    let seen: [OCRLine]
+                    do { seen = try await accurate(in: image, roi: roi, languages: languages, customWords: customWords) } catch {
+                        Trace.count("ocr.reader.auto.vnfailed")
+                        Trace.mark("reader auto → documentLayout: lines not read (\(error))", since: t)
+                        seen = []
+                    }
+                    read = seen.isEmpty ? nil : seen
+                    let size = CGSize(width: image.width, height: image.height)
+                    let rects = seen.map(\.rect)
+                    let (chosen, why) = seen.isEmpty ? (.documentLayout, "reader auto → documentLayout: no lines") : plan?.decide(lines: rects, texts: seen.map(\.text), size: size, partial: roi != nil)
+                        ?? (.documentLayout, "reader auto → documentLayout: no plan")
+                    reader = chosen
+                    Trace.count("ocr.reader.auto." + chosen.rawValue)
+                    Trace.mark(why, since: t)
+                    if Trace.lineDump {
+                        Trace.mark("reader lines \(size.width)x\(size.height) " + rects.map { "[\(Int($0.minX)),\(Int($0.minY)),\(Int($0.width)),\(Int($0.height))]" }.joined(), since: t)
+                    }
+                }
+                if reader == .documentLayout {
+                    do {
+                        let found = try await deadline(seconds: documentDeadline) { try await swiftBlocks(in: image, roi: roi, languages: languages, customWords: customWords) }
+                        Trace.count("ocr.blocks.swift")
+                        Trace.count("ocr.blocks.lines", found.reduce(0) { $0 + $1.lines.count })
+                        return found
+                    } catch is Timeout {
+                        Trace.count("ocr.swift.missed")
+                        log.error("document recognition did not answer in \(Int(documentDeadline)) s, reading with VN")
+                        gate.withLock { $0.missed(key) }
+                        publish()
+                    } catch {
+                        log.error("document recognition failed: \(String(describing: error), privacy: .public), reading with VN")
+                    }
                 }
             }
         }
         Trace.count("ocr.blocks.vn")
-        let lines = try await accurate(in: image, roi: roi, languages: languages, customWords: customWords)
+        let lines: [OCRLine]
+        if let read { lines = read } else { lines = try await accurate(in: image, roi: roi, languages: languages, customWords: customWords) }
         Trace.count("ocr.blocks.lines", lines.count)
         return ParagraphGrouper.groups(lines, rect: \.rect, text: \.text).map(makeBlock)
     }

@@ -76,7 +76,7 @@ final class RegionSession {
         let capture = Self.overscan(config.rect, wide: false)
         self.capture = capture
         let tap = SnapshotTap()
-        pipeline = RegionPipeline(options: PipelineOptions(settings), capture: capture, translator: translator,
+        pipeline = RegionPipeline(options: PipelineOptions(settings, lensApp: AppModel.readerContext(for: config)), capture: capture, translator: translator,
                                   inpainter: inpainter, onSnapshot: { snapshot in Task { @MainActor in panel.apply(snapshot); tap.handler?(snapshot) } })
         capturer.onFrame = { [pipeline] frame in Task { await pipeline.ingest(frame) } }
         capturer.onStop = { [weak self] error in Task { @MainActor in self?.captureStopped(error) } }
@@ -137,7 +137,7 @@ final class RegionSession {
         }
         chrome.setDetail(Self.languagePair(settings), badge: settings.activeEngineConfig?.badgeSymbol)
         chrome.setStyle(settings.lensStyle)
-        await pipeline.update(options: PipelineOptions(settings))
+        await pipeline.update(options: PipelineOptions(settings, lensApp: AppModel.readerContext(for: config)))
         if settings.framesPerSecond != fps {
             fps = settings.framesPerSecond
             try? await capturer.update(rect: capture, fps: fps)
@@ -163,6 +163,12 @@ final class RegionSession {
             return
         }
         onConfigChange?(config)
+    }
+
+    /// The app under the lens changed (dropped on another window, followed another): the pipeline's options carry it.
+    private func refreshReaderContext() {
+        let options = PipelineOptions(settings, lensApp: AppModel.readerContext(for: config))
+        Task { [pipeline] in await pipeline.update(options: options) }
     }
 
     private func follow(_ w: WindowInfo?) {
@@ -363,6 +369,7 @@ final class RegionSession {
         // A window lens follows whichever window it was dropped on (off every window, it stays where it is).
         // A screen lens stays pinned.
         if config.anchor != nil { follow(windowUnderLens()) }
+        refreshReaderContext()
         onConfigChange?(config)
         updateEmphasis(NSEvent.mouseLocation)
     }

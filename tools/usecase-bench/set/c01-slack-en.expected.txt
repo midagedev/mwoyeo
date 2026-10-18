@@ -1,0 +1,12 @@
+# general
+Priya Shah 10:42 AM
+Morning all! The release candidate is ready for testing.
+Tom Becker 10:45 AM
+Great, I will start with the payment flow. Can someone share the staging credentials?
+3 replies
+Yuki Tanaka 10:51 AM
+Posted them in the vault. Please check https://wiki.example.com/rc-notes before you begin.
+Priya Shah 11:03 AM
+Found a bug in checkout: the coupon field clears itself when you switch tabs. Filing a ticket now.
+Tom Becker 11:10 AM
+Confirmed, I can reproduce it on Safari too.

@@ -129,7 +129,7 @@ enum TextRecognizer {
                         Trace.count("ocr.swift.missed")
                         log.error("document recognition did not answer in \(Int(documentDeadline)) s, reading with VN")
                         gate.withLock { $0.missed(key) }
-                        publish()
+                        publishAndRun()
                     } catch {
                         if OCRHealth.programsNotReady(error) { Trace.count("ocr.swift.notready") }
                         log.error("document recognition failed: \(String(describing: error), privacy: .public), reading with VN")
@@ -166,7 +166,7 @@ enum TextRecognizer {
                         Trace.count("ocr.swift.missed")
                         log.error("document recognition did not answer in \(Int(documentDeadline)) s, reading with VN")
                         gate.withLock { $0.missed(key) }
-                        publish()
+                        publishAndRun()
                     } catch {
                         if OCRHealth.programsNotReady(error) { Trace.count("ocr.swift.notready") }
                         log.error("document recognition failed: \(String(describing: error), privacy: .public), reading with VN")
@@ -395,8 +395,8 @@ enum TextRecognizer {
     /// The initialization, at every launch: for the key of `languages`, `SwiftVisionGate.Step`s in order, in the background and to
     /// completion (a load is never cancelled): revision 3 on a drawn wide line (given the cold allowance; reads that come meanwhile
     /// do not queue behind it unless nothing else can read their language), then the Swift document model, then the Swift text
-    /// model. A failed step is not retried here: the next launch or `retry()` does. Tells the user nothing (`VisionSetup` is what
-    /// a screen reads).
+    /// model. A failed step is not retried here: the next launch or `retry()` does (a first missed document deadline is not a
+    /// failure: `SwiftVisionGate.missed`). Tells the user nothing (`VisionSetup` is what a screen reads).
     static func warmUp(languages: [Locale.Language] = []) async {
         gate.withLock { $0.want(key(languages)) }
         await runSteps()
@@ -428,16 +428,9 @@ enum TextRecognizer {
         guard let picture = probePicture else { throw Stalled() }
         switch due.step {
         case .textModel:
-            // "Programs not ready" is a transient (OCRHealth): ask again every few seconds, within the cold allowance.
-            let began = Trace.now
-            while true {
-                do {
-                    _ = try await tracked(OCRHealth.coldWait) {
-                        try visionRead(in: picture, roi: nil, level: .accurate, revision: 3, customWords: []) { _ in [] }
-                    }
-                    return
-                } catch where OCRHealth.programsNotReady(error) && Trace.now - began < OCRHealth.coldWait {
-                    try await Task.sleep(for: .seconds(OCRHealth.notReadyRetryEvery))
+            try await askingAgainWhileNotReady {
+                _ = try await tracked(OCRHealth.coldWait) {
+                    try visionRead(in: picture, roi: nil, level: .accurate, revision: 3, customWords: []) { _ in [] }
                 }
             }
         case .documentModel, .swiftTextModel:
@@ -455,6 +448,20 @@ enum TextRecognizer {
 
     private struct ChildFailure: Error, CustomStringConvertible { let message: String; var description: String { message } }
 
+    /// "Programs not ready" is a transient (OCRHealth): a model load asks again every few seconds, within the cold allowance.
+    private static func askingAgainWhileNotReady(_ load: () async throws -> Void) async throws {
+        let began = Trace.now
+        while true {
+            do {
+                try await load()
+                return
+            } catch where OCRHealth.programsNotReady(error) && Trace.now - began < OCRHealth.coldWait {
+                Trace.count("ocr.setup.notready")
+                try await Task.sleep(for: .seconds(OCRHealth.notReadyRetryEvery))
+            }
+        }
+    }
+
     /// Loads the Swift model of `step` for `key` on the drawn picture (the app's own load, and the child's).
     static func loadSwiftModel(step: SwiftVisionGate.Step, key: String) async throws {
         guard let picture = probePicture else { throw Stalled() }
@@ -463,12 +470,14 @@ enum TextRecognizer {
         case .textModel:
             break
         case .documentModel:
-            _ = try await swiftBlocks(in: picture, roi: nil, languages: languages, customWords: [])
+            try await askingAgainWhileNotReady {
+                _ = try await swiftBlocks(in: picture, roi: nil, languages: languages, customWords: [])
+            }
         case .swiftTextModel:
             var req = RecognizeTextRequest()
             req.recognitionLevel = .accurate
             if languages.isEmpty { req.automaticallyDetectsLanguage = true } else { req.recognitionLanguages = languages }
-            _ = try await req.perform(on: picture)
+            try await askingAgainWhileNotReady { _ = try await req.perform(on: picture) }
         }
     }
 

@@ -48,6 +48,8 @@ public struct SwiftVisionGate: Sendable, Equatable {
     private var wanted: [String] = []
     private var states: [String: [Step: StepState]] = [:]
     private var lastDone: TimeInterval?
+    /// Document reads per key that missed their deadline after the key was ready.
+    private var misses: [String: Int] = [:]
     /// The step that runs, nil if none.
     public private(set) var running: Due?
     /// The running Swift step is being compiled by a child process (the app's own executable), not in this process.
@@ -124,11 +126,13 @@ public struct SwiftVisionGate: Sendable, Equatable {
         }
     }
 
-    /// A document read for a ready key missed its deadline: the key is not ready until a retry (the next launch or `retry()`
-    /// loads it again). The abandoned request is not cancelled.
+    /// A document read for a ready key missed its deadline: the key is not ready until its document model loads again. The first
+    /// miss makes the step due again with no issue (a cold first run can miss once while the system compiles); a second fails it
+    /// until a retry (the next launch or `retry()`). The abandoned request is not cancelled.
     public mutating func missed(_ key: String) {
         guard !everyKey, case .done = states[key]?[.documentModel] else { return }
-        states[key]?[.documentModel] = .failed("no answer in time")
+        misses[key, default: 0] += 1
+        states[key]?[.documentModel] = misses[key] == 1 ? .pending : .failed("no answer in time")
         lastDone = nil
     }
 

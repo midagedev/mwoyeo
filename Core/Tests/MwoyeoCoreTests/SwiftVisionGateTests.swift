@@ -88,15 +88,30 @@ import Testing
         #expect(g.steps[.textModel] == .done(seconds: 1))
     }
 
-    @Test func aMissedDeadlineTakesAReadyKeyBackUntilRetry() {
+    @Test func aFirstMissedDeadlineLoadsTheKeyAgainWithoutAnIssue() {
         var g = G()
         g.want("ja")
         _ = runAll(&g, from: 0, each: 1)
         #expect(g.isReady("ja"))
         g.missed("ja")
         #expect(!g.isReady("ja"))
+        #expect(g.nextDue() == G.Due(key: "ja", step: .documentModel))
+        #expect(g.steps[.documentModel] == .pending)
+        #expect(!g.shouldShowProgress(now: 10))
+        _ = runAll(&g, from: 10, each: 1)
+        #expect(g.isReady("ja"))
+    }
+
+    @Test func aSecondMissedDeadlineTakesTheKeyBackUntilRetry() {
+        var g = G()
+        g.want("ja")
+        _ = runAll(&g, from: 0, each: 1)
+        g.missed("ja")
+        _ = runAll(&g, from: 10, each: 1)
+        g.missed("ja")
+        #expect(!g.isReady("ja"))
         #expect(g.nextDue() == nil)
-        #expect(g.shouldShowProgress(now: 10))
+        #expect(g.shouldShowProgress(now: 20))
         g.retry()
         #expect(g.nextDue() == G.Due(key: "ja", step: .documentModel))
     }

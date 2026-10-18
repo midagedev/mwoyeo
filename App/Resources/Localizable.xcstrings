@@ -21085,6 +21085,22 @@
         }
       }
     },
+    "Translation is slow (%@) — retrying": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Translation is slow (%@) — retrying"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Translation is slow (%@) — retrying"
+          }
+        }
+      }
+    },
     "Translation is taking too long. Trying again shortly.": {
       "localizations": {
         "ko": {
@@ -21151,6 +21167,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Переклад триває надто довго. Незабаром буде нова спроба."
+          }
+        }
+      }
+    },
+    "Translation isn’t answering (%@)": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Translation isn’t answering (%@)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Translation isn’t answering (%@)"
           }
         }
       }

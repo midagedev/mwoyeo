@@ -28,6 +28,7 @@ final class RegionSession {
     /// Where the capture's frames go (the check-logic harness feeds it).
     var frameSink: (@Sendable (CapturedFrame) -> Void)? { capturer.onFrame }
     private let pipeline: RegionPipeline
+    private let translator: TranslationService
     private let panel: OverlayPanel
     private let chrome: RegionFrameWindow
     private var fps: Double
@@ -40,6 +41,12 @@ final class RegionSession {
     private var captureFailure: CaptureFailure?
     /// "Already in <language>" waits for two reads that agree (`TargetLanguageStreak`).
     private var targetStreak = TargetLanguageStreak()
+    /// "Translation isn't answering" waits for two failed groups in a row, none translated, after this lens read text (`TranslationWait`).
+    private var translationWait = TranslationWait()
+    /// This lens's listener on the translator's batches (`TranslationService.observe`), for `translationWait`.
+    private var outcomeObserver: UUID?
+    /// Takes the hint down when its failures are too old to count, if no newer one comes first (`TranslationWait.lapse`).
+    private var troubleClock: Timer?
     /// What the pill says now instead of the languages (`LensHint`).
     private(set) var shownHint: LensHint?
     /// The followed window was seen alive in this session (so its ID is not just stale from a relaunch).
@@ -103,6 +110,7 @@ final class RegionSession {
     init(config: RegionConfig, settings: AppSettings, translator: TranslationService, inpainter: Inpainter?,
          capturer: any ScreenCapturing = RegionCapturer(), recovery: CaptureRecoveryPolicy = .standard) {
         self.capturer = capturer
+        self.translator = translator
         self.policy = recovery
         self.config = config
         self.fps = settings.framesPerSecond
@@ -137,6 +145,7 @@ final class RegionSession {
         await pipeline.setMotionHandler { [weak self] in Task { @MainActor in self?.noteMotion() } }
         await pipeline.setScrollHandler { [weak self] r in Task { @MainActor in self?.scrolled(r) } }
         await pipeline.setReadHandler { [weak self] tally in Task { @MainActor in self?.read(tally) } }
+        outcomeObserver = await translator.observe { [weak self] event in Task { @MainActor in self?.translationEvent(event) } }
         panel.prediction = { [weak self] since, now in self?.predictedScroll(since: since, now: now) }
         await pipeline.setVisible(config.rect)
         panel.orderFrontRegardless()
@@ -178,6 +187,10 @@ final class RegionSession {
     func stop() async {
         stopped = true
         recovering = false
+        if let id = outcomeObserver { await translator.stopObserving(id) }
+        outcomeObserver = nil
+        troubleClock?.invalidate()
+        troubleClock = nil
         recoveryTask?.cancel()
         displayTask?.cancel()
         trackTimer?.invalidate()
@@ -216,6 +229,8 @@ final class RegionSession {
         chrome.setDetail(Self.languagePair(settings), badge: settings.activeEngineConfig?.badgeSymbol)
         chrome.setAppearance(settings)
         if settings.sourceLanguage != before.sourceLanguage || settings.targetLanguage != before.targetLanguage { targetStreak.reset() }
+        // What failed before says nothing about another engine or pair.
+        if lensPair(before) != lensPair(settings) || settings.engine != before.engine { translationWait.reset() }
         refreshHint()
         await pipeline.update(options: PipelineOptions(settings, lensApp: AppModel.readerContext(for: config)))
         if settings.framesPerSecond != fps {
@@ -226,6 +241,7 @@ final class RegionSession {
 
     func refresh() async {
         targetStreak.reset()
+        translationWait.reset()
         refreshHint()
         await pipeline.refresh()
     }
@@ -407,7 +423,8 @@ final class RegionSession {
         var signals = LensSignals(screen: .init(allowed: model.hasScreenPermission, failure: captureFailure),
                                   recognitionPreparing: model.recognitionPreparing,
                                   showsTranslations: lastSnapshot?.blocks.isEmpty == false,
-                                  alreadyInTarget: targetStreak.shown ? settings.targetLanguage : nil)
+                                  alreadyInTarget: targetStreak.shown ? settings.targetLanguage : nil,
+                                  translation: translationWait.trouble(at: ProcessInfo.processInfo.systemUptime))
         // The translator's issue is for whatever pair it last failed on: it counts for a lens that translates that pair.
         if case let .languagePackMissing(source, target)? = model.issue, Self.sameLanguage(target, settings.targetLanguage),
            settings.sourceLanguage == "auto" || Self.sameLanguage(source, settings.sourceLanguage) {
@@ -419,10 +436,28 @@ final class RegionSession {
     /// Puts the one line the lens has (`LensSignals.hint`) on the pill.
     func refreshHint() {
         let hint = hintSignals().hint()
+        watchTroubleLapse()
         guard hint != shownHint else { return }
         shownHint = hint
         chrome.setHint(hint.map(LensHintText.line), actionable: hint?.action != nil, forcesTab: hint?.showsTabAlways ?? false)
         if let hint { Trace.count("lens.hint.\(Self.counterName(hint))") }
+    }
+
+    /// What this lens translates now, as the translator's batches are matched to it (`TranslationRoute.serves`).
+    private func lensPair(_ s: AppSettings) -> LensPair {
+        LensPair(source: s.sourceLanguage, target: s.targetLanguage, engine: s.activeEngineConfig?.id)
+    }
+
+    /// One look at the hint when the failures behind it stop counting; a newer failure moves that time on.
+    private func watchTroubleLapse() {
+        troubleClock?.invalidate()
+        troubleClock = nil
+        guard let due = translationWait.lapse else { return }
+        let wait = due - ProcessInfo.processInfo.systemUptime
+        guard wait > 0 else { return }
+        troubleClock = Timer.scheduledTimer(withTimeInterval: wait + 0.05, repeats: false) { [weak self] _ in
+            MainActor.assumeIsolated { self?.refreshHint() }
+        }
     }
 
     private static func sameLanguage(_ a: String, _ b: String) -> Bool {
@@ -436,6 +471,8 @@ final class RegionSession {
         case .downloadPack: "pack"
         case .preparingRecognition: "preparing"
         case .recognitionNotResponding: "not-responding"
+        case .translationNotAnswering: "translation-failing"
+        case .translationSlow: "translation-slow"
         case .alreadyInTarget: "already"
         }
     }
@@ -447,15 +484,30 @@ final class RegionSession {
         case .openScreenRecordingSettings?: model.openScreenRecordingSettings()
         case .restart?: model.relaunch()
         case let .downloadPack(pair)?: model.downloadPack(pair)
+        case .openTranslationSettings?:
+            model.settingsTab = .translation
+            NSApp.activate(ignoringOtherApps: true)
+            model.openSettingsAction?()
         case nil: break
         }
     }
 
-    /// What a read found: two in a row that found only text in the target language put "Already in …" on the pill.
+    /// What a read found: two in a row that found only text in the target language put "Already in …" on the pill; text to translate
+    /// makes the lens wait for it, which is what lets the translator's failures be this lens's (`TranslationWait`).
     func read(_ tally: ReadTally) {
-        let before = targetStreak.shown
+        let before = targetStreak.shown, waiting = translationWait
         targetStreak.read(tally)
-        if targetStreak.shown != before { refreshHint() }
+        translationWait.read(tally)
+        if targetStreak.shown != before || translationWait != waiting { refreshHint() }
+    }
+
+    /// What became of a batch of lines the translator worked on (any lens's; only the groups that are this lens's pair count): two failed
+    /// in a row say so on the pill, the first translated one takes it down.
+    private func translationEvent(_ event: TranslationEvent) {
+        guard !stopped else { return }
+        let before = translationWait
+        translationWait.apply(event, at: ProcessInfo.processInfo.systemUptime, lens: lensPair(settings))
+        if translationWait != before { refreshHint() }
     }
 
     // MARK: - Keeping what the lens read

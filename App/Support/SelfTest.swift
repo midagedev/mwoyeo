@@ -211,6 +211,7 @@ enum SelfTest {
         // The two sources of an issue reach the hint as they do in the app (`AppModel.received`, `recognitionNotice`).
         await translator.setIssueHandler { issue in report(issue); instruments.issues.fromTranslation(issue) }
         TextRecognizer.setNoticeHandler { issue in report(issue); instruments.issues.fromRecognizer(issue) }
+        _ = await translator.observe { event in instruments.trouble.apply(event) }
         // A render is a fresh process, the cold case: the text model loads in the background, as at the app's launch, and `--warm`
         // waits for it.
         let source = settings.sourceLanguage
@@ -235,8 +236,9 @@ enum SelfTest {
         let pipeline = still.pipeline
         let capture = CGRect(x: 0, y: 0, width: CGFloat(image.width) / scale, height: CGFloat(image.height) / scale)
         // The silence timeline runs from here (the start of the lens pass) to the exit.
-        await pipeline.setReadHandler { tally in instruments.streak.read(tally) }
-        instruments.startSampling(source: settings.sourceLanguage, target: settings.targetLanguage, drawn: { still.latest?.blocks.isEmpty == false })
+        await pipeline.setReadHandler { tally in instruments.streak.read(tally); instruments.trouble.read(tally) }
+        instruments.startSampling(source: settings.sourceLanguage, target: settings.targetLanguage, engine: settings.activeEngineConfig?.id,
+                                  drawn: { still.latest?.blocks.isEmpty == false })
         let start = Date()
         await still.ingest()
         let keeping = Keeping(settings: settings, option: option, args: args)
@@ -722,6 +724,21 @@ extension SelfTest {
         check("a hint without a payload", hintName(.preparingRecognition) == "preparingRecognition")
         check("a hint with a payload loses it", hintName(.alreadyInTarget(target: "ko")) == "alreadyInTarget"
               && hintName(.downloadPack(PackPair(source: "ja", target: "ko"))) == "downloadPack")
+        check("the translation hints keep their case names", hintName(.translationSlow(engine: "Apple")) == "translationSlow"
+              && hintName(.translationNotAnswering(engine: "Apple", addedEngine: false)) == "translationNotAnswering")
+        let trouble = Instruments(args: ["in.png", "out.png"]).trouble
+        let ko = TranslationRoute(source: "en", target: "ko", engineID: nil, engineName: "Apple")
+        trouble.set(LensPair(source: "auto", target: "ko", engine: nil))
+        trouble.read(ReadTally(inTarget: 0, needing: 3))
+        trouble.apply(TranslationEvent(.timedOut, ko))
+        check("one timeout is no trouble", trouble.current() == nil)
+        trouble.apply(TranslationEvent(.timedOut, TranslationRoute(source: "en", target: "ja", engineID: nil, engineName: "Apple")))
+        check("a batch into another language is not this lens's", trouble.current() == nil)
+        trouble.apply(TranslationEvent(.timedOut, ko))
+        check("two in a row are slow", trouble.current()?.kind == .slow)
+        check("and a lapsed run is not", trouble.current(at: ProcessInfo.processInfo.systemUptime + TranslationWait.window + 1) == nil)
+        trouble.apply(TranslationEvent(.answered, ko))
+        check("a translated group ends it", trouble.current() == nil)
         // The hooks, as the host will register them. Nothing registered first: a run still has its answers.
         let bare = Instruments(args: ["in.png", "out.png", "--max-wait", "0.5"])
         check("no readerReady registered: n/a", await bare.readerLine() == "reader-ready: n/a")
@@ -775,10 +792,24 @@ extension SelfTest {
             var shown: Bool { lock.withLock { streak.shown } }
         }
 
+        /// What the translator did with each batch and what the reads found, for "translation isn't answering" (`RegionSession.translationEvent`, `read`).
+        final class Trouble: @unchecked Sendable {
+            private let lock = NSLock()
+            private var wait = TranslationWait()
+            private var lens = LensPair(source: "auto", target: "", engine: nil)
+            func set(_ pair: LensPair) { lock.withLock { lens = pair } }
+            /// A new target: what failed before says nothing about it.
+            func setTarget(_ language: String) { lock.withLock { lens.target = language; wait.reset() } }
+            func apply(_ event: TranslationEvent) { lock.withLock { wait.apply(event, at: ProcessInfo.processInfo.systemUptime, lens: lens) } }
+            func read(_ tally: ReadTally) { lock.withLock { wait.read(tally) } }
+            func current(at now: TimeInterval = ProcessInfo.processInfo.systemUptime) -> TranslationTrouble? { lock.withLock { wait.trouble(at: now) } }
+        }
+
         enum WarmUp { case none, running, ended }
 
         let issues = Issues()
         let streak = Streak()
+        let trouble = Trouble()
         /// `--max-wait` when given.
         private let maxWait: Double?
         private let noDrain: Bool
@@ -796,7 +827,10 @@ extension SelfTest {
             noDrain = args.contains("--no-drain")
         }
 
-        func setTarget(_ language: String) { lock.withLock { target = language } }
+        func setTarget(_ language: String) {
+            lock.withLock { target = language }
+            trouble.setTarget(language)
+        }
 
         // MARK: Warm-up
 
@@ -826,9 +860,10 @@ extension SelfTest {
         // MARK: Silence timeline
 
         /// Samples what the lens would show every 100 ms, from now to `finish`. `drawn` is whether a translated block is on the lens.
-        func startSampling(source: String, target: String, drawn: @escaping @Sendable () -> Bool) {
+        func startSampling(source: String, target: String, engine: UUID?, drawn: @escaping @Sendable () -> Bool) {
             let t0 = Date()
             lock.withLock { began = t0; self.source = source; self.target = target }
+            trouble.set(LensPair(source: source, target: target, engine: engine))
             let task = Task.detached(priority: .userInitiated) { [self] in
                 var k = 0
                 while !Task.isCancelled {
@@ -865,7 +900,8 @@ extension SelfTest {
                 preparing = gate.shouldShowProgress(now: now) && !VisionSetupDisplay.failed(gate) && !VisionSetupDisplay.allDone(gate)
             }
             var signals = LensSignals(screen: .fine, recognitionPreparing: preparing, showsTranslations: drawn,
-                                      alreadyInTarget: streak.shown ? target : nil)
+                                      alreadyInTarget: streak.shown ? target : nil,
+                                      translation: trouble.current())
             func same(_ a: String, _ b: String) -> Bool { Locale.Language(identifier: a).languageCode == Locale.Language(identifier: b).languageCode }
             if case let .languagePackMissing(missingSource, missingTarget)? = issue, same(missingTarget, target),
                source == "auto" || same(missingSource, source) {

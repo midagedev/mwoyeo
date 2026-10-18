@@ -108,6 +108,9 @@ actor TranslationService {
     private var cooldowns: [UUID: Cooldown] = [:]
     /// The added engine is failing and Apple is standing in: successful Apple groups must not clear its issue.
     private var engineIssue: TranslationIssue?
+    /// Who hears what became of each group (`TranslationEvent`): every lens's hint and the render harness. The issue stream does not
+    /// say it: it keeps only the newest issue, so a second timeout looks like the first.
+    private var observers: [UUID: @Sendable (TranslationEvent) -> Void] = [:]
 
     private struct Cooldown {
         var backoff = HealthyBackoff()
@@ -177,6 +180,26 @@ actor TranslationService {
     }
 
     func setIssueHandler(_ h: @escaping @Sendable (TranslationIssue?) -> Void) { issueHandler = h }
+
+    /// Calls `h` for every group's end from now on, until `stopObserving`.
+    func observe(_ h: @escaping @Sendable (TranslationEvent) -> Void) -> UUID {
+        let id = UUID()
+        observers[id] = h
+        return id
+    }
+
+    func stopObserving(_ id: UUID) { observers[id] = nil }
+
+    private func tell(_ event: TranslationEvent) { for h in observers.values { h(event) } }
+
+    /// A group that threw counts as the engine not answering, unless it threw for the pack or the pair (their own hints say so).
+    private static func isEngineTrouble(_ error: any Error) -> Bool {
+        switch error as? TranslationIssue {
+        case .languagePackMissing?, .unsupportedPair?: false
+        default: true
+        }
+    }
+
     func setRejectionHandler(_ h: @escaping @Sendable (UUID, [String]) -> Void) { rejectionHandler = h }
 
     /// Request fields the active added engine's server refused (for the harness and the engine list).
@@ -330,10 +353,17 @@ actor TranslationService {
             groups[lang, default: []].append(t)
         }
 
+        // What the lenses' hints hear is one event for the whole call, a result per language group: a batch of three lines that splits in
+        // two groups (7 s + 9 s of deadlines) is one slow batch, and two timeouts of it must not read as two. Each result carries the pair
+        // and the engine that really took the group (Apple while the chosen engine rests), so a lens reads only the ones that are its own.
+        // Any line translated is an answer, even from a group that then threw or hit its deadline.
+        var results: [TranslationEvent.Group] = []
+        defer { if !results.isEmpty { tell(TranslationEvent(groups: results)) } }
         for source in order {
             if Task.isCancelled { outcome.cancelled = true; break }
             let items = groups[source]!
             let space = cache.namespace
+            let target = settings.targetLanguage
             let appleSpace = Self.namespace(settings, engine: nil)
             var run = await attempt(items, source: source, via: route(), onResult: onResult)
             if case let .added(engine) = run.route {
@@ -357,6 +387,7 @@ actor TranslationService {
             let storeSpace: String
             if case .apple = run.route { storeSpace = appleSpace } else { storeSpace = space }
             var groupFailed = false, groupCancelled = false
+            var groupTrouble: TranslationEvent.Kind?
             switch run.status {
             case .value:
                 // An added engine's issue stays up while Apple stands in for it.
@@ -370,11 +401,19 @@ actor TranslationService {
                 groupFailed = true
                 dropSessions(source: source)
                 issueHandler?((error as? TranslationIssue) ?? .failed(error.localizedDescription))
+                if Self.isEngineTrouble(error) { groupTrouble = .failed }
             case .timedOut:
                 groupFailed = true
                 dropSessions(source: source)
                 outcome.timedOut = true
                 issueHandler?(.timedOut)
+                groupTrouble = .timedOut
+            }
+            if let kind = translated.isEmpty ? groupTrouble : .answered {
+                let engine: EngineConfig?
+                if case let .added(e) = run.route { engine = e } else { engine = nil }
+                let route = TranslationRoute(source: source, target: target, engineID: engine?.id, engineName: engine?.name ?? String(localized: "Apple"))
+                results.append(TranslationEvent.Group(route: route, kind: kind))
             }
             // Settings changed while it ran: the engine may have used either, so it is not cached under any.
             let current = cache.namespace == space

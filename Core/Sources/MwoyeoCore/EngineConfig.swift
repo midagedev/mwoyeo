@@ -41,15 +41,18 @@ public struct EngineConfig: Codable, Equatable, Identifiable, Sendable {
     public var id: UUID
     public var name: String
     public var kind: EngineKind
+    /// What this engine may be sent besides the lines (design §3). nil is Off: the engine is saved and sent exactly as before.
+    public var context: EngineContext?
 
-    public init(id: UUID = UUID(), name: String, kind: EngineKind) {
+    public init(id: UUID = UUID(), name: String, kind: EngineKind, context: EngineContext? = nil) {
         self.id = id
         self.name = name
         self.kind = kind
+        self.context = context
     }
 
     private enum Key: String, CodingKey {
-        case id, name, kind, baseURL, model, thinking, extraHeaders, formality, template, command
+        case id, name, kind, baseURL, model, thinking, extraHeaders, formality, template, command, context
     }
 
     public init(from decoder: Decoder) throws {
@@ -79,6 +82,8 @@ public struct EngineConfig: Codable, Equatable, Identifiable, Sendable {
         default:
             throw EngineConfigError.unknownKind(tag)
         }
+        // A context this build cannot read is no context, never a lost engine.
+        context = (try? c.decodeIfPresent(EngineContext.self, forKey: .context)) ?? nil
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -86,6 +91,8 @@ public struct EngineConfig: Codable, Equatable, Identifiable, Sendable {
         try c.encode(id, forKey: .id)
         try c.encode(name, forKey: .name)
         try c.encode(kind.tag, forKey: .kind)
+        // Written only when set, so an engine without one is saved exactly as before.
+        try c.encodeIfPresent(context, forKey: .context)
         switch kind {
         case let .openAICompatible(baseURL, model, thinking, extraHeaders):
             try c.encode(baseURL, forKey: .baseURL)
@@ -114,12 +121,16 @@ public struct EngineConfig: Codable, Equatable, Identifiable, Sendable {
 /// One exception: a header of an HTTP template or an OpenAI-compatible engine may be named like a secret as long as its
 /// value is the `{{key}}` placeholder, because "Authorization: Bearer {{key}}" is how such an engine says where the key goes.
 /// Export applies the same rule on the way out: a literal secret in a header is replaced by `{{key}}` (template) or dropped.
+/// The engine's `context` is not shared: export leaves it out and import ignores it, because what an engine may be sent
+/// (a window title, the learned memory) is the importing user's choice to make (design §9).
 public enum EngineShare {
     public static let version = 1
     static let secretNames: Set<String> = ["apikey", "key", "token", "authorization", "x-api-key"]
 
     public static func encode(_ c: EngineConfig) -> String {
         var config = c
+        // Design §9: what an engine may be sent (the window title, learned rows) is each user's own opt-in, never a shared file's.
+        config.context = nil
         switch c.kind {
         case let .openAICompatible(baseURL, model, thinking, headers):
             let kept = headers.filter { !isSecretName($0.key) || $0.value.contains("{{key}}") }
@@ -150,6 +161,8 @@ public enum EngineShare {
         }
         if let path = secretPath(in: engine, path: "engine") { throw EngineConfigError.secretField(path) }
         engine["id"] = UUID().uuidString
+        // The same rule on the way in: a file cannot switch context on for the user who imports it.
+        engine["context"] = nil
         let data = try JSONSerialization.data(withJSONObject: engine)
         return try JSONDecoder().decode(EngineConfig.self, from: data)
     }

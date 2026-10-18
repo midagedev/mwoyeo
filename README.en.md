@@ -176,7 +176,7 @@ follow the context.
 |---|---|
 | General | Languages · **Display**: *Adaptive* (default: plain boxes while things move, a seamless rewrite once still), *Quick* (always boxes, least battery) or *Seamless* (always rewrites) · how often the screen is checked (4, 8 or 15 fps) · open at login · **Saving**: keep what each lens reads and its translation as Markdown and SRT transcripts, and the folder for transcripts and lens images (default `~/Documents/Mwoyeo`) |
 | Translation | **Engine**: *Automatic* (language pack if installed, Apple Intelligence otherwise), *High fidelity* (always Apple Intelligence: the most natural and the slowest) or *Glossary first* · language packs · **translation memory**: how many translations to keep for reuse (1,000, 5,000 or 20,000; in memory only, cleared when Mwoyeo quits) · a **glossary** of names, one `original = translation` per line · **Add another engine** · **App profiles** (shown only once you have remembered an app from the lens menu) |
-| Appearance | **Lens style**: *Glow*, *Subtle* (glows only while reading) or *Minimal* (a faint line; the name tag shows on hover) · font (default, rounded, serif) · box opacity · AI erasing on photos and artwork |
+| Appearance | **Lens style**: *Glow*, *Subtle* (glows only while reading), *Corners* (only the four corners) or *Minimal* (a faint line; the name tag shows on hover) · **colour**: Spectrum, Accent, Ocean, Sunset, Forest, Mono · **name tag**: when it shows (Automatic, Always, On Hover) and where (any corner) · font (default, rounded, serif) · box opacity · AI erasing on photos and artwork |
 
 ### Settings file
 

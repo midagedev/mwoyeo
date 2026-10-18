@@ -42,6 +42,7 @@ struct MwoyeoApp: App {
         } label: {
             Image(systemName: menuSymbol)
                 .accessibilityLabel("Mwoyeo")
+                .background(SettingsOpener())
         }
         .menuBarExtraStyle(.window)
 
@@ -58,13 +59,35 @@ struct MwoyeoApp: App {
     }
 }
 
+/// The Settings scene opens only through `openSettings`, which only a view has. The menu bar item is always there: this view in it
+/// hands the action to the app, for what opens Settings from elsewhere (a lens's "Download <language>").
+private struct SettingsOpener: View {
+    @Environment(\.openSettings) private var openSettings
+
+    var body: some View {
+        Color.clear.frame(width: 0, height: 0).onAppear { AppModel.shared.openSettingsAction = { openSettings() } }
+    }
+}
+
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         Task { @MainActor in await AppModel.shared.bootstrap() }
-        // `MWOYEO_PREVIEW=menu|onboarding` shows that window on launch, for screenshots.
+        // `MWOYEO_PREVIEW=menu|onboarding` shows that window on launch, for screenshots. `pack` does what a lens's "Download <language>"
+        // does (Settings on Translation, the pack's download for ja → en: nothing to ask for when it is installed), `relaunch` what
+        // its "Restart Mwoyeo" does; both after 3 s, for gates.
         switch ProcessInfo.processInfo.environment["MWOYEO_PREVIEW"] {
         case "menu": Task { @MainActor in WindowPresenter.shared.showMenuPreview() }
         case "onboarding": Task { @MainActor in WindowPresenter.shared.showOnboarding() }
+        case "pack":
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(3))
+                AppModel.shared.downloadPack(PackPair(source: "ja", target: "en"))
+            }
+        case "relaunch":
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(3))
+                AppModel.shared.relaunch()
+            }
         default: break
         }
     }

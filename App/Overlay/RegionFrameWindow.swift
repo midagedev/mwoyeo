@@ -22,6 +22,8 @@ final class RegionFrameWindow: NSPanel {
     var onToggleFollowing: (() -> Void)?
     /// Right-click on the name pill: the menu to show, built when asked.
     var onContextMenu: (() -> NSMenu?)?
+    /// The pill's hint (`setHint`) was clicked.
+    var onHintAction: (() -> Void)?
 
     private let chrome: FrameChromeView
     private var tabPosition = LensTabPosition.topLeading
@@ -97,6 +99,13 @@ final class RegionFrameWindow: NSPanel {
     /// Says `text` on the pill for a moment ("Copied", "Saved").
     func flash(_ text: String, seconds: TimeInterval = 1.5) { chrome.flash(text, seconds: seconds) }
 
+    /// The one line a lens that shows nothing has for the user (`LensHint`), in place of the languages while it lasts and never
+    /// beside them; a flash wins over it for its few seconds. `actionable`: clicking it calls `onHintAction`. `forcesTab`: the pill
+    /// shows even where the look keeps it away. nil takes it down.
+    func setHint(_ text: String?, actionable: Bool = false, forcesTab: Bool = false) {
+        chrome.setHint(text, actionable: actionable, forcesTab: forcesTab)
+    }
+
     /// A light sweep across the lens, for when it first comes alive.
     func sweep() { chrome.sweep() }
 }
@@ -119,6 +128,14 @@ private final class FrameChromeView: NSView {
     /// A short message that takes the place of the pill's second line.
     private var notice: String? { didSet { needsDisplay = true } }
     private var noticeTimer: Timer?
+    /// What the lens says about itself (`RegionFrameWindow.setHint`) in the second line's place, after any notice.
+    private var hint: String? { didSet { needsDisplay = true } }
+    private var hintActionable = false
+    private var hintForcesTab = false
+    /// Where the hint was last drawn (view coordinates), for clicks and the cursor; nil when it is not on the pill.
+    private var hintHit: NSRect?
+    /// The hint as the pill writes it: a hint to click ends in an arrow.
+    private var hintLine: String? { hint.map { hintActionable ? $0 + " ›" : $0 } }
 
     private enum Drag { case move, resize }
     private var drag: Drag?
@@ -226,7 +243,7 @@ private final class FrameChromeView: NSView {
     private var strong: Bool { emphasized || hovering || drag != nil }
     /// A notice always shows the tag; otherwise the setting decides (automatic: minimal lenses show it only under the pointer).
     private var showsTab: Bool {
-        if strong || notice != nil { return true }
+        if strong || notice != nil || (hint != nil && hintForcesTab) { return true }
         switch tabVisibility {
         case .automatic: return style != .minimal
         case .always: return true
@@ -236,7 +253,7 @@ private final class FrameChromeView: NSView {
 
     private var tabRect: NSRect {
         let title = (name as NSString).size(withAttributes: [.font: Self.titleFont]).width
-        let longest = [detail, notice ?? ""].max { $0.count < $1.count } ?? ""
+        let longest = [detail, notice ?? "", hintLine ?? ""].max { $0.count < $1.count } ?? ""
         let sub = longest.isEmpty ? 0 : (longest as NSString).size(withAttributes: [.font: Self.detailFont]).width + 10 + (badge == nil ? 0 : 14)
         let w = min(regionRect.width, title + sub + 40 + 20 + (strong ? 22 : 0))
         let width = max(72, w)
@@ -257,6 +274,9 @@ private final class FrameChromeView: NSView {
     private var resizeRect: NSRect {
         NSRect(x: regionRect.maxX - corner + band / 2, y: regionRect.minY - band / 2, width: corner, height: corner)
     }
+
+    /// The hint's place on the pill while it is something to click.
+    private var clickableHint: NSRect? { hintActionable && hint != nil && notice == nil && !original ? hintHit : nil }
 
     private func zone(at p: NSPoint) -> Drag? {
         if resizeRect.contains(p) { return .resize }
@@ -353,6 +373,12 @@ private final class FrameChromeView: NSView {
         updateToolTip() // the icon shifts when the close button shows
     }
 
+    func setHint(_ text: String?, actionable: Bool, forcesTab: Bool) {
+        hintActionable = actionable
+        hintForcesTab = forcesTab
+        hint = text
+    }
+
     func flash(_ text: String, seconds: TimeInterval) {
         notice = text
         noticeTimer?.invalidate()
@@ -392,6 +418,7 @@ private final class FrameChromeView: NSView {
     override func mouseMoved(with event: NSEvent) { updateCursor(convert(event.locationInWindow, from: nil)) }
 
     private func updateCursor(_ p: NSPoint) {
+        if let hit = clickableHint, hit.contains(p) { return NSCursor.pointingHand.set() }
         switch zone(at: p) {
         case .resize?: NSCursor.frameResize(position: .bottomRight, directions: .all).set()
         case .move?: ((strong && closeRect.contains(p)) || (showsTab && modeRect.contains(p)) ? NSCursor.arrow : NSCursor.openHand).set()
@@ -412,6 +439,7 @@ private final class FrameChromeView: NSView {
         let p = convert(event.locationInWindow, from: nil)
         if strong, closeRect.contains(p) { window_?.onClose?(); return }
         if showsTab, modeRect.contains(p) { window_?.onToggleFollowing?(); return }
+        if let hit = clickableHint, hit.contains(p) { window_?.onHintAction?(); return }
         drag = zone(at: p)
         startMouse = NSEvent.mouseLocation
         startRegion = window_?.regionFrame ?? .zero
@@ -515,25 +543,31 @@ private final class FrameChromeView: NSView {
         NSGradient(colors: Array((original ? LensTint.mono : tint).colors.prefix(4)))?
             .draw(in: NSBezierPath(ovalIn: dot), angle: busy ? 90 : -45)
 
+        hintHit = nil
         var x = dot.maxX + 8
         let title = NSAttributedString(string: name, attributes: [.font: Self.titleFont, .foregroundColor: NSColor.white])
         let limit = tab.maxX - x - (strong ? 48 : 30)
         title.draw(with: NSRect(x: x, y: tab.midY - title.size().height / 2 + 1, width: limit, height: title.size().height),
                    options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])
         x += title.size().width + 10
-        if original || !detail.isEmpty || notice != nil, x < tab.maxX - 50 {
-            let sub = NSAttributedString(string: notice ?? (original ? String(localized: "Original") : detail),
-                                         attributes: [.font: Self.detailFont, .foregroundColor: NSColor.white.withAlphaComponent(0.6)])
+        // A notice and the original's label are the pill's own words; the hint stands where the languages would.
+        let hinted = notice == nil && !original ? hint : nil
+        if original || !detail.isEmpty || notice != nil || hinted != nil, x < tab.maxX - 50 {
+            let line = notice ?? (original ? String(localized: "Original") : hinted != nil ? hintLine ?? detail : detail)
+            let sub = NSAttributedString(string: line, attributes: [.font: Self.detailFont,
+                                                                    .foregroundColor: NSColor.white.withAlphaComponent(hinted == nil ? 0.6 : hintActionable ? 0.95 : 0.8)])
             // An added engine's mark: a cloud for a remote one, a Mac for one on this Mac.
-            if let badge, notice == nil, !original,
+            if let badge, notice == nil, !original, hinted == nil,
                let icon = NSImage(systemSymbolName: badge, accessibilityDescription: nil)?.withSymbolConfiguration(.init(pointSize: 9, weight: .medium)) {
                 let s = icon.size
                 icon.tinted(.white.withAlphaComponent(0.6))
                     .draw(in: NSRect(x: x, y: tab.midY - s.height / 2 + 1, width: s.width, height: s.height))
                 x += s.width + 4
             }
-            sub.draw(with: NSRect(x: x, y: tab.midY - sub.size().height / 2 + 1, width: tab.maxX - x - (strong ? 48 : 30),
-                                  height: sub.size().height), options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])
+            let room = tab.maxX - x - (strong ? 48 : 30)
+            sub.draw(with: NSRect(x: x, y: tab.midY - sub.size().height / 2 + 1, width: room, height: sub.size().height),
+                     options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])
+            if hinted != nil { hintHit = NSRect(x: x - 4, y: tab.minY, width: min(sub.size().width, room) + 8, height: tab.height) }
         }
 
         if let icon = NSImage(systemSymbolName: following ? "macwindow" : "pin.fill", accessibilityDescription: modeHelp)?

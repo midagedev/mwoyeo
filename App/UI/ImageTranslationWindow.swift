@@ -9,7 +9,8 @@ import UniformTypeIdentifiers
 @MainActor
 @Observable
 final class ImageTranslationModel {
-    enum Phase: Equatable { case empty, working, done(lines: Int), failed(String) }
+    /// `needsPack`: the picture was read, and the translation waits for a language pack.
+    enum Phase: Equatable { case empty, working, done(lines: Int), needsPack(PackPair), failed(String) }
 
     private(set) var title = ""
     private(set) var phase = Phase.empty
@@ -19,6 +20,10 @@ final class ImageTranslationModel {
     var showOriginal = false
 
     @ObservationIgnored private var still: StillTranslation?
+    /// Opens the picture again (after a language pack came down).
+    @ObservationIgnored private var reload: (() -> Void)?
+    /// A new picture sizes the window to itself; opening the same one again does not.
+    @ObservationIgnored private var fitting = true
     @ObservationIgnored private var generation = 0
     @ObservationIgnored private var queued: OverlaySnapshot?
     @ObservationIgnored private var compositing = false
@@ -39,10 +44,32 @@ final class ImageTranslationModel {
 
     func open(url: URL) {
         let data = try? Data(contentsOf: url)
+        reload = { [weak self] in self?.open(url: url) }
         start(title: url.lastPathComponent) { try data.map { try StillTranslation.decode($0) } ?? { throw StillTranslation.Unreadable(description: "Can’t read \(url.lastPathComponent).") }() }
     }
 
-    func open(data: Data, title: String) { start(title: title) { try StillTranslation.decode(data) } }
+    func open(data: Data, title: String) {
+        reload = { [weak self] in self?.open(data: data, title: title) }
+        start(title: title) { try StillTranslation.decode(data) }
+    }
+
+    /// The picture again, once the pack it waited for is installed; the window stays as the person left it.
+    func retry() {
+        fitting = false
+        reload?()
+        fitting = true
+    }
+
+    /// "Download <language> (once)": the system's sheet over this window (`packDownload(in: .image)`).
+    func downloadPack(_ pair: PackPair) { PackDownload.shared.request(pair, in: .image) }
+
+    /// An issue the translator cannot get past by itself: waiting on retries would only spin until the ceiling.
+    private static func blocksTranslating(_ issue: TranslationIssue?) -> Bool {
+        switch issue {
+        case .languagePackMissing?, .unsupportedPair?: true
+        default: false
+        }
+    }
 
     private func start(title: String, decode: () throws -> StillTranslation.Decoded) {
         generation += 1
@@ -59,7 +86,7 @@ final class ImageTranslationModel {
         texts = []
         showOriginal = false
         phase = .working
-        onLoaded?(size)
+        if fitting { onLoaded?(size) }
 
         let app = AppModel.shared
         var settings = app.effectiveSettings
@@ -70,15 +97,23 @@ final class ImageTranslationModel {
         self.still = still
         Task {
             await still.ingest()
-            try? await still.settle(from: Date(), maxWait: 180)
+            // A missing pack is no reason to wait out the ceiling: the translator fails the same way on every retry.
+            try? await still.settle(from: Date(), maxWait: 180, giveUpWhenPaused: { await MainActor.run { Self.blocksTranslating(AppModel.shared.issue) } })
             guard mine == generation else { return }
             let snapshot = still.latest
             texts = ReadingOrder.sorted(snapshot?.texts ?? [], frame: \.frame)
             if let snapshot { await show(snapshot, of: still, generation: mine) }
             guard mine == generation else { return }
-            // "No text found" would be wrong when the recognizer could not read at all.
+            // "No text found" would be wrong when the recognizer could not read at all, and "N lines translated" when the
+            // picture is still in its own language.
             if texts.isEmpty, let issue = app.issue, issue.isTextRecognition {
                 phase = .failed(issue.message)
+            } else if texts.contains(where: { $0.translation == nil }), Self.blocksTranslating(app.issue), let issue = app.issue {
+                if case let .languagePackMissing(source, target) = issue {
+                    phase = .needsPack(PackPair(source: source, target: target))
+                } else {
+                    phase = .failed(issue.message)
+                }
             } else {
                 phase = .done(lines: texts.count)
             }
@@ -158,6 +193,8 @@ struct ImageTranslationView: View {
             bar
         }
         .dropDestination(for: URL.self) { (urls: [URL], _: CGPoint) -> Bool in onDrop(urls) }
+        // The pack the picture waits for comes down in a sheet over this window; then the picture is translated again.
+        .packDownload(in: .image) { model.retry() }
     }
 
     private var bar: some View {
@@ -187,6 +224,11 @@ struct ImageTranslationView: View {
             }
         case .done(let n):
             Text(n == 0 ? String(localized: "No text found") : String(localized: "\(n) lines translated")).font(.caption).foregroundStyle(.secondary)
+        case .needsPack(let pair):
+            HStack(spacing: 8) {
+                Label("Language pack needed", systemImage: "exclamationmark.triangle.fill").font(.caption).foregroundStyle(.secondary)
+                Button(LensHintText.downloadPack(pair)) { model.downloadPack(pair) }.controlSize(.small)
+            }
         case .failed(let message):
             Label(message, systemImage: "exclamationmark.triangle.fill").font(.caption).foregroundStyle(.secondary).lineLimit(2)
         }

@@ -100,13 +100,15 @@ final class StillTranslation: @unchecked Sendable {
     func update(settings: AppSettings) async { await pipeline.update(options: PipelineOptions(settings, lensApp: lensApp)) }
 
     /// Waits until reading and translating are done and the snapshots stop changing, or `maxWait` seconds after `start`.
-    func settle(from start: Date, maxWait: Double) async throws {
+    /// `giveUpWhenPaused` is asked while the translation rests after a failure: true ends the wait (the failure will not pass).
+    func settle(from start: Date, maxWait: Double, giveUpWhenPaused: (@Sendable () async -> Bool)? = nil) async throws {
         var lastChange = Date(), lastVersion = -1
         while Date().timeIntervalSince(start) < maxWait {
             try await Task.sleep(for: .milliseconds(200))
             let state = await pipeline.debugState()
             if let v = latest?.version, v != lastVersion { lastVersion = v; lastChange = Date() }
             if !state.busy, !state.paused, Date().timeIntervalSince(lastChange) > 0.6 { break }
+            if state.paused, let giveUpWhenPaused, await giveUpWhenPaused() { break }
         }
     }
 

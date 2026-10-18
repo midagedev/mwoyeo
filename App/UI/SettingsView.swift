@@ -4,16 +4,26 @@ import ServiceManagement
 import SwiftUI
 import Translation
 
+/// The tabs of Settings; the app can open it on one (`AppModel.settingsTab`).
+enum SettingsTab: Hashable {
+    case general, translation, appearance, shortcuts, about
+}
+
 struct SettingsView: View {
+    @Environment(AppModel.self) private var model
+
     var body: some View {
-        TabView {
-            Tab("General", systemImage: "gearshape") { GeneralSettings() }
-            Tab("Translation", systemImage: "character.bubble") { TranslationSettings() }
-            Tab("Appearance", systemImage: "textformat") { AppearanceSettings() }
-            Tab("Shortcuts", systemImage: "command") { ShortcutSettings() }
-            Tab("About", systemImage: "info.circle") { AboutView() }
+        @Bindable var model = model
+        TabView(selection: $model.settingsTab) {
+            Tab("General", systemImage: "gearshape", value: SettingsTab.general) { GeneralSettings() }
+            Tab("Translation", systemImage: "character.bubble", value: SettingsTab.translation) { TranslationSettings() }
+            Tab("Appearance", systemImage: "textformat", value: SettingsTab.appearance) { AppearanceSettings() }
+            Tab("Shortcuts", systemImage: "command", value: SettingsTab.shortcuts) { ShortcutSettings() }
+            Tab("About", systemImage: "info.circle", value: SettingsTab.about) { AboutView() }
         }
         .frame(width: 560, height: 520)
+        // A lens's "Download <language>" (`AppModel.downloadPack`): the system's sheet comes up over this window.
+        .packDownload(in: .settings)
     }
 }
 
@@ -340,6 +350,7 @@ struct LanguagePacksView: View {
             }
         }
         .task(id: target) { await reload() }
+        .onChange(of: PackDownload.shared.ended) { Task { await reload() } }
         .translationTask(downloading) { session in
             // Shows the system download sheet; returns once the pack is installed or the user declines.
             try? await session.prepareTranslation()

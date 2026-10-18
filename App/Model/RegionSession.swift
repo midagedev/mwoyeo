@@ -25,6 +25,8 @@ final class RegionSession {
     var onToggleOriginal: (() -> Void)?
 
     private let capturer = RegionCapturer()
+    /// Where the capture's frames go (the check-logic harness feeds it).
+    var frameSink: (@Sendable (CapturedFrame) -> Void)? { capturer.onFrame }
     private let pipeline: RegionPipeline
     private let panel: OverlayPanel
     private let chrome: RegionFrameWindow
@@ -32,6 +34,14 @@ final class RegionSession {
     private var trackTimer: Timer?
     private var mouseMonitors: [Any] = []
     private var hiddenByOcclusion = false
+    /// Frames reach the pipeline only while the lens is uncovered (`ReadingGate`); they arrive on the capture's queue.
+    private let readingGate = OSAllocatedUnfairLock(initialState: ReadingGate())
+    /// Why the capture failed, if it did (`CaptureFailure`); the hint says what to do about a refused one.
+    private var captureFailure: CaptureFailure?
+    /// "Already in <language>" waits for two reads that agree (`TargetLanguageStreak`).
+    private var targetStreak = TargetLanguageStreak()
+    /// What the pill says now instead of the languages (`LensHint`).
+    private(set) var shownHint: LensHint?
     /// The followed window was seen alive in this session (so its ID is not just stale from a relaunch).
     private var anchorSeen = false
     private var translationsVisible = true
@@ -83,10 +93,16 @@ final class RegionSession {
         let tap = SnapshotTap()
         pipeline = RegionPipeline(options: PipelineOptions(settings, lensApp: AppModel.readerContext(for: config)), capture: capture, translator: translator,
                                   inpainter: inpainter, onSnapshot: { snapshot in Task { @MainActor in panel.apply(snapshot); tap.handler?(snapshot) } })
-        capturer.onFrame = { [pipeline] frame in Task { await pipeline.ingest(frame) } }
+        let gate = readingGate
+        capturer.onFrame = { [pipeline] frame in
+            // Covered: the capture shows the window above, whose text is not the user's to have translated (or sent away).
+            guard gate.withLock({ $0.admitsFrames }) else { Trace.count("lens.dropped.occluded"); return }
+            Task { await pipeline.ingest(frame) }
+        }
         capturer.onStop = { [weak self] error in Task { @MainActor in self?.captureStopped(error) } }
         wireChrome()
         tap.handler = { [weak self] in self?.received($0) }
+        chrome.onHintAction = { [weak self] in self?.performHint() }
     }
 
     func start() async {
@@ -94,23 +110,43 @@ final class RegionSession {
         await pipeline.setNoticeHandler { [weak self] text in Task { @MainActor in self?.showNotice(text) } }
         await pipeline.setMotionHandler { [weak self] in Task { @MainActor in self?.noteMotion() } }
         await pipeline.setScrollHandler { [weak self] r in Task { @MainActor in self?.scrolled(r) } }
+        await pipeline.setReadHandler { [weak self] tally in Task { @MainActor in self?.read(tally) } }
         panel.prediction = { [weak self] since, now in self?.predictedScroll(since: since, now: now) }
         await pipeline.setVisible(config.rect)
         panel.orderFrontRegardless()
         chrome.orderFrontRegardless()
         panel.setTranslationsVisible(translationsVisible, animated: false)
         chrome.setOriginal(!translationsVisible)
-        do {
-            try await capturer.start(rect: capture, fps: fps)
-            errorMessage = nil
-            chrome.sweep()
-        } catch {
-            errorMessage = String(localized: "Couldn’t start capturing: \(error.localizedDescription)")
-            log.error("capture start failed: \(error.localizedDescription)")
-        }
+        await startCapture()
         startTracking()
         watchPointer()
         onChange?()
+    }
+
+    private func startCapture() async {
+        do {
+            try await capturer.start(rect: capture, fps: fps)
+            errorMessage = nil
+            captureFailure = nil
+            chrome.sweep()
+        } catch {
+            errorMessage = String(localized: "Couldn’t start capturing: \(error.localizedDescription)")
+            captureFailure = Self.failure(of: error)
+            log.error("capture start failed: \(error.localizedDescription)")
+        }
+        refreshHint()
+    }
+
+    /// After a grant of Screen Recording: a capture that was refused starts again.
+    func retryCapture() async {
+        guard captureFailure != nil else { return }
+        await startCapture()
+        onChange?()
+    }
+
+    private static func failure(of error: Error) -> CaptureFailure {
+        let e = error as NSError
+        return CaptureFailure.classify(domain: e.domain, code: e.code)
     }
 
     func stop() async {
@@ -149,6 +185,8 @@ final class RegionSession {
         }
         chrome.setDetail(Self.languagePair(settings), badge: settings.activeEngineConfig?.badgeSymbol)
         chrome.setAppearance(settings)
+        if settings.sourceLanguage != before.sourceLanguage || settings.targetLanguage != before.targetLanguage { targetStreak.reset() }
+        refreshHint()
         await pipeline.update(options: PipelineOptions(settings, lensApp: AppModel.readerContext(for: config)))
         if settings.framesPerSecond != fps {
             fps = settings.framesPerSecond
@@ -156,7 +194,11 @@ final class RegionSession {
         }
     }
 
-    func refresh() async { await pipeline.refresh() }
+    func refresh() async {
+        targetStreak.reset()
+        refreshHint()
+        await pipeline.refresh()
+    }
 
     func setTranslationsVisible(_ visible: Bool) {
         translationsVisible = visible
@@ -215,7 +257,69 @@ final class RegionSession {
     private func captureStopped(_ error: Error?) {
         guard let error else { return }
         errorMessage = error.localizedDescription
+        captureFailure = Self.failure(of: error)
+        // A revoked grant ends the stream: the hint depends on whether it still stands.
+        AppModel.shared.recheckPermission()
+        refreshHint()
         onChange?()
+    }
+
+    // MARK: - What the pill says
+
+    /// Everything the pill's hint depends on, as this lens sees it.
+    func hintSignals() -> LensSignals {
+        let model = AppModel.shared
+        var signals = LensSignals(screen: .init(allowed: model.hasScreenPermission, failure: captureFailure),
+                                  recognitionPreparing: model.recognitionPreparing,
+                                  showsTranslations: lastSnapshot?.blocks.isEmpty == false,
+                                  alreadyInTarget: targetStreak.shown ? settings.targetLanguage : nil)
+        // The translator's issue is for whatever pair it last failed on: it counts for a lens that translates that pair.
+        if case let .languagePackMissing(source, target)? = model.issue, Self.sameLanguage(target, settings.targetLanguage),
+           settings.sourceLanguage == "auto" || Self.sameLanguage(source, settings.sourceLanguage) {
+            signals.missingPack = PackPair(source: source, target: target)
+        }
+        return signals
+    }
+
+    /// Puts the one line the lens has (`LensSignals.hint`) on the pill.
+    func refreshHint() {
+        let hint = hintSignals().hint()
+        guard hint != shownHint else { return }
+        shownHint = hint
+        chrome.setHint(hint.map(LensHintText.line), actionable: hint?.action != nil, forcesTab: hint?.showsTabAlways ?? false)
+        if let hint { Trace.count("lens.hint.\(Self.counterName(hint))") }
+    }
+
+    private static func sameLanguage(_ a: String, _ b: String) -> Bool {
+        Locale.Language(identifier: a).languageCode == Locale.Language(identifier: b).languageCode
+    }
+
+    private static func counterName(_ hint: LensHint) -> String {
+        switch hint {
+        case .allowScreenRecording: "allow"
+        case .restartToFinish: "restart"
+        case .downloadPack: "pack"
+        case .preparingRecognition: "preparing"
+        case .alreadyInTarget: "already"
+        }
+    }
+
+    /// A click on the hint.
+    private func performHint() {
+        let model = AppModel.shared
+        switch shownHint?.action {
+        case .openScreenRecordingSettings?: model.openScreenRecordingSettings()
+        case .restart?: model.relaunch()
+        case let .downloadPack(pair)?: model.downloadPack(pair)
+        case nil: break
+        }
+    }
+
+    /// What a read found: two in a row that found only text in the target language put "Already in …" on the pill.
+    func read(_ tally: ReadTally) {
+        let before = targetStreak.shown
+        targetStreak.read(tally)
+        if targetStreak.shown != before { refreshHint() }
     }
 
     // MARK: - Keeping what the lens read
@@ -224,7 +328,9 @@ final class RegionSession {
     func contains(_ point: CGPoint) -> Bool { config.rect.contains(point) }
 
     private func received(_ snapshot: OverlaySnapshot) {
+        let showedTranslations = lastSnapshot?.blocks.isEmpty == false
         lastSnapshot = snapshot
+        if showedTranslations != !snapshot.blocks.isEmpty { refreshHint() }
         observeTranscript()
     }
 
@@ -584,10 +690,19 @@ final class RegionSession {
             ?? (anchorSeen ? nil : windows.first { $0.appName == a.appName })
     }
 
-    private func setOccluded(_ occluded: Bool) {
+    /// A covered, closed or minimized window hides the lens and stops its reading (`ReadingGate`): the capture shows whatever is
+    /// above it. Uncovered, one fresh frame is asked for, since content that did not change sends none.
+    func setOccluded(_ occluded: Bool) {
         guard occluded != hiddenByOcclusion else { return }
         hiddenByOcclusion = occluded
         panel.setTranslationsVisible(translationsVisible && !occluded)
         occluded ? chrome.orderOut(nil) : chrome.orderFrontRegardless()
+        switch readingGate.withLock({ $0.setOccluded(occluded) }) {
+        case .paused: Trace.count("lens.paused.occluded")
+        case .resumed:
+            Trace.count("lens.resumed.occluded")
+            scheduleCaptureUpdate()
+        case .none: break
+        }
     }
 }

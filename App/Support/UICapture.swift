@@ -154,6 +154,10 @@ enum UICapture {
             case "lens-badge": await lens(name, badge: "cloud", notice: nil)
             case "lens-notice": await lens(name, badge: "cloud", notice: "Gemini unavailable · using Apple")
             case "lens-menu": await lens(name, badge: nil, notice: nil, menu: true)
+            case "lens-hint-allow", "lens-hint-restart", "lens-hint-pack", "lens-hint-preparing", "lens-hint-already", "lens-hint-notice",
+                 "lens-hint-narrow":
+                await lensHints(name)
+            case "image-window-pack", "image-window-blocked": await imageWindowBlocked(name)
             case "add-flow": await addFlow()
             default: print("unknown scenario \(name)")
             }
@@ -346,11 +350,107 @@ enum UICapture {
             let unknown = (try? JSONSerialization.data(withJSONObject: saved)).flatMap { try? JSONDecoder().decode(AppSettings.self, from: $0) }
             check("unknown tint decodes to spectrum", unknown?.lensTint == .spectrum && unknown?.lensStyle == .corners)
             check("the corners style sits between subtle and minimal", LensStyle.allCases == [.glow, .subtle, .corners, .minimal])
+            failed += await firstRunChecks()
             failed += SettingsFileChecks.run(model)
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
         }
 
         // MARK: synthetic clicks
+
+        /// A new user is never left with a silent lens: what the session makes of the app's state (`LensHint`), the reads that say
+        /// "already in <language>", a covered lens that reads nothing, a region of interest outside the picture. Returns the failures.
+        private func firstRunChecks() async -> Int {
+            var failures = 0
+            func check(_ what: String, _ ok: Bool) {
+                print("check-logic: \(ok ? "PASS" : "FAIL") \(what)")
+                if !ok { failures += 1 }
+            }
+            func session(_ source: String, _ target: String) -> RegionSession {
+                var config = RegionConfig(name: "Safari", rect: CGRect(x: 200, y: 300, width: 360, height: 200))
+                config.follow(nil)
+                var s = AppSettings()
+                s.sourceLanguage = source
+                s.targetLanguage = target
+                return RegionSession(config: config, settings: s, translator: model.translator, inpainter: nil)
+            }
+            let ja = PackPair(source: "ja", target: "en")
+
+            // The translator's missing pack reaches the lenses that translate that pair, and only them.
+            model.received(.languagePackMissing(source: "ja", target: "en"))
+            check("a missing pack is in the signals of a lens on Detect → English", session("auto", "en").hintSignals().missingPack == ja)
+            check("and of a lens on Japanese → English", session("ja", "en").hintSignals().missingPack == ja)
+            check("not of a lens that reads Korean", session("ko", "en").hintSignals().missingPack == nil)
+            check("not of a lens that translates into Korean", session("auto", "ko").hintSignals().missingPack == nil)
+            model.received(nil)
+            check("a translation that went well takes it away", session("auto", "en").hintSignals().missingPack == nil)
+
+            // The setup of the text recognizer (the menu panel's "Preparing text recognition…") is the same line on the lens.
+            MenuPanel.fakeSetup = Self.fakeGate("running")
+            check("the lens is told while the text recognizer sets up", session("auto", "en").hintSignals().recognitionPreparing)
+            MenuPanel.fakeSetup = Self.fakeGate("done")
+            check("and not once it is done", !session("auto", "en").hintSignals().recognitionPreparing)
+            MenuPanel.fakeSetup = nil
+            model.recognitionNotice(.textRecognitionStarting(language: "ja"))
+            check("macOS preparing a recognizer for the language counts too", session("auto", "en").hintSignals().recognitionPreparing)
+            model.recognitionNotice(nil)
+
+            // "Already in <language>": two reads that agree, dropped by one block to translate.
+            let lens = session("auto", "en")
+            lens.read(ReadTally(inTarget: 3, needing: 0))
+            check("one read of text in the target language says nothing yet", lens.hintSignals().alreadyInTarget == nil)
+            lens.read(ReadTally(inTarget: 2, needing: 0))
+            check("the second says it", lens.hintSignals().alreadyInTarget == "en")
+            lens.read(ReadTally(inTarget: 2, needing: 1))
+            check("a block to translate drops it", lens.hintSignals().alreadyInTarget == nil)
+
+            // A covered lens reads nothing: its frames stop before the pipeline, once, and it says so in the counts.
+            func frame(at time: TimeInterval) -> CapturedFrame? {
+                let w = 8, h = 8, bytesPerRow = w * 4
+                var pixels = [UInt8](repeating: 0, count: bytesPerRow * h)
+                let image = pixels.withUnsafeMutableBytes { raw -> CGImage? in
+                    CGContext(data: raw.baseAddress, width: w, height: h, bitsPerComponent: 8, bytesPerRow: bytesPerRow, space: CGColorSpace(name: CGColorSpace.sRGB)!,
+                              bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue)?.makeImage()
+                }
+                guard let image else { return nil }
+                let gray = pixels.withUnsafeBytes { GrayImage(bgra: $0.baseAddress!, width: w, height: h, bytesPerRow: bytesPerRow, step: 2) }
+                return CapturedFrame(image: image, gray: gray, grayStep: 2, scale: 1, rect: CGRect(x: 0, y: 0, width: 8, height: 8), time: time)
+            }
+            let covered = session("auto", "en")
+            if let f = frame(at: 1) {
+                _ = Trace.takeCounts()
+                covered.frameSink?(f)
+                check("an uncovered lens passes its frames on", Trace.takeCounts()["lens.dropped.occluded"] == nil)
+                covered.setOccluded(true)
+                covered.setOccluded(true)
+                covered.frameSink?(f)
+                covered.frameSink?(f)
+                let counts = Trace.takeCounts()
+                check("a covered lens drops its frames (lens.dropped.occluded)", counts["lens.dropped.occluded"] == 2)
+                check("and counts the pause once (lens.paused.occluded)", counts["lens.paused.occluded"] == 1)
+            } else {
+                check("a test frame can be made", false)
+            }
+
+            // Vision's region of interest: outside the picture, or thinner than a pixel, no request is made.
+            if let f = frame(at: 2) {
+                _ = Trace.takeCounts()
+                let outside = try? await TextRecognizer.lines(in: f.image, roi: CGRect(x: 4000, y: 4000, width: 40, height: 40), languages: [], fast: true)
+                let thin = try? await TextRecognizer.lines(in: f.image, roi: CGRect(x: 0, y: 0, width: 0.3, height: 8), languages: [], fast: true)
+                check("a region of interest outside the picture, or under a pixel wide, reads nothing and sends nothing to Vision",
+                      outside?.isEmpty == true && thin?.isEmpty == true && Trace.takeCounts()["ocr.roi.empty"] == 2)
+            }
+
+            // What a block of text is to the lens.
+            typealias V = TextRecognizer.Verdict
+            check("a clock, a link and a formula stay as written",
+                  ["12:45", "10:42 AM", "https://example.com/a", "O(n² · d)"].allSatisfy { TextRecognizer.verdict($0, target: "en") == V.literal })
+            check("English text is already in English", TextRecognizer.verdict("The quick brown fox jumps over the lazy dog today.", target: "en") == V.inTarget)
+            check("Japanese text needs translating into English", TextRecognizer.verdict("今日はとても良い天気ですね。散歩に行きましょう。", target: "en") == V.needs)
+            check("Hangul is already Korean", TextRecognizer.verdict("오늘은 날씨가 정말 좋네요", target: "ko") == V.inTarget)
+            check("a read counts the blocks worth a look only",
+                  TextRecognizer.tally([V.literal, .inTarget, .needs, .inTarget]) == ReadTally(inTarget: 2, needing: 1))
+            return failures
+        }
 
         private func views(_ root: NSView) -> [NSView] { [root] + root.subviews.flatMap { views($0) } }
 
@@ -496,9 +596,10 @@ enum UICapture {
         /// A lens (360 × 200) in one look over a plain dark or light backdrop; returns the PNG's path.
         @discardableResult
         private func lensShot(_ name: String, style: LensStyle = .glow, tint: LensTint = .spectrum, position: LensTabPosition = .topLeading,
-                              dark: Bool, busy: Bool = false, emphasized: Bool = false, notice: String? = nil, wait: Double = 0.5) async -> String {
+                              dark: Bool, busy: Bool = false, emphasized: Bool = false, notice: String? = nil, hint: LensHint? = nil,
+                              width: CGFloat = 360, wait: Double = 0.5) async -> String {
             let screen = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1512, height: 982)
-            let region = NSRect(x: 200, y: screen.height - 520, width: 360, height: 200)
+            let region = NSRect(x: 200, y: screen.height - 520, width: width, height: 200)
             let page = NSWindow(contentRect: region.insetBy(dx: -40, dy: -70).offsetBy(dx: 0, dy: -10), styleMask: [.borderless], backing: .buffered, defer: false)
             page.backgroundColor = NSColor(white: dark ? 0.12 : 0.96, alpha: 1)
             page.level = .normal
@@ -510,6 +611,7 @@ enum UICapture {
             lens.setFollowing(true)
             lens.setDetail("English → Korean")
             lens.setBusy(busy)
+            lens.setHint(hint.map(LensHintText.line), actionable: hint?.action != nil, forcesTab: hint?.showsTabAlways ?? false)
             lens.orderFrontRegardless()
             lens.setEmphasized(emphasized)
             if let notice { lens.flash(notice, seconds: 30) }
@@ -521,6 +623,42 @@ enum UICapture {
             lens.orderOut(nil)
             page.orderOut(nil)
             return path
+        }
+
+        /// A lens pill with each hint (`LensHint`) over a dark and a light backdrop. `notice` shows a notice over a hint (it wins for its
+        /// seconds); `narrow` a lens too small for the whole line.
+        private func lensHints(_ name: String) async {
+            let hint: LensHint = switch name {
+            case "lens-hint-allow": .allowScreenRecording
+            case "lens-hint-restart": .restartToFinish
+            case "lens-hint-preparing": .preparingRecognition
+            case "lens-hint-already": .alreadyInTarget(target: "en")
+            default: .downloadPack(PackPair(source: "ja", target: "en"))
+            }
+            for dark in [true, false] {
+                await lensShot("\(name)-\(dark ? "dark" : "light")", dark: dark, notice: name == "lens-hint-notice" ? "Gemini unavailable · using Apple" : nil,
+                               hint: hint, width: name == "lens-hint-narrow" ? 230 : 360)
+            }
+        }
+
+        /// The image window over a picture whose translation cannot happen, run for real with `MWOYEO_FAKE_ENGINE=fail` (every call fails, as
+        /// a missing pack does) and the issue the app would hold seeded: `needsPack` = a language pack is missing, `blocked` = the pair
+        /// is not supported. Prints the phase and how long the window took to settle: the wait used to run to its 180 s ceiling.
+        private func imageWindowBlocked(_ name: String) async {
+            guard let path = option("--image") else { print("\(name): needs --image <picture> (and MWOYEO_FAKE_ENGINE=fail)"); return }
+            let pack = name == "image-window-pack"
+            model.settings.sourceLanguage = "auto"
+            model.settings.targetLanguage = "ko"
+            model.received(pack ? .languagePackMissing(source: "en", target: "ko") : .unsupportedPair(source: "en", target: "ko"))
+            await AppModel.loadVision()
+            let picture = ImageTranslationModel()
+            let started = Date()
+            picture.open(url: URL(fileURLWithPath: path))
+            for _ in 0..<2000 where picture.phase == .working || picture.phase == .empty { try? await Task.sleep(for: .milliseconds(100)) }
+            print("\(name): \(picture.phase) after \(String(format: "%.1f", Date().timeIntervalSince(started))) s, \(picture.texts.count) lines, "
+                  + "\(picture.texts.filter { $0.translation != nil }.count) translated")
+            await shoot(name, ImageTranslationView(model: picture, onDrop: { _ in false }), CGSize(width: 1040, height: 760))
+            model.received(nil)
         }
 
         /// Every style in every tint, on both backdrops, and a grid of each backdrop (styles across, tints down).

@@ -55,7 +55,8 @@ enum TextRecognizer {
     private static func visionRead(in image: CGImage, roi: CGRect?, level: VNRequestTextRecognitionLevel, revision: Int?,
                                    customWords: [String], languages: (VNRecognizeTextRequest) -> [String]) throws -> [OCRLine] {
         let size = CGSize(width: image.width, height: image.height)
-        let region = roi.map { normalized($0, in: size) } ?? CGRect(x: 0, y: 0, width: 1, height: 1)
+        // A region with no pixel in the picture has no origin, and Vision traps on it (v1.0.0 crash report): no request.
+        guard let region = regionOfInterest(roi, in: size) else { return [] }
         let req = VNRecognizeTextRequest()
         req.recognitionLevel = level
         if let revision { req.revision = revision }
@@ -193,7 +194,7 @@ enum TextRecognizer {
             req.textRecognitionOptions.recognitionLanguages = languages
         }
         let size = CGSize(width: image.width, height: image.height)
-        let region = roi.map { normalized($0, in: size) } ?? CGRect(x: 0, y: 0, width: 1, height: 1)
+        guard let region = regionOfInterest(roi, in: size) else { return [] }
         req.regionOfInterest = NormalizedRect(normalizedRect: region)
         var out: [OCRBlock] = []
         for doc in try await req.perform(on: image) {
@@ -493,7 +494,10 @@ enum TextRecognizer {
     }
 
     private static func publish() {
-        Task { @MainActor in VisionSetup.shared.gate = TextRecognizer.setupState }
+        Task { @MainActor in
+            VisionSetup.shared.gate = TextRecognizer.setupState
+            VisionSetup.shared.onChange?()
+        }
     }
 
     /// Latin and CJK text, drawn here so that the probe and the warm-up need no file: a Latin line of 240 characters, a CJK line of
@@ -629,27 +633,45 @@ enum TextRecognizer {
         return OCRBlock(rect: rect, lines: lines, text: text)
     }
 
+    /// What a block of text is to the lens.
+    enum Verdict: Sendable {
+        /// Stays as written: no letters, a time stamp, a link, a formula.
+        case literal
+        /// Already in the target language.
+        case inTarget
+        /// Worth translating.
+        case needs
+    }
+
     /// Text worth translating: has letters, and is not already in the target language.
-    static func needsTranslation(_ text: String, target: String) -> Bool {
-        guard text.unicodeScalars.contains(where: { CharacterSet.letters.contains($0) }) else { return false }
+    static func needsTranslation(_ text: String, target: String) -> Bool { verdict(text, target: target) == .needs }
+
+    static func verdict(_ text: String, target: String) -> Verdict {
+        guard text.unicodeScalars.contains(where: { CharacterSet.letters.contains($0) }) else { return .literal }
         if TranslationFilter.isLiteral(text) {
             if TranslationFilter.isFormula(text) || TranslationFilter.isIdentifier(text) { Trace.count("ocr.kept.formula") }
-            return false
+            return .literal
         }
         let targetCode = Locale.Language(identifier: target).languageCode?.identifier
         // Hangul is unambiguous; for other targets ask NaturalLanguage, but only trust confident answers.
         if targetCode == "ko" {
             let hangul = text.unicodeScalars.filter { (0xAC00...0xD7A3).contains($0.value) || (0x3131...0x318E).contains($0.value) }.count
             let letters = text.unicodeScalars.filter { CharacterSet.letters.contains($0) }.count
-            return Double(hangul) / Double(max(letters, 1)) < 0.5
+            return Double(hangul) / Double(max(letters, 1)) < 0.5 ? .needs : .inTarget
         }
         let r = NLLanguageRecognizer()
         r.processString(text)
         if let (lang, p) = r.languageHypotheses(withMaximum: 1).first, p > 0.8,
            Locale.Language(identifier: lang.rawValue).languageCode?.identifier == targetCode {
-            return false
+            return .inTarget
         }
-        return true
+        return .needs
+    }
+
+    /// What one read found, for the lens's "already in <language>" line: literals count for nothing. `partial`: it read only a part
+    /// of the capture.
+    static func tally(_ verdicts: [Verdict], partial: Bool = false) -> ReadTally {
+        ReadTally(inTarget: verdicts.filter { $0 == .inTarget }.count, needing: verdicts.filter { $0 == .needs }.count, partial: partial)
     }
 
     static func isCJK(_ c: Character) -> Bool {
@@ -670,9 +692,11 @@ enum TextRecognizer {
         CGRect(x: n.minX * size.width, y: (1 - n.maxY) * size.height, width: n.width * size.width, height: n.height * size.height)
     }
 
-    /// Image pixels (top-left origin) → Vision's normalized region of interest (bottom-left origin).
-    private static func normalized(_ r: CGRect, in size: CGSize) -> CGRect {
-        let c = r.intersection(CGRect(origin: .zero, size: size))
-        return CGRect(x: c.minX / size.width, y: 1 - c.maxY / size.height, width: c.width / size.width, height: c.height / size.height)
+    /// The region of interest for `roi` in image pixels (nil: the whole picture), or nil when no pixel of it lies in the picture
+    /// (`VisionRegion`): the caller reads nothing, and the count says how often that happened.
+    private static func regionOfInterest(_ roi: CGRect?, in size: CGSize) -> CGRect? {
+        guard let roi else { return CGRect(x: 0, y: 0, width: 1, height: 1) }
+        guard let r = VisionRegion.normalized(roi, in: size) else { Trace.count("ocr.roi.empty"); return nil }
+        return r
     }
 }

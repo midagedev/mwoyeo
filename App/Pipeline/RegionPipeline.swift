@@ -130,6 +130,7 @@ actor RegionPipeline {
     private let onSnapshot: @Sendable (OverlaySnapshot) -> Void
     private var onActivity: (@Sendable (RegionActivity) -> Void)?
     private var onNotice: (@Sendable (String) -> Void)?
+    private var onRead: (@Sendable (ReadTally) -> Void)?
     /// The last read found vertical text, and said so: the notice is shown once per such text, not per pass.
     private var verticalNoticed = false
     private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "pipeline")
@@ -247,6 +248,8 @@ actor RegionPipeline {
     }
 
     func setNoticeHandler(_ h: @escaping @Sendable (String) -> Void) { onNotice = h }
+    /// Told after every read what it found, for the lens's "already in <language>" line.
+    func setReadHandler(_ h: @escaping @Sendable (ReadTally) -> Void) { onRead = h }
     func setActivityHandler(_ h: @escaping @Sendable (RegionActivity) -> Void) { onActivity = h }
     /// Called (at most twice a second) when content moves a lot: scrolling, page flips, animation.
     func setMotionHandler(_ h: @escaping @Sendable () -> Void) { onMotion = h }
@@ -802,10 +805,11 @@ actor RegionPipeline {
         }
         found = splitByStyle(joinSplitLines(readableLines(found, in: frame.image)), in: frame.image)
         Trace.mark("fast: OCR \(Int(dirty.width))×\(Int(dirty.height))px → \(found.count) blocks", since: t)
-        let fresh = found.filter { ocr in
-            TextRecognizer.needsTranslation(ocr.text, target: options.targetLanguage)
-                && !keptRects.contains { $0.contains(CGPoint(x: ocr.rect.midX, y: ocr.rect.midY)) }
-        }
+        let verdicts = found.map { TextRecognizer.verdict($0.text, target: options.targetLanguage) }
+        onRead?(TextRecognizer.tally(verdicts, partial: dirty.width < CGFloat(frame.image.width) || dirty.height < CGFloat(frame.image.height)))
+        let fresh = zip(found, verdicts).filter { ocr, verdict in
+            verdict == .needs && !keptRects.contains { $0.contains(CGPoint(x: ocr.rect.midX, y: ocr.rect.midY)) }
+        }.map(\.0)
         let full = wantsErase ? RGBAImage(cgImage: frame.image) : nil
         let places = layoutPlaces(of: fresh, among: found, in: frame.image)
         let old = blocks.filter { staleIDs.contains($0.id) }
@@ -885,7 +889,9 @@ actor RegionPipeline {
             return true
         }
         let read = splitByStyle(joinSplitLines(readableLines(found, in: frame.image)), in: frame.image)
-        found = read.filter { TextRecognizer.needsTranslation($0.text, target: options.targetLanguage) }
+        let verdicts = read.map { TextRecognizer.verdict($0.text, target: options.targetLanguage) }
+        onRead?(TextRecognizer.tally(verdicts))
+        found = zip(read, verdicts).filter { $1 == .needs }.map(\.0)
         let places = layoutPlaces(of: found, among: read, in: frame.image)
         guard let full = RGBAImage(cgImage: frame.image) else { return true }
         Trace.mark("seamless: frame → RGBA", since: t); t = Trace.now

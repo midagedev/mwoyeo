@@ -51,6 +51,8 @@ final class AppModel {
     private(set) var inpaintingAvailable = false
     /// Bumped when any session's activity/error changes, so views re-read them.
     private(set) var sessionTick = 0
+    /// The tab Settings opens on: a lens's "Download <language>" lands on Translation, where the pack comes down.
+    var settingsTab = SettingsTab.general
 
     @ObservationIgnored let translator: TranslationService
     /// Where added engines keep their API keys (the Keychain; memory only when `MWOYEO_MEMORY_SECRETS` is set, for captures).
@@ -64,6 +66,10 @@ final class AppModel {
     @ObservationIgnored private(set) var inpainter: Inpainter?
     @ObservationIgnored private let picker = RegionPicker()
     @ObservationIgnored private var picking = false
+    /// The one-shot that looks at the lens hints again when the text recognizer's setup has run long enough to show.
+    @ObservationIgnored private var setupClock: Timer?
+    /// While a lens asks to allow Screen Recording: looks at the grant once a second, so that the lens moves on the moment it is given.
+    @ObservationIgnored private var grantClock: Timer?
     /// The app's preferences; `MWOYEO_DEFAULTS_SUITE` names a scratch domain instead (the capture harness must not touch the real ones).
     @ObservationIgnored private let defaults = ProcessInfo.processInfo.environment["MWOYEO_DEFAULTS_SUITE"].flatMap { UserDefaults(suiteName: $0) } ?? .standard
     @ObservationIgnored private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "app")
@@ -141,6 +147,8 @@ final class AppModel {
     // MARK: - Lifecycle
 
     func bootstrap() async {
+        // A relaunch (`relaunch()`) starts before the old process is gone: its shortcuts and its lenses wait for it.
+        await Relaunch.waitForPredecessor()
         HotKeys.shared.setHandler(.addLens) { [weak self] in Task { await self?.addRegion() } }
         HotKeys.shared.setHandler(.toggleOriginal) { [weak self] in self?.toggleTranslations() }
         HotKeys.shared.setHandler(.pause) { [weak self] in Task { await self?.togglePause() } }
@@ -160,6 +168,7 @@ final class AppModel {
 
         await translator.setIssueHandler { issue in Task { @MainActor in AppModel.shared.received(issue) } }
         TextRecognizer.setNoticeHandler { issue in Task { @MainActor in AppModel.shared.recognitionNotice(issue) } }
+        VisionSetup.shared.onChange = { [weak self] in self?.visionSetupChanged() }
         await translator.setRejectionHandler { id, fields in Task { @MainActor in AppModel.shared.learned(fields, for: id) } }
         await translator.prewarm()
         inpainter = await Task.detached(priority: .userInitiated) { Inpainter.load() }.value
@@ -207,14 +216,85 @@ final class AppModel {
     }
 
     func recheckPermission() {
+        let was = hasScreenPermission
         hasScreenPermission = CGPreflightScreenCaptureAccess()
+        if hasScreenPermission != was { permissionChanged() }
     }
 
     func requestPermission() {
-        if !CGRequestScreenCaptureAccess() {
-            NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
-        }
+        if !CGRequestScreenCaptureAccess() { openScreenRecordingSettings() }
         recheckPermission()
+    }
+
+    /// System Settings on Privacy & Security › Screen Recording.
+    func openScreenRecordingSettings() {
+        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
+    }
+
+    /// The grant came or went while the app ran. After a grant, saved lenses that could not start do now (until now they
+    /// stayed dead until the next launch), and a lens whose capture was refused tries once more: if this process cannot use
+    /// the grant yet, the lens says to restart.
+    private func permissionChanged() {
+        refreshHints()
+        guard hasScreenPermission, !isPaused else { return }
+        Task {
+            for r in regions where r.isEnabled && sessions[r.id] == nil { await startSession(r) }
+            for s in sessions.values { await s.retryCapture() }
+        }
+    }
+
+    /// Starts the app again and quits this one; the saved lenses open in the new one. A grant of Screen Recording takes
+    /// effect only in a process started after it.
+    func relaunch() { Relaunch.run() }
+
+    /// A lens's "Download <language>": Settings on Translation, with the pack's download sheet up.
+    func downloadPack(_ pair: PackPair) {
+        PackDownload.shared.request(pair, in: .settings)
+        settingsTab = .translation
+        NSApp.activate(ignoringOtherApps: true)
+        openSettingsAction?()
+    }
+
+    /// Opens the Settings window; set by the menu bar item's view (`SettingsOpener`), the only holder of SwiftUI's `openSettings`.
+    @ObservationIgnored var openSettingsAction: (() -> Void)?
+
+    // MARK: - What the lenses say
+
+    /// The text recognizer is in its first-time setup, or macOS is still preparing a recognizer for the source language.
+    var recognitionPreparing: Bool {
+        if case .textRecognitionStarting? = issue { return true }
+        let (gate, now) = VisionSetupDisplay.current
+        return gate.shouldShowProgress(now: now) && !VisionSetupDisplay.failed(gate) && !VisionSetupDisplay.allDone(gate)
+    }
+
+    /// Every lens looks at what it should say again (an issue, the setup, the grant changed).
+    func refreshHints() {
+        sessions.values.forEach { $0.refreshHint() }
+        let needsGrant = sessions.values.contains { $0.shownHint == .allowScreenRecording }
+        if needsGrant, grantClock == nil {
+            let t = Timer(timeInterval: 1, repeats: true) { _ in Task { @MainActor in AppModel.shared.recheckPermission() } }
+            RunLoop.main.add(t, forMode: .common)
+            grantClock = t
+        } else if !needsGrant {
+            grantClock?.invalidate()
+            grantClock = nil
+        }
+    }
+
+    /// The text recognizer's setup moved on. Its progress shows after `SwiftVisionGate.showAfter` seconds of a step, which no
+    /// event marks: one look at that moment.
+    func visionSetupChanged() {
+        refreshHints()
+        setupClock?.invalidate()
+        setupClock = nil
+        let (gate, now) = VisionSetupDisplay.current
+        let due = gate.steps.values.compactMap { state -> TimeInterval? in
+            if case let .running(since) = state { since + SwiftVisionGate.showAfter - now } else { nil }
+        }.filter { $0 > 0 }.min()
+        guard let due else { return }
+        setupClock = Timer.scheduledTimer(withTimeInterval: due + 0.05, repeats: false) { _ in
+            Task { @MainActor in AppModel.shared.refreshHints() }
+        }
     }
 
     // MARK: - Regions
@@ -240,6 +320,7 @@ final class AppModel {
         await sessions.removeValue(forKey: id)?.stop()
         regions.removeAll { $0.id == id }
         sessionTick += 1
+        refreshHints()
     }
 
     func setEnabled(_ id: UUID, _ enabled: Bool) async {
@@ -247,6 +328,7 @@ final class AppModel {
         regions[i].isEnabled = enabled
         if enabled, !isPaused { await startSession(regions[i]) } else { await sessions.removeValue(forKey: id)?.stop() }
         sessionTick += 1
+        refreshHints()
     }
 
     func shortcut(_ action: HotKeyAction) -> String? { settings.shortcuts[action.rawValue]?.display }
@@ -353,18 +435,20 @@ final class AppModel {
     /// The text recognizer's notice, or its end. Only the recognizer ends it: a translation that went well says nothing
     /// about reading.
     func recognitionNotice(_ new: TranslationIssue?) {
-        if let new { received(new) } else if issue?.isTextRecognition == true { issue = nil }
+        if let new { received(new) } else if issue?.isTextRecognition == true { issue = nil; refreshHints() }
     }
 
     /// Shows the issue in the menu panel, and once on every lens when an engine gave way to Apple.
     func received(_ new: TranslationIssue?) {
         if new == nil, issue?.isTextRecognition == true { return }
         let step = Self.step(old: issue, new: new, dismissed: dismissedIssue)
+        let changed = issue != new
         issue = new
         dismissedIssue = step.dismissed
         if step.tellLenses {
             for s in sessions.values { s.showNotice(new?.headline ?? "") }
         }
+        if changed { refreshHints() }
     }
 
     // MARK: - Global actions
@@ -383,6 +467,7 @@ final class AppModel {
             for r in regions where r.isEnabled { await startSession(r) }
         }
         sessionTick += 1
+        refreshHints()
     }
 
     func refreshAll() async {

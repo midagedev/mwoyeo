@@ -89,6 +89,8 @@ struct GeneralSettings: View {
                     Button("Show in Finder") { model.showSettingsFile() }
                 }
                 .buttonStyle(.borderless)
+                // A borderless button in a form row is drawn grey, like a disabled label; the accent says it is a button.
+                .foregroundStyle(.tint)
                 if let note = issueNote {
                     Text(note).font(.caption).foregroundStyle(.secondary)
                 }

@@ -56,14 +56,25 @@ import Testing
         #expect(r.failures == 0 && !r.isWaiting(now: 0))
     }
 
-    /// A transient error (programs not ready after a compile, a timeout) is retried in 1 s and never builds up the wait:
-    /// otherwise the minute of e5rt errors after an update would leave the lens idle long after recognition is back.
-    @Test func transientReadFailuresDoNotBuildUp() {
+    /// RE-PINNED 2026-10-18 (R2 reader-core, design §4.8 and F5). This test said a transient error (programs not ready after a
+    /// compile, no result) waits a fixed 1 s and never builds up, so that the minute of e5rt errors after an update would not leave
+    /// the lens idle long after recognition is back. Derivation of the change: a fixed 1 s with a lens on a stalled rev3 is one
+    /// Code-13 error every ~1.01 s, 56 a minute for 32 minutes in the RC and 13,361 in one process over 2 h 57 min; a wait that
+    /// doubles 1 s to 30 s allows 6 in the first minute (`BackoffTests.testRungBoundsCodeThirteenToSixAMinute`). The idle-after-recovery
+    /// worry is met by the rung, not by the lens: rev2 and `.fast` read while rev3 rests (`ReadRouter`), and the wait is 30 s at most.
+    /// FAIL-first: `BackoffTests.testTransientWaitsDouble` fails on the old code (waits [1, 1, 1, ...]). What stays: a transient
+    /// streak never feeds the hard one.
+    @Test func transientReadFailuresDoubleOnTheirOwnStreak() {
         var r = ReadBackoff()
-        for _ in 0..<20 { #expect(r.failure(now: 0, transient: true) == 1) }
-        #expect(r.failures == 0)
-        #expect(r.failure(now: 0) == 1)
-        #expect(r.failure(now: 0, transient: true) == 1)
-        #expect(r.failure(now: 0) == 2)
+        let waits = (0..<20).map { _ in r.failure(now: 0, transient: true) }
+        #expect(waits.prefix(7) == [1, 2, 4, 8, 16, 30, 30])
+        #expect(waits.allSatisfy { $0 <= 30 })
+        let hard = r.failure(now: 0)
+        #expect(hard == 1)                                       // the hard streak did not move
+        let next = r.failure(now: 0)
+        #expect(next == 2)
+        r.reset()
+        let afterReset = r.failure(now: 0, transient: true)
+        #expect(afterReset == 1)
     }
 }

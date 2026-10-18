@@ -215,7 +215,7 @@ import Testing
 
     @Test func aCleanPageHasNoFindings() {
         let a = drawn(r(320, 100, 1190, 76)), b = drawn(r(320, 200, 1190, 76))
-        #expect(LayoutCheck.check([a, b]).summary == "layout: blocks=2 overlaps=0 spill=0 cut=0")
+        #expect(LayoutCheck.check([a, b]).summary == "layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0")
     }
 
     @Test func translationsThatIntersectAreCounted() {

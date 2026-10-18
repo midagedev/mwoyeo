@@ -174,6 +174,26 @@ public enum TextFitter {
         return lo
     }
 
+    /// `text` cut to what fits, ending in "…": the longest start of it, at a word where there is one, whose cut `fits`
+    /// ("…" included). `text` itself when it fits, and when not even one character and "…" do (the room is less than a line:
+    /// cutting characters gains nothing). A translation that does not fit its room at the smallest size would otherwise be cut
+    /// through a line at the edge of its patch.
+    public static func truncating(_ text: String, fits: (String) -> Bool) -> String {
+        if fits(text) || !fits("…") { return text }
+        let chars = Array(text)
+        var lo = 0, hi = chars.count - 1   // the most characters kept that still fit, between lo (always fits) and hi
+        while lo < hi {
+            let mid = (lo + hi + 1) / 2
+            if fits(String(chars[..<mid]) + "…") { lo = mid } else { hi = mid - 1 }
+        }
+        guard lo > 0 else { return text }
+        var kept = Array(chars[..<lo])
+        // Back to the end of a word, unless that gives up more than a third of what fits (a long unbroken run).
+        if let space = kept.lastIndex(where: { $0 == " " }), space * 3 >= kept.count * 2 { kept = Array(kept[..<space]) }
+        while let last = kept.last, last.isWhitespace || ",.;:·-–—".contains(last) { kept.removeLast() }
+        return String(kept) + "…"
+    }
+
     /// CoreText breaks Hangul between any two syllables (it treats them like ideographs) and ignores
     /// `lineBreakStrategy`, so "노스필드" can wrap as "노스필/드". A word joiner between two syllables of one word
     /// forbids the break there; a word longer than the line still breaks, as CoreText falls back to any position.
@@ -303,7 +323,9 @@ public enum TranslationFilter {
     /// Operands are the name of a call whose arguments are variables ("Sublayer(x)"), the name of any call when the line
     /// holds an `=`, and the words inside such a call or lowercase beside an `=` ("headi = Attention(Q)"): a word that
     /// is capital-first ("Mode = Fast") stays prose. One prose word is the label of a typeset line when the rest holds
-    /// an `=` and twice its letters ("where headi = Attention(QWQ i, …)").
+    /// an `=` and twice its letters ("where headi = Attention(QWQ i, …)"); two, the first two words of the line, when the rest
+    /// holds a call too and one and a half times their letters ("where head; = Attention (QW®, KW, VW!)": the space before
+    /// the parenthesis and the arguments read as runs of letters are the OCR's).
     public static func isFormula(_ text: String) -> Bool {
         FormulaScan(text.trimmingCharacters(in: .whitespacesAndNewlines)).isFormula
     }
@@ -343,6 +365,9 @@ private struct FormulaScan {
     private var digit = false
     private var latin = false, greek = false, cyrillic = false
     private var bracket = false      // a slash, bar, bracket, comparison or arithmetic sign
+    private var callSeen = false     // a name followed by its arguments in parentheses
+    private var runs = 0             // runs of letters so far
+    private var proseRuns: [Int] = []  // which runs (counted from 0) are prose words
     private var supported = true     // every letter is Latin, Greek or Cyrillic
 
     /// Consonant-only words that are chat, not symbols; a capital in them does not make them a formula.
@@ -395,6 +420,23 @@ private struct FormulaScan {
             return widest == 1
         }
 
+        /// A call's arguments hold no prose word: no run of three letters or more with a vowel in it ("x, y", "QWQ i, KWK i").
+        func argumentsHoldNoProse(_ open: Int) -> Bool {
+            var depth = 0, run = 0, vowel = false
+            for k in open..<s.count where !isMark(s[k]) {
+                if s[k] == "(" { depth += 1 } else if s[k] == ")" { depth -= 1; if depth == 0 { break } }
+                if isLetter(s[k]) {
+                    run += 1
+                    vowel = vowel || (String(s[k]).lowercased().first.map { Self.vowels.contains($0) } ?? false)
+                    if run >= 3, vowel { return false }
+                } else {
+                    run = 0
+                    vowel = false
+                }
+            }
+            return true
+        }
+
         var openParens: [Bool] = []  // per open "(": is a call's name right before it, and are its words operands
         var callOpensAt = -1, callExempt = false
         var i = 0
@@ -442,6 +484,8 @@ private struct FormulaScan {
             if underscore { sign = true }
             i = j
             guard count > 0 else { continue }
+            let runIndex = runs
+            runs += 1
 
             let lettersOnly = digits == 0 && !underscore
             let plural = { () -> Bool in
@@ -449,14 +493,16 @@ private struct FormulaScan {
                 return tail.hasPrefix("(s)") || tail.hasPrefix("(es)")
             }
             // OCR may read a space before the parenthesis ("Attention (Q, K, V) = softmax"): on a line with a relation, a name
-            // followed by variables in parentheses is still a call.
+            // followed by arguments that hold no prose word in parentheses is still a call. The arguments of a typeset call
+            // come back as runs of letters ("QWQ i", "KWK"): subscripts and superscripts read as letters beside the name.
             var open = j
             while relation, open < s.count, s[open] == " " { open += 1 }
-            if open > j, !(open < s.count && s[open] == "(" && argumentsAreVariables(open)) { open = j }
+            if open > j, !(open < s.count && s[open] == "(" && argumentsHoldNoProse(open)) { open = j }
             let call = open < s.count && s[open] == "(" && isLetter(s[run.startIndex]) && !plural()
             let word = lettersOnly && scripts.count == 1 && !scripts.contains(.math) && (contraction || (count >= 3 && vowel))
             if call {
                 sign = true
+                callSeen = true
                 callOpensAt = open
                 callExempt = relation || camel || !word || argumentsAreVariables(open)
             }
@@ -472,7 +518,7 @@ private struct FormulaScan {
                     .contains { $0.map { Self.isRelation($0.value) } ?? false }
                 let lowerFirst = CharacterSet.lowercaseLetters.contains(s[run.startIndex])
                 let operand = (call && callExempt) || openParens.contains(true) || (relation && lowerFirst && beside)
-                if !operand { proseWords += 1; proseLetters += count }
+                if !operand { proseWords += 1; proseLetters += count; proseRuns.append(runIndex) }
             }
             if lettersOnly && count >= 2 && vowel == false && capital && !Self.consonantWords.contains(String(String.UnicodeScalarView(run.filter { !isMark($0) })).lowercased()) {
                 capsCluster = true
@@ -484,8 +530,16 @@ private struct FormulaScan {
     var isFormula: Bool {
         guard supported, letters > 0 else { return false }
         if letters == 1 { return true }
-        // A lone word of prose among many symbols ("where headi = Attention(QWQ i, …)") is the label of a typeset line.
-        if proseWords > 1 || (proseWords == 1 && !(relation && letters - proseLetters >= 2 * proseLetters)) { return false }
+        // One or two words of prose among many symbols ("where headi = Attention(QWQ i, …)") are the label of a typeset line: one
+        // when the rest holds an `=` and twice its letters; two, the first two words of the line, when the rest holds a call as
+        // well and one and a half times its letters (the OCR drops the subscripts of the arguments: "QW®, KW, VW!").
+        if proseWords > 2 { return false }
+        if proseWords > 0 {
+            let rest = letters - proseLetters
+            let one = proseWords == 1 && relation && rest >= 2 * proseLetters
+            let two = proseWords == 2 && relation && callSeen && proseRuns == [0, 1] && 2 * rest >= 3 * proseLetters
+            if !(one || two) { return false }
+        }
         if sign { return true }
         if onlyAtoms && (digitLetter || (capsCluster && !digit)) { return true }
         // A short Cyrillic fragment beside a slash or bracket: a "√dk" read as "/ак".
@@ -516,6 +570,16 @@ public enum VerticalText {
         let usable = boxes.filter { $0.width > 4 && $0.height > 4 }
         let tall = usable.filter { $0.height >= 2.2 * $0.width }
         return tall.count >= 3 && Double(tall.count) >= 0.6 * Double(usable.count)
+    }
+
+    /// One line of text turned on its side among horizontal text (a word of a figure, an axis label, the stamp in a margin): its
+    /// box is taller than wide by 1.4 times with three characters or more, by 1.7 times with two. A horizontal line is wider than
+    /// it is tall (a word of three letters is as wide as it is tall at the least), and the recognizer's boxes of the rotated
+    /// words of a figure measure 1.8 to 2.8 (the paper bench, page 15: "The" 21×45, "we" 19×37, "application" 23×123). Translated,
+    /// such a word comes out as a column of syllables.
+    public static func isRotatedLine(_ box: CGRect, characters: Int) -> Bool {
+        guard box.width > 0, characters >= 2 else { return false }
+        return box.height >= (characters >= 3 ? 1.4 : 1.7) * box.width
     }
 }
 

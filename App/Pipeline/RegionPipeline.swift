@@ -119,6 +119,10 @@ actor RegionPipeline {
         var ink: CGRect?
         /// Where in `rect` the translation may be laid out, relative to `rect`; nil = all of it.
         var textArea: CGRect?
+        /// What the last render drew: its font size (pixels), whether the translation needed more room than the patch has, and
+        /// whether it was cut to fit.
+        var drawnSize: CGFloat = 0
+        var clipped = false, ellipsis = false
     }
 
     private let translator: TranslationService
@@ -796,7 +800,7 @@ actor RegionPipeline {
             _ = finishPass(start, frame: frame)
             return
         }
-        found = splitByStyle(joinSplitLines(found), in: frame.image)
+        found = splitByStyle(joinSplitLines(readableLines(found, in: frame.image)), in: frame.image)
         Trace.mark("fast: OCR \(Int(dirty.width))×\(Int(dirty.height))px → \(found.count) blocks", since: t)
         let fresh = found.filter { ocr in
             TextRecognizer.needsTranslation(ocr.text, target: options.targetLanguage)
@@ -825,6 +829,7 @@ actor RegionPipeline {
             if let prior, prior.source == ocr.text { b.translation = prior.translation }
             made.append(b)
         }
+        capBodySizes(&made, among: blocks.filter { !staleIDs.contains($0.id) })
         guard let moved = finishPass(start, frame: frame) else { return }
         let bounds = CGRect(x: 0, y: 0, width: frame.image.width, height: frame.image.height)
         // Translations that arrived meanwhile are on the current copies of the old blocks.
@@ -879,7 +884,7 @@ actor RegionPipeline {
             emit(animated: false)
             return true
         }
-        let read = splitByStyle(joinSplitLines(found), in: frame.image)
+        let read = splitByStyle(joinSplitLines(readableLines(found, in: frame.image)), in: frame.image)
         found = read.filter { TextRecognizer.needsTranslation($0.text, target: options.targetLanguage) }
         let places = layoutPlaces(of: found, among: read, in: frame.image)
         guard let full = RGBAImage(cgImage: frame.image) else { return true }
@@ -900,6 +905,7 @@ actor RegionPipeline {
             b.erased = e.patch
             next.append(b)
         }
+        capBodySizes(&next, among: [])
         Trace.mark("seamless: erase \(next.count) blocks", since: t); t = Trace.now
         guard let moved = finishPass(start, frame: frame) else { return true }
         let bounds = CGRect(x: 0, y: 0, width: frame.image.width, height: frame.image.height)
@@ -950,6 +956,35 @@ actor RegionPipeline {
             if Trace.enabled { Trace.mark("merged blocks \(group): " + group.map { String(blocks[$0].text.prefix(24)) }.joined(separator: " + "), since: Trace.now) }
             return TextRecognizer.makeBlock(BlockMerge.readingOrder(lines.map(\.rect)).map { lines[$0] })
         }
+    }
+
+    /// The lines of `blocks` that are worth reading as they are; the rest are left on the picture, not translated and not erased.
+    /// A line the capture cuts in two (its box reaches the top or bottom of the frame: `CaptureEdge`) is read from half of it, and
+    /// its translation, drawn over the visible half, is of half a sentence: the capture is larger than the lens, so it is the
+    /// frame's edge, not the lens's, that cuts, and a pass that holds the whole line reads it whole. A word turned on its side
+    /// (`VerticalText.isRotatedLine`: the words of a figure) comes out as a column of syllables.
+    private func readableLines(_ blocks: [OCRBlock], in image: CGImage) -> [OCRBlock] {
+        let bounds = CGRect(x: 0, y: 0, width: image.width, height: image.height)
+        let cut = CaptureEdge.cut(blocks.flatMap { $0.lines.map(\.rect) }, in: bounds)
+        var first = 0
+        return blocks.compactMap { block in
+            defer { first += block.lines.count }
+            let kept = block.lines.indices.filter { i in
+                if cut.contains(first + i) { Trace.count("ocr.cut_line"); return false }
+                if VerticalText.isRotatedLine(block.lines[i].rect, characters: block.lines[i].text.count) { Trace.count("ocr.rotated_line"); return false }
+                return true
+            }
+            guard kept.count < block.lines.count else { return block }
+            return kept.isEmpty ? nil : TextRecognizer.makeBlock(kept.map { block.lines[$0] })
+        }
+    }
+
+    /// A translation's size comes from the glyphs of its source, which stand taller in a line with subscripts and superscripts: a
+    /// body-like block is not drawn larger than the body-like blocks on the screen (`BodySize`), the new ones and `kept` alike.
+    private func capBodySizes(_ made: inout [Block], among kept: [Block]) {
+        func item(_ b: Block) -> BodySize.Block { BodySize.Block(fontSize: b.fontSize, characters: b.source.count, lines: max(1, b.lines.count)) }
+        let ceiling = BodySize.ceiling(among: (kept + made).map(item))
+        for i in made.indices { made[i].fontSize = BodySize.capped(item(made[i]), ceiling: ceiling) }
     }
 
     /// `MWOYEO_LAYOUT=off` reads and erases blocks as before the layout rules (joining split lines, `Territory`, `ColumnEdge`,
@@ -1431,6 +1466,9 @@ actor RegionPipeline {
                 textArea: b.textArea))
             blocks[i].image = rendered?.image
             blocks[i].ink = rendered?.text
+            blocks[i].drawnSize = rendered?.fontSize ?? 0
+            blocks[i].clipped = rendered?.clipped ?? false
+            blocks[i].ellipsis = rendered?.ellipsis ?? false
             if Trace.enabled, let ink = rendered?.text {
                 Trace.mark("render '\(b.source.prefix(24))' patch \(Int(b.rect.minX)),\(Int(b.rect.minY)) \(Int(b.rect.width))x\(Int(b.rect.height)) spare \(Int(b.spareWidth)) "
                     + "area \(b.textArea.map { "\(Int($0.minX)),\(Int($0.minY)) \(Int($0.width))x\(Int($0.height))" } ?? "-") ink \(Int(ink.minX)),\(Int(ink.minY)) \(Int(ink.width))x\(Int(ink.height))",
@@ -1454,7 +1492,8 @@ actor RegionPipeline {
             guard b.image != nil else { return nil }
             let core = b.lines.dropFirst().reduce(b.lines.first ?? b.rect) { $0.union($1) }
             let text = b.ink.map { $0.offsetBy(dx: b.rect.minX, dy: b.rect.minY) } ?? b.rect
-            return DrawnBlock(source: b.source, core: core, patch: b.rect, text: text)
+            return DrawnBlock(source: b.source, core: core, patch: b.rect, text: text, fontSize: b.drawnSize, lines: max(1, b.lines.count), clipped: b.clipped,
+                              ellipsis: b.ellipsis)
         }
         onSnapshot(OverlaySnapshot(version: version, blocks: out, animated: animated, origin: origin, time: frameTime,
                                    texts: texts, frame: latest?.image, scale: s, drawn: drawn))

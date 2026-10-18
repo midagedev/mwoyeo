@@ -271,13 +271,21 @@ enum SelfTest {
         try keeping.finish(still.latest, lens: lensRect, time: phase + 1)
     }
 
-    /// `layout: blocks=N overlaps=K spill=S cut=C` (LayoutCheck) and one line per finding with the sources involved: the gate
-    /// and the debug view of a page whose translated blocks run into each other.
+    /// `layout: blocks=N overlaps=K spill=S cut=C clipped=Q` (LayoutCheck) and one line per finding with the sources involved: the
+    /// gate and the debug view of a page whose translated blocks run into each other. After it, `image: W×H` and one `block:`
+    /// line per drawn block (core and text rects in image pixels, drawn font size, source lines, characters, clipped, ellipsis) for
+    /// `tools/paper-bench/score.py`.
     private static func printLayout(_ snapshot: OverlaySnapshot?) {
         let drawn = snapshot?.drawn ?? []
         let report = LayoutCheck.check(drawn)
         func name(_ i: Int) -> String { "\"" + String(drawn[i].source.prefix(40)) + "\"" }
         print(report.summary)
+        if let frame = snapshot?.frame { print("image: \(frame.width)×\(frame.height)") }
+        func rect(_ r: CGRect) -> String { "\(Int(r.minX)),\(Int(r.minY)),\(Int(r.width)),\(Int(r.height))" }
+        for b in drawn {
+            print("block: core=\(rect(b.core)) text=\(rect(b.text)) size=\(String(format: "%.1f", b.fontSize)) lines=\(b.lines) chars=\(b.source.count) "
+                  + "clipped=\(b.clipped ? 1 : 0) ellipsis=\(b.ellipsis ? 1 : 0) \"\(b.source.prefix(60).replacingOccurrences(of: "\n", with: " "))\"")
+        }
         for (a, b) in report.overlaps { print("  overlap: \(name(a)) x \(name(b))") }
         for (a, b) in report.cut { print("  cut: \(name(a)) painted over by \(name(b))") }
         for a in report.spill { print("  spill: \(name(a)) past its column") }

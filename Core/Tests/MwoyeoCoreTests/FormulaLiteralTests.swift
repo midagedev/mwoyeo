@@ -57,6 +57,29 @@ import Testing
         }
     }
 
+    // MARK: the display formula of page 5 (v1.1.1 RC, live, 2026-10-18 13:09)
+
+    /// "where headᵢ = Attention(QWᵢ^Q, KWᵢ^K, VWᵢ^V)" came back translated ("where head; = 주의 (QW, KWK, VW…"): the OCR put a space
+    /// before "(", read the typeset arguments as runs of letters and "headᵢ" as "head;". Two words of prose open it ("where
+    /// head") and a call and an `=` hold the rest.
+    @Test func aTypesetCallReadWithASpaceAndRunsOfLettersStaysAsWritten() {
+        // The first is what the OCR read of page 5 in the paper bench (v1.1.1, 2x screen, page ~ 820 pt wide).
+        for t in ["where head; = Attention (QW®, KW, VW!)", "where head; = Attention (QWQ i, KWK i, VWV i)", "where head; = Attention (QWQ i , KWK i , VWV i )",
+                  "where headi = Attention (QWQ i , KWK i , VWV i )", "where head = Attention (QW, KWK, VW)"] {
+            #expect(kept(t), "\(t)")
+        }
+    }
+
+    /// The rule is wider only where the line is mostly symbols: arguments that hold a word, a third word of prose, prose after
+    /// the first words of the line, or a line that is mostly words stay text.
+    @Test func aSpacedCallWithWordsInItIsStillText() {
+        for t in ["Mode = Fast (see the settings)", "where x = Attention (the queries and keys)", "Attention (queries, keys) = softmax",
+                  "Note that the value x = Attention (Q, K, V)", "Here we set x = Attention (Q, K, V)", "Total = Cost (in the first year)",
+                  "where all of the heads = Attention (Q, K, V)"] {
+            #expect(!TranslationFilter.isLiteral(t), "\(t)")
+        }
+    }
+
     // MARK: text that merely looks short or symbolic is still text
 
     @Test func chatAndLabelsAreStillTranslated() {

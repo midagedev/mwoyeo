@@ -182,6 +182,79 @@ public enum ColumnEdge {
     }
 }
 
+/// The size body text is drawn at. A translation's size starts from the glyphs of its source (`emSize`), and the glyphs of a
+/// line with subscripts and superscripts ("W ∈ R dmodel × dk", "dk = dv = dmodel/h") stand taller than the letters beside them:
+/// the translation of such a line came out 1.5 times as large as the lines around it. Body text is set in one size on a
+/// screen, so a body-like block is not drawn larger than the body-like blocks beside it; titles and headings keep theirs.
+public enum BodySize {
+    /// A block is body-like when its lines hold this many characters on average: a title, a heading, a caption or a label
+    /// is shorter, and is set in its own size.
+    public static let bodyCharacters = 40
+    /// How much larger than the median of the body-like blocks a body-like block may be drawn (a line of a paragraph
+    /// differs by a few percent on its own).
+    public static let ceilingFactor: CGFloat = 1.15
+
+    /// One block, as far as its size is concerned.
+    public struct Block: Sendable, Equatable {
+        public var fontSize: CGFloat?
+        public var characters: Int
+        public var lines: Int
+
+        public init(fontSize: CGFloat?, characters: Int, lines: Int) {
+            self.fontSize = fontSize
+            self.characters = characters
+            self.lines = lines
+        }
+
+        public var isBody: Bool { characters >= bodyCharacters * max(1, lines) }
+    }
+
+    /// The largest size a body-like block may be drawn at among `blocks` (every block on the screen, the new and the kept):
+    /// `ceilingFactor` times the median size of the body-like ones, the lower of the two middle ones when their number is
+    /// even (scripts only ever make a size larger). Nil when fewer than two blocks are body-like: one block has nothing to be
+    /// compared with.
+    public static func ceiling(among blocks: [Block]) -> CGFloat? {
+        let sizes = blocks.filter(\.isBody).compactMap(\.fontSize).filter { $0 > 0 }.sorted()
+        guard sizes.count >= 2 else { return nil }
+        return sizes[(sizes.count - 1) / 2] * ceilingFactor
+    }
+
+    /// `block`'s size under `ceiling`: a body-like block is capped, any other block keeps its size.
+    public static func capped(_ block: Block, ceiling: CGFloat?) -> CGFloat? {
+        guard let size = block.fontSize, let ceiling, block.isBody else { return block.fontSize }
+        return min(size, ceiling)
+    }
+}
+
+/// A line the capture cuts. The recognizer reads what the picture holds: a line that stands half inside the capture is read
+/// from its upper or lower half, and its translation, drawn over the visible half, is of half a sentence. The capture is
+/// larger than the lens (overscan), so such a line is out of sight unless the capture ends at the edge of the display; it is
+/// left as it is (not translated, not erased) until the capture holds the whole line.
+public enum CaptureEdge {
+    /// A line's box this close to the top or bottom of the capture (pixels) touches it: the recognizer's boxes follow the
+    /// glyphs it saw, and a line cut through the middle of its letters ends 3 px short of the edge as often as at it (measured
+    /// on the paper bench's crops, 2 px missed five of eighteen).
+    public static let tolerance: CGFloat = 4
+    /// A touching line is cut when its box is shorter than this share of the median height of the lines that do not touch: the
+    /// visible half of a cut line is about half as tall, while a line of a picture cropped to its text (one subtitle line, a
+    /// caption) touches the edge whole.
+    public static let shortShare: CGFloat = 0.85
+
+    /// Whether `line` reaches the top or bottom edge of `bounds`.
+    public static func touches(_ line: CGRect, in bounds: CGRect) -> Bool {
+        line.minY <= bounds.minY + tolerance || line.maxY >= bounds.maxY - tolerance
+    }
+
+    /// The indices of the lines of one capture that it cuts. With no line clear of the edges there is nothing to compare with,
+    /// and none is cut.
+    public static func cut(_ lines: [CGRect], in bounds: CGRect) -> Set<Int> {
+        let clear = lines.filter { !touches($0, in: bounds) }.map(\.height).sorted()
+        guard !clear.isEmpty else { return [] }
+        let reference = clear[clear.count / 2]
+        return Set(lines.indices.filter { touches(lines[$0], in: bounds) && lines[$0].height < shortShare * reference })
+    }
+}
+
 /// One drawn translation, for `LayoutCheck`.
 public struct DrawnBlock: Sendable, Equatable {
     public var source: String
@@ -191,12 +264,23 @@ public struct DrawnBlock: Sendable, Equatable {
     public var patch: CGRect
     /// Where its translation is drawn, inside `patch`.
     public var text: CGRect
+    /// The translation's font size (pixels) and the source lines it replaces.
+    public var fontSize: CGFloat
+    public var lines: Int
+    /// The translation needed more room than its patch has at the smallest size, and whether it was cut to fit and ends in "…".
+    public var clipped: Bool
+    public var ellipsis: Bool
 
-    public init(source: String, core: CGRect, patch: CGRect, text: CGRect) {
+    public init(source: String, core: CGRect, patch: CGRect, text: CGRect, fontSize: CGFloat = 0, lines: Int = 1, clipped: Bool = false,
+                ellipsis: Bool = false) {
         self.source = source
         self.core = core
         self.patch = patch
         self.text = text
+        self.fontSize = fontSize
+        self.lines = lines
+        self.clipped = clipped
+        self.ellipsis = ellipsis
     }
 }
 
@@ -214,19 +298,22 @@ public enum LayoutCheck {
         public var spill: [Int] = []
         /// (painted, by): a drawn translation and the later block whose patch covers part of it.
         public var cut: [(Int, Int)] = []
+        /// Drawn translations that did not fit their patch at the smallest size.
+        public var clipped: [Int] = []
 
         public static func == (a: Report, b: Report) -> Bool {
-            a.blocks == b.blocks && a.spill == b.spill && a.overlaps.elementsEqual(b.overlaps, by: ==) && a.cut.elementsEqual(b.cut, by: ==)
+            a.blocks == b.blocks && a.spill == b.spill && a.clipped == b.clipped && a.overlaps.elementsEqual(b.overlaps, by: ==) && a.cut.elementsEqual(b.cut, by: ==)
         }
 
         /// The one line the gates read.
-        public var summary: String { "layout: blocks=\(blocks) overlaps=\(overlaps.count) spill=\(spill.count) cut=\(cut.count)" }
+        public var summary: String { "layout: blocks=\(blocks) overlaps=\(overlaps.count) spill=\(spill.count) cut=\(cut.count) clipped=\(clipped.count)" }
     }
 
     public static func check(_ drawn: [DrawnBlock]) -> Report {
         var r = Report()
         r.blocks = drawn.count
         for i in drawn.indices {
+            if drawn[i].clipped { r.clipped.append(i) }
             if let limit = ColumnEdge.right(of: drawn[i].core, among: drawn.indices.filter { $0 != i }.map { drawn[$0].core }),
                drawn[i].text.maxX > limit + tolerance {
                 r.spill.append(i)

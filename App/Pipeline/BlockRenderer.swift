@@ -38,6 +38,12 @@ enum BlockRenderer {
         var image: CGImage
         /// The translation's extent in the image (pixels, top-left origin), cut to the image.
         var text: CGRect
+        /// The size the translation was drawn at (pixels, em).
+        var fontSize: CGFloat = 0
+        /// The translation needed more height than the image has at the smallest size.
+        var clipped = false
+        /// It was cut to what fits and ends in "…" (`TextFitter.truncating`): more than the glyphs' leading past the image.
+        var ellipsis = false
     }
 
     /// Background around the text (pixels) that an erased block takes in, for the glyph mask's ring.
@@ -75,8 +81,8 @@ enum BlockRenderer {
         // Outlined text keeps its own fill: the outline, not the background, is what it is read against.
         let textColor = outline != nil ? input.appearance.textColor.cgColor : legibleTextColor(input.appearance)
         let weight = fontWeight(coverage: input.appearance.coverage)
-        func make(_ s: CGFloat) -> NSAttributedString {
-            attributed(input.text, size: s, weight: weight, style: input.fontStyle, color: textColor, language: input.targetLanguage,
+        func make(_ s: CGFloat, text: String? = nil) -> NSAttributedString {
+            attributed(text ?? input.text, size: s, weight: weight, style: input.fontStyle, color: textColor, language: input.targetLanguage,
                        centered: input.centered)
         }
 
@@ -104,8 +110,24 @@ enum BlockRenderer {
                 size = TextFitter.fitFontSize(in: box.size, minSize: minSize, maxSize: maxSize) { TextFitter.measure(make($0), width: box.width) }
             }
         }
-        let string = make(size)
-        let measured = TextFitter.measure(string, width: wraps ? box.width : .greatestFiniteMagnitude)
+        var string = make(size)
+        let lineWidth = wraps ? box.width : CGFloat.greatestFiniteMagnitude
+        var measured = TextFitter.measure(string, width: lineWidth)
+        // The text is drawn about the middle of its area and the lines past the image are not drawn: a translation taller than
+        // the room the image gives it at the smallest size is cut through a line at the image's edge. It ends in "…" instead.
+        // A line box reaches a quarter of the size past the glyphs it holds: only a translation taller than that is cut through
+        // glyphs. `clipped` counts what needs more room than the image gives it at all.
+        let room = 2 * min(box.midY, CGFloat(h) - box.midY), slack = size * 0.25
+        let clipped = measured.height > room + 1
+        var ellipsis = false
+        if measured.height > room + slack {
+            let cut = TextFitter.truncating(input.text) { TextFitter.measure(make(size, text: $0), width: lineWidth).height <= room + slack }
+            if cut != input.text {
+                string = make(size, text: cut)
+                measured = TextFitter.measure(string, width: lineWidth)
+                ellipsis = true
+            }
+        }
 
         // Vertically centre; CoreText draws in a y-up space, which matches CGContext's default.
         let textRect = CGRect(x: box.minX, y: box.midY - measured.height / 2, width: box.width, height: measured.height)
@@ -135,7 +157,7 @@ enum BlockRenderer {
         guard let image = ctx.makeImage() else { return nil }
         let inkWidth = min(measured.width, pathWidth), inkX = input.centered ? textRect.midX - inkWidth / 2 : textRect.minX
         let ink = CGRect(x: inkX, y: CGFloat(h) - textRect.maxY, width: inkWidth, height: textRect.height).intersection(bounds)
-        return Rendered(image: image, text: ink.isNull ? .zero : ink)
+        return Rendered(image: image, text: ink.isNull ? .zero : ink, fontSize: size, clipped: clipped, ellipsis: ellipsis)
     }
 
     private static func attributed(_ text: String, size: CGFloat, weight: NSFont.Weight, style: FontStyleChoice,

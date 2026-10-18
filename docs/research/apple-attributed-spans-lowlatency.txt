@@ -1,0 +1,21 @@
+SRC We compute the dot products of the query with all keys, divide each by √dk, and apply a softmax function.
+TGT 우리는 모든 키를 사용하여 쿼리의 도트 곱을 계산하고, 각각을 √dk로 나눈 뒤, 소프트맥스 함수를 적용합니다.
+  RUN [√dk로 ] skip=true link=math:1
+SRC The input consists of queries and keys of dimension dk, and values of dimension dv.
+TGT 입력은 차원 dk의 쿼리와 키, 그리고 차원 dv의 값으로 구성됩니다.
+  RUN [dk의] skip=true link=math:1
+  RUN [dv의] skip=true link=math:2
+SRC Where the projections are parameter matrices W_i^Q ∈ R^{dmodel×dk} and W^O ∈ R^{hdv×dmodel}.
+TGT 여기서 투영은 파라미터 행렬 W_i^Q ∈ R^{dmodel×dk} 및 W^O ∈ R^{hdv×dmodel}입니다.
+  RUN [W_i^Q ∈ R^{dmodel×dk} ] skip=true link=math:1
+  RUN [W^O ∈ R^{hdv×dmodel}] skip=true link=math:2
+SRC In this work we employ h = 8 parallel attention layers, or heads.
+TGT 본 연구에서는 h = 8개의 평행 주의층, 즉 헤드를 사용합니다.
+  RUN [h = 8개의 ] skip=true link=math:1
+SRC Then their dot product, q · k, has mean 0 and variance dk.
+TGT 그렇다면 그들의 점곱인 q·k는 평균이 0이고 분산은 dk입니다.
+  RUN [q·k는] skip=true link=math:1
+  RUN [dk입니다] skip=true link=math:2
+SRC Each layer has two sub-layers, and the output is LayerNorm(x + Sublayer(x)).
+TGT 각 레이어는 두 개의 서브 레이어를 가지고 있으며, 출력은 LayerNorm(x + Sublayer(x))입니다.
+  RUN [LayerNorm(x + Sublayer(x))입니다.] skip=true link=math:1

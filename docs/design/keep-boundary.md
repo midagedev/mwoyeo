@@ -191,3 +191,75 @@ Each step needs the user's go. Every stage reuses what the earlier ones built, s
   disagreements (recommended).
 - CC BY-SA as training data: recommended no (test and render material only).
 - Names as `either` (the engine decides), or as `keep`.
+
+## 9. Stage 0 results (2026-10-19)
+
+Sources: tools/keep-labels/RESULTS-2026-10-19.txt (rules report), CODE-FEATURES-2026-10-19.txt, and
+tools/inline-math-probe/RESULTS-2026-10-19.txt. Labels: two CC BY 4.0 papers (2401.10066 dev, 2310.06142 hold-out),
+1706.03762 (dev, local only), and twelve code use-cases k01-k12 (dev k01-k08, hold-out k09-k12). Read: the document
+model (doc); the VN read is in the files and similar.
+
+**Today's rules on the keep boundary**
+
+| Source | Word P / R | Span exact F1 | Block keep P / R | keep→translated words | translate→kept words |
+|---|---|---|---|---|---|
+| Papers dev | 0.91 / 0.39 | 0.26 | 0.85 / 0.76 | 798 / 1309 | 51 / 6791 |
+| Papers hold-out | 0.95 / 0.32 | 0.38 | 0.90 / 0.59 | 312 / 462 | 8 / 4781 |
+| Cases dev | 0.91 / 0.40 | 0.56 | 0.95 / 0.56 | 143 / 239 | 10 / 362 |
+| Cases hold-out | 1.00 / 0.58 | 0.77 | 1.00 / 0.78 | 88 / 208 | 0 / 249 |
+
+The rules rarely leave prose untranslated, but they miss most keep words. By reason, on the cases hold-out:
+- recall 1.00 for cmd (n = 13), math (n = 18) and hotkey (n = 4);
+- path 0.90 and code 0.52;
+- id 0.08;
+- flag and url 0.00.
+
+The misses cluster in five places:
+- single letters and bare operands (246 of 788 missed math words, papers dev);
+- garbled symbols and weak operators;
+- code lines with English words or CJK comments;
+- git-log lines;
+- terminal blocks mixing commands and CJK output.
+
+**Region versus word (§3)**
+
+| Source | Pure blocks | Keep words in all-keep blocks | Display regions whole / split / merged with prose |
+|---|---|---|---|
+| Papers dev | 61 % | 31 % | 24 / 13 / 32 |
+| Papers hold-out | 65 % | 46 % | 8 / 5 / 12 |
+| Cases dev | 83 % | 88 % | 3 / 6 / 0 |
+| Cases hold-out | 91 % | 87 % | 8 / 5 / 0 |
+
+- **Developer screens:** a region judge carries about 90 % of keep words. The cases are hand-written and few, so this
+  needs confirming on real screens.
+- **Papers:** most keep words are inline math inside mixed blocks, and Vision merges about half the display equations
+  with prose. Papers need a span-level judge, or a block splitter first.
+
+**Code blocks the rules translate:** 24 of 74 pure-keep blocks (doc read). The document model often cuts a code region
+into one-line blocks. The features that catch them are listed below; thresholds were set on the same set, so the catch
+counts are an upper bound.
+
+| Feature | Catches (of 24) | False fires (of 44 pure-translate blocks) |
+|---|---|---|
+| Indentation | 17 | 4 |
+| Tinted background | 12 | 5 |
+| Keyword density | 10 | 2 |
+| Line end `; { } )` | 2 | 0 |
+| Monospace | 1 | 1 |
+
+Together, any of the five catches 23 of 24; tint or keyword alone catches 20.
+
+**Inline math pixels (M0)**
+- Word-box crops are clean for 76 % of spans (VN) and 64 % (Docs) on p3-p6.
+- An ink-grown box (≤ 3 px) raises that to 94 % / 86 %, and drawing only the span's own ink components gives 100 % on the
+  (a, b) criteria.
+- Word boxes never missed sub/superscript ink, so Plan B (character boxes) is not needed.
+- Verbatim locate of the span text in Apple's translation: 95 % (38/40).
+
+But the rules find only 13 % of inline math spans (hold-out span recall 0.13), so the pixel path would reach few
+formulas. It is deferred with this document (user scope for the first MAS submission, 2026-10-19).
+
+**Decision for the first MAS submission (cheap path):**
+- A rule-based code-region keep: group adjacent blocks by tint and indentation, then score keywords and line ends.
+- No model.
+- The paper-side gaps (inline spans, block splitting) wait for the stage gates in §7.

@@ -7,10 +7,12 @@
 #   run:   SP=<dir with in/chat.png, in/vn.png, in/article.png, in/sub-mid.png> NEW=<binary> MAIN=<baseline binary> bash healthy.sh
 #          (QUICK=1 skips the 200 s ja check)
 # One PASS/FAIL line per check, a summary line at the end. Outputs: $OUT/*.out (stdout) and *.err (stderr), default /tmp/ocr-stall/healthy.
-# 2026-10-17 (ocr-vn): the app asks no Swift Vision request any more (they stall the whole process, tools/ocr-probe/inprocess.swift);
-# every read is the Objective-C VNRecognizeTextRequest, lines grouped into paragraphs by ParagraphGrouper. The checks of the child
+# 2026-10-17 (ocr-vn): the app asked no Swift Vision request (they seemed to stall the whole process, tools/ocr-probe/inprocess.swift);
+# every read was the Objective-C VNRecognizeTextRequest, lines grouped into paragraphs by ParagraphGrouper. The checks of the child
 # warm-up (--warm-vision, --assume-vision-ready, slow-child, fail-child) and of the Swift path are gone; `stall` and `stall-vn` both
 # stall revision 3 now (checks 2 and 5), `slow:<ms>` makes revision 3 answer late (check 4).
+# 2026-10-18 (vision-revive): the stall was a cold ANE compile, and the app loads the Swift document model itself at launch and
+# reads paragraphs with it once loaded. These checks run on that default; MWOYEO_OCR_PATH=vn (never a Swift model) must pass them too.
 SP=${SP:?set SP to a folder holding in/chat.png (English chat), in/vn.png (Japanese), in/article.png and in/sub-mid.png (Japanese)}
 NEW=${NEW:-/tmp/ocr-stall/dd/Build/Products/Debug/Mwoyeo.app/Contents/MacOS/Mwoyeo}
 MAIN=${MAIN:-/tmp/mwoyeo-main/dd/Build/Products/Debug/Mwoyeo.app/Contents/MacOS/Mwoyeo}
@@ -61,6 +63,14 @@ n=$(arrows "$OUT/d.out"); st=$(count "$OUT/d.out" ocr.stalled.vn3); rc=$(count "
 run e "$NEW" stall-vn chat.png en 90
 n=$(arrows "$OUT/e.out"); f=$(count "$OUT/e.out" ocr.fallback.rev2); st=$(count "$OUT/e.out" ocr.stalled.vn3)
 [ "$n" -ge 25 ] && [ "$f" -gt 0 ] && [ "$st" -ge 1 ]; verdict $? "5 chat.png en>ko, MWOYEO_FAKE_OCR=stall-vn: >=25 arrows, ocr.fallback.rev2>0, ocr.stalled.vn3>=1" "arrows=$n rev2=$f vn3-stalled=$st wall=$(cat $OUT/e.s)s"
+
+# Programs not ready (2026-10-18, vision-setup): revision 3 throws e5rtError twenty times (what a Mac logs for ~90 s after a long cold
+# compile). The reads fall down the ladder in the same call (revision 2 for English): every block still translates, the pass never
+# fails, and the log has no "document OCR failed" line (that was the message of an ended pass).
+since=$(date '+%Y-%m-%d %H:%M:%S')
+run x "$NEW" e5rt chat.png en 90
+n=$(arrows "$OUT/x.out"); f=$(count "$OUT/x.out" ocr.fallback.notready); ft=$(/usr/bin/log show --start "$since" --predicate 'eventMessage CONTAINS "document OCR failed"' 2>/dev/null | grep -c 'document OCR failed:')
+[ "$n" -ge 27 ] && [ "$ft" -eq 0 ]; verdict $? "8 chat.png en>ko, MWOYEO_FAKE_OCR=e5rt: >=27 arrows (29 on revision 3, 30 on revision 2), no 'document OCR failed'" "arrows=$n notready-fallbacks=$f failed-lines=$ft wall=$(cat $OUT/x.s)s"
 
 # Paragraphs (ParagraphGrouper): the three-line body paragraph of article.png is one block, and the two centred subtitle lines
 # of sub-mid.png are one block.

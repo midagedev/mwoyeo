@@ -1,10 +1,10 @@
-// A pending Swift Vision request blocks the Objective-C one in the same process. In ONE process: start a Swift
-// `RecognizeDocumentsRequest` (its model still loading), and 2 s later run a `VNRecognizeTextRequest`; print when each ends.
+// Swift `RecognizeDocumentsRequest` and `VNRecognizeTextRequest` in ONE process: start the Swift request (its model still loading),
+// and 2 s later run a `VNRecognizeTextRequest`; print when each ends.
 // Measured on macOS 27 with the document model compiling: accurate revision 3 blocked for more than 60 s, revision 2 for
 // more than 30 s, `.fast` answered in 0.12 s; the same request in another process at that moment answered in 0.3 s.
-// That is why the app asks no Swift Vision request at all (ocr-vn, 2026-10-17): a child process that loaded the Swift models
-// first (ocr-iso, `SwiftVisionWarm`, removed) was not enough, a ready Swift model still stalled in-process in the GUI.
-// The app reads lines with `VNRecognizeTextRequest` and groups them into paragraphs itself (`ParagraphGrouper`).
+// The block was first read as "a pending Swift request blocks VN" (ocr-vn, 2026-10-17, which dropped every Swift request).
+// vision-revive (2026-10-18, mix.swift) found it is a cold compile in the system's ANE service: warm, the Swift requests and
+// VN revision 3 run side by side at 0.2-0.5 s. The app loads the Swift models itself at launch (`SwiftVisionGate`).
 //   build: swiftc -O inprocess.swift -o inprocess
 //   run:   ./inprocess chat.png rev3|rev2|fast [seconds]      (no [seconds]: waits for the answer, however long)
 // With [seconds] it prints "blocked" and exits 1 then. Exiting abandons the pending Swift request, and a client that goes

@@ -5,7 +5,11 @@ import SwiftUI
 
 /// Window captures of the engine UI, for checking a look without clicking through the app:
 ///   Mwoyeo --capture-ui outdir scenario… [--mock http://host:port/v1] [--delay s] [--image picture]
-/// Scenarios: translation-default, translation-engines, general-saving, menu-default, menu-switcher, menu-notice,
+/// `vision-reads [--src ja] [--image picture] [--for seconds]` is a probe, not a capture: it starts the initialization of the text
+/// models for the language and reads the picture in this process every half second until every step is done, printing each
+/// read's latency and the steps as they change (what a lens sees during a cold compile; no window).
+/// Scenarios: menu-init-running, menu-init-failed, menu-init-done (the panel during the initialization of the text
+/// models, from a gate of its own, no real recognition), translation-default, translation-engines, general-saving, menu-default, menu-switcher, menu-notice,
 /// menu-profile, image-window and image-window-original (the Translate Image window on `--image`, translated through the
 /// mock, then with Show Original on; when the text recognizer reads nothing the picture stands in for its translation, which
 /// still shows the toggle's two states), sheet-pick, sheet-config, sheet-config-remote, lens-badge, lens-notice, lens-menu, add-flow (adds an
@@ -105,6 +109,11 @@ enum UICapture {
                 await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
                 model.frontmostBundleID = nil
                 model.settings.appProfiles = []
+            case "menu-init-running", "menu-init-failed", "menu-init-done":
+                MenuPanel.fakeSetup = Self.fakeGate(String(name.dropFirst(10)))
+                await shoot(name, MenuPanel(), CGSize(width: 340, height: 460))
+                MenuPanel.fakeSetup = nil
+            case "vision-reads": await visionReads()
             case "image-window": await imageWindow(name, showOriginal: false)
             case "image-window-original": await imageWindow(name, showOriginal: true)
             case "check-logic": await checkLogic()
@@ -120,6 +129,65 @@ enum UICapture {
             case "lens-menu": await lens(name, badge: nil, notice: nil, menu: true)
             case "add-flow": await addFlow()
             default: print("unknown scenario \(name)")
+            }
+        }
+
+        /// A gate in the middle of the initialization, on a clock of its own: the text reader done in 34 s, then the paragraph reader
+        /// running for 46 s (`running`), failed (`failed`), or done too with the last step finished a second ago (`done`).
+        private static func fakeGate(_ state: String) -> (gate: SwiftVisionGate, now: TimeInterval) {
+            let t: TimeInterval = 1000
+            var g = SwiftVisionGate()
+            g.want("auto")
+            func step(_ s: SwiftVisionGate.Step, from: TimeInterval, to: TimeInterval?, failure: String? = nil) {
+                g.started(SwiftVisionGate.Due(key: "auto", step: s), now: t - from)
+                if let to { g.finished(failure: failure, now: t - to) }
+            }
+            step(.textModel, from: 90, to: 56)
+            switch state {
+            case "failed": step(.documentModel, from: 56, to: 10, failure: "the helper process ended with status 1")
+            case "done":
+                step(.documentModel, from: 56, to: 12)
+                step(.swiftTextModel, from: 12, to: 1)
+            default: step(.documentModel, from: 56, to: nil)
+            }
+            return (g, t)
+        }
+
+        /// Reads during the initialization: the latency of each read in this process while the steps run (the child compiles meanwhile).
+        private func visionReads() async {
+            let language = option("--src") ?? "ja"
+            let limit = Double(option("--for") ?? "400") ?? 400
+            let picture: CGImage? = option("--image").flatMap { NSImage(contentsOf: URL(fileURLWithPath: $0))?.cgImage(forProposedRect: nil, context: nil, hints: nil) } ?? TextRecognizer.probePicture
+            guard let picture else { print("vision-reads: no picture"); return }
+            let t0 = Trace.now
+            func at() -> String { String(format: "%6.1f", Trace.now - t0) }
+            Task.detached(priority: .utility) { await AppModel.loadVision(source: language) }
+            var shown = ""
+            var n = 0
+            while Trace.now - t0 < limit {
+                let gate = TextRecognizer.setupState
+                let steps = SwiftVisionGate.Step.allCases.map { "\($0.rawValue)=\(gate.steps[$0].map(Self.describe) ?? "?")" }.joined(separator: " ")
+                if steps != shown { shown = steps; print("[\(at())] steps: \(steps) child=\(gate.inChild)") }
+                if gate.running == nil, gate.allReady, !gate.steps.values.contains(.pending), n > 0 { break }
+                let began = Trace.now
+                n += 1
+                do {
+                    let blocks = try await TextRecognizer.blocks(in: picture, languages: [Locale.Language(identifier: language)])
+                    print("[\(at())] read \(n): \(blocks.count) blocks in \(Int((Trace.now - began) * 1000)) ms")
+                } catch {
+                    print("[\(at())] read \(n): failed \(error) in \(Int((Trace.now - began) * 1000)) ms")
+                }
+                try? await Task.sleep(for: .milliseconds(500))
+            }
+            print("[\(at())] vision-reads: end, \(n) reads, \(TextRecognizer.setupState.steps.map { "\($0.key.rawValue)=\(Self.describe($0.value))" }.sorted().joined(separator: " "))")
+        }
+
+        private static func describe(_ s: SwiftVisionGate.StepState) -> String {
+            switch s {
+            case .pending: "pending"
+            case .running: "running"
+            case let .done(seconds): String(format: "done(%.1fs)", seconds)
+            case let .failed(m): "failed(\(m))"
             }
         }
 

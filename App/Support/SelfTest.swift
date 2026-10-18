@@ -165,7 +165,8 @@ enum SelfTest {
         TextRecognizer.setNoticeHandler(report)
         // A render is a fresh process, the cold case: the text model loads in the background, as at the app's launch, and `--warm`
         // waits for it.
-        let loading = Task.detached(priority: .utility) { await AppModel.loadVision() }
+        let source = settings.sourceLanguage
+        let loading = Task.detached(priority: .utility) { await AppModel.loadVision(source: source) }
         let t0 = Date()
         let inpainter = settings.useInpaintingModel ? Inpainter.load() : nil
         print("inpainter: \(inpainter != nil ? "MI-GAN loaded (\(ms(t0)) ms)" : "none")")

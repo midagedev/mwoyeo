@@ -38,7 +38,7 @@ enum TextRecognizer {
     }
 
     /// `.fast` through the Objective-C request: the Swift `RecognizeTextRequest` at `.fast` returns no observations at all on
-    /// macOS 27, and no Swift Vision request is used in this process (see `accurate`).
+    /// macOS 27 (the Swift document and text requests are used for paragraphs only, see `blocks`).
     private static func fastLines(in image: CGImage, roi: CGRect?, languages: [Locale.Language]) async throws -> [OCRLine] {
         let wanted = languages.compactMap(\.languageCode)
         return try await deadline {
@@ -91,11 +91,66 @@ enum TextRecognizer {
         return ranges
     }
 
-    /// Paragraph-level recognition: the lines of `lines`, grouped into reading units by layout (`ParagraphGrouper`).
+    /// Paragraph-level recognition. Priority: Swift document model (`RecognizeDocumentsRequest`, once the gate says its model is
+    /// loaded for these languages) > VN revision 3 + `ParagraphGrouper` > revision 2 > `.fast` > issue (`accurate`). A document read
+    /// that has not answered in `documentDeadline` falls back to VN for that read, and the key waits for a retry (`SwiftVisionGate.missed`).
     static func blocks(in image: CGImage, roi: CGRect? = nil, languages: [Locale.Language], customWords: [String] = []) async throws -> [OCRBlock] {
         Trace.count("ocr.blocks")
+        let key = key(languages)
+        if ocrPath != .vn {
+            if gate.withLock({ $0.want(key) }) { publishAndRun() }
+            if gate.withLock({ $0.isReady(key) }) {
+                do {
+                    let found = try await deadline(seconds: documentDeadline) { try await swiftBlocks(in: image, roi: roi, languages: languages, customWords: customWords) }
+                    Trace.count("ocr.blocks.swift")
+                    Trace.count("ocr.blocks.lines", found.reduce(0) { $0 + $1.lines.count })
+                    return found
+                } catch is Timeout {
+                    Trace.count("ocr.swift.missed")
+                    log.error("document recognition did not answer in \(Int(documentDeadline)) s, reading with VN")
+                    gate.withLock { $0.missed(key) }
+                    publish()
+                } catch {
+                    if OCRHealth.programsNotReady(error) { Trace.count("ocr.swift.notready") }
+                    log.error("document recognition failed: \(String(describing: error), privacy: .public), reading with VN")
+                }
+            }
+        }
+        Trace.count("ocr.blocks.vn")
         let lines = try await accurate(in: image, roi: roi, languages: languages, customWords: customWords)
+        Trace.count("ocr.blocks.lines", lines.count)
         return ParagraphGrouper.groups(lines, rect: \.rect, text: \.text).map(makeBlock)
+    }
+
+    /// Warm document reads take 0.33-0.48 s (vision-revive, 2026-10-18).
+    private static let documentDeadline: Double = 8
+
+    private static func swiftBlocks(in image: CGImage, roi: CGRect?, languages: [Locale.Language], customWords: [String]) async throws -> [OCRBlock] {
+        var req = RecognizeDocumentsRequest()
+        req.textRecognitionOptions.customWords = customWords
+        if languages.isEmpty {
+            req.textRecognitionOptions.automaticallyDetectLanguage = true
+        } else {
+            req.textRecognitionOptions.recognitionLanguages = languages
+        }
+        let size = CGSize(width: image.width, height: image.height)
+        let region = roi.map { normalized($0, in: size) } ?? CGRect(x: 0, y: 0, width: 1, height: 1)
+        req.regionOfInterest = NormalizedRect(normalizedRect: region)
+        var out: [OCRBlock] = []
+        for doc in try await req.perform(on: image) {
+            for paragraph in doc.document.paragraphs {
+                let lines = paragraph.lines.compactMap { obs -> OCRLine? in
+                    guard let c = obs.topCandidates(1).first, !c.string.isEmpty else { return nil }
+                    let words = wordRanges(c.string).compactMap { r in
+                        c.boundingBox(for: r).map { OCRWord(rect: pixelRect(unclip($0.boundingBox.cgRect, from: region), in: size), range: r) }
+                    }
+                    return OCRLine(rect: pixelRect(unclip(obs.boundingBox.cgRect, from: region), in: size), text: c.string, words: words)
+                }
+                guard !lines.isEmpty else { continue }
+                out.append(makeBlock(lines))
+            }
+        }
+        return out
     }
 
     struct Timeout: Error {}
@@ -133,11 +188,40 @@ enum TextRecognizer {
 
     // MARK: - Which recognizer reads
 
-    /// Only the Objective-C `VNRecognizeTextRequest` reads here, never the Swift `RecognizeTextRequest` or
-    /// `RecognizeDocumentsRequest`: on macOS 27 a Swift request that is loading its model (or stalled) blocks every accurate
-    /// `VNRecognizeTextRequest` in the same process for more than a minute, even after a child process has loaded the model
-    /// (tools/ocr-probe/inprocess.swift), while the Objective-C request answers in 0.3 s. Its revision 3 is the one that can
-    /// stall (a compile that hangs or crawls, `OCRHealth`); the health below is that revision's.
+    /// The Objective-C `VNRecognizeTextRequest` reads lines; paragraphs come from the Swift document model once it is loaded
+    /// (`gate`), else from those lines grouped by `ParagraphGrouper`. The Swift models are loaded by the app itself at launch
+    /// (`warmUp`): a cold compile takes 80-90 s and a VN revision 3 read in the same process waits for it, a warm one answers in
+    /// 0.3-0.5 s and does not disturb VN (tools/ocr-probe/mix.swift). Revision 3 is the one that can stall (a compile that hangs or
+    /// crawls, `OCRHealth`); the health below is that revision's.
+    ///
+    /// `MWOYEO_OCR_PATH=vn|swift` for gates: `vn` never asks a Swift model, `swift` assumes the document model ready.
+    private enum OCRPath { case vn, swift }
+    private static let ocrPath: OCRPath? = switch ProcessInfo.processInfo.environment["MWOYEO_OCR_PATH"] {
+    case "vn": .vn
+    case "swift": .swift
+    default: nil
+    }
+
+    /// The initialization steps and which keys may ask the Swift models (`SwiftVisionGate`); `VisionSetup` shows it.
+    private static let gate = OSAllocatedUnfairLock<SwiftVisionGate>(initialState: {
+        var g = SwiftVisionGate()
+        if ocrPath == .swift { g.assumeReady() }
+        return g
+    }())
+
+    /// The gate as it is now.
+    static var setupState: SwiftVisionGate { gate.withLock { $0 } }
+
+    /// The key for reads in these languages (empty: detect).
+    static func key(_ languages: [Locale.Language]) -> String {
+        let codes = languages.compactMap(code)
+        return codes.isEmpty ? SwiftVisionGate.anyLanguage : codes.joined(separator: ",")
+    }
+
+    private static func languages(of key: String) -> [Locale.Language] {
+        key == SwiftVisionGate.anyLanguage ? [] : key.split(separator: ",").map { Locale.Language(identifier: String($0)) }
+    }
+
     private static let health = OSAllocatedUnfairLock(initialState: OCRHealth())
     /// Suffix of the counters about revision 3: `ocr.stalled.vn3`, `ocr.recovered.vn3`, `ocr.probe.vn3`.
     private static let counterTag = ".vn3"
@@ -155,6 +239,13 @@ enum TextRecognizer {
             let more = i < rungs.count - 1
             switch rung {
             case .vision3:
+                // While a Swift model is compiling, a revision 3 read of this process waits for the compile: 37 s with revision 3
+                // warm and a cold Swift text model (vision-revive, 2026-10-18, /tmp/vision2/step0f.log), against 0.23 s when warm. So a read
+                // that has an older recognizer for its language goes there; one that has none waits (the notice tells).
+                if more, gate.withLock({ $0.isSwiftCompiling }) {
+                    Trace.count("ocr.fallback.swiftcompiling")
+                    continue
+                }
                 switch health.withLock({ $0.plan(canFallBack: more, now: Trace.now) }) {
                 case .refuse:
                     throw stalled(languages)
@@ -167,6 +258,10 @@ enum TextRecognizer {
                         return try await tracked(seconds, tellingAbout: more ? nil : languages) { try read(rung) }
                     } catch is Timeout {
                         if !more { throw stalled(languages) }
+                    } catch where more && OCRHealth.programsNotReady(error) {
+                        // Its programs are not ready (a transient after a long cold compile): the same call reads on revision 2 or
+                        // `.fast`, and `health` keeps reads there for `OCRHealth.notReadyRetryEvery`.
+                        Trace.count("ocr.fallback.notready")
                     }
                 }
             case .revision2:
@@ -212,7 +307,12 @@ enum TextRecognizer {
             raise(nil)
             return r
         } catch {
-            health.withLock { $0.failed(id) }
+            if OCRHealth.programsNotReady(error) {
+                health.withLock { $0.notReady(id, now: Trace.now) }
+                Trace.count("ocr.notready" + counterTag)
+            } else {
+                health.withLock { $0.failed(id) }
+            }
             throw error
         }
     }
@@ -233,14 +333,99 @@ enum TextRecognizer {
         }
     }
 
-    /// Loads revision 3 before the first real read (about a minute on a fresh install): one accurate read of a drawn picture with
-    /// Latin and CJK text. It is given the cold allowance, and reads that come meanwhile do not queue behind it unless nothing else can
-    /// read their language. Tells the user nothing.
-    static func warmUp() async {
-        guard let picture = probePicture else { return }
-        _ = try? await tracked(OCRHealth.coldWait) {
-            try visionRead(in: picture, roi: nil, level: .accurate, revision: 3, customWords: []) { _ in [] }
+    /// The initialization, at every launch: for the key of `languages`, `SwiftVisionGate.Step`s in order, in the background and to
+    /// completion (a load is never cancelled): revision 3 on a drawn wide line (given the cold allowance; reads that come meanwhile
+    /// do not queue behind it unless nothing else can read their language), then the Swift document model, then the Swift text
+    /// model. A failed step is not retried here: the next launch or `retry()` does. Tells the user nothing (`VisionSetup` is what
+    /// a screen reads).
+    static func warmUp(languages: [Locale.Language] = []) async {
+        gate.withLock { $0.want(key(languages)) }
+        await runSteps()
+        // A read may have started the steps first: wait for the one that runs.
+        while gate.withLock({ $0.running != nil }) { try? await Task.sleep(for: .milliseconds(100)) }
+    }
+
+    /// Runs the due steps one after another; a second caller while one runs returns at once (the first goes on to the next).
+    private static func runSteps() async {
+        while true {
+            let due = gate.withLock { g -> SwiftVisionGate.Due? in
+                guard let d = g.nextDue(), ocrPath != .vn || d.step == .textModel else { return nil }
+                g.started(d, now: Trace.now)
+                return d
+            }
+            guard let due else { return }
+            publish()
+            var failure: String?
+            let began = Trace.now
+            do { try await perform(due) } catch { failure = String(describing: error) }
+            gate.withLock { $0.finished(failure: failure, now: Trace.now) }
+            publish()
+            Trace.mark("vision setup \(due.step.rawValue) [\(due.key)] \(failure.map { "failed: \($0)," } ?? "done,")", since: began)
+            if let failure { log.error("vision setup \(due.step.rawValue, privacy: .public) for \(due.key, privacy: .public) failed: \(failure, privacy: .public)") }
         }
+    }
+
+    private static func perform(_ due: SwiftVisionGate.Due) async throws {
+        guard let picture = probePicture else { throw Stalled() }
+        switch due.step {
+        case .textModel:
+            // "Programs not ready" is a transient (OCRHealth): ask again every few seconds, within the cold allowance.
+            let began = Trace.now
+            while true {
+                do {
+                    _ = try await tracked(OCRHealth.coldWait) {
+                        try visionRead(in: picture, roi: nil, level: .accurate, revision: 3, customWords: []) { _ in [] }
+                    }
+                    return
+                } catch where OCRHealth.programsNotReady(error) && Trace.now - began < OCRHealth.coldWait {
+                    try await Task.sleep(for: .seconds(OCRHealth.notReadyRetryEvery))
+                }
+            }
+        case .documentModel, .swiftTextModel:
+            // The compile (80-90 s cold) runs in a child process, where no read of this process waits for it; the load here
+            // afterwards finds the model in the system's cache (under 2 s). If no child can be started, it is loaded here.
+            gate.withLock { $0.childPhase(true) }
+            let outcome = await SwiftVisionChild.run(step: due.step, key: due.key)
+            gate.withLock { $0.childPhase(false) }
+            if case let .failed(message) = outcome { throw ChildFailure(message: message) }
+            let began = Trace.now
+            try await loadSwiftModel(step: due.step, key: due.key)
+            Trace.mark("vision setup \(due.step.rawValue) [\(due.key)] in this process, child \(outcome == .loaded ? "loaded" : "unavailable"),", since: began)
+        }
+    }
+
+    private struct ChildFailure: Error, CustomStringConvertible { let message: String; var description: String { message } }
+
+    /// Loads the Swift model of `step` for `key` on the drawn picture (the app's own load, and the child's).
+    static func loadSwiftModel(step: SwiftVisionGate.Step, key: String) async throws {
+        guard let picture = probePicture else { throw Stalled() }
+        let languages = languages(of: key)
+        switch step {
+        case .textModel:
+            break
+        case .documentModel:
+            _ = try await swiftBlocks(in: picture, roi: nil, languages: languages, customWords: [])
+        case .swiftTextModel:
+            var req = RecognizeTextRequest()
+            req.recognitionLevel = .accurate
+            if languages.isEmpty { req.automaticallyDetectsLanguage = true } else { req.recognitionLanguages = languages }
+            _ = try await req.perform(on: picture)
+        }
+    }
+
+    /// Every failed step is run again (the screen's retry button); steps never retry themselves.
+    static func retrySetup() {
+        gate.withLock { $0.retry() }
+        publishAndRun()
+    }
+
+    private static func publishAndRun() {
+        publish()
+        Task.detached(priority: .utility) { await runSteps() }
+    }
+
+    private static func publish() {
+        Task { @MainActor in VisionSetup.shared.gate = TextRecognizer.setupState }
     }
 
     /// Latin and CJK text, drawn here so that the probe and the warm-up need no file: a Latin line of 240 characters, a CJK line of
@@ -273,13 +458,26 @@ enum TextRecognizer {
 
     /// `MWOYEO_FAKE_OCR=stall` or `stall-vn` (revision 3 never answers, as on the stalled Mac: the reads go down the ladder to
     /// revision 2 and `.fast`) or `slow:<ms>` (revision 3 answers late), to exercise the fallback and the recovery on a healthy
-    /// Mac. Read like `MWOYEO_FAKE_ENGINE`: in any build. Until 2026-10-17 (ocr-vn) `stall` stalled the Swift models and left
-    /// revision 3 reading; there are no Swift models in the app now, so it is the same as `stall-vn`.
+    /// Mac. Read like `MWOYEO_FAKE_ENGINE`: in any build. Only revision 3 is simulated, never the Swift models, so `stall` is the
+    /// same as `stall-vn`.
     private static let fake = ProcessInfo.processInfo.environment["MWOYEO_FAKE_OCR"]
+
+    /// `MWOYEO_FAKE_OCR=e5rt[:n]`: revision 3 throws the error a Mac logs while its programs are not ready, n times (20), then works.
+    private enum FakeVisionError: Error { case e5rtError(String, Int) }
+    private static let e5rtLeft = OSAllocatedUnfairLock<Int?>(initialState: nil)
 
     private static func simulated() async throws {
         guard let fake else { return }
-        if fake == "stall" || fake == "stall-vn" {
+        if fake == "e5rt" || fake.hasPrefix("e5rt:") {
+            let throwing = e5rtLeft.withLock { left -> Bool in
+                let n = left ?? Int(fake.dropFirst(5)) ?? 20
+                left = max(0, n - 1)
+                return n > 0
+            }
+            if throwing {
+                throw FakeVisionError.e5rtError("e5rt_execution_stream_operation_create_precompiled_compute_operation_with_options call failed", 13)
+            }
+        } else if fake == "stall" || fake == "stall-vn" {
             try await Task.sleep(for: .seconds(31_536_000))
         } else if fake.hasPrefix("slow:"), let ms = Int(fake.dropFirst(5)) {
             try await Task.sleep(for: .milliseconds(ms))

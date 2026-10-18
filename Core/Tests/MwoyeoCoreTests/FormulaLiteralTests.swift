@@ -113,8 +113,14 @@ import Testing
     /// brackets is dropped, and a `|` separates the cells of a row (not in a shell line or the "Feature" header).
     private func units(_ path: String) throws -> [String] {
         let note = try NSRegularExpression(pattern: #"\s*\((?:[^()]*(?:optional|header|row|merged|vertical|each|one sentence|figure labels|controls|timestamps|columns|table)[^()]*)\)\s*$"#)
+        // Keep-boundary notes (tools/usecase-bench score.py): a `(keep…)` unit must stay as written, so it is not this test's
+        // prose; an `(inline: …)` unit is prose whose note only names its kept spans.
+        let keep = try NSRegularExpression(pattern: #"\s*\(keep(?::[^()]*)?\)\s*$"#)
+        let inline = try NSRegularExpression(pattern: #"\s*\(inline:[^()]*\)\s*$"#)
         var units: [String] = []
         for var line in try String(contentsOfFile: path, encoding: .utf8).split(separator: "\n", omittingEmptySubsequences: true).map(String.init) {
+            if keep.firstMatch(in: line, range: NSRange(line.startIndex..., in: line)) != nil { continue }
+            line = inline.stringByReplacingMatches(in: line, range: NSRange(line.startIndex..., in: line), withTemplate: "")
             line = note.stringByReplacingMatches(in: line, range: NSRange(line.startIndex..., in: line), withTemplate: "")
             let cells = line.contains("|") && !line.hasPrefix("$") && !line.hasPrefix("Feature") ? line.split(separator: "|", omittingEmptySubsequences: false).map(String.init) : [line]
             units += cells.map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }

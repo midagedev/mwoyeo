@@ -119,6 +119,9 @@ actor RegionPipeline {
     private let inpainter: Inpainter?
     private let onSnapshot: @Sendable (OverlaySnapshot) -> Void
     private var onActivity: (@Sendable (RegionActivity) -> Void)?
+    private var onNotice: (@Sendable (String) -> Void)?
+    /// The last read found vertical text, and said so: the notice is shown once per such text, not per pass.
+    private var verticalNoticed = false
     private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "pipeline")
 
     private var options: PipelineOptions
@@ -153,6 +156,8 @@ actor RegionPipeline {
     private var resumeTask: Task<Void, Never>?
     private var backoff = RetryBackoff()
     private var strikes = SourceStrikes()
+    /// Consecutive failed recognition passes: the next read waits, whatever the pixels do.
+    private var readBackoff = ReadBackoff()
     private var version = 0
     private var scale: CGFloat = 2
     private var activity = RegionActivity.idle
@@ -231,6 +236,7 @@ actor RegionPipeline {
         self.onSnapshot = onSnapshot
     }
 
+    func setNoticeHandler(_ h: @escaping @Sendable (String) -> Void) { onNotice = h }
     func setActivityHandler(_ h: @escaping @Sendable (RegionActivity) -> Void) { onActivity = h }
     /// Called (at most twice a second) when content moves a lot: scrolling, page flips, animation.
     func setMotionHandler(_ h: @escaping @Sendable () -> Void) { onMotion = h }
@@ -293,6 +299,7 @@ actor RegionPipeline {
         pauseID += 1
         backoff.reset()
         strikes.reset()
+        readBackoff.reset()
     }
 
     /// Re-translate everything currently on screen (e.g. after the user downloads a language pack).
@@ -451,6 +458,8 @@ actor RegionPipeline {
     private func run() async {
         while let frame = latest {
             let now = ProcessInfo.processInfo.systemUptime
+            // A pixel change inside the backoff waits for its end (the timer below kicks again).
+            if readBackoff.isWaiting(now: now) { Trace.count("ocr.backoff_wait"); break }
             let stale = staleness(for: frame)
             // Seamless mode re-reads on change only, and a tile that stopped animating changed while it was left out.
             if options.renderMode == .seamless, seamlessDone, stale.change?.isUnchanged == false { seamlessDone = false }
@@ -476,6 +485,7 @@ actor RegionPipeline {
         }
         // An animation that stops sends no more frames: look again once its tiles count as still.
         if latest != nil, let c = churn.coolsIn(at: now) { wait = min(wait ?? .infinity, c + 0.05) }
+        if latest != nil, let r = readBackoff.remaining(now: now) { wait = r + 0.05 }
         if let wait {
             settleTask?.cancel()
             settleTask = Task { [weak self] in
@@ -572,6 +582,7 @@ actor RegionPipeline {
             }
             lensMoved = now
             lastVisibleChange = now
+            readBackoff.reset()
         }
         visible = rect
         reconsider()
@@ -658,6 +669,7 @@ actor RegionPipeline {
         origin = rect.origin
         captureSize = rect.size
         geometryEpoch += 1
+        readBackoff.reset()
         churn.reset()
         lastChange = ProcessInfo.processInfo.systemUptime
         seamlessDone = false
@@ -769,7 +781,15 @@ actor RegionPipeline {
             log.error("fast OCR failed: \(String(describing: error), privacy: .public)")
             Trace.mark("fast: OCR failed \(error)", since: t)
             // A stuck request is retried; any other failure would just fail again on the same pixels.
-            if !(error is TextRecognizer.Timeout) { _ = finishPass(start, frame: frame) }
+            if !(error is TextRecognizer.Timeout) {
+                noteReadFailure()
+                _ = finishPass(start, frame: frame)
+            }
+            return
+        }
+        readBackoff.success()
+        if holdsVerticalText(found) {
+            _ = finishPass(start, frame: frame)
             return
         }
         found = splitByStyle(found, in: frame.image)
@@ -837,10 +857,18 @@ actor RegionPipeline {
             log.error("document OCR failed: \(String(describing: error), privacy: .public)")
             Trace.mark("seamless: OCR failed \(error)", since: t)
             if error is TextRecognizer.Timeout { return false }
+            noteReadFailure()
             _ = finishPass(start, frame: frame)
             return true
         }
+        readBackoff.success()
         Trace.mark("seamless: document OCR (\(found.count) blocks)", since: t); t = Trace.now
+        if holdsVerticalText(found) {
+            guard finishPass(start, frame: frame) != nil else { return true }
+            blocks = []
+            emit(animated: false)
+            return true
+        }
         found = splitByStyle(found, in: frame.image)
             .filter { TextRecognizer.needsTranslation($0.text, target: options.targetLanguage) }
         guard let full = RGBAImage(cgImage: frame.image) else { return true }
@@ -872,6 +900,25 @@ actor RegionPipeline {
         return true
     }
 
+    private func noteReadFailure() {
+        let wait = readBackoff.failure(now: ProcessInfo.processInfo.systemUptime)
+        Trace.count("ocr.failed_pass")
+        Trace.mark("ocr: failed pass \(readBackoff.failures), next read in \(Int(wait)) s", since: Trace.now)
+    }
+
+    /// Vertical text (tategaki, manga balloons) is not read yet: its lines come back as tall narrow boxes. Nothing on
+    /// such a frame is translated or erased, and the lens says so once per such text.
+    private func holdsVerticalText(_ found: [OCRBlock]) -> Bool {
+        let tall = VerticalText.isVertical(found.flatMap(\.lines).filter { $0.text.count >= 2 }.map(\.rect))
+        Trace.mark("vertical: \(tall)", since: Trace.now)
+        if tall, !verticalNoticed {
+            verticalNoticed = true
+            onNotice?(String(localized: "Vertical text isn't supported yet"))
+        }
+        if !tall { verticalNoticed = false }
+        return tall
+    }
+
     /// The document reader groups lines by layout alone, so a chat message and the next sender's name, or a post
     /// title and its body, can land in one paragraph. Split wherever the text colour or size changes — first within
     /// a line (a name, a badge and a timestamp read as one line each become their own block, icons in front of text
@@ -889,19 +936,25 @@ actor RegionPipeline {
             }
             return parts.filter { !$0.isEmpty }.flatMap { lines -> [OCRBlock] in
                 guard lines.count > 1 else { return [TextRecognizer.makeBlock(lines)] }
-                let styles = lines.map { (color: appearance(of: $0.rect, in: image).textColor, height: $0.rect.height) }
+                let styles = lines.map { (color: appearance(of: $0.rect, in: image).textColor, size: LineSize.Line(height: $0.rect.height, width: $0.rect.width, text: $0.text)) }
+                if Trace.enabled {
+                    Trace.mark("sizes: " + lines.map { l in "h\(Int(l.rect.height)) w\(Int(l.rect.width)) n\(l.text.count) '\(l.text.prefix(14))'" }.joined(separator: " ; "), since: Trace.now)
+                }
                 var groups: [[OCRLine]] = [[lines[0]]]
                 for i in 1..<lines.count {
                     let a = styles[i - 1], b = styles[i]
-                    let sizeJump = max(a.height, b.height) / max(1, min(a.height, b.height)) > 1.3
-                    if a.color.distance(to: b.color) > 60 || sizeJump { groups.append([]) }
+                    if a.color.distance(to: b.color) > 60 || LineSize.differ(a.size, b.size) || ParagraphMarker.startsItem(lines[i].text) { groups.append([]) }
                     groups[groups.count - 1].append(lines[i])
                 }
                 return groups.map(TextRecognizer.makeBlock)
             }
         }
-        let items = split.map { LabelRule.Item(rect: $0.rect, text: $0.text, color: appearance(of: $0.lines[0].rect, in: image).textColor) }
+        let items = split.map { LabelRule.Item(rect: $0.rect, text: $0.text, color: appearance(of: $0.lines[0].rect, in: image).textColor,
+                                                 lineHeight: $0.lines[0].rect.height) }
         let labels = LabelRule.labels(items)
+        if Trace.enabled {
+            Trace.mark("items: " + items.enumerated().map { "\($0.offset)\(labels.contains($0.offset) ? "*" : "") '\($0.element.text.prefix(10))' \(Int($0.element.rect.minX)),\(Int($0.element.rect.minY)) \(Int($0.element.rect.width))x\(Int($0.element.rect.height)) lh\(Int($0.element.lineHeight)) c\($0.element.color.r),\($0.element.color.g),\($0.element.color.b)" }.joined(separator: " ; "), since: Trace.now)
+        }
         return split.indices.filter { !labels.contains($0) }.map { split[$0] }
     }
 

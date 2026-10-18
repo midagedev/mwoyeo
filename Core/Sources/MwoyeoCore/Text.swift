@@ -733,6 +733,40 @@ public enum VerticalText {
         guard box.width > 0, characters >= 2 else { return false }
         return box.height >= (characters >= 3 ? 1.4 : 1.7) * box.width
     }
+
+    /// A short word of letters that `isRotatedLine` lets through is rotated all the same when it stands among rotated words: its
+    /// box is no wider than 1.3 times its height, it starts at the top of a rotated word's box within one of its own heights, and
+    /// such a word is no further than four of its widths away (the words of a figure's sentence are columns of their own, 1.4 to
+    /// 2.5 widths apart, all starting at the same top). Turned on its side a short word is as wide as it is tall ("in" 27×27,
+    /// "th" 26×26, "is" 26×30: the paper bench, pages 14 and 15), and a rule that looks at its box alone cannot tell it from a
+    /// horizontal one.
+    static let shortWordLetters = 2...3
+    static let shortWordShape = 1.3
+    static let sharedTop = 1.0
+    static let neighbourGap = 4.0
+
+    /// The lines of one capture that are rotated words: each that `isRotatedLine` finds, and the short words beside them, or beside
+    /// a short word that is (a run of them: "in my" stands further from the next long word than four widths).
+    public static func rotatedLines(_ lines: [(box: CGRect, text: String)]) -> Set<Int> {
+        var rotated = Set(lines.indices.filter { isRotatedLine(lines[$0].box, characters: lines[$0].text.count) })
+        guard !rotated.isEmpty else { return rotated }
+        var grew = true
+        while grew {
+            grew = false
+            for i in lines.indices where !rotated.contains(i) {
+                let (box, text) = lines[i]
+                guard shortWordLetters.contains(text.count), box.width > 0, box.height > 0, box.width <= shortWordShape * box.height,
+                      text.unicodeScalars.allSatisfy({ CharacterSet.letters.contains($0) }) else { continue }
+                let beside = rotated.contains { j in
+                    let other = lines[j].box
+                    let apart = max(box.minX - other.maxX, other.minX - box.maxX)
+                    return abs(box.minY - other.minY) <= sharedTop * box.height && apart <= neighbourGap * max(box.width, other.width)
+                }
+                if beside { rotated.insert(i); grew = true }
+            }
+        }
+        return rotated
+    }
 }
 
 /// Whether two neighbouring lines of one block are set in different sizes (a heading over body text). An OCR line

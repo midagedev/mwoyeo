@@ -955,12 +955,29 @@ actor RegionPipeline {
     private func joinSplitLines(_ blocks: [OCRBlock]) -> [OCRBlock] {
         guard blocks.count > 1, Self.layoutRules else { return blocks }
         let groups = BlockMerge.groups(blocks.map { $0.lines.map(\.rect) })
+        if Trace.lineDump { traceRowPairs(blocks, groups: groups) }
         guard groups.contains(where: { $0.count > 1 }) else { return blocks }
         return groups.map { group in
             guard group.count > 1 else { return blocks[group[0]] }
             let lines = group.flatMap { blocks[$0].lines }
             if Trace.enabled { Trace.mark("merged blocks \(group): " + group.map { String(blocks[$0].text.prefix(24)) }.joined(separator: " + "), since: Trace.now) }
             return TextRecognizer.makeBlock(BlockMerge.readingOrder(lines.map(\.rect)).map { lines[$0] })
+        }
+    }
+
+    /// `MWOYEO_TRACE_LINES`: the pairs of lines of different blocks that stand on one text row within three heights of each other,
+    /// their gap in heights (`BlockMerge.rowGap` is the widest that joins) and whether the blocks ended up as one.
+    private func traceRowPairs(_ blocks: [OCRBlock], groups: [[Int]]) {
+        var group: [Int: Int] = [:]
+        for (g, members) in groups.enumerated() { for m in members { group[m] = g } }
+        func box(_ r: CGRect) -> String { "[\(Int(r.minX)),\(Int(r.minY)),\(Int(r.width)),\(Int(r.height))]" }
+        for i in blocks.indices {
+            for j in blocks.indices where j > i {
+                for x in blocks[i].lines { for y in blocks[j].lines {
+                    guard let gap = BlockMerge.rowGapBetween(x.rect, y.rect), gap > -3, gap < 3 else { continue }
+                    Trace.mark("row pair \(box(x.rect)) \(box(y.rect)) gap=\(String(format: "%.2f", Double(gap))) joined=\(group[i] == group[j])", since: Trace.now)
+                } }
+            }
         }
     }
 
@@ -971,13 +988,19 @@ actor RegionPipeline {
     /// (`VerticalText.isRotatedLine`: the words of a figure) comes out as a column of syllables.
     private func readableLines(_ blocks: [OCRBlock], in image: CGImage) -> [OCRBlock] {
         let bounds = CGRect(x: 0, y: 0, width: image.width, height: image.height)
-        let cut = CaptureEdge.cut(blocks.flatMap { $0.lines.map(\.rect) }, in: bounds)
+        let all = blocks.flatMap(\.lines)
+        let cut = CaptureEdge.cut(all.map(\.rect), in: bounds)
+        let rotated = VerticalText.rotatedLines(all.map { (box: $0.rect, text: $0.text) })
         var first = 0
         return blocks.compactMap { block in
             defer { first += block.lines.count }
             let kept = block.lines.indices.filter { i in
                 if cut.contains(first + i) { Trace.count("ocr.cut_line"); return false }
-                if VerticalText.isRotatedLine(block.lines[i].rect, characters: block.lines[i].text.count) { Trace.count("ocr.rotated_line"); return false }
+                let line = block.lines[i]
+                if Trace.lineDump, line.text.count <= 3 || rotated.contains(first + i) {
+                    Trace.mark("line [\(Int(line.rect.minX)),\(Int(line.rect.minY)),\(Int(line.rect.width)),\(Int(line.rect.height))] \"\(line.text)\" rotated=\(rotated.contains(first + i)) strict=\(VerticalText.isRotatedLine(line.rect, characters: line.text.count))", since: Trace.now)
+                }
+                if rotated.contains(first + i) { Trace.count("ocr.rotated_line"); return false }
                 return true
             }
             guard kept.count < block.lines.count else { return block }
@@ -986,11 +1009,16 @@ actor RegionPipeline {
     }
 
     /// A translation's size comes from the glyphs of its source, which stand taller in a line with subscripts and superscripts: a
-    /// body-like block is not drawn larger than the body-like blocks on the screen (`BodySize`), the new ones and `kept` alike.
+    /// body-like block is not drawn larger than the body-like blocks on the screen (`BodySize`), the new ones and `kept` alike. A
+    /// label is not drawn larger than its line's width says (`LabelSize`).
     private func capBodySizes(_ made: inout [Block], among kept: [Block]) {
         func item(_ b: Block) -> BodySize.Block { BodySize.Block(fontSize: b.fontSize, characters: b.source.count, lines: max(1, b.lines.count)) }
         let ceiling = BodySize.ceiling(among: (kept + made).map(item))
-        for i in made.indices { made[i].fontSize = BodySize.capped(item(made[i]), ceiling: ceiling) }
+        for i in made.indices {
+            let size = BodySize.capped(item(made[i]), ceiling: ceiling)
+            let core = made[i].lines.dropFirst().reduce(made[i].lines.first ?? made[i].rect) { $0.union($1) }
+            made[i].fontSize = LabelSize.capped(size, text: made[i].source, width: core.width, lines: made[i].lines.count)
+        }
     }
 
     /// `MWOYEO_LAYOUT=off` reads and erases blocks as before the layout rules (joining split lines, `Territory`, `ColumnEdge`,
@@ -1128,7 +1156,7 @@ actor RegionPipeline {
             guard !lr.isEmpty else { continue }
             let text = PixelRect(line.rect).clamped(width: full.width, height: full.height)
             let local = PixelRect(x: text.x - lr.x, y: text.y - lr.y, width: text.width, height: text.height)
-            let m = TextEraser.mask(for: full.cropped(to: lr), textRect: local, dilation: max(1, Int(line.rect.height * 0.07)), outlines: true)
+            let m = TextEraser.mask(for: full.cropped(to: lr), textRect: local, dilation: max(1, Int(line.rect.height * 0.07)), outlines: true, frames: true)
             masks.append((lr, m))
             if let g = m.glyphBounds { glyphHeights.append(CGFloat(g.height)) }
         }
@@ -1166,6 +1194,9 @@ actor RegionPipeline {
             TextEraser.fill(&patch, mask: mask)
         }
         let glyph = glyphHeights.isEmpty ? nil : glyphHeights.sorted()[glyphHeights.count / 2]
+        if Trace.lineDump, block.text.count <= 16 {
+            Trace.mark("erase label [\(Int(block.rect.minX)),\(Int(block.rect.minY)),\(Int(block.rect.width)),\(Int(block.rect.height))] lines=\(block.lines.count) line=\(Int(lineHeight)) glyph=\(glyph.map { Int($0) } ?? -1) \"\(block.text)\"", since: Trace.now)
+        }
         let area = Territory.textArea(core: block.rect, ring: CGFloat(ring), spare: CGFloat(spare), in: rect.cgRect)
             .offsetBy(dx: -CGFloat(rect.x), dy: -CGFloat(rect.y))
         return Erased(rect: rect, patch: patch, look: look, fontSize: glyph.map { Self.emSize(glyphHeight: $0, text: block.text) },

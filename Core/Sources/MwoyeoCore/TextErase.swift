@@ -61,7 +61,9 @@ public enum TextEraser {
     /// - The mask is dilated by `dilation` px to swallow anti-aliased edges.
     /// `outlines`: also look for outlined text (white letters, black edge) and take both tones into the mask — for
     /// erasing only; colour runs and labels want the plain one-tone mask.
-    public static func mask(for patch: RGBAImage, textRect: PixelRect, dilation: Int, outlines: Bool = false) -> TextMask {
+    /// `frames`: also take the coloured frames round glyphs (the boxes of a PDF viewer's links) — for erasing only, too: they
+    /// are no ink of the text's colour.
+    public static func mask(for patch: RGBAImage, textRect: PixelRect, dilation: Int, outlines: Bool = false, frames: Bool = false) -> TextMask {
         let w = patch.width, h = patch.height
         let inner = textRect.clamped(width: w, height: h)
         @inline(__always) func inInner(_ x: Int, _ y: Int) -> Bool {
@@ -152,6 +154,12 @@ public enum TextEraser {
             textColor = meanColor(Array(core))
         }
 
+        // The box a PDF viewer draws round a link (Safari: a light green frame round the "38" of "[38]") is lighter than the Otsu
+        // split's dark class, so the glyphs went and the frame stayed round the place where they were.
+        if frames, coverage < 1 {
+            for i in Self.frames(in: patch, inner: inner, background: bg, glyphs: bits, ring: (ringLeft, ringTop, ringRight, ringBottom)) { bits[i] = 1 }
+        }
+
         var appearance = TextAppearance(textColor: textColor, backgroundColor: bg, backgroundNoise: noise, coverage: coverage)
         // Outlined text (subtitles over video): the Otsu split keeps only one of its two tones, so the letters' fill
         // or their edge would survive the erase and the translation would be drawn in the edge colour.
@@ -163,6 +171,64 @@ public enum TextEraser {
         var m = TextMask(width: w, height: h, bits: bits, appearance: appearance, glyphBounds: glyphBounds)
         m.bits = dilate(m.bits, width: w, height: h, radius: dilation)
         return m
+    }
+
+    /// A coloured frame is at least this far from the background in some channel and this saturated.
+    static let frameContrast = 48, frameSaturation = 40
+    /// A frame's pixels fill at most this share of its bounding box (an outline round glyphs: 0.12 to 0.15; a filled badge: 1).
+    static let frameFill = 0.35
+    /// Fewest glyph pixels a frame must hold inside it.
+    static let frameGlyphs = 8
+
+    /// The pixels (patch indices) of the coloured frames round glyphs that the glyph mask missed: a connected run of pixels that
+    /// differ from the background in colour (not only in luma) and are not glyph pixels, that reaches the text rect and does not
+    /// run off the ring, that is an outline (it fills a small share of its bounding box) and that holds glyph pixels inside.
+    /// A rule, an underline or a dot holds none; a filled badge is not an outline; a frame the patch cuts runs off its ring.
+    static func frames(in patch: RGBAImage, inner: PixelRect, background bg: RGBA, glyphs: [UInt8],
+                       ring: (left: Bool, top: Bool, right: Bool, bottom: Bool)) -> [Int] {
+        let w = patch.width, h = patch.height
+        var coloured = [Bool](repeating: false, count: w * h)
+        var any = false
+        for y in 0..<h {
+            for x in 0..<w where glyphs[y * w + x] == 0 {
+                let c = patch.color(x: x, y: y)
+                let hi = max(c.r, c.g, c.b), lo = min(c.r, c.g, c.b)
+                let far = max(abs(Int(c.r) - Int(bg.r)), abs(Int(c.g) - Int(bg.g)), abs(Int(c.b) - Int(bg.b)))
+                if far >= frameContrast && Int(hi) - Int(lo) >= frameSaturation { coloured[y * w + x] = true; any = true }
+            }
+        }
+        guard any else { return [] }
+        var seen = [Bool](repeating: false, count: w * h)
+        var out: [Int] = []
+        for start in 0..<(w * h) where coloured[start] && !seen[start] {
+            var component: [Int] = []
+            var stack = [start]
+            seen[start] = true
+            var touchesOuter = false, reachesInner = false
+            var minX = Int.max, minY = Int.max, maxX = -1, maxY = -1
+            while let i = stack.popLast() {
+                component.append(i)
+                let x = i % w, y = i / w
+                minX = min(minX, x); maxX = max(maxX, x); minY = min(minY, y); maxY = max(maxY, y)
+                if (x == 0 && ring.left) || (x == w - 1 && ring.right) || (y == 0 && ring.top) || (y == h - 1 && ring.bottom) { touchesOuter = true }
+                if x >= inner.x && x < inner.x + inner.width && y >= inner.y && y < inner.y + inner.height { reachesInner = true }
+                for dy in -1...1 {
+                    for dx in -1...1 where dx != 0 || dy != 0 {
+                        let nx = x + dx, ny = y + dy
+                        guard nx >= 0, ny >= 0, nx < w, ny < h else { continue }
+                        let j = ny * w + nx
+                        if coloured[j] && !seen[j] { seen[j] = true; stack.append(j) }
+                    }
+                }
+            }
+            let boxWidth = maxX - minX + 1, boxHeight = maxY - minY + 1
+            guard reachesInner, !touchesOuter, boxWidth > 2, boxHeight > 2,
+                  Double(component.count) <= frameFill * Double(boxWidth * boxHeight) else { continue }
+            var held = 0
+            for y in (minY + 1)..<maxY { for x in (minX + 1)..<maxX where glyphs[y * w + x] != 0 { held += 1 } }
+            if held >= frameGlyphs { out += component }
+        }
+        return out
     }
 
     /// Outlined text in `inner`: enough very light and very dark pixels, nearly every light one within a few pixels of

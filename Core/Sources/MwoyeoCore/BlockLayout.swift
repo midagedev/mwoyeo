@@ -11,9 +11,11 @@ import Foundation
 public enum BlockMerge {
     /// Two lines are on one text row when their vertical overlap exceeds this fraction of the shorter one.
     static let rowOverlap = 0.5
-    /// The widest gap between two lines of one row that still reads as one run of text, in heights of the taller line (a sum
-    /// with limits is about one and a half heights wide; columns of a table or items of a menu are further apart).
-    static let rowGap = 2.0
+    /// The widest gap between two lines of one row that still reads as one run of text, in heights of the taller line (1.5 em).
+    /// The pieces of a line the recognizer could not read across stand against each other (a fraction: 0.1 heights, a sum with
+    /// limits: their boxes overlap) or across a sign no wider than an em with its spaces; a wider gap is the gutter between columns,
+    /// items of a menu or cells of a table. The author header of the Attention paper has its columns 1.5 to 2.9 heights apart.
+    static let rowGap = 1.2
     /// Lines of one row may overlap this much horizontally, in heights: the limits of a sum are stacked over and under its sign,
     /// so the box of the text before it and the box of the text after it reach into each other (measured: 1 height).
     static let rowSlop = 1.5
@@ -55,20 +57,28 @@ public enum BlockMerge {
         return endsWithPiece(a, b) || endsWithPiece(b, a)
     }
 
-    /// `piece` is one line that starts inside the width of `paragraph` and shares a text row with its last line.
+    /// `piece` is one line that starts inside the width of `paragraph` (a line wholly to the left of it is the cell of the column
+    /// beside, not the end of the last line) and shares a text row with its last line.
     private static func endsWithPiece(_ paragraph: [CGRect], _ piece: [CGRect]) -> Bool {
         guard paragraph.count > 1, piece.count == 1, let last = paragraph.last else { return false }
         let core = paragraph.dropFirst().reduce(paragraph[0]) { $0.union($1) }
-        return piece[0].minX < core.maxX && sharesRow(last, piece[0])
+        return piece[0].minX < core.maxX && piece[0].maxX > core.minX && sharesRow(last, piece[0])
     }
 
     /// Two lines side by side on one text row, close enough to be one run of text.
     static func sharesRow(_ a: CGRect, _ b: CGRect) -> Bool {
+        guard let gap = rowGapBetween(a, b) else { return false }
+        return gap >= -rowSlop && gap <= rowGap
+    }
+
+    /// The horizontal gap between two lines on one text row, in heights of the taller one (negative: their boxes overlap); nil
+    /// when they are not on one row or neither is a run of text (`wideLine`). `sharesRow` bounds it; the pipeline's trace prints
+    /// it for the pairs just outside the bounds.
+    public static func rowGapBetween(_ a: CGRect, _ b: CGRect) -> CGFloat? {
         let tall = max(a.height, b.height), short = min(a.height, b.height)
         guard short > 0, max(a.width, b.width) >= wideLine * tall,
-              overlap(a.minY, a.maxY, b.minY, b.maxY) > rowOverlap * short else { return false }
-        let gap = max(a.minX - b.maxX, b.minX - a.maxX)
-        return gap >= -rowSlop * tall && gap <= rowGap * tall
+              overlap(a.minY, a.maxY, b.minY, b.maxY) > rowOverlap * short else { return nil }
+        return max(a.minX - b.maxX, b.minX - a.maxX) / tall
     }
 
     /// Two lines stacked in one column whose boxes overlap in height: neither is below the other.
@@ -223,6 +233,38 @@ public enum BodySize {
     public static func capped(_ block: Block, ceiling: CGFloat?) -> CGFloat? {
         guard let size = block.fontSize, let ceiling, block.isBody else { return block.fontSize }
         return min(size, ceiling)
+    }
+}
+
+/// The size a lone label is drawn at. A label of a figure ("Positional", "Attention", "Add & Norm") is one short line, and its
+/// source size is estimated from the glyphs in its box and from the box's height. When the recognizer's box holds more than the
+/// line it read (the box of "Positional Encoding" with the text of its first line only, 43 px tall for glyphs 22 px tall), both
+/// say twice the size, and the translation came out at 45.8 px beside labels of 23 px. What a line's own width says is more
+/// reliable for a short line of letters: a Latin letter is about 0.4 to 0.5 em wide on average, and labels drawn from their
+/// source measure 1.5 to 2.4 times as large (em) as the average width of their characters, 2.85 at the most (200 labels of the
+/// paper bench's pages, 2026-10-18); a Han, kana or hangul glyph is one em wide, so for those the cap never binds.
+public enum LabelSize {
+    /// A label is at most this many words and characters, and at least `minCharacters` (one letter or two has no average width).
+    public static let maxWords = 2
+    public static let maxCharacters = 16
+    public static let minCharacters = 4
+    /// The largest size (em) of a label, in widths of its characters: above anything measured on a source label but "This" (2.85).
+    public static let advanceCeiling: CGFloat = 2.6
+
+    /// One line of at most two words and sixteen characters.
+    public static func isLabel(_ text: String, lines: Int) -> Bool {
+        guard lines == 1 else { return false }
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        // A sign between two words is no word ("Add & Norm").
+        let words = trimmed.split(whereSeparator: \.isWhitespace).filter { $0.contains(where: \.isLetter) || $0.contains(where: \.isNumber) }
+        return (minCharacters...maxCharacters).contains(trimmed.count) && words.count <= maxWords
+    }
+
+    /// `size` of a block, held to what the width of its line says when it is a label (`width` is the line's, in pixels).
+    public static func capped(_ size: CGFloat?, text: String, width: CGFloat, lines: Int) -> CGFloat? {
+        guard let size, width > 0, isLabel(text, lines: lines) else { return size }
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return min(size, advanceCeiling * width / CGFloat(trimmed.count))
     }
 }
 

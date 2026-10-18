@@ -64,8 +64,9 @@ given a marker attribute (`link = math:N`) comes back **unchanged, in place, car
   whitespace normalisation; the rest is translated text.
 - Grammar stays natural (the engine sees the span text), unlike placeholders.
 
-Measured next with words (round apple-spans, 2026-10-18; `tools/apple-translation-probe/glossary-spans.swift`, outputs
-`apple-glossary-spans-*.txt`), which corrects the above for anything the engine can translate:
+Measured next with words (round apple-spans, 2026-10-18; the probe `glossary-spans.swift`, removed since, is at
+`git show 04092b1:tools/apple-translation-probe/glossary-spans.swift`; outputs `apple-glossary-spans-*.txt`), which corrects the
+above for anything the engine can translate:
 
 - A `translate(batch:)` response has no `attributedTargetText` (nor `attributedSourceText`); only `translate(_: AttributedString)`
   returns it. A source with spans goes as its own request; at once with the others it costs the same wall time as the batch
@@ -77,7 +78,15 @@ Measured next with words (round apple-spans, 2026-10-18; `tools/apple-translatio
 - So a glossary term gets a marker and no skip: the run is the engine's rendering, and the glossary target replaces the word
   before the particle. 33 terms in 20 lines: honoured 33/33 in both strategies (post-hoc `applyGlossary`: 25 and 23, nearly all
   because the engine chose the same word). The particle the engine chose for its own word was wrong for the target 3 of 22 times
-  (low latency) and 5 of 20 (high fidelity); `KoreanParticle` fits it (0 wrong).
+  (low latency) and 5 of 20 (high fidelity); a rule that fitted it to the target's last sound left 0 wrong.
+- Dropped (1.1.2). It worked, but only by patching the engine's output. Where the engine's word ends was guessed: a rendering
+  that ends like a particle was cut inside the word (20 of 41 wrong with the language pack, 18 with Apple Intelligence; a lookup
+  of the engine's own word brought both to 3, `apple-glossary-words-{before,after}-*.txt`), and outside Korean the marked path
+  applied 1 (ja) and 4 (zh) of 14 terms with Apple Intelligence, 12 and 13 with the lookup, the plain path 1 and 3
+  (`apple-glossary-{ja,zh}-{before,after}-highfidelity.txt`). The Korean particle was redone on top. Apple Translation takes no
+  term constraint, so that patching was the whole feature. The glossary engine is Foundation Models ("용어집 우선"), and glossary
+  terms already feed OCR's custom words. The glossary spans, `KoreanParticle` and the probe are removed (history: f35e079, bc187b8,
+  its revert 04092b1); `ProtectedSpans` keeps formulas.
 
 This is Apple's equivalent of DeepL's `tag_handling=xml` + `ignore_tags` ("placeholder tags are placed next to the
 translation of the words that precede or follow them", developers.deepl.com/docs/translate/translating-xml), and of the
@@ -93,7 +102,6 @@ detag-and-project.
    original image (cropped from the frame by `VNRecognizedText.boundingBox(for:)`) as an inline attachment scaled to the
    text size. Fallback to text when a span does not come back exactly once. DeepL: `<m>` + `ignore_tags`; OpenAI-
    compatible engines: the same tags with an instruction, checked once each. Requires macOS 26.4 for Apple; earlier: text.
-3. Same mechanism, other uses: glossary terms in Apple Translation (marker, replace the run with the glossary target; done in
-   1.1.2, `ProtectedSpans`) instead of the post-hoc `applyGlossary`, which stays for a span that does not come back once;
-   protect URLs, code and names instead of `restoreSourceTokens`.
+3. Same mechanism, other uses: protect URLs, code and names instead of `restoreSourceTokens`. (Glossary terms in Apple
+   Translation were tried with it and dropped, §4; `applyGlossary` stays as the post-hoc replacement.)
 4. Later: a page-image regression set beyond one paper (DoTA, IBEM pages); "…" with the full text on hover.

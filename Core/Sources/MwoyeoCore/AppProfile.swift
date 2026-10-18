@@ -8,19 +8,23 @@ public struct AppProfile: Codable, Equatable, Identifiable, Sendable {
     public var target: String
     /// The added engine to use; nil keeps the base choice.
     public var customEngineID: UUID?
+    /// How this app's text is cut into paragraphs; nil inherits the global default.
+    public var paragraphReader: ParagraphReader?
 
     public var id: String { bundleID }
 
-    public init(bundleID: String, appName: String, source: String, target: String, customEngineID: UUID? = nil) {
+    public init(bundleID: String, appName: String, source: String, target: String, customEngineID: UUID? = nil,
+                paragraphReader: ParagraphReader? = nil) {
         self.bundleID = bundleID
         self.appName = appName
         self.source = source
         self.target = target
         self.customEngineID = customEngineID
+        self.paragraphReader = paragraphReader
     }
 
     // Decode leniently so a profile saved by another version never takes the others with it.
-    enum CodingKeys: String, CodingKey { case bundleID, appName, source, target, customEngineID }
+    enum CodingKeys: String, CodingKey { case bundleID, appName, source, target, customEngineID, paragraphReader }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         bundleID = try c.decode(String.self, forKey: .bundleID)
@@ -28,6 +32,8 @@ public struct AppProfile: Codable, Equatable, Identifiable, Sendable {
         source = try c.decodeIfPresent(String.self, forKey: .source) ?? "auto"
         target = try c.decodeIfPresent(String.self, forKey: .target) ?? "en"
         customEngineID = try? c.decodeIfPresent(UUID.self, forKey: .customEngineID)
+        // A reader this build does not know (saved by a newer version) inherits, like a profile without one.
+        paragraphReader = (try? c.decodeIfPresent(ParagraphReader.self, forKey: .paragraphReader)) ?? nil
     }
 }
 
@@ -57,6 +63,11 @@ public enum AppProfiles {
         var out = LanguageChoice(source: p.source, target: p.target, customEngineID: base.customEngineID)
         if let id = p.customEngineID, engines.contains(id) { out.customEngineID = id }
         return out
+    }
+
+    /// The paragraph reader for the app `bundleID`: its profile's choice, else `base`.
+    public static func paragraphReader(base: ParagraphReader, profiles: [AppProfile], app bundleID: String?) -> ParagraphReader {
+        profile(for: bundleID, in: profiles)?.paragraphReader ?? base
     }
 
     /// `profiles` with `profile` added, or replacing the one for the same app.

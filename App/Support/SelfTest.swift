@@ -130,6 +130,10 @@ enum SelfTest {
         settings.renderMode = option("--mode") == "fast" ? .fast : .seamless
         settings.engine = TranslationEngineChoice(rawValue: option("--engine") ?? "auto") ?? .auto
         settings.useInpaintingModel = !args.contains("--no-inpaint")
+        // `--reader automatic|documentLayout|lineGrouping` is the global choice; `--lens-app <bundleID> [--lens-category <type>]`
+        // renders as if that app were in the lens (what automatic reads from the app).
+        settings.paragraphReader = option("--reader").flatMap(ParagraphReader.init(rawValue:)) ?? .automatic
+        let lensApp = ReaderContext(bundleID: option("--lens-app"), category: option("--lens-category"))
         let scale = CGFloat(Double(option("--scale") ?? "2") ?? 2)
         guard let decoded = try? StillTranslation.decode(url: input, scale: scale) else { throw Failure(description: "cannot read \(input.path)") }
         let image = decoded.image
@@ -169,7 +173,8 @@ enum SelfTest {
         TextRecognizer.setNoticeHandler(report)
         // A render is a fresh process, the cold case: the text model loads in the background, as at the app's launch, and `--warm`
         // waits for it.
-        let loading = Task.detached(priority: .utility) { await AppModel.loadVision() }
+        let source = settings.sourceLanguage
+        let loading = Task.detached(priority: .utility) { await AppModel.loadVision(source: source) }
         let t0 = Date()
         let inpainter = settings.useInpaintingModel ? Inpainter.load() : nil
         print("inpainter: \(inpainter != nil ? "MI-GAN loaded (\(ms(t0)) ms)" : "none")")
@@ -186,7 +191,7 @@ enum SelfTest {
             await loading.value
             print("warm-up: \(ms(w)) ms")
         }
-        let still = StillTranslation(decoded, settings: settings, translator: translator, inpainter: inpainter)
+        let still = StillTranslation(decoded, settings: settings, translator: translator, inpainter: inpainter, lensApp: lensApp)
         let pipeline = still.pipeline
         let capture = CGRect(x: 0, y: 0, width: CGFloat(image.width) / scale, height: CGFloat(image.height) / scale)
         let start = Date()
@@ -214,7 +219,7 @@ enum SelfTest {
                 settings.targetLanguage = step
             }
             await translator.update(settings: settings)
-            await pipeline.update(options: PipelineOptions(settings))
+            await pipeline.update(options: PipelineOptions(settings, lensApp: lensApp))
         }
         let steps = (option("--then") ?? "").split(separator: ",").map(String.init)
         if let early = option("--then-early").flatMap({ Double($0) }) {

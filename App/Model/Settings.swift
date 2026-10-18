@@ -1,3 +1,4 @@
+import AppKit
 import CoreGraphics
 import Foundation
 import MwoyeoCore
@@ -85,6 +86,8 @@ enum LensStyle: String, Codable, CaseIterable, Identifiable {
     case glow
     /// A thin spectrum line; it glows only while reading.
     case subtle
+    /// Four corner brackets; it glows only while reading.
+    case corners
     /// A faint grey line; the name tag shows only under the pointer.
     case minimal
 
@@ -93,7 +96,81 @@ enum LensStyle: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .glow: String(localized: "Glow")
         case .subtle: String(localized: "Subtle")
+        case .corners: String(localized: "Corners")
         case .minimal: String(localized: "Minimal")
+        }
+    }
+}
+
+/// The colours of the lens ring.
+enum LensTint: String, Codable, CaseIterable, Identifiable {
+    case spectrum, accent, ocean, sunset, forest, mono
+
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .spectrum: String(localized: "Spectrum")
+        case .accent: String(localized: "Accent")
+        case .ocean: String(localized: "Ocean")
+        case .sunset: String(localized: "Sunset")
+        case .forest: String(localized: "Forest")
+        case .mono: String(localized: "Mono")
+        }
+    }
+
+    /// The colours around the ring (the system accent for `.accent`, read when asked); the gradient closes on its first.
+    var colors: [NSColor] {
+        func hex(_ v: Int) -> NSColor {
+            NSColor(srgbRed: CGFloat(v >> 16 & 255) / 255, green: CGFloat(v >> 8 & 255) / 255, blue: CGFloat(v & 255) / 255, alpha: 1)
+        }
+        let loop: [NSColor]
+        switch self {
+        case .spectrum:
+            loop = [NSColor(srgbRed: 1.00, green: 0.62, blue: 0.04, alpha: 1), // orange
+                    NSColor(srgbRed: 1.00, green: 0.22, blue: 0.37, alpha: 1), // pink
+                    NSColor(srgbRed: 0.75, green: 0.35, blue: 0.95, alpha: 1), // purple
+                    NSColor(srgbRed: 0.37, green: 0.36, blue: 0.90, alpha: 1), // indigo
+                    NSColor(srgbRed: 0.39, green: 0.82, blue: 1.00, alpha: 1)] // cyan
+        case .accent:
+            let a = NSColor.controlAccentColor.usingColorSpace(.sRGB) ?? .systemBlue
+            loop = [a, a.blended(withFraction: 0.35, of: .white) ?? a, a, a.blended(withFraction: 0.25, of: .black) ?? a]
+        case .ocean: loop = [hex(0x2E6BFF), hex(0x00B4D8), hex(0x48CAE4), hex(0x3A86FF)]
+        case .sunset: loop = [hex(0xFF7A00), hex(0xFF3D7F), hex(0xB14EFF), hex(0xFFB703)]
+        case .forest: loop = [hex(0x2DC653), hex(0x00A884), hex(0x8BD346), hex(0x1B998B)]
+        case .mono: loop = [0.72, 0.40, 0.64, 0.36].map { NSColor(white: $0, alpha: 1) }
+        }
+        return loop + [loop[0]]
+    }
+}
+
+/// When the lens shows its name tag.
+enum LensTabVisibility: String, Codable, CaseIterable, Identifiable {
+    /// Always, except on a minimal lens, where it shows under the pointer.
+    case automatic, always, onHover
+
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .automatic: String(localized: "Automatic")
+        case .always: String(localized: "Always")
+        case .onHover: String(localized: "On Hover")
+        }
+    }
+}
+
+/// Where the name tag sits around the lens.
+enum LensTabPosition: String, Codable, CaseIterable, Identifiable {
+    case topLeading, topTrailing, bottomLeading, bottomTrailing
+
+    var id: String { rawValue }
+    var isBottom: Bool { self == .bottomLeading || self == .bottomTrailing }
+    var isTrailing: Bool { self == .topTrailing || self == .bottomTrailing }
+    var title: String {
+        switch self {
+        case .topLeading: String(localized: "Top Left")
+        case .topTrailing: String(localized: "Top Right")
+        case .bottomLeading: String(localized: "Bottom Left")
+        case .bottomTrailing: String(localized: "Bottom Right")
         }
     }
 }
@@ -121,6 +198,9 @@ struct AppSettings: Codable, Equatable {
     /// Opacity of the box behind text in fast mode.
     var boxOpacity = 0.94
     var lensStyle = LensStyle.glow
+    var lensTint = LensTint.spectrum
+    var lensTabVisibility = LensTabVisibility.automatic
+    var lensTabPosition = LensTabPosition.topLeading
     /// Translations kept in memory for reuse.
     var cacheSize = 5000
     /// HotKeyAction raw value → combo; an action missing here has no shortcut.
@@ -133,6 +213,8 @@ struct AppSettings: Codable, Equatable {
     var exportFolder = ("~/Documents/Mwoyeo" as NSString).expandingTildeInPath
     /// Languages (and engine) remembered per app; the app in front decides which applies (see `effective`).
     var appProfiles: [AppProfile] = []
+    /// How text is cut into paragraphs, unless an app's profile says otherwise.
+    var paragraphReader = ParagraphReader.automatic
 
     /// The settings that translate while the app `frontmost` is in front: this app's profile over the base choice.
     func effective(frontmost: String?) -> AppSettings {
@@ -176,6 +258,9 @@ struct AppSettings: Codable, Equatable {
         fontStyle = (try? c.decodeIfPresent(FontStyleChoice.self, forKey: .fontStyle)) ?? d.fontStyle
         boxOpacity = try c.decodeIfPresent(Double.self, forKey: .boxOpacity) ?? d.boxOpacity
         lensStyle = (try? c.decodeIfPresent(LensStyle.self, forKey: .lensStyle)) ?? d.lensStyle
+        lensTint = (try? c.decodeIfPresent(LensTint.self, forKey: .lensTint)) ?? d.lensTint
+        lensTabVisibility = (try? c.decodeIfPresent(LensTabVisibility.self, forKey: .lensTabVisibility)) ?? d.lensTabVisibility
+        lensTabPosition = (try? c.decodeIfPresent(LensTabPosition.self, forKey: .lensTabPosition)) ?? d.lensTabPosition
         shortcuts = (try? c.decodeIfPresent([String: KeyCombo].self, forKey: .shortcuts)) ?? d.shortcuts
         checksForUpdates = try c.decodeIfPresent(Bool.self, forKey: .checksForUpdates) ?? d.checksForUpdates
         cacheSize = max(100, try c.decodeIfPresent(Int.self, forKey: .cacheSize) ?? d.cacheSize)
@@ -183,6 +268,7 @@ struct AppSettings: Codable, Equatable {
         savesTranscripts = try c.decodeIfPresent(Bool.self, forKey: .savesTranscripts) ?? d.savesTranscripts
         exportFolder = try c.decodeIfPresent(String.self, forKey: .exportFolder) ?? d.exportFolder
         appProfiles = ((try? c.decodeIfPresent([Lossy<AppProfile>].self, forKey: .appProfiles)) ?? nil)?.compactMap(\.value) ?? d.appProfiles
+        paragraphReader = (try? c.decodeIfPresent(ParagraphReader.self, forKey: .paragraphReader)) ?? d.paragraphReader
     }
 }
 

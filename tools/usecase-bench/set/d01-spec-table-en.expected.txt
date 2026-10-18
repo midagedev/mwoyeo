@@ -1,0 +1,6 @@
+Specifications
+Feature | Standard | Pro (header cells)
+Display | 13.6-inch | 14.2-inch
+Battery life | Up to 18 hours | Up to 22 hours
+Weight | 1.24 kg | 1.55 kg
+Price | $1,099 | $1,599

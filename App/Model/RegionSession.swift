@@ -43,6 +43,10 @@ final class RegionSession {
     private var wideMargins = false
     private var lastMotion: TimeInterval = 0
     private var calmTimer: Timer?
+    /// The dot and glow follow translating only, settled by `BusyDebounce`; notices pass `NoticeGate`.
+    private var busyDebounce = BusyDebounce()
+    private var busyTimer: Timer?
+    private var noticeGate = NoticeGate()
     /// Where things are heading (-1…1 per axis): the lens while dragged, new content while the page scrolls.
     private var lead = CGVector.zero
     private var lastLens: (rect: CGRect, time: TimeInterval)?
@@ -72,11 +76,11 @@ final class RegionSession {
         chrome = RegionFrameWindow(region: frame, name: config.name)
         chrome.setDetail(Self.languagePair(settings), badge: settings.activeEngineConfig?.badgeSymbol)
         chrome.setFollowing(config.anchor != nil)
-        chrome.setStyle(settings.lensStyle)
+        chrome.setAppearance(settings)
         let capture = Self.overscan(config.rect, wide: false)
         self.capture = capture
         let tap = SnapshotTap()
-        pipeline = RegionPipeline(options: PipelineOptions(settings), capture: capture, translator: translator,
+        pipeline = RegionPipeline(options: PipelineOptions(settings, lensApp: AppModel.readerContext(for: config)), capture: capture, translator: translator,
                                   inpainter: inpainter, onSnapshot: { snapshot in Task { @MainActor in panel.apply(snapshot); tap.handler?(snapshot) } })
         capturer.onFrame = { [pipeline] frame in Task { await pipeline.ingest(frame) } }
         capturer.onStop = { [weak self] error in Task { @MainActor in self?.captureStopped(error) } }
@@ -112,6 +116,8 @@ final class RegionSession {
         trackTimer = nil
         calmTimer?.invalidate()
         calmTimer = nil
+        busyTimer?.invalidate()
+        busyTimer = nil
         mouseMonitors.forEach { NSEvent.removeMonitor($0) }
         mouseMonitors = []
         finishTranscript()
@@ -122,7 +128,10 @@ final class RegionSession {
     }
 
     /// A quiet line on the lens's pill for a few seconds.
-    func showNotice(_ text: String, seconds: TimeInterval = 6) { chrome.flash(text, seconds: seconds) }
+    func showNotice(_ text: String, seconds: TimeInterval = 6) {
+        guard noticeGate.allow(text, now: ProcessInfo.processInfo.systemUptime) else { return }
+        chrome.flash(text, seconds: seconds)
+    }
 
     private static func languagePair(_ s: AppSettings) -> String {
         "\(s.sourceLanguage == "auto" ? String(localized: "Auto") : Languages.name(s.sourceLanguage)) → \(Languages.name(s.targetLanguage))"
@@ -136,8 +145,8 @@ final class RegionSession {
             finishTranscript()
         }
         chrome.setDetail(Self.languagePair(settings), badge: settings.activeEngineConfig?.badgeSymbol)
-        chrome.setStyle(settings.lensStyle)
-        await pipeline.update(options: PipelineOptions(settings))
+        chrome.setAppearance(settings)
+        await pipeline.update(options: PipelineOptions(settings, lensApp: AppModel.readerContext(for: config)))
         if settings.framesPerSecond != fps {
             fps = settings.framesPerSecond
             try? await capturer.update(rect: capture, fps: fps)
@@ -165,6 +174,12 @@ final class RegionSession {
         onConfigChange?(config)
     }
 
+    /// The app under the lens changed (dropped on another window, followed another): the pipeline's options carry it.
+    private func refreshReaderContext() {
+        let options = PipelineOptions(settings, lensApp: AppModel.readerContext(for: config))
+        Task { [pipeline] in await pipeline.update(options: options) }
+    }
+
     private func follow(_ w: WindowInfo?) {
         config.follow(w)
         chrome.setName(config.name)
@@ -179,8 +194,19 @@ final class RegionSession {
     private func setActivity(_ a: RegionActivity) {
         guard a != activity else { return }
         activity = a
-        chrome.setBusy(a != .idle)
+        settleBusy()
         onChange?()
+    }
+
+    private func settleBusy() {
+        let now = ProcessInfo.processInfo.systemUptime
+        chrome.setBusy(busyDebounce.update(activity == .translating, now: now))
+        busyTimer?.invalidate()
+        busyTimer = nil
+        guard let due = busyDebounce.nextChange else { return }
+        busyTimer = Timer.scheduledTimer(withTimeInterval: max(0, due - now), repeats: false) { [weak self] _ in
+            MainActor.assumeIsolated { self?.settleBusy() }
+        }
     }
 
     private func captureStopped(_ error: Error?) {
@@ -363,6 +389,7 @@ final class RegionSession {
         // A window lens follows whichever window it was dropped on (off every window, it stays where it is).
         // A screen lens stays pinned.
         if config.anchor != nil { follow(windowUnderLens()) }
+        refreshReaderContext()
         onConfigChange?(config)
         updateEmphasis(NSEvent.mouseLocation)
     }

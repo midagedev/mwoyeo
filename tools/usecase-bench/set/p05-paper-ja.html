@@ -1,0 +1,13 @@
+<!doctype html><meta charset=utf-8><style>body{margin:0;background:#fff;color:#111;font:13px/1.35 "Times New Roman",Times,serif}
+.pg{padding:46px 52px;width:860px;box-sizing:border-box}
+h1{font-size:22px;text-align:center;margin:0 0 8px;line-height:1.2}.au{text-align:center;font-size:13px;margin:4px 0}
+.ab{margin:14px 30px;font-size:12px}.cols{column-count:2;column-gap:26px;text-align:justify;hyphens:manual}
+h2{font-size:14px;margin:10px 0 4px}p{margin:0 0 7px}.eq{text-align:center;margin:8px 0;font-style:italic}
+.cap{font-size:11.5px;margin:4px 0 10px}.fn{font-size:10.5px;border-top:1px solid #000;margin-top:10px;padding-top:4px;width:40%}
+table{border-collapse:collapse;font-size:12px;margin:6px auto}td,th{padding:3px 10px;border-top:1px solid #000;border-bottom:1px solid #000;text-align:center}
+.ref{font-size:11.5px;padding-left:22px;text-indent:-22px;margin-bottom:5px}</style><style>body{font-family:"Hiragino Mincho ProN",serif}</style><div class=pg><h1>画面上の文字のオンデバイス翻訳に関する研究</h1><div class=au>山田 太郎、鈴木 花子</div><div class=au>北原大学 情報工学科</div>
+<div class=ab><b>概要</b> 本研究では、画面に表示された文字をサーバーに送信せずに翻訳する手法を提案する。認識した行を段落にまとめることで、翻訳の品質を向上させた。</div>
+<div class=cols><h2>1. はじめに</h2><p>外国語の画面を読むとき、利用者は文字をコピーして翻訳ツールに貼り付ける必要があり、読書の流れが途切れてしまう。</p>
+<p>そこで本稿では、画面の上に重ねて表示するレンズを提案する。主な課題は、どの行が同じ文に属するかを判断することである。</p>
+<h2>2. 手法</h2><p>入力画像から認識された行の集合を考え、隣り合う行の間隔が小さいものを同じ段落として結合する。</p>
+<div class=eq>d(l<sub>i</sub>, l<sub>i+1</sub>) &lt; &tau;&nbsp;&nbsp;&nbsp;(1)</div><p>式(1)を満たす行は同じ段落とみなす。</p></div></div>

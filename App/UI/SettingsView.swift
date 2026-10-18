@@ -109,6 +109,8 @@ struct TranslationSettings: View {
     @State private var cached = 0
     @State private var sheet: EngineSheetTarget?
     @State private var removing: EngineConfig?
+    /// The active added engine's speed, polled; nil (no row at all) until it has enough batches.
+    @State private var speed: SpeedSummary?
     private let intelligence = IntelligenceTranslator()
 
     /// The radio in use: an Apple choice, or an added engine.
@@ -116,18 +118,46 @@ struct TranslationSettings: View {
         Binding(get: { EngineSelection(model.settings) }, set: { model.select($0) })
     }
 
+    /// The paragraph reader remembered for one app; nil follows the default (Automatic).
+    private func readerChoice(for p: AppProfile) -> Binding<ParagraphReader?> {
+        Binding(get: { model.profile(for: p.bundleID)?.paragraphReader },
+                set: { choice in
+                    guard var updated = model.profile(for: p.bundleID) else { return }
+                    updated.paragraphReader = choice
+                    model.remember(updated)
+                })
+    }
+
+    /// The languages, and the paragraph reader only when it is not the automatic one.
+    private func profileDetail(_ p: AppProfile) -> String {
+        let pair = "\(Languages.name(p.source)) → \(Languages.name(p.target))"
+        guard let reader = p.paragraphReader, reader != .automatic else { return pair }
+        return "\(pair) · \(reader.title)"
+    }
+
     /// Languages remembered per app (from a lens's menu); the group exists only once there is one.
     private var appProfiles: some View {
         Section {
             ForEach(model.settings.appProfiles) { p in
                 LabeledContent {
-                    Button { model.forgetProfile(p.bundleID) } label: { Image(systemName: "minus.circle") }
-                        .buttonStyle(.borderless)
-                        .help("Forget languages for \(p.appName)")
+                    // The rarely needed choices stay behind ⋯, as on the added engine rows.
+                    Menu {
+                        Picker("Paragraphs", selection: readerChoice(for: p)) {
+                            Text("Automatic").tag(ParagraphReader?.none)
+                            ForEach(ParagraphReader.allCases.filter { $0 != .automatic }, id: \.self) { Text($0.title).tag(ParagraphReader?.some($0)) }
+                        }
+                        Divider()
+                        Button("Forget This App", role: .destructive) { model.forgetProfile(p.bundleID) }
+                    } label: { Image(nsImage: .moreActions) }
+                        .menuStyle(.borderlessButton)
+                        .menuIndicator(.hidden)
+                        .fixedSize()
+                        .help("More actions for \(p.appName)")
+                        .accessibilityLabel("More actions for \(p.appName)")
                 } label: {
                     VStack(alignment: .leading) {
                         Text(p.appName)
-                        Text("\(Languages.name(p.source)) → \(Languages.name(p.target))").font(.caption).foregroundStyle(.secondary)
+                        Text(profileDetail(p)).font(.caption).foregroundStyle(.secondary)
                     }
                 }
             }
@@ -136,6 +166,18 @@ struct TranslationSettings: View {
         } footer: {
             Text("The app in front picks the languages, one pair at a time.").font(.caption).foregroundStyle(.secondary)
         }
+    }
+
+    /// One added engine's actions: the ⋯ button on its row and the right-click menu.
+    @ViewBuilder private func engineActions(_ engine: EngineConfig) -> some View {
+        Button("Edit…") { sheet = .edit(engine) }
+        Button("Duplicate") { model.duplicateEngine(engine.id) }
+        Button("Copy Setup") {
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(EngineShare.encode(engine), forType: .string)
+        }
+        Divider()
+        Button("Remove…", role: .destructive) { removing = engine }
     }
 
     var body: some View {
@@ -151,22 +193,13 @@ struct TranslationSettings: View {
                         .tag(EngineSelection.builtIn(choice))
                     }
                     ForEach(model.settings.engines) { engine in
-                        AddedEngineLabel(engine: engine).tag(EngineSelection.added(engine.id))
+                        AddedEngineLabel(engine: engine) { engineActions(engine) }.tag(EngineSelection.added(engine.id))
                     }
                 }
                 .pickerStyle(.radioGroup)
                 .contextMenu {
                     ForEach(model.settings.engines) { engine in
-                        Section(engine.name) {
-                            Button("Edit…") { sheet = .edit(engine) }
-                            Button("Duplicate") { model.duplicateEngine(engine.id) }
-                            Button("Copy Setup") {
-                                NSPasteboard.general.clearContents()
-                                NSPasteboard.general.setString(EngineShare.encode(engine), forType: .string)
-                            }
-                            Divider()
-                            Button("Remove…", role: .destructive) { removing = engine }
-                        }
+                        Section(engine.name) { engineActions(engine) }
                     }
                 }
                 Button { sheet = .add } label: {
@@ -181,13 +214,19 @@ struct TranslationSettings: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                if let e = model.settings.activeEngineConfig { SpeedLine(engine: e) }
+                if let speed { SpeedLine(summary: speed) }
                 LabeledContent("Apple Intelligence") {
                     if let why = intelligence.unavailableReason {
                         Label(why, systemImage: "xmark.circle").foregroundStyle(.secondary)
                     } else {
                         Label("Available · on device", systemImage: "checkmark.seal.fill").foregroundStyle(.green)
                     }
+                }
+            }
+            .task(id: model.settings.activeEngineConfig?.id) {
+                while !Task.isCancelled {
+                    speed = model.settings.activeEngineConfig.flatMap { model.translator.speedSummary(for: $0.id) }
+                    try? await Task.sleep(for: .seconds(2))
                 }
             }
             .sheet(item: $sheet) { target in
@@ -203,7 +242,7 @@ struct TranslationSettings: View {
                 Text("Its saved key is deleted from the Keychain.")
             }
             Section {
-                LanguagePacksView(target: model.settings.targetLanguage) {
+                LanguagePacksView(source: model.settings.sourceLanguage, target: model.settings.targetLanguage) {
                     Task { await model.languagePacksChanged() }
                 }
             } header: {
@@ -257,33 +296,27 @@ struct TranslationSettings: View {
     }
 }
 
+/// The pack the lenses use now (the chosen pair; none while the source is automatic) and "All Languages" with the installed
+/// count, holding every pair: the section is one or two rows, not one per language.
 struct LanguagePacksView: View {
+    let source: String
     let target: String
     var onChange: () -> Void
     @State private var status: [String: LanguageAvailability.Status] = [:]
     @State private var downloading: TranslationSession.Configuration?
+    @State private var showsAll = false
 
     private var sources: [String] { Languages.sources.dropFirst().filter { $0 != target } }
+    private var shown: [String] { source == "auto" || source == target ? [] : [source] }
+    private var installed: Int { sources.filter { status[$0] == .installed }.count }
 
     var body: some View {
-        ForEach(sources, id: \.self) { source in
-            LabeledContent {
-                switch status[source] {
-                case .installed?:
-                    Label("Installed", systemImage: "checkmark.circle.fill").foregroundStyle(.green).labelStyle(.titleAndIcon)
-                case .supported?:
-                    Button("Download") {
-                        downloading = TranslationSession.Configuration(source: Locale.Language(identifier: source),
-                                                                       target: Locale.Language(identifier: target))
-                    }
-                    .disabled(downloading != nil)
-                case nil:
-                    ProgressView().controlSize(.small)
-                default:
-                    Text("Not supported").foregroundStyle(.secondary)
-                }
-            } label: {
-                Text(verbatim: "\(Languages.name(source)) → \(Languages.name(target))")
+        ForEach(shown, id: \.self) { row($0) }
+        DisclosureGroup(isExpanded: $showsAll) {
+            ForEach(sources, id: \.self) { row($0) }
+        } label: {
+            LabeledContent("All Languages") {
+                if !status.isEmpty { Text("\(installed) installed").foregroundStyle(.secondary) }
             }
         }
         .task(id: target) { await reload() }
@@ -293,6 +326,27 @@ struct LanguagePacksView: View {
             await MainActor.run { downloading = nil }
             await reload()
             await MainActor.run { onChange() }
+        }
+    }
+
+    private func row(_ source: String) -> some View {
+        LabeledContent {
+            switch status[source] {
+            case .installed?:
+                Label("Installed", systemImage: "checkmark.circle.fill").foregroundStyle(.green).labelStyle(.titleAndIcon)
+            case .supported?:
+                Button("Download") {
+                    downloading = TranslationSession.Configuration(source: Locale.Language(identifier: source),
+                                                                   target: Locale.Language(identifier: target))
+                }
+                .disabled(downloading != nil)
+            case nil:
+                ProgressView().controlSize(.small)
+            default:
+                Text("Not supported").foregroundStyle(.secondary)
+            }
+        } label: {
+            Text(verbatim: "\(Languages.name(source)) → \(Languages.name(target))")
         }
     }
 
@@ -306,19 +360,30 @@ struct LanguagePacksView: View {
     }
 }
 
-private struct AppearanceSettings: View {
+struct AppearanceSettings: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
         @Bindable var model = model
         Form {
             Section("Lens") {
-                HStack(spacing: 12) {
+                HStack(spacing: 8) {
                     ForEach(LensStyle.allCases) { style in
-                        LensStyleCard(style: style, selected: model.settings.lensStyle == style) { model.settings.lensStyle = style }
+                        LensStyleCard(style: style, tint: model.settings.lensTint, selected: model.settings.lensStyle == style) { model.settings.lensStyle = style }
                     }
                 }
                 .frame(maxWidth: .infinity)
+                Picker("Colour", selection: $model.settings.lensTint) {
+                    ForEach(LensTint.allCases) { tint in
+                        Label { Text(tint.title) } icon: { Image(nsImage: Self.swatch(tint)) }.tag(tint)
+                    }
+                }
+                Picker("Name tag", selection: $model.settings.lensTabVisibility) {
+                    ForEach(LensTabVisibility.allCases) { Text($0.title).tag($0) }
+                }
+                Picker("Name tag position", selection: $model.settings.lensTabPosition) {
+                    ForEach(LensTabPosition.allCases) { Text($0.title).tag($0) }
+                }
             }
             Section("Text") {
                 Picker("Font", selection: $model.settings.fontStyle) {
@@ -351,11 +416,22 @@ private struct AppearanceSettings: View {
         }
         .formStyle(.grouped)
     }
+
+    /// A small round sample of a tint's colours (not a template image, so a menu keeps its colours).
+    private static func swatch(_ tint: LensTint) -> NSImage {
+        let image = NSImage(size: NSSize(width: 12, height: 12), flipped: false) { rect in
+            NSGradient(colors: Array(tint.colors.prefix(4)))?.draw(in: NSBezierPath(ovalIn: rect.insetBy(dx: 0.5, dy: 0.5)), angle: -45)
+            return true
+        }
+        image.isTemplate = false
+        return image
+    }
 }
 
 /// A lens in miniature, drawn in one style, to pick from.
 private struct LensStyleCard: View {
     let style: LensStyle
+    let tint: LensTint
     let selected: Bool
     let action: () -> Void
 
@@ -366,14 +442,14 @@ private struct LensStyleCard: View {
                     RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color(white: 0.13))
                     VStack(alignment: .leading, spacing: 5) {
                         ForEach([0.9, 0.7, 0.8, 0.45], id: \.self) { f in
-                            Capsule().fill(.white.opacity(0.75)).frame(width: 64 * f, height: 3)
+                            Capsule().fill(.white.opacity(0.75)).frame(width: 52 * f, height: 3)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, 22)
+                    .padding(.leading, 18)
                     ring.padding(10)
                 }
-                .frame(width: 112, height: 70)
+                .frame(width: 100, height: 64)
                 .overlay {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .strokeBorder(selected ? Color.accentColor : .clear, lineWidth: 2.5)
@@ -390,9 +466,12 @@ private struct LensStyleCard: View {
 
     @ViewBuilder private var ring: some View {
         switch style {
-        case .glow: LensRing(cornerRadius: 7, lineWidth: 2, glow: 4)
-        case .subtle: LensRing(cornerRadius: 7, lineWidth: 1.2, glow: 0)
-        case .minimal: RoundedRectangle(cornerRadius: 7, style: .continuous).stroke(.white.opacity(0.4), lineWidth: 1.2)
+        case .glow: LensRing(cornerRadius: 7, lineWidth: 1.3, glow: 3, tint: tint)
+        case .subtle: LensRing(cornerRadius: 7, lineWidth: 0.9, glow: 0, tint: tint)
+        case .corners:
+            CornerBrackets(cornerRadius: 7, arm: 7)
+                .stroke(Brand.ring(.degrees(45), tint: tint), style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
+        case .minimal: RoundedRectangle(cornerRadius: 7, style: .continuous).stroke(.white.opacity(0.4), lineWidth: 0.9)
         }
     }
 }
@@ -560,16 +639,26 @@ enum EngineSheetTarget: Identifiable {
 }
 
 /// An added engine's radio label, laid out like the Apple choices: its name, then where it runs and its measured time.
-private struct AddedEngineLabel: View {
+private struct AddedEngineLabel<Actions: View>: View {
     @Environment(AppModel.self) private var model
     let engine: EngineConfig
+    @ViewBuilder let actions: Actions
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(engine.name)
-            TimelineView(.periodic(from: .now, by: 2)) { _ in
-                Text(detail).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
+        HStack(spacing: 8) {
+            VStack(alignment: .leading) {
+                Text(engine.name).lineLimit(1).fixedSize(horizontal: true, vertical: false)
+                TimelineView(.periodic(from: .now, by: 2)) { _ in
+                    Text(detail).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
+                }
             }
+            Spacer(minLength: 0)
+            Menu { actions } label: { Image(nsImage: .moreActions) }
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .fixedSize()
+                .help("More actions for \(engine.name)")
+                .accessibilityLabel("More actions for \(engine.name)")
         }
     }
 
@@ -580,15 +669,58 @@ private struct AddedEngineLabel: View {
 
 /// "First result 0.3 s · 62% from memory", for the engine in use once it has run a few batches.
 private struct SpeedLine: View {
-    @Environment(AppModel.self) private var model
-    let engine: EngineConfig
+    let summary: SpeedSummary
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 2)) { _ in
-            if let s = model.translator.speedSummary(for: engine.id) {
-                Text("First result \(String(format: "%.1f", s.seconds)) s · \(Int((s.fromMemory * 100).rounded()))% from memory")
-                    .font(.caption).foregroundStyle(.secondary)
-            }
+        Text("First result \(String(format: "%.1f", summary.seconds)) s · \(Int((summary.fromMemory * 100).rounded()))% from memory")
+            .font(.caption).foregroundStyle(.secondary)
+    }
+}
+
+extension ParagraphReader {
+    var title: String {
+        switch self {
+        case .automatic: String(localized: "Automatic")
+        case .documentLayout: String(localized: "Document layout")
+        case .lineGrouping: String(localized: "Line grouping")
         }
+    }
+}
+
+extension NSImage {
+    /// The ⋯ of a row's menu in the secondary label colour: a borderless menu button draws a template image in the primary
+    /// colour whatever the SwiftUI style says, so the colour is in the image (vision verdict, 2026-10-18).
+    static let moreActions: NSImage = {
+        let symbol = NSImage(systemSymbolName: "ellipsis.circle", accessibilityDescription: nil) ?? NSImage()
+        return symbol.withSymbolConfiguration(.init(paletteColors: [.secondaryLabelColor])) ?? symbol
+    }()
+}
+
+/// Four corner brackets: a quarter arc with an arm along each side, as the lens draws them.
+private struct CornerBrackets: Shape {
+    var cornerRadius: CGFloat
+    var arm: CGFloat
+
+    func path(in r: CGRect) -> Path {
+        var p = Path()
+        let c = cornerRadius, a = arm
+        // y down: top-left, top-right, bottom-right, bottom-left.
+        p.move(to: CGPoint(x: r.minX, y: r.minY + c + a))
+        p.addLine(to: CGPoint(x: r.minX, y: r.minY + c))
+        p.addArc(tangent1End: CGPoint(x: r.minX, y: r.minY), tangent2End: CGPoint(x: r.minX + c, y: r.minY), radius: c)
+        p.addLine(to: CGPoint(x: r.minX + c + a, y: r.minY))
+        p.move(to: CGPoint(x: r.maxX - c - a, y: r.minY))
+        p.addLine(to: CGPoint(x: r.maxX - c, y: r.minY))
+        p.addArc(tangent1End: CGPoint(x: r.maxX, y: r.minY), tangent2End: CGPoint(x: r.maxX, y: r.minY + c), radius: c)
+        p.addLine(to: CGPoint(x: r.maxX, y: r.minY + c + a))
+        p.move(to: CGPoint(x: r.maxX, y: r.maxY - c - a))
+        p.addLine(to: CGPoint(x: r.maxX, y: r.maxY - c))
+        p.addArc(tangent1End: CGPoint(x: r.maxX, y: r.maxY), tangent2End: CGPoint(x: r.maxX - c, y: r.maxY), radius: c)
+        p.addLine(to: CGPoint(x: r.maxX - c - a, y: r.maxY))
+        p.move(to: CGPoint(x: r.minX + c + a, y: r.maxY))
+        p.addLine(to: CGPoint(x: r.minX + c, y: r.maxY))
+        p.addArc(tangent1End: CGPoint(x: r.minX, y: r.maxY), tangent2End: CGPoint(x: r.minX, y: r.maxY - c), radius: c)
+        p.addLine(to: CGPoint(x: r.minX, y: r.maxY - c - a))
+        return p
     }
 }

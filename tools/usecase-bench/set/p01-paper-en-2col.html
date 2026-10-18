@@ -1,0 +1,19 @@
+<!doctype html><meta charset=utf-8><style>body{margin:0;background:#fff;color:#111;font:13px/1.35 "Times New Roman",Times,serif}
+.pg{padding:46px 52px;width:860px;box-sizing:border-box}
+h1{font-size:22px;text-align:center;margin:0 0 8px;line-height:1.2}.au{text-align:center;font-size:13px;margin:4px 0}
+.ab{margin:14px 30px;font-size:12px}.cols{column-count:2;column-gap:26px;text-align:justify;hyphens:manual}
+h2{font-size:14px;margin:10px 0 4px}p{margin:0 0 7px}.eq{text-align:center;margin:8px 0;font-style:italic}
+.cap{font-size:11.5px;margin:4px 0 10px}.fn{font-size:10.5px;border-top:1px solid #000;margin-top:10px;padding-top:4px;width:40%}
+table{border-collapse:collapse;font-size:12px;margin:6px auto}td,th{padding:3px 10px;border-top:1px solid #000;border-bottom:1px solid #000;text-align:center}
+.ref{font-size:11.5px;padding-left:22px;text-indent:-22px;margin-bottom:5px}</style><div class=pg><h1>Efficient Screen Translation with On-Device Text Recognition</h1>
+<div class=au>Alice Johnson, Min-jun Park, Carlos Rivera</div><div class=au><i>Department of Computer Science, Northfield University</i></div>
+<div class=ab><b>Abstract.</b> We present a system that translates on-screen text in real time without sending pixels to a server. Our method groups recognized lines into paragraphs and reduces latency by a factor of three.</div>
+<div class=cols><h2>1. Introduction</h2>
+<p>Reading foreign-language content on a screen usually requires copying text into a trans&shy;lation tool, which breaks the reader's con&shy;centration and loses the visual context of the page.</p>
+<p>In this paper we describe a lens that sits above the screen and replaces the original text in place. The main challenge is deciding which lines belong together as a single sen&shy;tence.</p>
+<h2>2. Method</h2>
+<p>Let x denote an input frame and let the recog&shy;nizer return a set of lines. We define the grouping objective as</p>
+<div class=eq>L = &Sigma;<sub>i</sub> d(l<sub>i</sub>, l<sub>i+1</sub>) + &lambda; |G|&nbsp;&nbsp;&nbsp;&nbsp;(1)</div>
+<p>where d measures the vertical gap between two lines and G is the set of groups. A small gap indicates the same para&shy;graph.</p>
+<p>Equation (1) is minimized greedily, which runs in linear time over the number of lines in the frame.</p>
+<div class=fn><sup>1</sup> Code is available upon request.</div></div></div>

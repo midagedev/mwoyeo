@@ -52,12 +52,10 @@ public enum EnginePresets {
                config: EngineConfig(name: "Claude", kind: .anthropic(
                    baseURL: EngineKind.anthropicDefaultBaseURL, model: "", thinking: .off))),
         // https://developers.deepl.com/docs/getting-started/auth
-        Preset(name: "DeepL Free", hint: "Free key from deepl.com/pro-api; the key ends in :fx", needsKey: true,
+        // The host follows the key (DeepLTranslation.resolvedBaseURL): a key ending in :fx is a Free key.
+        Preset(name: "DeepL", hint: "Free or Pro key from deepl.com/pro-api", needsKey: true,
                keyURL: URL(string: "https://www.deepl.com/pro-api"),
-               config: EngineConfig(name: "DeepL Free", kind: .deepL(baseURL: URL(string: "https://api-free.deepl.com")!, formality: nil))),
-        Preset(name: "DeepL Pro", hint: "Your DeepL Pro key", needsKey: true,
-               keyURL: URL(string: "https://www.deepl.com/pro-api"),
-               config: EngineConfig(name: "DeepL Pro", kind: .deepL(baseURL: URL(string: "https://api.deepl.com")!, formality: nil))),
+               config: EngineConfig(name: "DeepL", kind: .deepL(baseURL: URL(string: "https://api.deepl.com")!, formality: nil))),
         // https://docs.libretranslate.com/guides/api_usage/ (README of github.com/LibreTranslate/LibreTranslate links there)
         Preset(name: "LibreTranslate", hint: "Self-hosted, default http://localhost:5000; the key is optional", needsKey: false,
                keyURL: nil,

@@ -1,0 +1,13 @@
+Efficient Screen Translation with On-Device Text Recognition
+Alice Johnson, Min-jun Park, Carlos Rivera
+Department of Computer Science, Northfield University
+Abstract. We present a system that translates on-screen text in real time without sending pixels to a server. Our method groups recognized lines into paragraphs and reduces latency by a factor of three.
+1. Introduction
+Reading foreign-language content on a screen usually requires copying text into a translation tool, which breaks the reader's concentration and loses the visual context of the page.
+In this paper we describe a lens that sits above the screen and replaces the original text in place. The main challenge is deciding which lines belong together as a single sentence.
+2. Method
+Let x denote an input frame and let the recognizer return a set of lines. We define the grouping objective as
+L = Σi d(li, li+1) + λ |G| (1)
+where d measures the vertical gap between two lines and G is the set of groups. A small gap indicates the same paragraph.
+Equation (1) is minimized greedily, which runs in linear time over the number of lines in the frame.
+1 Code is available upon request.

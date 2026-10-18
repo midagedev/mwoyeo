@@ -72,8 +72,11 @@ struct PipelineOptions: Sendable, Equatable {
     var sourceLanguage: String
     var targetLanguage: String
     var glossaryTerms: [String]
+    /// How text is cut into paragraphs in this lens (the app's profile over the global choice) and the app it covers.
+    var paragraphReader: ParagraphReader
+    var lensApp: ReaderContext
 
-    init(_ s: AppSettings) {
+    init(_ s: AppSettings, lensApp: ReaderContext = ReaderContext()) {
         renderMode = s.renderMode
         settleDelay = s.settleDelay
         useInpainting = s.useInpaintingModel
@@ -82,6 +85,8 @@ struct PipelineOptions: Sendable, Equatable {
         sourceLanguage = s.sourceLanguage
         targetLanguage = s.targetLanguage
         glossaryTerms = s.glossaryPairs.map(\.0)
+        paragraphReader = AppProfiles.paragraphReader(base: s.paragraphReader, profiles: s.appProfiles, app: lensApp.bundleID)
+        self.lensApp = lensApp
     }
 }
 
@@ -117,6 +122,8 @@ actor RegionPipeline {
     private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "pipeline")
 
     private var options: PipelineOptions
+    /// Which paragraph reader the lens uses now (set from `options`, kept calm by the plan).
+    private let readerPlan = ReaderPlan()
     private var latest: CapturedFrame?
     private var prevGray: GrayImage?
     /// Part of `prevGray` that holds real pixels (after the capture grew); nil = all of it.
@@ -218,6 +225,7 @@ actor RegionPipeline {
         self.captureSize = capture.size
         self.visible = capture
         self.options = options
+        readerPlan.configure(setting: options.paragraphReader, context: options.lensApp)
         self.translator = translator
         self.inpainter = inpainter
         self.onSnapshot = onSnapshot
@@ -243,6 +251,7 @@ actor RegionPipeline {
         restyled.settleDelay = new.settleDelay
         let reread = restyled != new, redraw = new.fontStyle != options.fontStyle || new.boxOpacity != options.boxOpacity
         options = new
+        readerPlan.configure(setting: new.paragraphReader, context: new.lensApp)
         if reread { reset(); return }
         guard redraw else { return }
         // Only the look changed: redraw what is already read, erased and translated.
@@ -751,7 +760,7 @@ actor RegionPipeline {
             // Erasing modes read paragraphs, like the seamless pass: the settled re-read then finds the same text and
             // keeps its translations instead of translating everything a second time.
             found = wantsErase ? (try? await TextRecognizer.blocks(in: frame.image, roi: dirty, languages: ocrLanguages,
-                                                                   customWords: options.glossaryTerms)) ?? [] : []
+                                                                   customWords: options.glossaryTerms, plan: readerPlan)) ?? [] : []
             if found.isEmpty {
                 found = try await TextRecognizer.lines(in: frame.image, roi: dirty, languages: ocrLanguages, fast: useFast,
                                                        customWords: options.glossaryTerms).map { TextRecognizer.makeBlock([$0]) }
@@ -815,7 +824,7 @@ actor RegionPipeline {
         var found: [OCRBlock]
         do {
             do {
-                found = try await TextRecognizer.blocks(in: frame.image, languages: ocrLanguages, customWords: options.glossaryTerms)
+                found = try await TextRecognizer.blocks(in: frame.image, languages: ocrLanguages, customWords: options.glossaryTerms, plan: readerPlan)
             } catch is TextRecognizer.Timeout {
                 Trace.mark("seamless: document OCR timed out, reading lines", since: t)
                 found = []
@@ -1362,6 +1371,8 @@ enum Trace {
     private static let samples = OSAllocatedUnfairLock(initialState: [String: [Double]]())
     static func sample(_ key: String, _ v: Double) { samples.withLock { $0[key, default: []].append(v) } }
     static func takeSamples() -> [String: [Double]] { samples.withLock { defer { $0 = [:] }; return $0 } }
+    /// `MWOYEO_TRACE_LINES` adds the recognized lines of every automatic reader decision to the trace (tools/usecase-bench/tune.sh).
+    static let lineDump = enabled && ProcessInfo.processInfo.environment["MWOYEO_TRACE_LINES"] != nil
     static let dumpDirectory: URL? = ProcessInfo.processInfo.environment["MWOYEO_DUMP"].map { URL(fileURLWithPath: $0) }
 }
 

@@ -103,6 +103,42 @@ Inside `appProfiles`, a profile can carry a note for the translator, names and t
 
 `context` is how much surrounding text goes along with each line of that app. Left out, the app follows the default, which is off. `previousLines` counts only in `conversation` mode.
 
+## Context for an engine
+
+Each entry of `engines` can carry a `context` object. It says what that engine is sent besides the lines to translate. Everything is off by default: an engine without `context`, or with `"enabled": false`, gets exactly the requests it always got. Every field is optional.
+
+```json
+{
+  "engines": [
+    {
+      "kind": "openAICompatible",
+      "name": "Local Qwen",
+      "baseURL": "http://localhost:8765/v1",
+      "model": "qwen3:8b",
+      "context": { "enabled": true, "previousLines": 3 }
+    }
+  ]
+}
+```
+
+| Field | Type and limit |
+|---|---|
+| `context.enabled` | `true` or `false`; left out, `false`. While it is `false`, the other fields do nothing. |
+| `context.previousLines` | whole number, 0 to 8; left out, 3. How many earlier lines go along with each line. |
+| `context.includeTitle` | `true` or `false`; left out, `false`. Also sends the window title. The title leaves this Mac when the engine is a cloud service. |
+| `context.useLearned` | `true` or `false`; left out, `false`. Also sends the terms the app learned while translating, and records the terms the engine's reply names. They stay in memory. |
+| `context.deepLInstructions` | `true` or `false`; left out, `false`. DeepL only: `custom_instructions` and a formality come from the memory written for the app. |
+
+The names are those of `appProfiles[].context`, which is laid over the engine's `context` for that app. A wrong value inside `context` is reported and treated as not written:
+
+```
+settings.json:7: engines[0].context.previousLines: 12 is out of range 0 to 8; ignored
+```
+
+A second global key, `appleUsesPinnedTerms` (`true` or `false`), lets Apple Translation follow the names and terms pinned in an app's memory, by putting your translation into the source text. It is off by default. The app writes the key to the file only while it is `true`; write `false` to turn it off.
+
+The app keeps and checks these keys, and they take effect when the request path lands.
+
 ## What is never in the file
 
 - **Learned entries.** Terms the app picks up while translating live in memory only. A term is in the file only as a row of `appProfiles[].entries`, which you or the user wrote.

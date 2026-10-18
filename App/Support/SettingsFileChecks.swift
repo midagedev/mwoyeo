@@ -504,6 +504,268 @@ enum SettingsFileChecks {
         let everyRead = SettingsFileCheck.read(SettingsFileFormat.render(everyKind), over: AppSettings())
         check("engines of all five kinds: written by the app, read back equal with no issue", everyRead.settings == everyKind && everyRead.issues.isEmpty)
 
+        // Engine context (round T3a-1, 2026-10-19): engines[].context and appleUsesPinnedTerms. Both are off by default; the
+        // schema, the check and the app's save keep them, and a file written before them is saved again as the same bytes.
+        let secondID = "8C4A2D3F-6B5E-4F9C-8D32-4E7A1B2C3D4E"
+        let engineContextFile = """
+        {
+          "appleUsesPinnedTerms": true,
+          "engines": [
+            {
+              "baseURL": "http://localhost:8765/v1",
+              "context": {
+                "deepLInstructions": false,
+                "enabled": true,
+                "includeTitle": true,
+                "previousLines": 6,
+                "useLearned": true
+              },
+              "extraHeaders": {},
+              "id": "\(FieldKind.exampleUUID)",
+              "kind": "openAICompatible",
+              "model": "qwen3:8b",
+              "name": "Local Qwen",
+              "thinking": "off"
+            },
+            {
+              "baseURL": "https://api.deepl.com",
+              "context": {
+                "deepLInstructions": true,
+                "enabled": true,
+                "includeTitle": false,
+                "previousLines": 0,
+                "useLearned": false
+              },
+              "id": "\(secondID)",
+              "kind": "deepL",
+              "name": "DeepL"
+            }
+          ]
+        }
+        """
+        let engineContext = SettingsFileCheck.read(Data(engineContextFile.utf8), over: AppSettings())
+        let engineContextObject = (try? JSONSerialization.jsonObject(with: Data(engineContextFile.utf8))) as? [String: Any] ?? [:]
+        let qwenContext = EngineContext(enabled: true, previousLines: 6, includeTitle: true, useLearned: true, deepLInstructions: false)
+        let deepLContext = EngineContext(enabled: true, previousLines: 0, includeTitle: false, useLearned: false, deepLInstructions: true)
+        check("engine context: a valid file reads without issues, the app keeps both contexts and the flag, and the schema describes every field in it",
+              engineContext.issues.isEmpty && engineContext.settings.appleUsesPinnedTerms
+              && engineContext.settings.engines.map(\.context) == [qwenContext, deepLContext]
+              && describedByTheSchema(engineContextObject, ["properties": agentSchema ?? [:]]))
+        check("engine context: the file text is the app's own format, so a reload leaves it as written",
+              SettingsFileFormat.pretty(engineContextObject) + "\n" == engineContextFile + "\n")
+        check("engine context: settings → file → settings is stable, and the render keeps both engines and the flag as the file had them",
+              SettingsFileCheck.read(SettingsFileFormat.render(engineContext.settings), over: AppSettings()).settings == engineContext.settings
+              && SettingsFileCheck.read(SettingsFileFormat.render(engineContext.settings), over: AppSettings()).issues.isEmpty
+              && ((try? JSONSerialization.jsonObject(with: SettingsFileFormat.render(engineContext.settings))) as? [String: Any])
+                  .map { ($0["engines"] as? NSArray)?.isEqual(to: engineContextObject["engines"] as? [Any] ?? []) == true && $0["appleUsesPinnedTerms"] as? Bool == true } == true)
+        // The save path: start on this file, change a setting, save with the app's writer, read again.
+        let contextSaveURL = dir.appendingPathComponent("context-save/settings.json")
+        try? FileManager.default.createDirectory(at: contextSaveURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try? Data(engineContextFile.utf8).write(to: contextSaveURL)
+        let contextStore = SettingsFileStore(url: contextSaveURL)
+        var contextStarted = contextStore.startup(fallback: AppSettings())
+        contextStarted.boxOpacity = 0.9
+        contextStore.save(contextStarted)
+        let contextSaved = SettingsFileCheck.read((try? Data(contentsOf: contextSaveURL)) ?? Data(), over: AppSettings())
+        let contextSavedObject = (try? JSONSerialization.jsonObject(with: Data(text(contextSaveURL).utf8))) as? [String: Any] ?? [:]
+        check("engine context survives the app's save: start on the file, change a setting, save, read again; both contexts and the flag are the same",
+              contextSaved.issues.isEmpty && contextSaved.settings.boxOpacity == 0.9
+              && contextSaved.settings.engines.map(\.context) == [qwenContext, deepLContext] && contextSaved.settings.appleUsesPinnedTerms
+              && (contextSavedObject["engines"] as? NSArray)?.isEqual(to: engineContextObject["engines"] as? [Any] ?? []) == true
+              && contextSavedObject["appleUsesPinnedTerms"] as? Bool == true)
+        // All five kinds, each with a context at both ends of the range.
+        var everyKindContext = everyKind
+        everyKindContext.engines = everyKind.engines.enumerated().map { i, e in
+            var c = e
+            c.context = EngineContext(enabled: i % 2 == 0, previousLines: i % 2 == 0 ? AppContextOverride.maxPreviousLines : 0, includeTitle: i % 2 == 0,
+                                      useLearned: i % 2 == 0, deepLInstructions: i % 2 == 0)
+            return c
+        }
+        let everyKindContextRead = SettingsFileCheck.read(SettingsFileFormat.render(everyKindContext), over: AppSettings())
+        check("engine context: engines of all five kinds, each with a context, are written by the app and read back equal with no issue",
+              everyKindContextRead.settings == everyKindContext && everyKindContextRead.issues.isEmpty
+              && everyKindContextRead.settings.engines.allSatisfy { $0.context != nil })
+        // The model: a file with the context is applied, and a change in Settings leaves it in the file.
+        let enginesBefore = model.settings.engines
+        let flagBefore = model.settings.appleUsesPinnedTerms
+        try? Data(engineContextFile.utf8).write(to: model.settingsFile.url, options: .atomic)
+        model.settingsFileChanged()
+        let appliedContexts = model.settings.engines.map(\.context)
+        model.settings.lensStyle = .subtle
+        let contextResaved = (try? JSONSerialization.jsonObject(with: Data(text(model.settingsFile.url).utf8))) as? [String: Any]
+        check("engine context: the file applies to the app and a change in Settings keeps the contexts and the flag in the file",
+              model.settingsIssues.isEmpty && appliedContexts == [qwenContext, deepLContext] && model.settings.appleUsesPinnedTerms
+              && (contextResaved?["engines"] as? NSArray)?.isEqual(to: engineContextObject["engines"] as? [Any] ?? []) == true
+              && contextResaved?["appleUsesPinnedTerms"] as? Bool == true)
+        // Editing an engine in Settings (the sheet builds the engine from its own fields, so it has no context) keeps what an agent
+        // wrote in engines[].context, and a duplicate carries it too.
+        if let edited = model.settings.engines.first {
+            model.updateEngine(EngineConfig(id: edited.id, name: "Renamed in Settings", kind: edited.kind))
+            let afterEdit = model.settings.engines.first
+            model.duplicateEngine(edited.id)
+            let copy = model.settings.engines.last
+            let afterEditFile = (try? JSONSerialization.jsonObject(with: Data(text(model.settingsFile.url).utf8))) as? [String: Any]
+            check("engine context: editing the engine in Settings (updateEngine) keeps its context, the name changes; a duplicate carries the context under a new id",
+                  afterEdit?.name == "Renamed in Settings" && afterEdit?.context == qwenContext && afterEdit?.id == edited.id
+                  && model.settings.engines.count == 3 && copy?.id != edited.id && copy?.context == qwenContext
+                  && ((afterEditFile?["engines"] as? [[String: Any]])?.first?["context"] as? [String: Any])?["previousLines"] as? Int == 6)
+        } else {
+            check("engine context: editing the engine in Settings keeps its context (the file's engines were not applied)", false)
+        }
+        model.settings.engines = enginesBefore
+        model.settings.appleUsesPinnedTerms = flagBefore
+        model.settings.lensStyle = .glow
+
+        // The check: a wrong value inside an engine's context is reported with its path and line, ends in "ignored", and the rest applies.
+        let tooManyFile = """
+        {
+          "engines": [
+            {
+              "baseURL": "http://localhost:8765/v1",
+              "context": {
+                "enabled": true,
+                "previousLines": 12
+              },
+              "kind": "openAICompatible",
+              "name": "Local"
+            }
+          ]
+        }
+        """
+        let tooMany = SettingsFileCheck.read(Data(tooManyFile.utf8), over: AppSettings())
+        let previousLinesIssue = "engines[0].context.previousLines: 12 is out of range 0 to \(AppContextOverride.maxPreviousLines); ignored"
+        check("engine context: \"previousLines\": 12 is reported with its path and line and ends in ignored; the engine applies with the default lines",
+              tooMany.issues == [SettingsFileIssue(line: 7, message: previousLinesIssue)]
+              && tooMany.settings.engines.map(\.name) == ["Local"]
+              && tooMany.settings.engines.first?.context == EngineContext(enabled: true, previousLines: AppContextOverride.defaultPreviousLines))
+        let mistakes = SettingsFileCheck.read(Data("""
+        {
+          "engines": [
+            {
+              "baseURL": "https://api.deepl.com",
+              "context": {
+                "enabled": "yes",
+                "includeTitel": true,
+                "useLearned": true
+              },
+              "kind": "deepL",
+              "name": "D"
+            },
+            {
+              "baseURL": "https://api.deepl.com",
+              "context": 5,
+              "kind": "deepL",
+              "name": "E"
+            }
+          ]
+        }
+        """.utf8), over: AppSettings())
+        check("engine context: a wrong type, a misspelt key and a context that is not an object are each reported with their line; the engines apply",
+              mistakes.issues == [
+                  SettingsFileIssue(line: 6, message: "engines[0].context.enabled: expected true or false, got a string; ignored"),
+                  SettingsFileIssue(line: 7, message: "unknown key engines[0].context.includeTitel (did you mean includeTitle?)"),
+                  SettingsFileIssue(line: 15, message: "engines[1].context: expected an object, got a number; ignored"),
+              ]
+              && mistakes.settings.engines.map(\.name) == ["D", "E"]
+              && mistakes.settings.engines.first?.context == EngineContext(enabled: false, useLearned: true) && mistakes.settings.engines.last?.context == nil)
+        // One rule for an engine's context in a file: the validator and the Core decode give the same `EngineConfig.context` for the same text.
+        let engineContextTexts = [
+            #"{"enabled":true,"previousLines":12}"#, #"{"enabled":true,"previousLines":9}"#, #"{"enabled":true,"previousLines":-1}"#,
+            #"{"enabled":true,"previousLines":5.5}"#, #"{"enabled":true,"previousLines":"many"}"#, #"{"enabled":true,"previousLines":true}"#,
+            #"{"enabled":true,"previousLines":null}"#, #"{"enabled":true,"previousLines":0}"#, #"{"enabled":true,"previousLines":8}"#,
+            #"{"enabled":true}"#, #"{"enabled":"yes","useLearned":true}"#, #"{"enabled":1}"#, #"{"enabled":null,"includeTitle":true}"#,
+            #"{"includeTitle":true,"useLearned":false,"deepLInstructions":true}"#, #"{"future":1,"enabled":true}"#, #"{}"#, #"5"#, #""on""#, #"[true]"#, #"null"#,
+        ]
+        let engineContextAgreement = engineContextTexts.map { context -> (text: String, viaFile: EngineContext?, direct: EngineContext?) in
+            let engine = #"{"baseURL":"https://api.deepl.com","kind":"deepL","name":"D","context":\#(context)}"#
+            let viaFile = SettingsFileCheck.read(Data(#"{"engines":[\#(engine)]}"#.utf8), over: AppSettings()).settings.engines.first?.context
+            let direct = try? JSONDecoder().decode(EngineConfig.self, from: Data(engine.utf8)).context
+            return (context, viaFile, direct ?? nil)
+        }
+        for row in engineContextAgreement where row.viaFile != row.direct {
+            print("check-logic: engine context \(row.text): the file check gives \(String(describing: row.viaFile)), the Core decode \(String(describing: row.direct))")
+        }
+        check("engine context: a context in a file reads the same through the file check and through a direct Core decode, out-of-range, fractional, wrong-typed and missing values included",
+              engineContextAgreement.allSatisfy { $0.viaFile == $0.direct }
+              && engineContextAgreement[0].viaFile == EngineContext(enabled: true, previousLines: AppContextOverride.defaultPreviousLines)
+              && engineContextAgreement[8].viaFile == EngineContext(enabled: true, previousLines: AppContextOverride.maxPreviousLines)
+              && engineContextAgreement[15].viaFile == EngineContext() && engineContextAgreement[16].viaFile == nil)
+        // And the command: an agent running --check-settings sees the documented line.
+        let tooManyFileURL = dir.appendingPathComponent("too-many.json")
+        try? Data((tooManyFile + "\n").utf8).write(to: tooManyFileURL)
+        let tooManyCommand = command(["--check-settings", tooManyFileURL.path])
+        check("engine context: --check-settings prints the previousLines line and exits 1",
+              tooManyCommand.0 == 1 && tooManyCommand.1 == "too-many.json:7: \(previousLinesIssue)\n")
+
+        // appleUsesPinnedTerms is off by default, kept while true, and checked like any other switch.
+        var pinned = AppSettings()
+        pinned.appleUsesPinnedTerms = true
+        let renderedOff = String(decoding: SettingsFileFormat.render(AppSettings()), as: UTF8.self)
+        let renderedOn = String(decoding: SettingsFileFormat.render(pinned), as: UTF8.self)
+        check("appleUsesPinnedTerms is off by default", AppSettings().appleUsesPinnedTerms == false && AppSettings().effective(frontmost: "x").appleUsesPinnedTerms == false)
+        check("appleUsesPinnedTerms: the file leaves it out while it is off, and writes it while it is on",
+              !renderedOff.contains("appleUsesPinnedTerms") && renderedOn.contains("\n  \"appleUsesPinnedTerms\": true,\n"))
+        check("appleUsesPinnedTerms: on → file → on, and an explicit false in a file turns it off",
+              SettingsFileCheck.read(SettingsFileFormat.render(pinned), over: AppSettings()).settings.appleUsesPinnedTerms
+              && SettingsFileCheck.read(Data(#"{"appleUsesPinnedTerms": false}"#.utf8), over: pinned).settings.appleUsesPinnedTerms == false
+              && SettingsFileCheck.read(Data(#"{"appleUsesPinnedTerms": false}"#.utf8), over: pinned).issues.isEmpty)
+        let pinnedWrong = SettingsFileCheck.read(Data("{\n  \"appleUsesPinnedTerms\": \"yes\"\n}\n".utf8), over: pinned)
+        check("appleUsesPinnedTerms: a wrong type is reported with its line and keeps the current value",
+              pinnedWrong.issues == [SettingsFileIssue(line: 2, message: "appleUsesPinnedTerms: expected true or false, got a string; keeping the current value")]
+              && pinnedWrong.settings.appleUsesPinnedTerms)
+        check("appleUsesPinnedTerms: a key the file leaves out keeps the current value, like every other key",
+              SettingsFileCheck.read(Data("{}".utf8), over: pinned).settings.appleUsesPinnedTerms
+              && SettingsFileCheck.changedKeys(AppSettings(), pinned) == ["appleUsesPinnedTerms"])
+        check("appleUsesPinnedTerms: the switch is in SettingSpec, and the schema lists it with its default", {
+            let property = (((try? JSONSerialization.jsonObject(with: SettingsSchema.data())) as? [String: Any])?["properties"] as? [String: Any])?["appleUsesPinnedTerms"] as? [String: Any]
+            return SettingSpec.spec(for: "appleUsesPinnedTerms") != nil && property?["type"] as? String == "boolean" && property?["default"] as? Bool == false
+                && (property?["description"] as? String).map { $0.contains("Off by default.") && $0.contains("Written to the file only when true") } == true
+        }())
+        // A 1.1.2 settings.json: all 24 keys 1.1.2 wrote and none of the later ones. Read and saved again it is the same bytes (the
+        // keys after 1.1.2 are not added to a file that does not use them).
+        let v112File = """
+        {
+          "$schema": "settings.schema.json",
+          "appProfiles": [],
+          "boxOpacity": 0.94,
+          "cacheSize": 5000,
+          "checksForUpdates": true,
+          "customEngineID": null,
+          "engine": "auto",
+          "engines": [],
+          "exportFolder": "/Users/test/Documents/Mwoyeo",
+          "fontStyle": "system",
+          "framesPerSecond": 8,
+          "glossary": "",
+          "lensStyle": "glow",
+          "lensTabPosition": "topLeading",
+          "lensTabVisibility": "automatic",
+          "lensTint": "spectrum",
+          "paragraphReader": "automatic",
+          "renderMode": "adaptive",
+          "savesTranscripts": false,
+          "settleDelay": 0.5,
+          "shortcuts": {},
+          "sourceLanguage": "auto",
+          "targetLanguage": "en",
+          "transcriptFormats": [
+            "markdown",
+            "srt"
+          ],
+          "useInpaintingModel": true
+        }
+        """ + "\n"
+        let v112Real = SettingsFileCheck.read(Data(v112File.utf8), over: AppSettings())
+        let v112Disk = dir.appendingPathComponent("v112-real/settings.json")
+        try? FileManager.default.createDirectory(at: v112Disk.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try? Data(v112File.utf8).write(to: v112Disk)
+        let v112Store = SettingsFileStore(url: v112Disk)
+        v112Store.save(v112Store.startup(fallback: AppSettings()))
+        check("a 1.1.2 settings.json (the 24 keys of 1.1.2 and no later one) is read without issues and saved again as the same bytes, by the renderer and by the store",
+              v112Real.issues.isEmpty && String(decoding: SettingsFileFormat.render(v112Real.settings), as: UTF8.self) == v112File
+              && text(v112Disk) == v112File && Set(((try? JSONSerialization.jsonObject(with: Data(v112File.utf8))) as? [String: Any] ?? [:]).keys).count == 25
+              && v112Real.settings.engines.isEmpty && v112Real.settings.appleUsesPinnedTerms == false)
+
         // Schema, nested
         func at(_ root: Any?, _ path: String...) -> Any? {
             path.reduce(root) { node, key in (node as? [String: Any])?[key] }
@@ -549,11 +811,26 @@ enum SettingsFileChecks {
         let populatedEntry = (populatedKeys["entries"] as? [[String: Any]])?.first ?? [:]
         let populatedAddressing = (populatedEntry["addressing"] as? [[String: Any]])?.first ?? [:]
         func schemaKeys(_ object: Any?) -> Set<String> { Set((at(object, "properties") as? [String: Any] ?? [:]).keys) }
+        // The engines: one fully populated engine of each of the five kinds, each with a full context. The schema of `engines[]` is
+        // the union of the kinds' fields, so the union of the encoded keys must equal it, and `engines[].context` must equal the
+        // encoded context.
+        let populatedContext = EngineContext(enabled: true, previousLines: 5, includeTitle: true, useLearned: true, deepLInstructions: true)
+        let populatedEngines = [
+            EngineConfig(id: engine.id, name: "a", kind: .openAICompatible(baseURL: URL(string: "http://localhost:8765/v1")!, model: "m", thinking: .provider, extraHeaders: ["X": "1"]), context: populatedContext),
+            EngineConfig(name: "b", kind: .anthropic(baseURL: URL(string: "https://api.anthropic.com")!, model: "m", thinking: .provider), context: populatedContext),
+            EngineConfig(name: "c", kind: .deepL(baseURL: URL(string: "https://api.deepl.com")!, formality: "more"), context: populatedContext),
+            EngineConfig(name: "d", kind: .httpTemplate(HTTPTemplate(url: "http://h/t", resultPath: "r")), context: populatedContext),
+            EngineConfig(name: "e", kind: .command(CommandSpec(executable: "/bin/x")), context: populatedContext),
+        ]
+        let populatedEngineObjects = populatedEngines.compactMap { (try? JSONSerialization.jsonObject(with: JSONEncoder().encode($0))) as? [String: Any] }
+        let populatedContextObject = populatedEngineObjects.first?["context"] as? [String: Any] ?? [:]
         let levels: [(name: String, app: Set<String>, schema: Set<String>)] = [
             ("appProfiles[]", Set(populatedKeys.keys), schemaKeys(profile)),
             ("appProfiles[].entries[]", Set(populatedEntry.keys), schemaKeys(entryItem)),
             ("appProfiles[].entries[].addressing[]", Set(populatedAddressing.keys), schemaKeys(addressingItem)),
             ("appProfiles[].context", Set((populatedKeys["context"] as? [String: Any] ?? [:]).keys), schemaKeys(at(profile, "properties", "context"))),
+            ("engines[]", populatedEngineObjects.reduce(into: Set<String>()) { $0.formUnion($1.keys) }, schemaKeys(engineItem)),
+            ("engines[].context", Set(populatedContextObject.keys), schemaKeys(at(engineItem, "properties", "context"))),
         ]
         for level in levels {
             check("schema: \(level.name) has exactly the fields the app keeps", !level.app.isEmpty && level.app == level.schema)

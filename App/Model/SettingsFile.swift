@@ -66,6 +66,8 @@ struct SettingSpec {
               examples: SettingExamples.appProfiles),
         .init(key: "paragraphReader", kind: .choice(ParagraphReader.allCases.map(\.rawValue)),
               doc: "How text is cut into paragraphs: automatic, documentLayout (the macOS document model) or lineGrouping (the app's own line rules)."),
+        .init(key: "appleUsesPinnedTerms", kind: .bool,
+              doc: "Apple Translation follows the names and terms you pinned in an app's memory, by putting your translation into the source text. Off by default. Written to the file only when true; write false to turn it off."),
     ]
 
     static func spec(for key: String) -> SettingSpec? { all.first { $0.key == key } }
@@ -118,6 +120,26 @@ extension FieldKind {
                                             default: "off")
     private static let headers = FieldKind.map(.string)
 
+    /// `engines[].context`: the keys, defaults and limits are those of `EngineContext` and `AppContextOverride`, never a copy.
+    /// A field this object lacks would be dropped at the app's next save, and `SettingsFileChecks` fails when the two differ.
+    private static let engineContext: FieldKind = .object([
+        FieldSpec("enabled", .bool,
+                  "Turn context on for this engine. Off, nothing below has an effect and requests are unchanged. On, each request also carries the app's name and kind, the lines around the text on screen, the earlier lines (previousLines) and the memory written for that app.",
+                  example: true, default: false),
+        FieldSpec("previousLines", .integer(0...AppContextOverride.maxPreviousLines),
+                  "How many earlier lines go along with each line, 0 to \(AppContextOverride.maxPreviousLines). Counts only while enabled is true.",
+                  example: 3, default: AppContextOverride.defaultPreviousLines),
+        FieldSpec("includeTitle", .bool,
+                  "Also send the title of the window. Off by default, because the title leaves this Mac when the engine is a cloud service; a server on this Mac gets it whenever enabled is true.",
+                  example: false, default: false),
+        FieldSpec("useLearned", .bool,
+                  "Also send the names and terms the app picked up while translating, and record the terms the engine's reply names. Learned terms stay in memory and are never saved to this file.",
+                  example: false, default: false),
+        FieldSpec("deepLInstructions", .bool,
+                  "DeepL only. Send custom_instructions and a formality that come from the memory written for the app. Other engine kinds ignore it.",
+                  example: false, default: false),
+    ])
+
     /// The engines you added. `kind` picks the shape: what the other fields are depends on it.
     static let engines: FieldKind = .list(.tagged(
         tag: "kind",
@@ -125,6 +147,8 @@ extension FieldKind {
         common: [
             FieldSpec("id", .uuid, "Identifies the engine; customEngineID and appProfiles refer to it.", example: exampleUUID),
             FieldSpec("name", .string, "The name shown in Settings.", required: true, example: "Local Qwen"),
+            FieldSpec("context", engineContext,
+                      "What this engine is sent besides the lines to translate. Everything here is off by default: left out, or with enabled false, every request is the one it always was. An app's own context (appProfiles[].context) is laid over these."),
         ],
         variants: [
             FieldVariant(tag: "openAICompatible", fields: [
@@ -207,6 +231,8 @@ enum SettingExamples {
         [["id": FieldKind.exampleUUID, "kind": "openAICompatible", "name": "Local Qwen", "baseURL": "http://localhost:8765/v1",
           "model": "qwen3:8b", "thinking": "off"] as [String: Any]],
         [["kind": "deepL", "name": "DeepL", "baseURL": "https://api.deepl.com", "formality": "prefer_more"] as [String: Any]],
+        [["kind": "openAICompatible", "name": "Local Qwen with context", "baseURL": "http://localhost:8765/v1", "model": "qwen3:8b",
+          "context": ["enabled": true, "previousLines": 3, "includeTitle": false, "useLearned": false, "deepLInstructions": false] as [String: Any]] as [String: Any]],
     ]
 
     /// One profile with a note, two entries that carry addressing, and a context override.
@@ -240,17 +266,23 @@ enum SettingsFileCheck {
     static let notInFile: Set<String> = ["engineRejections", "hasCompletedOnboarding"]
 
     /// The file's own view of the settings: what AppSettings encodes, without the run-time state, plus an explicit null id.
-    static func fileValues(_ s: AppSettings) -> [String: Any] {
+    static func fileValues(_ s: AppSettings, omittingUnset: Bool = true) -> [String: Any] {
         guard let data = try? JSONEncoder().encode(s),
               var d = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return [:] }
         for k in notInFile { d[k] = nil }
+        if omittingUnset { for k in writtenOnlyWhenTrue where d[k] as? Bool == false { d[k] = nil } }
         if d["customEngineID"] == nil { d["customEngineID"] = NSNull() }
         return d
     }
 
-    /// Keys AppSettings writes to the file that `SettingSpec.all` does not describe (the schema would lack them).
+    /// Switches added after 1.1.2 that are off by default. The file holds one only while it is true, so a file from before
+    /// the key re-saves byte for byte. The schema still lists it, with its default.
+    static let writtenOnlyWhenTrue: Set<String> = ["appleUsesPinnedTerms"]
+
+    /// Keys AppSettings writes to the file that `SettingSpec.all` does not describe (the schema would lack them). Every
+    /// switch counts, also one the file leaves out while it is off.
     static func uncoveredKeys() -> [String] {
-        fileValues(AppSettings()).keys.filter { SettingSpec.spec(for: $0) == nil }.sorted()
+        fileValues(AppSettings(), omittingUnset: false).keys.filter { SettingSpec.spec(for: $0) == nil }.sorted()
     }
 
     /// Reads the file's `data` over `current`. A key the file lacks keeps its current value; so does a key that is
@@ -388,7 +420,7 @@ enum SettingsFileFormat {
 /// from the same `FieldKind` trees the check walks, so the schema says exactly what `--check-settings` accepts.
 enum SettingsSchema {
     static func data() -> Data {
-        let defaults = SettingsFileCheck.fileValues(AppSettings())
+        let defaults = SettingsFileCheck.fileValues(AppSettings(), omittingUnset: false)
         var props: [String: Any] = ["$schema": ["type": "string", "description": "This schema, next to the file. Keep it as it is."]]
         for spec in SettingSpec.all {
             var p = spec.kind.schema()

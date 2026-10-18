@@ -407,15 +407,20 @@ final class AppModel {
         settings.customEngineID = engine.id
     }
 
+    /// Replaces the engine of the same id with `engine`. The Settings sheet builds `engine` from its own fields (address, model,
+    /// headers), which do not include `context`, so an `engine` without one keeps the context the stored engine has (the user's,
+    /// or one an agent wrote in settings.json).
     func updateEngine(_ engine: EngineConfig) {
         guard let i = settings.engines.firstIndex(where: { $0.id == engine.id }) else { return }
-        settings.engines[i] = engine
+        var updated = engine
+        updated.context = engine.context ?? settings.engines[i].context
+        settings.engines[i] = updated
     }
 
-    /// A copy under a new id, with its own (empty) key slot.
+    /// A copy under a new id, with its own (empty) key slot. It is the same user's engine, so its context is copied.
     func duplicateEngine(_ id: UUID) {
         guard let e = settings.engines.first(where: { $0.id == id }) else { return }
-        settings.engines.append(EngineConfig(name: String(localized: "\(e.name) copy"), kind: e.kind))
+        settings.engines.append(EngineConfig(name: String(localized: "\(e.name) copy"), kind: e.kind, context: e.context))
     }
 
     /// Removes the engine, its saved key and what it learned about its server.

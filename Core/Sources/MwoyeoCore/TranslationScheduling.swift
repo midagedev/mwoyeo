@@ -67,6 +67,13 @@ public enum TranslationScheduling {
         !dwells.isEmpty && dwells.allSatisfy { $0 < remaining }
     }
 
+    /// The velocity of text `r`: `velocity` when the whole lens moves (`region` nil) or `r` lies on the scrolling
+    /// `region`; zero for text outside it, which stays where it is (a fixed header, an input box).
+    public static func velocity(of r: CGRect, _ velocity: CGVector, scrollRegion region: CGRect?) -> CGVector {
+        guard let region else { return velocity }
+        return r.intersects(region) ? velocity : .zero
+    }
+
     /// Seconds until `r` has wholly passed the lens's exit edge, with text moving at `velocity` relative to the lens
     /// (image pixels per second, +y toward `lens.maxY`, +x toward `lens.maxX`): after that, a translation is of no use.
     /// Text that has already passed it: 0. Not moving along either axis: nil (no limit). With two moving axes, the
@@ -102,15 +109,17 @@ public enum TranslationScheduling {
     /// The batch to start while content moves at `velocity`: lens text first (reading order), then text that will enter
     /// soonest. Greedy: the k-th source (1-based) is taken only if it stays in the lens at least
     /// `expectedSeconds(k) + margin` seconds, so what the engine delivers is still on show. Empty when nothing qualifies.
-    public static func batch(from candidates: [Candidate], lens: CGRect, velocity: CGVector, limit: Int,
+    /// `scrollRegion`: the area that scrolls at `velocity`, or nil when the whole lens moves; text outside it never leaves.
+    public static func batch(from candidates: [Candidate], lens: CGRect, velocity: CGVector, scrollRegion: CGRect? = nil, limit: Int,
                              expectedSeconds: (Int) -> Double, margin: Double = 0.5) -> [String] {
         struct Entry { var source: String; var dwell: Double; var inLens: Bool; var y: CGFloat; var entry: Double }
         var entries: [String: Entry] = [:]
         var order: [String] = []
         for c in candidates {
-            let dwell = dwell(of: c.rect, lens: lens, velocity: velocity) ?? .infinity
+            let v = Self.velocity(of: c.rect, velocity, scrollRegion: scrollRegion)
+            let dwell = dwell(of: c.rect, lens: lens, velocity: v) ?? .infinity
             let inLens = c.rect.intersects(lens)
-            let e = entry(of: c.rect, lens: lens, velocity: velocity) ?? .infinity
+            let e = entry(of: c.rect, lens: lens, velocity: v) ?? .infinity
             if var old = entries[c.source] {
                 old.dwell = max(old.dwell, dwell)
                 old.entry = min(old.entry, e)

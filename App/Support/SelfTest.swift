@@ -25,6 +25,9 @@ import UniformTypeIdentifiers
 ///   Mwoyeo --render screen.png outdir --pan --lens x,y,w,h --to x,y [--steps 40] [--step-ms 100] [--hold-ms 3000]
 /// With `--scroll`, the lens stays and the content scrolls by `--to` instead (screen.png is the whole page); `--scroll-rect x,y,w,h`
 /// scrolls only that part (a message log between a fixed sidebar, header and footer), `--ease` decelerates like inertial scrolling.
+/// `--late-fixed x,y,w,h` keeps that fixed part blank until the scroll starts, then shows it (a sticky banner or an input box
+/// appearing while the log scrolls): its text must be translated during the scroll, not after it.
+/// `--watch text` adds `watch=translated|waiting|absent` to each frame line: the state of the blocks whose source contains `text`.
 /// `--back` holds at the end, then scrolls back. Work counts (OCR, erase, engine calls) are printed per phase.
 /// `--wheel N` also sends N trackpad scroll events per captured frame and shows the translations where the scroll
 /// predictor puts them between frames (`--no-predict`: where the last frame left them).
@@ -329,6 +332,9 @@ enum SelfTest {
         let sr = numbers("--scroll-rect")
         let scrollRect = sr.count == 4 ? CGRect(x: sr[0], y: sr[1], width: sr[2], height: sr[3]) : CGRect.infinite
         let ease = CommandLine.arguments.contains("--ease")
+        let watch = option("--watch")
+        let lf = numbers("--late-fixed")
+        var hidden: CGRect? = lf.count == 4 ? CGRect(x: lf[0], y: lf[1], width: lf[2], height: lf[3]) : nil
         let wheelsPerFrame = Int(option("--wheel") ?? "0") ?? 0, predicting = !CommandLine.arguments.contains("--no-predict")
         var predictor = ScrollPredictor()
         predictor.latency = 0   // the "app" here shows a scroll at once
@@ -367,6 +373,10 @@ enum SelfTest {
                 ctx.draw(screen, in: CGRect(x: -o.x * scale, y: CGFloat(h) + o.y * scale - sh, width: CGFloat(screen.width), height: sh))
             }
             draw(from: r.origin)
+            if let hidden, case let h = hidden.intersection(r), !h.isNull {
+                ctx.setFillColor(CGColor(red: 1, green: 1, blue: 1, alpha: 1))
+                ctx.fill(CGRect(x: (h.minX - r.minX) * scale, y: CGFloat(ctx.height) - (h.maxY - r.minY) * scale, width: h.width * scale, height: h.height * scale))
+            }
             let s = scrollRect.intersection(r)
             if !s.isNull {
                 ctx.clip(to: CGRect(x: (s.minX - r.minX) * scale, y: CGFloat(h) - (s.maxY - r.minY) * scale, width: s.width * scale, height: s.height * scale))
@@ -433,6 +443,10 @@ enum SelfTest {
             keeping.observe(collector.latest, lens: lens, time: ProcessInfo.processInfo.systemUptime - began)
             let state = await pipeline.debugState()
             let flight = state.flight, motion = state.motion
+            let watched = watch.map { w in
+                let hits = state.blocks.filter { $0.0.contains(w) }
+                return " watch=" + (hits.isEmpty ? "absent" : hits.allSatisfy { $0.1 != nil } ? "translated" : "waiting")
+            } ?? ""
             guard let out = ctx.makeImage() else { return }
             let url = outdir.appendingPathComponent(String(format: "frame_%03d.png", frameIndex))
             if let dest = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil) {
@@ -440,10 +454,10 @@ enum SelfTest {
                 CGImageDestinationFinalize(dest)
             }
             frameIndex += 1
-            print(String(format: "frame %03d lens (%4.0f,%4.0f) capture (%4.0f,%4.0f %4.0f×%4.0f) blocks shown %d drift %.1f %@ flight [%@]",
+            print(String(format: "frame %03d lens (%4.0f,%4.0f) capture (%4.0f,%4.0f %4.0f×%4.0f) blocks shown %d drift %.1f %@%@ flight [%@]",
                          frameIndex - 1, lens.minX, lens.minY, capture.minX, capture.minY, capture.width, capture.height, shown, drift,
                          String(format: "%@ v=%.0f L=%@", motion.moving ? "moving" : "still", motion.velocity.dy, motion.expected.map { String(format: "%.1f", $0) } ?? "n/a"),
-                         flight.joined(separator: " ")))
+                         watched, flight.joined(separator: " ")))
         }
 
         // At rest: read and translate the start position completely.
@@ -486,6 +500,7 @@ enum SelfTest {
                 // Scrolling the page down moves its content up.
                 if wheelsPerFrame > 0 { predictor.wheel(delta: Double(scroll.dy - next.dy), time: ProcessInfo.processInfo.systemUptime, precise: true) }
                 scroll = next
+                hidden = nil
                 if i % sub == 0 {
                     if !wide, motion.latest != nil {
                         wide = true

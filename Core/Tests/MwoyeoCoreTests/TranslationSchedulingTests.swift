@@ -106,6 +106,27 @@ import Testing
         #expect(S.batch(from: c, lens: lens, velocity: up, limit: 1, expectedSeconds: { Double($0) }) == ["B"])
     }
 
+    /// Fixed text (a header, an input box) outside the scrolling region does not move: no dwell limit, never too late.
+    @Test(arguments: [100.0, 1500.0]) func textOutsideTheScrollRegionIsAdmittedAndNeverCut(speed: Double) {
+        let up = CGVector(dx: 0, dy: -speed)
+        let region = CGRect(x: 0, y: 1100, width: 600, height: 200)          // the message log under a fixed header
+        let header = S.Candidate(source: "header", rect: CGRect(x: 100, y: 1010, width: 50, height: 20))  // dwell would be 0.03 s at 1 k px/s or less
+        let line = S.Candidate(source: "line", rect: CGRect(x: 100, y: 1250, width: 50, height: 20))
+        // Without the region rule the header's predicted dwell is far below the 0.5 s margin: it is held back.
+        #expect(!S.batch(from: [header], lens: lens, velocity: up, limit: 3, expectedSeconds: { _ in 1 }).contains("header"))
+        let out = S.batch(from: [header, line], lens: lens, velocity: up, scrollRegion: region, limit: 3, expectedSeconds: { _ in 1 })
+        #expect(out.contains("header"))
+        // Inside the region the old prediction stays: the line (dwell 2.7 s at 100 px/s, 0.18 s at 1500) qualifies only when it outlasts.
+        #expect(out.contains("line") == (speed == 100))
+        // In flight: the header's dwell is unlimited, so the batch is not too late.
+        let v = S.velocity(of: header.rect, up, scrollRegion: region)
+        #expect(v == .zero)
+        #expect(S.dwell(of: header.rect, lens: lens, velocity: v) == nil)
+        #expect(!S.tooLate(dwells: [S.dwell(of: header.rect, lens: lens, velocity: v) ?? .infinity], remaining: 5))
+        #expect(S.velocity(of: line.rect, up, scrollRegion: region) == up)
+        #expect(S.velocity(of: header.rect, up, scrollRegion: nil) == up)
+    }
+
     @Test func movingBatchKeepsReadingOrderInTheLensAndDropsTextThatNeverArrives() {
         let up = CGVector(dx: 0, dy: -10)
         let c = sources([("low", 1200), ("high", 1050)]) + sources([("aside", 1500)], x: 700)

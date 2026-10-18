@@ -189,6 +189,9 @@ actor RegionPipeline {
     /// Text velocity relative to the lens, image pixels per second, +y toward the lens's maxY. Zero when unknown (an
     /// animation, a page flip) or after the motion ends.
     private var velocity = CGVector.zero
+    /// The image-pixel area that scrolls at `velocity`; nil when the whole lens moves (or the velocity is unknown).
+    /// Text outside it is fixed and has no dwell limit.
+    private var velocityRegion: CGRect?
     /// When the newest motion reached the pipeline (`systemUptime` clock; a frame read late counts from when it was
     /// read, since more frames of the same scroll may still be queued behind it), and the capture-time gap between the
     /// last two motion frames.
@@ -254,6 +257,7 @@ actor RegionPipeline {
         stillTask?.cancel()
         wasMoving = false
         velocity = .zero
+        velocityRegion = nil
         settleFrom = nil
         blocks = []
         baseGray = nil
@@ -318,6 +322,7 @@ actor RegionPipeline {
         let previous = frameTime
         frameTime = frame.time
         scrollVelocity = nil
+        scrollRect = nil
         if let full = prevGray, full.width == frame.gray.width, full.height == frame.gray.height {
             let prev = prevValid.map { full.cropped(to: $0) } ?? full
             let gray = prevValid.map { frame.gray.cropped(to: $0) } ?? frame.gray
@@ -342,7 +347,7 @@ actor RegionPipeline {
                 }
                 if raw.ratio > 0.2 || !scrolled.isEmpty {
                     noteMotion(frame.time)
-                    noteMotionFrame(captured: frame.time, velocity: scrollVelocity)
+                    noteMotionFrame(captured: frame.time, velocity: scrollVelocity, region: scrollRect)
                 } else {
                     velocity = CGVector(dx: velocity.dx / 2, dy: velocity.dy / 2)
                 }
@@ -358,17 +363,20 @@ actor RegionPipeline {
 
     /// The velocity the scroll regions of the frame being read gave (the largest region's).
     private var scrollVelocity: CGVector?
+    private var scrollRect: CGRect?
     private var scrollArea = 0
 
     /// A frame (or a lens move) showed motion, at `velocity` when it is known.
-    private func noteMotionFrame(captured t: TimeInterval, velocity v: CGVector?) {
+    private func noteMotionFrame(captured t: TimeInterval, velocity v: CGVector?, region: CGRect? = nil) {
         let gap = max(0, t - lastMotionCapture)
         Trace.mark("motion frame gap \(Int(min(gap, 99) * 1000)) ms v=\(v.map { Int($0.dy) } ?? 0)", since: t)
         motionInterval = gap < Self.rhythmCap ? gap : 0
         if let v {
             velocity = gap < Self.rhythmCap && velocity != .zero ? CGVector(dx: (velocity.dx + v.dx) / 2, dy: (velocity.dy + v.dy) / 2) : v
+            velocityRegion = region
         } else {
             velocity = .zero
+            velocityRegion = nil
         }
         lastMotionCapture = t
         lastMotionAt = max(t, ProcessInfo.processInfo.systemUptime)
@@ -386,9 +394,10 @@ actor RegionPipeline {
     /// The velocity to plan with: known only while content moves; otherwise nil.
     private func motionVelocity(at now: TimeInterval) -> CGVector? { Self.planning && isMoving(at: now) && velocity != .zero ? velocity : nil }
 
-    private func scheduleStill() {
+    private func scheduleStill(after grace: TimeInterval? = nil) {
         stillTask?.cancel()
-        let due = max(lastMotionAt + stillWindow, ProcessInfo.processInfo.systemUptime) + 0.02
+        let due = grace.map { ProcessInfo.processInfo.systemUptime + $0 }
+            ?? max(lastMotionAt + stillWindow, ProcessInfo.processInfo.systemUptime) + 0.02
         stillTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(due - ProcessInfo.processInfo.systemUptime))
             guard !Task.isCancelled else { return }
@@ -400,12 +409,13 @@ actor RegionPipeline {
     private func refreshMotion(due: TimeInterval) {
         let now = ProcessInfo.processInfo.systemUptime
         guard wasMoving else { return }
-        // Late: the actor was busy with a pass, so frames queued behind it have not been looked at yet. Look again a
-        // window later instead of calling the content still.
-        if now - due > 0.1 { lastMotionAt = now; scheduleStill(); return }
+        // Late: the actor was busy with a pass, so frames queued behind it have not been looked at yet. Look again
+        // shortly (the stamp stays: a whole new window would delay the still decision) instead of calling it still.
+        if now - due > 0.1 { scheduleStill(after: 0.05); return }
         guard stopped(at: now) else { scheduleStill(); return }
         wasMoving = false
         velocity = .zero
+        velocityRegion = nil
         settleFrom = lastMotionCapture
         Trace.mark("motion stopped (window \(Int(stillWindow * 1000)) ms)", since: lastMotionCapture)
         // Nothing else changes at a stop: this is the one moment to cut a batch the still lens no longer needs and to
@@ -527,6 +537,7 @@ actor RegionPipeline {
             apply(Move(area: area, dx: 0, dy: CGFloat(r.dy) * step, gx: 0, gy: gy, grayArea: g, strip: strip))
             if scrollVelocity == nil || r.rect.width * r.rect.height > scrollArea {
                 scrollArea = r.rect.width * r.rect.height
+                scrollRect = area
                 scrollVelocity = CGVector(dx: 0, dy: CGFloat(r.dy) * step / CGFloat(min(max(frame.time - t0, 0.016), 0.5)))
             }
             onScroll?(ScrollReport(area: CGRect(x: origin.x + area.minX / scale, y: origin.y + area.minY / scale,
@@ -542,8 +553,13 @@ actor RegionPipeline {
         if rect != visible {
             // A dragged lens moves the text the opposite way relative to it.
             if rect.size == visible.size {
-                let dt = min(max(now - lastVisibleChange, 0.016), 0.5)
-                noteMotionFrame(captured: now, velocity: CGVector(dx: -(rect.minX - visible.minX) * scale / dt, dy: -(rect.minY - visible.minY) * scale / dt))
+                if now - lastVisibleChange >= Self.rhythmCap {
+                    // A jump after a pause, not a drag: no speed to measure.
+                    noteMotionFrame(captured: now, velocity: nil)
+                } else {
+                    let dt = min(max(now - lastVisibleChange, 0.016), 0.5)
+                    noteMotionFrame(captured: now, velocity: CGVector(dx: -(rect.minX - visible.minX) * scale / dt, dy: -(rect.minY - visible.minY) * scale / dt))
+                }
             }
             lensMoved = now
             lastVisibleChange = now
@@ -1128,7 +1144,12 @@ actor RegionPipeline {
             // What the engine can still deliver, against how long each source stays in the lens.
             let dwells = unfinished.map { source in
                 blocks.filter { $0.source == source && $0.translation == nil }
-                    .map { TranslationScheduling.dwell(of: $0.rect, lens: lens, velocity: v) ?? .infinity }.max() ?? 0
+                    .map { TranslationScheduling.dwell(of: $0.rect, lens: lens,
+                                                       velocity: TranslationScheduling.velocity(of: $0.rect, v, scrollRegion: velocityRegion)) ?? .infinity }.max() ?? 0
+            }
+            if let region = velocityRegion,
+               unfinished.contains(where: { s in blocks.contains { $0.source == s && $0.translation == nil && !$0.rect.intersects(region) } }) {
+                Trace.count("translate.outside_scroll_kept")
             }
             let remaining = translator.remainingSeconds(lines: unfinished.count + f.done.count, delivered: f.done.count,
                                                         elapsed: now - f.started) ?? 0
@@ -1191,8 +1212,12 @@ actor RegionPipeline {
         if let v = motionVelocity(at: now), translator.expectedSeconds(lines: 1) != nil {
             let candidates = blocks.filter { $0.translation == nil && pending.contains($0.source) }
                 .map { TranslationScheduling.Candidate(source: $0.source, rect: $0.rect) }
-            let batch = TranslationScheduling.batch(from: candidates, lens: lens, velocity: v, limit: 3,
+            let batch = TranslationScheduling.batch(from: candidates, lens: lens, velocity: v, scrollRegion: velocityRegion, limit: 3,
                                                     expectedSeconds: { [translator] in translator.expectedSeconds(lines: $0) ?? 0 })
+            if let region = velocityRegion,
+               batch.contains(where: { s in candidates.contains { $0.source == s && !$0.rect.intersects(region) } }) {
+                Trace.count("translate.outside_scroll_admitted")
+            }
             return batch.isEmpty ? nil : batch
         }
         var seen = Set<String>()

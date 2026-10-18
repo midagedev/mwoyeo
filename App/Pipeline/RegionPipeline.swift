@@ -363,6 +363,7 @@ actor RegionPipeline {
     /// A frame (or a lens move) showed motion, at `velocity` when it is known.
     private func noteMotionFrame(captured t: TimeInterval, velocity v: CGVector?) {
         let gap = max(0, t - lastMotionCapture)
+        Trace.mark("motion frame gap \(Int(min(gap, 99) * 1000)) ms v=\(v.map { Int($0.dy) } ?? 0)", since: t)
         motionInterval = gap < Self.rhythmCap ? gap : 0
         if let v {
             velocity = gap < Self.rhythmCap && velocity != .zero ? CGVector(dx: (velocity.dx + v.dx) / 2, dy: (velocity.dy + v.dy) / 2) : v

@@ -13,6 +13,7 @@ import UniformTypeIdentifiers
 /// model first, as the app loads it at launch (the first run of a new binary compiles it, up to a minute; killing a run
 /// mid-compile restarts it).
 /// `MWOYEO_FAKE_ENGINE=hang|fail|fail-once|slow:<ms>` replaces the translation engine (see `TranslationService`).
+/// `MWOYEO_PLAN=off` turns the time-aware scheduling rules off (content then counts as moving at an unknown speed, as before them), to measure against.
 /// `MWOYEO_FAKE_OCR=stall|stall-vn|slow:<ms>` makes the text model (revision 3) never answer, or answer late (see
 /// `TextRecognizer`); the work counts then show `ocr.stalled.vn3`, `ocr.fallback.vn3|rev2|fast` and `ocr.recovered.vn3`.
 /// `--engine-config file.json` runs the pass through an added engine (an `EngineShare` file, as the app exports it) with

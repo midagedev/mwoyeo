@@ -13,7 +13,9 @@ import SwiftUI
 /// settings.json clean, then with problems in it; the file is a scratch one, `MWOYEO_SETTINGS_FILE` names it), translation-default, translation-packs, translation-packs-auto, translation-engines, general-saving, menu-default, menu-switcher, menu-notice,
 /// menu-profile, image-window and image-window-original (the Translate Image window on `--image`, translated through the
 /// mock, then with Show Original on; when the text recognizer reads nothing the picture stands in for its translation, which
-/// still shows the toggle's two states), sheet-pick, sheet-config, sheet-config-remote, lens-badge, lens-notice, lens-menu, add-flow (adds an
+/// still shows the toggle's two states), appearance (Settings › Appearance), lens-gallery (every lens style in every tint on a dark and
+/// a light backdrop: one PNG each, lens-<style>-<tint>-<dark|light>.png, and a grid per backdrop), lens-tab-positions (the name tag
+/// in its four places, one carrying a notice), lens-reading (the default glow while the lens reads), sheet-pick, sheet-config, sheet-config-remote, lens-badge, lens-notice, lens-menu, add-flow (adds an
 /// engine through the sheet, prints where the key is), check-logic (prints PASS/FAIL for the engine selection and the
 /// engine notice's dismissal; no window). Run it with `MWOYEO_MEMORY_SECRETS=1` so it does not touch the Keychain. It keeps its
 /// preferences in a scratch suite of its own (deleted at exit; `MWOYEO_DEFAULTS_SUITE` names one to keep), never the app's real
@@ -143,6 +145,12 @@ enum UICapture {
             case "sheet-config-remote":
                 let setup = EngineShare.encode(engine("Gemini", "https://gemini.example.invalid/v1beta/openai/", "gemini-3.1-flash-lite"))
                 await shoot(name, EngineSheet(autopilot: .init(setup: setup, key: "sk-test-capture")), CGSize(width: 480, height: 560), wait: 5)
+            case "appearance": await shoot(name, AppearanceSettings(), CGSize(width: 560, height: 520))
+            case "lens-gallery": await lensGallery()
+            case "lens-tab-positions": await lensTabPositions()
+            case "lens-reading":
+                await lensShot("lens-reading", dark: false, busy: true)
+                await lensShot("lens-reading-dark", dark: true, busy: true)
             case "lens-badge": await lens(name, badge: "cloud", notice: nil)
             case "lens-notice": await lens(name, badge: "cloud", notice: "Gemini unavailable · using Apple")
             case "lens-menu": await lens(name, badge: nil, notice: nil, menu: true)
@@ -313,6 +321,31 @@ enum UICapture {
             model.recognitionNotice(nil)
             check("its end leaves another issue alone", model.shownIssue == a)
             model.received(nil)
+
+            // The lens window around a region, for each place of the name tag.
+            let region = NSRect(x: 200, y: 300, width: 360, height: 200), moved = NSRect(x: 80, y: 120, width: 250, height: 90)
+            let lens = RegionFrameWindow(region: region, name: "Safari")
+            var places = region
+            for position in LensTabPosition.allCases {
+                lens.setAppearance(style: .glow, tint: .spectrum, tabVisibility: .automatic, tabPosition: position)
+                let kept = lens.regionFrame == region && lens.frame == RegionFrameWindow.windowFrame(for: region, position: position)
+                lens.setRegion(moved)
+                let after = lens.regionFrame == moved
+                lens.setRegion(region)
+                places = lens.regionFrame
+                check("lens window round-trips the region for \(position.rawValue)", kept && after && places == region)
+            }
+
+            // Settings saved before the lens looks existed, and a tint this build does not know.
+            var saved = (try? JSONSerialization.jsonObject(with: JSONEncoder().encode(AppSettings()))) as? [String: Any] ?? [:]
+            for key in ["lensTint", "lensTabVisibility", "lensTabPosition"] { saved[key] = nil }
+            let old = (try? JSONSerialization.data(withJSONObject: saved)).flatMap { try? JSONDecoder().decode(AppSettings.self, from: $0) }
+            check("settings without the new keys decode to the defaults", old == AppSettings())
+            saved["lensTint"] = "neon"
+            saved["lensStyle"] = "corners"
+            let unknown = (try? JSONSerialization.data(withJSONObject: saved)).flatMap { try? JSONDecoder().decode(AppSettings.self, from: $0) }
+            check("unknown tint decodes to spectrum", unknown?.lensTint == .spectrum && unknown?.lensStyle == .corners)
+            check("the corners style sits between subtle and minimal", LensStyle.allCases == [.glow, .subtle, .corners, .minimal])
             failed += SettingsFileChecks.run(model)
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
         }
@@ -429,7 +462,7 @@ enum UICapture {
             page.level = .normal
             page.orderFrontRegardless()
             let lens = RegionFrameWindow(region: region, name: "Safari")
-            lens.setStyle(.glow)
+            lens.setAppearance(style: .glow, tint: .spectrum, tabVisibility: .automatic, tabPosition: .topLeading)
             lens.setFollowing(true)
             lens.setDetail("English → Korean", badge: badge)
             lens.orderFrontRegardless()
@@ -458,6 +491,81 @@ enum UICapture {
             print("wrote \(path)")
             lens.orderOut(nil)
             page.orderOut(nil)
+        }
+
+        /// A lens (360 × 200) in one look over a plain dark or light backdrop; returns the PNG's path.
+        @discardableResult
+        private func lensShot(_ name: String, style: LensStyle = .glow, tint: LensTint = .spectrum, position: LensTabPosition = .topLeading,
+                              dark: Bool, busy: Bool = false, emphasized: Bool = false, notice: String? = nil, wait: Double = 0.5) async -> String {
+            let screen = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1512, height: 982)
+            let region = NSRect(x: 200, y: screen.height - 520, width: 360, height: 200)
+            let page = NSWindow(contentRect: region.insetBy(dx: -40, dy: -70).offsetBy(dx: 0, dy: -10), styleMask: [.borderless], backing: .buffered, defer: false)
+            page.backgroundColor = NSColor(white: dark ? 0.12 : 0.96, alpha: 1)
+            page.level = .normal
+            page.orderFrontRegardless()
+            let lens = RegionFrameWindow(region: region, name: "Safari")
+            // The pointer of whoever uses the screen must not hover the lens: hovering brightens it.
+            lens.ignoresMouseEvents = true
+            lens.setAppearance(style: style, tint: tint, tabVisibility: .automatic, tabPosition: position)
+            lens.setFollowing(true)
+            lens.setDetail("English → Korean")
+            lens.setBusy(busy)
+            lens.orderFrontRegardless()
+            lens.setEmphasized(emphasized)
+            if let notice { lens.flash(notice, seconds: 30) }
+            try? await Task.sleep(for: .seconds(wait))
+            let r = page.frame
+            let path = out.appendingPathComponent("\(name).png").path
+            run("/usr/sbin/screencapture", ["-x", "-R", "\(Int(r.minX)),\(Int(screen.height - r.maxY)),\(Int(r.width)),\(Int(r.height))", path])
+            print("wrote \(path)")
+            lens.orderOut(nil)
+            page.orderOut(nil)
+            return path
+        }
+
+        /// Every style in every tint, on both backdrops, and a grid of each backdrop (styles across, tints down).
+        private func lensGallery() async {
+            for dark in [true, false] {
+                var rows: [[String]] = []
+                for tint in LensTint.allCases {
+                    var row: [String] = []
+                    for style in LensStyle.allCases {
+                        row.append(await lensShot("lens-\(style.rawValue)-\(tint.rawValue)-\(dark ? "dark" : "light")", style: style, tint: tint, dark: dark))
+                    }
+                    rows.append(row)
+                }
+                writeGrid("lens-gallery-\(dark ? "dark" : "light")", rows)
+            }
+        }
+
+        /// The name tag in each of its four places; the last carries a notice.
+        private func lensTabPositions() async {
+            for (i, position) in LensTabPosition.allCases.enumerated() {
+                await lensShot("lens-tab-\(position.rawValue)", position: position, dark: false, emphasized: i != 1,
+                               notice: i == 3 ? "Copied" : nil)
+            }
+        }
+
+        /// The captures in `rows` laid side by side at one point per pixel (the captures themselves are twice that).
+        private func writeGrid(_ name: String, _ rows: [[String]]) {
+            let images = rows.map { $0.map { NSImage(contentsOfFile: $0) } }
+            guard let first = images.first?.first ?? nil else { return }
+            let cell = first.size
+            let w = Int(cell.width) * (rows.first?.count ?? 0), h = Int(cell.height) * rows.count
+            guard let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: w, pixelsHigh: h, bitsPerSample: 8, samplesPerPixel: 4,
+                                             hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0),
+                  let context = NSGraphicsContext(bitmapImageRep: rep) else { return }
+            NSGraphicsContext.saveGraphicsState()
+            NSGraphicsContext.current = context
+            for (y, row) in images.enumerated() {
+                for (x, image) in row.enumerated() {
+                    image?.draw(in: NSRect(x: CGFloat(x) * cell.width, y: CGFloat(rows.count - 1 - y) * cell.height, width: cell.width, height: cell.height))
+                }
+            }
+            NSGraphicsContext.restoreGraphicsState()
+            let path = out.appendingPathComponent("\(name).png").path
+            try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))
+            print("wrote \(path)")
         }
 
         /// The add flow end to end: the sheet pastes a setup and a key, runs the sample and adds the engine.

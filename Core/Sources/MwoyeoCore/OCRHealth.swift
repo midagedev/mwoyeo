@@ -1,5 +1,11 @@
 import Foundation
 
+/// A read that did not answer in the time its caller gave it (a rung's deadline). The request is never cancelled and runs on; the
+/// pass that asked is not repeated at once (`OCRHealth.passFailureIsTransient`: it waits out `ReadBackoff`).
+public struct ReadTimeout: Error, Sendable {
+    public init() {}
+}
+
 /// Whether Vision's newest text model (accurate revision 3 of `VNRecognizeTextRequest`) is answering. On some Macs it never
 /// does (its compiler service spins and the request hangs for good), and a hung request cannot be cancelled. This is the
 /// bookkeeping that notices, routes reads away from it, and notices when it answers again. Pure: callers pass `now` (any monotonic clock, in seconds) and do
@@ -25,10 +31,12 @@ public struct OCRHealth: Sendable, Equatable {
 
     public static func programsNotReady(description: String) -> Bool { description.contains("e5rtError") }
 
-    /// A failed read pass that the system's recognizer recovers from by itself, so the picture is read again soon rather than
-    /// counted as read: programs not ready, or a read that returned neither a result nor an error (`nilError`, logged on a
-    /// saturated Neural Engine, 2026-10-18).
+    /// A failed read pass that the system's recognizer recovers from by itself, so the picture is read again after a backoff
+    /// rather than counted as read: programs not ready, a read that returned neither a result nor an error (`nilError`, logged on a
+    /// saturated Neural Engine, 2026-10-18), or a read that did not answer in time (`ReadTimeout`; until 2026-10-18 the pass ran
+    /// again at once on the process that had just not answered, design F5).
     public static func passFailureIsTransient(_ error: Error) -> Bool {
+        if error is ReadTimeout { return true }
         let d = String(describing: error)
         return programsNotReady(description: d) || d == "nilError"
     }

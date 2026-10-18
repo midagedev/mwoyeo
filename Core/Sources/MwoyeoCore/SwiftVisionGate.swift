@@ -1,28 +1,27 @@
 import Foundation
 
-/// The initialization of the text models, and whether the Swift Vision models (`RecognizeDocumentsRequest`,
-/// `RecognizeTextRequest`) may be asked for a language key. Measured on macOS 27 (vision-revive, 2026-10-18): the block that was
-/// once blamed on "a pending Swift request" is a cold ANE compile. Warm, in one process, 30 looped document requests beside 10
-/// concurrent `VNRecognizeTextRequest` reads left those reads at 0.16-0.27 s, and a warm document read takes 0.3-0.5 s. Cold (the
-/// first run of a binary, or of a language) VN revision 3 takes 65-119 s, the document model 80-90 s, and the compiles queue in
-/// the system service; while a Swift model is compiling, a VN revision 3 read in the same process waits for it (37 s with VN warm
-/// and a cold Arabic text model), and revision 2 and `.fast` still answer in under 0.25 s. The models are loaded per
-/// language (ja 34 s, fr 32 s, ar 40 s, ko 8 s, es after fr 0.1 s), so readiness is per *key*: the requested languages ("ja",
-/// "zh-Hans", "ja,en"), or `anyLanguage` when the language is detected.
+/// The initialization of the text models, as a screen shows it, and which keys have their document model warm. Measured on macOS 27
+/// (vision-revive, 2026-10-18): the block that was once blamed on "a pending Swift request" is a cold ANE compile. Warm, in one
+/// process, 30 looped document requests beside 10 concurrent `VNRecognizeTextRequest` reads left those reads at 0.16-0.27 s, and a
+/// warm document read takes 0.3-0.5 s. Cold (the first run of a binary, or of a language) VN revision 3 takes 65-119 s, the document
+/// model 80-90 s, and the compiles queue in the system service; while one compiles, every Vision request of the same process waits
+/// for it (ocr-stall-112: 34 s + 26 s for the two document networks of a figure page, ~90 s silent), and another process answers in
+/// 0.3-0.6 s. The models are loaded per language (ja 34 s, fr 32 s, ar 40 s, ko 8 s, es after fr 0.1 s), so readiness is per *key*:
+/// the requested languages ("ja", "zh-Hans", "ja,en"), or `anyLanguage` when the language is detected.
 ///
 /// The app loads them itself, in the background, at every launch: per key, the steps in `Step` order, one at a time (the compiler
-/// service takes one compile at a time, and a load is never cancelled). This is the bookkeeping: which step is due, how each
-/// ended, which keys the Swift models may be asked for, and whether a progress screen should be up. Nothing is persisted: a key is
+/// service takes one compile at a time, and a load is never cancelled). Revision 3 compiles in this process; the document model
+/// compiles in the Docs service (`DocsHost`), so no read of this process waits for it. This is the bookkeeping: which step is due,
+/// how each ended, and whether a progress screen should be up. Whether a read may go to Docs is `WorkerHealth`'s to say
+/// (`DocsRoute`), not this struct's: a document read that is slow is not a failure of the step. Nothing is persisted: a key is
 /// ready when its step ran in this process, and the timing of that step is what shows whether the compile was cold.
 /// Pure: callers pass `now` (any monotonic clock, in seconds), run the step and report how it ended.
 public struct SwiftVisionGate: Sendable, Equatable {
     public enum Step: String, CaseIterable, Sendable {
         /// `VNRecognizeTextRequest`, revision 3, on one drawn wide line.
         case textModel
-        /// `RecognizeDocumentsRequest`: the paragraph blocks of a read come from it.
+        /// `RecognizeDocumentsRequest` in the Docs service: the paragraph blocks of a read come from it.
         case documentModel
-        /// `RecognizeTextRequest`.
-        case swiftTextModel
     }
 
     public enum StepState: Sendable, Equatable {
@@ -44,29 +43,21 @@ public struct SwiftVisionGate: Sendable, Equatable {
     /// The progress screen shows once a step has run this long (or failed), and stays this long after the last step is done.
     public static let showAfter: TimeInterval = 2
 
-    private var everyKey = false
     private var wanted: [String] = []
     private var states: [String: [Step: StepState]] = [:]
     private var lastDone: TimeInterval?
-    /// Document reads per key that missed their deadline after the key was ready.
-    private var misses: [String: Int] = [:]
     /// The step that runs, nil if none.
     public private(set) var running: Due?
-    /// The running Swift step is being compiled by a child process (the app's own executable), not in this process.
-    public private(set) var inChild = false
 
     public init() {}
 
-    /// Every key is ready (gates that want the Swift path at once); nothing is started.
-    public mutating func assumeReady() { everyKey = true }
-
-    /// The Swift document model may be asked for this key.
+    /// The Docs service has warmed its document model for this key in this run.
     public func isReady(_ key: String) -> Bool {
-        everyKey || states[key]?[.documentModel].map { if case .done = $0 { true } else { false } } ?? false
+        states[key]?[.documentModel].map { if case .done = $0 { true } else { false } } ?? false
     }
 
-    /// The keys whose document model is loaded ("*" when every key is assumed ready).
-    public var readyKeys: [String] { everyKey ? ["*"] : wanted.filter(isReady).sorted() }
+    /// The keys whose document model is warm.
+    public var readyKeys: [String] { wanted.filter(isReady).sorted() }
 
     /// Every key asked for so far is ready.
     public var allReady: Bool { wanted.allSatisfy(isReady) }
@@ -80,14 +71,6 @@ public struct SwiftVisionGate: Sendable, Equatable {
         states[key] = Dictionary(uniqueKeysWithValues: Step.allCases.map { ($0, StepState.pending) })
         return true
     }
-
-    /// A Swift step (a model that may be compiling) runs in this process now. VN revision 3 reads in the same process wait for it,
-    /// so a read that has an older recognizer for its language goes there meanwhile. While a child compiles it, nothing in this
-    /// process waits (the same read in another process answered in 0.3 s).
-    public var isSwiftCompiling: Bool { !inChild && (running.map { $0.step != .textModel } ?? false) }
-
-    /// The running step's compile moves to a child process (`true`) or is back in this process (`false`).
-    public mutating func childPhase(_ on: Bool) { inChild = on && running != nil }
 
     /// The step to run now, if any: nothing runs (a running step is never stacked on, however long it takes), and the first
     /// pending step of the first key whose earlier steps are done. A key with a failed step waits for `retry()`.
@@ -109,7 +92,6 @@ public struct SwiftVisionGate: Sendable, Equatable {
     /// The step is being started. Call before the work runs: it can end before the caller has seen it return.
     public mutating func started(_ due: Due, now: TimeInterval) {
         running = due
-        inChild = false
         states[due.key]?[due.step] = .running(since: now)
     }
 
@@ -117,23 +99,12 @@ public struct SwiftVisionGate: Sendable, Equatable {
     public mutating func finished(failure: String?, now: TimeInterval) {
         guard let due = running else { return }
         running = nil
-        inChild = false
         if let failure {
             states[due.key]?[due.step] = .failed(failure)
         } else if case let .running(since) = states[due.key]?[due.step] {
             states[due.key]?[due.step] = .done(seconds: max(0, now - since))
             if allDone { lastDone = now }
         }
-    }
-
-    /// A document read for a ready key missed its deadline: the key is not ready until its document model loads again. The first
-    /// miss makes the step due again with no issue (a cold first run can miss once while the system compiles); a second fails it
-    /// until a retry (the next launch or `retry()`). The abandoned request is not cancelled.
-    public mutating func missed(_ key: String) {
-        guard !everyKey, case .done = states[key]?[.documentModel] else { return }
-        misses[key, default: 0] += 1
-        states[key]?[.documentModel] = misses[key] == 1 ? .pending : .failed("no answer in time")
-        lastDone = nil
     }
 
     /// Every failed step is due again (the user pressed retry). Never called by the procedure itself.

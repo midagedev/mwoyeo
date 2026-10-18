@@ -169,6 +169,10 @@ actor RegionPipeline {
     private var strikes = SourceStrikes()
     /// Consecutive failed recognition passes: the next read waits, whatever the pixels do.
     private var readBackoff = ReadBackoff()
+    /// This pipeline as the reader host knows it (`ReaderClients`): told when Docs is ready and the last layout was the grouper's.
+    private let readerClient: Int
+    /// Docs became ready since the running seamless pass began: the frame is read once more when it ends.
+    private var layoutStale = false
     private var version = 0
     private var scale: CGFloat = 2
     private var activity = RegionActivity.idle
@@ -245,6 +249,23 @@ actor RegionPipeline {
         self.translator = translator
         self.inpainter = inpainter
         self.onSnapshot = onSnapshot
+        let ref = WeakPipeline()
+        readerClient = ReaderClients.shared.add { Task { await ref.value?.layoutReady() } }
+        ref.value = self
+    }
+
+    private final class WeakPipeline: @unchecked Sendable { weak var value: RegionPipeline? }
+
+    deinit { ReaderClients.shared.remove(readerClient) }
+
+    /// Docs is ready and this pipeline's last layout was read with the grouper while it was not (`ReaderClients`): the frame is
+    /// read once more, and now gets the document layout. Blocks whose text is unchanged keep their translations.
+    func layoutReady() {
+        guard latest != nil else { return }
+        layoutStale = true
+        seamlessDone = false
+        Trace.count("reader.reread")
+        kick()
     }
 
     func setNoticeHandler(_ h: @escaping @Sendable (String) -> Void) { onNotice = h }
@@ -479,8 +500,9 @@ actor RegionPipeline {
             let settled = now - max(lastChange, lensMoved) >= options.settleDelay
             let wantsSeamless = options.renderMode != .fast && !seamlessDone && (settled || options.renderMode == .seamless)
             if wantsSeamless {
-                // A timed-out read is tried again rather than counted as done.
-                if await seamlessPass(frame) { seamlessDone = lastChange <= frame.time }
+                // A failed read is not counted as done: it waits out its backoff (`noteReadFailure`) and is read again. So is a read
+                // after which Docs became ready while it ran (`layoutReady`).
+                if await seamlessPass(frame) { seamlessDone = lastChange <= frame.time && !layoutStale }
                 continue
             }
             if options.renderMode != .seamless, let dirty = dirtyRect(for: frame, stale) {
@@ -785,7 +807,7 @@ actor RegionPipeline {
             // Erasing modes read paragraphs, like the seamless pass: the settled re-read then finds the same text and
             // keeps its translations instead of translating everything a second time.
             found = wantsErase ? (try? await TextRecognizer.blocks(in: frame.image, roi: dirty, languages: ocrLanguages,
-                                                                   customWords: options.glossaryTerms, plan: readerPlan)) ?? [] : []
+                                                                   customWords: options.glossaryTerms, plan: readerPlan, client: readerClient)) ?? [] : []
             if found.isEmpty {
                 found = try await TextRecognizer.lines(in: frame.image, roi: dirty, languages: ocrLanguages, fast: useFast,
                                                        customWords: options.glossaryTerms).map { TextRecognizer.makeBlock([$0]) }
@@ -793,9 +815,9 @@ actor RegionPipeline {
         } catch {
             log.error("fast OCR failed: \(String(describing: error), privacy: .public)")
             Trace.mark("fast: OCR failed \(error)", since: t)
-            // A stuck request is retried, and so is a transient (after its backoff); any other failure would just fail again
-            // on the same pixels.
-            if !(error is TextRecognizer.Timeout), noteReadFailure(error) { _ = finishPass(start, frame: frame) }
+            // A transient (a read that timed out, programs not ready) is read again after its backoff; any other failure would just
+            // fail again on the same pixels.
+            if noteReadFailure(error) { _ = finishPass(start, frame: frame) }
             return
         }
         readBackoff.success()
@@ -853,16 +875,13 @@ actor RegionPipeline {
     @discardableResult
     private func seamlessPass(_ frame: CapturedFrame) async -> Bool {
         setActivity(.reading)
+        layoutStale = false
         let start = startPass()
         var t = Trace.now
         var found: [OCRBlock]
         do {
-            do {
-                found = try await TextRecognizer.blocks(in: frame.image, languages: ocrLanguages, customWords: options.glossaryTerms, plan: readerPlan)
-            } catch is TextRecognizer.Timeout {
-                Trace.mark("seamless: document OCR timed out, reading lines", since: t)
-                found = []
-            }
+            found = try await TextRecognizer.blocks(in: frame.image, languages: ocrLanguages, customWords: options.glossaryTerms,
+                                                    plan: readerPlan, client: readerClient)
             if found.isEmpty {
                 found = try await TextRecognizer.lines(in: frame.image, languages: ocrLanguages, fast: false)
                     .map { TextRecognizer.makeBlock([$0]) }
@@ -870,7 +889,6 @@ actor RegionPipeline {
         } catch {
             log.error("document OCR failed: \(String(describing: error), privacy: .public)")
             Trace.mark("seamless: OCR failed \(error)", since: t)
-            if error is TextRecognizer.Timeout { return false }
             guard noteReadFailure(error) else { return false }
             _ = finishPass(start, frame: frame)
             return true
@@ -923,9 +941,10 @@ actor RegionPipeline {
         return true
     }
 
-    /// A failed pass delays the next read (`ReadBackoff`); "programs not ready" or no result is a transient of the system's
-    /// recognizer (`OCRHealth.passFailureIsTransient`) and only waits a second, so the minute of it after an update or a heavy
-    /// compile does not pile up. True when the frame counts as read (a lasting failure: the same pixels would fail again); a
+    /// A failed pass delays the next read (`ReadBackoff`); "programs not ready", no result, or a read that did not answer in its
+    /// time (`ReadTimeout`) is a transient of the system's recognizer and waits 1 s, doubling to 30 s per consecutive
+    /// failure (`Backoff.rev3Rung`), so the minute of it after an update or a heavy compile does not pile up, and a read that timed
+    /// out is never run again at once on the same blocked process (design F5). True when the frame counts as read (a lasting failure: the same pixels would fail again); a
     /// transient leaves it unread, so a still picture is read again once the backoff ends instead of staying empty until
     /// something on it changes.
     private func noteReadFailure(_ error: Error) -> Bool {
@@ -1507,8 +1526,8 @@ actor RegionPipeline {
             blocks[i].clipped = rendered?.clipped ?? false
             blocks[i].ellipsis = rendered?.ellipsis ?? false
             if Trace.enabled, let ink = rendered?.text {
-                Trace.mark("render '\(b.source.prefix(24))' patch \(Int(b.rect.minX)),\(Int(b.rect.minY)) \(Int(b.rect.width))x\(Int(b.rect.height)) spare \(Int(b.spareWidth)) "
-                    + "area \(b.textArea.map { "\(Int($0.minX)),\(Int($0.minY)) \(Int($0.width))x\(Int($0.height))" } ?? "-") ink \(Int(ink.minX)),\(Int(ink.minY)) \(Int(ink.width))x\(Int(ink.height))",
+                Trace.mark("render '\(b.source.prefix(24))' patch \(TraceNumber.px(b.rect.minX)),\(TraceNumber.px(b.rect.minY)) \(TraceNumber.px(b.rect.width))x\(TraceNumber.px(b.rect.height)) spare \(TraceNumber.px(b.spareWidth)) "
+                    + "area \(b.textArea.map { "\(TraceNumber.px($0.minX)),\(TraceNumber.px($0.minY)) \(TraceNumber.px($0.width))x\(TraceNumber.px($0.height))" } ?? "-") ink \(TraceNumber.px(ink.minX)),\(TraceNumber.px(ink.minY)) \(TraceNumber.px(ink.width))x\(TraceNumber.px(ink.height))",
                     since: Trace.now)
             }
         }

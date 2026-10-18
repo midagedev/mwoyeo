@@ -178,15 +178,13 @@ enum UICapture {
             step(.textModel, from: 90, to: 56)
             switch state {
             case "failed": step(.documentModel, from: 56, to: 10, failure: "the helper process ended with status 1")
-            case "done":
-                step(.documentModel, from: 56, to: 12)
-                step(.swiftTextModel, from: 12, to: 1)
+            case "done": step(.documentModel, from: 56, to: 1)
             default: step(.documentModel, from: 56, to: nil)
             }
             return (g, t)
         }
 
-        /// Reads during the initialization: the latency of each read in this process while the steps run (the child compiles meanwhile).
+        /// Reads during the initialization: the latency of each read in this process while the steps run (the Docs service compiles meanwhile).
         private func visionReads() async {
             let language = option("--src") ?? "ja"
             let limit = Double(option("--for") ?? "400") ?? 400
@@ -200,7 +198,7 @@ enum UICapture {
             while Trace.now - t0 < limit {
                 let gate = TextRecognizer.setupState
                 let steps = SwiftVisionGate.Step.allCases.map { "\($0.rawValue)=\(gate.steps[$0].map(Self.describe) ?? "?")" }.joined(separator: " ")
-                if steps != shown { shown = steps; print("[\(at())] steps: \(steps) child=\(gate.inChild)") }
+                if steps != shown { shown = steps; print("[\(at())] steps: \(steps)") }
                 if gate.running == nil, gate.allReady, !gate.steps.values.contains(.pending), n > 0 { break }
                 let began = Trace.now
                 n += 1

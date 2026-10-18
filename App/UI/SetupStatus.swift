@@ -42,7 +42,6 @@ enum VisionSetupDisplay {
         switch step {
         case .textModel: String(localized: "Text reader")
         case .documentModel: String(localized: "Paragraph reader")
-        case .swiftTextModel: String(localized: "Language reader")
         }
     }
 }

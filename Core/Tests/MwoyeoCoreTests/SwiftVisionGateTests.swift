@@ -38,16 +38,16 @@ import Testing
         #expect(g.nextDue() == G.Due(key: "ja", step: .textModel))
         g.started(G.Due(key: "ja", step: .textModel), now: 0)
         #expect(g.nextDue() == nil)
-        #expect(!g.isSwiftCompiling)
         g.finished(failure: nil, now: 1)
         #expect(g.nextDue() == G.Due(key: "ja", step: .documentModel))
         g.started(G.Due(key: "ja", step: .documentModel), now: 1)
-        #expect(g.isSwiftCompiling)
         #expect(g.nextDue() == nil)
         #expect(!g.isReady("ja"))
         g.finished(failure: nil, now: 90)
         #expect(g.isReady("ja"))
-        #expect(g.nextDue() == G.Due(key: "ja", step: .swiftTextModel))
+        // 2026-10-18 (r3-docs-xpc): there is no third step. `RecognizeTextRequest` was never read and cost a ~30 s serial compile.
+        #expect(g.nextDue() == nil)
+        #expect(G.Step.allCases == [.textModel, .documentModel])
     }
 
     @Test func keysGoInTheOrderTheyWereAskedFor() {
@@ -88,42 +88,16 @@ import Testing
         #expect(g.steps[.textModel] == .done(seconds: 1))
     }
 
-    @Test func aFirstMissedDeadlineLoadsTheKeyAgainWithoutAnIssue() {
+    @Test func aSlowDocumentStepIsDoneNotFailedAndTheKeyStaysReady() {
+        // 2026-10-18 (r3-docs-xpc): a document answer that is slow is not a failure (the old rule took the key back after a second
+        // miss until relaunch). The step takes as long as the Docs service takes, and once done the key stays ready for the run.
         var g = G()
         g.want("ja")
-        _ = runAll(&g, from: 0, each: 1)
+        _ = runAll(&g, from: 0, each: 130)
         #expect(g.isReady("ja"))
-        g.missed("ja")
-        #expect(!g.isReady("ja"))
-        #expect(g.nextDue() == G.Due(key: "ja", step: .documentModel))
-        #expect(g.steps[.documentModel] == .pending)
-        #expect(!g.shouldShowProgress(now: 10))
-        _ = runAll(&g, from: 10, each: 1)
-        #expect(g.isReady("ja"))
-    }
-
-    @Test func aSecondMissedDeadlineTakesTheKeyBackUntilRetry() {
-        var g = G()
-        g.want("ja")
-        _ = runAll(&g, from: 0, each: 1)
-        g.missed("ja")
-        _ = runAll(&g, from: 10, each: 1)
-        g.missed("ja")
-        #expect(!g.isReady("ja"))
+        #expect(g.steps[.documentModel] == .done(seconds: 130))
         #expect(g.nextDue() == nil)
-        #expect(g.shouldShowProgress(now: 20))
-        g.retry()
-        #expect(g.nextDue() == G.Due(key: "ja", step: .documentModel))
-    }
-
-    @Test func assumingReadyMakesEveryKeyReadyAndStartsNothing() {
-        var g = G()
-        g.assumeReady()
-        #expect(g.isReady("ja") && g.isReady("anything"))
-        #expect(g.nextDue() == nil)
-        #expect(g.readyKeys == ["*"])
-        g.missed("ja")
-        #expect(g.isReady("ja"))
+        #expect(g.readyKeys == ["ja"])
     }
 
     @Test func stepsAcrossKeysReportRunningThenDoneSum() {
@@ -179,23 +153,5 @@ import Testing
         #expect(g.shouldShowProgress(now: 10_000))
         g.retry()
         #expect(!g.shouldShowProgress(now: 10_001))
-    }
-
-    @Test func aCompileInAChildBlocksNothingInThisProcess() {
-        var g = G()
-        g.want("ja")
-        g.started(G.Due(key: "ja", step: .textModel), now: 0)
-        g.finished(failure: nil, now: 1)
-        g.started(G.Due(key: "ja", step: .documentModel), now: 1)
-        #expect(g.isSwiftCompiling)
-        g.childPhase(true)
-        #expect(g.inChild && !g.isSwiftCompiling)
-        g.childPhase(false)
-        #expect(g.isSwiftCompiling)
-        g.childPhase(true)
-        g.finished(failure: nil, now: 90)
-        #expect(!g.inChild)
-        g.childPhase(true)                  // nothing running: nothing to move
-        #expect(!g.inChild)
     }
 }

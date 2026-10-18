@@ -60,6 +60,8 @@ targetTemplates:
         CODE_SIGN_ENTITLEMENTS: Reader/Reader.entitlements
         GENERATE_INFOPLIST_FILE: NO
         DEAD_CODE_STRIPPING: YES
+        # The document read (`RecognizeDocumentsRequest`) is compiled into the services only: the app cannot run one (`VisionExec`).
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) READER_SERVICE"
 targets:
   MwoyeoReaderLines:
     templates: [ReaderService]

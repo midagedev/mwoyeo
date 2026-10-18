@@ -20,7 +20,9 @@ struct OCRWord: Sendable {
 
 /// The Vision calls themselves, with the parameters the app has always read with (moved out of `TextRecognizer`). Pure: no
 /// counters, no health, no deadline (`TextRecognizer` owns those), no state. They run in the reader services; the app still
-/// compiles them in until it stops reading in its own process (design §4.3).
+/// compiles the line reads in until it stops reading lines in its own process (design §4.3). The document reads
+/// (`RecognizeDocumentsRequest`) are compiled into the services only (`READER_SERVICE`, set by the service targets): the app has
+/// no code that can run one, so no document networks can ever compile in its process (r3-docs-xpc, `nm -u` gate).
 enum VisionExec {
     /// What a read of one kind returns: lines for the lines kinds, the lines of each paragraph for the document kinds.
     enum Output: Sendable {
@@ -53,14 +55,22 @@ enum VisionExec {
             guard let image else { throw Failure(description: "\(kind.rawValue) read without a picture") }
             return .lines(try readLines(kind, in: image, roi: roi, languages: languages, customWords: customWords))
         case .doc:
+            #if READER_SERVICE
             guard let image else { throw Failure(description: "doc read without a picture") }
             return .paragraphs(try await documentLines(in: image, roi: roi, languages: documentLanguages, customWords: customWords))
+            #else
+            throw Failure(description: "documents are read by the Docs service")
+            #endif
         case .warmLines:
             guard let picture = probePicture else { throw Failure(description: "the probe picture could not be drawn") }
             return .lines(try recognize(in: picture, roi: nil, level: .accurate, revision: 3, customWords: [], identifiers: []))
         case .warmDoc:
+            #if READER_SERVICE
             guard let picture = probePicture else { throw Failure(description: "the probe picture could not be drawn") }
             return .paragraphs(try await documentLines(in: picture, roi: nil, languages: documentLanguages, customWords: []))
+            #else
+            throw Failure(description: "documents are read by the Docs service")
+            #endif
         }
     }
 
@@ -99,6 +109,7 @@ enum VisionExec {
         }
     }
 
+    #if READER_SERVICE
     /// `RecognizeDocumentsRequest`: the lines of each paragraph it finds.
     static func documentLines(in image: CGImage, roi: CGRect?, languages: [Locale.Language], customWords: [String]) async throws -> [[OCRLine]] {
         var req = RecognizeDocumentsRequest()
@@ -127,6 +138,7 @@ enum VisionExec {
         }
         return out
     }
+    #endif
 
     // MARK: Geometry and text
 

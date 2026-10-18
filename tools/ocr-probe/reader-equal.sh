@@ -11,6 +11,9 @@
 #   env:   PNGS   the use-case pictures of tools/usecase-bench/set/index.tsv   (default /Users/hckim/.cache/mwoyeo-gates/usecases/set)
 #          PAGES  the paper pages p<N>.png                                      (default /tmp/paper-quality/paper)
 #          ONLY   run only the pictures whose name starts with this
+# 2026-10-18 (r3-docs-xpc): the document reads always go to the Docs service now, whatever MWOYEO_READER says, so `swift inprocess` of a
+# newer binary is "lines here, documents in the service". The in-process document baseline is the run of a binary before that change
+# (R1's /tmp/r1/g1/swift-inprocess, b1f39a5): `python3 -I same-lines.py <that dir> <this run's dir>` is the before/after of the doc path.
 # swift = MWOYEO_OCR_PATH=swift (the document model reads), vn = MWOYEO_OCR_PATH=vn (revision 3 lines grouped). Needs the Bash sandbox
 # off (headless --render), one render at a time, and warm models: a cold compile is minutes (run a warm-up first, e.g. `Mwoyeo
 # --reader-check warm en` for the services, and one render for this process). A picture whose .rc exists is skipped, so a cut run resumes.

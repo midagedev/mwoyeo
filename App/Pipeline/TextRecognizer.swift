@@ -31,14 +31,17 @@ enum TextRecognizer {
         return try await deadline { try await exec(.fast, in: image, roi: roi, languages: ids).lines }
     }
 
-    /// Paragraph-level recognition. Priority: Swift document model (`RecognizeDocumentsRequest`, once the gate says its model is
-    /// loaded for these languages) > VN revision 3 + `ParagraphGrouper` > revision 2 > `.fast` > issue (`accurate`). A document read
-    /// that has not answered in `documentDeadline` falls back to VN for that read, and the key waits for a retry (`SwiftVisionGate.missed`).
+    /// Paragraph-level recognition. Priority: the document model of the Docs service (`RecognizeDocumentsRequest`, in its own process,
+    /// when Docs is idle and warm for the key) > VN revision 3 + `ParagraphGrouper` > revision 2 > `.fast` > issue (`accurate`).
+    /// The lens never waits for Docs: a pass that cannot send its read (Docs warming, busy, compiling, restarting) reads with VN at
+    /// once, and one that did send waits `ReadVia.doc.patience` (S = 2 s) and then reads with VN while the request runs on, never
+    /// cancelled. A document answer that is here when the VN read ends is the one used (it is the better layout); a later one
+    /// marks Docs ready, and the lens reads again once (`ReaderClients`, `RegionPipeline.layoutReady`).
     /// `plan` says which paragraph reader the lens wants (`ParagraphReader`): `lineGrouping` never asks the document model, and
     /// `automatic` reads the lines with VN first and lets `ReaderDecider` pick from their layout; once the plan holds the document
-    /// model, that model reads alone and its lines feed the decision.
+    /// model, that model reads alone and its lines feed the decision. `client` is the pipeline asking (`ReaderClients`).
     static func blocks(in image: CGImage, roi: CGRect? = nil, languages: [Locale.Language], customWords: [String] = [],
-                       plan: ReaderPlan? = nil) async throws -> [OCRBlock] {
+                       plan: ReaderPlan? = nil, client: Int? = nil) async throws -> [OCRBlock] {
         Trace.count("ocr.blocks")
         let key = key(languages)
         let wanted: ParagraphReader = switch ocrPath {
@@ -47,16 +50,17 @@ enum TextRecognizer {
         case nil: plan?.setting ?? .automatic
         }
         var read: [OCRLine]?
+        var sent: DocsRead?
         if wanted != .lineGrouping {
             if gate.withLock({ $0.want(key) }) { publishAndRun() }
-            if gate.withLock({ $0.isReady(key) }) {
+            if case .doc = await DocsHost.shared.route(key: key, client: client) {
                 var reader = wanted
                 // Automatic with the document model already held: its own lines are the layout evidence, so the frame is read
                 // once, not twice (VN first cost ~0.2 s more per subtitle frame, usecase-bench 2026-10-18).
                 if wanted == .automatic, let plan, plan.held == .documentLayout {
                     let t = Trace.now
-                    do {
-                        let found = try await deadline(seconds: documentDeadline) { try await swiftBlocks(in: image, roi: roi, languages: languages, customWords: customWords) }
+                    switch await documentBlocks(in: image, roi: roi, languages: languages, customWords: customWords, key: key, client: client) {
+                    case let .found(found):
                         let lines = found.flatMap(\.lines)
                         let (_, why) = plan.decide(lines: lines.map(\.rect), texts: lines.map(\.text),
                                                    size: CGSize(width: image.width, height: image.height), partial: roi != nil)
@@ -65,14 +69,8 @@ enum TextRecognizer {
                         Trace.count("ocr.blocks.swift")
                         Trace.count("ocr.blocks.lines", lines.count)
                         return found
-                    } catch is Timeout {
-                        Trace.count("ocr.swift.missed")
-                        log.error("document recognition did not answer in \(Int(documentDeadline)) s, reading with VN")
-                        gate.withLock { $0.missed(key) }
-                        publishAndRun()
-                    } catch {
-                        if OCRHealth.programsNotReady(error) { Trace.count("ocr.swift.notready") }
-                        log.error("document recognition failed: \(String(describing: error), privacy: .public), reading with VN")
+                    case let .fellBack(late):
+                        sent = late
                     }
                     reader = .lineGrouping
                 } else if wanted == .automatic {
@@ -97,38 +95,67 @@ enum TextRecognizer {
                     }
                 }
                 if reader == .documentLayout {
-                    do {
-                        let found = try await deadline(seconds: documentDeadline) { try await swiftBlocks(in: image, roi: roi, languages: languages, customWords: customWords) }
+                    switch await documentBlocks(in: image, roi: roi, languages: languages, customWords: customWords, key: key, client: client) {
+                    case let .found(found):
                         Trace.count("ocr.blocks.swift")
                         Trace.count("ocr.blocks.lines", found.reduce(0) { $0 + $1.lines.count })
                         return found
-                    } catch is Timeout {
-                        Trace.count("ocr.swift.missed")
-                        log.error("document recognition did not answer in \(Int(documentDeadline)) s, reading with VN")
-                        gate.withLock { $0.missed(key) }
-                        publishAndRun()
-                    } catch {
-                        if OCRHealth.programsNotReady(error) { Trace.count("ocr.swift.notready") }
-                        log.error("document recognition failed: \(String(describing: error), privacy: .public), reading with VN")
+                    case let .fellBack(late):
+                        sent = late
                     }
                 }
             }
+            // else: Docs cannot take the read now (`DocsRoute`, counted by the host): the grouper reads, and this lens reads again
+            // when Docs is ready.
         }
         Trace.count("ocr.blocks.vn")
         let lines: [OCRLine]
         if let read { lines = read } else { lines = try await accurate(in: image, roi: roi, languages: languages, customWords: customWords) }
+        // A document answer that came while the VN read ran is the better layout, and is here: use it, not the grouper's.
+        if let sent, case let .success(paragraphs)? = sent.answer {
+            ReaderClients.shared.served(client)
+            Trace.count("ocr.blocks.swift")
+            Trace.count("ocr.blocks.lines", paragraphs.reduce(0) { $0 + $1.count })
+            return paragraphs.map(makeBlock)
+        }
         Trace.count("ocr.blocks.lines", lines.count)
         return ParagraphGrouper.groups(lines, rect: \.rect, text: \.text).map(makeBlock)
     }
 
-    /// Warm document reads take 0.33-0.48 s (vision-revive, 2026-10-18).
-    private static let documentDeadline: Double = 8
-
-    private static func swiftBlocks(in image: CGImage, roi: CGRect?, languages: [Locale.Language], customWords: [String]) async throws -> [OCRBlock] {
-        try await exec(.doc, in: image, roi: roi, documentLanguages: languages, customWords: customWords).paragraphs.map(makeBlock)
+    /// What a document read came to for one pass.
+    private enum Document {
+        case found([OCRBlock])
+        /// The grouper reads. `late` is the request that did not answer in S and runs on (nil: none was sent, or it failed).
+        case fellBack(DocsRead?)
     }
 
-    struct Timeout: Error {}
+    /// The paragraphs of the Docs service for this picture, if it answers within S. Never cancels the request.
+    private static func documentBlocks(in image: CGImage, roi: CGRect?, languages: [Locale.Language], customWords: [String], key: String,
+                                       client: Int?) async -> Document {
+        let t = Trace.now
+        switch await DocsHost.shared.send(client: client, key: key, image: image, roi: roi, languages: languages, customWords: customWords) {
+        case .fallback:
+            return .fellBack(nil)
+        case let .sent(read):
+            switch await read.wait(seconds: DocsHost.patience) {
+            case let .success(paragraphs)?:
+                ReaderClients.shared.served(client)
+                Trace.mark("document read (Docs service)", since: t)
+                return .found(paragraphs.map(makeBlock))
+            case .failure?:
+                Trace.count("ocr.swift.failed")
+                ReaderClients.shared.fellBack(client)
+                return .fellBack(nil)
+            case nil:
+                // S passed: probably compiling. It runs on; its answer marks Docs ready for the lenses that stood in for it.
+                Trace.count("ocr.swift.missed")
+                ReaderClients.shared.fellBack(client)
+                return .fellBack(read)
+            }
+        }
+    }
+
+    typealias Timeout = ReadTimeout
 
     /// An accurate read that cannot be had: every recognizer for these languages is not answering (or none reads them). Not
     /// retried by the passes (a retry would only wait again); the user has been told (see `setNoticeHandler`).
@@ -163,13 +190,14 @@ enum TextRecognizer {
 
     // MARK: - Which recognizer reads
 
-    /// The Objective-C `VNRecognizeTextRequest` reads lines; paragraphs come from the Swift document model once it is loaded
-    /// (`gate`), else from those lines grouped by `ParagraphGrouper`. The Swift models are loaded by the app itself at launch
-    /// (`warmUp`): a cold compile takes 80-90 s and a VN revision 3 read in the same process waits for it, a warm one answers in
-    /// 0.3-0.5 s and does not disturb VN (tools/ocr-probe/mix.swift). Revision 3 is the one that can stall (a compile that hangs or
-    /// crawls, `OCRHealth`); the health below is that revision's.
+    /// The Objective-C `VNRecognizeTextRequest` reads lines in this process; paragraphs come from the document model of the Docs
+    /// service (`DocsHost`, a process of its own) once it is warm for the key, else from those lines grouped by `ParagraphGrouper`.
+    /// The models are loaded by the app itself at launch (`warmUp`): a cold compile takes 80-90 s and every Vision request of the
+    /// process that compiles it waits for it, so the document model compiles in the service and revision 3 (in this process) is
+    /// never behind it. A warm document read answers in 0.33-0.48 s. Revision 3 is the one that can stall here (a compile that
+    /// hangs or crawls, `OCRHealth`); the health below is that revision's.
     ///
-    /// `MWOYEO_OCR_PATH=vn|swift` for gates: `vn` never asks a Swift model, `swift` assumes the document model ready.
+    /// `MWOYEO_OCR_PATH=vn|swift` for gates: `vn` never asks Docs, `swift` assumes the document model warm for every key.
     private enum OCRPath { case vn, swift }
     private static let ocrPath: OCRPath? = switch ProcessInfo.processInfo.environment["MWOYEO_OCR_PATH"] {
     case "vn": .vn
@@ -177,12 +205,8 @@ enum TextRecognizer {
     default: nil
     }
 
-    /// The initialization steps and which keys may ask the Swift models (`SwiftVisionGate`); `VisionSetup` shows it.
-    private static let gate = OSAllocatedUnfairLock<SwiftVisionGate>(initialState: {
-        var g = SwiftVisionGate()
-        if ocrPath == .swift { g.assumeReady() }
-        return g
-    }())
+    /// The initialization steps (`SwiftVisionGate`); `VisionSetup` shows it. Whether a read may go to Docs is `DocsHost`'s to say.
+    private static let gate = OSAllocatedUnfairLock(initialState: SwiftVisionGate())
 
     /// The gate as it is now.
     static var setupState: SwiftVisionGate { gate.withLock { $0 } }
@@ -193,7 +217,7 @@ enum TextRecognizer {
         return codes.isEmpty ? SwiftVisionGate.anyLanguage : codes.joined(separator: ",")
     }
 
-    private static func languages(of key: String) -> [Locale.Language] {
+    static func languages(of key: String) -> [Locale.Language] {
         key == SwiftVisionGate.anyLanguage ? [] : key.split(separator: ",").map { Locale.Language(identifier: String($0)) }
     }
 
@@ -214,13 +238,6 @@ enum TextRecognizer {
             let more = i < rungs.count - 1
             switch rung {
             case .vision3:
-                // While a Swift model is compiling, a revision 3 read of this process waits for the compile: 37 s with revision 3
-                // warm and a cold Swift text model (vision-revive, 2026-10-18, /tmp/vision2/step0f.log), against 0.23 s when warm. So a read
-                // that has an older recognizer for its language goes there; one that has none waits (the notice tells).
-                if more, gate.withLock({ $0.isSwiftCompiling }) {
-                    Trace.count("ocr.fallback.swiftcompiling")
-                    continue
-                }
                 switch health.withLock({ $0.plan(canFallBack: more, now: Trace.now) }) {
                 case .refuse:
                     throw stalled(languages)
@@ -309,10 +326,10 @@ enum TextRecognizer {
     }
 
     /// The initialization, at every launch: for the key of `languages`, `SwiftVisionGate.Step`s in order, in the background and to
-    /// completion (a load is never cancelled): revision 3 on a drawn wide line (given the cold allowance; reads that come meanwhile
-    /// do not queue behind it unless nothing else can read their language), then the Swift document model, then the Swift text
-    /// model. A failed step is not retried here: the next launch or `retry()` does (a first missed document deadline is not a
-    /// failure: `SwiftVisionGate.missed`). Tells the user nothing (`VisionSetup` is what a screen reads).
+    /// completion (a load is never cancelled): revision 3 on a drawn wide line in this process (given the cold allowance; reads that
+    /// come meanwhile do not queue behind it unless nothing else can read their language), then the document model, which the Docs
+    /// service compiles (`DocsHost.warm`), so that nothing in this process waits for it. A failed step is not retried here: the next
+    /// launch or `retry()` does. Tells the user nothing (`VisionSetup` is what a screen reads).
     static func warmUp(languages: [Locale.Language] = []) async {
         gate.withLock { $0.want(key(languages)) }
         await runSteps()
@@ -347,30 +364,11 @@ enum TextRecognizer {
             try await askingAgainWhileNotReady {
                 _ = try await tracked(OCRHealth.coldWait) { try await exec(.warmLines, in: nil, roi: nil) }
             }
-        case .documentModel where readsViaXPC:
-            // The Docs service compiles it, in its own process: no read of this one waits for the compile, as with the child.
-            gate.withLock { $0.childPhase(true) }
-            defer { gate.withLock { $0.childPhase(false) } }
-            try await askingAgainWhileNotReady {
-                _ = try await exec(.warmDoc, in: nil, roi: nil, documentLanguages: languages(of: due.key))
-            }
-        case .swiftTextModel where readsViaXPC:
-            // Nothing reads with `RecognizeTextRequest`: through the services the step has no model to load (R3 removes it).
-            break
-        case .documentModel, .swiftTextModel:
-            // The compile (80-90 s cold) runs in a child process, where no read of this process waits for it; the load here
-            // afterwards finds the model in the system's cache (under 2 s). If no child can be started, it is loaded here.
-            gate.withLock { $0.childPhase(true) }
-            let outcome = await SwiftVisionChild.run(step: due.step, key: due.key)
-            gate.withLock { $0.childPhase(false) }
-            if case let .failed(message) = outcome { throw ChildFailure(message: message) }
-            let began = Trace.now
-            try await loadSwiftModel(step: due.step, key: due.key)
-            Trace.mark("vision setup \(due.step.rawValue) [\(due.key)] in this process, child \(outcome == .loaded ? "loaded" : "unavailable"),", since: began)
+        case .documentModel:
+            // The Docs service compiles it, in its own process: no read of this one waits for the compile.
+            try await DocsHost.shared.warm(key: due.key, languages: languages(of: due.key))
         }
     }
-
-    private struct ChildFailure: Error, CustomStringConvertible { let message: String; var description: String { message } }
 
     /// "Programs not ready" is a transient (OCRHealth): a model load asks again every few seconds, within the cold allowance.
     private static func askingAgainWhileNotReady(_ load: () async throws -> Void) async throws {
@@ -383,25 +381,6 @@ enum TextRecognizer {
                 Trace.count("ocr.setup.notready")
                 try await Task.sleep(for: .seconds(OCRHealth.notReadyRetryEvery))
             }
-        }
-    }
-
-    /// Loads the Swift model of `step` for `key` on the drawn picture (the app's own load, and the child's).
-    static func loadSwiftModel(step: SwiftVisionGate.Step, key: String) async throws {
-        guard let picture = probePicture else { throw Stalled() }
-        let languages = languages(of: key)
-        switch step {
-        case .textModel:
-            break
-        case .documentModel:
-            try await askingAgainWhileNotReady {
-                _ = try await exec(.warmDoc, in: nil, roi: nil, documentLanguages: languages)
-            }
-        case .swiftTextModel:
-            var req = RecognizeTextRequest()
-            req.recognitionLevel = .accurate
-            if languages.isEmpty { req.automaticallyDetectsLanguage = true } else { req.recognitionLanguages = languages }
-            try await askingAgainWhileNotReady { _ = try await req.perform(on: picture) }
         }
     }
 
@@ -588,14 +567,14 @@ enum TextRecognizer {
 
     // MARK: Where a read runs
 
-    /// `MWOYEO_READER=xpc` sends the reads to the reader services (`ReaderConnection`, the Lines and Docs processes of the app
-    /// bundle); otherwise Vision runs in this process, as it always did. Routing, health and the hint stay as they are: R3
-    /// makes the services the only path.
+    /// `MWOYEO_READER=xpc` sends the line reads to the Lines service (`ReaderConnection`, a process of the app bundle); otherwise
+    /// Vision runs in this process, as it always did. The document reads always go to the Docs service (`DocsHost`), whatever this
+    /// says. Routing and health of the lines stay as they are: moving Lines is 1.1.3.
     private static let readsViaXPC = ProcessInfo.processInfo.environment["MWOYEO_READER"] == "xpc"
 
     /// `MWOYEO_TRACE_READS=1` prints the lines of every read (kind, size, region, then one record per line: text, rect, word
     /// rects) on stderr: what `tools/ocr-probe/same-lines.py` compares between two runs.
-    private static let traceReads = ProcessInfo.processInfo.environment["MWOYEO_TRACE_READS"] != nil
+    static let traceReads = ProcessInfo.processInfo.environment["MWOYEO_TRACE_READS"] != nil
 
     /// One read of `kind`, here or in a service. The warm-up kinds take no picture. A region with no pixel in the picture reads
     /// nothing, and does not cross to a service.
@@ -611,14 +590,13 @@ enum TextRecognizer {
             out = try await VisionExec.run(kind, image: image, roi: roi, languages: languages, documentLanguages: documentLanguages,
                                            customWords: customWords)
         }
-        if traceReads { printRead(kind, image: image, roi: roi, out) }
+        if traceReads { printRead(kind, size: image.map { "\($0.width)x\($0.height)" } ?? "probe", roi: roi, out) }
         return out
     }
 
-    private static func printRead(_ kind: ReadKind, image: CGImage?, roi: CGRect?, _ out: VisionExec.Output) {
+    static func printRead(_ kind: ReadKind, size: String, roi: CGRect?, _ out: VisionExec.Output) {
         func field(_ s: String) -> String { s.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\t", with: "\\t").replacingOccurrences(of: "\n", with: "\\n") }
         func rect(_ r: CGRect) -> String { "\(r.minX)\t\(r.minY)\t\(r.width)\t\(r.height)" }
-        let size = image.map { "\($0.width)x\($0.height)" } ?? "probe"
         var text = "[read]\t\(kind.rawValue)\tbegin\t\(size)\t\(roi.map { "\($0)" } ?? "-")\t\(out.lines.count)\n"
         for (p, lines) in out.paragraphs.enumerated() {
             for line in lines {

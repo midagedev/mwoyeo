@@ -144,6 +144,23 @@ import Testing
         #expect(!H.passFailureIsTransient(CancellationError()))
     }
 
+    /// 2026-10-18 (r3-docs-xpc): a read that did not answer in time was a failure the pass ran again at once (`seamlessPass` returned
+    /// false and the loop went round, `fastPass` returned and `run` went round) on the process that had just not answered. It is a
+    /// transient now, so `ReadBackoff` makes the pass wait 1 s, 2 s, 4 s … 30 s (design F5, §4.8).
+    @Test func aReadThatTimedOutIsATransientAndWaitsItsBackoff() {
+        #expect(H.passFailureIsTransient(ReadTimeout()))
+        var backoff = ReadBackoff()
+        var waits: [TimeInterval] = []
+        var t: TimeInterval = 100
+        for _ in 0..<6 {
+            let wait = backoff.failure(now: t, transient: H.passFailureIsTransient(ReadTimeout()))
+            waits.append(wait)
+            #expect(backoff.isWaiting(now: t))
+            t += wait
+        }
+        #expect(waits == [1, 2, 4, 8, 16, 30])
+    }
+
     @Test func notReadySendsReadsDownTheLadderForFiveSecondsThenAsksAgain() {
         var h = H()
         let id = h.begin(now: 100)

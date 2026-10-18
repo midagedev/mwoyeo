@@ -277,24 +277,21 @@ enum ReaderCheck {
         }
         await show("after \(reads) reads of each")
         print("check: footprint reads rev3 p50=\(percentile(lineMs, 0.5)) ms p95=\(percentile(lineMs, 0.95)) ms; doc p50=\(percentile(docMs, 0.5)) ms p95=\(percentile(docMs, 0.95)) ms")
-        // The same reads in this process, and the packing alone: what the hop costs is the difference.
-        let languageValue = Locale.Language(identifier: language)
-        var localLines: [Double] = [], localDoc: [Double] = [], pack: [Double] = []
+        // The same line read in this process, and the packing alone: what the hop costs is the difference (a document read has no
+        // in-process time: the app cannot run one any more).
+        var localLines: [Double] = [], pack: [Double] = []
         for _ in 0..<reads {
             var t = Date()
             _ = try VisionExec.readLines(.rev3, in: image, roi: nil, languages: ids, customWords: [])
             localLines.append(msFine(t))
             t = Date()
-            _ = try await VisionExec.documentLines(in: image, roi: nil, languages: [languageValue], customWords: [])
-            localDoc.append(msFine(t))
-            t = Date()
             _ = ReaderPixels.surface(from: image)
             pack.append(msFine(t))
         }
         func p50(_ v: [Double]) -> Double { v.sorted()[v.count / 2] }
-        print(String(format: "check: latency %dx%d (%.1f MB) rev3 xpc %.1f in-process %.1f hop %.1f ms; doc xpc %.1f in-process %.1f hop %.1f ms; packing alone %.2f ms",
+        print(String(format: "check: latency %dx%d (%.1f MB) rev3 xpc %.1f in-process %.1f hop %.1f ms; doc xpc %.1f ms; packing alone %.2f ms",
                      image.width, image.height, Double(image.width * image.height * 4) / 1e6, p50(lineMs), p50(localLines), p50(lineMs) - p50(localLines),
-                     p50(docMs), p50(localDoc), p50(docMs) - p50(localDoc), p50(pack)))
+                     p50(docMs), p50(pack)))
         try verdict("footprint", true)
     }
 
@@ -322,8 +319,9 @@ enum ReaderCheck {
             func add(_ key: String, _ v: Double) { samples[key, default: []].append(v) }
             func runLocal() async throws {
                 let t = Date()
-                if kind == .rev3 { _ = try VisionExec.readLines(.rev3, in: image, roi: nil, languages: ids, customWords: []) } else { _ = try await VisionExec.documentLines(in: image, roi: nil, languages: [doc], customWords: []) }
-                add("local", msFine(t))
+                // The app has no document read of its own any more (r3-docs-xpc): only the line kinds have an in-process time.
+                if kind == .rev3 { _ = try VisionExec.readLines(.rev3, in: image, roi: nil, languages: ids, customWords: []) }
+                add("local", kind == .rev3 ? msFine(t) : 0)
             }
             func runRemote(_ name: String, surface: IOSurface?, bytes: Data?) async throws {
                 let t = Date()
@@ -410,8 +408,10 @@ enum ReaderCheck {
                 runs.append(lineRun("fast@docs", .fast, ids, role: .docs))
             }
         }
+        // The app has no in-process document read any more (r3-docs-xpc): the reference of this run is the service's own earlier answer
+        // (repeatability). The equivalence with the in-process read was proved by R1 (55/55) and across binaries by reader-equal.sh.
         runs.append(Run(label: "doc",
-                        local: { .paragraphs(try await VisionExec.documentLines(in: image, roi: nil, languages: [doc], customWords: [])) },
+                        local: { try await ReaderConnection.shared(.docs).read(.doc, image: image, roi: nil, documentLanguages: [doc]) },
                         remote: { try await ReaderConnection.shared(.docs).read(.doc, image: image, roi: nil, documentLanguages: [doc]) },
                         remotePixelBuffer: { try await ReaderConnection.shared(.docs).read(.doc, pixelBuffer: $0, roi: nil, documentLanguages: [doc]) }))
         return runs

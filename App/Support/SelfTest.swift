@@ -930,10 +930,12 @@ extension SelfTest {
             return counts
         }
 
-        /// Waits until nothing is in flight (the host's `inFlight`, else today's), 180 s at most. `--max-wait` does not shorten it: a run
+        /// Waits until nothing is in flight (the host's `inFlight` plus today's), 180 s at most. `--max-wait` does not shorten it: a run
         /// that gave up waiting (a settle that hit its bound behind a compile) is the one that would exit mid-compile.
         func drain() async -> (ms: Int, inFlight: Int) {
-            let inFlight = SelfTest.hooks.inFlight ?? { [self] in await todaysInFlight() }
+            // The host's requests (the Docs service) and what this process still runs itself (the text model's load, a revision 3
+            // request past its deadline): both, because Lines is not hosted yet (r3-docs-xpc).
+            let inFlight: @Sendable () async -> Int = { [self] in await (SelfTest.hooks.inFlight?() ?? 0) + todaysInFlight() }
             let began = Date(), bound = 180.0
             var n = await inFlight()
             while n > 0, Date().timeIntervalSince(began) < bound {

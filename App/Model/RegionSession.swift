@@ -24,7 +24,7 @@ final class RegionSession {
     /// "Show Original" is the app's, not this lens's: the menu item asks the app.
     var onToggleOriginal: (() -> Void)?
 
-    private let capturer = RegionCapturer()
+    private let capturer: any ScreenCapturing
     /// Where the capture's frames go (the check-logic harness feeds it).
     var frameSink: (@Sendable (CapturedFrame) -> Void)? { capturer.onFrame }
     private let pipeline: RegionPipeline
@@ -48,6 +48,29 @@ final class RegionSession {
     private var dragging = false
     private var captureUpdateRunning = false
     private var captureUpdatePending = false
+    /// The next pass of the capture's updates starts the stream again instead of reconfiguring it.
+    private var captureRestartPending = false
+    /// What the capture does when it stops or the displays change (`CaptureRecovery`), and its state: restarts tried since the stream
+    /// last ran healthy, when it last started, whether a restart is waiting or running, the display event settling.
+    private let policy: CaptureRecoveryPolicy
+    private var restartsTried = 0
+    private var captureStartedAt: TimeInterval = 0
+    private var recovering = false
+    private var recoveryTask: Task<Void, Never>?
+    private var displayTask: Task<Void, Never>?
+    private var pendingDisplayEvent: CaptureEvent?
+    private var stopped = false
+    /// The displays now; the check harness lays others out.
+    var layoutProvider: @MainActor () -> DisplayLayout = { .current }
+    /// What the recovery has done, for the check harness and the debug counters (`capture.restart`, `capture.moved`, `capture.gaveup`).
+    struct RecoveryStats: Equatable {
+        var restarts = 0
+        var moves = 0
+        var gaveUp = 0
+    }
+    private(set) var recoveryStats = RecoveryStats()
+    /// The capture is down and nothing is about to start it again: the menu bar icon says so (`MenuBarIcon`).
+    var needsAttention: Bool { errorMessage != nil && !recovering }
     /// Captured rect, global Quartz points; contains `config.rect` (the visible lens).
     private var capture: CGRect
     private var wideMargins = false
@@ -77,7 +100,10 @@ final class RegionSession {
     /// Hands the pipeline's snapshots to the session once it exists (the pipeline is built inside `init`).
     @MainActor private final class SnapshotTap { var handler: ((OverlaySnapshot) -> Void)? }
 
-    init(config: RegionConfig, settings: AppSettings, translator: TranslationService, inpainter: Inpainter?) {
+    init(config: RegionConfig, settings: AppSettings, translator: TranslationService, inpainter: Inpainter?,
+         capturer: any ScreenCapturing = RegionCapturer(), recovery: CaptureRecoveryPolicy = .standard) {
+        self.capturer = capturer
+        self.policy = recovery
         self.config = config
         self.fps = settings.framesPerSecond
         self.settings = settings
@@ -123,16 +149,16 @@ final class RegionSession {
         onChange?()
     }
 
-    private func startCapture() async {
+    /// Starts the capture (`start` does, and the checks, which have no windows to bring up).
+    func startCapture() async {
         do {
             try await capturer.start(rect: capture, fps: fps)
+            captureStartedAt = ProcessInfo.processInfo.systemUptime
             errorMessage = nil
             captureFailure = nil
             chrome.sweep()
         } catch {
-            errorMessage = String(localized: "Couldn’t start capturing: \(error.localizedDescription)")
-            captureFailure = Self.failure(of: error)
-            log.error("capture start failed: \(error.localizedDescription)")
+            captureFailed(error)
         }
         refreshHint()
     }
@@ -150,6 +176,10 @@ final class RegionSession {
     }
 
     func stop() async {
+        stopped = true
+        recovering = false
+        recoveryTask?.cancel()
+        displayTask?.cancel()
         trackTimer?.invalidate()
         trackTimer = nil
         calmTimer?.invalidate()
@@ -255,13 +285,118 @@ final class RegionSession {
     }
 
     private func captureStopped(_ error: Error?) {
-        guard let error else { return }
+        guard let error, !stopped else { return }
         errorMessage = error.localizedDescription
         captureFailure = Self.failure(of: error)
         // A revoked grant ends the stream: the hint depends on whether it still stands.
         AppModel.shared.recheckPermission()
+        // A stream that ran healthy for a while starts a new episode; one that stops soon after a restart goes on down the backoff.
+        if ProcessInfo.processInfo.systemUptime - captureStartedAt > policy.healthy { restartsTried = 0 }
+        recover(.streamStopped(Self.stop(of: error)))
         refreshHint()
         onChange?()
+    }
+
+    /// A capture that could not start or restart: the lens says what failed (the menu panel shows it) and `recover` decides about trying again.
+    private func captureFailed(_ error: Error) {
+        errorMessage = String(localized: "Couldn’t start capturing: \(error.localizedDescription)")
+        captureFailure = Self.failure(of: error)
+        log.error("capture start failed: \((error as NSError).domain, privacy: .public) \((error as NSError).code) \(error.localizedDescription)")
+        recover(.streamStopped(Self.stop(of: error)))
+    }
+
+    /// A capture that runs: whatever was wrong is over.
+    private func captureRecovered() {
+        captureStartedAt = ProcessInfo.processInfo.systemUptime
+        recovering = false
+        guard errorMessage != nil || captureFailure != nil else { return }
+        errorMessage = nil
+        captureFailure = nil
+        refreshHint()
+        onChange?()
+    }
+
+    private static func stop(of error: Error) -> CaptureStop {
+        let e = error as NSError
+        return CaptureStop.classify(domain: e.domain, code: e.code)
+    }
+
+    // MARK: - Capture recovery
+
+    /// The Mac woke or its displays changed (`DisplayWatcher`). A wake or an undock comes as a burst, and the displays are not all back at once:
+    /// it is looked at after `policy.settle` seconds of quiet, once.
+    func displaysChanged(_ event: CaptureEvent) {
+        guard !stopped else { return }
+        // A wake outranks a change of displays: it restarts the capture whatever the displays did.
+        if event == .wake || pendingDisplayEvent == nil { pendingDisplayEvent = event }
+        displayTask?.cancel()
+        displayTask = Task { [weak self, settle = policy.settle] in
+            try? await Task.sleep(for: .seconds(settle))
+            guard !Task.isCancelled, let self, !self.stopped, let event = self.pendingDisplayEvent else { return }
+            self.pendingDisplayEvent = nil
+            self.displayTask = nil
+            self.recover(event)
+        }
+    }
+
+    /// Carries out what `CaptureRecovery.decide` says about `event`: starts the capture again (after the backoff for a stop), or moves a lens
+    /// whose display is gone and starts it there.
+    private func recover(_ event: CaptureEvent) {
+        guard !stopped else { return }
+        if event == .wake || event == .screensChanged { restartsTried = 0 }
+        let action = CaptureRecovery.decide(event, lens: config.rect, followsWindow: config.anchor != nil, streamDisplay: capturer.streamDisplay,
+                                            layout: layoutProvider(), failures: restartsTried, policy: policy)
+        switch action {
+        case .nothing:
+            guard case .streamStopped = event else { return }
+            recovering = false
+            // Not for the grant or the person's own stop: nothing was tried, nothing is given up.
+            if case .streamStopped(.other) = event {
+                recoveryStats.gaveUp += 1
+                Trace.count("capture.gaveup")
+                log.error("capture recovery gave up after \(self.restartsTried) restarts")
+            }
+            onChange?()
+        case let .restart(after):
+            if case .streamStopped = event { restartsTried += 1 }
+            scheduleRestart(after: after)
+        case let .move(to):
+            relocate(to: to)
+            scheduleRestart(after: 0)
+        }
+    }
+
+    private func scheduleRestart(after delay: TimeInterval) {
+        recovering = true
+        recoveryTask?.cancel()
+        recoveryTask = Task { [weak self] in
+            if delay > 0 { try? await Task.sleep(for: .seconds(delay)) }
+            guard !Task.isCancelled, let self, !self.stopped else { return }
+            self.recoveryTask = nil
+            self.recoveryStats.restarts += 1
+            Trace.count("capture.restart")
+            self.scheduleCaptureUpdate(restart: true)
+        }
+    }
+
+    /// The lens's display is gone: the lens goes to `rect` on another one, with its capture, overlay and chrome.
+    private func relocate(to rect: CGRect) {
+        guard rect != config.rect else { return }
+        log.notice("lens display gone: moved from \(NSStringFromRect(self.config.rect)) to \(NSStringFromRect(rect))")
+        recoveryStats.moves += 1
+        Trace.count("capture.moved")
+        config.rect = rect
+        capture = Self.overscan(rect, wide: wideMargins, in: layoutProvider())
+        let frame = ScreenGeometry.appKitRect(fromQuartz: rect)
+        panel.slide(to: frame)
+        chrome.setRegion(frame)
+        let moved = capture
+        Task { [pipeline] in
+            await pipeline.captureResized(to: moved)
+            await pipeline.setVisible(rect)
+        }
+        onConfigChange?(config)
+        showNotice(String(localized: "Moved to the main display"))
     }
 
     // MARK: - What the pill says
@@ -512,18 +647,21 @@ final class RegionSession {
 
     // MARK: - Overscan
 
-    /// The lens's display, Quartz points.
-    private static func display(of lens: CGRect) -> CGRect {
-        ScreenGeometry.screen(for: lens).map { ScreenGeometry.quartzRect(fromAppKit: $0.frame) } ?? lens
+    /// The lens's display, Quartz points (the lens itself where no display shows any of it).
+    private static func display(of lens: CGRect, in layout: DisplayLayout) -> CGRect {
+        layout.display(showing: lens) ?? lens
     }
 
-    static func overscan(_ lens: CGRect, wide: Bool) -> CGRect {
-        Overscan.rect(around: lens, wide: wide, display: display(of: lens))
+    private func display(of lens: CGRect) -> CGRect { Self.display(of: lens, in: layoutProvider()) }
+
+    /// `layout`: the displays as the session sees them (`layoutProvider`); nil at construction, when the real ones are looked at.
+    static func overscan(_ lens: CGRect, wide: Bool, in layout: DisplayLayout? = nil) -> CGRect {
+        Overscan.rect(around: lens, wide: wide, display: display(of: lens, in: layout ?? .current))
     }
 
     private func fitCapture(allowResize: Bool) {
         let lens = config.rect
-        switch Overscan.plan(lens: lens, capture: capture, wide: wideMargins, allowResize: allowResize, display: Self.display(of: lens), lead: lead) {
+        switch Overscan.plan(lens: lens, capture: capture, wide: wideMargins, allowResize: allowResize, display: display(of: lens), lead: lead) {
         case .keep: break
         case .move(let r):
             capture = r
@@ -599,14 +737,21 @@ final class RegionSession {
     }
 
     /// Coalesces capture reconfiguration: at most one in flight, always ending on the latest rect.
-    private func scheduleCaptureUpdate() {
+    private func scheduleCaptureUpdate(restart: Bool = false) {
+        if restart { captureRestartPending = true }
         guard !captureUpdateRunning else { captureUpdatePending = true; return }
         captureUpdateRunning = true
         Task {
             repeat {
                 captureUpdatePending = false
-                do { try await capturer.update(rect: capture, fps: fps) } catch {
-                    log.error("capture update failed: \(error.localizedDescription)")
+                let restarting = captureRestartPending
+                captureRestartPending = false
+                do {
+                    if restarting { try await capturer.start(rect: capture, fps: fps) } else { try await capturer.update(rect: capture, fps: fps) }
+                    captureRecovered()
+                } catch {
+                    log.error("capture \(restarting ? "restart" : "update") failed: \(error.localizedDescription)")
+                    if !stopped { captureFailed(error); onChange?() }
                 }
             } while captureUpdatePending
             captureUpdateRunning = false
@@ -672,7 +817,7 @@ final class RegionSession {
         panel.move(to: frame)      // content moved with the window: blocks move along
         chrome.setRegion(frame)
         // The capture moves with the window too (slid back onto the display if it would leave it).
-        let moved = Self.overscan(target, wide: wideMargins)
+        let moved = Self.overscan(target, wide: wideMargins, in: layoutProvider())
         if moved.size == capture.size {
             capture = moved
             Task { await pipeline.captureMoved(to: moved.origin, contentDelta: delta); scheduleCaptureUpdate() }

@@ -65,6 +65,8 @@ final class AppModel {
     @ObservationIgnored private var sessions: [UUID: RegionSession] = [:]
     @ObservationIgnored private(set) var inpainter: Inpainter?
     @ObservationIgnored private let picker = RegionPicker()
+    /// Hears the Mac wake and the displays change, for the lenses' captures (`CaptureRecovery`).
+    @ObservationIgnored private var displayWatcher: DisplayWatcher?
     @ObservationIgnored private var picking = false
     /// The one-shot that looks at the lens hints again when the text recognizer's setup has run long enough to show.
     @ObservationIgnored private var setupClock: Timer?
@@ -162,6 +164,7 @@ final class AppModel {
         NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.sessions.values.forEach { $0.finishTranscript(wait: true) } }
         }
+        displayWatcher = DisplayWatcher { [weak self] event in self?.displaysChanged(event) }
         Updates.shared.schedule(enabled: settings.checksForUpdates)
         startWatchingFrontmostApp()
         ImageTranslation.shared.openFromLaunchArguments()
@@ -173,6 +176,11 @@ final class AppModel {
         await translator.prewarm()
         inpainter = await Task.detached(priority: .userInitiated) { Inpainter.load() }.value
         inpaintingAvailable = inpainter != nil
+        // The warm-up starts at launch, granted or not, and stays so (lens-robust, 2026-10-18; tools/ocr-probe/relaunch-cold.sh). A relaunch
+        // restarts the cold compile (killed at 30 s: 62.0 s after the relaunch, against 64.3 s undisturbed), so one could wait for the
+        // grant of Screen Recording. Waiting never shortens a first wait: someone who must relaunch after granting pays the 64 s from the
+        // relaunch either way (the compile of the first process is lost in both), and someone who need not relaunch pays the time they
+        // took to grant on top of it. Someone who granted before launching starts it at once in both.
         Self.warmUpVision(settings.sourceLanguage)
 
         if !settings.hasCompletedOnboarding || !hasScreenPermission {
@@ -213,6 +221,20 @@ final class AppModel {
     /// real picture comes (`TextRecognizer.warmUp`).
     static func loadVision(source: String = "auto") async {
         await TextRecognizer.warmUp(languages: source == "auto" ? [] : [Locale.Language(identifier: source)])
+    }
+
+    /// The Mac woke or its displays changed: every lens looks at its capture once things have settled.
+    private func displaysChanged(_ event: CaptureEvent) {
+        sessions.values.forEach { $0.displaysChanged(event) }
+    }
+
+    /// A lens needs the person: Screen Recording is missing for lenses that are on, or a lens's capture is down for good. The menu bar
+    /// icon wears a badge for it (`MenuBarIcon`).
+    var lensNeedsAttention: Bool {
+        _ = sessionTick   // the sessions are not observed: their changes bump this
+        let enabled = regions.filter(\.isEnabled).count
+        return !isPaused && MenuBarIcon.needsAttention(permissionGranted: hasScreenPermission, enabledLenses: enabled,
+                                                       lensesDown: sessions.values.filter(\.needsAttention).count)
     }
 
     func recheckPermission() {
@@ -348,6 +370,16 @@ final class AppModel {
 
     private func startSession(_ config: RegionConfig) async {
         guard sessions[config.id] == nil else { return }
+        // A saved lens may have been left on a display this Mac no longer has (an unplugged one, a smaller resolution): it comes up on the
+        // main display instead of off every screen.
+        var config = config
+        var moved = false
+        if case let .move(to) = CaptureRecovery.decide(.launch, lens: config.rect, followsWindow: config.anchor != nil, streamDisplay: nil,
+                                                       layout: .current, failures: 0) {
+            config.rect = to
+            moved = true
+            if let i = regions.firstIndex(where: { $0.id == config.id }) { regions[i].rect = to }
+        }
         let s = RegionSession(config: config, settings: effectiveSettings, translator: translator, inpainter: inpainter)
         s.onChange = { [weak self] in self?.sessionTick += 1 }
         s.onConfigChange = { [weak self] updated in
@@ -361,6 +393,7 @@ final class AppModel {
         sessions[config.id] = s
         s.setTranslationsVisible(translationsVisible)
         await s.start()
+        if moved { s.showNotice(String(localized: "Moved to the main display")) }
     }
 
     // MARK: - Engines

@@ -138,6 +138,8 @@ enum UICapture {
             case "image-window": await imageWindow(name, showOriginal: false)
             case "image-window-original": await imageWindow(name, showOriginal: true)
             case "check-logic": await checkLogic()
+            case "inpaint-footprint": await LensRobustChecks.inpaintFootprint()
+            case "menu-icon": LensRobustChecks.menuIcon(into: out.appendingPathComponent("menu-icon.png"))
             case "sheet-pick": await shoot(name, EngineSheet(), CGSize(width: 480, height: 560))
             case "sheet-config":
                 let setup = EngineShare.encode(engine("Gemini", mock, "mock-model"))
@@ -352,6 +354,7 @@ enum UICapture {
             check("the corners style sits between subtle and minimal", LensStyle.allCases == [.glow, .subtle, .corners, .minimal])
             failed += await firstRunChecks()
             failed += SettingsFileChecks.run(model)
+            failed += await LensRobustChecks.run(model)
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
         }
 

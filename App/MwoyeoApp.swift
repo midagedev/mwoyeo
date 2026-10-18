@@ -40,9 +40,13 @@ struct MwoyeoApp: App {
             MenuPanel()
                 .environment(model)
         } label: {
-            Image(systemName: menuSymbol)
-                .accessibilityLabel("Mwoyeo")
-                .background(SettingsOpener())
+            // The icon the system draws from the symbol, until a lens is down: then the same symbol with a badge, drawn here.
+            Group {
+                if icon.badge { Image(nsImage: MenuBarIconImage.badged(icon.symbol)) } else { Image(systemName: icon.symbol) }
+            }
+            // English only: the accessibility text of an error state is not part of the translated copy.
+            .accessibilityLabel(icon.badge ? Text(verbatim: "Mwoyeo, a lens needs attention") : Text("Mwoyeo"))
+            .background(SettingsOpener())
         }
         .menuBarExtraStyle(.window)
 
@@ -52,10 +56,9 @@ struct MwoyeoApp: App {
         }
     }
 
-    private var menuSymbol: String {
-        if model.isPaused { return "pause.circle" }
-        if !model.translationsVisible { return "eye.slash" }
-        return model.regions.contains(where: \.isEnabled) ? "text.viewfinder" : "viewfinder"
+    private var icon: MenuBarIcon {
+        MenuBarIcon(paused: model.isPaused, translationsVisible: model.translationsVisible,
+                    hasLens: model.regions.contains(where: \.isEnabled), needsAttention: model.lensNeedsAttention)
     }
 }
 

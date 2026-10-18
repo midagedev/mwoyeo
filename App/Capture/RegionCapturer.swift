@@ -5,10 +5,21 @@ import MwoyeoCore
 import ScreenCaptureKit
 import os
 
+/// What a lens session needs of its capture (`RegionCapturer`; the check harness stands another in, to stop and fail it on demand).
+protocol ScreenCapturing: AnyObject {
+    var onFrame: (@Sendable (CapturedFrame) -> Void)? { get set }
+    var onStop: (@Sendable (Error?) -> Void)? { get set }
+    /// The frame of the display the stream runs on (Quartz points); nil while no stream runs.
+    var streamDisplay: CGRect? { get }
+    func start(rect: CGRect, fps: Double) async throws
+    func update(rect: CGRect, fps: Double) async throws
+    func stop() async
+}
+
 /// Streams one screen rectangle with ScreenCaptureKit. Mwoyeo's own windows (the overlays) are excluded,
 /// so it always sees the original content underneath. ScreenCaptureKit only delivers frames when pixels
 /// change, so a static region costs nothing.
-final class RegionCapturer: NSObject, SCStreamOutput, SCStreamDelegate, @unchecked Sendable {
+final class RegionCapturer: NSObject, SCStreamOutput, SCStreamDelegate, ScreenCapturing, @unchecked Sendable {
     enum CaptureError: LocalizedError {
         case displayNotFound
         var errorDescription: String? { String(localized: "Can’t find the display this lens is on.") }
@@ -49,6 +60,8 @@ final class RegionCapturer: NSObject, SCStreamOutput, SCStreamDelegate, @uncheck
     }
 
     private var displayFrame: CGRect = .zero
+
+    var streamDisplay: CGRect? { stream == nil ? nil : displayFrame }
 
     /// Moves/resizes the captured rect without restarting (same display).
     func update(rect: CGRect, fps: Double) async throws {
@@ -149,8 +162,14 @@ final class RegionCapturer: NSObject, SCStreamOutput, SCStreamDelegate, @uncheck
     // MARK: - SCStreamDelegate
 
     func stream(_ stream: SCStream, didStopWithError error: Error) {
-        log.error("stream stopped: \(error.localizedDescription)")
-        if self.stream === stream { self.stream = nil }
+        let e = error as NSError
+        // A stream this capturer already replaced or stopped says nothing about the one that runs now.
+        guard self.stream === stream else {
+            log.notice("an old stream stopped: \(e.domain, privacy: .public) \(e.code)")
+            return
+        }
+        log.error("stream stopped: \(e.domain, privacy: .public) \(e.code) \(error.localizedDescription)")
+        self.stream = nil
         onStop?(error)
     }
 }

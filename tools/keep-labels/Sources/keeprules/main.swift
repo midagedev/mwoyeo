@@ -6,6 +6,8 @@ import MwoyeoCore
 // TranslationService.translate, ProtectedSpans): InlineMath.spans, isFormula, isMathHeavy, isIdentifier, isLiteral, needsTranslation.
 // {"id","spans":[[start,end]...] (Characters, as InlineMath counts), "formula","mathHeavy","identifier","literal","needs","share","signs"}
 // `needs` is TranslationFilter.needsTranslation(text, cjkSource) with cjkSource true for a block whose "lang" is ko, ja or zh*.
+// With KEEP_FEED=<regionfeed output> every record also carries "region": CodeRegion.keep run on the blocks of the block's read (one picture, one
+// read, in reading-list order), the reason it keeps the block or null.
 
 func json(_ s: String) -> String {
     var o = "\""
@@ -18,6 +20,36 @@ func json(_ s: String) -> String {
     }
     return o + "\""
 }
+
+/// CodeRegion on every (picture, read) of the feed: block id -> reason.
+func regions(feedPath: String) -> [String: String] {
+    guard let data = FileManager.default.contents(atPath: feedPath), let text = String(data: data, encoding: .utf8) else {
+        FileHandle.standardError.write(Data("cannot read \(feedPath)\n".utf8)); exit(1)
+    }
+    struct Row { var idx: Int; var id: String; var block: CodeRegion.Block; var frame: RGBA }
+    var groups: [String: [Row]] = [:]
+    for line in text.split(separator: "\n") {
+        guard let o = try? JSONSerialization.jsonObject(with: Data(line.utf8)) as? [String: Any], let id = o["id"] as? String, let pic = o["pic"] as? String,
+              let read = o["read"] as? String, let idx = o["idx"] as? Int, let r = o["r"] as? [Double], let t = o["t"] as? String,
+              let bg = o["bg"] as? [Int], let frame = o["frame"] as? [Int], let ls = o["lines"] as? [[String: Any]] else { continue }
+        let lines = ls.compactMap { l -> CodeRegion.Line? in
+            guard let lr = l["r"] as? [Double], let lt = l["t"] as? String else { return nil }
+            return CodeRegion.Line(text: lt, rect: CGRect(x: lr[0], y: lr[1], width: lr[2], height: lr[3]))
+        }
+        let block = CodeRegion.Block(text: t, rect: CGRect(x: r[0], y: r[1], width: r[2], height: r[3]), lines: lines,
+                                     background: RGBA(UInt8(bg[0]), UInt8(bg[1]), UInt8(bg[2])))
+        groups["\(pic)|\(read)", default: []].append(Row(idx: idx, id: id, block: block, frame: RGBA(UInt8(frame[0]), UInt8(frame[1]), UInt8(frame[2]))))
+    }
+    var out: [String: String] = [:]
+    for rows in groups.values {
+        let sorted = rows.sorted { $0.idx < $1.idx }
+        let verdicts = CodeRegion.keep(blocks: sorted.map(\.block), frameBackground: sorted[0].frame)
+        for (row, v) in zip(sorted, verdicts) { if let v { out[row.id] = v.rawValue } }
+    }
+    return out
+}
+
+let regionOf: [String: String]? = ProcessInfo.processInfo.environment["KEEP_FEED"].map(regions(feedPath:))
 
 var out = ""
 for path in CommandLine.arguments.dropFirst() {
@@ -33,7 +65,8 @@ for path in CommandLine.arguments.dropFirst() {
         let share = TranslationFilter.mathShare(of: t)
         out += "{\"id\":\(json(id)),\"spans\":[\(spans)],\"formula\":\(TranslationFilter.isFormula(t)),\"mathHeavy\":\(TranslationFilter.isMathHeavy(t)),"
             + "\"identifier\":\(TranslationFilter.isIdentifier(t)),\"literal\":\(TranslationFilter.isLiteral(t)),"
-            + "\"needs\":\(TranslationFilter.needsTranslation(t, cjkSource: cjk)),\"share\":\(String(format: "%.3f", share.share)),\"signs\":\(share.signs)}\n"
+            + "\"needs\":\(TranslationFilter.needsTranslation(t, cjkSource: cjk)),\"share\":\(String(format: "%.3f", share.share)),\"signs\":\(share.signs)"
+            + (regionOf.map { ",\"region\":" + ($0[id].map(json) ?? "null") } ?? "") + "}\n"
     }
 }
 FileHandle.standardOutput.write(Data(out.utf8))

@@ -354,6 +354,44 @@ def decision(accs, out):
         out.append(f'    whole-block keep: P {Pb:.2f} R {Rb:.2f} -> ' + ('defer' if Pb >= 0.95 and Rb >= 0.95 else 'train for the band'))
 
 
+def region_tables(blocks, rules, out):
+    """CodeRegion (keeprules with KEEP_FEED): the rules alone, and the rules OR the region verdict, per source and read. A block the region
+    keeps and today's rules translate is `flipped`; a flipped block whose truth is not pure keep is a false fire and is listed by name."""
+    out.append('CODE REGIONS (Core CodeRegion, tools/keep-labels/Sources/keeprules; kept = today\'s rules OR a region verdict)')
+    only = os.environ.get('KEEP_SETS')                       # e.g. "cases dev,papers dev": fit on these, leave the hold-outs unread
+    if only: out.append(f'  (only the sets {only})')
+    for read in READS:
+        for src in SOURCES:
+            if only and src not in only.split(','): continue
+            B = [b for b in blocks if b['src'] == src and b['read'] == read and not b['noletter']]
+            if not B: continue
+            a0, a1 = Acc(), Acc()
+            fired, false_fires = collections.Counter(), []
+            for b in B:
+                r = rules[b['id']]
+                accumulate(a0, b, r)
+                r1 = dict(r)
+                if r.get('region') and r['needs']:
+                    r1['needs'] = False
+                    fired[r['region']] += 1
+                    st = b['stats']
+                    if st['keep'] + st['translate'] > 0 and st['translate'] > 0: false_fires.append(b)
+                accumulate(a1, b, r1)
+            tw = a0.tw
+            out.append(f'  [{src}, read {read}]')
+            out.append(f'    block keep   before {pr_line(a0.bk_tp, a0.bk_fp, a0.bk_fn)}')
+            out.append(f'                 after  {pr_line(a1.bk_tp, a1.bk_fp, a1.bk_fn)}')
+            out.append(f'    keep->translated words  {a0.fn} -> {a1.fn} of {a0.tp + a0.fn};  translate->kept words {a0.fp} -> {a1.fp} of {tw} '
+                       f'(+{a1.fp - a0.fp} = {100 * (a1.fp - a0.fp) / max(1, tw):.2f} % of translate words)')
+            out.append(f'    blocks flipped to keep by region: {sum(fired.values())} {dict(fired)}; of them with translate words in the truth: {len(false_fires)}')
+            for b in false_fires:
+                out.append(f'      FALSE FIRE {b["id"]} truth {b["keep"]} {rules[b["id"]]["region"]}: ' + re.sub(r'\s+', ' ', b['text'])[:70])
+    pt = [b for b in blocks if b['read'] == 'doc' and b['src'].startswith('cases') and b['keep'] == 'translate' and not b['noletter']
+          and (not only or b['src'] in only.split(','))]
+    ff = [b for b in pt if rules[b['id']].get('region') and rules[b['id']]['needs']]
+    out.append(f'  pure-translate case blocks (read doc, dev + hold-out): {len(pt)}; fired by the region (and translated today): {len(ff)}  ' + ', '.join(b['id'] for b in ff))
+
+
 def main():
     labels_dir, rules_path = sys.argv[1:3]
     blocks, regions = load(labels_dir)
@@ -380,6 +418,9 @@ def main():
     group_table(blocks, rules, out)
     out.append('')
     decision(accs, out)
+    if any('region' in r for r in rules.values()):
+        out.append('')
+        region_tables(blocks, rules, out)
     print('\n'.join(out))
     if '--json' in sys.argv:
         json.dump({'text': out}, open(sys.argv[sys.argv.index('--json') + 1], 'w'), ensure_ascii=False, indent=1)

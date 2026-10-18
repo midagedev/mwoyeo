@@ -938,22 +938,7 @@ final class IntelligenceTranslator: @unchecked Sendable {
     }
 
     private func session(source: String?, target: String, glossary: [(String, String)]) -> LanguageModelSession {
-        let en = Locale(identifier: "en")
-        let targetName = en.localizedString(forIdentifier: target) ?? target
-        let sourceName = source.flatMap { en.localizedString(forIdentifier: $0) } ?? "the source language"
-        var instructions = """
-        You translate text captured from a computer screen — apps, games, web pages, comics, video subtitles — \
-        from \(sourceName) into natural, fluent \(targetName).
-        Rules:
-        - Reply with the translation only: no quotes, labels, explanations, romanization or notes.
-        - Keep it about as short as the original; it replaces UI labels and captions in place. Match the original's register.
-        - Keep numbers, units, names, product names, keyboard shortcuts and placeholders like %@ or {0} unchanged.
-        """
-        if !glossary.isEmpty {
-            instructions += "\nGlossary — always use these translations:\n"
-            instructions += glossary.map { "- \($0.0) → \($0.1)" }.joined(separator: "\n")
-        }
-        return LanguageModelSession(model: model, instructions: instructions)
+        LanguageModelSession(model: model, instructions: RequestLayout.foundationModelsInstructions(source: source, target: target, glossary: glossary))
     }
 
 

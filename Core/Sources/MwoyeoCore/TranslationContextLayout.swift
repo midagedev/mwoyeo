@@ -478,8 +478,9 @@ public enum RequestLayout {
 
     // MARK: Apple Foundation Models
 
-    /// The session instructions today's app builds (TranslationService `session(source:target:glossary:)`, main 93e6acc).
-    static func foundationModelsInstructions(source: String?, target: String, glossary: [(String, String)]) -> String {
+    /// The session instructions of the Apple Foundation Models engine, which `TranslationService` hands to its session
+    /// (its text is today's, main 93e6acc: `fm-instructions-*.txt` fix it). `source` nil reads "the source language".
+    public static func foundationModelsInstructions(source: String?, target: String, glossary: [(String, String)]) -> String {
         let en = Locale(identifier: "en")
         let targetName = en.localizedString(forIdentifier: target) ?? target
         let sourceName = source.flatMap { en.localizedString(forIdentifier: $0) } ?? "the source language"

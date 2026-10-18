@@ -448,12 +448,17 @@ private struct FormulaScan {
                 let tail = String(String.UnicodeScalarView(s[j...].prefix(4)))
                 return tail.hasPrefix("(s)") || tail.hasPrefix("(es)")
             }
-            let call = j < s.count && s[j] == "(" && isLetter(s[run.startIndex]) && !plural()
+            // OCR may read a space before the parenthesis ("Attention (Q, K, V) = softmax"): on a line with a relation, a name
+            // followed by variables in parentheses is still a call.
+            var open = j
+            while relation, open < s.count, s[open] == " " { open += 1 }
+            if open > j, !(open < s.count && s[open] == "(" && argumentsAreVariables(open)) { open = j }
+            let call = open < s.count && s[open] == "(" && isLetter(s[run.startIndex]) && !plural()
             let word = lettersOnly && scripts.count == 1 && !scripts.contains(.math) && (contraction || (count >= 3 && vowel))
             if call {
                 sign = true
-                callOpensAt = j
-                callExempt = relation || camel || !word || argumentsAreVariables(j)
+                callOpensAt = open
+                callExempt = relation || camel || !word || argumentsAreVariables(open)
             }
             if digits > 0 { digitLetter = true }
             if scripts.contains(.math) { sign = true }

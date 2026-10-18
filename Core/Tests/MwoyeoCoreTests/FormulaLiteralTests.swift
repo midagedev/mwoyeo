@@ -13,7 +13,7 @@ import Testing
     // MARK: what page 4 sent to the engine and must not have
 
     @Test func fragmentsOfPage4StayAsWritten() {
-        for t in ["K", "E", "Q", "QKT", "-)V", "/ак", "_inea", "Attention(Q, K,V) = softmax", "MatMul", "SoftMax"] {
+        for t in ["K", "E", "Q", "QKT", "-)V", "/ак", "_inea", "Attention(Q, K,V) = softmax", "Attention (Q, K, V) = softmax", "MatMul", "SoftMax"] {
             #expect(kept(t), "\(t)")
         }
     }

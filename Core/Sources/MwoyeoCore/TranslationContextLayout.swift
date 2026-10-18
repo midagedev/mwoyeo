@@ -90,6 +90,34 @@ public struct ContextOptions: Codable, Equatable, Sendable {
     }
 }
 
+extension ContextOptions {
+    /// `base` with one app's context override laid over it. No override is `base`.
+    ///
+    /// - `off` → `enabled: false`.
+    /// - `nearby` → `enabled: true` and no earlier lines (`transcriptCount: 0`): the lines around the text on screen only.
+    /// - `conversation` → `enabled: true` and the last `previousLines` lines before. More than `shortTranscript` lines need
+    ///   `longTranscript`, so it is turned on for those and left as `base` has it otherwise.
+    ///
+    /// Every other field is `base`'s: the override says how much text goes along, not which engines may send a title or
+    /// which rows go in.
+    public static func resolved(base: ContextOptions, override: AppContextOverride?) -> ContextOptions {
+        guard let override else { return base }
+        var out = base
+        switch override.mode {
+        case .off:
+            out.enabled = false
+        case .nearby:
+            out.enabled = true
+            out.transcriptCount = 0
+        case .conversation:
+            out.enabled = true
+            out.transcriptCount = override.previousLines
+            if override.previousLines > shortTranscript { out.longTranscript = true }
+        }
+        return out
+    }
+}
+
 /// Everything one request may carry. The layout picks what fits the engine's budget; the caller does not pre-trim.
 public struct ContextRequest: Sendable {
     /// The source lines to translate. Their ids are 0..<count in this order.

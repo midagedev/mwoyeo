@@ -31,7 +31,7 @@ public struct Addressing: Codable, Equatable, Hashable, Sendable {
     }
 
     // Read through the capping init; a row without a valid `to` or `register` throws and `LossyArray` drops just that row.
-    enum CodingKeys: String, CodingKey { case to, register }
+    enum CodingKeys: String, CodingKey, CaseIterable { case to, register }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         self.init(to: try c.decode(String.self, forKey: .to), register: try c.decode(Register.self, forKey: .register))
@@ -81,7 +81,7 @@ public struct MemoryEntry: Codable, Equatable, Hashable, Identifiable, Sendable 
     // (to, register). Nothing else is written or read; `origin`, `uses` and `lastSeen` live in RAM only, and an entry read
     // from a file is a user entry. Lenient: a bad enum value, a missing field or a bad addressing row never loses the
     // entry; an entry without `src` or `dst` throws, and `LossyArray` drops just that one.
-    enum CodingKeys: String, CodingKey { case src, dst, kind, gender, note, reading, addressing }
+    enum CodingKeys: String, CodingKey, CaseIterable { case src, dst, kind, gender, note, reading, addressing }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let src = try c.decode(String.self, forKey: .src)

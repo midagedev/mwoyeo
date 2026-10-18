@@ -137,13 +137,21 @@ import Testing
                                 origin: .user, uses: 7, lastSeen: Date(timeIntervalSince1970: 1_700_000_000),
                                 addressing: [Addressing(to: "ボブ", register: .casual)])
         let full = AppProfile(bundleID: "a.b", appName: "A", source: "ja", target: "ko", customEngineID: UUID(), paragraphReader: .lineGrouping,
-                              note: "Close friends.", entries: [entry])
+                              note: "Close friends.", entries: [entry], context: AppContextOverride(mode: .conversation, previousLines: 5))
         let root = try JSONSerialization.jsonObject(with: JSONEncoder().encode(full)) as! [String: Any]
-        #expect(Set(root.keys) == ["bundleID", "appName", "source", "target", "customEngineID", "paragraphReader", "note", "entries"])
+        #expect(Set(root.keys) == ["bundleID", "appName", "source", "target", "customEngineID", "paragraphReader", "note", "entries", "context"])
         let e = try #require((root["entries"] as? [[String: Any]])?.first)
         #expect(Set(e.keys) == ["src", "dst", "kind", "gender", "note", "reading", "addressing"])
         let a = try #require((e["addressing"] as? [[String: Any]])?.first)
         #expect(Set(a.keys) == ["to", "register"])
+        let c = try #require(root["context"] as? [String: Any])
+        #expect(Set(c.keys) == ["mode", "previousLines"] && c["mode"] as? String == "conversation" && c["previousLines"] as? Int == 5)
+        // The settings-file schema is compared with these encoded keys (App/Support/SettingsFileChecks.swift), so a key added to a
+        // type's CodingKeys must appear in this fully populated value: otherwise it hides from that comparison and this fails.
+        #expect(Set(root.keys) == Set(AppProfile.CodingKeys.allCases.map(\.rawValue)))
+        #expect(Set(e.keys) == Set(MemoryEntry.CodingKeys.allCases.map(\.rawValue)))
+        #expect(Set(a.keys) == Set(Addressing.CodingKeys.allCases.map(\.rawValue)))
+        #expect(Set(c.keys) == Set(AppContextOverride.CodingKeys.allCases.map(\.rawValue)))
         // The enums are strings.
         #expect(e["kind"] as? String == "person" && e["gender"] as? String == "f" && a["register"] as? String == "casual")
         #expect(root["paragraphReader"] is String && root["customEngineID"] is String)
@@ -157,6 +165,24 @@ import Testing
         var expected = entry
         expected.uses = 0
         expected.lastSeen = nil
-        #expect(back.entries == [expected] && back.note == full.note)
+        #expect(back.entries == [expected] && back.note == full.note && back.context == full.context)
+    }
+
+    /// docs/settings-for-agents.md states the caps in words. They are the constants above, so a changed constant fails here
+    /// until the page follows (the schema follows by itself: `SettingsFile.swift` reads the same constants).
+    @Test func theAgentsGuideStatesTheCaps() throws {
+        var root = URL(fileURLWithPath: #filePath)
+        for _ in 0..<4 { root.deleteLastPathComponent() }
+        let guide = try String(contentsOf: root.appendingPathComponent("docs/settings-for-agents.md"), encoding: .utf8)
+        let rows = [
+            "| `note` | text, up to \(AppProfile.maxNoteLength) characters |",
+            "| `entries` | up to \(AppProfile.maxEntries) rows; a second row with the same `src` is left out |",
+            "| `entries[].src`, `dst` | text, 1 to \(MemoryEntry.maxName) characters |",
+            "| `entries[].note` | text, up to \(MemoryEntry.maxEntryNote) characters |",
+            "| `entries[].reading` | text, up to \(MemoryEntry.maxName) characters |",
+            "| `entries[].addressing[]` | up to \(MemoryEntry.maxAddressing) rows; `to` (text, 1 to \(MemoryEntry.maxName) characters)",
+            "| `context.previousLines` | whole number, 0 to \(AppContextOverride.maxPreviousLines); left out, \(AppContextOverride.defaultPreviousLines) |",
+        ]
+        for row in rows { #expect(guide.contains(row), "\(row)") }
     }
 }

@@ -19,6 +19,7 @@ or an estimate ([U]).
 | terms-probe/ | The three OS-query probes behind it (NLTagger schemes, NER on 14 sentences, StringTransform + NSSpellChecker) |
 | cost-model.py | The cost model script behind caching-and-cost.md |
 | math-code-detectors.md | Existing math/code/prose detectors and layout models: licenses (AGPL traps), sizes, Core ML paths, distillation data and teachers |
+| keep-boundary-datasets.md | Datasets and render recipes for translate/keep boundary labels: licenses (CC BY-SA, NC, gated), boundary quality, the train / hold-out plan |
 
 The bench that measures these choices lives in tools/translation-bench/. Its sequences, memory sheets, probes and run
 outputs are kept in the repo, with a manifest per run (engine, model, date, commit).

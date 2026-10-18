@@ -1,0 +1,120 @@
+#0 ja | 田中さんは昨日会議に遅れた。 / 謝りに来た。
+  A  459ms  사과하러 왔습니다.
+  B  63ms  ext=사과하러 왔습니다.  full=다나카 씨는 어제 회의에 늦었습니다.⏎⏎사과하러 왔습니다.
+  C  51ms  ext=사과하러 왔습니다.  full=다나카 씨는 어제 회의에 늦었습니다.⏎⏎사과하러 왔습니다.
+#1 ja | 新しい上司が来た。 / 厳しそうな人だ。
+  A  31ms  엄격해 보이는 사람입니다.
+  B  48ms  ext=엄격해 보이는 사람입니다.  full=새로운 상사가 왔습니다.⏎⏎엄격해 보이는 사람입니다.
+  C  47ms  ext=엄격해 보이는 사람입니다.  full=새로운 상사가 왔습니다.⏎⏎엄격해 보이는 사람입니다.
+#2 ja | 母から電話があった。 / 来週帰ると言っていた。
+  A  35ms  다음 주에 돌아가겠다고 말했습니다.
+  B  54ms  ext=다음 주에 돌아가겠다고 말했습니다.  full=어머니에게서 전화가 왔습니다.⏎⏎다음 주에 돌아가겠다고 말했습니다.
+  C  50ms  ext=다음 주에 돌아가겠다고 말했습니다.  full=어머니에게서 전화가 왔습니다.⏎⏎다음 주에 돌아가겠다고 말했습니다.
+#3 ja | 先生に質問した。 / 丁寧に答えてくれた。
+  A  31ms  정중하게 대답해 주셨다.
+  B  48ms  ext=정중하게 대답해 주셨다.  full=선생님께 질문했습니다.⏎⏎정중하게 대답해 주셨다.
+  C  43ms  ext=정중하게 대답해 주셨다.  full=선생님께 질문했습니다.⏎⏎정중하게 대답해 주셨다.
+#4 ja | 私はこのゲームを三年やっている。 / でもまだクリアできない。
+  A  31ms  하지만 아직 클리어할 수 없습니다.
+  B  54ms  ext=하지만 아직 클리어할 수 없습니다.  full=저는 이 게임을 3년째 하고 있습니다.⏎⏎하지만 아직 클리어할 수 없습니다.
+  C  51ms  ext=하지만 아직 클리어할 수 없습니다.  full=저는 이 게임을 3년째 하고 있습니다.⏎⏎하지만 아직 클리어할 수 없습니다.
+#5 ja | 社長が到着しました。 / すぐに会議室へお通ししてください。
+  A  37ms  즉시 회의실로 가 주세요.
+  B  52ms  ext=즉시 회의실로 가 주세요.  full=사장님이 도착하셨습니다.⏎⏎즉시 회의실로 가 주세요.
+  C  50ms  ext=즉시 회의실로 가 주세요.  full=사장님이 도착하셨습니다.⏎⏎즉시 회의실로 가 주세요.
+#6 ja | 彼女に告白した。 / 断られた。
+  A  24ms  거절당했습니다.
+  B  43ms  ext=거절당했습니다.  full=그녀에게 고백했습니다.⏎⏎거절당했습니다.
+  C  45ms  ext=거절당했습니다.  full=그녀에게 고백했습니다.⏎⏎거절당했습니다.
+#7 ja | ボスを倒した。 / 報酬はレアだった。
+  A  30ms  보상은 희귀했습니다.
+  B  51ms  ext=보상은 희귀했습니다.  full=보스를 물리쳤습니다.⏎⏎보상은 희귀했습니다.
+  C  46ms  ext=보상은 희귀했습니다.  full=보스를 물리쳤습니다.⏎⏎보상은 희귀했습니다.
+#8 ja | 部長が出張から戻った。 / 明日お土産を配るそうだ。
+  A  32ms  내일 기념품을 나눠 간다고 합니다.
+  B  56ms  ext=내일 기념품을 나눠 간다고 합니다.  full=부장님이 출장에서 돌아오셨습니다.⏎⏎내일 기념품을 나눠 간다고 합니다.
+  C  54ms  ext=내일 기념품을 나눠 간다고 합니다.  full=부장님이 출장에서 돌아오셨습니다.⏎⏎내일 기념품을 나눠 간다고 합니다.
+#9 ja | 弟がゲームを買った。 / まだ開けていない。
+  A  28ms  아직 열지 않았습니다.
+  B  48ms  ext=아직 열지 않았습니다.  full=동생이 게임을 샀습니다.⏎⏎아직 열지 않았습니다.
+  C  46ms  ext=아직 열지 않았습니다.  full=동생이 게임을 샀습니다.⏎⏎아직 열지 않았습니다.
+#10 zh | 老板昨天来了。 / 说要开会。
+  A  9ms  ERR
+  B  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+  C  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+#11 zh | 我买了一台新电脑。 / 速度很快。
+  A  7ms  ERR
+  B  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+  C  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+#12 zh | 妈妈打电话来了。 / 问你什么时候回家。
+  A  8ms  ERR
+  B  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+  C  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+#13 zh | 老师讲了新课。 / 讲得很清楚。
+  A  8ms  ERR
+  B  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+  C  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+#14 zh | 他输了比赛。 / 很难过。
+  A  7ms  ERR
+  B  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+  C  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+#15 zh | 这个手机很贵。 / 但是质量很好。
+  A  7ms  ERR
+  B  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+  C  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+#16 zh | 我们到了机场。 / 航班已经取消了。
+  A  8ms  ERR
+  B  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+  C  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+#17 zh | 小王辞职了。 / 听说要去美国。
+  A  8ms  ERR
+  B  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+  C  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+#18 zh | 客服回复了。 / 请稍等。
+  A  7ms  ERR
+  B  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+  C  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+#19 zh | 我养了一只猫。 / 它很可爱。
+  A  7ms  ERR
+  B  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+  C  0ms  ext=NIL  full=ERR TranslationError(cause: Translation.TranslationError.Cause.notInstalled, sourceLanguage: nil, targetLanguage: nil)
+#20 en | Tom missed the meeting. / Said he was sick.
+  A  420ms  그는 아프다고 말했습니다.
+  B  53ms  ext=그는 아프다고 말했습니다.  full=Tom은 회의를 놓쳤습니다.⏎⏎그는 아프다고 말했습니다.
+  C  46ms  ext=그는 아프다고 말했습니다.  full=Tom은 회의를 놓쳤습니다.⏎⏎그는 아프다고 말했습니다.
+#21 en | My sister called yesterday. / Wants to visit next week.
+  A  28ms  다음 주에 방문하고 싶어합니다.
+  B  61ms  ext=다음 주에 방문하고 싶어합니다.  full=제 여동생이 어제 전화를 걸었습니다.⏎⏎다음 주에 방문하고 싶어합니다.
+  C  49ms  ext=다음 주에 방문하고 싶어합니다.  full=제 여동생이 어제 전화를 걸었습니다.⏎⏎다음 주에 방문하고 싶어합니다.
+#22 en | The new update is out. / Fixes the crash on startup.
+  A  34ms  시작 시 발생하는 충돌을 해결합니다.
+  B  54ms  ext=시작 시 발생하는 충돌을 해결합니다.  full=새 업데이트가 나왔습니다.⏎⏎시작 시 발생하는 충돌을 해결합니다.
+  C  50ms  ext=시작 시 발생하는 충돌을 해결합니다.  full=새 업데이트가 나왔습니다.⏎⏎시작 시 발생하는 충돌을 해결합니다.
+#23 en | I asked the teacher a question. / She answered patiently.
+  A  32ms  그녀는 인내심 있게 대답했습니다.
+  B  50ms  ext=그녀는 인내심 있게 대답했습니다.  full=선생님께 질문을 했습니다.⏎⏎그녀는 인내심 있게 대답했습니다.
+  C  45ms  ext=그녀는 인내심 있게 대답했습니다.  full=선생님께 질문을 했습니다.⏎⏎그녀는 인내심 있게 대답했습니다.
+#24 en | The boss arrived. / Asked everyone to sit down.
+  A  29ms  모두에게 앉으라고 요청했습니다.
+  B  45ms  ext=모두에게 앉으라고 요청했습니다.  full=상사가 도착했습니다.⏎⏎모두에게 앉으라고 요청했습니다.
+  C  43ms  ext=모두에게 앉으라고 요청했습니다.  full=상사가 도착했습니다.⏎⏎모두에게 앉으라고 요청했습니다.
+#25 en | Is the bar open? / I need a cold drink.
+  A  34ms  차가운 음료가 필요합니다.
+  B  51ms  ext=차가운 음료가 필요합니다.  full=바가 열려 있습니까?⏎⏎차가운 음료가 필요합니다.
+  C  48ms  ext=차가운 음료가 필요합니다.  full=바가 열려 있습니까?⏎⏎차가운 음료가 필요합니다.
+#26 en | Where is Mina? / Haven't seen her since lunch.
+  A  34ms  점심 이후로 그녀를 본 적이 없습니다.
+  B  52ms  ext=점심 이후로 그녀를 본 적이 없습니다.  full=미나는 어디에 있나요?⏎⏎점심 이후로 그녀를 본 적이 없습니다.
+  C  49ms  ext=점심 이후로 그녀를 본 적이 없습니다.  full=미나는 어디에 있나요?⏎⏎점심 이후로 그녀를 본 적이 없습니다.
+#27 en | The patch notes mention a nerf. / Hits hard for mages.
+  A  31ms  마법사들에게 큰 타격을 가합니다.
+  B  57ms  ext=마법사들에게 큰 타격을 가합니다.  full=패치 노트에 nerf가 언급되어 있습니다.⏎⏎마법사들에게 큰 타격을 가합니다.
+  C  59ms  ext=마법사들에게 큰 타격을 가합니다.  full=패치 노트에 nerf가 언급되어 있습니다.⏎⏎마법사들에게 큰 타격을 가합니다.
+#28 en | The kids are asleep. / Don't wake them.
+  A  28ms  그들을 깨우지 마세요.
+  B  45ms  ext=그들을 깨우지 마세요.  full=아이들이 자고 있습니다.⏎⏎그들을 깨우지 마세요.
+  C  44ms  ext=그들을 깨우지 마세요.  full=아이들이 자고 있습니다.⏎⏎그들을 깨우지 마세요.
+#29 en | I love this song. / Played it all day.
+  A  29ms  하루 종일 플레이했습니다.
+  B  45ms  ext=하루 종일 플레이했습니다.  full=이 노래를 사랑합니다.⏎⏎하루 종일 플레이했습니다.
+  C  43ms  ext=하루 종일 플레이했습니다.  full=이 노래를 사랑합니다.⏎⏎하루 종일 플레이했습니다.

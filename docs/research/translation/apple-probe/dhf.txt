@@ -1,0 +1,120 @@
+#0 ja | 田中さんは昨日会議に遅れた。 / 謝りに来た。
+  A  2045ms  사과하러 왔다.
+  B  1231ms  ext=사과하러 왔다.  full=다나카 씨는 어제 회의에 늦었다. 사과하러 왔다.
+  C  0ms  ext=-  full=-
+#1 ja | 新しい上司が来た。 / 厳しそうな人だ。
+  A  608ms  엄격해 보이는 사람이다.
+  B  771ms  ext=엄격해 보이는 사람이다.  full=새로운 상사가 왔다. 엄격해 보이는 사람이다.
+  C  0ms  ext=-  full=-
+#2 ja | 母から電話があった。 / 来週帰ると言っていた。
+  A  805ms  다음 주에 돌아올 거라고 말하고 있었다.
+  B  2395ms  ext=다음 주에 돌아올 거라고 말하고 있었다.  full=엄마에게서 전화가 왔다. 다음 주에 돌아올 거라고 말하고 있었다.
+  C  0ms  ext=-  full=-
+#3 ja | 先生に質問した。 / 丁寧に答えてくれた。
+  A  1577ms  꼼꼼하게 대답해 주었다.
+  B  2042ms  ext=정중하게 대답해 주셨다.  full=선생님께 질문했다. 정중하게 대답해 주셨다.
+  C  0ms  ext=-  full=-
+#4 ja | 私はこのゲームを三年やっている。 / でもまだクリアできない。
+  A  1785ms  하지만 아직 클리어할 수 없어.
+  B  1830ms  ext=하지만 아직 클리어할 수 없다.  full=나는 이 게임을 3년이나 하고 있다. 하지만 아직 클리어할 수 없다.
+  C  0ms  ext=-  full=-
+#5 ja | 社長が到着しました。 / すぐに会議室へお通ししてください。
+  A  1474ms  바로 회의실로 안내해 주세요.
+  B  989ms  ext=바로 회의실로 안내해 주세요.  full=사장님이 도착했습니다. 바로 회의실로 안내해 주세요.
+  C  0ms  ext=-  full=-
+#6 ja | 彼女に告白した。 / 断られた。
+  A  636ms  거절당했다.
+  B  941ms  ext=거절당했다.  full=그녀에게 고백했다. 거절당했다.
+  C  0ms  ext=-  full=-
+#7 ja | ボスを倒した。 / 報酬はレアだった。
+  A  671ms  보상은 레어였다.
+  B  837ms  ext=보상은 레어였다.  full=보스를 물리쳤다. 보상은 레어였다.
+  C  0ms  ext=-  full=-
+#8 ja | 部長が出張から戻った。 / 明日お土産を配るそうだ。
+  A  802ms  내일 기념품을 나눠줄 것 같다.
+  B  1154ms  ext=내일 기념품을 나눠줄 것 같다.  full=부장이 출장에서 돌아왔다. 내일 기념품을 나눠줄 것 같다.
+  C  0ms  ext=-  full=-
+#9 ja | 弟がゲームを買った。 / まだ開けていない。
+  A  629ms  아직 열지 않았다.
+  B  802ms  ext=아직 열지 않았다.  full=동생이 게임을 샀다. 아직 열지 않았다.
+  C  0ms  ext=-  full=-
+#10 zh | 老板昨天来了。 / 说要开会。
+  A  804ms  회의를 열겠다고 말했다.
+  B  982ms  ext=회의를 할 거라고 했어요.  full=사장님이 어제 왔어요. 회의를 할 거라고 했어요.
+  C  0ms  ext=-  full=-
+#11 zh | 我买了一台新电脑。 / 速度很快。
+  A  576ms  속도가 빨라.
+  B  894ms  ext=속도가 빠르다.  full=나는 새 컴퓨터를 샀다. 속도가 빠르다.
+  C  0ms  ext=-  full=-
+#12 zh | 妈妈打电话来了。 / 问你什么时候回家。
+  A  711ms  언제 집에 돌아올지 묻고 있어요.
+  B  970ms  ext=언제 집에 올지 물어봤어.  full=엄마가 전화왔어. 언제 집에 올지 물어봤어.
+  C  0ms  ext=-  full=-
+#13 zh | 老师讲了新课。 / 讲得很清楚。
+  A  1219ms  잘 설명했어요.
+  B  1850ms  ext=아주 명확하게 말씀하셨어요.  full=선생님이 새로운 수업을 하셨어요. 아주 명확하게 말씀하셨어요.
+  C  0ms  ext=-  full=-
+#14 zh | 他输了比赛。 / 很难过。
+  A  1290ms  슬퍼요.
+  B  1611ms  ext=슬프다.  full=그는 경기를 졌다. 슬프다.
+  C  0ms  ext=-  full=-
+#15 zh | 这个手机很贵。 / 但是质量很好。
+  A  1268ms  하지만 품질이 좋다.
+  B  1656ms  ext=하지만 품질이 아주 좋습니다.  full=이 휴대폰은 비싸요. 하지만 품질이 아주 좋습니다.
+  C  0ms  ext=-  full=-
+#16 zh | 我们到了机场。 / 航班已经取消了。
+  A  1353ms  항공편이 이미 취소되었습니다.
+  B  1821ms  ext=비행편이 이미 취소됐어요.  full=우리는 공항에 도착했어요. 비행편이 이미 취소됐어요.
+  C  0ms  ext=-  full=-
+#17 zh | 小王辞职了。 / 听说要去美国。
+  A  1362ms  미국에 가는다고 들었어요.
+  B  2084ms  ext=미국에 갈 거라고 들었다.  full=샤오왕이 사직했다. 미국에 갈 거라고 들었다.
+  C  0ms  ext=-  full=-
+#18 zh | 客服回复了。 / 请稍等。
+  A  1481ms  잠시만 기다려 주세요.
+  B  3209ms  ext=잠시만 기다려 주세요.  full=고객센터에서 답변했습니다. 잠시만 기다려 주세요.
+  C  0ms  ext=-  full=-
+#19 zh | 我养了一只猫。 / 它很可爱。
+  A  1775ms  그것은 정말 귀엽다.
+  B  1192ms  ext=그것은 정말 귀엽다.  full=나는 고양이를 키웠다. 그것은 정말 귀엽다.
+  C  0ms  ext=-  full=-
+#20 en | Tom missed the meeting. / Said he was sick.
+  A  1146ms  그는 아프다고 말했다.
+  B  961ms  ext=아프다고 말했다.  full=톰은 회의에 참석하지 못했다. 아프다고 말했다.
+  C  0ms  ext=-  full=-
+#21 en | My sister called yesterday. / Wants to visit next week.
+  A  672ms  다음 주에 방문하고 싶어요.
+  B  1161ms  ext=다음 주에 방문하고 싶어 해요.  full=내 여동생이 어제 전화했어요. 다음 주에 방문하고 싶어 해요.
+  C  0ms  ext=-  full=-
+#22 en | The new update is out. / Fixes the crash on startup.
+  A  836ms  시작 시 발생하는 충돌을 수정했습니다.
+  B  1031ms  ext=시작 시 발생하는 충돌을 수정했습니다.  full=새 업데이트가 나왔습니다. 시작 시 발생하는 충돌을 수정했습니다.
+  C  0ms  ext=-  full=-
+#23 en | I asked the teacher a question. / She answered patiently.
+  A  661ms  그녀는 인내심 있게 대답했다.
+  B  983ms  ext=그녀는 인내심 있게 대답했어요.  full=나는 선생님에게 질문을 했어요. 그녀는 인내심 있게 대답했어요.
+  C  0ms  ext=-  full=-
+#24 en | The boss arrived. / Asked everyone to sit down.
+  A  775ms  모두에게 앉으라고 요청했다.
+  B  892ms  ext=모두에게 앉으라고 했다.  full=보스가 도착했다. 모두에게 앉으라고 했다.
+  C  0ms  ext=-  full=-
+#25 en | Is the bar open? / I need a cold drink.
+  A  679ms  차가운 음료가 필요해요.
+  B  1062ms  ext=차가운 음료가 필요해요.  full=바는 열려 있나요? 차가운 음료가 필요해요.
+  C  0ms  ext=-  full=-
+#26 en | Where is Mina? / Haven't seen her since lunch.
+  A  772ms  점심 이후로 그녀를 못 봤어.
+  B  953ms  ext=점심 이후로 못 봤어.  full=미나는 어디에 있어? 점심 이후로 못 봤어.
+  C  0ms  ext=-  full=-
+#27 en | The patch notes mention a nerf. / Hits hard for mages.
+  A  875ms  마법사에게 강하게 타격한다.
+  B  1472ms  ext=있습니다마법사에게는 강력하게 타격합니다.  full=패치 노트에 너프가 언급되어 있습니다. 마법사에게는 강력하게 타격합니다.
+  C  0ms  ext=-  full=-
+#28 en | The kids are asleep. / Don't wake them.
+  A  788ms  그들을 깨우지 마.
+  B  2501ms  ext=있어요깨우지 마세요.  full=아이들은 자고 있어요. 깨우지 마세요.
+  C  0ms  ext=-  full=-
+#29 en | I love this song. / Played it all day.
+  A  2020ms  하루 종일 플레이했어요.
+  B  2417ms  ext=하루 종일 틀어봤어.  full=이 노래 정말 좋아. 하루 종일 틀어봤어.
+  C  0ms  ext=-  full=-

@@ -1,0 +1,12 @@
+Written before any probe run (2026-10-18, round research-apple).
+Variants: A = current line alone (plain). B = "prev\ncur" one attributed request, cur run marked with link, prev translated. C = prev skipsTranslation + cur marked.
+ll (language pack, a small NMT): run extraction ok >= 90 % in B; cur output differs from A in <= 30 % of lines and mostly trivially (spacing); real improvement (dropped subject/honorific resolved) <= 10 %. Expected: sentence-wise NMT ignores neighbours.
+hf (Apple Intelligence model): extraction ok 70-95 % (marker may bleed over the newline); output differs from A in 40-70 %, improved in 30-50 %, worsened 5-15 %.
+C: extraction ok >= 90 % both; effect on cur = B's or smaller; prev appears untranslated in output (cost: nothing, it is cut).
+Latency: B ~ 2x A tokens; ll 25-70 ms stays under 150 ms; hf 1-2 s per request.
+
+Result of round 1 (see ll.txt, hf.txt): cur output == A in 20/20 (ll ja,en) and 30/30 (hf): "\n" starts a new segment, so context is cut. zh ll pack not installed (not downloaded, user system untouched).
+Round 2, written before running: variant D = "prev cur" in ONE segment (space joined, ja/zh with no space), cur run marked with link.
+  ll: cur differs from A in 30-60 %, improved (subject/honorific/pronoun resolved) in 10-25 %; extraction ok 60-85 % (marker bleeds when words reorder).
+  hf: differs 40-70 %, improved 20-40 %, extraction ok 60-90 %, ~2x latency.
+Shaping S1 (lines of one wrapped sentence, joined vs per line): joined better in >= 60 % of cases in both. S2 (hyphen split "trans- lation"): repaired text better in >= 80 %. S4 (long 6-sentence paragraph, whole vs per sentence): ll equal quality, hf whole slower ~ 4-6x per-sentence sum? total similar; no truncation expected.

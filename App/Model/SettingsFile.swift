@@ -62,7 +62,7 @@ struct SettingSpec {
         .init(key: "transcriptFormats", kind: .choiceList(TranscriptFileFormat.allCases.map(\.rawValue)),
               doc: "Files of the translation log: markdown, srt, and jsonl (one JSON line per translated line with time, lens, app, source, target, engine, original and translation, added as it happens so tail -f works)."),
         .init(key: "appProfiles", kind: .appProfiles,
-              doc: "Languages, engine and paragraph reader remembered per app; the app in front decides which applies. Easier to set from a lens's menu. A profile can also carry a note for the translator, names and terms with their translations, and a context override for that app; the app keeps these but does not use them to translate yet.",
+              doc: "Languages, engine and paragraph reader remembered per app; the app in front decides which applies. Easier to set from a lens's menu. A profile can also carry a note for the translator, names and terms with their translations, and a context override for that app; the app uses them to translate while context is on for that app.",
               examples: SettingExamples.appProfiles),
         .init(key: "paragraphReader", kind: .choice(ParagraphReader.allCases.map(\.rawValue)),
               doc: "How text is cut into paragraphs: automatic, documentLayout (the macOS document model) or lineGrouping (the app's own line rules)."),

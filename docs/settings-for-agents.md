@@ -60,7 +60,7 @@ An unknown key is reported with the closest known one and is ignored. A list ove
 
 ## Per-app memory
 
-Inside `appProfiles`, a profile can carry a note for the translator, names and terms, and a context override. All of these fields are optional. A profile still needs `bundleID`, `source` and `target`. The app keeps these fields in the file, but it does not use them to translate yet.
+Inside `appProfiles`, a profile can carry a note for the translator, names and terms, and a context override. All of these fields are optional. A profile still needs `bundleID`, `source` and `target`. The app uses them to translate while context is on for that app (the engine's `context` below, or this profile's own `context`); with context off, a request carries none of them.
 
 ```json
 {
@@ -137,7 +137,7 @@ settings.json:7: engines[0].context.previousLines: 12 is out of range 0 to 8; ig
 
 A second global key, `appleUsesPinnedTerms` (`true` or `false`), lets Apple Translation follow the names and terms pinned in an app's memory, by putting your translation into the source text. It is off by default. The app writes the key to the file only while it is `true`; write `false` to turn it off.
 
-The app keeps and checks these keys, and they take effect when the request path lands.
+The app keeps and checks these keys. With context off, which is the default, a request is exactly the one earlier versions sent.
 
 ## What is never in the file
 

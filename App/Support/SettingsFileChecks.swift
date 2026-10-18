@@ -55,6 +55,17 @@ enum SettingsFileChecks {
         check("the schema is written next to the file",
               FileManager.default.fileExists(atPath: migrated.deletingLastPathComponent().appendingPathComponent("settings.schema.json").path))
 
+        // Downgrade to 1.1.0 and back: what the older version changed in the preferences wins over the file, nothing else.
+        let mirrored = Data(#"{"lensStyle":"glow","targetLanguage":"ko","shortcuts":{"a":1,"b":2},"lensTint":"ocean"}"#.utf8)
+        let reencoded = Data(#"{"shortcuts":{"b":2,"a":1},"targetLanguage":"ko","lensStyle":"glow"}"#.utf8)
+        let changedByOld = Data(#"{"shortcuts":{"b":2,"a":1},"targetLanguage":"ja","lensStyle":"glow"}"#.utf8)
+        check("downgrade: an older version's re-encoding alone changes nothing",
+              AppModel.olderVersionChanges(blob: reencoded, mirror: mirrored).isEmpty)
+        check("downgrade: a value the older version changed is taken, keys it does not know are kept",
+              Set(AppModel.olderVersionChanges(blob: changedByOld, mirror: mirrored).keys) == ["targetLanguage"])
+        check("downgrade: no mirror yet (first launch after 1.1.0) changes nothing",
+              AppModel.olderVersionChanges(blob: changedByOld, mirror: nil).isEmpty)
+
         // Self-write echo, external edit
         store.save(changed)
         check("an event for the bytes the app wrote is ignored", store.fileChanged(current: changed) == nil)
@@ -84,8 +95,9 @@ enum SettingsFileChecks {
               wrong.settings.cacheSize == changed.cacheSize && wrong.settings.lensStyle == .minimal && wrong.settings.boxOpacity == 0.75
               && wrong.settings.framesPerSecond == changed.framesPerSecond && wrong.settings.customEngineID == engine.id
               && wrong.settings.renderMode == .fast && wrong.issues.count == 5)
+        // The allowed styles come from LensStyle (corners joined them on 2026-10-18), not a copy of them.
         check("a value not among the allowed ones lists them",
-              wrong.issues.contains { $0.message.contains("lensStyle") && $0.message.contains("\"neon\"") && $0.message.contains("glow, subtle, minimal") })
+              wrong.issues.contains { $0.message.contains("lensStyle") && $0.message.contains("\"neon\"") && $0.message.contains(LensStyle.allCases.map(\.rawValue).joined(separator: ", ")) })
         check("a number out of range names the range", wrong.issues.contains { $0.message.contains("boxOpacity") && $0.message.contains("0.6 to 1") })
         let nested = SettingsFileCheck.read(Data("{\"engines\": [{\"name\": \"x\"}], \"shortcuts\": {\"pasuse\": {}}}".utf8), over: changed)
         check("a bad engine and an unknown shortcut action are reported", nested.issues.count == 2 && nested.settings == changed)
@@ -123,7 +135,7 @@ enum SettingsFileChecks {
                   return p?["description"] is String && (p?["type"] != nil)
               })
         check("the schema carries enums, ranges and defaults",
-              ((props["lensStyle"] as? [String: Any])?["enum"] as? [String]) == ["glow", "subtle", "minimal"]
+              ((props["lensStyle"] as? [String: Any])?["enum"] as? [String]) == LensStyle.allCases.map(\.rawValue)
               && (props["boxOpacity"] as? [String: Any])?["minimum"] as? Double == 0.6
               && (props["lensStyle"] as? [String: Any])?["default"] as? String == "glow")
 

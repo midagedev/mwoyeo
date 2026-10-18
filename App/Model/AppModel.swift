@@ -69,8 +69,18 @@ final class AppModel {
     @ObservationIgnored private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "app")
 
     private init() {
-        let saved = (defaults.data(forKey: "settings")).flatMap { try? JSONDecoder().decode(AppSettings.self, from: $0) } ?? AppSettings()
-        let s = settingsFile.startup(fallback: saved)
+        let blob = defaults.data(forKey: "settings")
+        let saved = blob.flatMap { try? JSONDecoder().decode(AppSettings.self, from: $0) } ?? AppSettings()
+        var s = settingsFile.startup(fallback: saved)
+        // After a downgrade to a version before the file and back, what that version changed is newer than settings.json.
+        let newer = Self.olderVersionChanges(blob: blob, mirror: defaults.data(forKey: Self.mirrorKey))
+        if !newer.isEmpty, var d = (try? JSONSerialization.jsonObject(with: JSONEncoder().encode(s))) as? [String: Any] {
+            d.merge(newer) { $1 }
+            if let data = try? JSONSerialization.data(withJSONObject: d), let merged = try? JSONDecoder().decode(AppSettings.self, from: data) {
+                s = merged
+                settingsFile.save(s)
+            }
+        }
         settings = s
         settingsIssues = settingsFile.issues
         let store: any SecretStore = ProcessInfo.processInfo.environment["MWOYEO_MEMORY_SECRETS"] != nil ? MemorySecrets() : KeychainSecrets()
@@ -78,15 +88,32 @@ final class AppModel {
         translator = TranslationService(settings: s, secrets: store)
         regions = (defaults.data(forKey: "regions")).flatMap { try? JSONDecoder().decode([RegionConfig].self, from: $0) } ?? []
         // The preferences' copy follows the file (a downgrade keeps the settings); the file itself is not touched here.
-        if s != saved, let d = try? JSONEncoder().encode(s) { defaults.set(d, forKey: "settings") }
+        if s != saved || defaults.data(forKey: Self.mirrorKey) != blob, let d = try? JSONEncoder().encode(s) { mirror(d) }
     }
 
     /// The preferences get the whole settings (a downgrade to a version before the file keeps them); the file gets its keys.
     private func saveSettings() {
-        if let d = try? JSONEncoder().encode(settings) { defaults.set(d, forKey: "settings") }
+        if let d = try? JSONEncoder().encode(settings) { mirror(d) }
         guard !applyingFile else { return }
         settingsFile.save(settings)
         settingsIssues = settingsFile.issues
+    }
+
+    /// The preferences' copy, and the same bytes under `mirrorKey`: a later difference means an older version wrote them.
+    private func mirror(_ d: Data) {
+        defaults.set(d, forKey: "settings")
+        defaults.set(d, forKey: Self.mirrorKey)
+    }
+
+    private static let mirrorKey = "settingsMirror"
+
+    /// The keys whose values a version before the settings file (1.1.0) changed in the preferences since this version last
+    /// wrote them (`mirror`); empty when nothing did. Compared as JSON values, so re-encoding alone changes nothing.
+    nonisolated static func olderVersionChanges(blob: Data?, mirror: Data?) -> [String: Any] {
+        guard let blob, let mirror, blob != mirror,
+              let b = (try? JSONSerialization.jsonObject(with: blob)) as? [String: Any],
+              let m = (try? JSONSerialization.jsonObject(with: mirror)) as? [String: Any] else { return [:] }
+        return b.filter { key, value in !(m[key].map { ($0 as AnyObject).isEqual(value) } ?? false) }
     }
 
     private func saveRegions() {

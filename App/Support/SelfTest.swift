@@ -3,13 +3,28 @@ import ImageIO
 import MwoyeoCore
 import MwoyeoEngines
 import UniformTypeIdentifiers
+import os
 
 /// Headless end-to-end run on a still image:
-///   Mwoyeo --render in.png out.png [--src ja] [--tgt ko] [--mode fast|seamless] [--engine auto|translation|intelligence]
-///                                  [--glossary "term=translation;…"] [--no-inpaint] [--scale 2] [--then en,ko,style] [--then-early ms] [--max-wait s] [--warm]
-/// Prints what was read and translated, and writes the composited result. Exits when done.
+///   Mwoyeo --render in.png out.png [--src ja] [--tgt ko] [--mode fast|seamless|adaptive] [--engine auto|translation|intelligence]
+///                                  [--glossary "term=translation;…"] [--no-inpaint] [--scale 2] [--then en,ko,style,reader-ready] [--then-early ms] [--max-wait s] [--warm]
+///                                  [--no-drain]
+/// Prints what was read and translated, and writes the composited result. Exits when done, after the drain below.
+/// `--mode` defaults to seamless here (the bench baselines are measured in it), not to the app's own default, adaptive: `--mode adaptive` is
+/// what a lens runs, a still read twice (fast boxes, then the rewrite).
+/// A run ends with the numbers of the shipped behaviour (`Instruments`):
+///   `hint: <case> at <ms>` one line per change of what the lens pill would say (`LensSignals.hint`, `none` when it clears), then
+///   `silence: longest=<ms> total=<ms>` the time the lens showed neither a translated block nor a hint, sampled every 100 ms from the
+///   start of the pass to the exit, then `drain: <ms> in-flight=<n>`: the exit waits (180 s at most) until no recognition request is in
+///   flight, so that a compile is not thrown away; `--no-drain` exits at once, as before (`drain: skipped`). Then `reader: <line>` for
+///   each line of the host's stats.
+/// `--then reader-ready` waits until the recognition host says both readers are warm (`reader-ready: <ms>`, `n/a` while no host has
+/// registered, `timeout <ms>` after `--max-wait`, default 600 for this wait). The host registers `SelfTest.register(inFlight:readerReady:statsLines:)`.
+/// `Mwoyeo --render --check-instruments` checks the silence meter, the hint names and the hooks' registry on made-up input (no render).
 /// `--then-early ms` fires the `--then` steps `ms` after a translation batch is first in flight (a settings change
-/// mid-translation) and settles once at the end; `--max-wait s` is the settle ceiling (default 120); `--warm` waits for the text
+/// mid-translation) and settles once at the end; `--max-wait s` bounds the waits of the run (the settle, default 120; `--warm`; `--then
+/// reader-ready`, default 600); the drain before the exit has its own bound, 180 s, whatever `--max-wait` is: a run that gave up
+/// waiting is the very run that exits mid-compile. `--warm` waits for the text
 /// model first, as the app loads it at launch (the first run of a new binary compiles it, up to a minute; killing a run
 /// mid-compile restarts it).
 /// `MWOYEO_FAKE_ENGINE=hang|fail|fail-once|slow:<ms>` replaces the translation engine (see `TranslationService`).
@@ -44,6 +59,10 @@ import UniformTypeIdentifiers
 enum SelfTest {
     static func run(_ args: [String]) -> Never {
         setvbuf(stdout, nil, _IOLBF, 0)
+        if args.first == "--check-instruments" {
+            Task.detached { exit(await checkInstruments() ? 0 : 1) }
+            RunLoop.main.run()
+        }
         Task.detached {
             do {
                 try await render(args)
@@ -122,6 +141,16 @@ enum SelfTest {
 
     private static func render(_ args: [String]) async throws {
         guard args.count >= 2 else { throw Failure(description: "usage: --render in.png out.png [options]") }
+        // However the run ends, it drains before it exits (a compile the exit interrupts is thrown away) and prints its numbers.
+        let instruments = Instruments(args: args)
+        do { try await renderPass(args, instruments) } catch {
+            await instruments.finish()
+            throw error
+        }
+        await instruments.finish()
+    }
+
+    private static func renderPass(_ args: [String], _ instruments: Instruments) async throws {
         func option(_ name: String) -> String? {
             args.firstIndex(of: name).flatMap { $0 + 1 < args.count ? args[$0 + 1] : nil }
         }
@@ -130,7 +159,12 @@ enum SelfTest {
         var settings = AppSettings()
         settings.sourceLanguage = option("--src") ?? "auto"
         settings.targetLanguage = option("--tgt") ?? "ko"
-        settings.renderMode = option("--mode") == "fast" ? .fast : .seamless
+        // Seamless unless asked: the bench baselines are measured in it. `adaptive` is the app's own default (`AppSettings.renderMode`).
+        settings.renderMode = switch option("--mode") {
+        case "fast": .fast
+        case "adaptive": .adaptive
+        default: .seamless
+        }
         settings.engine = TranslationEngineChoice(rawValue: option("--engine") ?? "auto") ?? .auto
         settings.useInpaintingModel = !args.contains("--no-inpaint")
         // `--glossary "co-op=협력;raid=레이드"` sets the glossary (one `term=translation` per `;`).
@@ -174,12 +208,13 @@ enum SelfTest {
         let report: @Sendable (TranslationIssue?) -> Void = { issue in
             if let issue { issues.bump(); FileHandle.standardError.write("issue: \(issue.message)\n".data(using: .utf8)!) }
         }
-        await translator.setIssueHandler(report)
-        TextRecognizer.setNoticeHandler(report)
+        // The two sources of an issue reach the hint as they do in the app (`AppModel.received`, `recognitionNotice`).
+        await translator.setIssueHandler { issue in report(issue); instruments.issues.fromTranslation(issue) }
+        TextRecognizer.setNoticeHandler { issue in report(issue); instruments.issues.fromRecognizer(issue) }
         // A render is a fresh process, the cold case: the text model loads in the background, as at the app's launch, and `--warm`
         // waits for it.
         let source = settings.sourceLanguage
-        let loading = Task.detached(priority: .utility) { await AppModel.loadVision(source: source) }
+        let loading = instruments.beginWarmUp(source: source)
         let t0 = Date()
         let inpainter = settings.useInpaintingModel ? Inpainter.load() : nil
         print("inpainter: \(inpainter != nil ? "MI-GAN loaded (\(ms(t0)) ms)" : "none")")
@@ -193,12 +228,15 @@ enum SelfTest {
         // `--warm`: load the text model first, as the app does at launch (a fresh binary compiles it once, up to a minute).
         if args.contains("--warm") {
             let w = Date()
-            await loading.value
-            print("warm-up: \(ms(w)) ms")
+            let ended = await instruments.waitForWarmUp(loading)
+            print("warm-up: \(ended ? "" : "timeout ")\(ms(w)) ms")
         }
         let still = StillTranslation(decoded, settings: settings, translator: translator, inpainter: inpainter, lensApp: lensApp)
         let pipeline = still.pipeline
         let capture = CGRect(x: 0, y: 0, width: CGFloat(image.width) / scale, height: CGFloat(image.height) / scale)
+        // The silence timeline runs from here (the start of the lens pass) to the exit.
+        await pipeline.setReadHandler { tally in instruments.streak.read(tally) }
+        instruments.startSampling(source: settings.sourceLanguage, target: settings.targetLanguage, drawn: { still.latest?.blocks.isEmpty == false })
         let start = Date()
         await still.ingest()
         let keeping = Keeping(settings: settings, option: option, args: args)
@@ -222,6 +260,7 @@ enum SelfTest {
                 settings.boxOpacity = settings.boxOpacity == 1 ? 0.94 : 1
             } else {
                 settings.targetLanguage = step
+                instruments.setTarget(step)
             }
             await translator.update(settings: settings)
             await pipeline.update(options: PipelineOptions(settings, lensApp: lensApp))
@@ -235,6 +274,7 @@ enum SelfTest {
             }
             try await Task.sleep(for: .milliseconds(Int(early)))
             for step in steps {
+                if step == "reader-ready" { await instruments.waitForReader(); continue }
                 await applyThen(step)
                 print("then-early \(step): \(ms(start)) ms")
             }
@@ -248,6 +288,7 @@ enum SelfTest {
             await printCounts("still", pipeline)
             keeping.observe(still.latest, lens: lensRect, time: phase)
             for step in steps {
+                if step == "reader-ready" { await instruments.waitForReader(); continue }
                 let t = Date()
                 await applyThen(step)
                 try await settle(from: t)
@@ -325,6 +366,7 @@ enum SelfTest {
     /// The work done since the last call: OCR requests, erases, engine calls.
     private static func printCounts(_ phase: String, _ pipeline: RegionPipeline? = nil) async {
         var counts = Trace.takeCounts()
+        Instruments.seen.add(counts)
         for key in ["translate.cancelled", "translate.wasted", "translate.landed_outside", "translate.lens_unserved"] where counts[key] == nil { counts[key] = 0 }
         var parts = counts.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }
         // How long text waited for its translation while in the lens (first seen there → translated).
@@ -593,5 +635,321 @@ enum SelfTest {
         print(String(format: "drift: mean %.1f pt, max %.1f pt, %d of %d frames over 2 pt", drifts.reduce(0, +) / CGFloat(max(1, drifts.count)),
                      drifts.max() ?? 0, drifts.filter { $0 > 2 }.count, drifts.count))
         await printEngineSummary(translator, issues: issues, wasAdded: !settings.engines.isEmpty)
+    }
+}
+
+// MARK: - What the host registers, and the numbers a run ends with
+
+extension SelfTest {
+    /// What the recognition host registers (R3) so that a headless run can wait for it and read it. Each is optional: with none
+    /// registered a run drains on what `TextRecognizer` exposes today (`inFlight`), prints `reader-ready: n/a` and no `reader:` lines.
+    struct Hooks: Sendable {
+        /// Recognition requests in flight now in the host's workers, queued ones included. The drain before exit waits for 0.
+        var inFlight: (@Sendable () async -> Int)?
+        /// Both workers are warm for the run's language key (`--then reader-ready` waits for it).
+        var readerReady: (@Sendable () async -> Bool)?
+        /// The host's stats, one line each; printed at the end as `reader: <line>` (a line that starts with `reader:` is printed as is).
+        var statsLines: (@Sendable () async -> [String])?
+    }
+
+    private static let registered = OSAllocatedUnfairLock(initialState: Hooks())
+    static var hooks: Hooks { registered.withLock { $0 } }
+
+    /// Registers the hooks the host has; one that is not passed keeps what it had. Call once, when the host starts.
+    static func register(inFlight: (@Sendable () async -> Int)? = nil, readerReady: (@Sendable () async -> Bool)? = nil,
+                         statsLines: (@Sendable () async -> [String])? = nil) {
+        registered.withLock { h in
+            if let inFlight { h.inFlight = inFlight }
+            if let readerReady { h.readerReady = readerReady }
+            if let statsLines { h.statsLines = statsLines }
+        }
+    }
+
+    /// The case of a hint without its payload (`downloadPack(…)` → `downloadPack`), `none` for no hint: whatever cases `LensHint` gets.
+    static func hintName(_ hint: LensHint?) -> String {
+        guard let hint else { return "none" }
+        return String(String(describing: hint).prefix { $0 != "(" })
+    }
+
+    /// The time with neither a translated block nor a hint, from samples taken at known times.
+    struct SilenceMeter: Equatable {
+        private(set) var longest = 0.0
+        private(set) var total = 0.0
+        private var since: Double?
+
+        /// One sample at `t` seconds. A silent run lasts from its first silent sample to the first sample that is not silent.
+        mutating func sample(at t: Double, silent: Bool) {
+            if silent { if since == nil { since = t } } else { close(at: t) }
+        }
+
+        /// The exit at `t`: a silent run still open ends here.
+        mutating func end(at t: Double) { close(at: t) }
+
+        private mutating func close(at t: Double) {
+            guard let s = since else { return }
+            since = nil
+            let run = max(0, t - s)
+            longest = max(longest, run)
+            total += run
+        }
+    }
+
+    /// `--render --check-instruments`: the meter, the hint names and the hooks on made-up input (no render, no Vision). True when all hold.
+    fileprivate static func checkInstruments() async -> Bool {
+        var failed = 0
+        func check(_ name: String, _ ok: Bool) {
+            print("\(ok ? "PASS" : "FAIL") \(name)")
+            if !ok { failed += 1 }
+        }
+        // Samples every 0.1 s to a 12 s exit: silent to 2.3 s, shown, silent 5.0 to 5.4 s, shown, silent from 9.0 s to the exit.
+        var m = SilenceMeter()
+        for i in 0 ... 120 {
+            let t = Double(i) / 10
+            m.sample(at: t, silent: t < 2.3 || (t >= 5.0 && t < 5.4) || t >= 9.0)
+        }
+        m.end(at: 12)
+        check("longest is the run open at the exit (3.0 s)", abs(m.longest - 3.0) < 1e-9)
+        check("total adds the runs (2.3 + 0.4 + 3.0 s)", abs(m.total - 5.7) < 1e-9)
+        var never = SilenceMeter()
+        for i in 0 ... 20 { never.sample(at: Double(i) / 10, silent: false) }
+        never.end(at: 2)
+        check("a lens never silent measures 0", never.longest == 0 && never.total == 0)
+        var always = SilenceMeter()
+        for i in 0 ... 20 { always.sample(at: Double(i) / 10, silent: true) }
+        always.end(at: 2.05)
+        check("a lens silent to the exit measures the whole run", abs(always.longest - 2.05) < 1e-9 && always.longest == always.total)
+        check("no hint is none", hintName(nil) == "none")
+        check("a hint without a payload", hintName(.preparingRecognition) == "preparingRecognition")
+        check("a hint with a payload loses it", hintName(.alreadyInTarget(target: "ko")) == "alreadyInTarget"
+              && hintName(.downloadPack(PackPair(source: "ja", target: "ko"))) == "downloadPack")
+        // The hooks, as the host will register them. Nothing registered first: a run still has its answers.
+        let bare = Instruments(args: ["in.png", "out.png", "--max-wait", "0.5"])
+        check("no readerReady registered: n/a", await bare.readerLine() == "reader-ready: n/a")
+        check("no statsLines registered: no lines", await bare.readerStats().isEmpty)
+        let polls = OSAllocatedUnfairLock(initialState: 0), left = OSAllocatedUnfairLock(initialState: 3)
+        register(inFlight: { left.withLock { n in defer { n = max(0, n - 1) }; return n } })
+        register(readerReady: { polls.withLock { n in n += 1; return n >= 3 } }, statsLines: { ["lines=1", "reader: workers=2"] })
+        check("a later register keeps the earlier hooks", hooks.inFlight != nil && hooks.readerReady != nil && hooks.statsLines != nil)
+        let wait = await bare.readerLine()
+        check("readerReady true on the third poll: its time (\(wait))", wait.hasPrefix("reader-ready: ") && Int(wait.dropFirst(14)) != nil && polls.withLock { $0 } == 3)
+        check("stats lines get the prefix once", await bare.readerStats() == ["reader: lines=1", "reader: workers=2"])
+        let drained = await bare.drain()
+        check("the drain waits for the registered inFlight to reach 0 (\(drained.ms) ms)", drained.inFlight == 0 && drained.ms >= 200)
+        register(readerReady: { false })
+        check("a reader that never comes is reported after --max-wait", await bare.readerLine().hasPrefix("reader-ready: timeout "))
+        print("check-instruments: \(failed == 0 ? "all PASS" : "\(failed) FAIL")")
+        return failed == 0
+    }
+
+    /// What a run measures besides its result, and prints at its end (`finish`): the lens's silence and hints, the drain, the host's lines.
+    fileprivate final class Instruments: @unchecked Sendable {
+        /// The Trace counters of every phase so far: `printCounts` drains them.
+        final class Seen: @unchecked Sendable {
+            private let lock = NSLock()
+            private var counts: [String: Int] = [:]
+            func add(_ c: [String: Int]) { lock.withLock { for (k, v) in c { counts[k, default: 0] += v } } }
+            subscript(key: String) -> Int { lock.withLock { counts[key] ?? 0 } }
+        }
+        static let seen = Seen()
+
+        /// The one issue the app keeps (`AppModel.issue`), from its two sources.
+        final class Issues: @unchecked Sendable {
+            private let lock = NSLock()
+            private var current: TranslationIssue?
+            var value: TranslationIssue? { lock.withLock { current } }
+            /// A translation's issue, or its end: as `AppModel.received` (a translation that went well does not end the recognizer's).
+            func fromTranslation(_ new: TranslationIssue?) {
+                lock.withLock { if !(new == nil && current?.isTextRecognition == true) { current = new } }
+            }
+            /// The recognizer's notice, or its end: as `AppModel.recognitionNotice`.
+            func fromRecognizer(_ new: TranslationIssue?) {
+                lock.withLock { if let new { current = new } else if current?.isTextRecognition == true { current = nil } }
+            }
+        }
+
+        /// What the reads found, for "already in <target>" (`RegionSession.read`).
+        final class Streak: @unchecked Sendable {
+            private let lock = NSLock()
+            private var streak = TargetLanguageStreak()
+            func read(_ tally: ReadTally) { _ = lock.withLock { streak.read(tally) } }
+            var shown: Bool { lock.withLock { streak.shown } }
+        }
+
+        enum WarmUp { case none, running, ended }
+
+        let issues = Issues()
+        let streak = Streak()
+        /// `--max-wait` when given.
+        private let maxWait: Double?
+        private let noDrain: Bool
+        private let lock = NSLock()
+        private var warmUp = WarmUp.none
+        private var source = "auto", target = ""
+        private var began: Date?
+        private var sampler: Task<Void, Never>?
+        private var meter = SilenceMeter()
+        private var hints: [(name: String, ms: Int)] = []
+        private var lastHint = "none"
+
+        init(args: [String]) {
+            maxWait = args.firstIndex(of: "--max-wait").flatMap { $0 + 1 < args.count ? Double(args[$0 + 1]) : nil }
+            noDrain = args.contains("--no-drain")
+        }
+
+        func setTarget(_ language: String) { lock.withLock { target = language } }
+
+        // MARK: Warm-up
+
+        /// Starts the text models' load as the app does at launch; the drain waits for it.
+        func beginWarmUp(source: String) -> Task<Void, Never> {
+            lock.withLock { warmUp = .running }
+            return Task.detached(priority: .utility) { [self] in
+                await AppModel.loadVision(source: source)
+                lock.withLock { warmUp = .ended }
+            }
+        }
+
+        /// `--warm`: until the load is done, or `--max-wait` seconds when given. False when the bound came first.
+        func waitForWarmUp(_ loading: Task<Void, Never>) async -> Bool {
+            guard let bound = maxWait else {
+                await loading.value
+                return true
+            }
+            let began = Date()
+            while lock.withLock({ warmUp }) == .running {
+                if Date().timeIntervalSince(began) >= bound { return false }
+                try? await Task.sleep(for: .milliseconds(20))
+            }
+            return true
+        }
+
+        // MARK: Silence timeline
+
+        /// Samples what the lens would show every 100 ms, from now to `finish`. `drawn` is whether a translated block is on the lens.
+        func startSampling(source: String, target: String, drawn: @escaping @Sendable () -> Bool) {
+            let t0 = Date()
+            lock.withLock { began = t0; self.source = source; self.target = target }
+            let task = Task.detached(priority: .userInitiated) { [self] in
+                var k = 0
+                while !Task.isCancelled {
+                    await sample(at: Date().timeIntervalSince(t0), drawn: drawn())
+                    k += 1
+                    try? await Task.sleep(for: .seconds(max(0.01, Double(k) * 0.1 - Date().timeIntervalSince(t0))))
+                }
+            }
+            lock.withLock { sampler = task }
+        }
+
+        private func sample(at t: Double, drawn: Bool) async {
+            let hint = await signals(drawn: drawn).hint()
+            let name = SelfTest.hintName(hint)
+            lock.withLock {
+                if name != lastHint {
+                    hints.append((name, Int(t * 1000)))
+                    lastHint = name
+                }
+                meter.sample(at: t, silent: !drawn && hint == nil)
+            }
+        }
+
+        /// What `RegionSession.hintSignals` gathers for a lens, from the same sources: the screen is fine (a still has no capture), the
+        /// recognizer's setup is `AppModel.recognitionPreparing`, and the pack is the issue's when it is this lens's pair.
+        private func signals(drawn: Bool) async -> LensSignals {
+            let (gate, now) = await MainActor.run { VisionSetupDisplay.current }
+            let issue = issues.value
+            let (source, target) = lock.withLock { (self.source, self.target) }
+            var preparing: Bool
+            if case .textRecognitionStarting? = issue {
+                preparing = true
+            } else {
+                preparing = gate.shouldShowProgress(now: now) && !VisionSetupDisplay.failed(gate) && !VisionSetupDisplay.allDone(gate)
+            }
+            var signals = LensSignals(screen: .fine, recognitionPreparing: preparing, showsTranslations: drawn,
+                                      alreadyInTarget: streak.shown ? target : nil)
+            func same(_ a: String, _ b: String) -> Bool { Locale.Language(identifier: a).languageCode == Locale.Language(identifier: b).languageCode }
+            if case let .languagePackMissing(missingSource, missingTarget)? = issue, same(missingTarget, target),
+               source == "auto" || same(missingSource, source) {
+                signals.missingPack = PackPair(source: missingSource, target: missingTarget)
+            }
+            return signals
+        }
+
+        // MARK: Drain
+
+        /// What `TextRecognizer` exposes today: a setup step is compiling (this run's load, or one a read started), or revision 3 has a
+        /// request past its deadline that has not answered, which Vision keeps running (`ocr.stalled.vn3` counted, `ocr.recovered.vn3`
+        /// not yet). A request that a later answer retired is not seen, so this is a lower bound.
+        private func todaysInFlight() async -> Int {
+            let warming = lock.withLock { warmUp } == .running || TextRecognizer.setupState.running != nil
+            let counts = Self.peek()
+            func n(_ key: String) -> Int { Self.seen[key] + (counts[key] ?? 0) }
+            let stalled = n("ocr.stalled.vn3") - n("ocr.recovered.vn3") > 0
+            return (warming ? 1 : 0) + (stalled ? 1 : 0)
+        }
+
+        /// The Trace counters without draining them (the next `printCounts` still sees them).
+        private static func peek() -> [String: Int] {
+            let counts = Trace.takeCounts()
+            for (key, n) in counts { Trace.count(key, n) }
+            return counts
+        }
+
+        /// Waits until nothing is in flight (the host's `inFlight`, else today's), 180 s at most. `--max-wait` does not shorten it: a run
+        /// that gave up waiting (a settle that hit its bound behind a compile) is the one that would exit mid-compile.
+        func drain() async -> (ms: Int, inFlight: Int) {
+            let inFlight = SelfTest.hooks.inFlight ?? { [self] in await todaysInFlight() }
+            let began = Date(), bound = 180.0
+            var n = await inFlight()
+            while n > 0, Date().timeIntervalSince(began) < bound {
+                try? await Task.sleep(for: .milliseconds(100))
+                n = await inFlight()
+            }
+            return (SelfTest.ms(began), n)
+        }
+
+        // MARK: Reader
+
+        /// `--then reader-ready`: prints `readerLine`.
+        func waitForReader() async { print(await readerLine()) }
+
+        /// Waits until the host says its readers are warm, `--max-wait` seconds at most (600 by default); the line to print: its time in
+        /// ms, `timeout <ms>`, or `n/a` while no host has registered.
+        func readerLine() async -> String {
+            guard let ready = SelfTest.hooks.readerReady else { return "reader-ready: n/a" }
+            let began = Date(), bound = maxWait ?? 600
+            while !(await ready()) {
+                if Date().timeIntervalSince(began) >= bound { return "reader-ready: timeout \(SelfTest.ms(began))" }
+                try? await Task.sleep(for: .milliseconds(100))
+            }
+            return "reader-ready: \(SelfTest.ms(began))"
+        }
+
+        /// The host's stats as `reader: <line>` lines (a line that starts with `reader:` is kept as it is).
+        func readerStats() async -> [String] {
+            guard let stats = SelfTest.hooks.statsLines else { return [] }
+            return await stats().map { $0.hasPrefix("reader:") ? $0 : "reader: \($0)" }
+        }
+
+        // MARK: The end of the run
+
+        /// Drains, stops the timeline, and prints: `hint:` lines, `silence:`, `drain:`, then the host's `reader:` lines.
+        func finish() async {
+            let drained = noDrain ? nil : await drain()
+            let (task, t0) = lock.withLock { (sampler, began) }
+            task?.cancel()
+            await task?.value
+            if let t0 {
+                let (m, changes) = lock.withLock { () -> (SilenceMeter, [(name: String, ms: Int)]) in
+                    meter.end(at: Date().timeIntervalSince(t0))
+                    return (meter, hints)
+                }
+                for h in changes { print("hint: \(h.name) at \(h.ms)") }
+                print("silence: longest=\(Int((m.longest * 1000).rounded())) total=\(Int((m.total * 1000).rounded()))")
+            } else {
+                print("silence: n/a")
+            }
+            print(drained.map { "drain: \($0.ms) in-flight=\($0.inFlight)" } ?? "drain: skipped")
+            for line in await readerStats() { print(line) }
+        }
     }
 }

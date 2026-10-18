@@ -516,8 +516,8 @@ actor TranslationService {
             issueHandler?(.intelligenceUnavailable(intelligence.unavailableReason ?? ""))
         }
         guard source != "und" else { throw TranslationIssue.failed(String(localized: "Could not tell which language this is")) }
-        let (session, _) = try await session(source: source)
-        return try await stream(items, through: session, onResult: onResult)
+        let (session, strategy) = try await session(source: source)
+        return try await stream(items, through: session, space: sessionID(source: source, strategy: strategy), onResult: onResult)
     }
 
     /// One call to an added engine for the whole group (the engines translate a batch in one request, so results land
@@ -588,7 +588,7 @@ actor TranslationService {
             : settings.engine == .highFidelity ? [.highFidelity] : [.lowLatency, .highFidelity]
         var downloadable = false
         for strategy in wanted {
-            let id = "\(source)>\(settings.targetLanguage)|\(strategy == .highFidelity ? "hf" : "ll")"
+            let id = sessionID(source: source, strategy: strategy)
             if let s = sessions[id] { return (s, strategy) }
             let status: LanguageAvailability.Status
             if let cached = pairStatus[id] { status = cached } else {
@@ -609,6 +609,11 @@ actor TranslationService {
         throw TranslationIssue.unsupportedPair(source: source, target: settings.targetLanguage)
     }
 
+    /// One language pair and strategy: the key of a session and of what the engine's wording of a term was learned for.
+    private func sessionID(source: String, strategy: Strategy) -> String {
+        "\(source)>\(settings.targetLanguage)|\(strategy == .highFidelity ? "hf" : "ll")"
+    }
+
     private func availability(_ strategy: Strategy) -> LanguageAvailability {
         guard #available(macOS 26.4, *) else { return LanguageAvailability() }
         return LanguageAvailability(preferredStrategy: strategy == .highFidelity ? .highFidelity : .lowLatency)
@@ -623,7 +628,7 @@ actor TranslationService {
     /// Batch request whose responses arrive one by one, in order. A source with protected spans goes as a request of its own,
     /// all at once with the batch: a batch response carries no attributed text (measured 2026-10-18), so it could not say where
     /// the spans came back.
-    private func stream(_ items: [String], through session: TranslationSession,
+    private func stream(_ items: [String], through session: TranslationSession, space: String,
                         onResult: @escaping @Sendable (String, String) -> Void) async throws -> [String: String] {
         let pairs = settings.glossaryPairs
         let marked = protectedSpans(for: items, pairs: pairs)
@@ -649,7 +654,7 @@ actor TranslationService {
                     group.addTask {
                         let t: String
                         do {
-                            t = try await self.translateMarked(source, plan, pairs: pairs, through: session)
+                            t = try await self.translateMarked(source, plan, pairs: pairs, through: session, space: space)
                         } catch is CancellationError {
                             throw CancellationError()
                         } catch {
@@ -691,18 +696,25 @@ actor TranslationService {
     /// language pack, and high fidelity honours it but writes pieces of its own rendering beside the forced word ("손실실은").
     /// So the run of a term is the engine's rendering and its particle, and the glossary target takes the rendering's place.
     /// A span that did not come back once stays as the engine wrote it, and its term is left to `applyGlossary`.
+    /// Where the term's word ends in a run is told by the engine's own rendering of the term, asked alone once per pair and strategy
+    /// (`TermRenderings`) while this request runs: "평가" and "카메라" end in a syllable that is also a particle, and the run alone
+    /// cannot say it is not one.
     @available(macOS 26.4, *)
     private nonisolated func translateMarked(_ source: String, _ plan: ProtectedSpans, pairs: [(String, String)],
-                                             through session: TranslationSession) async throws -> String {
+                                             through session: TranslationSession, space: String) async throws -> String {
+        let terms = plan.glossaryTerms
+        async let learned = renderings.learn(terms, in: space, through: session)
         let response = try await session.translate(plan.attributedSource())
+        let known = await learned
         guard let attributed = response.attributedTargetText else {
             Trace.count("translate.marked_plain")
             return Self.applyGlossary(TranslationCleanup.restoreSourceTokens(response.targetText, source: source), source: source, pairs: pairs)
         }
         let (text, runs) = ProtectedSpans.answer(attributed)
-        let resolution = plan.resolve(target: text, runs: runs)
-        let pending = Set(resolution.unresolved.compactMap { span -> String? in if case let .glossary(t) = span.kind { t } else { nil } })
-        let handled = Set(plan.spans.compactMap { span -> String? in if case let .glossary(t) = span.kind, !pending.contains(t) { t } else { nil } })
+        let resolution = plan.resolve(target: text, runs: runs, renderings: known)
+        for r in resolution.resolved where r.span.isGlossary { Trace.count("translate.cut_\(r.cut)") }
+        let pending = Set(resolution.unresolved.compactMap { span -> String? in if case let .glossary(t, _) = span.kind { t } else { nil } })
+        let handled = Set(plan.spans.compactMap { span -> String? in if case let .glossary(t, _) = span.kind, !pending.contains(t) { t } else { nil } })
         if !resolution.unresolved.isEmpty { Trace.count("translate.span_unresolved", resolution.unresolved.count) }
         // Same length as what it replaces (`restoreSourceTokens` only changes case), so the formulas' ranges hold.
         let t = Self.applyGlossary(TranslationCleanup.restoreSourceTokens(resolution.text, source: source), source: source, pairs: pairs, skipping: handled)
@@ -717,6 +729,9 @@ actor TranslationService {
     }
 
     private nonisolated let placements = MathPlacements()
+
+    /// What Apple Translation writes for each glossary term alone, per language pair and strategy, for this launch.
+    private nonisolated let renderings = TermRenderings()
 
     /// Apple Translation has no glossary; enforce entries whose source term survived untranslated. `skipping`: targets of terms
     /// whose spans were all resolved.
@@ -772,6 +787,53 @@ private final class Arrivals: @unchecked Sendable {
             return (t - last, count == 0)
         }
     }
+}
+
+/// What an Apple Translation session writes for a glossary term alone (the answer to `translate("assessment")`: "평가"), asked
+/// once per language pair, strategy and term and kept for the launch. Memory only: nothing of it is written out. A run of a marked
+/// term that starts with it is cut where it ends (`ProtectedSpans.resolve(renderings:)`). Short: a term is a word or two, and the
+/// glossary is a few dozen entries at most. A failed or cancelled ask is forgotten, so the next line asks again.
+private final class TermRenderings: @unchecked Sendable {
+    private let lock = NSLock()
+    private var asked: [String: Task<String?, Never>] = [:]
+
+    /// The renderings of `terms` (the ones that have a usable one), asked concurrently; a term already asked, by this call or
+    /// another running now, is not asked again.
+    func learn(_ terms: [String], in space: String, through session: TranslationSession) async -> [String: String] {
+        guard !terms.isEmpty else { return [:] }
+        return await withTaskGroup(of: (String, String?).self) { group in
+            for term in terms {
+                group.addTask { (term, await self.rendering(of: term, in: space) { try await session.translate(term).targetText }) }
+            }
+            var out: [String: String] = [:]
+            for await (term, r) in group { if let r { out[term] = r } }
+            return out
+        }
+    }
+
+    /// The caller that starts an ask owns it: its cancellation cancels the ask (the others get nil and ask again next time).
+    private func rendering(of term: String, in space: String, answer: @escaping @Sendable () async throws -> String) async -> String? {
+        let key = space + "\u{1F}" + term
+        let (task, owner) = lock.withLock { () -> (Task<String?, Never>, Bool) in
+            if let t = asked[key] { return (t, false) }
+            let t = Task<String?, Never> {
+                do {
+                    Trace.count("translate.rendering_asked")
+                    let r = ProtectedSpans.usableRendering(try await answer(), ofTerm: term)
+                    if r == nil { Trace.count("translate.rendering_unusable") }
+                    return r
+                } catch {
+                    self.forget(key)
+                    return nil
+                }
+            }
+            asked[key] = t
+            return (t, true)
+        }
+        return await withTaskCancellationHandler { await task.value } onCancel: { if owner { task.cancel() } }
+    }
+
+    private func forget(_ key: String) { lock.withLock { asked[key] = nil } }
 }
 
 /// Where the formulas stand in the translation last made for a source (see `TranslationService.inlineMath`). Few: only the lines

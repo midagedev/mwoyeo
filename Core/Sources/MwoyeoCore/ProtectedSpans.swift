@@ -6,6 +6,8 @@ import Foundation
 /// glossary term is not (measured, 2026-10-18, `docs/research/apple-glossary-spans-*.txt`): low latency ignores the mark for words, and
 /// high fidelity honours it but writes bits of its own rendering beside the forced word ("손실실은", "인encoder"); so the run of
 /// a glossary term is the engine's rendering plus the particle it attached, and the glossary target replaces the rendering.
+/// Where the rendering ends and the particle begins is read from the engine's own rendering of the term, asked alone
+/// (`resolve(renderings:)`); a run that does not start with it is cut from how it looks (`KoreanParticle.wordEnd`).
 ///
 /// This type is pure: it says which ranges to mark, and, given the target text and the marked runs that came back, puts the
 /// glossary targets in and says where the other spans stand. The app turns it into an `AttributedString` and back.
@@ -13,8 +15,9 @@ import Foundation
 /// Offsets are in `Character`s.
 public struct ProtectedSpans: Equatable, Sendable {
     public enum Kind: Equatable, Sendable {
-        /// A glossary source term: the engine carries it through, and `target` takes its place in the translation.
-        case glossary(target: String)
+        /// A glossary source term: the engine carries it through, and `target` takes its place in the translation. `term` is the
+        /// glossary entry it was found as ("token" for "Tokens"), the key of the engine's rendering of it (`resolve(renderings:)`).
+        case glossary(target: String, term: String = "")
         /// A formula the page typesets as symbols: it stays as the engine returned it, to be drawn over later.
         case math(id: Int)
     }
@@ -49,6 +52,17 @@ public struct ProtectedSpans: Equatable, Sendable {
         public let text: String
         /// What the engine had written there: the span itself, or its own rendering of a glossary term.
         public let was: String
+        /// How the end of `was` was found (a glossary term in Korean: how the engine's rendering was told from its particle).
+        public let cut: Cut
+    }
+
+    public enum Cut: Equatable, Sendable {
+        /// The run started with the span as it was written (a formula, a name the engine kept), or `was` is the whole of it.
+        case span
+        /// The run started with the engine's rendering of the term asked alone: the word ends where that does.
+        case rendering
+        /// No rendering to compare with: the word ends before what looks like a particle (`KoreanParticle.wordEnd`).
+        case look
     }
 
     public struct Resolution: Equatable, Sendable {
@@ -65,6 +79,14 @@ public struct ProtectedSpans: Equatable, Sendable {
     public let spans: [Span]
 
     public var isEmpty: Bool { spans.isEmpty }
+
+    /// The glossary entries the spans were found as, each once, in source order.
+    public var glossaryTerms: [String] {
+        var seen = Set<String>()
+        return spans.compactMap { span in
+            if case let .glossary(_, term) = span.kind, !term.isEmpty, seen.insert(term).inserted { term } else { nil }
+        }
+    }
 
     /// Spans that overlap an earlier one (the longer wins at one start) or lie outside `source` are dropped.
     public init(source: String, spans wanted: [(range: Range<Int>, kind: Kind)]) {
@@ -122,7 +144,7 @@ public struct ProtectedSpans: Equatable, Sendable {
                     }
                     guard !taken[i..<end].contains(true) else { continue }
                     for k in i..<end { taken[k] = true }
-                    found.append((i..<end, .glossary(target: target)))
+                    found.append((i..<end, .glossary(target: target, term: term)))
                     i = end
                     continue scan
                 }
@@ -138,6 +160,21 @@ public struct ProtectedSpans: Equatable, Sendable {
     }
     private static func isWordChar(_ c: Character) -> Bool { c.isLetter || c.isNumber || c == "_" }
 
+    // MARK: - The engine's rendering of a term
+
+    /// What the engine answered for a glossary term translated alone, as a rendering to look for at the start of a run: trimmed of
+    /// space and closing punctuation. nil when it is no rendering: empty, several lines, far longer than a term, or the term itself
+    /// (the engine kept it: "softmax"), which the span-text rule already handles.
+    public static func usableRendering(_ answer: String, ofTerm term: String) -> String? {
+        var chars = Array(answer.trimmingCharacters(in: .whitespacesAndNewlines))
+        while let last = chars.last, ".,;:!?…。、，！？".contains(last) || last.isWhitespace { chars.removeLast() }
+        let rendering = String(chars)
+        func squeezed(_ s: String) -> String { s.filter { !$0.isWhitespace }.lowercased() }
+        guard !rendering.isEmpty, !rendering.contains("\n"), rendering.count <= max(24, term.count * 3),
+              squeezed(rendering) != squeezed(term) else { return nil }
+        return rendering
+    }
+
     // MARK: - Resolving
 
     /// Finds each span in the translation and puts the glossary targets in.
@@ -145,17 +182,21 @@ public struct ProtectedSpans: Equatable, Sendable {
     /// `runs` are the marked runs of the target in order. A span is resolved when exactly one run carries its marker and
     /// - the run starts with the span's text (spaces apart: the engine respaced "q · k" to "q·k"); the rest of the run is
     ///   translated text, the particle the engine attached ("dk의", "√dk로 "); or
-    /// - for a glossary term in Korean (target and run), the run is the engine's own rendering of it and its particle ("토큰으로", "모델에 "): the word
-    ///   before the particle (`KoreanParticle.wordEnd`) is replaced, unless it is one word of a longer target ("헤드" of
+    /// - for a glossary term, the run is the engine's own rendering of it and its particle ("토큰으로", "모델에 ", "카메라는"):
+    ///   the word ends where `renderings[term]`, the engine's rendering of the term asked alone, ends when the run starts with it
+    ///   and only a particle or the like follows ("카메라" ends in a syllable that is also a particle, and only the rendering says
+    ///   it is not one; "정확" of "정확도가" is the front of a word), or, for a term in Korean (target and run), before the particle by
+    ///   how the run looks (`KoreanParticle.wordEnd`). The word is replaced, unless it is one word of a longer target ("헤드" of
     ///   "어텐션 헤드": the rest of the rendering stands outside the run, and replacing the piece would say it twice).
     /// The run is looked for in `target` from where the last one ended, so two runs with the same text are two places. An
     /// unresolved span adds nothing to `text`; the caller handles its term another way. A glossary target's particle is put in
     /// the form its last sound asks for unless `fixParticles` is false (the probe measures how often it was wrong).
-    public func resolve(target: String, runs: [Run], fixParticles: Bool = true) -> Resolution {
+    /// `renderings`: glossary term → what the engine writes for it alone (`usableRendering`), per language pair and strategy.
+    public func resolve(target: String, runs: [Run], fixParticles: Bool = true, renderings: [String: String] = [:]) -> Resolution {
         let t = Array(target)
         var count: [Int: Int] = [:]
         for r in runs { count[r.marker, default: 0] += 1 }
-        var hits: [(span: Span, start: Int, end: Int)] = []
+        var hits: [(span: Span, start: Int, end: Int, cut: Cut)] = []
         var seen = Set<Int>()
         var cursor = 0
         for run in runs {
@@ -164,21 +205,30 @@ public struct ProtectedSpans: Equatable, Sendable {
             let rc = Array(run.text)
             guard let at = Self.find(rc, in: t, from: cursor) else { continue }
             var extent = Self.prefix(of: Array(span.text), in: rc)
-            if extent == nil, case let .glossary(replacement) = span.kind, Self.hasHangul(replacement), rc.contains(where: Self.isHangul) {
-                // The engine's rendering of the term, then its particle: the word before the particle is what the target replaces.
-                // Korean only: where a run ends and its particle begins is not known for other languages, and cutting the
-                // particle off a Japanese or Chinese run would leave the sentence broken.
-                let from = rc.prefix { $0.isWhitespace }.count
-                if from < rc.count {
-                    let to = from + KoreanParticle.wordEnd(in: String(rc[from...]))
-                    let word = String(rc[from..<to])
+            var cut = Cut.span
+            if extent == nil, case let .glossary(replacement, term) = span.kind {
+                // Where the word ends: by the engine's rendering of the term asked alone, when the run starts with it and only what
+                // may follow a word comes after it (any script; for a term in Korean `KoreanParticle.isTail` says what may); else,
+                // for a term in Korean, by how the run looks (the word before the particle). Korean only for the look: where a
+                // run ends and its particle begins is not known for other languages, and cutting the particle off a Japanese
+                // or Chinese run would leave the sentence broken.
+                var word: (from: Int, to: Int, cut: Cut)?
+                let korean = Self.hasHangul(replacement)
+                if let asked = renderings[term], let found = Self.prefix(of: Array(asked), in: rc),
+                   !korean || KoreanParticle.isTail(String(rc[found.1...])) {
+                    word = (found.0, found.1, .rendering)
+                } else if korean, rc.contains(where: Self.isHangul) {
+                    let from = rc.prefix { $0.isWhitespace }.count
+                    if from < rc.count { word = (from, from + KoreanParticle.wordEnd(in: String(rc[from...])), .look) }
+                }
+                if let w = word {
                     // One word of a longer target ("헤드" of "어텐션 헤드"): the rest of the rendering is outside the run.
                     let words = replacement.split(separator: " ")
-                    if !(words.count > 1 && words.contains(Substring(word))) { extent = (from, to) }
+                    if !(words.count > 1 && words.contains(Substring(String(rc[w.from..<w.to])))) { extent = (w.from, w.to); cut = w.cut }
                 }
             }
             guard let (from, to) = extent else { continue }
-            hits.append((span, at + from, at + to))
+            hits.append((span, at + from, at + to, cut))
             seen.insert(span.marker)
             cursor = at + rc.count
         }
@@ -190,12 +240,12 @@ public struct ProtectedSpans: Equatable, Sendable {
             out += t[pos..<h.start]
             let piece: [Character]
             switch h.span.kind {
-            case let .glossary(replacement): piece = Array(replacement)
+            case let .glossary(replacement, _): piece = Array(replacement)
             case .math: piece = Array(t[h.start..<h.end])
             }
             let from = out.count
             out += piece
-            resolved.append(Resolved(span: h.span, range: from..<out.count, text: String(piece), was: String(t[h.start..<h.end])))
+            resolved.append(Resolved(span: h.span, range: from..<out.count, text: String(piece), was: String(t[h.start..<h.end]), cut: h.cut))
             // What the engine wrote after the span is kept up to the next span; a glossary target's particle follows its sound.
             let limit = k + 1 < hits.count ? hits[k + 1].start : t.count
             let rest = String(t[h.end..<max(h.end, limit)])

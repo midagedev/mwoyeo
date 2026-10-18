@@ -67,16 +67,57 @@ public enum KoreanParticle {
         return all.sorted { $0.count > $1.count }
     }()
 
+    /// Particles that follow another particle ("에서는", "로는", "가도"): what a word may be followed by, second.
+    private static let auxiliaries: Set<String> = ["은", "는", "도", "만", "까지", "부터", "보다", "처럼", "조차", "마저"]
+
+    /// A copula after a noun ("토큰입니다", "인코더이다"): not a particle, but not part of the word either.
+    private static let copulas: [String] = ["입니다", "이다", "이며", "이고", "이지만", "이므로", "이라서", "인데", "이었다", "였다"]
+
+    /// Whether `rest`, what stands in a run after the engine's rendering of a term, is only what may follow a word: nothing, space or
+    /// punctuation, a plural 들, a particle, a case particle and an auxiliary one ("로는"), or a copula. A rendering that ends
+    /// before anything else ("정확" in "정확도가", "회의" in "회의록을", "사과" in "사과파이를") is the front of a longer word.
+    public static func isTail(_ rest: String) -> Bool {
+        var s = Substring(rest)
+        while let c = s.first, c.isWhitespace || ".,!?;:".contains(c) { s = s.dropFirst() }
+        while let c = s.last, c.isWhitespace || ".,!?;:".contains(c) { s = s.dropLast() }
+        if s.hasPrefix("들") { s = s.dropFirst() }
+        if s.isEmpty || copulas.contains(String(s)) { return true }
+        return trailing.contains { p in
+            guard s.hasPrefix(p) else { return false }
+            let after = String(s.dropFirst(p.count))
+            return after.isEmpty || (!auxiliaries.contains(p) && auxiliaries.contains(after))
+        }
+    }
+
+    /// Particles that are also the last syllable of common nouns (평가, 결과, 회의, 카메라, 고양이, 속도): a run that ends in one cannot
+    /// say by itself whether it is word + particle ("결과가") or just the word ("결과"). The others ("은", "를", "에서", "으로" …)
+    /// end a word so rarely that a run that ends in one is cut.
+    private static let nounEndings: Set<String> = ["이", "가", "과", "와", "도", "의", "만", "에", "로", "나", "라"]
+
+    /// Whether `particle` ends `stem + particle` as a particle, judged from the run alone: one of `nounEndings` is cut only when
+    /// at least two syllables are left in front of it and, if it changes with the last sound (이/가, 과/와, 나, 라, 로), its form is the one
+    /// the stem's last sound asks for ("평"+"가" is not: 평 has a final consonant and 가 follows a vowel). This still reads
+    /// 카메|라 and 고양|이 as a particle; the engine's own rendering of the term (`ProtectedSpans.resolve(renderings:)`) settles those.
+    private static func isParticle(_ particle: String, after stem: ArraySlice<Character>) -> Bool {
+        guard nounEndings.contains(particle) else { return true }
+        let shown = stem.filter { !$0.isWhitespace }
+        guard shown.count >= 2 else { return false }
+        guard let pair = pairs.first(where: { $0.consonant == particle || $0.vowel == particle }),
+              let jong = finalConsonant(of: String(shown.suffix(1))) else { return true }
+        return (pair.consonant == particle) == asksConsonantForm(pair, jong)
+    }
+
     /// Where the word ends in `text` when the engine's rendering of a term and the particle it attached ("토큰으로", "모델에 ",
     /// "레이어들은") stand together: the offset (in Characters) before the trailing space, punctuation, particle and plural 들.
-    /// The whole text when it holds no particle. Never 0 for a non-empty text: the word keeps at least one Character.
+    /// The whole text when it holds no particle, or when its last syllable only looks like one ("평가", "결과 ": see `isParticle`).
+    /// Never 0 for a non-empty text: the word keeps at least one Character.
     public static func wordEnd(in text: String) -> Int {
         let t = Array(text)
         var end = t.count
         while end > 1, t[end - 1].isWhitespace || ".,!?;:".contains(t[end - 1]) { end -= 1 }
         let word = String(t[..<end])
         for p in trailing where word.hasSuffix(p) && end - p.count >= 1 {
-            end -= p.count
+            if isParticle(p, after: t[..<(end - p.count)]) { end -= p.count }
             break
         }
         if end > 1, t[end - 1] == "들" { end -= 1 }

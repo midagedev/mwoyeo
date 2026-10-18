@@ -360,19 +360,30 @@ struct LanguagePacksView: View {
     }
 }
 
-private struct AppearanceSettings: View {
+struct AppearanceSettings: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
         @Bindable var model = model
         Form {
             Section("Lens") {
-                HStack(spacing: 12) {
+                HStack(spacing: 8) {
                     ForEach(LensStyle.allCases) { style in
-                        LensStyleCard(style: style, selected: model.settings.lensStyle == style) { model.settings.lensStyle = style }
+                        LensStyleCard(style: style, tint: model.settings.lensTint, selected: model.settings.lensStyle == style) { model.settings.lensStyle = style }
                     }
                 }
                 .frame(maxWidth: .infinity)
+                Picker("Colour", selection: $model.settings.lensTint) {
+                    ForEach(LensTint.allCases) { tint in
+                        Label { Text(tint.title) } icon: { Image(nsImage: Self.swatch(tint)) }.tag(tint)
+                    }
+                }
+                Picker("Name tag", selection: $model.settings.lensTabVisibility) {
+                    ForEach(LensTabVisibility.allCases) { Text($0.title).tag($0) }
+                }
+                Picker("Name tag position", selection: $model.settings.lensTabPosition) {
+                    ForEach(LensTabPosition.allCases) { Text($0.title).tag($0) }
+                }
             }
             Section("Text") {
                 Picker("Font", selection: $model.settings.fontStyle) {
@@ -405,11 +416,22 @@ private struct AppearanceSettings: View {
         }
         .formStyle(.grouped)
     }
+
+    /// A small round sample of a tint's colours (not a template image, so a menu keeps its colours).
+    private static func swatch(_ tint: LensTint) -> NSImage {
+        let image = NSImage(size: NSSize(width: 12, height: 12), flipped: false) { rect in
+            NSGradient(colors: Array(tint.colors.prefix(4)))?.draw(in: NSBezierPath(ovalIn: rect.insetBy(dx: 0.5, dy: 0.5)), angle: -45)
+            return true
+        }
+        image.isTemplate = false
+        return image
+    }
 }
 
 /// A lens in miniature, drawn in one style, to pick from.
 private struct LensStyleCard: View {
     let style: LensStyle
+    let tint: LensTint
     let selected: Bool
     let action: () -> Void
 
@@ -420,14 +442,14 @@ private struct LensStyleCard: View {
                     RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Color(white: 0.13))
                     VStack(alignment: .leading, spacing: 5) {
                         ForEach([0.9, 0.7, 0.8, 0.45], id: \.self) { f in
-                            Capsule().fill(.white.opacity(0.75)).frame(width: 64 * f, height: 3)
+                            Capsule().fill(.white.opacity(0.75)).frame(width: 52 * f, height: 3)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, 22)
+                    .padding(.leading, 18)
                     ring.padding(10)
                 }
-                .frame(width: 112, height: 70)
+                .frame(width: 100, height: 64)
                 .overlay {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .strokeBorder(selected ? Color.accentColor : .clear, lineWidth: 2.5)
@@ -444,9 +466,12 @@ private struct LensStyleCard: View {
 
     @ViewBuilder private var ring: some View {
         switch style {
-        case .glow: LensRing(cornerRadius: 7, lineWidth: 2, glow: 4)
-        case .subtle: LensRing(cornerRadius: 7, lineWidth: 1.2, glow: 0)
-        case .minimal: RoundedRectangle(cornerRadius: 7, style: .continuous).stroke(.white.opacity(0.4), lineWidth: 1.2)
+        case .glow: LensRing(cornerRadius: 7, lineWidth: 1.3, glow: 3, tint: tint)
+        case .subtle: LensRing(cornerRadius: 7, lineWidth: 0.9, glow: 0, tint: tint)
+        case .corners:
+            CornerBrackets(cornerRadius: 7, arm: 7)
+                .stroke(Brand.ring(.degrees(45), tint: tint), style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
+        case .minimal: RoundedRectangle(cornerRadius: 7, style: .continuous).stroke(.white.opacity(0.4), lineWidth: 0.9)
         }
     }
 }
@@ -669,4 +694,33 @@ extension NSImage {
         let symbol = NSImage(systemSymbolName: "ellipsis.circle", accessibilityDescription: nil) ?? NSImage()
         return symbol.withSymbolConfiguration(.init(paletteColors: [.secondaryLabelColor])) ?? symbol
     }()
+}
+
+/// Four corner brackets: a quarter arc with an arm along each side, as the lens draws them.
+private struct CornerBrackets: Shape {
+    var cornerRadius: CGFloat
+    var arm: CGFloat
+
+    func path(in r: CGRect) -> Path {
+        var p = Path()
+        let c = cornerRadius, a = arm
+        // y down: top-left, top-right, bottom-right, bottom-left.
+        p.move(to: CGPoint(x: r.minX, y: r.minY + c + a))
+        p.addLine(to: CGPoint(x: r.minX, y: r.minY + c))
+        p.addArc(tangent1End: CGPoint(x: r.minX, y: r.minY), tangent2End: CGPoint(x: r.minX + c, y: r.minY), radius: c)
+        p.addLine(to: CGPoint(x: r.minX + c + a, y: r.minY))
+        p.move(to: CGPoint(x: r.maxX - c - a, y: r.minY))
+        p.addLine(to: CGPoint(x: r.maxX - c, y: r.minY))
+        p.addArc(tangent1End: CGPoint(x: r.maxX, y: r.minY), tangent2End: CGPoint(x: r.maxX, y: r.minY + c), radius: c)
+        p.addLine(to: CGPoint(x: r.maxX, y: r.minY + c + a))
+        p.move(to: CGPoint(x: r.maxX, y: r.maxY - c - a))
+        p.addLine(to: CGPoint(x: r.maxX, y: r.maxY - c))
+        p.addArc(tangent1End: CGPoint(x: r.maxX, y: r.maxY), tangent2End: CGPoint(x: r.maxX - c, y: r.maxY), radius: c)
+        p.addLine(to: CGPoint(x: r.maxX - c - a, y: r.maxY))
+        p.move(to: CGPoint(x: r.minX + c + a, y: r.maxY))
+        p.addLine(to: CGPoint(x: r.minX + c, y: r.maxY))
+        p.addArc(tangent1End: CGPoint(x: r.minX, y: r.maxY), tangent2End: CGPoint(x: r.minX, y: r.maxY - c), radius: c)
+        p.addLine(to: CGPoint(x: r.minX, y: r.maxY - c - a))
+        return p
+    }
 }

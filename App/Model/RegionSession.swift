@@ -76,7 +76,7 @@ final class RegionSession {
         chrome = RegionFrameWindow(region: frame, name: config.name)
         chrome.setDetail(Self.languagePair(settings), badge: settings.activeEngineConfig?.badgeSymbol)
         chrome.setFollowing(config.anchor != nil)
-        chrome.setStyle(settings.lensStyle)
+        chrome.setAppearance(settings)
         let capture = Self.overscan(config.rect, wide: false)
         self.capture = capture
         let tap = SnapshotTap()
@@ -145,7 +145,7 @@ final class RegionSession {
             finishTranscript()
         }
         chrome.setDetail(Self.languagePair(settings), badge: settings.activeEngineConfig?.badgeSymbol)
-        chrome.setStyle(settings.lensStyle)
+        chrome.setAppearance(settings)
         await pipeline.update(options: PipelineOptions(settings, lensApp: AppModel.readerContext(for: config)))
         if settings.framesPerSecond != fps {
             fps = settings.framesPerSecond

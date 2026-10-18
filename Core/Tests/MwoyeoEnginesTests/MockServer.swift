@@ -7,6 +7,7 @@ final class MockServer: @unchecked Sendable {
     let port: Int
     private let process = Process()
     private let logURL: URL
+    private let exited = DispatchSemaphore(value: 0)
 
     var base: URL { URL(string: "http://127.0.0.1:\(port)")! }
     var v1: URL { URL(string: "http://127.0.0.1:\(port)/v1")! }
@@ -21,6 +22,7 @@ final class MockServer: @unchecked Sendable {
         process.arguments = ["python3", "-I", root.appendingPathComponent("tools/mock-openai/server.py").path, "\(port)", mode]
         process.standardError = try FileHandle(forWritingTo: logURL)
         process.standardOutput = FileHandle.nullDevice
+        process.terminationHandler = { [exited] _ in exited.signal() }
         try process.run()
         // Ready when the port accepts a connection.
         for _ in 0..<100 {
@@ -33,7 +35,9 @@ final class MockServer: @unchecked Sendable {
 
     func stop() {
         if process.isRunning { process.terminate() }
-        process.waitUntilExit()
+        // Not `waitUntilExit()`: on the test runner's threads it waited in a run loop that never heard of the exit, and the
+        // whole `swift test` hung with the mock already gone (MockServerTests). The handler is told on a queue of its own.
+        if exited.wait(timeout: .now() + 10) == .success { exited.signal() }
         try? FileManager.default.removeItem(at: logURL)
     }
 

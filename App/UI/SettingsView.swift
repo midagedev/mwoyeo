@@ -587,7 +587,9 @@ private struct ShortcutRecorder: View {
 
 private struct AboutView: View {
     @Environment(AppModel.self) private var model
+    #if !MAS
     private let updates = Updates.shared
+    #endif
 
     var body: some View {
         @Bindable var model = model
@@ -599,6 +601,7 @@ private struct AboutView: View {
             Text("Version \(Updates.version) (\(Updates.build))")
                 .font(.caption).foregroundStyle(.tertiary).textSelection(.enabled)
 
+            #if !MAS
             VStack(spacing: 6) {
                 HStack(spacing: 10) {
                     Button("Check for Updates") { Task { await updates.check() } }
@@ -609,10 +612,13 @@ private struct AboutView: View {
                     .toggleStyle(.checkbox).font(.callout)
             }
             .padding(.top, 6)
+            #endif
 
             HStack(spacing: 18) {
                 Link(destination: Updates.repository) { Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right") }
+                #if !MAS
                 Link(destination: Updates.releases) { Label("Release Notes", systemImage: "doc.text") }
+                #endif
                 Link(destination: Updates.issues) { Label("Report a Problem", systemImage: "exclamationmark.bubble") }
             }
             .font(.callout)
@@ -626,11 +632,15 @@ private struct AboutView: View {
                 }
             }
             .font(.callout)
+            Link(destination: Distribution.privacyPolicy) { Label("Privacy Policy", systemImage: "hand.raised") }
+                .font(.callout)
 
             Divider().frame(width: 300).padding(.vertical, 6)
             VStack(alignment: .leading, spacing: 6) {
                 Label("Screen text is read, erased and translated on this Mac and never leaves it", systemImage: "lock.shield")
+                #if !MAS
                 Label("Update checks ask GitHub for the latest version and count installs without any identifier", systemImage: "arrow.down.circle")
+                #endif
                 Label("Vision · Translation · Apple Intelligence · Core ML", systemImage: "apple.intelligence")
                 Label("Inpainting: MI-GAN (Picsart AI Research, MIT)", systemImage: "paintbrush")
             }
@@ -642,6 +652,7 @@ private struct AboutView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
+    #if !MAS
     @ViewBuilder private var updateStatus: some View {
         switch updates.state {
         case .idle: EmptyView()
@@ -656,6 +667,7 @@ private struct AboutView: View {
             }
         }
     }
+    #endif
 }
 
 enum EngineSheetTarget: Identifiable {

@@ -1,6 +1,16 @@
 import AppKit
 import Observation
 
+#if MAS
+/// The Mac App Store distributes updates (guideline 2.4.5(vii)): this build compiles no update check, banner or install count.
+/// What the About view reads stays, so it is one view in both flavours.
+enum Updates {
+    static let repository = URL(string: "https://github.com/midagedev/mwoyeo")!
+    static let issues = repository.appending(path: "issues")
+    static let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
+    static let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "0"
+}
+#else
 /// Asks GitHub for the latest release. Sends nothing but the request itself: no screen text, no identifiers.
 ///
 /// The check downloads a small file attached to every release, so GitHub's download count of it says how many Macs
@@ -102,3 +112,4 @@ final class Updates {
         a.compare(b, options: .numeric) == .orderedDescending
     }
 }
+#endif

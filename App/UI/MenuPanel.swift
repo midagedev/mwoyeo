@@ -26,9 +26,11 @@ struct MenuPanel: View {
                     WindowPresenter.shared.showOnboarding()
                 }
             }
+            #if !MAS
             if case .available(let version, let page) = Updates.shared.state {
                 UpdateBanner(version: version) { NSWorkspace.shared.open(page) }
             }
+            #endif
             HStack(spacing: 8) {
                 LanguageBar(source: Binding(get: { model.effectiveSettings.sourceLanguage }, set: { model.setLanguages(source: $0) }),
                             target: Binding(get: { model.effectiveSettings.targetLanguage }, set: { model.setLanguages(target: $0) }))
@@ -356,6 +358,7 @@ private struct EngineMenu: View {
     }
 }
 
+#if !MAS
 private struct UpdateBanner: View {
     let version: String
     let open: () -> Void
@@ -376,6 +379,7 @@ private struct UpdateBanner: View {
         .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 }
+#endif
 
 struct IssueBanner: View {
     let message: String

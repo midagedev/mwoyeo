@@ -261,11 +261,24 @@ enum SelfTest {
         }
         await printEngineSummary(translator, issues: issues, wasAdded: !settings.engines.isEmpty)
 
+        printLayout(still.latest)
         // Composite: original + overlay blocks, the same function the lens image uses.
         guard let out = still.composite(still.latest) else { throw Failure(description: "context") }
         do { try LensImage.writePNG(out, to: output) } catch { throw Failure(description: "cannot write \(output.path)") }
         print("wrote \(output.path)")
         try keeping.finish(still.latest, lens: lensRect, time: phase + 1)
+    }
+
+    /// `layout: blocks=N overlaps=K spill=S cut=C` (LayoutCheck) and one line per finding with the sources involved: the gate
+    /// and the debug view of a page whose translated blocks run into each other.
+    private static func printLayout(_ snapshot: OverlaySnapshot?) {
+        let drawn = snapshot?.drawn ?? []
+        let report = LayoutCheck.check(drawn)
+        func name(_ i: Int) -> String { "\"" + String(drawn[i].source.prefix(40)) + "\"" }
+        print(report.summary)
+        for (a, b) in report.overlaps { print("  overlap: \(name(a)) x \(name(b))") }
+        for (a, b) in report.cut { print("  cut: \(name(a)) painted over by \(name(b))") }
+        for a in report.spill { print("  spill: \(name(a)) past its column") }
     }
 
     private final class Counter: @unchecked Sendable {

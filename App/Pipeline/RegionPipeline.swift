@@ -48,6 +48,8 @@ struct OverlaySnapshot: @unchecked Sendable {
     /// The newest captured frame (nil right after the capture moved) and its image pixels per point, for saving the lens.
     var frame: CGImage?
     var scale: CGFloat = 2
+    /// The drawn blocks in image pixels, in draw order, for the self-test's layout check.
+    var drawn: [DrawnBlock] = []
 }
 
 /// Content scrolled by `shift` points (positive = down) in `area` (global Quartz points) between frames captured at
@@ -113,6 +115,10 @@ actor RegionPipeline {
         var spareWidth: CGFloat = 0
         var erased: RGBAImage?      // seamless background covering `rect`
         var image: CGImage?
+        /// Where the translation is drawn in `image`, relative to `rect` (pixels).
+        var ink: CGRect?
+        /// Where in `rect` the translation may be laid out, relative to `rect`; nil = all of it.
+        var textArea: CGRect?
     }
 
     private let translator: TranslationService
@@ -790,13 +796,14 @@ actor RegionPipeline {
             _ = finishPass(start, frame: frame)
             return
         }
-        found = splitByStyle(found, in: frame.image)
+        found = splitByStyle(joinSplitLines(found), in: frame.image)
         Trace.mark("fast: OCR \(Int(dirty.width))×\(Int(dirty.height))px → \(found.count) blocks", since: t)
         let fresh = found.filter { ocr in
             TextRecognizer.needsTranslation(ocr.text, target: options.targetLanguage)
                 && !keptRects.contains { $0.contains(CGPoint(x: ocr.rect.midX, y: ocr.rect.midY)) }
         }
         let full = wantsErase ? RGBAImage(cgImage: frame.image) : nil
+        let places = layoutPlaces(of: fresh, among: found, in: frame.image)
         let old = blocks.filter { staleIDs.contains($0.id) }
         let matches = BlockMatcher.match(old: old.map { .init(rect: $0.rect, text: $0.source) },
                                          new: fresh.map { .init(rect: $0.rect, text: $0.text) })
@@ -804,9 +811,9 @@ actor RegionPipeline {
         for (i, ocr) in fresh.enumerated() {
             let prior = matches[i].map { old[$0] }
             var b: Block
-            if let full, let e = erase(ocr, in: full) {
+            if let full, let e = erase(ocr, in: full, place: places[i]) {
                 b = Block(id: prior?.id ?? UUID(), rect: e.rect.cgRect, lines: ocr.lines.map(\.rect), source: ocr.text, appearance: e.look,
-                          fontSize: e.fontSize, spareWidth: e.spare)
+                          fontSize: e.fontSize, spareWidth: e.spare, textArea: e.textArea)
                 b.erased = e.patch
             } else {
                 let r = ocr.rect, pad = ocr.lines.map(\.rect.height).min() ?? r.height
@@ -861,14 +868,20 @@ actor RegionPipeline {
         }
         readBackoff.success()
         Trace.mark("seamless: document OCR (\(found.count) blocks)", since: t); t = Trace.now
+        if Trace.enabled {
+            for (i, b) in found.enumerated() {
+                Trace.mark("ocr-block \(i) lines: " + b.lines.map { l in "\(Int(l.rect.minX)),\(Int(l.rect.minY)),\(Int(l.rect.width)),\(Int(l.rect.height)) '\(l.text.prefix(24))'" }.joined(separator: " ; "), since: Trace.now)
+            }
+        }
         if holdsVerticalText(found) {
             guard finishPass(start, frame: frame) != nil else { return true }
             blocks = []
             emit(animated: false)
             return true
         }
-        found = splitByStyle(found, in: frame.image)
-            .filter { TextRecognizer.needsTranslation($0.text, target: options.targetLanguage) }
+        let read = splitByStyle(joinSplitLines(found), in: frame.image)
+        found = read.filter { TextRecognizer.needsTranslation($0.text, target: options.targetLanguage) }
+        let places = layoutPlaces(of: found, among: read, in: frame.image)
         guard let full = RGBAImage(cgImage: frame.image) else { return true }
         Trace.mark("seamless: frame → RGBA", since: t); t = Trace.now
 
@@ -879,10 +892,10 @@ actor RegionPipeline {
         let prior = blocks
         var next: [Block] = []
         for (i, ocr) in found.enumerated() {
-            guard let e = erase(ocr, in: full) else { continue }
+            guard let e = erase(ocr, in: full, place: places[i]) else { continue }
             let id = matches[i].map { prior[$0].id } ?? UUID()
             var b = Block(id: id, rect: e.rect.cgRect, lines: ocr.lines.map(\.rect), source: ocr.text, appearance: e.look,
-                          fontSize: e.fontSize, spareWidth: e.spare)
+                          fontSize: e.fontSize, spareWidth: e.spare, textArea: e.textArea)
             if let oi = matches[i], prior[oi].source == ocr.text { b.translation = prior[oi].translation }
             b.erased = e.patch
             next.append(b)
@@ -922,6 +935,56 @@ actor RegionPipeline {
         }
         if !tall { verticalNoticed = false }
         return tall
+    }
+
+    /// A line the recognizer could not read across (an inline sum, a fraction) comes back as pieces on one text row, in
+    /// separate blocks; a tall line reaches up into the block above. Translated apart, the pieces read badly and their patches
+    /// paint over each other, so blocks that share a text row or interlock (`BlockMerge`) are one block before anything else.
+    private func joinSplitLines(_ blocks: [OCRBlock]) -> [OCRBlock] {
+        guard blocks.count > 1, Self.layoutRules else { return blocks }
+        let groups = BlockMerge.groups(blocks.map { $0.lines.map(\.rect) })
+        guard groups.contains(where: { $0.count > 1 }) else { return blocks }
+        return groups.map { group in
+            guard group.count > 1 else { return blocks[group[0]] }
+            let lines = group.flatMap { blocks[$0].lines }
+            if Trace.enabled { Trace.mark("merged blocks \(group): " + group.map { String(blocks[$0].text.prefix(24)) }.joined(separator: " + "), since: Trace.now) }
+            return TextRecognizer.makeBlock(BlockMerge.readingOrder(lines.map(\.rect)).map { lines[$0] })
+        }
+    }
+
+    /// `MWOYEO_LAYOUT=off` reads and erases blocks as before the layout rules (joining split lines, `Territory`, `ColumnEdge`,
+    /// the descender strip), to put the self-test's layout line of the old behaviour beside the new one.
+    private static let layoutRules = ProcessInfo.processInfo.environment["MWOYEO_LAYOUT"] != "off"
+
+    /// What one block may paint and how far right it may write.
+    private struct Place {
+        /// The block's patch before it is widened into free space to the right: its text, margins and a strip for descenders,
+        /// less what a neighbouring block takes (`Territory`).
+        var territory: CGRect
+        /// The right edge of the block's column (`ColumnEdge`); nil when no other block shares it.
+        var columnRight: CGFloat?
+        /// Depth under the lines that is erased with them: room for descenders.
+        var below: Int
+    }
+
+    /// The places of `blocks`, which are read among `read` (the columns count every block read, translated or not).
+    private func layoutPlaces(of blocks: [OCRBlock], among read: [OCRBlock], in image: CGImage) -> [Place] {
+        let bounds = CGRect(x: 0, y: 0, width: image.width, height: image.height)
+        let cores = blocks.map(\.rect)
+        let lineHeights = blocks.map { b in b.lines.map(\.rect.height).sorted()[b.lines.count / 2] }
+        let rings = lineHeights.map { CGFloat(BlockRenderer.eraseMargin(lineHeight: $0)) }
+        guard Self.layoutRules else {
+            return blocks.indices.map { i in
+                Place(territory: cores[i].insetBy(dx: -rings[i], dy: -rings[i]).intersection(bounds), columnRight: nil, below: Int(rings[i]))
+            }
+        }
+        let wants = blocks.indices.map { Territory.want(core: cores[$0], lineHeight: lineHeights[$0], ring: rings[$0]).intersection(bounds) }
+        let territories = Territory.trim(cores: cores, wants: wants)
+        let others = read.map(\.rect)
+        return blocks.indices.map { i in
+            Place(territory: territories[i], columnRight: ColumnEdge.right(of: cores[i], among: others.filter { $0 != cores[i] }),
+                  below: Int(Territory.below(lineHeight: lineHeights[i], ring: rings[i])))
+        }
     }
 
     /// The document reader groups lines by layout alone, so a chat message and the next sender's name, or a post
@@ -998,21 +1061,29 @@ actor RegionPipeline {
         var look: TextAppearance
         var fontSize: CGFloat?
         var spare: CGFloat
+        /// Where in `rect` a translation is laid out (pixels, relative to `rect`).
+        var textArea: CGRect
     }
 
     /// Erases a block's text: builds the glyph mask per line, then fills it (flat backgrounds) or inpaints it
-    /// (textured ones). The patch also takes in free background to the right for longer translations.
-    private func erase(_ block: OCRBlock, in full: RGBAImage) -> Erased? {
+    /// (textured ones). The patch also takes in free background to the right for longer translations, up to the
+    /// right edge of the block's column, and covers the descenders of its lines; it stays inside the block's `place`.
+    private func erase(_ block: OCRBlock, in full: RGBAImage, place: Place) -> Erased? {
         Trace.count("erase")
         let lineHeight = block.lines.map(\.rect.height).sorted()[block.lines.count / 2]
         let ring = BlockRenderer.eraseMargin(lineHeight: lineHeight)
-        var rect = PixelRect(block.rect.insetBy(dx: -CGFloat(ring), dy: -CGFloat(ring))).clamped(width: full.width, height: full.height)
+        let below = place.below
+        var rect = PixelRect(place.territory).clamped(width: full.width, height: full.height)
         guard !rect.isEmpty else { return nil }
 
         var masks: [(PixelRect, TextMask)] = []
         var glyphHeights: [CGFloat] = []
         for line in block.lines {
-            let lr = PixelRect(line.rect.insetBy(dx: -CGFloat(ring), dy: -CGFloat(ring))).clamped(width: full.width, height: full.height)
+            // The strip under a line is as deep as its descenders: a tail that ends past the crop would count as a glyph
+            // running off the patch and stay.
+            let crop = CGRect(x: line.rect.minX - CGFloat(ring), y: line.rect.minY - CGFloat(ring),
+                              width: line.rect.width + CGFloat(2 * ring), height: line.rect.height + CGFloat(ring + below))
+            let lr = PixelRect(crop).clamped(width: full.width, height: full.height)
             guard !lr.isEmpty else { continue }
             let text = PixelRect(line.rect).clamped(width: full.width, height: full.height)
             let local = PixelRect(x: text.x - lr.x, y: text.y - lr.y, width: text.width, height: text.height)
@@ -1023,7 +1094,9 @@ actor RegionPipeline {
         // Prefer a line whose glyphs were actually segmented over a whole-box fallback.
         guard let look = masks.map(\.1.appearance).first(where: { $0.coverage < 0.95 }) ?? masks.first?.1.appearance else { return nil }
 
-        let spare = freeWidth(rightOf: rect, in: full, background: look.backgroundColor)
+        // Free background to the right ends at the column's edge: the text may use it up to there, not the page's margin.
+        let reach = place.columnRight.map { max(0, Int($0 - block.rect.maxX)) }
+        let spare = freeWidth(rightOf: rect, in: full, background: look.backgroundColor, atMost: reach)
         rect.width += spare
         var patch = full.cropped(to: rect)
         var mask = [UInt8](repeating: 0, count: rect.width * rect.height)
@@ -1052,13 +1125,15 @@ actor RegionPipeline {
             TextEraser.fill(&patch, mask: mask)
         }
         let glyph = glyphHeights.isEmpty ? nil : glyphHeights.sorted()[glyphHeights.count / 2]
+        let area = Territory.textArea(core: block.rect, ring: CGFloat(ring), spare: CGFloat(spare), in: rect.cgRect)
+            .offsetBy(dx: -CGFloat(rect.x), dy: -CGFloat(rect.y))
         return Erased(rect: rect, patch: patch, look: look, fontSize: glyph.map { Self.emSize(glyphHeight: $0, text: block.text) },
-                      spare: CGFloat(spare))
+                      spare: CGFloat(spare), textArea: area)
     }
 
-    /// Columns to the right of `rect` that hold nothing but the background colour (up to 80 % more width).
-    private func freeWidth(rightOf rect: PixelRect, in full: RGBAImage, background: RGBA) -> Int {
-        let limit = min(full.width - (rect.x + rect.width), Int(Double(rect.width) * 0.8))
+    /// Columns to the right of `rect` that hold nothing but the background colour (up to 80 % more width, and `atMost`).
+    private func freeWidth(rightOf rect: PixelRect, in full: RGBAImage, background: RGBA, atMost: Int? = nil) -> Int {
+        let limit = min(full.width - (rect.x + rect.width), Int(Double(rect.width) * 0.8), atMost ?? .max)
         guard limit > 0 else { return 0 }
         var free = 0
         columns: while free < limit {
@@ -1347,12 +1422,20 @@ actor RegionPipeline {
             let background: BlockRenderer.Background = b.erased.map { .erased($0) }
                 ?? .box(b.appearance.backgroundColor, opacity: options.boxOpacity)
             Trace.count("render")
-            blocks[i].image = BlockRenderer.render(.init(
+            let rendered = BlockRenderer.render(.init(
                 size: b.rect.size, text: text, background: background, appearance: b.appearance,
                 lineHeight: lineHeight, fontSize: b.fontSize, originalLineCount: max(1, b.lines.count), spareWidth: b.spareWidth,
                 fontStyle: options.fontStyle,
                 targetLanguage: options.targetLanguage, scale: scale,
-                centered: LineAlignment.isCentered(b.lines.map { ($0.minX, $0.maxX) }, outlined: b.appearance.outlineColor != nil)))
+                centered: LineAlignment.isCentered(b.lines.map { ($0.minX, $0.maxX) }, outlined: b.appearance.outlineColor != nil),
+                textArea: b.textArea))
+            blocks[i].image = rendered?.image
+            blocks[i].ink = rendered?.text
+            if Trace.enabled, let ink = rendered?.text {
+                Trace.mark("render '\(b.source.prefix(24))' patch \(Int(b.rect.minX)),\(Int(b.rect.minY)) \(Int(b.rect.width))x\(Int(b.rect.height)) spare \(Int(b.spareWidth)) "
+                    + "area \(b.textArea.map { "\(Int($0.minX)),\(Int($0.minY)) \(Int($0.width))x\(Int($0.height))" } ?? "-") ink \(Int(ink.minX)),\(Int(ink.minY)) \(Int(ink.width))x\(Int(ink.height))",
+                    since: Trace.now)
+            }
         }
     }
 
@@ -1366,8 +1449,15 @@ actor RegionPipeline {
         }
         let texts = blocks.map { BlockText(frame: CGRect(x: $0.rect.minX / s, y: $0.rect.minY / s, width: $0.rect.width / s, height: $0.rect.height / s),
                                            source: $0.source, translation: $0.translation) }
+        // What the self-test's layout line counts: every drawn block, in draw order.
+        let drawn = blocks.compactMap { b -> DrawnBlock? in
+            guard b.image != nil else { return nil }
+            let core = b.lines.dropFirst().reduce(b.lines.first ?? b.rect) { $0.union($1) }
+            let text = b.ink.map { $0.offsetBy(dx: b.rect.minX, dy: b.rect.minY) } ?? b.rect
+            return DrawnBlock(source: b.source, core: core, patch: b.rect, text: text)
+        }
         onSnapshot(OverlaySnapshot(version: version, blocks: out, animated: animated, origin: origin, time: frameTime,
-                                   texts: texts, frame: latest?.image, scale: s))
+                                   texts: texts, frame: latest?.image, scale: s, drawn: drawn))
         dump(out)
     }
 

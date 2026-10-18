@@ -28,12 +28,22 @@ enum BlockRenderer {
         var scale: CGFloat
         /// Centred lines (subtitles, captions) stay centred on where the original was.
         var centered = false
+        /// Where in the image the text is laid out (pixels, top-left origin): the source text and its margin. The image may
+        /// reach further down for descenders of the source that are erased; the translation does not use that strip.
+        var textArea: CGRect?
+    }
+
+    /// A drawn block: its image and where the translation sits in it.
+    struct Rendered {
+        var image: CGImage
+        /// The translation's extent in the image (pixels, top-left origin), cut to the image.
+        var text: CGRect
     }
 
     /// Background around the text (pixels) that an erased block takes in, for the glyph mask's ring.
     static func eraseMargin(lineHeight: CGFloat) -> Int { max(3, Int(lineHeight * 0.18)) }
 
-    static func render(_ input: Input) -> CGImage? {
+    static func render(_ input: Input) -> Rendered? {
         let w = Int(input.size.width.rounded(.up)), h = Int(input.size.height.rounded(.up))
         guard w > 0, h > 0,
               let ctx = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: 0,
@@ -57,7 +67,9 @@ enum BlockRenderer {
         if case .erased = input.background { padX = CGFloat(eraseMargin(lineHeight: input.lineHeight)) }
         let padY = max(0, input.lineHeight * 0.02)
         // The text box is the original block; `spareWidth` on the right is only used if the text needs it.
-        let full = bounds.insetBy(dx: padX, dy: padY)
+        let area = input.textArea.map { CGRect(x: $0.minX, y: CGFloat(h) - $0.maxY, width: $0.width, height: $0.height).intersection(bounds) }
+            .flatMap { $0.isNull || $0.isEmpty ? nil : $0 } ?? bounds
+        let full = area.insetBy(dx: padX, dy: padY)
         let original = CGRect(x: full.minX, y: full.minY, width: max(1, full.width - input.spareWidth), height: full.height)
         let outline = input.appearance.outlineColor?.cgColor
         // Outlined text keeps its own fill: the outline, not the background, is what it is read against.
@@ -101,7 +113,7 @@ enum BlockRenderer {
             // Busy background: a soft halo in the background colour keeps text readable.
             ctx.setShadow(offset: .zero, blur: size * 0.25, color: input.appearance.backgroundColor.cgColor)
         }
-        if ProcessInfo.processInfo.environment["MWOYEO_ERASE_ONLY"] != nil { return ctx.makeImage() } // debug: background only
+        if ProcessInfo.processInfo.environment["MWOYEO_ERASE_ONLY"] != nil { return ctx.makeImage().map { Rendered(image: $0, text: .zero) } } // debug: background only
         let setter = CTFramesetterCreateWithAttributedString(string)
         let pathWidth = input.centered ? textRect.width : max(textRect.width, measured.width + 1)
         let path = CGPath(rect: CGRect(x: textRect.minX, y: textRect.minY - 2, width: pathWidth, height: textRect.height + 4), transform: nil)
@@ -120,7 +132,10 @@ enum BlockRenderer {
         }
         let frame = CTFramesetterCreateFrame(setter, CFRange(location: 0, length: 0), path, nil)
         CTFrameDraw(frame, ctx)
-        return ctx.makeImage()
+        guard let image = ctx.makeImage() else { return nil }
+        let inkWidth = min(measured.width, pathWidth), inkX = input.centered ? textRect.midX - inkWidth / 2 : textRect.minX
+        let ink = CGRect(x: inkX, y: CGFloat(h) - textRect.maxY, width: inkWidth, height: textRect.height).intersection(bounds)
+        return Rendered(image: image, text: ink.isNull ? .zero : ink)
     }
 
     private static func attributed(_ text: String, size: CGFloat, weight: NSFont.Weight, style: FontStyleChoice,

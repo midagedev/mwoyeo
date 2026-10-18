@@ -135,6 +135,15 @@ import Testing
         #expect(!H.programsNotReady(CancellationError()))
     }
 
+    /// Logged 2026-10-18 by the RC on a saturated Neural Engine ("document OCR failed: nilError"): the read returned no result
+    /// and no error. Like "programs not ready", the next read answers once the system catches up.
+    @Test func aPassFailureIsTransientForNotReadyAndNilResults() {
+        #expect(H.passFailureIsTransient(Logged(description: logged)))
+        #expect(H.passFailureIsTransient(Logged(description: "nilError")))
+        #expect(!H.passFailureIsTransient(Logged(description: "Error Domain=com.apple.vis Code=9 \"timeout\"")))
+        #expect(!H.passFailureIsTransient(CancellationError()))
+    }
+
     @Test func notReadySendsReadsDownTheLadderForFiveSecondsThenAsksAgain() {
         var h = H()
         let id = h.begin(now: 100)

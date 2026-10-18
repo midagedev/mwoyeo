@@ -898,14 +898,15 @@ actor RegionPipeline {
         return true
     }
 
-    /// A failed pass delays the next read (`ReadBackoff`); "programs not ready" is a transient of the system's recognizer
-    /// (OCRHealth) and only waits a second, so the minute of it after an update or a heavy compile does not pile up. True when
-    /// the frame counts as read (a lasting failure: the same pixels would fail again); a transient leaves it unread, so a still
-    /// picture is read again once the backoff ends instead of staying empty until something on it changes.
+    /// A failed pass delays the next read (`ReadBackoff`); "programs not ready" or no result is a transient of the system's
+    /// recognizer (`OCRHealth.passFailureIsTransient`) and only waits a second, so the minute of it after an update or a heavy
+    /// compile does not pile up. True when the frame counts as read (a lasting failure: the same pixels would fail again); a
+    /// transient leaves it unread, so a still picture is read again once the backoff ends instead of staying empty until
+    /// something on it changes.
     private func noteReadFailure(_ error: Error) -> Bool {
-        let transient = OCRHealth.programsNotReady(error)
+        let transient = OCRHealth.passFailureIsTransient(error)
         let wait = readBackoff.failure(now: ProcessInfo.processInfo.systemUptime, transient: transient)
-        Trace.count(transient ? "ocr.failed_pass.notready" : "ocr.failed_pass")
+        Trace.count(transient ? "ocr.failed_pass.transient" : "ocr.failed_pass")
         Trace.mark("ocr: failed pass \(readBackoff.failures), next read in \(Int(wait)) s", since: Trace.now)
         return !transient
     }

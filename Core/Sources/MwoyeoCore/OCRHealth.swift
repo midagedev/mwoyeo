@@ -25,6 +25,14 @@ public struct OCRHealth: Sendable, Equatable {
 
     public static func programsNotReady(description: String) -> Bool { description.contains("e5rtError") }
 
+    /// A failed read pass that the system's recognizer recovers from by itself, so the picture is read again soon rather than
+    /// counted as read: programs not ready, or a read that returned neither a result nor an error (`nilError`, logged on a
+    /// saturated Neural Engine, 2026-10-18).
+    public static func passFailureIsTransient(_ error: Error) -> Bool {
+        let d = String(describing: error)
+        return programsNotReady(description: d) || d == "nilError"
+    }
+
     public enum Plan: Equatable, Sendable {
         /// Ask the newest model and give up after `seconds`.
         case run(seconds: TimeInterval)

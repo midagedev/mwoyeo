@@ -76,7 +76,7 @@ n=$(arrows "$OUT/x.out"); f=$(count "$OUT/x.out" ocr.fallback.notready); ft=$(/u
 # pass. It must leave the still picture unread and read it again after the 1 s backoff; before, the frame counted as read and a
 # still lens stayed empty until its pixels changed (measured on 7ad1e24: 0 arrows; fixed: 19).
 run y "$NEW" e5rt:3 article.png ja 300
-n=$(arrows "$OUT/y.out"); f=$(count "$OUT/y.out" ocr.failed_pass.notready)
+n=$(arrows "$OUT/y.out"); f=$(count "$OUT/y.out" ocr.failed_pass.transient)
 [ "$n" -ge 10 ] && [ "$f" -ge 1 ]; verdict $? "9 article.png ja>ko, MWOYEO_FAKE_OCR=e5rt:3: a pass failed on programs not ready, then >=10 arrows" "arrows=$n notready-passes=$f wall=$(cat $OUT/y.s)s"
 
 # Paragraphs (ParagraphGrouper): the three-line body paragraph of article.png is one block, and the two centred subtitle lines

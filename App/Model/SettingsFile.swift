@@ -13,24 +13,14 @@ struct SettingsFileIssue: Equatable {
 
 /// What the file says about one setting: its documentation, type and limits. The one place that lists the keys of
 /// settings.json, for `SettingsSchema` (what an editor or an agent reads) and for `SettingsFileCheck` (what is accepted).
+/// A setting's `kind` is a `FieldKind` tree (`SettingsFieldSpec.swift`): the same tree gives the schema and the check, nested objects included.
 /// `SettingsFileCheck.uncoveredKeys` fails a check when AppSettings writes a key this table lacks.
 struct SettingSpec {
-    enum Kind {
-        case string, bool
-        case number(ClosedRange<Double>)
-        case integer(ClosedRange<Int>)
-        /// One of these raw values.
-        case choice([String])
-        /// A UUID string, or null.
-        case idOrNull
-        /// A list of these raw values; a value not among them is reported and dropped, the rest applies.
-        case choiceList([String])
-        case shortcuts, engines, appProfiles
-    }
-
     let key: String
-    let kind: Kind
+    let kind: FieldKind
     let doc: String
+    /// Realistic values of the whole setting, for `examples` in the schema; each must pass the check.
+    var examples: [Any] = []
 
     static let all: [SettingSpec] = [
         .init(key: "sourceLanguage", kind: .choice(Languages.sources),
@@ -39,7 +29,8 @@ struct SettingSpec {
         .init(key: "engine", kind: .choice(TranslationEngineChoice.allCases.map(\.rawValue)),
               doc: "Apple's translation choice: auto (the language pack when installed), highFidelity (Apple Intelligence's translation model) or customModel (a prompted on-device model that follows the glossary)."),
         .init(key: "engines", kind: .engines,
-              doc: "Translation engines you added, each with a name, a kind and its address. API keys are never stored here; they stay in the Keychain. Add engines in Settings > Translation."),
+              doc: "Translation engines you added, each with a name, a kind and its address. API keys are never stored here; they stay in the Keychain. Add engines in Settings > Translation.",
+              examples: SettingExamples.engines),
         .init(key: "customEngineID", kind: .idOrNull, doc: "The id of the added engine in use, or null to use Apple's translation."),
         .init(key: "renderMode", kind: .choice(RenderMode.allCases.map(\.rawValue)),
               doc: "How translations are drawn: adaptive (boxes while things move, a rewrite in place once still), fast (always boxes) or seamless (always erase and rewrite)."),
@@ -71,57 +62,18 @@ struct SettingSpec {
         .init(key: "transcriptFormats", kind: .choiceList(TranscriptFileFormat.allCases.map(\.rawValue)),
               doc: "Files of the translation log: markdown, srt, and jsonl (one JSON line per translated line with time, lens, app, source, target, engine, original and translation, added as it happens so tail -f works)."),
         .init(key: "appProfiles", kind: .appProfiles,
-              doc: "Languages, engine and paragraph reader remembered per app; the app in front decides which applies. Easier to set from a lens's menu."),
+              doc: "Languages, engine and paragraph reader remembered per app; the app in front decides which applies. Easier to set from a lens's menu. A profile can also carry a note for the translator, names and terms with their translations, and a context override for that app.",
+              examples: SettingExamples.appProfiles),
         .init(key: "paragraphReader", kind: .choice(ParagraphReader.allCases.map(\.rawValue)),
               doc: "How text is cut into paragraphs: automatic, documentLayout (the macOS document model) or lineGrouping (the app's own line rules)."),
     ]
 
     static func spec(for key: String) -> SettingSpec? { all.first { $0.key == key } }
 
-    /// What is wrong with `value` for this setting, or nil when it is fine.
-    func problem(with value: Any) -> String? {
-        switch kind {
-        case .string:
-            return value is String ? nil : "expected a string, got \(Self.name(of: value))"
-        case .bool:
-            return Self.isBool(value) ? nil : "expected true or false, got \(Self.name(of: value))"
-        case let .number(range):
-            guard let n = Self.number(value) else { return "expected a number, got \(Self.name(of: value))" }
-            return range.contains(n) ? nil : "\(Self.shown(n)) is out of range \(Self.shown(range.lowerBound)) to \(Self.shown(range.upperBound))"
-        case let .integer(range):
-            guard let n = Self.number(value) else { return "expected a whole number, got \(Self.name(of: value))" }
-            guard n == n.rounded(), abs(n) < 1e15 else { return "expected a whole number, got \(Self.shown(n))" }
-            return range.contains(Int(n)) ? nil : "\(Int(n)) is out of range \(range.lowerBound) to \(range.upperBound)"
-        case let .choice(allowed):
-            guard let s = value as? String else { return "expected one of \(allowed.joined(separator: ", ")), got \(Self.name(of: value))" }
-            return allowed.contains(s) ? nil : "\"\(s)\" is not allowed; use one of \(allowed.joined(separator: ", "))"
-        case .idOrNull:
-            if value is NSNull { return nil }
-            if let s = value as? String, UUID(uuidString: s) != nil { return nil }
-            return "expected an engine id from engines, or null"
-        case let .choiceList(allowed):
-            guard let list = value as? [Any] else { return "expected a list of \(allowed.joined(separator: ", ")), got \(Self.name(of: value))" }
-            return list.allSatisfy { $0 is String } ? nil : "expected a list of strings (\(allowed.joined(separator: ", ")))"
-        case .shortcuts:
-            guard let d = value as? [String: Any] else { return "expected an object of action: shortcut, got \(Self.name(of: value))" }
-            for (action, combo) in d.sorted(by: { $0.key < $1.key }) {
-                guard HotKeyAction(rawValue: action) != nil else {
-                    return "unknown action \"\(action)\"; use \(HotKeyAction.allCases.map(\.rawValue).joined(separator: ", "))"
-                }
-                if let e = Self.strict(KeyCombo.self, combo) { return "\(action): \(e)" }
-            }
-            return nil
-        case .engines:
-            return Self.strictElements(EngineConfig.self, value)
-        case .appProfiles:
-            return Self.strictElements(AppProfile.self, value)
-        }
-    }
-
-    /// For a list setting: what stays of `value` (already a list of strings) and the entries dropped for not being allowed.
-    func filtered(_ value: Any) -> (kept: [Any], dropped: [String])? {
-        guard case let .choiceList(allowed) = kind, let list = value as? [String] else { return nil }
-        return (list.filter(allowed.contains), list.filter { !allowed.contains($0) })
+    /// `value` as this setting with the bad parts left out, or nil when it cannot stand (the setting then keeps its current
+    /// value). What is wrong goes to `problems`, each with its path.
+    func read(_ value: Any, problems: inout [FieldProblem]) -> Any? {
+        kind.read(value, at: FieldPath(steps: [.key(key)]), fallout: .keep, problems: &problems)
     }
 
     // MARK: value helpers
@@ -138,35 +90,131 @@ struct SettingSpec {
         if v is [Any] { return "an array" }
         return "an object"
     }
+}
 
-    /// nil when `value` decodes as T, else why not.
-    private static func strict<T: Decodable>(_ type: T.Type, _ value: Any) -> String? {
-        guard JSONSerialization.isValidJSONObject(value),
-              let data = try? JSONSerialization.data(withJSONObject: value) else { return "not an object" }
-        do {
-            _ = try JSONDecoder().decode(T.self, from: data)
-            return nil
-        } catch { return describe(error) }
-    }
+// MARK: the trees of the nested settings
 
-    private static func strictElements<T: Decodable>(_ type: T.Type, _ value: Any) -> String? {
-        guard let items = value as? [Any] else { return "expected an array, got \(name(of: value))" }
-        for (i, item) in items.enumerated() {
-            if let e = strict(T.self, item) { return "item \(i): \(e)" }
-        }
-        return nil
-    }
+/// The nested settings, each one a `FieldKind` tree. To add a nested field, add a `FieldSpec` here; the schema, the check
+/// and its line numbers follow. Keep a field's JSON key equal to what its Codable type encodes.
+extension FieldKind {
+    /// Action name → key combo. An action left out has no shortcut.
+    static let shortcuts: FieldKind = .map(
+        .object([
+            FieldSpec("keyCode", .integer(0...4_294_967_295), "Carbon virtual key code.", required: true, example: 37),
+            FieldSpec("modifiers", .integer(0...4_294_967_295),
+                      "Carbon modifier mask: cmdKey 256, shiftKey 512, optionKey 2048, controlKey 4096, added together.", required: true, example: 6144),
+            FieldSpec("display", .string, "How the shortcut is shown, such as ⌃⌥L.", required: true, example: "⌃⌥L"),
+        ]),
+        keys: HotKeyAction.allCases.map(\.rawValue), keyNoun: "action")
 
-    private static func describe(_ error: Error) -> String {
-        guard let e = error as? DecodingError else { return error.localizedDescription }
-        func path(_ c: DecodingError.Context) -> String { c.codingPath.map(\.stringValue).joined(separator: ".") }
-        switch e {
-        case let .keyNotFound(k, _): return "missing \"\(k.stringValue)\""
-        case let .typeMismatch(_, c), let .valueNotFound(_, c): return "wrong type at \"\(path(c))\""
-        case let .dataCorrupted(c): return c.codingPath.isEmpty ? c.debugDescription : "bad value at \"\(path(c))\""
-        @unknown default: return "unreadable"
-        }
+    private static func baseURL(required: Bool) -> FieldSpec {
+        FieldSpec("baseURL", .url,
+                  "Where the engine's server answers, an http or https address such as http://localhost:8765/v1. An Anthropic engine without one uses https://api.anthropic.com.",
+                  required: required, example: "http://localhost:8765/v1")
     }
+    private static let model = FieldSpec("model", .string, "The model name the server expects, such as qwen3:8b. Left out, it is empty.", example: "qwen3:8b")
+    private static let thinking = FieldSpec("thinking", .choice(["off", "provider"]),
+                                            "off asks the server not to reason (faster, cleaner translations); provider sends nothing extra and lets a reasoning model think.",
+                                            default: "off")
+    private static let headers = FieldKind.map(.string)
+
+    /// The engines you added. `kind` picks the shape: what the other fields are depends on it.
+    static let engines: FieldKind = .list(.tagged(
+        tag: "kind",
+        tagDoc: "What the engine speaks: openAICompatible (Ollama, LM Studio and the like), anthropic, deepL, httpTemplate (any HTTP service you describe) or command (a program of your own). The other fields depend on it.",
+        common: [
+            FieldSpec("id", .uuid, "Identifies the engine; customEngineID and appProfiles refer to it.", example: exampleUUID),
+            FieldSpec("name", .string, "The name shown in Settings.", required: true, example: "Local Qwen"),
+        ],
+        variants: [
+            FieldVariant(tag: "openAICompatible", fields: [
+                baseURL(required: true), model, thinking,
+                FieldSpec("extraHeaders", headers,
+                          "Extra HTTP headers, name to value. Never put a key here: a header that must carry it holds {{key}}, which the app fills in from the Keychain.",
+                          example: ["X-Org": "team-a"]),
+            ]),
+            FieldVariant(tag: "anthropic", fields: [baseURL(required: false), model, thinking]),
+            FieldVariant(tag: "deepL", fields: [
+                baseURL(required: true),
+                FieldSpec("formality", .string, "DeepL's formality: default, more, less, prefer_more or prefer_less. Left out, DeepL decides.", example: "prefer_more"),
+            ]),
+            FieldVariant(tag: "httpTemplate", fields: [
+                FieldSpec("template", .object([
+                    FieldSpec("method", .string, "GET, POST, PUT or PATCH.", default: "POST"),
+                    FieldSpec("url", .string, "The request address. {{text}}, {{source}}, {{target}} and {{key}} are filled in.", required: true,
+                              example: "http://localhost:5000/translate"),
+                    FieldSpec("headers", headers, "HTTP headers, name to value; the same placeholders work in the values."),
+                    FieldSpec("body", .string, "The request body, with the same placeholders. {{lines}} sends all lines as a JSON array (batching jsonArray).", default: ""),
+                    FieldSpec("resultPath", .string,
+                              "Where the translations are in the JSON reply: dot keys and [n] indexes, [*] maps over an array, such as translatedText or data.translations[0].translatedText.",
+                              required: true, example: "translatedText"),
+                    FieldSpec("batching", .choice(["perLine", "jsonArray"]),
+                              "perLine sends one request per line ({{text}}); jsonArray sends all lines in one ({{lines}}).", default: "perLine"),
+                ]), "How to call an HTTP service that is none of the built-in kinds (LibreTranslate, DeepLX, Papago, a server of your own).", required: true),
+            ]),
+            FieldVariant(tag: "command", fields: [
+                FieldSpec("command", .object([
+                    FieldSpec("executable", .string, "Path of the program to run.", required: true, example: "/usr/local/bin/translate-me"),
+                    FieldSpec("arguments", .list(.string), "Arguments passed to the program.", example: ["--fast"]),
+                ]), "A program of your own: the app writes one JSON line {source, target, lines} to its stdin and reads {translations} from its stdout.", required: true),
+            ]),
+        ]))
+
+    /// What the app remembers per app. The memory fields (note, entries, context) are all optional.
+    static let appProfiles: FieldKind = .list(.object([
+        FieldSpec("bundleID", .string, "Bundle identifier of the app.", required: true, example: "com.example.chat"),
+        FieldSpec("appName", .string, "The app's name, for display.", example: "Example Chat"),
+        FieldSpec("source", .choice(Languages.sources), "Source language code, or auto.", required: true, example: "ja"),
+        FieldSpec("target", .choice(Languages.targets), "Target language code.", required: true, example: "en"),
+        FieldSpec("customEngineID", .idOrNull, "Engine for this app; null keeps the base choice."),
+        FieldSpec("paragraphReader", .choice(ParagraphReader.allCases.map(\.rawValue)), "Paragraph reader for this app; left out follows the default."),
+        FieldSpec("note", .text(maxLength: 500),
+                  "A note for the translator about this app: who is talking, the setting, the register. Up to 500 characters.",
+                  example: "Casual chat between two friends. Keep it informal and short."),
+        FieldSpec("entries", .list(.object([
+            FieldSpec("src", .text(minLength: 1), "The name or term as it is written in the text.", required: true, example: "田中"),
+            FieldSpec("dst", .text(minLength: 1), "How it is translated.", required: true, example: "Tanaka"),
+            FieldSpec("kind", .choice(["person", "place", "term", "org"]), "What it is.", example: "person"),
+            FieldSpec("gender", .choice(["f", "m", "n"]), "For a person: f, m or n (neutral), so pronouns and agreement come out right.", example: "m"),
+            FieldSpec("note", .text(maxLength: 40), "A short hint about it, up to 40 characters.", example: "the speaker's older colleague"),
+            FieldSpec("reading", .string, "How src is pronounced, such as the kana of a kanji name.", example: "たなか"),
+            FieldSpec("addressing", .list(.object([
+                FieldSpec("to", .text(minLength: 1), "Who is being spoken to, as written in that entry's src.", required: true, example: "Hana"),
+                FieldSpec("register", .choice(["casual", "polite", "formal", "honorific"]), "How this person speaks to them.", required: true, example: "polite"),
+            ]), dropsBad: true), "How this person speaks to others: one row per listener."),
+        ]), maxItems: 40, dropsBad: true),
+                  "Names and terms of this app with their translations, up to 40 rows. A bad row is reported and dropped; the rest apply."),
+        FieldSpec("context", .object([
+            FieldSpec("mode", .choice(["off", "nearby", "conversation"]),
+                      "How much surrounding text goes along with each line: off (none), nearby (the lines around it on screen) or conversation (also the lines read before).",
+                      example: "nearby"),
+            FieldSpec("previousLines", .integer(0...8), "How many earlier lines go along, 0 to 8.", example: 3),
+        ]), "Context for this app's translations. A field left out keeps the default."),
+    ]))
+}
+
+/// Realistic values for the schema's `examples`. check-logic reads each through the check, so they stay valid.
+enum SettingExamples {
+    static let engines: [Any] = [
+        [["id": FieldKind.exampleUUID, "kind": "openAICompatible", "name": "Local Qwen", "baseURL": "http://localhost:8765/v1",
+          "model": "qwen3:8b", "thinking": "off"] as [String: Any]],
+        [["kind": "deepL", "name": "DeepL", "baseURL": "https://api.deepl.com", "formality": "prefer_more"] as [String: Any]],
+    ]
+
+    /// One profile with a note, two entries that carry addressing, and a context override.
+    static let appProfiles: [Any] = [
+        [[
+            "bundleID": "com.example.chat", "appName": "Example Chat", "source": "ja", "target": "en", "paragraphReader": "lineGrouping",
+            "note": "Casual chat between two friends. Keep it informal and short.",
+            "entries": [
+                ["src": "田中", "dst": "Tanaka", "kind": "person", "gender": "m", "note": "the speaker's older colleague", "reading": "たなか",
+                 "addressing": [["to": "Hana", "register": "polite"]]] as [String: Any],
+                ["src": "花", "dst": "Hana", "kind": "person", "gender": "f",
+                 "addressing": [["to": "Tanaka", "register": "casual"]]] as [String: Any],
+            ],
+            "context": ["mode": "nearby", "previousLines": 3] as [String: Any],
+        ] as [String: Any]],
+    ]
 }
 
 /// What reading settings.json gives: the settings to apply and the issues found.
@@ -215,22 +263,27 @@ enum SettingsFileCheck {
         }
         var issues: [SettingsFileIssue] = []
         var accepted: [String: Any] = [:]
-        for (key, value) in object.sorted(by: { $0.key < $1.key }) where key != "$schema" {
-            let line = lineOf(key: key, in: text)
-            guard let spec = SettingSpec.spec(for: key) else {
-                let hint = closest(to: key, in: SettingSpec.all.map(\.key)).map { " (did you mean \($0)?)" } ?? ""
-                issues.append(.init(line: line, message: "unknown key \(key)\(hint)"))
+        let lines = JSONLines.index(text)
+        for (key, value) in object.sorted(by: { $0.key < $1.key }) {
+            let path = FieldPath(steps: [.key(key)])
+            if key == "$schema" {
+                var problems: [FieldProblem] = []
+                _ = FieldKind.string.read(value, at: path, fallout: .ignore, problems: &problems)
+                issues += problems.map { SettingsFileIssue(line: lines.line(of: $0.path), message: $0.message) }
                 continue
             }
-            if let why = spec.problem(with: value) {
-                issues.append(.init(line: line, message: "\(key): \(why); keeping the current value"))
-            } else if let (kept, dropped) = spec.filtered(value), !dropped.isEmpty, case let .choiceList(allowed) = spec.kind {
-                let names = dropped.map { "\"\($0)\"" }.joined(separator: ", ")
-                issues.append(.init(line: line, message: "\(key): \(names) not allowed, dropped; use \(allowed.joined(separator: ", "))"))
-                accepted[key] = kept
-            } else {
-                accepted[key] = value
+            guard let spec = SettingSpec.spec(for: key) else {
+                let hint = closest(to: key, in: SettingSpec.all.map(\.key)).map { " (did you mean \($0)?)" } ?? ""
+                issues.append(.init(line: lines.line(of: path), message: "unknown key \(key)\(hint)"))
+                continue
             }
+            var problems: [FieldProblem] = []
+            let kept = spec.read(value, problems: &problems)
+            issues += problems.map { SettingsFileIssue(line: lines.line(of: $0.path), message: $0.message) }
+            if let kept { accepted[key] = kept }
+        }
+        for line in lines.trailingCommas {
+            issues.append(.init(line: line, message: "trailing comma: JSON does not allow a comma before } or ]; the app reads it, other tools will not"))
         }
         issues.sort { ($0.line ?? .max, $0.message) < ($1.line ?? .max, $1.message) }
 
@@ -253,25 +306,13 @@ enum SettingsFileCheck {
         }.sorted()
     }
 
-    // MARK: positions and suggestions
+    // MARK: positions and suggestions (the line of every value is `JSONLines`)
 
     /// The "around line 3, column 7" of Foundation's JSON error.
     private static func position(in description: String) -> (line: Int, column: Int)? {
         guard let m = description.firstMatch(of: /line (\d+), column (\d+)/),
               let l = Int(m.1), let c = Int(m.2) else { return nil }
         return (l, c)
-    }
-
-    /// The line where the top-level `key` is written (the one with the fewest leading spaces when a nested key repeats it).
-    static func lineOf(key: String, in text: String) -> Int? {
-        var best: (line: Int, indent: Int)?
-        for (i, raw) in text.split(separator: "\n", omittingEmptySubsequences: false).enumerated() {
-            let indent = raw.prefix { $0 == " " || $0 == "\t" }.count
-            let rest = raw.dropFirst(indent)
-            guard rest.hasPrefix("\"\(key)\""), rest.dropFirst(key.count + 2).drop(while: { $0 == " " }).first == ":" else { continue }
-            if best == nil || indent < best!.indent { best = (i + 1, indent) }
-        }
-        return best?.line
     }
 
     /// The known key nearest to `key` (ignoring case), if it is near enough to be a typo of it.
@@ -335,15 +376,17 @@ enum SettingsFileFormat {
     }
 }
 
-/// settings.schema.json (JSON Schema 2020-12), generated from `SettingSpec.all` and AppSettings' defaults.
+/// settings.schema.json (JSON Schema 2020-12), generated from `SettingSpec.all` and AppSettings' defaults. Nested objects come
+/// from the same `FieldKind` trees the check walks, so the schema says exactly what `--check-settings` accepts.
 enum SettingsSchema {
     static func data() -> Data {
         let defaults = SettingsFileCheck.fileValues(AppSettings())
         var props: [String: Any] = ["$schema": ["type": "string", "description": "This schema, next to the file. Keep it as it is."]]
         for spec in SettingSpec.all {
-            var p = typeEntries(spec.kind)
+            var p = spec.kind.schema()
             p["description"] = spec.doc
             if let d = defaults[spec.key] { p["default"] = d }
+            if !spec.examples.isEmpty { p["examples"] = spec.examples }
             props[spec.key] = p
         }
         let schema: [String: Any] = [
@@ -356,65 +399,20 @@ enum SettingsSchema {
         ]
         return Data((SettingsFileFormat.pretty(schema) + "\n").utf8)
     }
-
-    private static func typeEntries(_ kind: SettingSpec.Kind) -> [String: Any] {
-        switch kind {
-        case .string: return ["type": "string"]
-        case .bool: return ["type": "boolean"]
-        case let .number(r): return ["type": "number", "minimum": r.lowerBound, "maximum": r.upperBound]
-        case let .integer(r): return ["type": "integer", "minimum": r.lowerBound, "maximum": r.upperBound]
-        case let .choice(values): return ["type": "string", "enum": values]
-        case let .choiceList(values): return ["type": "array", "items": ["enum": values], "uniqueItems": true]
-        case .idOrNull: return ["type": ["string", "null"], "format": "uuid"]
-        case .shortcuts:
-            return ["type": "object",
-                    "propertyNames": ["enum": HotKeyAction.allCases.map(\.rawValue)],
-                    "additionalProperties": [
-                        "type": "object",
-                        "required": ["keyCode", "modifiers", "display"],
-                        "properties": [
-                            "keyCode": ["type": "integer", "minimum": 0, "description": "Carbon virtual key code."],
-                            "modifiers": ["type": "integer", "minimum": 0, "description": "Carbon modifier mask: cmdKey 256, shiftKey 512, optionKey 2048, controlKey 4096, added together."],
-                            "display": ["type": "string", "description": "How the shortcut is shown, such as ⌃⌥L."],
-                        ],
-                    ] as [String: Any]]
-        case .engines:
-            return ["type": "array",
-                    "items": [
-                        "type": "object",
-                        "required": ["name", "kind"],
-                        "properties": [
-                            "id": ["type": "string", "format": "uuid", "description": "Identifies the engine; customEngineID and appProfiles refer to it."],
-                            "name": ["type": "string", "description": "The name shown in Settings."],
-                            "kind": ["enum": ["openAICompatible", "anthropic", "deepL", "httpTemplate", "command"],
-                                     "description": "What the engine speaks. Other fields (baseURL, model, thinking, extraHeaders, formality, template, command) depend on it."],
-                        ],
-                    ] as [String: Any]]
-        case .appProfiles:
-            return ["type": "array",
-                    "items": [
-                        "type": "object",
-                        "required": ["bundleID", "source", "target"],
-                        "properties": [
-                            "bundleID": ["type": "string", "description": "Bundle identifier of the app."],
-                            "appName": ["type": "string", "description": "The app's name, for display."],
-                            "source": ["type": "string", "description": "Source language code, or auto."],
-                            "target": ["type": "string", "description": "Target language code."],
-                            "customEngineID": ["type": ["string", "null"], "format": "uuid", "description": "Engine for this app; null keeps the base choice."],
-                            "paragraphReader": ["enum": ParagraphReader.allCases.map(\.rawValue), "description": "Paragraph reader for this app; left out follows the default."],
-                        ],
-                    ] as [String: Any]]
-        }
-    }
 }
 
-/// The two commands an agent or a script uses; neither starts the app:
+/// The three commands an agent or a script uses; none starts the app:
 ///   `Mwoyeo --settings-path`            prints where settings.json is.
+///   `Mwoyeo --settings-schema`          prints the schema (the settings.schema.json next to the file) to stdout.
 ///   `Mwoyeo --check-settings [path]`    prints `settings.json:<line>: <message>` per issue, or `ok`; exit 1 when there are issues.
 enum SettingsFileCommand {
     static func run(_ args: [String]) -> Never {
         if args.first == "--settings-path" {
             print(SettingsFileStore.defaultURL.path)
+            exit(0)
+        }
+        if args.first == "--settings-schema" {
+            FileHandle.standardOutput.write(SettingsSchema.data())
             exit(0)
         }
         let url = args.dropFirst().first.map { URL(fileURLWithPath: $0) } ?? SettingsFileStore.defaultURL

@@ -103,6 +103,271 @@ enum SettingsFileChecks {
         check("a bad engine and an unknown shortcut action are reported", nested.issues.count == 2 && nested.settings == changed)
         check("a null engine id means Apple", SettingsFileCheck.read(Data("{\"customEngineID\": null}".utf8), over: changed).settings.customEngineID == nil)
 
+        // Nested fields (round S1, 2026-10-18): the same spec tree drives the schema and the check, so a problem inside
+        // appProfiles, engines or shortcuts carries its path and the line of that value.
+        func lineNumber(of needle: String, in s: String) -> Int? { s.components(separatedBy: "\n").firstIndex { $0.contains(needle) }.map { $0 + 1 } }
+        let misspelt = """
+        {
+          "appProfiles": [
+            {
+              "bundleID": "com.example.app",
+              "paragraphReadr": "lineGrouping",
+              "source": "ja",
+              "target": "en"
+            }
+          ]
+        }
+        """
+        let misspeltRead = SettingsFileCheck.read(Data(misspelt.utf8), over: changed)
+        check("nested unknown key: reported with its path, its line and the closest known key",
+              misspeltRead.issues == [SettingsFileIssue(line: 5, message: "unknown key appProfiles[0].paragraphReadr (did you mean paragraphReader?)")])
+        check("nested unknown key: the rest of the profile applies",
+              misspeltRead.settings.appProfiles.map(\.bundleID) == ["com.example.app"] && misspeltRead.settings.appProfiles.first?.target == "en")
+        let badGender = """
+        {
+          "appProfiles": [
+            {
+              "bundleID": "com.example.app",
+              "source": "ja",
+              "target": "en",
+              "entries": [
+                {
+                  "src": "田中",
+                  "dst": "Tanaka",
+                  "gender": "x"
+                }
+              ]
+            }
+          ]
+        }
+        """
+        let genderRead = SettingsFileCheck.read(Data(badGender.utf8), over: changed)
+        check("nested enum: entries[0].gender \"x\" is reported with its path, its line and the allowed values",
+              genderRead.issues == [SettingsFileIssue(line: 11, message: "appProfiles[0].entries[0].gender: \"x\" is not allowed; use one of f, m, n; ignored")])
+        let capped: [String: Any] = ["appProfiles": [["bundleID": "com.example.app", "source": "ja", "target": "en",
+                                                    "note": String(repeating: "a", count: 501),
+                                                    "entries": (0..<41).map { ["src": "s\($0)", "dst": "d\($0)"] }]]]
+        let cappedText = SettingsFileFormat.pretty(capped) + "\n"
+        let cappedRead = SettingsFileCheck.read(Data(cappedText.utf8), over: changed)
+        check("caps: a 501-character note and a 41-entry list are reported at their lines",
+              cappedRead.issues.sorted { ($0.line ?? 0) < ($1.line ?? 0) } == [
+                  SettingsFileIssue(line: lineNumber(of: "\"entries\"", in: cappedText),
+                                    message: "appProfiles[0].entries: 41 items; the limit is 40; the first 40 apply"),
+                  SettingsFileIssue(line: lineNumber(of: "\"note\"", in: cappedText),
+                                    message: "appProfiles[0].note: 501 characters; the limit is 500; ignored"),
+              ].sorted { ($0.line ?? 0) < ($1.line ?? 0) })
+        var atCap = capped
+        atCap["appProfiles"] = [["bundleID": "com.example.app", "source": "ja", "target": "en", "note": String(repeating: "a", count: 500),
+                                 "entries": (0..<40).map { ["src": "s\($0)", "dst": "d\($0)"] }]]
+        check("caps: exactly 500 characters and 40 entries are fine",
+              SettingsFileCheck.read(Data((SettingsFileFormat.pretty(atCap) + "\n").utf8), over: changed).issues.isEmpty)
+        let engineTypo = SettingsFileCheck.read(Data("""
+        {
+          "engines": [
+            {
+              "kind": "openAICompatible",
+              "baseURL": "http://localhost:8765/v1",
+              "modle": "qwen3:8b",
+              "name": "Local"
+            }
+          ]
+        }
+        """.utf8), over: changed)
+        check("nested unknown key in engines[0]: reported with its line and the closest known key",
+              engineTypo.issues == [SettingsFileIssue(line: 6, message: "unknown key engines[0].modle (did you mean model?)")])
+        // An agent's memory for an app, written the way docs/settings-for-agents.md shows it.
+        let memoryFile = """
+        {
+          "appProfiles": [
+            {
+              "appName": "Example Chat",
+              "bundleID": "com.example.chat",
+              "context": {
+                "mode": "nearby",
+                "previousLines": 3
+              },
+              "entries": [
+                {
+                  "addressing": [
+                    {
+                      "register": "polite",
+                      "to": "Hana"
+                    }
+                  ],
+                  "dst": "Tanaka",
+                  "gender": "m",
+                  "kind": "person",
+                  "note": "the speaker's older colleague",
+                  "reading": "たなか",
+                  "src": "田中"
+                },
+                {
+                  "addressing": [
+                    {
+                      "register": "casual",
+                      "to": "Tanaka"
+                    }
+                  ],
+                  "dst": "Hana",
+                  "gender": "f",
+                  "kind": "person",
+                  "src": "花"
+                }
+              ],
+              "note": "Casual chat between two friends. Keep it informal and short.",
+              "paragraphReader": "lineGrouping",
+              "source": "ja",
+              "target": "en"
+            }
+          ]
+        }
+        """
+        let memory = SettingsFileCheck.read(Data(memoryFile.utf8), over: AppSettings())
+        let memoryObject = (try? JSONSerialization.jsonObject(with: Data(memoryFile.utf8))) as? [String: Any] ?? [:]
+        func describedByTheSchema(_ value: Any, _ schema: [String: Any]) -> Bool {
+            if let object = value as? [String: Any] {
+                let known = schema["properties"] as? [String: Any] ?? [:]
+                return object.allSatisfy { k, v in (known[k] as? [String: Any]).map { describedByTheSchema(v, $0) } ?? false }
+            }
+            if let list = value as? [Any] { return list.allSatisfy { describedByTheSchema($0, schema["items"] as? [String: Any] ?? [:]) } }
+            return true
+        }
+        let memorySchema = ((try? JSONSerialization.jsonObject(with: SettingsSchema.data())) as? [String: Any])?["properties"] as? [String: Any]
+        check("memory fields: a valid file reads without issues, applies, and the schema describes every field in it",
+              memory.issues.isEmpty && memory.settings.appProfiles.map(\.bundleID) == ["com.example.chat"]
+              && memory.settings.appProfiles.first?.paragraphReader == .lineGrouping
+              && describedByTheSchema(memoryObject["appProfiles"] ?? [], memorySchema?["appProfiles"] as? [String: Any] ?? [:]))
+        check("memory fields: the file text is the app's own format, so a reload leaves it as written",
+              SettingsFileFormat.pretty(memoryObject) + "\n" == memoryFile + "\n")
+        let afterMemory = SettingsFileCheck.read(SettingsFileFormat.render(memory.settings), over: AppSettings())
+        check("memory fields: settings → file → settings is stable", afterMemory.settings == memory.settings && afterMemory.issues.isEmpty)
+
+        // Lines and what applies
+        let minified = SettingsFileCheck.read(Data("{\"engines\":[{\"name\":\"x\",\"kind\":\"command\",\"command\":{\"executable\":\"/bin/x\",\"arguements\":[]}}],\"lenStyle\":1}".utf8), over: changed)
+        check("minified file: every issue is on line 1, nested ones with their path",
+              minified.issues.map(\.line) == [1, 1] && minified.issues.contains { $0.message == "unknown key engines[0].command.arguements (did you mean arguments?)" })
+        let spread = SettingsFileCheck.read(Data("""
+        {
+          "appProfiles": [
+            { "bundleID": "a", "source": "ja", "target": "en" },
+            {
+              "bundleID": "b",
+              "source": "ja",
+              "target": "en",
+              "entries": [
+                { "src": "x", "dst": "y" },
+                { "src": "x", "dst": "y", "kind": "company" },
+                { "dst": "y" }
+              ]
+            }
+          ]
+        }
+        """.utf8), over: changed)
+        check("lines: a bad optional field is on its own line, a missing required field on the line of its item",
+              spread.issues.map(\.line) == [10, 11] && spread.issues[0].message.hasPrefix("appProfiles[1].entries[1].kind:")
+              && spread.issues[1].message == "appProfiles[1].entries[2]: missing \"src\"; dropped")
+        let rows = SettingSpec.spec(for: "appProfiles")?.kind
+        var rowProblems: [FieldProblem] = []
+        let rowKept = rows?.read((try? JSONSerialization.jsonObject(with: Data("""
+        [{"bundleID": "a", "source": "ja", "target": "en", "entries": [
+          {"src": "1", "dst": "1", "gender": "x", "addressing": [{"to": "p", "register": "polite"}, {"to": "q", "register": "rude"}]},
+          {"src": "2"},
+          {"src": "3", "dst": "3"}]}]
+        """.utf8))) ?? [], at: FieldPath(steps: [.key("appProfiles")]), fallout: .keep, problems: &rowProblems) as? [[String: Any]]
+        let keptEntries = rowKept?.first?["entries"] as? [[String: Any]]
+        check("a bad field is left out, a bad row is dropped, the rest of the profile applies",
+              rowProblems.count == 3 && keptEntries?.map { $0["src"] as? String ?? "" } == ["1", "3"]
+              && keptEntries?.first?["gender"] == nil && (keptEntries?.first?["addressing"] as? [[String: Any]])?.count == 1)
+        check("a bad required field of a profile keeps the current profiles, as before",
+              SettingsFileCheck.read(Data("{\"appProfiles\": [{\"bundleID\": 7, \"source\": \"ja\", \"target\": \"en\"}]}".utf8), over: changed).settings == changed)
+        check("an engine's unknown field is left out and the engine applies",
+              engineTypo.settings.engines.map(\.name) == ["Local"])
+        check("a field of another engine kind is reported and left out",
+              SettingsFileCheck.read(Data("{\"engines\": [{\"kind\": \"anthropic\", \"name\": \"C\", \"formality\": \"more\"}]}".utf8), over: AppSettings()).issues.map(\.message)
+              == ["engines[0].formality: used by kind deepL, not by kind anthropic; ignored"])
+        let dupes = SettingsFileCheck.read(Data("{\"transcriptFormats\": [\"jsonl\", \"srt\", \"jsonl\"]}".utf8), over: AppSettings())
+        check("a duplicate in a list the schema says is unique is reported and dropped",
+              dupes.settings.transcriptFormats == [.jsonl, .srt] && dupes.issues.count == 1 && dupes.issues[0].message.hasPrefix("transcriptFormats[2]:"))
+        let trailing = SettingsFileCheck.read(Data("{\n  \"lensStyle\": \"minimal\",\n}\n".utf8), over: AppSettings())
+        check("a trailing comma applies but is reported with its line, as other tools cannot read it",
+              trailing.settings.lensStyle == .minimal && trailing.issues.map(\.line) == [2] && trailing.issues[0].message.hasPrefix("trailing comma"))
+        check("$schema must be a string", SettingsFileCheck.read(Data("{\"$schema\": 5}".utf8), over: AppSettings()).issues.count == 1)
+
+        // Every engine kind the app writes reads back without an issue
+        var everyKind = AppSettings()
+        everyKind.engines = [
+            engine,
+            EngineConfig(name: "Claude", kind: .anthropic(baseURL: URL(string: "https://api.anthropic.com")!, model: "claude-haiku-5-5", thinking: .provider)),
+            EngineConfig(name: "DeepL", kind: .deepL(baseURL: URL(string: "https://api.deepl.com")!, formality: "more")),
+            EngineConfig(name: "Libre", kind: .httpTemplate(HTTPTemplate(url: "http://localhost:5000/translate", headers: ["Content-Type": "application/json"],
+                                                                         body: "{\"q\": {{text}}}", resultPath: "translatedText"))),
+            EngineConfig(name: "Mine", kind: .command(CommandSpec(executable: "/usr/local/bin/translate-me", arguments: ["--fast"]))),
+        ]
+        let everyRead = SettingsFileCheck.read(SettingsFileFormat.render(everyKind), over: AppSettings())
+        check("engines of all five kinds: written by the app, read back equal with no issue", everyRead.settings == everyKind && everyRead.issues.isEmpty)
+
+        // Schema, nested
+        func at(_ root: Any?, _ path: String...) -> Any? {
+            path.reduce(root) { node, key in (node as? [String: Any])?[key] }
+        }
+        let schemaObject = (try? JSONSerialization.jsonObject(with: SettingsSchema.data())) as? [String: Any]
+        let profile = at(schemaObject, "properties", "appProfiles", "items")
+        let entryItem = at(profile, "properties", "entries", "items")
+        check("schema: nested objects are closed, with enums, ranges, length and item caps and the uuid format",
+              at(profile, "additionalProperties") as? Bool == false && at(entryItem, "additionalProperties") as? Bool == false
+              && at(entryItem, "properties", "gender", "enum") as? [String] == ["f", "m", "n"]
+              && at(entryItem, "properties", "kind", "enum") as? [String] == ["person", "place", "term", "org"]
+              && at(entryItem, "properties", "note", "maxLength") as? Int == 40
+              && at(profile, "properties", "note", "maxLength") as? Int == 500
+              && at(profile, "properties", "entries", "maxItems") as? Int == 40
+              && at(profile, "properties", "context", "properties", "previousLines", "maximum") as? Int == 8
+              && at(profile, "properties", "context", "properties", "mode", "enum") as? [String] == ["off", "nearby", "conversation"]
+              && at(entryItem, "properties", "addressing", "items", "properties", "register", "enum") as? [String] == ["casual", "polite", "formal", "honorific"]
+              && at(profile, "properties", "customEngineID", "format") as? String == "uuid"
+              && at(profile, "required") as? [String] == ["bundleID", "source", "target"])
+        func undocumented(_ node: Any?, _ path: String) -> [String] {
+            guard let object = node as? [String: Any] else { return [] }
+            var missing: [String] = []
+            for (name, child) in (object["properties"] as? [String: Any] ?? [:]).sorted(by: { $0.key < $1.key }) {
+                guard let c = child as? [String: Any] else { continue }
+                if !(c["description"] is String) { missing.append("\(path).\(name)") }
+                missing += undocumented(c, "\(path).\(name)")
+            }
+            for key in ["items", "additionalProperties"] { missing += undocumented(object[key], "\(path).\(key)") }
+            for branch in object["allOf"] as? [[String: Any]] ?? [] { missing += undocumented(branch["then"], "\(path).then") }
+            return missing
+        }
+        let undocumentedProperties = undocumented(schemaObject, "")
+        check("schema: every property, nested ones too, has a description", undocumentedProperties.isEmpty)
+        if !undocumentedProperties.isEmpty { print("check-logic: without a description: \(undocumentedProperties)") }
+        check("schema: engines and appProfiles carry examples, the profile one with a note, two entries with addressing and a context",
+              ((at(schemaObject, "properties", "engines", "examples") as? [Any])?.count ?? 0) >= 1
+              && ((at(schemaObject, "properties", "appProfiles", "examples") as? [[[String: Any]]])?.first?.first).map { p in
+                  p["note"] is String && (p["entries"] as? [[String: Any]])?.count == 2
+                  && (p["entries"] as? [[String: Any]])?.allSatisfy { ($0["addressing"] as? [Any])?.isEmpty == false } == true && p["context"] != nil
+              } == true)
+        let badExamples = SettingSpec.all.flatMap { spec in
+            spec.examples.compactMap { example -> String? in
+                var problems: [FieldProblem] = []
+                _ = spec.read(example, problems: &problems)
+                return problems.isEmpty ? nil : "\(spec.key): \(problems.map(\.message))"
+            }
+        } + SettingSpec.all.flatMap { spec in
+            spec.kind.fields.compactMap { field -> String? in
+                guard let example = field.example else { return nil }
+                var problems: [FieldProblem] = []
+                _ = field.kind.read(example, at: FieldPath(steps: [.key(field.name)]), fallout: .keep, problems: &problems)
+                return problems.isEmpty ? nil : "\(spec.key).\(field.name): \(problems.map(\.message))"
+            }
+        }
+        check("every example in the spec trees passes the check", badExamples.isEmpty)
+        if !badExamples.isEmpty { print("check-logic: bad examples: \(badExamples)") }
+        let schemaText = SettingsSchema.data()
+        check("schema: the output is deterministic and in the app's own format (sorted keys, two-space indent)",
+              schemaText == SettingsSchema.data() && schemaObject.map { Data((SettingsFileFormat.pretty($0) + "\n").utf8) == schemaText } == true)
+        check("schema: the file next to settings.json is the schema --settings-schema prints",
+              (try? Data(contentsOf: migrated.deletingLastPathComponent().appendingPathComponent("settings.schema.json"))) == schemaText)
+
         // Invalid JSON: nothing applied, file untouched, a UI change keeps the broken file first
         edited = "{\n  \"lensStyle\": \"glow\",\n  \"cacheSize\": ,\n}\n"
         try? Data(edited.utf8).write(to: migrated, options: .atomic)

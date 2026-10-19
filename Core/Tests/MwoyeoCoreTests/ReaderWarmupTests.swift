@@ -116,4 +116,59 @@ import Testing
         w.finished(failure: nil, now: 1)
         #expect(w.remaining == 0)
     }
+
+    /// R3a (2026-10-19): the order as `RecognitionHost` runs it, with the real health and scheduler: each step is dispatched as a
+    /// warm-up job to its worker, which is down (`warming`) while it runs. Lines compiles first for every key, Docs after, and no
+    /// two warm-ups overlap; a lens read that takes a worker keeps its step waiting; a restart replays the plan from the start.
+    @Test func theHostRunsLinesThenDocsPerKeyOnTheRealHealth() {
+        var lines = WorkerHealth(role: .lines), docs = WorkerHealth(role: .docs)
+        var sched = ReadScheduler()
+        var w = W()
+        _ = w.want("auto", lensOn: false)
+        _ = w.want("ja", lensOn: false)
+        var dispatched: [String] = []
+        var t: TimeInterval = 0
+
+        /// What the host's loop does: start the step that is due on its worker, let it run `seconds`, report it.
+        func runDue(seconds: TimeInterval) -> Bool {
+            guard let step = w.nextDue(idleSlots: W.idleSlots(lines: lines, docs: docs, scheduler: sched)) else { return false }
+            w.started(step, now: t)
+            let job = sched.beginWarmup(client: 0, role: step.role, via: step.via, key: step.key, now: t)!
+            if step.role == .lines { lines.dispatch(job.workerJob, now: t) } else { docs.dispatch(job.workerJob, now: t) }
+            dispatched.append("\(step.role.rawValue):\(step.key)")
+            // while it runs, the other worker may not take a second warm-up, and a step is not stacked on a running one
+            #expect(w.nextDue(idleSlots: W.idleSlots(lines: lines, docs: docs, scheduler: sched)) == nil)
+            t += seconds
+            if step.role == .lines { lines.reply(.answered, now: t) } else { docs.reply(.answered, now: t) }
+            _ = sched.complete(step.role, id: job.id)
+            w.finished(failure: nil, now: t)
+            return true
+        }
+
+        // a lens read holds Lines: the first step waits for it
+        let busy = sched.submit(client: 1, purpose: .lens, frame: 1, key: "auto", target: ReadTarget(role: .lines, via: .rev3), now: 0).job
+        #expect(!runDue(seconds: 1))
+        #expect(sched.next(.lines)?.id == busy.id)
+        lines.dispatch(busy.workerJob, now: 0)
+        #expect(!runDue(seconds: 1))
+        lines.reply(.answered, now: 1)
+        _ = sched.complete(.lines, id: busy.id)
+        while runDue(seconds: 30) {}
+        #expect(dispatched == ["lines:auto", "docs:auto", "lines:ja", "docs:ja"])
+        #expect(w.allDone)
+
+        // Lines crashes: its warm set is gone, and the host plans again from the start (a fresh plan over the same keys)
+        lines.dispatch(WorkerJob(via: .rev3, key: "ja"), now: t)
+        _ = lines.interrupted(now: t)
+        #expect(lines.warm.isEmpty)
+        _ = sched.lost(.lines)
+        w = W()
+        _ = w.want("auto", lensOn: false)
+        _ = w.want("ja", lensOn: false)
+        t += 60
+        _ = lines.tick(now: t)
+        dispatched = []
+        while runDue(seconds: 1) {}
+        #expect(dispatched == ["lines:auto", "docs:auto", "lines:ja", "docs:ja"])
+    }
 }

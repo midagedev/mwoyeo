@@ -11,7 +11,7 @@ import Foundation
 ///
 /// The app loads them itself, in the background, at every launch: per key, the steps in `Step` order, one at a time (the compiler
 /// service takes one compile at a time, and a load is never cancelled). Revision 3 compiles in this process; the document model
-/// compiles in the Docs service (`DocsHost`), so no read of this process waits for it. This is the bookkeeping: which step is due,
+/// compiles in the Docs service (`RecognitionHost`), so no read of this process waits for it. This is the bookkeeping: which step is due,
 /// how each ended, and whether a progress screen should be up. Whether a read may go to Docs is `WorkerHealth`'s to say
 /// (`DocsRoute`), not this struct's: a document read that is slow is not a failure of the step. Nothing is persisted: a key is
 /// ready when its step ran in this process, and the timing of that step is what shows whether the compile was cold.

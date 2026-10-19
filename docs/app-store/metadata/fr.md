@@ -6,8 +6,8 @@ Source: the English section of ../metadata.md, in the vous form of the app. UI t
 
 **Subtitle** (30): `Votre écran, dans votre langue`
 
-**Promotional text** (165):
-Chats, jeux, sous-titres, articles. Mwoyeo efface l’original et écrit la traduction au même endroit, même taille, même couleur. Par défaut, tout reste sur votre Mac.
+**Promotional text** (167):
+En direct : nouveaux messages, sous-titres, pages qui défilent. La loupe réécrit la traduction au même endroit, même taille et couleur. Par défaut, tout sur votre Mac.
 
 **Keywords**: `traducteur,OCR,overlay,direct,jeux,sous-titres,chat,japonais,coréen,chinois,anglais,texte`
 

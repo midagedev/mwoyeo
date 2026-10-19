@@ -21,17 +21,19 @@ were taken with `python3 -c 'print(len(s))'` when this file was written.
 
 ## 한국어
 
-**이름** (19): `Mwoyeo – 화면 그 자리 번역`
+**이름** (18): `Mwoyeo – 실시간 화면 번역`
 
-**부제** (18): `렌즈 아래 글자를 제자리에서 번역`
+**부제** (20): `바뀌는 화면을 그 자리에서 바로 번역`
 
-**프로모션 텍스트** (93):
-채팅, 게임, 영상 자막, 논문까지. 렌즈를 올려 두면 원문을 지우고 같은 자리에 같은 크기와 색으로 번역을 써요. 기본 설정에서는 모든 처리가 Mac 안에서 끝나요.
+**프로모션 텍스트** (111):
+화면이 바뀌면 번역도 바로 바뀌어요. 새 채팅, 넘어가는 자막, 스크롤하는 페이지를 렌즈가 계속 읽고, 같은 자리에 같은 크기와 색으로 다시 써요. 기본 설정에서는 모든 처리가 Mac 안에서 끝나요.
 
-**키워드** (UTF-8 100 바이트 이내로 맞춤): `번역,화면번역,실시간번역,OCR,게임번역,자막,채팅,논문,일본어,번역기,렌즈`
+**키워드** (UTF-8 100 바이트 이내로 맞춤): `번역기,OCR,게임,자막,채팅,논문,일본어,중국어,영어,자동번역,스크린,렌즈`
 
 **설명**:
-화면 속 외국어를 그 자리에서 한국어로.
+화면 속 외국어를 실시간으로, 그 자리에서 한국어로.
+
+채팅이 올라오고, 자막이 넘어가고, 페이지를 스크롤해도 번역이 화면을 따라와요.
 
 번역 팝업도, 화면 아래 자막 줄도 없어요. Mwoyeo는 렌즈 아래 글자를 읽어서 화면에서 지우고, 같은 자리에 같은 크기와 색으로 번역을 다시 써요. 그래서 원래 한국어로 된 화면을 보는 것처럼 읽혀요. 새 메시지가 올라오거나 페이지를 스크롤해도 번역이 따라와요.
 
@@ -58,17 +60,19 @@ were taken with `python3 -c 'print(len(s))'` when this file was written.
 
 ## English
 
-**Name** (27): `Mwoyeo – Translate in Place`
+**Name** (26): `Mwoyeo – Screen Translator`
 
-**Subtitle** (29): `Your screen, in your language`
+**Subtitle** (28): `Translates your screen, live`
 
-**Promotional text** (169):
-Chats, games, subtitles, papers. Put a lens over them and Mwoyeo erases the original and writes the translation in its place, same size and colour. On-device by default.
+**Promotional text** (165):
+Live as it changes: new messages, changing subtitles, scrolling pages. The lens keeps rewriting the translation in place, same size and colour. On-device by default.
 
-**Keywords**: `translate,translator,screen,OCR,overlay,live,game,subtitle,chat,paper,Japanese,Korean,Chinese,lens`
+**Keywords**: `translate,translation,OCR,overlay,realtime,game,subtitle,chat,paper,Japanese,Korean,Chinese,lens`
 
 **Description**:
-Foreign text on your screen, translated right where it is.
+Foreign text on your screen, translated live, right where it is.
+
+New chat messages, changing subtitles, a page you scroll: the translation keeps up with the screen.
 
 No pop-up, no subtitle bar. Mwoyeo reads the text under a lens, erases it from the screen and writes the translation in the same place, at the same size and colour. It reads as if the page had been in your language all along, and it keeps up as new messages arrive and as you scroll.
 

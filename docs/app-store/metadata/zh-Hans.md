@@ -6,8 +6,8 @@ Source: the English section of ../metadata.md. UI terms from App/Resources/Local
 
 **Subtitle** (13): `透镜一罩，外文变成你的语言`
 
-**Promotional text** (75):
-聊天、游戏、视频字幕、论文都行。把透镜放上去，Mwoyeo 会擦掉原文，并在原处以相同的大小和颜色写上译文。默认设置下，所有处理都在 Mac 上完成。
+**Promotional text** (78):
+画面一变，译文跟着变。新的聊天消息、切换的字幕、滚动的页面，透镜都会持续读取，并在原处以相同的大小和颜色重写译文。默认设置下，所有处理都在 Mac 上完成。
 
 **Keywords**: `OCR,翻译器,实时,游戏,字幕,聊天,论文,日语,韩语,英语,悬浮,取词`
 

@@ -6,8 +6,8 @@ Source: the English section of ../metadata.md, in the Sie form of the app's welc
 
 **Subtitle** (28): `Ihr Bildschirm, Ihre Sprache`
 
-**Promotional text** (166):
-Chats, Spiele, Untertitel, Papers: Mwoyeo löscht das Original und schreibt die Übersetzung an dieselbe Stelle, in gleicher Größe und Farbe. Standardmäßig auf dem Mac.
+**Promotional text** (155):
+Live: neue Nachrichten, wechselnde Untertitel, scrollende Seiten. Die Linse schreibt die Übersetzung laufend an dieselbe Stelle. Standardmäßig auf dem Mac.
 
 **Keywords**: `Übersetzer,Bildschirmübersetzer,Live,OCR,Overlay,Spiele,Untertitel,Chat,Japanisch,Koreanisch,Linse`
 

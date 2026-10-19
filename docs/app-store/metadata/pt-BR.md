@@ -6,8 +6,8 @@ Source: the English section of ../metadata.md, in the você form of the app. UI 
 
 **Subtitle** (23): `Sua tela, no seu idioma`
 
-**Promotional text** (168):
-Chats, jogos, legendas, artigos. Com uma lente, o Mwoyeo apaga o original e escreve a tradução no mesmo lugar, do mesmo tamanho e cor. Por padrão, tudo fica no seu Mac.
+**Promotional text** (162):
+Ao vivo, enquanto muda: mensagens novas, legendas, páginas rolando. A lente reescreve a tradução no mesmo lugar, mesmo tamanho e cor. Por padrão, tudo no seu Mac.
 
 **Keywords**: `tradutor,OCR,overlay,jogos,legendas,chat,japonês,coreano,chinês,inglês,lente`
 

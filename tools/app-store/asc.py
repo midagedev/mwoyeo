@@ -5,10 +5,13 @@
   asc.py apply [--dry]   writes docs/app-store/metadata.md and metadata/*.md to the version being prepared: the version
                          string (newest v* tag), the 12 locales (name, subtitle, privacy URL; description, keywords,
                          promotional text, support and marketing URLs), categories, copyright, and the newest valid build
+  asc.py shots [--dry]   the Mac screenshots of every locale (APP_DESKTOP set of the version being prepared): Korean gets
+                         tools/app-store/screenshots/out/ko, every other locale out/en (compose.sh makes them); the set's
+                         screenshots are replaced, in file order
 
 Key: ASC_KEY_ID (default J6C3DV9S7R), ASC_ISSUER_ID, ASC_KEY_FILE (default ~/.appstoreconnect/private_keys/AuthKey_<id>.p8).
 What the API does not cover (App Privacy answers, price, review contact) is done in the web page."""
-import base64, importlib.util, json, os, subprocess, sys, time, urllib.error, urllib.request
+import base64, hashlib, importlib.util, json, os, subprocess, sys, time, urllib.error, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 BUNDLE = 'dev.midagedev.mwoyeo.appstore'
@@ -20,6 +23,7 @@ PRIVACY = 'https://github.com/midagedev/mwoyeo/blob/main/docs/PRIVACY.md'
 SUPPORT = 'https://github.com/midagedev/mwoyeo/issues'
 MARKETING = 'https://github.com/midagedev/mwoyeo'
 COPYRIGHT = '2026 Hyeoncheol Kim'
+SHOTS = os.path.join(ROOT, 'tools/app-store/screenshots/out')
 
 
 def b64(b):
@@ -63,6 +67,16 @@ def call(method, path, body=None):
     except urllib.error.HTTPError as e:
         detail = e.read().decode()
         sys.exit(f'{method} {path}: HTTP {e.code}\n{detail[:1500]}')
+
+
+def put_chunk(url, method, headers, data):
+    """One upload operation of an asset: its bytes to the URL Apple gave, with its headers (not the API: no prefix, no JSON, no token)."""
+    req = urllib.request.Request(url, method=method, data=data, headers={h['name']: h['value'] for h in headers or []})
+    try:
+        with urllib.request.urlopen(req) as r:
+            r.read()
+    except urllib.error.HTTPError as e:
+        sys.exit(f'{method} upload chunk: HTTP {e.code}\n{e.read().decode()[:1500]}')
 
 
 def app():
@@ -159,11 +173,65 @@ def apply(dry):
         print('build', builds[0]['attributes']['version'], 'attached')
 
 
+def delivered(shot_id, timeout=300):
+    """The screenshot's asset delivery state once Apple has processed it (COMPLETE or FAILED), with its errors."""
+    end = time.time() + timeout
+    while True:
+        at = call('GET', f'/v1/appScreenshots/{shot_id}')['data']['attributes']
+        state = (at.get('assetDeliveryState') or {}).get('state')
+        if state in ('COMPLETE', 'FAILED') or time.time() > end:
+            return state, (at.get('assetDeliveryState') or {}).get('errors') or []
+        time.sleep(2)
+
+
+def shots(dry):
+    a = app()
+    v = editable_version(a['id'])
+    print('version', v['attributes']['versionString'], v['attributes']['appStoreState'])
+    files = {}
+    for folder in ('ko', 'en'):
+        d = os.path.join(SHOTS, folder)
+        files[folder] = sorted(f for f in os.listdir(d) if f.endswith('.png')) if os.path.isdir(d) else []
+        if not 1 <= len(files[folder]) <= 10:
+            sys.exit(f'{d}: {len(files[folder])} PNGs (1 to 10 needed; run tools/app-store/screenshots/compose.sh)')
+    have = {x['attributes']['locale']: x for x in call('GET', f'/v1/appStoreVersions/{v["id"]}/appStoreVersionLocalizations')['data']}
+    for ours, theirs in LOCALES.items():
+        folder = 'ko' if ours == 'ko' else 'en'
+        loc = have.get(theirs) or sys.exit(f'no version localization {theirs}: run apply first')
+        sets = call('GET', f'/v1/appStoreVersionLocalizations/{loc["id"]}/appScreenshotSets')['data']
+        shot_set = next((x for x in sets if x['attributes']['screenshotDisplayType'] == 'APP_DESKTOP'), None)
+        old = call('GET', f'/v1/appScreenshotSets/{shot_set["id"]}/appScreenshots')['data'] if shot_set else []
+        print(f'{theirs}: APP_DESKTOP set {shot_set["id"] if shot_set else "(create)"}, delete {len(old)}, upload out/{folder} '
+              f'{" ".join(files[folder])}')
+        if dry:
+            continue
+        if not shot_set:
+            shot_set = call('POST', '/v1/appScreenshotSets', {'data': {'type': 'appScreenshotSets',
+                            'attributes': {'screenshotDisplayType': 'APP_DESKTOP'},
+                            'relationships': {'appStoreVersionLocalization': {'data': {'type': 'appStoreVersionLocalizations', 'id': loc['id']}}}}})['data']
+        for o in old:
+            call('DELETE', f'/v1/appScreenshots/{o["id"]}')
+        # the display order is the order of creation
+        for name in files[folder]:
+            data = open(os.path.join(SHOTS, folder, name), 'rb').read()
+            shot = call('POST', '/v1/appScreenshots', {'data': {'type': 'appScreenshots',
+                        'attributes': {'fileName': f'mwoyeo-{folder}-{name}', 'fileSize': len(data)},
+                        'relationships': {'appScreenshotSet': {'data': {'type': 'appScreenshotSets', 'id': shot_set['id']}}}}})['data']
+            for op in shot['attributes']['uploadOperations']:
+                put_chunk(op['url'], op['method'], op.get('requestHeaders'), data[op['offset']:op['offset'] + op['length']])
+            call('PATCH', f'/v1/appScreenshots/{shot["id"]}', {'data': {'type': 'appScreenshots', 'id': shot['id'],
+                 'attributes': {'uploaded': True, 'sourceFileChecksum': hashlib.md5(data).hexdigest()}}})
+            state, errors = delivered(shot['id'])
+            print(f'  {name}: {state}', '; '.join(f'{e.get("code")}: {e.get("description")}' for e in errors))
+
+
 if __name__ == '__main__':
     cmd = sys.argv[1] if len(sys.argv) > 1 else 'status'
     if cmd == 'status':
         status()
     elif cmd == 'apply':
         apply('--dry' in sys.argv)
+    elif cmd == 'shots':
+        shots('--dry' in sys.argv)
     else:
         sys.exit(__doc__)

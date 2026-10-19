@@ -6,6 +6,15 @@
 # GUI the lens was silent for ~90 s (ocr-stall-112). The reader must take the read in the Docs service, read with VN meanwhile, and
 # never leave the lens silent for more than N = 8 s.
 #
+# NOT PER LANDING (g2-fast-host-gates, 2026-10-19). Its wall is real work, not policy waits: the build of a fresh id, then the cold
+# compiles of the Lines service (rev3, ~65 s), the Docs service (~85 s) and, on p13, the figure page's two networks (~60 s), 5-8 min
+# on a quiet Mac. The policy it used to carry along (no silence over 8 s behind a slow Docs, the preparing hint after S, the rest of a
+# rung or a restart) is Core unit tests now (`cd Core && swift test --filter ReaderHostTests`, a fake clock, milliseconds). What only
+# this script shows, and is kept: that NO network compiles in the GUI process (the GUI's e5rt cache stays empty from a fresh id on),
+# that the services' caches gain the entries, and that nothing is aborted (drain, no new .tmp). Run it when a change touches which
+# process reads (App/Reader/, Reader/, Shared/VisionExec.swift, TextRecognizer), never for a change of policy. Its silence and hint
+# asserts stay: they are measured in the same run and cost nothing more.
+#
 #   usage: reader-cold.sh [p13]                      (a page of $PAGES; default p13, the figure page that compiles both networks)
 #          reader-cold.sh ja[:<picture>]             (the ja variant: a use-case picture of $PNGS, default d02-timetable-ja, read on a
 #                                                     fresh id: rev3 for ja compiles in the Lines service and the lens must say

@@ -83,6 +83,8 @@ struct GeneralSettings: View {
                 Toggle("Save transcripts", isOn: savesTranscripts)
                 Text("Each lens writes what it reads and its translation to Markdown and SRT files.")
                     .font(.caption).foregroundStyle(.secondary)
+                Text("The names and terms an engine learns are written to the same folder.")
+                    .font(.caption).foregroundStyle(.secondary)
                 LabeledContent("Folder") {
                     Text(ExportFolder.shownPath(model.settings).map { ($0 as NSString).abbreviatingWithTildeInPath } ?? String(localized: "None chosen"))
                         .lineLimit(1).truncationMode(.middle).foregroundStyle(.secondary)
@@ -166,6 +168,8 @@ struct TranslationSettings: View {
     @State private var cached = 0
     @State private var sheet: EngineSheetTarget?
     @State private var removing: EngineConfig?
+    /// The app whose Memory sheet is open.
+    @State private var memoryApp: MemoryTarget?
     /// The active added engine's speed, polled; nil (no row at all) until it has enough batches.
     @State private var speed: SpeedSummary?
     private let intelligence = IntelligenceTranslator()
@@ -192,6 +196,21 @@ struct TranslationSettings: View {
         return "\(pair) · \(reader.title)"
     }
 
+    /// An app profile's row: the app, its languages, and (once it has memory) what it remembers, which is the first to be cut short.
+    private func profileLabel(_ p: AppProfile) -> some View {
+        VStack(alignment: .leading) {
+            Text(p.appName)
+            HStack(spacing: 0) {
+                Text(profileDetail(p)).lineLimit(1).layoutPriority(1)
+                if let summary = AppMemorySummary.short(p) {
+                    Text(verbatim: " · \(summary)").lineLimit(1).truncationMode(.tail)
+                }
+            }
+            .font(.caption).foregroundStyle(.secondary)
+            .help(AppMemorySummary.full(p) ?? "")
+        }
+    }
+
     /// Languages remembered per app (from a lens's menu); the group exists only once there is one.
     private var appProfiles: some View {
         Section {
@@ -203,6 +222,7 @@ struct TranslationSettings: View {
                             Text("Automatic").tag(ParagraphReader?.none)
                             ForEach(ParagraphReader.allCases.filter { $0 != .automatic }, id: \.self) { Text($0.title).tag(ParagraphReader?.some($0)) }
                         }
+                        Button("Memory…") { memoryApp = MemoryTarget(id: p.bundleID) }
                         Divider()
                         Button("Forget This App", role: .destructive) { model.forgetProfile(p.bundleID) }
                     } label: { Image(nsImage: .moreActions) }
@@ -212,16 +232,23 @@ struct TranslationSettings: View {
                         .help("More actions for \(p.appName)")
                         .accessibilityLabel("More actions for \(p.appName)")
                 } label: {
-                    VStack(alignment: .leading) {
-                        Text(p.appName)
-                        Text(profileDetail(p)).font(.caption).foregroundStyle(.secondary)
-                    }
+                    profileLabel(p)
                 }
+            }
+            if AppMemorySummary.showsAppleToggle(model.settings) {
+                Toggle("Use my names and terms with Apple Translation", isOn: AppMemorySummary.appleToggle(model))
             }
         } header: {
             Text("App profiles")
         } footer: {
-            Text("The app in front picks the languages, one pair at a time.").font(.caption).foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("The app in front picks the languages, one pair at a time.")
+                Text("Names and terms you wrote go to Apple Translation inside the text, only if you turn this on.")
+            }
+            .font(.caption).foregroundStyle(.secondary)
+        }
+        .sheet(item: $memoryApp) { target in
+            AppMemorySheet(bundleID: target.id, model: model)
         }
     }
 

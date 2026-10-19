@@ -56,12 +56,15 @@ def token():
     return f'{head}.{body}.{b64(der_to_raw(sig))}'
 
 
-TOKEN = None
+TOKEN, TOKEN_AT = None, 0.0
 
 
 def call(method, path, body=None):
-    global TOKEN
-    TOKEN = TOKEN or token()
+    # A token lives 15 minutes; a run that waits on video processing outlives it (an upload of 12 previews stopped on a 401,
+    # 2026-10-20), so a token older than 10 minutes is replaced.
+    global TOKEN, TOKEN_AT
+    if TOKEN is None or time.time() - TOKEN_AT > 600:
+        TOKEN, TOKEN_AT = token(), time.time()
     req = urllib.request.Request(API + path, method=method, data=json.dumps(body).encode() if body else None,
                                  headers={'Authorization': f'Bearer {TOKEN}', 'Content-Type': 'application/json'})
     try:

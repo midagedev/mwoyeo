@@ -78,8 +78,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "%@ download didn’t finish"
+            "state": "translated",
+            "value": "%@ 내려받기가 끝나지 않았어요"
           }
         },
         "ja": {
@@ -148,8 +148,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "%@ download didn’t finish — try again"
+            "state": "translated",
+            "value": "%@ 내려받기가 끝나지 않았어요 — 다시 시도"
           }
         },
         "ja": {
@@ -501,8 +501,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "%@ → %@ isn’t supported"
+            "state": "translated",
+            "value": "%@ → %@ 번역은 지원되지 않아요"
           }
         },
         "ja": {
@@ -650,7 +650,7 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
+            "state": "translated",
             "value": "%lld / %lld"
           }
         },
@@ -1270,8 +1270,8 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "%lld lines"
+            "state": "translated",
+            "value": "%lld줄"
           }
         },
         "ja": {
@@ -1466,8 +1466,8 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "%lld lines after"
+            "state": "translated",
+            "value": "뒤 %lld줄"
           }
         },
         "ja": {
@@ -1662,8 +1662,8 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "%lld lines before"
+            "state": "translated",
+            "value": "앞 %lld줄"
           }
         },
         "ja": {
@@ -1928,8 +1928,8 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "%lld names"
+            "state": "translated",
+            "value": "이름 %lld개"
           }
         },
         "ja": {
@@ -2106,8 +2106,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "%lld of %lld characters"
+            "state": "translated",
+            "value": "%lld / %lld자"
           }
         },
         "ja": {
@@ -2316,8 +2316,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "A name is stored once both fields are filled."
+            "state": "translated",
+            "value": "두 칸을 모두 채우면 이름이 저장됩니다."
           }
         },
         "ja": {
@@ -2736,8 +2736,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Add Name"
+            "state": "translated",
+            "value": "이름 추가"
           }
         },
         "ja": {
@@ -2806,8 +2806,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Add Person"
+            "state": "translated",
+            "value": "상대 추가"
           }
         },
         "ja": {
@@ -2876,8 +2876,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Age, role, how they speak"
+            "state": "translated",
+            "value": "나이, 역할, 말투"
           }
         },
         "ja": {
@@ -3156,8 +3156,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Also sent to %@ when another app is in front."
+            "state": "translated",
+            "value": "다른 앱이 앞에 있을 때는 %@에도 보냅니다."
           }
         },
         "ja": {
@@ -3296,8 +3296,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Another row already has this name."
+            "state": "translated",
+            "value": "같은 이름이 이미 있습니다."
           }
         },
         "ja": {
@@ -4982,8 +4982,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Applies only to engines you added. Apple Translation is not affected."
+            "state": "translated",
+            "value": "추가한 엔진에만 적용됩니다. Apple 번역에는 영향이 없습니다."
           }
         },
         "ja": {
@@ -5962,8 +5962,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Casual"
+            "state": "translated",
+            "value": "반말"
           }
         },
         "ja": {
@@ -6452,8 +6452,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Choose Languages"
+            "state": "translated",
+            "value": "언어 선택"
           }
         },
         "ja": {
@@ -7082,8 +7082,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Context"
+            "state": "translated",
+            "value": "문맥"
           }
         },
         "ja": {
@@ -7152,8 +7152,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Context for this app"
+            "state": "translated",
+            "value": "이 앱의 문맥"
           }
         },
         "ja": {
@@ -7292,8 +7292,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Conversation"
+            "state": "translated",
+            "value": "대화"
           }
         },
         "ja": {
@@ -8412,8 +8412,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Didn’t finish"
+            "state": "translated",
+            "value": "끝나지 않음"
           }
         },
         "ja": {
@@ -8692,8 +8692,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Does what the lens’s name tag offers"
+            "state": "translated",
+            "value": "렌즈 이름표가 알려 주는 동작을 실행합니다"
           }
         },
         "ja": {
@@ -8762,8 +8762,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Done"
+            "state": "translated",
+            "value": "완료"
           }
         },
         "ja": {
@@ -8902,8 +8902,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Downloading %@…"
+            "state": "translated",
+            "value": "%@ 내려받는 중…"
           }
         },
         "ja": {
@@ -8972,8 +8972,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Downloading…"
+            "state": "translated",
+            "value": "내려받는 중…"
           }
         },
         "ja": {
@@ -9322,8 +9322,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Earlier lines: %lld"
+            "state": "translated",
+            "value": "앞 줄: %lld"
           }
         },
         "ja": {
@@ -10023,8 +10023,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Female"
+            "state": "translated",
+            "value": "여성"
           }
         },
         "ja": {
@@ -10093,8 +10093,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Fill in the name and its translation to store it."
+            "state": "translated",
+            "value": "이름과 번역을 채우면 저장됩니다."
           }
         },
         "ja": {
@@ -10373,8 +10373,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Follow the engine"
+            "state": "translated",
+            "value": "엔진 설정 따르기"
           }
         },
         "ja": {
@@ -10863,8 +10863,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Forget Learned"
+            "state": "translated",
+            "value": "배운 것 지우기"
           }
         },
         "ja": {
@@ -10933,8 +10933,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Forget the conversation kept for this app. Learned names stay."
+            "state": "translated",
+            "value": "이 앱에 대해 기억한 대화를 지웁니다. 배운 이름은 남습니다."
           }
         },
         "ja": {
@@ -11003,8 +11003,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Forget the names and terms learned for this app."
+            "state": "translated",
+            "value": "이 앱에서 배운 이름과 용어를 지웁니다."
           }
         },
         "ja": {
@@ -11143,8 +11143,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Formal"
+            "state": "translated",
+            "value": "격식체"
           }
         },
         "ja": {
@@ -11495,8 +11495,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Gender"
+            "state": "translated",
+            "value": "성별"
           }
         },
         "ja": {
@@ -12055,8 +12055,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Honorific"
+            "state": "translated",
+            "value": "존칭"
           }
         },
         "ja": {
@@ -12125,8 +12125,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "How it is read, for Japanese"
+            "state": "translated",
+            "value": "읽는 법(일본어)"
           }
         },
         "ja": {
@@ -12195,8 +12195,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "How many lines before the text are sent. More lines tell the engine more about who and what is meant, and make each request longer."
+            "state": "translated",
+            "value": "번역할 글 앞의 몇 줄을 함께 보낼지 정합니다. 많이 보낼수록 엔진이 누가 무엇을 말하는지 더 잘 알지만, 요청마다 길어집니다."
           }
         },
         "ja": {
@@ -12615,8 +12615,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Include window title"
+            "state": "translated",
+            "value": "창 제목 포함"
           }
         },
         "ja": {
@@ -13036,8 +13036,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Its translation"
+            "state": "translated",
+            "value": "번역"
           }
         },
         "ja": {
@@ -13176,8 +13176,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Kind"
+            "state": "translated",
+            "value": "종류"
           }
         },
         "ja": {
@@ -13456,8 +13456,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Learn names and terms"
+            "state": "translated",
+            "value": "이름과 용어 배우기"
           }
         },
         "ja": {
@@ -13526,8 +13526,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Learned"
+            "state": "translated",
+            "value": "배운 것"
           }
         },
         "ja": {
@@ -14016,8 +14016,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "lines only"
+            "state": "translated",
+            "value": "번역할 줄만"
           }
         },
         "ja": {
@@ -14227,8 +14227,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Male"
+            "state": "translated",
+            "value": "남성"
           }
         },
         "ja": {
@@ -14297,8 +14297,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Memory for %@"
+            "state": "translated",
+            "value": "%@ 메모리"
           }
         },
         "ja": {
@@ -14367,8 +14367,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Memory…"
+            "state": "translated",
+            "value": "메모리…"
           }
         },
         "ja": {
@@ -15353,8 +15353,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Name or term"
+            "state": "translated",
+            "value": "이름 또는 용어"
           }
         },
         "ja": {
@@ -15423,8 +15423,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Name or term in the text"
+            "state": "translated",
+            "value": "원문 속 이름이나 용어"
           }
         },
         "ja": {
@@ -15703,8 +15703,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Names and terms"
+            "state": "translated",
+            "value": "이름과 용어"
           }
         },
         "ja": {
@@ -15773,8 +15773,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Names and terms the engine suggested. Pin keeps one as your own."
+            "state": "translated",
+            "value": "엔진이 알려 준 이름과 용어입니다. 고정하면 내 항목으로 남습니다."
           }
         },
         "ja": {
@@ -15843,8 +15843,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Names and terms you wrote go to Apple Translation inside the text, only if you turn this on."
+            "state": "translated",
+            "value": "켜면 직접 적은 이름과 용어를 원문에 넣어 Apple 번역에도 보냅니다."
           }
         },
         "ja": {
@@ -15913,8 +15913,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Names: %lld of %lld"
+            "state": "translated",
+            "value": "이름: %lld / %lld"
           }
         },
         "ja": {
@@ -15983,8 +15983,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Nearby"
+            "state": "translated",
+            "value": "주변 줄"
           }
         },
         "ja": {
@@ -16193,8 +16193,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Neutral"
+            "state": "translated",
+            "value": "보통"
           }
         },
         "ja": {
@@ -16753,8 +16753,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Not set"
+            "state": "translated",
+            "value": "정하지 않음"
           }
         },
         "ja": {
@@ -16893,8 +16893,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "note"
+            "state": "translated",
+            "value": "메모"
           }
         },
         "ja": {
@@ -16963,8 +16963,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Note"
+            "state": "translated",
+            "value": "메모"
           }
         },
         "ja": {
@@ -17033,8 +17033,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Note for the translator"
+            "state": "translated",
+            "value": "번역가에게 남길 메모"
           }
         },
         "ja": {
@@ -17103,8 +17103,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Nothing has been learned for this app yet."
+            "state": "translated",
+            "value": "이 앱에서 아직 배운 것이 없습니다."
           }
         },
         "ja": {
@@ -18224,8 +18224,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Organization"
+            "state": "translated",
+            "value": "단체"
           }
         },
         "ja": {
@@ -19064,8 +19064,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Person"
+            "state": "translated",
+            "value": "사람"
           }
         },
         "ja": {
@@ -19134,8 +19134,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Pin"
+            "state": "translated",
+            "value": "고정"
           }
         },
         "ja": {
@@ -19204,8 +19204,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Pin %@"
+            "state": "translated",
+            "value": "%@ 고정"
           }
         },
         "ja": {
@@ -19484,8 +19484,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Place"
+            "state": "translated",
+            "value": "장소"
           }
         },
         "ja": {
@@ -19694,8 +19694,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Polite"
+            "state": "translated",
+            "value": "존댓말"
           }
         },
         "ja": {
@@ -19904,8 +19904,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Previous lines"
+            "state": "translated",
+            "value": "앞 줄 수"
           }
         },
         "ja": {
@@ -19974,8 +19974,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Pronunciation"
+            "state": "translated",
+            "value": "읽는 법"
           }
         },
         "ja": {
@@ -20814,8 +20814,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Register"
+            "state": "translated",
+            "value": "말투"
           }
         },
         "ja": {
@@ -21024,8 +21024,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Remove"
+            "state": "translated",
+            "value": "삭제"
           }
         },
         "ja": {
@@ -21374,8 +21374,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Remove this name"
+            "state": "translated",
+            "value": "이 이름 삭제"
           }
         },
         "ja": {
@@ -21444,8 +21444,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Remove this person"
+            "state": "translated",
+            "value": "이 상대 삭제"
           }
         },
         "ja": {
@@ -23265,8 +23265,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Seen once. Used after a second sighting."
+            "state": "translated",
+            "value": "한 번 나왔습니다. 두 번째부터 씁니다."
           }
         },
         "ja": {
@@ -23547,8 +23547,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Sends the app’s name and the lines around the text with each request, so names and tone stay consistent."
+            "state": "translated",
+            "value": "요청마다 앱 이름과 주변 줄을 함께 보내서 이름과 말투가 일정하게 유지됩니다."
           }
         },
         "ja": {
@@ -23617,8 +23617,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Sends your note and names for the app to DeepL as instructions, and sets the formality from them."
+            "state": "translated",
+            "value": "앱에 적어 둔 메모와 이름을 DeepL에 지시문으로 보내고, 그에 맞춰 존댓말 정도를 정합니다."
           }
         },
         "ja": {
@@ -23687,8 +23687,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Sent: %@"
+            "state": "translated",
+            "value": "보냄: %@"
           }
         },
         "ja": {
@@ -24457,8 +24457,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Speaks to"
+            "state": "translated",
+            "value": "말하는 상대"
           }
         },
         "ja": {
@@ -24597,8 +24597,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Start Fresh"
+            "state": "translated",
+            "value": "새로 시작"
           }
         },
         "ja": {
@@ -24667,8 +24667,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Start fresh?"
+            "state": "translated",
+            "value": "새로 시작할까요?"
           }
         },
         "ja": {
@@ -25017,8 +25017,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Term"
+            "state": "translated",
+            "value": "용어"
           }
         },
         "ja": {
@@ -25647,8 +25647,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "That is the most names this app keeps."
+            "state": "translated",
+            "value": "이 앱에 담을 수 있는 이름이 가득 찼습니다."
           }
         },
         "ja": {
@@ -25717,8 +25717,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "That is the most. Remove a name to add another."
+            "state": "translated",
+            "value": "가득 찼습니다. 이름을 하나 지우면 더 넣을 수 있습니다."
           }
         },
         "ja": {
@@ -25787,8 +25787,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "The %@ → %@ language pack is not installed."
+            "state": "translated",
+            "value": "%@ → %@ 언어팩이 설치되어 있지 않습니다."
           }
         },
         "ja": {
@@ -26073,8 +26073,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "The conversation kept for this app is forgotten. Your note, names and learned terms stay."
+            "state": "translated",
+            "value": "이 앱에 대해 기억한 대화를 지웁니다. 메모, 이름, 배운 용어는 남습니다."
           }
         },
         "ja": {
@@ -26493,8 +26493,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "The engine suggests the names and terms it translated, and Mwoyeo reuses them for that app."
+            "state": "translated",
+            "value": "엔진이 번역한 이름과 용어를 알려 주면 Mwoyeo가 그 앱에서 다시 씁니다."
           }
         },
         "ja": {
@@ -26843,8 +26843,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "The names and terms an engine learns are written to the same folder."
+            "state": "translated",
+            "value": "엔진이 배운 이름과 용어도 같은 폴더에 저장됩니다."
           }
         },
         "ja": {
@@ -26913,8 +26913,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "The title of the window under the lens goes to this engine too. Titles can hold private text, so this stays off until you turn it on."
+            "state": "translated",
+            "value": "렌즈 아래 창의 제목도 이 엔진에 보냅니다. 제목에는 개인적인 내용이 있을 수 있어서 직접 켜기 전까지는 꺼져 있습니다."
           }
         },
         "ja": {
@@ -27123,8 +27123,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "This app keeps %lld names. Remove one to pin this."
+            "state": "translated",
+            "value": "이 앱에는 이름을 %lld개까지 담을 수 있습니다. 하나를 지우면 고정할 수 있습니다."
           }
         },
         "ja": {
@@ -27473,8 +27473,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "this name"
+            "state": "translated",
+            "value": "이 이름"
           }
         },
         "ja": {
@@ -27683,8 +27683,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Told to the translator with every line from this app."
+            "state": "translated",
+            "value": "이 앱의 모든 줄과 함께 번역 엔진에 전달됩니다."
           }
         },
         "ja": {
@@ -29293,8 +29293,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Try again"
+            "state": "translated",
+            "value": "다시 시도"
           }
         },
         "ja": {
@@ -29591,8 +29591,8 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "up to %lld names"
+            "state": "translated",
+            "value": "이름 최대 %lld개"
           }
         },
         "ja": {
@@ -29787,8 +29787,8 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "up to %lld names (learned too)"
+            "state": "translated",
+            "value": "이름 최대 %lld개(배운 것 포함)"
           }
         },
         "ja": {
@@ -30245,8 +30245,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use context"
+            "state": "translated",
+            "value": "문맥 사용"
           }
         },
         "ja": {
@@ -30315,8 +30315,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use my names and terms with Apple Translation"
+            "state": "translated",
+            "value": "Apple 번역에도 내 이름과 용어 사용"
           }
         },
         "ja": {
@@ -30385,8 +30385,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Use my notes with DeepL"
+            "state": "translated",
+            "value": "DeepL에 내 메모 사용"
           }
         },
         "ja": {
@@ -30455,8 +30455,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Using Apple Intelligence"
+            "state": "translated",
+            "value": "Apple Intelligence 사용 중"
           }
         },
         "ja": {
@@ -30948,8 +30948,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Who"
+            "state": "translated",
+            "value": "누가"
           }
         },
         "ja": {
@@ -31018,8 +31018,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Who is talking, the setting, the tone…"
+            "state": "translated",
+            "value": "누가 말하는지, 배경, 말투…"
           }
         },
         "ja": {
@@ -31088,8 +31088,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Who this person speaks to"
+            "state": "translated",
+            "value": "이 사람이 말하는 상대"
           }
         },
         "ja": {
@@ -31228,8 +31228,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "window title"
+            "state": "translated",
+            "value": "창 제목"
           }
         },
         "ja": {
@@ -31369,8 +31369,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Your notes and names for %@ are sent too."
+            "state": "translated",
+            "value": "%@에 적어 둔 메모와 이름도 함께 보냅니다."
           }
         },
         "ja": {

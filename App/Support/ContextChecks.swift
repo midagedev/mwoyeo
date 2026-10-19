@@ -26,13 +26,23 @@ enum ContextChecks {
         gateChecks(t)
         watchChecks(t)
         bookChecks(t)
+        memoryPlanChecks(t)
+        learnedFileChecks(t)
         await offChecks(t)
         await onChecks(t)
+        await memoryOnlyChecks(t)
+        await learnedFileRunChecks(t)
+        await pinChecks(t)
         await appleChecks(t)
         return t.failures
     }
 
     // MARK: fixtures
+
+    /// A string that stands in every screen line the On checks send; it is never printed, and the runner greps the output and the unified log
+    /// for it (`MWOYEO_CTX_SENTINEL` fixes it). The learned-memory file must not hold it either.
+    static let sentinel = ProcessInfo.processInfo.environment["MWOYEO_CTX_SENTINEL"] ?? "ZQ" + String(UUID().uuidString.prefix(8))
+    static func line(_ s: String) -> String { "\(s) \(sentinel)" }
 
     static let chat = "com.example.chat", mail = "com.example.mail"
     static let ids = ["openai": "00000000-0000-0000-0000-0000000000A1", "anthropic": "00000000-0000-0000-0000-0000000000A2",
@@ -264,6 +274,162 @@ enum ContextChecks {
                 && learning.usage(for: chat).prompt == 2000 && learning.usage(for: chat).sightings == 2)
         learning.forgetLearned(chat)
         t.check("forgetting learned empties the rows", learning.learned(for: chat).isEmpty)
+
+        // The book tells when the rows a request may use changed (the learned-memory file and the Memory sheet follow it), and not otherwise.
+        final class Told: @unchecked Sendable {
+            private let lock = NSLock()
+            private var apps: [String] = []
+            func note(_ app: String) { lock.withLock { apps.append(app) } }
+            var count: Int { lock.withLock { apps.count } }
+            var all: [String] { lock.withLock { apps } }
+        }
+        let told = Told()
+        var watched = ContextBook()
+        watched.learnedChanged = { told.note($0) }
+        let w0 = watched.begin(l1, profile: nil, pair: en, engineID: "e", now: 0)
+        watched.finish(l1, items: ["Alice came"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        t.check("learned rows: a first sighting is no change (the row is not used yet)", told.count == 0)
+        watched.finish(l1, items: ["Alice left"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        t.check("learned rows: the second sighting makes the row usable, and the book tells once", told.all == [chat])
+        watched.finish(l1, items: ["Alice again"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        t.check("learned rows: a third sighting changes nothing a file would hold", told.count == 1)
+        watched.removeLearned(src: "alice", for: chat)
+        t.check("learned rows: removing one tells (the source is matched as the sheet matches it), removing a missing one does not",
+                told.count == 2 && watched.learned(for: chat).isEmpty)
+        watched.removeLearned(src: "Nobody", for: chat)
+        watched.forgetLearned(chat)
+        t.check("learned rows: forgetting an empty memory tells nothing", told.count == 2)
+        watched.finish(l1, items: ["Alice came"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        watched.finish(l1, items: ["Alice left"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        watched.forgetLearned(chat)
+        t.check("learned rows: forgetting usable rows tells", told.count == 4)
+        watched.finish(l1, items: ["Alice came"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        watched.finish(l1, items: ["Alice left"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        let toldBeforePin = told.count
+        _ = watched.begin(l1, profile: profile(entries: [MemoryEntry(src: "Alice", dst: "앨리스")]), pair: en, engineID: "e", now: 1)
+        t.check("learned rows: a name written (or pinned) in the profile replaces the learned row, and the book tells",
+                told.count == toldBeforePin + 1 && watched.learned(for: chat).isEmpty)
+        _ = w0
+
+        // The lines right above the batch travel as their own field of the request: "nearby" sends them, the thread's history is not them.
+        var aboveBook = ContextBook()
+        let aboveSeen = lens(screen: screen, above: ["above one", "above two"], below: ["below one"])
+        let ap = aboveBook.begin(aboveSeen, profile: nil, pair: en, engineID: "e", now: 0)
+        let areq = aboveBook.request(aboveSeen, pass: ap, items: ["x"], source: nil, target: "ko", glossary: [])
+        t.check("the request carries the lines right above and below the batch", areq.above == ["above one", "above two"] && areq.after == ["below one"])
+    }
+
+    // MARK: memory only (D1)
+
+    @MainActor
+    static func memoryPlanChecks(_ t: Tally) {
+        let url = URL(string: "http://127.0.0.1:1")!
+        let plain = engine("openai", base: url)
+        let on = engine("openai", base: url, context: EngineContext(enabled: true, previousLines: 2))
+        let loud = engine("openai", base: url, context: EngineContext(enabled: false, previousLines: 8, includeTitle: true, useLearned: true))
+        let entries = [MemoryEntry(src: "Alice", dst: "앨리스", kind: .person, gender: .f)]
+        let written = profile(entries: entries, note: "casual")
+        func plan(_ e: EngineConfig?, _ p: AppProfile?) -> ContextPlan? {
+            ContextPlan.decide(settings: settings(e, profiles: p.map { [$0] } ?? []), engine: e, engineRests: false, profile: p)
+        }
+        func options(_ p: ContextPlan?) -> ContextOptions? { if case let .engine(_, o, _)? = p { o } else { nil } }
+        t.check("memory only: an app with a note and names puts an engine whose Context is off on the memory path",
+                options(plan(plain, written)).map { $0.enabled && $0.memoryOnly && $0.transcriptCount == 0 } == true
+                && options(plan(plain, profile(note: "casual"))).map(\.memoryOnly) == true
+                && options(plan(plain, profile(entries: entries))).map(\.memoryOnly) == true)
+        t.check("memory only: the engine's other switches do not widen it (no title, no learned rows, no lines)",
+                options(plan(loud, written)).map { $0.memoryOnly && !$0.includeTitle && !$0.includeLearned && $0.transcriptCount == 0 } == true)
+        t.check("memory only: an app with no note and no names is today's path", plan(plain, profile()) == nil && plan(plain, nil) == nil
+                && plan(plain, profile(note: "  ")) == nil)
+        let off = AppContextOverride(mode: .off)
+        t.check("memory only: an override of off sends nothing, memory or not, the engine On or not",
+                plan(plain, profile(context: off, entries: entries, note: "casual")) == nil && plan(on, profile(context: off, entries: entries, note: "casual")) == nil)
+        t.check("memory only: the engine's switch and an app's nearby are the full context",
+                options(plan(on, written)).map { $0.enabled && !$0.memoryOnly && $0.transcriptCount == 2 } == true
+                && options(plan(plain, profile(context: AppContextOverride(mode: .nearby), entries: entries))).map { !$0.memoryOnly && $0.transcriptCount == 0 } == true)
+        let deepL = engine("deepl", base: url)
+        let template = EngineConfig(name: "T", kind: .httpTemplate(HTTPTemplate(url: "http://127.0.0.1:1/t", body: "{}", resultPath: "t", batching: .jsonArray)))
+        t.check("memory only: Apple, DeepL and an engine that owns its body get none", plan(nil, written) == nil && plan(deepL, written) == nil && plan(template, written) == nil)
+        func needs(_ e: EngineConfig?, _ profiles: [AppProfile]) -> Bool { ContextPlan.needsWindow(settings(e, profiles: profiles)) }
+        t.check("memory only: a window is read for the app's name only where memory is written and not turned off",
+                needs(plain, [written]) && !needs(plain, [profile()]) && !needs(plain, [profile(context: off, entries: entries, note: "x")])
+                && !needs(deepL, [written]) && !needs(nil, [written]))
+        let social = "public.app-category.social-networking"
+        func summary(_ e: EngineConfig?, _ p: AppProfile?, learned: Int = 0) -> SentSummary {
+            ContextPreview.summary(engine: e, profile: p, appName: "Example Chat", category: social, learnedUsable: learned)
+        }
+        t.check("sent preview: memory only says the card, the note and the names, and no title or lines",
+                summary(plain, written).text == "Sent: Example Chat · social · note · up to 1 name" && summary(plain, written).mode == .memoryOnly)
+        t.check("sent preview: an override of off, no memory and Apple Translation are lines only",
+                summary(plain, profile(context: off, entries: entries, note: "x")).text == "Sent: lines only" && summary(plain, profile()).mode == .linesOnly
+                && summary(nil, written).mode == .linesOnly && summary(nil, written).engineName == nil)
+        t.check("sent preview: an engine that is On says its lines, the window title on this Mac, and learned rows when they are on",
+                summary(on, written).text == "Sent: Example Chat · social · window title · note · up to 1 name · 2 lines before · 2 lines after"
+                && summary(engine("openai", base: url, context: EngineContext(enabled: true, previousLines: 2, useLearned: true)), written, learned: 3).names == 4
+                && summary(on, written, learned: 3).names == 1)
+        t.check("sent preview: a cloud engine says the window title only with its opt-in",
+                !summary(engine("anthropic", base: url, context: EngineContext(enabled: true)), written).windowTitle
+                && summary(engine("anthropic", base: url, context: EngineContext(enabled: true, includeTitle: true)), written).windowTitle)
+        t.check("memory only: the footnote about sent lines is not triggered by written memory",
+                !EnginePermissions.sendsContext(plain, profiles: [written]) && EnginePermissions.sendsContext(on, profiles: [written]))
+
+        // The disclosure follows what is sent (addendum A1): an engine whose Context is off still names the apps whose memory goes.
+        let seen = EnginePermissions.disclosure(plain, profiles: [written])
+        t.check("disclosure: Context off and an app with written memory is disclosed - the app, no lines",
+                seen.memoryOnly && !seen.lines && !seen.isEmpty && seen.memoryApps == [written.appName])
+        let other = profile(mail, entries: entries)
+        let nothing = [EnginePermissions.disclosure(plain, profiles: []), EnginePermissions.disclosure(plain, profiles: [profile(), profile(mail, note: "  ")]),
+                       EnginePermissions.disclosure(plain, profiles: [profile(context: off, entries: entries, note: "x")]),
+                       EnginePermissions.disclosure(deepL, profiles: [written]), EnginePermissions.disclosure(template, profiles: [written]),
+                       EnginePermissions.disclosure(plain, profiles: [AppProfile(bundleID: mail, appName: mail, source: "en", target: "ko", customEngineID: UUID(), entries: entries)])]
+        t.check("disclosure: no memory, an override of off, DeepL, a template and an app on another engine say nothing beyond the lines",
+                nothing.allSatisfy { $0.isEmpty })
+        let both = EnginePermissions.disclosure(on, profiles: [written, other, profile(context: off, entries: entries, note: "x")])
+        t.check("disclosure: an engine that is On says the lines and every app whose memory goes, not the app that turned context off",
+                both.lines && !both.memoryOnly && both.memoryApps == [written.appName, other.appName])
+        func engineLine(_ e: EngineConfig, _ p: [AppProfile]) -> SentSummary { ContextPreview.engineSummary(engine: e, profiles: p, category: { _ in "public.app-category.social-networking" }) }
+        t.check("sent preview of an engine: Context off and an app with memory says what that app is sent, not \"lines only\"",
+                engineLine(plain, [written]).text == "Sent: com.example.chat · social · note · up to 1 name" && engineLine(plain, [written]).mode == .memoryOnly
+                && engineLine(plain, []).text == "Sent: lines only" && engineLine(on, []).text == "Sent: Example Chat · social · window title · 2 lines before · 2 lines after")
+    }
+
+    // MARK: the learned-memory file (G50), pure parts
+
+    @MainActor
+    static func learnedFileChecks(_ t: Tally) {
+        let usable = ContextMemory.LearnedRecord(entry: MemoryEntry(src: "Bob", dst: "밥", kind: .person, gender: .m, note: "a note", origin: .learned, uses: 3), sightings: 2, contradictions: 0)
+        let waiting = ContextMemory.LearnedRecord(entry: MemoryEntry(src: "Carol", dst: "캐럴", origin: .learned), sightings: 1, contradictions: 0)
+        let second = ContextMemory.LearnedRecord(entry: MemoryEntry(src: "Alice", dst: "앨리스", kind: .person, gender: .f, origin: .learned), sightings: 5, contradictions: 0)
+        let rows = LearnedMemoryFile.rows(from: [usable, waiting, second])
+        t.check("learned file: only rows a request may use go in, sorted by source", rows.map(\.src) == ["Alice", "Bob"])
+        let data = LearnedMemoryFile.render(bundleID: chat, appName: "Example Chat", rows: rows, updated: Date(timeIntervalSince1970: 0))
+        let root = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] ?? [:]
+        let fileRows = root["rows"] as? [[String: Any]] ?? []
+        t.check("learned file: the keys are fixed and a row holds the pair, its kind and gender and nothing else",
+                Set(root.keys) == ["app", "appName", "updated", "about", "rows"]
+                && fileRows.count == 2 && fileRows.allSatisfy { Set($0.keys).isSubset(of: ["src", "dst", "kind", "gender"]) }
+                && fileRows[0]["src"] as? String == "Alice" && fileRows[0]["gender"] as? String == "f" && fileRows[1]["note"] == nil
+                && root["updated"] as? String == "1970-01-01T00:00:00Z")
+        let text = String(decoding: data, as: UTF8.self)
+        t.check("learned file: no note, count, time of use or waiting row", !text.contains("a note") && !text.contains("Carol") && !text.contains("uses")
+                && !text.contains("sightings"))
+        t.check("learned file: the same memory is the same bytes", data == LearnedMemoryFile.render(bundleID: chat, appName: "Example Chat", rows: rows.reversed().sorted { $0.src < $1.src }, updated: Date(timeIntervalSince1970: 0)))
+        t.check("learned file: a bundle id is a file name and a path is not one",
+                LearnedMemoryFile.fileName(for: chat) == "com.example.chat.json" && LearnedMemoryFile.fileName(for: "../evil/x y") == "..-evil-x-y.json"
+                && LearnedMemoryFile.fileName(for: "..") == "app.json" && LearnedMemoryFile.fileName(for: "").hasSuffix(".json")
+                && !LearnedMemoryFile.fileName(for: "a/b\\c:d").contains("/"))
+
+        // At most one write per app in 5 s; a change inside the interval is written when it ends. Numbers, no clock.
+        var g = LearnedWriteGate()
+        let steps = [g.changed("a", at: 100), g.changed("a", at: 101), g.changed("a", at: 103), g.changed("b", at: 101)]
+        t.check("write gate: the first change of an app writes now, a change within 5 s waits for the end of the interval, then it is pending, and apps are independent",
+                steps == [.now, .later(4), .pending, .now], "\(steps)")
+        g.flushed("a", at: 105)
+        let later = [g.changed("a", at: 106), g.changed("a", at: 110), g.changed("a", at: 111)]
+        t.check("write gate: after the waiting write, the interval starts again; 5 s after a write is due", later == [.later(4), .pending, .pending], "\(later)")
+        var g2 = LearnedWriteGate()
+        _ = g2.changed("a", at: 0)
+        t.check("write gate: exactly 5 s later writes now, and the interval counts from that write", g2.changed("a", at: 5) == .now && g2.changed("a", at: 8) == .later(2))
     }
 
     // MARK: Off, end to end (G3)
@@ -368,7 +534,14 @@ enum ContextChecks {
                 ("(b) context enabled: false", off, [], true),
                 ("(c) a profile override of off", EngineContext(enabled: true, includeTitle: true, useLearned: true),
                  [profile(chat, context: AppContextOverride(mode: .off)), profile(mail, context: AppContextOverride(mode: .off))], true),
-            ]
+                // The default path with a profile that remembers only languages: no memory, so nothing to send (the memory-only gate).
+                ("(d) profiles with no memory", nil, [profile(chat), profile(mail)], true),
+                ("(e) written memory and an override of off", EngineContext(enabled: true, includeTitle: true),
+                 [profile(chat, context: AppContextOverride(mode: .off), entries: [MemoryEntry(src: "Alice", dst: "앨리스")], note: "casual"),
+                  profile(mail, context: AppContextOverride(mode: .off), entries: [MemoryEntry(src: "Alice", dst: "앨리스")], note: "casual")], true),
+            ] + (label == "deepl" ? [("(g) written memory, DeepL (it takes memory only through its own opt-in)", nil,
+                                     [profile(chat, entries: [MemoryEntry(src: "Alice", dst: "앨리스")], note: "casual"),
+                                      profile(mail, entries: [MemoryEntry(src: "Alice", dst: "앨리스")], note: "casual")], true)] : [])
             var keysOf: [Set<String>] = []
             for v in variants {
                 let e = engine(label, base: mock.base, context: v.context)
@@ -399,8 +572,6 @@ enum ContextChecks {
 
     @MainActor
     static func onChecks(_ t: Tally) async {
-        let sentinel = ProcessInfo.processInfo.environment["MWOYEO_CTX_SENTINEL"] ?? "ZQ" + String(UUID().uuidString.prefix(8))
-        func line(_ s: String) -> String { "\(s) \(sentinel)" }
         let b1 = [line("Alice sent the first photo"), line("Bob liked the first photo")]
         let b2 = [line("Alice sent the second photo"), line("Bob liked the second photo")]
         let b3 = [line("Alice sent the third photo"), line("Bob liked the third photo")]
@@ -518,6 +689,259 @@ enum ContextChecks {
         }
     }
 
+    // MARK: memory only, and nearby, end to end
+
+    /// One lensed call: the request body the mock saw (read) and the outcome.
+    @MainActor
+    static func send(_ mock: Mock, _ service: TranslationService, _ items: [String], _ l: LensContext) async -> (sent: Sent, body: String, outcome: TranslationOutcome) {
+        let n = mock.bodies.count
+        let outcome = await service.translate(items, context: l)
+        let bodies = mock.bodies
+        let body = bodies.count > n ? bodies[n] : "{}"
+        return (Sent(body), body, outcome)
+    }
+
+    @MainActor
+    static func memoryOnlyChecks(_ t: Tally) async {
+        let b1 = [line("Alice sent the first photo"), line("Bob liked the first photo")]
+        let b2 = [line("Alice sent the second photo"), line("Bob liked the second photo")]
+        let above = ["Above one \(sentinel)", "Above two \(sentinel)"], below = ["Carol is typing now \(sentinel)", "Dave is online \(sentinel)"]
+        let screen = above + b1 + b2 + below
+        guard let mock = Mock(mode: "terms") else { t.check("memory only: the mock server starts", false); return }
+        defer { mock.stop() }
+        let title = "Project Zebra"
+        let doc = lens(title: title, screen: screen, above: above, below: below)
+        let alice = MemoryEntry(src: "Alice", dst: "앨리스", kind: .person, gender: .f)
+        let written = profile(chat, entries: [alice], note: "casual chat between friends")
+
+        // The engine's Context is off; the app has a note and a name: the card, the note and the matching name, nothing of the screen.
+        let held = service(settings(engine("openai", base: mock.base), profiles: [written]))
+        let (r1, _, o1) = await send(mock, held, b1, doc)
+        t.check("memory only: the request carries the items, the card, the note and the matching name",
+                r1.items == b1 && o1.translations.count == 2 && r1.text.contains("Document: Example Chat (social).")
+                && r1.text.contains("casual chat between friends") && r1.memory.first?.hasPrefix("Alice -> 앨리스") == true && r1.memory.count == 1)
+        t.check("memory only: no neighbours, no earlier lines, no who's who and no window title",
+                r1.before.isEmpty && r1.after.isEmpty && r1.last["referents"] == nil && !r1.text.contains("Zebra") && !r1.text.contains("window")
+                && above.allSatisfy { !r1.text.contains($0) } && below.allSatisfy { !r1.text.contains($0) })
+        let (r2, _, _) = await send(mock, held, b2, doc)
+        t.check("memory only: the second batch does not carry the first, and still no screen", r2.items == b2 && r2.before.isEmpty && r2.after.isEmpty
+                && b1.allSatisfy { !r2.text.contains($0) } && !r2.text.contains("Zebra"))
+        let stores = held.storeCounts
+        t.check("memory only: the translations are kept under the memory's namespace, not the global one",
+                !stores.isEmpty && stores.keys.allSatisfy { $0.contains("|ctx:") } && held.cached(b1[0]) == nil)
+        let again = await held.translate(b2, context: doc)
+        t.check("memory only: a line already translated is served from memory", again.translations.count == 2 && mock.bodies.count == 2)
+        let usage = await held.contextUsage(for: chat)
+        t.check("memory only: usage counts the requests", usage.requests == 2)
+
+        // Learned rows are a switch of their own: a loud engine that is off sends no `terms` request and learns nothing.
+        let loud = EngineContext(enabled: false, previousLines: 8, includeTitle: true, useLearned: true)
+        let loudService = service(settings(engine("openai", base: mock.base, context: loud), profiles: [written]))
+        let (l1, _, _) = await send(mock, loudService, b1, doc)
+        _ = await send(mock, loudService, b2, doc)
+        let loudLearned = await loudService.learnedRows(for: chat)
+        t.check("memory only: useLearned of an engine that is off asks for no terms and records none",
+                !l1.text.contains("\"terms\"") && l1.before.isEmpty && !l1.text.contains("Zebra") && loudLearned.isEmpty)
+
+        // An override of off sends exactly what no profile sends.
+        let reference = service(settings(engine("openai", base: mock.base), profiles: []))
+        let (_, refBody, _) = await send(mock, reference, b1, doc)
+        let offOverride = profile(chat, context: AppContextOverride(mode: .off), entries: [alice], note: "casual chat between friends")
+        let offAlone = service(settings(engine("openai", base: mock.base), profiles: [offOverride]))
+        let (offSent, offBody, _) = await send(mock, offAlone, b1, doc)
+        t.check("memory only: an override of off sends the bytes of no profile at all (no card, no note, no name)",
+                offBody == refBody && offSent.last["translate"] == nil && !offBody.contains("casual chat") && !offBody.contains("Document:"))
+        let onOff = service(settings(engine("openai", base: mock.base, context: EngineContext(enabled: true, previousLines: 2)), profiles: [offOverride]))
+        let (_, onOffBody, _) = await send(mock, onOff, b1, doc)
+        t.check("memory only: an override of off wins over the engine's own switch too", onOffBody == refBody)
+
+        // No memory written: a profile that remembers languages only sends today's bytes.
+        let memoryless = service(settings(engine("openai", base: mock.base), profiles: [profile(chat)]))
+        let (_, memorylessBody, _) = await send(mock, memoryless, b1, doc)
+        t.check("memory only: a profile with no note and no name sends the bytes of no profile", memorylessBody == refBody)
+
+        // Cloud: the card (app and category) goes, never the title.
+        if let cloud = Mock(mode: "terms") {
+            defer { cloud.stop() }
+            let anthropic = service(settings(engine("anthropic", base: cloud.base, context: EngineContext(enabled: false, includeTitle: true)), profiles: [written]))
+            let (a1, _, _) = await send(cloud, anthropic, b1, doc)
+            t.check("memory only: Anthropic gets the card, the note and the name, and no window title even with includeTitle",
+                    a1.text.contains("Document: Example Chat (social).") && a1.text.contains("casual chat between friends") && !a1.text.contains("Zebra")
+                    && a1.memory.first?.hasPrefix("Alice -> 앨리스") == true && a1.before.isEmpty && a1.after.isEmpty)
+        }
+        // DeepL takes the memory only through its own opt-in: written memory changes nothing for it.
+        if let d = Mock(mode: "terms"), let dr = Mock(mode: "terms") {
+            defer { d.stop(); dr.stop() }
+            let withMemory = service(settings(engine("deepl", base: d.base), profiles: [written]))
+            let without = service(settings(engine("deepl", base: dr.base), profiles: []))
+            let (_, deeplBody, _) = await send(d, withMemory, b1, doc)
+            let (_, deeplRef, _) = await send(dr, without, b1, doc)
+            t.check("memory only: DeepL with written memory sends the bytes of no memory", deeplBody == deeplRef && !deeplBody.contains("casual chat"))
+        }
+
+        // Nearby (G8): the lines above the text on screen go with the lines below, and the thread's history does not.
+        let nearby = service(settings(engine("openai", base: mock.base), profiles: [profile(chat, context: AppContextOverride(mode: .nearby))]))
+        let (n1, _, _) = await send(mock, nearby, b1, lens(screen: screen, above: above, below: below))
+        t.check("nearby: the lines above the text go, and the lines below", n1.before == above && n1.after == below)
+        let aboveTwo = ["Above three \(sentinel)"]
+        let (n2, _, _) = await send(mock, nearby, b2, lens(screen: screen, above: aboveTwo, below: below))
+        t.check("nearby: only the lines right above this batch, not the batch read before", n2.before == aboveTwo && n2.after == below && b1.allSatisfy { !n2.text.contains($0) })
+        let zero = service(settings(engine("openai", base: mock.base, context: EngineContext(enabled: true, previousLines: 0))))
+        let (z1, _, _) = await send(mock, zero, b1, lens(screen: screen, above: above, below: below))
+        t.check("nearby: an engine with previousLines 0 sends the same neighbours", z1.before == above && z1.after == below)
+        let (n3, _, _) = await send(mock, nearby, [line("Zed arrived")], lens(screen: screen, below: below))
+        t.check("nearby: with no line above there is no context_before", n3.before.isEmpty && n3.last["context_before"] == nil)
+    }
+
+    // MARK: the learned-memory file, written (G50)
+
+    /// Everything the writer reads and does, held by the check: the settings, the clock, the folder, and the writes that wait.
+    @MainActor
+    final class FileWorld {
+        var now: TimeInterval = 100
+        var settings = AppSettings()
+        var scheduled: [(seconds: TimeInterval, body: @MainActor () async -> Void)] = []
+        let dir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("mwoyeo-lm-\(getpid())-\(UUID().uuidString)")
+        deinit { try? FileManager.default.removeItem(at: dir) }
+    }
+
+    @MainActor
+    static func learnedFileRunChecks(_ t: Tally) async {
+        guard let mock = Mock(mode: "terms") else { t.check("learned file: the mock server starts", false); return }
+        defer { mock.stop() }
+        let learning = EngineContext(enabled: true, previousLines: 0, useLearned: true)
+        let svc = service(settings(engine("openai", base: mock.base, context: learning)))
+        let b1 = [line("Alice sent the first photo"), line("Bob liked the first photo")]
+        let b2 = [line("Alice sent the second photo"), line("Bob liked the second photo")]
+        let screen = b1 + b2
+        _ = await send(mock, svc, b1, lens(screen: screen))
+        let firstOnly = await svc.learnedRows(for: chat)
+        t.check("learned file: one sighting is a row that waits, not one that is used", firstOnly.count == 2 && firstOnly.allSatisfy { !$0.isUsable })
+        _ = await send(mock, svc, b2, lens(screen: screen))
+        let usable = await svc.learnedRows(for: chat).filter(\.isUsable)
+        t.check("learned file: two sightings make both rows usable", usable.map(\.entry.src).sorted() == ["Alice", "Bob"])
+
+        let world = FileWorld()
+        world.settings.appProfiles = [profile(chat)]
+        let file = world.dir.appendingPathComponent("Memory/com.example.chat.json")
+        let writer = LearnedMemoryWriter(.init(
+            settings: { world.settings },
+            access: { _ in ExportFolder.Access(url: world.dir, scoped: false) },
+            records: { await svc.learnedRows(for: $0) },
+            now: { world.now }, date: { Date(timeIntervalSince1970: 1_000) },
+            after: { world.scheduled.append(($0, $1)) }))
+        func contents() -> String { String(decoding: (try? Data(contentsOf: file)) ?? Data(), as: UTF8.self) }
+
+        // Save transcripts off: no file, nothing planned.
+        let offTask = writer.changed(chat)
+        t.check("learned file: Save transcripts off writes no file and plans none",
+                offTask == nil && world.scheduled.isEmpty && !FileManager.default.fileExists(atPath: world.dir.appendingPathComponent("Memory").path))
+
+        // On: the file holds the usable rows and no screen text.
+        world.settings.savesTranscripts = true
+        await writer.changed(chat)?.value
+        let text = contents()
+        let root = (try? JSONSerialization.jsonObject(with: Data(text.utf8))) as? [String: Any] ?? [:]
+        let rows = root["rows"] as? [[String: Any]] ?? []
+        t.check("learned file: with Save transcripts on, Memory/<bundle id>.json holds the usable rows (source, translation, kind)",
+                rows.compactMap { $0["src"] as? String } == ["Alice", "Bob"] && rows.compactMap { $0["dst"] as? String } == ["T_Alice", "T_Bob"]
+                && root["app"] as? String == chat && root["appName"] as? String == chat && rows.allSatisfy { Set($0.keys).isSubset(of: ["src", "dst", "kind", "gender"]) })
+        t.check("learned file: no screen text but the terms - not the sentinel, not a line, not a sentence", !rows.isEmpty && !text.contains(sentinel)
+                && screen.allSatisfy { !text.contains($0) } && !text.contains("photo") && !text.contains("sent the"))
+
+        // A second change within 5 s waits and reads the newest rows when it is due.
+        world.now = 101
+        let waiting = writer.changed(chat)
+        world.now = 102
+        let pending = writer.changed(chat)
+        t.check("learned file: a change within 5 s of the write waits for the end of the interval, once", waiting == nil && pending == nil && world.scheduled.count == 1
+                && world.scheduled.first?.seconds == 4)
+        await svc.removeLearned(src: "Bob", for: chat)
+        world.now = 105
+        await world.scheduled.first?.body()
+        let afterRemove = (try? JSONSerialization.jsonObject(with: Data(contents().utf8))) as? [String: Any]
+        t.check("learned file: the waiting write holds the rows of the moment it is done (Bob was removed)",
+                (afterRemove?["rows"] as? [[String: Any]])?.compactMap { $0["src"] as? String } == ["Alice"])
+
+        // The last row goes: the file says so, it is not left with the old rows.
+        await svc.forgetLearned(for: chat)
+        world.now = 200
+        await writer.changed(chat)?.value
+        let emptied = (try? JSONSerialization.jsonObject(with: Data(contents().utf8))) as? [String: Any]
+        t.check("learned file: after Forget learned the file has no rows", (emptied?["rows"] as? [Any])?.isEmpty == true)
+
+        // An app that never learned anything gets no file.
+        world.now = 300
+        await writer.changed("com.example.other")?.value
+        t.check("learned file: an app with no learned row and no file gets none",
+                !FileManager.default.fileExists(atPath: world.dir.appendingPathComponent("Memory/com.example.other.json").path))
+
+        // Turning Save transcripts off stops writing; what is there stays, as a transcript does.
+        await svc.removeLearned(src: "Alice", for: chat)
+        world.settings.savesTranscripts = false
+        world.now = 400
+        let stale = contents()
+        let offAgain = writer.changed(chat)
+        t.check("learned file: turning Save transcripts off leaves the file as it was", offAgain == nil && contents() == stale)
+
+        // Turning it on again writes what was learned while it was off, without waiting for the next change.
+        let c3 = [line("Alice sent the third photo"), line("Bob liked the third photo")]
+        let c4 = [line("Alice sent the fourth photo"), line("Bob liked the fourth photo")]
+        _ = await send(mock, svc, c3, lens(screen: c3 + c4))
+        _ = await send(mock, svc, c4, lens(screen: c3 + c4))
+        let whileOff = contents()
+        world.settings.savesTranscripts = true
+        world.now = 500
+        for task in writer.savingTurnedOn(for: [chat]) { await task.value }
+        let turnedOn = (try? JSONSerialization.jsonObject(with: Data(contents().utf8))) as? [String: Any]
+        t.check("learned file: turning Save transcripts on writes the rows learned meanwhile",
+                whileOff == stale && (turnedOn?["rows"] as? [[String: Any]])?.compactMap { $0["src"] as? String } == ["Alice", "Bob"]
+                && !contents().contains(sentinel))
+    }
+
+    // MARK: pin, written to settings.json and read back (G5)
+
+    @MainActor
+    static func pinChecks(_ t: Tally) async {
+        guard let mock = Mock(mode: "terms") else { t.check("pin: the mock server starts", false); return }
+        defer { mock.stop() }
+        let e = engine("openai", base: mock.base, context: EngineContext(enabled: true, previousLines: 0, useLearned: true))
+        var s = settings(e, profiles: [profile(chat)])
+        let svc = service(s)
+        let b1 = [line("Alice sent the first photo"), line("Bob liked the first photo")]
+        _ = await send(mock, svc, b1, lens(screen: b1))
+        _ = await send(mock, svc, [line("Alice sent the second photo")], lens(screen: b1))
+        let row = await svc.learnedRows(for: chat).first { $0.entry.src == "Alice" }
+        var profiles = s.appProfiles
+        let result = AppProfiles.pin(row?.entry, bundleID: chat, in: &profiles)
+        s.appProfiles = profiles
+        await svc.removeLearned(src: "alice", for: chat)
+        let left = await svc.learnedRows(for: chat)
+        t.check("pin: a usable learned row becomes a row of the profile and leaves the learned rows",
+                row?.isUsable == true && result == .pinned && s.appProfiles[0].entries.map(\.src) == ["Alice"] && left.map(\.entry.src) == ["Bob"])
+
+        // Through the app's own settings file and back.
+        let url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("mwoyeo-pin-\(getpid())-\(UUID().uuidString).json")
+        defer { try? FileManager.default.removeItem(at: url) }
+        SettingsFileStore(url: url).save(s)
+        let data = (try? Data(contentsOf: url)) ?? Data()
+        let read = SettingsFileCheck.read(data, over: AppSettings())
+        let back = read.settings.appProfiles.first { $0.bundleID == chat }?.entries ?? []
+        let fileText = String(decoding: data, as: UTF8.self)
+        t.check("pin: it is in settings.json under appProfiles[].entries, with the pair fields only, and reads back as a user row",
+                read.issues.isEmpty && back.map(\.src) == ["Alice"] && back.first?.dst == "T_Alice" && back.first?.origin == .user
+                && fileText.contains("\"T_Alice\"") && !fileText.contains("\"origin\"") && !fileText.contains("\"uses\"") && !fileText.contains("sightings"))
+
+        // The reloaded profile is what a new service sends: as a name of the user, nothing learned about it.
+        var s2 = settings(e, profiles: read.settings.appProfiles)
+        s2.glossary = ""
+        let svc2 = service(s2)
+        let (sent, _, _) = await send(mock, svc2, [line("Alice sent the third photo")], lens(screen: b1))
+        let learnedAgain = await svc2.learnedRows(for: chat)
+        t.check("pin: the reloaded row goes in the request as the user's own, and is not learned again",
+                sent.memory.first?.hasPrefix("Alice -> T_Alice") == true && learnedAgain.allSatisfy { $0.entry.src != "Alice" })
+    }
+
     /// Counts the notices a service raised (its handler runs on any task).
     final class IssueCount: @unchecked Sendable {
         private let lock = NSLock()
@@ -543,6 +967,8 @@ enum ContextChecks {
 
         let nearby = profile(chat, context: AppContextOverride(mode: .nearby), entries: entries)
         t.check("Apple with a nearby profile and pinned terms off: today's text", await run(settings(nil, profiles: [nearby]), context: lens()) == today)
+        t.check("Apple with written memory (a note and a name) and no pinned terms on: today's text",
+                await run(settings(nil, profiles: [profile(chat, entries: entries, note: "casual")]), context: lens()) == today)
         var pinsOff = settings(nil, profiles: [nearby])
         pinsOff.appleUsesPinnedTerms = false
         t.check("Apple with pinned terms off and an entry: today's text", await run(pinsOff, context: lens()) == today)

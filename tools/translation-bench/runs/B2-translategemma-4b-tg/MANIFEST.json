@@ -1,0 +1,314 @@
+{
+ "manifest_version": 1,
+ "run": "B2-translategemma-4b-tg",
+ "kind": "model",
+ "note": "translategemma:4b through Ollama /v1 in the model's own prompt format (--layout tg: one user message with the model card's translator instruction, the notes, the context lines and the speakers, a reply of one translation per line; a failed attempt falls back to today's JSON request), temperature 0, jobs 1, batch 3. The engine file carries timeoutSeconds 90, a timeout is not retried. Machine shared with other rounds; latencies are not quiet-machine numbers. [machine load1m start=49.99 end=167.06 pageouts +1018 swapouts +198778 swap_used_mb start=18798.25 end=19826.12 free_pct start=42 end=35 ollama_ps='100% GPU; ctx 32768']",
+ "date": "2026-10-18T23:47:02Z",
+ "seconds": 424.100226417,
+ "preserved": "2026-10-18T23:54:07Z",
+ "condition": "B2",
+ "layout": "tg",
+ "jobs": 1,
+ "batch_size": 3,
+ "sequences": [
+  "chat-en-ko-1",
+  "chat-ja-ko-1",
+  "chat-ja-ko-2",
+  "chat-ko-en-1",
+  "chat-zh-ko-1",
+  "docs-en-ko-1",
+  "docs-ja-en-1",
+  "docs-ko-en-1",
+  "game-ja-en-1",
+  "game-ja-ko-1",
+  "game-zh-en-1",
+  "subs-en-ko-1",
+  "subs-ja-ko-1",
+  "subs-zh-ko-1"
+ ],
+ "command": "MWOYEO_MEMORY_SECRETS=1 /tmp/t4a/bin/bench-run-3 run --engine engines/ollama-translategemma-4b.json --condition B2 --out /tmp/t4a/out/B2-translategemma-4b-tg --root . --jobs 1 --layout tg",
+ "command_cwd": "tools/translation-bench",
+ "env": {
+  "MWOYEO_MEMORY_SECRETS": "1"
+ },
+ "engine": {
+  "config_file": "engines/ollama-translategemma-4b.json",
+  "config": {
+   "name": "ollama-translategemma-4b",
+   "kind": "openAICompatible",
+   "baseURL": "http://127.0.0.1:11434/v1",
+   "model": "translategemma:4b",
+   "thinking": "off",
+   "price": "local",
+   "timeoutSeconds": 90
+  },
+  "name": "ollama-translategemma-4b",
+  "kind": "openAICompatible"
+ },
+ "model": {
+  "name": "translategemma:4b",
+  "digest": "c49d986b0764f5881c476eb21435bb62b7abc62347aab3d4a6071e811be510a1",
+  "ollama_list_id": "c49d986b0764",
+  "size_bytes": 3298875707,
+  "modified_at": "2026-10-19T06:23:32.933877673+09:00",
+  "details": {
+   "parent_model": "",
+   "format": "gguf",
+   "family": "gemma3",
+   "families": [
+    "gemma3"
+   ],
+   "parameter_size": "4.3B",
+   "quantization_level": "Q4_K_M",
+   "context_length": 131072,
+   "embedding_length": 2560
+  },
+  "source": "ollama /api/tags (the data behind `ollama list`) at preservation time"
+ },
+ "machine": {
+  "chip": "Apple M1 Pro",
+  "memory_bytes": 34359738368,
+  "macos": "27.0",
+  "kernel": "27.0.0",
+  "ollama": "0.34.2"
+ },
+ "source": {
+  "git_head": "eb9f3c3785e13c27b556ec38051938299b724ffb",
+  "tree": "uncommitted tools/translation-bench tree",
+  "runner_sha256": "7f6f25f5e2284e43410e3d858d5624b114d673f53a022b35d718744616efead6",
+  "runner_files": {
+   "runner/Package.swift": "ac91cbe8e51384f9c33fb8628503fcf4bbe27e49fad22bf6a42142b6a2cda3d0",
+   "runner/Sources/BenchKit/AppleFM.swift": "de33c0f1c71a93c519e168e94b14fb087f33ed4ac5801630489c2e943302bcc7",
+   "runner/Sources/BenchKit/Conditions.swift": "55712316bd7da87581b53c2a734eb20d2b4d29d8cd6a8763faf25b3384313a60",
+   "runner/Sources/BenchKit/Engines.swift": "7ca64225138f8e24a1fc6212513261bc6b6f858483dc3ad54f226cf47c4802c0",
+   "runner/Sources/BenchKit/Models.swift": "65df04afdd6a966d8c34516926da39e6c67b3fd3c194e1de4d2be2b55f912a84",
+   "runner/Sources/BenchKit/Replay.swift": "df4f69e32e3599bb97f50dab2d6c95fd79a5aaa01aa12764d756c7cd29dd1757",
+   "runner/Sources/BenchKit/Run.swift": "43adb0f3020b440dea980490b0081bfa8b80e784b3b7db95c35ee8de91ec540e",
+   "runner/Sources/BenchKit/Tokens.swift": "47e42221ff5d864969aaec67481bd28df855072b6404148a747808463674765c",
+   "runner/Sources/bench-run/main.swift": "5b359bcb09cd131b5b8f398388eb5475d66d07f7ecaa176c84257fde5787ad80"
+  },
+  "runner_files_modified_after_run_start": [],
+  "binary": {
+   "path": "/tmp/t4a/bin/bench-run-3",
+   "sha256": "b524776a9d73e4334c7067a01e0014c8b81d6d2d74091f50c5229a58cf4c6b07",
+   "mtime": "2026-10-18T23:15:35Z",
+   "note": "hash of the binary at preservation time"
+  }
+ },
+ "corpus": {
+  "sequences": 14,
+  "sha256": "847a7533bd39c68dc0ce00d820d681623ae5fe07f60fcc5e2f23ad0fd05e797e",
+  "files": {
+   "sequences/chat-en-ko-1.json": "ab2522d85a9284fed420b7119cf79a1226642a40767da2404af84ddf1f5f22af",
+   "sequences/chat-ja-ko-1.json": "b74884821f398ba7e3e026775a9a24769cc19fea185b6b4ded3b36384be784bb",
+   "sequences/chat-ja-ko-2.json": "aa48e5aca75ef20b2b4a35fb960e5d6a4f6e0f7ea9dba47230e8fc74ed9eaeac",
+   "sequences/chat-ko-en-1.json": "f27cd057e207469171daea3bc5913a8b4c1f0c1de0041c7dccf13a6d29a93a03",
+   "sequences/chat-zh-ko-1.json": "520efa62f044f69fd91f76fb9b5f08d2dc3fe227396601516c1a796402da2ece",
+   "sequences/docs-en-ko-1.json": "ec358a53efe04a4c6d6a49aa046304644252baaf790aa38948b09af6f5cb8b39",
+   "sequences/docs-ja-en-1.json": "7187571247fbe808e9847b84fe9e6834254799ce0df77f3d9fe3abdb09b7a94c",
+   "sequences/docs-ko-en-1.json": "6c57a34fdb7c6bd53126e91b2bfff9f685fd2e287e6b8642a0a59318e407bcfa",
+   "sequences/game-ja-en-1.json": "7d613a1d3b3a91e80dfd13ef58e95d15980c5b4195a8da9756ba06f77ab1014d",
+   "sequences/game-ja-ko-1.json": "b366ef17a1469ef4b909e80433a110158bbd154d9257fda408b8a3f410e2b045",
+   "sequences/game-zh-en-1.json": "58a535be9cfe908a746e069da4ed2c39dacb8a6b2f2bd14d026b628343019e3c",
+   "sequences/subs-en-ko-1.json": "7b78d9972ab5457b243ac265f703100271d9065cda7c121eb90c0e8b1a169455",
+   "sequences/subs-ja-ko-1.json": "da693acbfeb29e0bdd24ab706acafa05943cd9028d815ad4617dedeae9ee3b70",
+   "sequences/subs-zh-ko-1.json": "8b34d6b9c79bf01452849f32cb06736245dc7d19776f9b46e43d8e13b37fda0d",
+   "memory/chat-en-ko-1.json": "322827e31b64e8d5c581353c4a588036dc025688f2f20b18657f08da042b13a8",
+   "memory/chat-ja-ko-1.json": "abcebe2b0decec51bbd5d879afdae59a276a5df93179d53276ed60e3ff79d37b",
+   "memory/chat-ja-ko-2.json": "8d50017af5e0dceae10086d289c846859e67c04d9093599df496d2a74da3d457",
+   "memory/chat-ko-en-1.json": "4d6feb7de587d0d64ebf68f363da8326abe21635e53dff3a69548d4bb2c06328",
+   "memory/chat-zh-ko-1.json": "0ff748323d17cd8406696a839d5f12f8a0dfaf03ab324c6dc2d0d182658fc827",
+   "memory/docs-en-ko-1.json": "63833d5430f264a93ed03987578cc456d2ec3f27cc55bef1a8a01b08816dee0e",
+   "memory/docs-ja-en-1.json": "17eaa7aa97e3b4c55098c01f469e6e94a3ebcf761e934da96583904212c5494f",
+   "memory/docs-ko-en-1.json": "51f4027da3c1ed58f82c729f3e3ef66cac8b39bee02d6d8d4d31571f6de75605",
+   "memory/game-ja-en-1.json": "e65de61cdbee29bdd2e2f35766cc4078bce79f8999b7953f68f7dd56d75962f4",
+   "memory/game-ja-ko-1.json": "87aae7b2243710256d82cf8d7c4480340a91143e93b583cb658418ca880e87f3",
+   "memory/game-zh-en-1.json": "4923e1695087c88fe14800d2aa6cb63efe8f7c042b924372dd7d5b5d2af36630",
+   "memory/subs-en-ko-1.json": "c7d32fb1da465200eff0b8ec86b387989a0c67007d27e27a253cd8e0d4721b93",
+   "memory/subs-ja-ko-1.json": "d8ab961cdae446aa9f23a0fd1fc150d88e6dd1194cb8664337a15a85fa1cf6d6",
+   "memory/subs-zh-ko-1.json": "1027c30cb867a9af6f1b4b76edc139b0f493b7b7616a1d4f88eb28276b5112d0",
+   "prices.json": "e82b780c604b5296a69c8962e67b9626d0b9610ff57193960a0442389dcd7add"
+  },
+  "snapshot": "_corpus/847a7533bd39c68d",
+  "files_modified_after_run_start": [],
+  "probes": 312
+ },
+ "score_summary": [
+  "== run B2 | ollama-translategemma-4b translategemma:4b | jobs=1 | 14 sequences, 252 requests",
+  "probes 312: 87 correct = 27.9%",
+  "  by evidence: memory 16/126 12.7%  lines 30/133 22.6%  none 41/53 77.4%",
+  "  by type:     name 13/107 12.1%  pronoun 14/53 26.4%  register 10/25 40.0%  speech_level 6/22 27.3%  term 44/105 41.9%",
+  "  by distance: 1-2 16/32 50.0%  3-4 1/28 3.6%  5-8 4/26 15.4%  9-16 4/30 13.3%  17+ 5/17 29.4%",
+  "  by pair:     en>ko 33.8%  ja>en 31.8%  ja>ko 26.4%  ko>en 25.0%  zh>en 26.1%  zh>ko 21.7%",
+  "speech level: 249 lines judged, 78 match the speaker's level = 31.3%, 67 mixed, 33 of 38 speaker-level groups inconsistent",
+  "carry-over: 13 repeated wrong forms after 20 probes that followed a wrong form; 62 fail streaks in 82 chances",
+  "failed attempts 5, fallback lines 7, empty lines 2",
+  "latency ms: p50 1378 p95 3498",
+  "tokens: in 41681 (mean 165.4: stable 67.0 + history 29.4 + volatile 69.0; shared prefix with the previous request 77.3; user memory 0.0) out 8373 (mean 33.2) cached 193",
+  "cost estimate: $0.0000"
+ ],
+ "score": {
+  "condition": "B2",
+  "engine": "ollama-translategemma-4b",
+  "model": "translategemma:4b",
+  "jobs": 1,
+  "sequences": 14,
+  "requests": 252,
+  "probes": {
+   "n": 312,
+   "ok": 87,
+   "by": {
+    "memory": [
+     16,
+     126
+    ],
+    "lines": [
+     30,
+     133
+    ],
+    "none": [
+     41,
+     53
+    ]
+   },
+   "type": {
+    "name": [
+     13,
+     107
+    ],
+    "pronoun": [
+     14,
+     53
+    ],
+    "register": [
+     10,
+     25
+    ],
+    "speech_level": [
+     6,
+     22
+    ],
+    "term": [
+     44,
+     105
+    ]
+   },
+   "pair": {
+    "en>ko": [
+     23,
+     68
+    ],
+    "ja>en": [
+     14,
+     44
+    ],
+    "ja>ko": [
+     23,
+     87
+    ],
+    "ko>en": [
+     11,
+     44
+    ],
+    "zh>en": [
+     6,
+     23
+    ],
+    "zh>ko": [
+     10,
+     46
+    ]
+   },
+   "kind": {
+    "chat": [
+     27,
+     110
+    ],
+    "docs": [
+     21,
+     66
+    ],
+    "game": [
+     18,
+     67
+    ],
+    "subtitles": [
+     21,
+     69
+    ]
+   },
+   "distance": {
+    "1-2": [
+     16,
+     32
+    ],
+    "3-4": [
+     1,
+     28
+    ],
+    "5-8": [
+     4,
+     26
+    ],
+    "9-16": [
+     4,
+     30
+    ],
+    "17+": [
+     5,
+     17
+    ]
+   }
+  },
+  "speech": {
+   "scored": 249,
+   "match": 78,
+   "mixed": 67,
+   "speakers": 38,
+   "inconsistent_speakers": 33
+  },
+  "carry": {
+   "repeat_same": 13,
+   "after_wrong": 20,
+   "fail_streak": 62,
+   "streak_chances": 82
+  },
+  "attempts_failed": 5,
+  "fallback_lines": 7,
+  "failed_lines": 2,
+  "latency": {
+   "p50": 1378.5,
+   "p95": 3498.35
+  },
+  "tokens": {
+   "in": 41681,
+   "out": 8373,
+   "cached": 193,
+   "mean_in": 165.40079365079364,
+   "mean_out": 33.226190476190474,
+   "stable": 67.01542541784299,
+   "history": 29.37268773530218,
+   "volatile": 69.0126804976485,
+   "lcp": 77.25028470961179,
+   "memory": 0.0
+  },
+  "cost_usd": 0.0
+ },
+ "files": {
+  "chat-en-ko-1.json": "dc6058fbce5257d42daa7969d0c94dccc330a3e491e7ae35333dcc5ce73d6809",
+  "chat-ja-ko-1.json": "b119cf3ce68f712bb4208a315db622eeb90e64b584f774091e0adfeb886f0032",
+  "chat-ja-ko-2.json": "25db113ed39dc9e5ae1ed06260900d13129564231b92a5a3694b27311bb07a7e",
+  "chat-ko-en-1.json": "411be0a18f041c674ea0f41329f4532dfdebe8283961e34adea5798dc09c42a4",
+  "chat-zh-ko-1.json": "300f8ac6646e5b6901e79654405bc4862b7f252a03b43863d086af3c80695072",
+  "docs-en-ko-1.json": "b8885595346f181e8d07271bb76c72110be6bc2140e2b20ab598a2f5afde543a",
+  "docs-ja-en-1.json": "46f47a2221c32055c4212015d747034e1487c72dff29d10f338b53407d71c12d",
+  "docs-ko-en-1.json": "51f153d519650ba29c68fa2fdc4f00b6d9926062488d748e2fa2dacb5736aaee",
+  "game-ja-en-1.json": "714f2633a81bc8f3468b680baca53c169a073840336d961de9b0a6718b3868a2",
+  "game-ja-ko-1.json": "2f199b7f2eb51aa11d1cf7e1b44dafbabfcb971f7d0ede0a17fd55711361eb99",
+  "game-zh-en-1.json": "0ad362fd7cc45dfc42ab37924caf01e9ad8279d3d703806e99f790501b18a6f3",
+  "meta.json": "2a8158aad23d42f52f9ea0cf72fa36c2026f5e2a974f03854320306196038146",
+  "subs-en-ko-1.json": "5a81262b345fc277d2a7f919aee20b0980254384215cb2a2a30ca27e13145104",
+  "subs-ja-ko-1.json": "59e0c9c573e42d415b522ffcc1d59297569240dd301ae786a06c3dab147fd474",
+  "subs-zh-ko-1.json": "453f2ea784d938fa8e2388347c4536cd8df691130080e0d0125934eafe51532c"
+ }
+}

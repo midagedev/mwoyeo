@@ -1,0 +1,28 @@
+{
+  "batch_size" : 3,
+  "condition" : "B2",
+  "engine" : "ollama-gemma4-e4b",
+  "jobs" : 1,
+  "kind" : "openAICompatible",
+  "layout" : "reference",
+  "model" : "gemma4:e4b",
+  "price" : "local",
+  "seconds" : 636.8247211249999,
+  "sequences" : [
+    "chat-en-ko-1",
+    "chat-ja-ko-1",
+    "chat-ja-ko-2",
+    "chat-ko-en-1",
+    "chat-zh-ko-1",
+    "docs-en-ko-1",
+    "docs-ja-en-1",
+    "docs-ko-en-1",
+    "game-ja-en-1",
+    "game-ja-ko-1",
+    "game-zh-en-1",
+    "subs-en-ko-1",
+    "subs-ja-ko-1",
+    "subs-zh-ko-1"
+  ],
+  "started" : "2026-10-18T21:48:06Z"
+}

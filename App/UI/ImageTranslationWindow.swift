@@ -48,6 +48,9 @@ final class ImageTranslationModel {
         start(title: url.lastPathComponent) { try data.map { try StillTranslation.decode($0) } ?? { throw StillTranslation.Unreadable(description: "Can’t read \(url.lastPathComponent).") }() }
     }
 
+    /// Shows `message` in the window's status line instead of a picture's result.
+    func fail(_ message: String) { phase = .failed(message) }
+
     func open(data: Data, title: String) {
         reload = { [weak self] in self?.open(data: data, title: title) }
         start(title: title) { try StillTranslation.decode(data) }
@@ -164,7 +167,8 @@ final class ImageTranslationModel {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.png]
         panel.nameFieldStringValue = ((title as NSString).deletingPathExtension + " translated").trimmingCharacters(in: .whitespaces) + ".png"
-        panel.directoryURL = URL(fileURLWithPath: AppModel.shared.settings.exportFolder)
+        // Only where the panel opens; the panel itself grants the write to the chosen file.
+        if let shown = ExportFolder.shownPath(AppModel.shared.settings) { panel.directoryURL = URL(fileURLWithPath: shown) }
         guard panel.runModal() == .OK, let url = panel.url else { return }
         do { try LensImage.writePNG(cg, to: url) } catch { phase = .failed("Couldn’t save the image.") }
     }
@@ -265,19 +269,38 @@ final class ImageTranslation: NSObject, NSWindowDelegate {
         return true
     }
 
+    /// What ⌘V opens. A file URL copied in Finder may not be readable inside the sandbox; the picture's own data on the
+    /// pasteboard (Finder puts it there too) is the fallback, and with neither the window says what to do instead.
+    enum PasteSource: Equatable {
+        case file(URL), data(Data), unreadable, nothing
+    }
+
+    static func pasteSource(urls: [URL], imageData: Data?, canRead: (URL) -> Bool = ImageTranslation.canRead) -> PasteSource {
+        if let url = urls.first, canRead(url) { return .file(url) }
+        if let imageData { return .data(imageData) }
+        return urls.isEmpty ? .nothing : .unreadable
+    }
+
+    nonisolated static func canRead(_ url: URL) -> Bool {
+        guard let handle = try? FileHandle(forReadingFrom: url) else { return false }
+        try? handle.close()
+        return true
+    }
+
     /// ⌘V while the window is open: a picture on the pasteboard (a file or image data).
     @discardableResult
     func paste() -> Bool {
         let pb = NSPasteboard.general
-        if let urls = pb.readObjects(forClasses: [NSURL.self], options: [.urlReadingContentsConformToTypes: [UTType.image.identifier]]) as? [URL],
-           !urls.isEmpty { return open(urls: urls) }
-        for type in [NSPasteboard.PasteboardType.png, .tiff] {
-            if let data = pb.data(forType: type) {
-                show { $0.open(data: data, title: String(localized: "Pasted Image")) }
-                return true
-            }
+        let urls = (pb.readObjects(forClasses: [NSURL.self], options: [.urlReadingContentsConformToTypes: [UTType.image.identifier]]) as? [URL]) ?? []
+        let data = [NSPasteboard.PasteboardType.png, .tiff].lazy.compactMap { pb.data(forType: $0) }.first
+        switch Self.pasteSource(urls: urls, imageData: data) {
+        case let .file(url): return open(urls: [url])
+        case let .data(data): show { $0.open(data: data, title: String(localized: "Pasted Image")) }; return true
+        case .unreadable:
+            show { $0.fail(String(localized: "Mwoyeo can’t read the copied file. Open the file with Open… instead.")) }
+            return true
+        case .nothing: return false
         }
-        return false
     }
 
     private func show(_ load: (ImageTranslationModel) -> Void) {

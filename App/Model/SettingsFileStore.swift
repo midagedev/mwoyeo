@@ -1,6 +1,13 @@
 import Foundation
 import os
 
+/// What the one-time import changed: the keys applied and the issues the file had.
+struct SettingsImport: Equatable {
+    var applied: [String]
+    var issues: [SettingsFileIssue]
+    var parsed: Bool
+}
+
 /// settings.json in Application Support (the container's, inside the sandbox: the same code), the source of truth of the
 /// settings. The app writes it on every change, watches it, and applies what a person or an agent saves in it.
 /// `MWOYEO_SETTINGS_FILE=<path>` names another file (captures and tests must, never the real one).
@@ -49,6 +56,21 @@ final class SettingsFileStore {
         issues = result.issues
         needsBackup = !result.issues.isEmpty
         return result.settings
+    }
+
+    // MARK: importing
+
+    /// A settings.json from another install (the GitHub version's, chosen in a panel), read the way the app's own is: over
+    /// `current`, issues reported. Nothing is written back here and the app's file keeps its own backup rules.
+    /// `keepsExportFolder`: the other install's folder path means nothing inside the sandbox, so the folder stays as it is.
+    nonisolated static func importResult(_ data: Data, over current: AppSettings,
+                                         keepsExportFolder: Bool = Distribution.isAppStore) -> SettingsFileResult {
+        var result = SettingsFileCheck.read(data, over: current)
+        if keepsExportFolder, result.parsed {
+            result.settings.exportFolder = current.exportFolder
+            result.changed.removeAll { $0 == "exportFolder" }
+        }
+        return result
     }
 
     // MARK: writing

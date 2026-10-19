@@ -31,8 +31,8 @@ enum LensExport {
         }
     }
 
-    static func capturesFolder(_ root: String) -> URL { URL(fileURLWithPath: root).appendingPathComponent("Captures") }
-    static func transcriptsFolder(_ root: String) -> URL { URL(fileURLWithPath: root).appendingPathComponent("Transcripts") }
+    static func capturesFolder(_ root: URL) -> URL { root.appendingPathComponent("Captures") }
+    static func transcriptsFolder(_ root: URL) -> URL { root.appendingPathComponent("Transcripts") }
 }
 
 // MARK: - Image
@@ -140,12 +140,15 @@ final class TranscriptWriter: @unchecked Sendable {
     /// closes (they stay small) and a player never sees cues out of order.
     private var merger = TranscriptMerger()
     private var failed = false
+    /// The security-scoped access to `directory`'s folder, held for the writer's whole life and ended with its last write.
+    private let access: ExportFolder.Access?
 
     /// `directory` is where the files go; `sourceCode` names the source SRT ("auto" becomes "source").
     /// `formats` are the files written; `engine` is "apple" or the added engine's name (for the JSON lines).
-    init(directory: URL, lens: String, sourceCode: String, targetCode: String, formats: [TranscriptFileFormat] = [.markdown, .srt],
+    init(directory: URL, access: ExportFolder.Access? = nil, lens: String, sourceCode: String, targetCode: String, formats: [TranscriptFileFormat] = [.markdown, .srt],
          engine: String = "apple", started: Date = Date(), onError: @escaping @Sendable () -> Void) {
         self.directory = directory
+        self.access = access
         self.formats = Set(formats)
         self.engine = engine
         self.sourceSetting = sourceCode
@@ -177,6 +180,7 @@ final class TranscriptWriter: @unchecked Sendable {
     private func close(_ time: TimeInterval) {
         let events = recorder.finish(time: time)
         write(entries: merger.add(events, now: time) + merger.finish(), cuesChanged: events.contains { if case .cue = $0 { true } else { false } })
+        access?.end()
     }
 
     private func write(_ events: [TranscriptRecorder.TranscriptEvent], now: TimeInterval) {

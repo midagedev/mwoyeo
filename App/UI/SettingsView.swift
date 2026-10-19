@@ -81,14 +81,14 @@ struct GeneralSettings: View {
                 Text("Performance")
             }
             Section {
-                Toggle("Save transcripts", isOn: $model.settings.savesTranscripts)
+                Toggle("Save transcripts", isOn: savesTranscripts)
                 Text("Each lens writes what it reads and its translation to Markdown and SRT files.")
                     .font(.caption).foregroundStyle(.secondary)
                 LabeledContent("Folder") {
-                    Text((model.settings.exportFolder as NSString).abbreviatingWithTildeInPath)
+                    Text(ExportFolder.shownPath(model.settings).map { ($0 as NSString).abbreviatingWithTildeInPath } ?? String(localized: "None chosen"))
                         .lineLimit(1).truncationMode(.middle).foregroundStyle(.secondary)
-                    Button("Choose…", action: chooseFolder)
-                    Button("Show in Finder", action: showFolder)
+                    Button("Choose…") { chooseFolder() }
+                    Button("Show in Finder", action: showFolder).disabled(ExportFolder.shownPath(model.settings) == nil)
                 }
             } header: {
                 Text("Saving")
@@ -104,6 +104,7 @@ struct GeneralSettings: View {
                 if let note = issueNote {
                     Text(note).font(.caption).foregroundStyle(.secondary)
                 }
+                if Distribution.isAppStore { ImportSettingsRow() }
             }
         }
         .formStyle(.grouped)
@@ -117,18 +118,41 @@ struct GeneralSettings: View {
         return more > 0 ? String(localized: "\(text) · \(more) more") : text
     }
 
-    private func chooseFolder() {
+    /// Turning saving on with no folder asks for one first; cancelling leaves it off.
+    private var savesTranscripts: Binding<Bool> {
+        Binding(get: { model.settings.savesTranscripts },
+                set: { on in
+                    if on, ExportFolder.shownPath(model.settings) == nil, !chooseFolder() { return }
+                    model.settings.savesTranscripts = on
+                })
+    }
+
+    @discardableResult
+    private func chooseFolder() -> Bool {
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
         panel.canCreateDirectories = true
-        panel.directoryURL = URL(fileURLWithPath: model.settings.exportFolder)
-        if panel.runModal() == .OK, let url = panel.url { model.settings.exportFolder = url.path }
+        panel.prompt = String(localized: "Choose")
+        if let shown = ExportFolder.shownPath(model.settings) { panel.directoryURL = URL(fileURLWithPath: shown) }
+        guard panel.runModal() == .OK, let url = panel.url else { return false }
+        if let bookmark = ExportFolder.makeBookmark(for: url) {
+            model.chooseExportFolder(url, bookmark: bookmark)
+        } else if !Distribution.isAppStore {
+            // Not sandboxed: the path alone still works.
+            model.settings.exportFolder = url.path
+            model.settings.exportBookmark = nil
+        } else {
+            return false
+        }
+        ExportFolderGate.shared.reset()
+        return true
     }
 
     /// The folder itself once something was saved there, else the nearest folder above it that exists.
     private func showFolder() {
-        var url = URL(fileURLWithPath: model.settings.exportFolder)
+        guard let shown = ExportFolder.shownPath(model.settings) else { return }
+        var url = URL(fileURLWithPath: shown)
         while !FileManager.default.fileExists(atPath: url.path), url.path != "/" { url.deleteLastPathComponent() }
         NSWorkspace.shared.open(url)
     }
@@ -706,7 +730,7 @@ private struct AddedEngineLabel<Actions: View>: View {
     }
 
     private var detail: String {
-        engine.subtitle + (model.translator.measuredSeconds(for: engine.id).map { String(format: " · ~%.1f s", $0) } ?? "")
+        engine.listSubtitle() + (model.translator.measuredSeconds(for: engine.id).map { String(format: " · ~%.1f s", $0) } ?? "")
     }
 }
 

@@ -105,6 +105,8 @@ final class RegionSession {
     /// The newest snapshot: what the lens's own actions (copy, save, transcripts) work from.
     private var lastSnapshot: OverlaySnapshot?
     private var transcript: TranscriptWriter?
+    /// The "choose a folder" notice shows once until a transcript can be written.
+    private var transcriptFolderFlashed = false
     private var transcriptBegan: TimeInterval = 0
     private var transcriptTimer: Timer?
     private var transcriptAppChecked: TimeInterval = 0
@@ -586,10 +588,14 @@ final class RegionSession {
         let showing = translationsVisible && !hiddenByOcclusion
         let layers = showing ? s.blocks.map { LensImage.Layer(frame: $0.frame, image: $0.image) } : []
         let crop = config.rect.offsetBy(dx: -s.origin.x, dy: -s.origin.y)
-        let folder = LensExport.capturesFolder(settings.exportFolder), name = LensExport.fileName(config.name), now = Date()
+        // The folder opens for the write only (a person pressed Save): the panel asks when none is chosen or the bookmark went stale.
+        let access = ExportFolderGate.shared.access(for: settings, store: { AppModel.shared.chooseExportFolder($1, bookmark: $0) })
+        let name = LensExport.fileName(config.name), now = Date()
         Task.detached(priority: .utility) { [weak self] in
+            defer { access?.end() }
             var saved = false
-            if let image = LensImage.composite(frame: frame, scale: s.scale, layers: layers, crop: crop) {
+            if let access, let image = LensImage.composite(frame: frame, scale: s.scale, layers: layers, crop: crop) {
+                let folder = LensExport.capturesFolder(access.url)
                 let url = LensExport.freeBase(in: folder, "\(name) \(LensExport.stamp(now, seconds: true))", ext: "png").appendingPathExtension("png")
                 saved = (try? LensImage.writePNG(image, to: url)) != nil
             }
@@ -601,9 +607,18 @@ final class RegionSession {
         guard settings.savesTranscripts, !hiddenByOcclusion, let s = lastSnapshot else { return }
         let now = ProcessInfo.processInfo.systemUptime
         if transcript == nil {
+            // No writer without a folder: a declined panel is not asked again until the person chooses one in Settings.
+            guard let access = ExportFolderGate.shared.access(for: settings, store: { AppModel.shared.chooseExportFolder($1, bookmark: $0) }) else {
+                if !transcriptFolderFlashed {
+                    transcriptFolderFlashed = true
+                    chrome.flash(String(localized: "Choose a folder in Settings to save transcripts"), seconds: 4)
+                }
+                return
+            }
+            transcriptFolderFlashed = false
             transcriptBegan = now
             transcriptAppChecked = 0
-            transcript = TranscriptWriter(directory: LensExport.transcriptsFolder(settings.exportFolder), lens: config.name,
+            transcript = TranscriptWriter(directory: LensExport.transcriptsFolder(access.url), access: access, lens: config.name,
                                           sourceCode: settings.sourceLanguage, targetCode: settings.targetLanguage,
                                           formats: settings.transcriptFormats, engine: settings.activeEngineConfig?.name ?? "apple",
                                           onError: { [weak self] in Task { @MainActor in self?.chrome.flash(String(localized: "Couldn’t save transcript"), seconds: 4) } })

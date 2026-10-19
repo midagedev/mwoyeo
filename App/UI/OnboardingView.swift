@@ -51,6 +51,13 @@ struct OnboardingView: View {
             }
             .padding(.horizontal, 28)
 
+            if Distribution.isAppStore {
+                ImportSettingsRow()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 32)
+                    .padding(.top, 14)
+            }
+
             HStack {
                 Text("Everything happens on this Mac.")
                     .font(.caption).foregroundStyle(.tertiary)

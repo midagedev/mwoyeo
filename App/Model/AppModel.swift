@@ -153,6 +153,24 @@ final class AppModel {
         if !result.changed.isEmpty { log.notice("settings reloaded: \(result.changed.joined(separator: ", "), privacy: .public)") }
     }
 
+    /// The folder for saved images and transcripts, chosen in a panel: its path for display, its bookmark to open it again.
+    func chooseExportFolder(_ url: URL, bookmark: Data) {
+        settings.exportFolder = url.path
+        settings.exportBookmark = bookmark
+    }
+
+    /// Applies the keys of a settings.json from the GitHub version (the App Store build's one-time import) over the current
+    /// settings, through the same checks as the app's own file: a key that is wrong is reported and left as it is, text that is
+    /// not JSON changes nothing. Keys kept out of the file (the folder bookmark, onboarding) stay.
+    func importSettings(from url: URL) -> SettingsImport {
+        guard let data = try? Data(contentsOf: url) else { return SettingsImport(applied: [], issues: [.init(line: nil, message: "the file could not be read")], parsed: false) }
+        let result = SettingsFileStore.importResult(data, over: settings)
+        if result.parsed, !result.changed.isEmpty {
+            settings = result.settings
+        }
+        return SettingsImport(applied: result.changed, issues: result.issues, parsed: result.parsed)
+    }
+
     func openSettingsFile() { NSWorkspace.shared.open(settingsFile.url) }
     func showSettingsFile() { NSWorkspace.shared.activateFileViewerSelecting([settingsFile.url]) }
 

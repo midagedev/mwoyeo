@@ -58,7 +58,7 @@ struct SettingSpec {
         .init(key: "savesTranscripts", kind: .bool,
               doc: "Translation log: every lens writes what it read and its translation to <exportFolder>/Transcripts (Markdown and SRT, see transcriptFormats) while this is true."),
         .init(key: "exportFolder", kind: .string,
-              doc: "Folder of the translation log (its Transcripts folder, while savesTranscripts is true) and of saved lens images."),
+              doc: "Folder of the translation log (its Transcripts folder, while savesTranscripts is true) and of saved lens images. The App Store version shows the folder chosen in Settings; a path typed here does not open one there."),
         .init(key: "transcriptFormats", kind: .choiceList(TranscriptFileFormat.allCases.map(\.rawValue)),
               doc: "Files of the translation log: markdown, srt, and jsonl (one JSON line per translated line with time, lens, app, source, target, engine, original and translation, added as it happens so tail -f works)."),
         .init(key: "appProfiles", kind: .appProfiles,
@@ -263,7 +263,7 @@ struct SettingsFileResult {
 
 enum SettingsFileCheck {
     /// Settings kept in UserDefaults instead (run-time state, not a choice), so never in the file.
-    static let notInFile: Set<String> = ["engineRejections", "hasCompletedOnboarding"]
+    static let notInFile: Set<String> = ["engineRejections", "hasCompletedOnboarding", "exportBookmark"]
 
     /// The file's own view of the settings: what AppSettings encodes, without the run-time state, plus an explicit null id.
     static func fileValues(_ s: AppSettings, omittingUnset: Bool = true) -> [String: Any] {

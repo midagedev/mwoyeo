@@ -217,7 +217,16 @@ struct AppSettings: Codable, Equatable {
     var hasCompletedOnboarding = false
     // Saving: every lens writes what it reads to `exportFolder` while this is on; lens images go there when asked for.
     var savesTranscripts = false
+    /// The DMG keeps `~/Documents/Mwoyeo` until a folder is chosen. The App Store build has no folder until one is chosen: the
+    /// sandbox does not let it write to one by path (see `ExportFolder`).
+    #if MAS
+    var exportFolder = ""
+    #else
     var exportFolder = ("~/Documents/Mwoyeo" as NSString).expandingTildeInPath
+    #endif
+    /// Security-scoped bookmark of the folder chosen in Settings (opaque bytes). Run-time state kept in UserDefaults, never
+    /// in settings.json (`SettingsFileCheck.notInFile`): it only opens the folder for this install.
+    var exportBookmark: Data?
     /// The files the translation log is written as (settings.json only: no row in Settings).
     var transcriptFormats: [TranscriptFileFormat] = [.markdown, .srt]
     /// Languages (and engine) remembered per app; the app in front decides which applies (see `effective`).
@@ -279,6 +288,7 @@ struct AppSettings: Codable, Equatable {
         hasCompletedOnboarding = try c.decodeIfPresent(Bool.self, forKey: .hasCompletedOnboarding) ?? d.hasCompletedOnboarding
         savesTranscripts = try c.decodeIfPresent(Bool.self, forKey: .savesTranscripts) ?? d.savesTranscripts
         exportFolder = try c.decodeIfPresent(String.self, forKey: .exportFolder) ?? d.exportFolder
+        exportBookmark = (try? c.decodeIfPresent(Data.self, forKey: .exportBookmark)) ?? nil
         transcriptFormats = ((try? c.decodeIfPresent([Lossy<TranscriptFileFormat>].self, forKey: .transcriptFormats)) ?? nil)?.compactMap(\.value) ?? d.transcriptFormats
         appProfiles = ((try? c.decodeIfPresent([Lossy<AppProfile>].self, forKey: .appProfiles)) ?? nil)?.compactMap(\.value) ?? d.appProfiles
         paragraphReader = (try? c.decodeIfPresent(ParagraphReader.self, forKey: .paragraphReader)) ?? d.paragraphReader

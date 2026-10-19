@@ -121,7 +121,7 @@ actor TranslationService {
 
     init(settings: AppSettings, secrets: any SecretStore = KeychainSecrets()) {
         self.settings = settings
-        client = EngineClient(secrets: secrets)
+        client = EngineClient(secrets: secrets, allowsCommands: !Distribution.isAppStore)
         cache.use(Self.namespace(settings))
         cache.capacity = settings.cacheSize
         pace.use(Self.paceSlot(settings, engine: Self.activeEngine(settings)))

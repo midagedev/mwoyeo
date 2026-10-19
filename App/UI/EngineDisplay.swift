@@ -35,6 +35,18 @@ extension EngineConfig {
         [endpointName, modelName].compactMap { $0 }.joined(separator: " · ")
     }
 
+    /// Whether this build can run the engine: the App Store build runs no program, so a command engine that came in with
+    /// imported settings or a file stays in the list but is never used.
+    func isAvailable(allowsCommands: Bool = !Distribution.isAppStore) -> Bool {
+        if case .command = kind { return allowsCommands }
+        return true
+    }
+
+    /// `subtitle` for the engine list; "Not available in this version" while this build cannot run it.
+    func listSubtitle(allowsCommands: Bool = !Distribution.isAppStore) -> String {
+        isAvailable(allowsCommands: allowsCommands) ? subtitle : String(localized: "Not available in this version")
+    }
+
     /// The lens pill's mark for this engine (SF Symbol).
     var badgeSymbol: String { isOnThisMac ? "desktopcomputer" : "cloud" }
 }

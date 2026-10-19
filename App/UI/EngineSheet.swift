@@ -110,7 +110,9 @@ struct EngineSheet: View {
             Section("Connect your own") {
                 pickRow("OpenAI-compatible server", "Any server that speaks the OpenAI chat API") { begin(custom: .server) }
                 pickRow("HTTP template", "Your own web service, described in a few lines") { begin(custom: .template) }
-                pickRow("Command", "A program on this Mac that reads and writes JSON") { begin(custom: .command) }
+                if !Distribution.isAppStore {
+                    pickRow("Command", "A program on this Mac that reads and writes JSON") { begin(custom: .command) }
+                }
                 pickRow("Paste Setup", "A setup someone shared with you") { step = .paste }
             }
         }
@@ -204,7 +206,7 @@ struct EngineSheet: View {
 
     private func readPasted() {
         do {
-            let config = try EngineShare.decode(pasted)
+            let config = try EngineShare.decode(pasted, allowsCommands: !Distribution.isAppStore)
             preset = EnginePresets.all.first { $0.name == config.name }
             custom = false
             load(config, blankURL: false)
@@ -215,6 +217,7 @@ struct EngineSheet: View {
             switch e {
             case .unknownKind: pasteError = String(localized: "This engine needs a newer Mwoyeo.")
             case .secretField: pasteError = String(localized: "This setup contains a key. Remove it and try again.")
+            case .commandNotAllowed: pasteError = String(localized: "Command engines are not available in this version.")
             case .notAnEngineFile: pasteError = String(localized: "This is not an engine setup.")
             case .malformed: pasteError = String(localized: "This text is not a valid setup.")
             }

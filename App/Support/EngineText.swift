@@ -19,6 +19,7 @@ extension EngineError {
         case .malformed: String(localized: "The engine's answer was not in the expected format.")
         case let .network(m): String(localized: "Could not reach the engine: \(m)")
         case let .commandFailed(m): String(localized: "The command failed: \(m)")
+        case .commandUnavailable: String(localized: "Not available in this version")
         case .cancelled: String(localized: "Cancelled.")
         }
     }

@@ -1528,6 +1528,146 @@
         }
       }
     },
+    "Allow each online engine in Settings.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erlaube jede Online-Engine in den Einstellungen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permite cada motor en línea en Ajustes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autorisez chaque moteur en ligne dans les réglages."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consenti ogni motore online nelle Impostazioni."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オンラインエンジンは設定で1つずつ許可してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "온라인 엔진은 설정에서 하나씩 허용해 주세요."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permita cada mecanismo online nos Ajustes."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Разрешите каждый онлайн-движок в настройках."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Дозвольте кожен онлайн-рушій у налаштуваннях."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请在设置中逐个允许在线引擎。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請在設定中逐一允許線上引擎。"
+          }
+        }
+      }
+    },
+    "Allow sending to %@ in Settings": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erlaube das Senden an %@ in den Einstellungen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permite el envío a %@ en Ajustes"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autorisez l’envoi vers %@ dans les réglages"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consenti l’invio a %@ nelle Impostazioni"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定で %@ への送信を許可してください"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설정에서 %@(으)로 보내기를 허용해 주세요"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permita o envio para %@ nos Ajustes"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Разрешите отправку на %@ в настройках"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Дозвольте надсилання на %@ у налаштуваннях"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请在设置中允许发送到 %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請在設定中允許傳送到 %@"
+          }
+        }
+      }
+    },
     "Always": {
       "localizations": {
         "ko": {
@@ -11345,6 +11485,76 @@
         }
       }
     },
+    "Needs your permission": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Braucht deine Erlaubnis"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Necesita tu permiso"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nécessite votre autorisation"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Richiede il tuo permesso"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "許可が必要"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "허용이 필요함"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Precisa da sua permissão"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нужно ваше разрешение"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Потрібен ваш дозвіл"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要你的允许"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要你的允許"
+          }
+        }
+      }
+    },
     "No lenses on": {
       "localizations": {
         "ko": {
@@ -14636,6 +14846,76 @@
         }
       }
     },
+    "Recent lines are sent too, for context.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Für den Kontext werden auch die letzten Zeilen gesendet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "También se envían las líneas recientes, como contexto."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les lignes récentes sont aussi envoyées, pour le contexte."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vengono inviate anche le righe recenti, per il contesto."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文脈のため、直近の行も一緒に送ります。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "문맥을 위해 최근 줄도 함께 보냅니다."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As linhas recentes também são enviadas, como contexto."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Для контекста отправляются и последние строки."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Для контексту надсилаються й останні рядки."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为提供上下文，最近的几行也会一并发送。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "為提供上下文，最近幾行也會一併傳送。"
+          }
+        }
+      }
+    },
     "Record Shortcut": {
       "localizations": {
         "ko": {
@@ -16737,72 +17017,72 @@
         }
       }
     },
-    "Screen text is read, erased and translated on this Mac and never leaves it": {
+    "By default, screen text is read, erased and translated on this Mac and never leaves it": {
       "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "화면의 글자는 이 Mac 안에서 읽고 지우고 번역하며, 밖으로 나가지 않습니다"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "画面の文字はこのMacの中で読み取り・消去・翻訳され、外に送られることはありません"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "屏幕文字在这台 Mac 上读取、擦除和翻译，绝不离开这台 Mac"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "螢幕文字在這部 Mac 上讀取、擦除和翻譯，絕不離開這部 Mac"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Le texte de l’écran est lu, effacé et traduit sur ce Mac et ne le quitte jamais"
-          }
-        },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bildschirmtext wird auf diesem Mac gelesen, entfernt und übersetzt und verlässt ihn nie"
+            "value": "Standardmäßig wird Bildschirmtext auf diesem Mac gelesen, gelöscht und übersetzt und verlässt ihn nie"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "El texto de la pantalla se lee, borra y traduce en este Mac y nunca sale de él"
+            "value": "De forma predeterminada, el texto de la pantalla se lee, se borra y se traduce en este Mac y nunca sale de él"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Par défaut, le texte à l’écran est lu, effacé et traduit sur ce Mac et ne le quitte jamais"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Il testo sullo schermo viene letto, cancellato e tradotto su questo Mac e non lo lascia mai"
+            "value": "Per impostazione predefinita, il testo sullo schermo viene letto, cancellato e tradotto su questo Mac e non lo lascia mai"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "標準の設定では、画面の文字はこのMacの中で読み取り・消去・翻訳され、外に送られることはありません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기본 설정에서는 화면의 글자를 이 Mac 안에서 읽고 지우고 번역하며, 밖으로 내보내지 않습니다"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O texto da tela é lido, apagado e traduzido neste Mac e nunca sai dele"
+            "value": "Por padrão, o texto da tela é lido, apagado e traduzido neste Mac e nunca sai dele"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Текст с экрана распознаётся, стирается и переводится на этом Mac и никогда его не покидает"
+            "value": "По умолчанию текст с экрана читается, стирается и переводится на этом Mac и никогда его не покидает"
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Текст з екрана розпізнається, стирається й перекладається на цьому Mac і ніколи його не залишає"
+            "value": "Типово текст з екрана читається, стирається й перекладається на цьому Mac і ніколи його не залишає"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "默认设置下，屏幕文字在这台 Mac 上读取、擦除和翻译，不会离开这台 Mac"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "預設設定下，螢幕文字在這台 Mac 上讀取、擦除和翻譯，不會離開這台 Mac"
           }
         }
       }
@@ -17015,6 +17295,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "Власний сервер, типово http://localhost:5000; ключ необов’язковий"
+          }
+        }
+      }
+    },
+    "Send the text the lens reads to %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den Text, den die Linse liest, an %@ senden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enviar a %@ el texto que lee la lente"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envoyer le texte lu par la loupe à %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invia a %@ il testo letto dalla lente"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "レンズが読んだ文字を %@ に送信"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "렌즈가 읽은 글자를 %@(으)로 보내기"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enviar para %@ o texto que a lente lê"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отправлять текст, который читает линза, на %@"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Надсилати текст, який читає лінза, на %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将透镜读取的文字发送到 %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將透鏡讀取的文字傳送到 %@"
           }
         }
       }
@@ -24244,6 +24594,76 @@
         }
       }
     },
+    "Your engine's provider handles that text under its own privacy policy.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Anbieter der Engine verarbeitet diesen Text nach seiner eigenen Datenschutzrichtlinie."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El proveedor del motor trata ese texto según su propia política de privacidad."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fournisseur du moteur traite ce texte selon sa propre politique de confidentialité."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il fornitore del motore tratta quel testo secondo la propria informativa sulla privacy."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "送った文字は、エンジン提供元のプライバシーポリシーに従って扱われます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "보낸 글자는 엔진 제공자의 개인정보 처리방침에 따라 처리됩니다."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O provedor do mecanismo trata esse texto conforme a própria política de privacidade."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поставщик движка обрабатывает этот текст по своей политике конфиденциальности."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Постачальник рушія обробляє цей текст за власною політикою конфіденційності."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送的文字由引擎提供方依据其隐私政策处理。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "傳送的文字由引擎提供者依其隱私權政策處理。"
+          }
+        }
+      }
+    },
     "勇者 = Hero\nポーション = Potion": {
       "localizations": {
         "ko": {
@@ -24316,70 +24736,70 @@
     },
     "Privacy Policy": {
       "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Privacy Policy"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Privacy Policy"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Privacy Policy"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Privacy Policy"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "Privacy Policy"
-          }
-        },
         "de": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Privacy Policy"
+            "state": "translated",
+            "value": "Datenschutzrichtlinie"
           }
         },
         "es": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Privacy Policy"
+            "state": "translated",
+            "value": "Política de privacidad"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Politique de confidentialité"
           }
         },
         "it": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Privacy Policy"
+            "state": "translated",
+            "value": "Informativa sulla privacy"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プライバシーポリシー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "개인정보 처리방침"
           }
         },
         "pt-BR": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Privacy Policy"
+            "state": "translated",
+            "value": "Política de Privacidade"
           }
         },
         "ru": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Privacy Policy"
+            "state": "translated",
+            "value": "Политика конфиденциальности"
           }
         },
         "uk": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Privacy Policy"
+            "state": "translated",
+            "value": "Політика конфіденційності"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐私政策"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隱私權政策"
           }
         }
       }

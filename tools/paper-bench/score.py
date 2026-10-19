@@ -14,6 +14,9 @@ Per page (p1..pN, whole pages; N is the number of pages of the PDF) and in total
                       has at the smallest size). ellipsis: of those, the translations cut to fit and ended in "…" (D4).
   big_text            drawn body-like blocks (40 or more characters per source line) whose font size is over 1.3 times the
                       median of the page's body-like blocks (the `block:` lines of the render).
+  colbreak            paragraphs the render cut into one block per column (`ocr.column_break` of the work line, summed over its passes; a
+                      render with colbreak > 0 is a firing) and squeezed: territories under half of their core (`layout.squeezed`); 0 for
+                      outputs from before the counters existed.
   cross_col           pairs of blocks where one block's source rect holds at least half of the other's: a join of lines across
                       a column gap (the author header of page 1: two columns' emails in one block) reaches over the block of the
                       column between them. Listed in detail.txt. The check is geometric, so it holds for any author block.
@@ -81,7 +84,7 @@ def parse(path):
             r['blocks'].append(dict(core=tuple(map(int, g[0:4])), text=tuple(map(int, g[4:8])), size=float(g[8]), lines=int(g[9]),
                                     chars=int(g[10]), clipped=int(g[11]), ellipsis=int(g[12] or 0), source=g[13]))
             continue
-        if re.match(r'^  \S', ln) and not ln.startswith('  overlap:') and not ln.startswith('  cut:') and not ln.startswith('  spill:'):
+        if re.match(r'^  \S', ln) and not ln.startswith(('  overlap:', '  cut:', '  spill:', '  holds:')):
             src = ln[2:]
         elif ln.startswith('    → ') and src is not None:
             r['pairs'].append((src, ln[6:]))
@@ -102,6 +105,16 @@ def kept_math(out, name):
     if os.path.exists(err):
         lines = [ln.split('[trace] ', 1)[1].rsplit(' ms', 1)[0] for ln in open(err, encoding='utf-8', errors='replace') if '[trace] kept math' in ln]
     return count, lines
+
+
+def counter(out, name, key):
+    """One counter of the render's work line (`work[still]: erase=33 ocr.column_break=1 ...`), summed over its work lines; 0 when absent."""
+    total = 0
+    for ln in open(os.path.join(out, name + '.out'), encoding='utf-8', errors='replace'):
+        if ln.startswith('work['):
+            m = re.search(r'(?<![\w.])' + re.escape(key) + r'=(\d+)', ln)
+            total += int(m.group(1)) if m else 0
+    return total
 
 
 def formula_translated(r, allow):
@@ -179,7 +192,8 @@ def main():
         km, kml = kept_math(out, n)
         cx = cross_column(r)
         db = debris(r, set(ft))
-        row = dict(r['layout'], formula=len(ft), math_kept=km, big=len(bt), cross=len(cx), debris=len(db), edge=et, side=es, near=nr, ellipsis=sum(b['ellipsis'] for b in r['blocks']))
+        row = dict(r['layout'], formula=len(ft), math_kept=km, big=len(bt), cross=len(cx), debris=len(db), edge=et, side=es, near=nr, ellipsis=sum(b['ellipsis'] for b in r['blocks']),
+                   colbreak=counter(out, n, 'ocr.column_break'), squeezed=counter(out, n, 'layout.squeezed'))
         (pages if re.fullmatch(r'p\d+', n) else crops).append((n, row))
         for line in kml:
             detail.append(f'{n} math_heavy_kept: {line[:150]}')
@@ -196,7 +210,7 @@ def main():
                 detail.append(f'{n} clipped{" ellipsis" if b["ellipsis"] else ""}: size={b["size"]} {b["source"][:60]!r}')
             if r['image'] and (b['core'][1] <= EDGE or b['core'][1] + b['core'][3] >= r['image'][1] - EDGE) and not re.fullmatch(r'p\d+', n):
                 detail.append(f'{n} edge_cut: core={b["core"]} {b["source"][:60]!r}')
-    cols = ['blocks', 'formula', 'math_kept', 'overlaps', 'spill', 'cut', 'clipped', 'ellipsis', 'big', 'cross']
+    cols = ['blocks', 'formula', 'math_kept', 'overlaps', 'spill', 'cut', 'clipped', 'ellipsis', 'big', 'cross', 'colbreak', 'squeezed']
     print('page   ' + ' '.join(f'{c:>8}' for c in cols))
     total = dict.fromkeys(cols, 0)
     for n, row in pages:
@@ -210,7 +224,7 @@ def main():
     p36 = sum(row['formula'] for n, row in pages if row and n in ('p3', 'p4', 'p5', 'p6'))
     d36 = sum(row['debris'] for n, row in pages if row and n in ('p3', 'p4', 'p5', 'p6'))
     print(f'formula_translated pages 3-6: {p36}   debris pages 3-6: {d36}')
-    cc = ['blocks', 'formula', 'math_kept', 'edge', 'near', 'side', 'overlaps', 'spill', 'cut', 'clipped', 'ellipsis', 'big', 'cross']
+    cc = ['blocks', 'formula', 'math_kept', 'edge', 'near', 'side', 'overlaps', 'spill', 'cut', 'clipped', 'ellipsis', 'big', 'cross', 'colbreak', 'squeezed']
     print('crop   ' + ' '.join(f'{c:>8}' for c in cc))
     ctotal = dict.fromkeys(cc, 0)
     for n, row in crops:
@@ -223,6 +237,8 @@ def main():
     print(f'{"TOTAL":<6} ' + ' '.join(f'{ctotal[c]:>8}' for c in cc))
     print(f'edge_cut (top/bottom crops c1,c2): {sum(row["edge"] for n, row in crops if row and "-c" in n)}  '
           f'side_cut (crops s1): {sum(row["side"] for n, row in crops if row and "-s" in n)}')
+    fired = [n for n, row in pages + crops if row and row['colbreak']]
+    print(f'column_break fired on {len(fired)} of {len([1 for n, row in pages + crops if row])} renders: {" ".join(fired)}')
     with open(os.path.join(out, 'detail.txt'), 'w', encoding='utf-8') as f:
         f.write('\n'.join(detail) + '\n')
 

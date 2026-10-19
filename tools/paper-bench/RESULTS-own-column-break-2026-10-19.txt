@@ -1,0 +1,94 @@
+# Paper bench on our own paper after the column break, 2026-10-19 (round I1)
+
+What changed   main 7f8d1af + I1: `ColumnBreak` (Core/Sources/MwoyeoCore/ColumnBreak.swift) cuts a block at a climbing line when its rect holds half of another
+               block; the pieces that carry the sentence on share one text and one translation (`FlowSplit`); `layout.squeezed` is counted and traced
+               (design: docs/design/recognition.md section 11, from D1's diagnosis of page 2). Compare with RESULTS-own-2026-10-19.txt (the same paper,
+               main before the change; the base rows below reproduce its totals).
+Document       tools/paper-own/mwoyeo-method, 13 pages: the pages and crops of /tmp/own-paper/bench/pages (pages.sh output of the first bench, 41 renders,
+               manifest in it; main.pdf sha256 2ebf808f...), copied to /tmp/i1/pages-own. Not rebuilt: a rebuilt PDF is another input.
+Binaries       two Release builds of the SAME bundle id, MWOYEO_APP_ID=dev.midagedev.mwoyeo.paperown (the reader services' ids derive from it, so both sides
+               share one e5rt cache state): base = `git archive 7f8d1af` (/tmp/i1/dd-base), candidate = this tree (/tmp/i1/dd-cand).
+Machine        Apple M1 Pro, macOS 27.0 (26A428). Not a quiet machine (other rounds render and build): load averages at the start of the runs 47.5, at the
+               ends 33, 32, 22, 21; ANECompilerService 0-99 % cpu (not ours). Every number below is an OUTPUT count (blocks, rects, counters), not a time:
+               a load that makes a render slow cannot move it, except through the reader's routing (see "p13" below).
+Commands       from the repository root, one render at a time, sandbox off:
+                 PAGES=/tmp/i1/pages-own tools/paper-bench/run.sh <base|candidate binary> /tmp/i1/{base,cand}-own
+                 PDF=~/.cache/mwoyeo-gates/paper/1706.03762.pdf SIDE="4 5" TOOLS=/tmp/i1/tools tools/paper-bench/pages.sh /tmp/i1/pages-1706
+                 PAGES=/tmp/i1/pages-1706 tools/paper-bench/run.sh <binary> /tmp/i1/{base,cand}-1706
+                 OUT=/tmp/i1/{base,cand}-uc tools/usecase-bench/bench.sh <binary> auto
+Outcome        every render rc=0: 41 own + 46 of 1706 + 52 use-case pictures, each on both binaries.
+
+## Decomposition and timeline, written before the runs (/tmp/i1/predictions.txt, 12:0x)
+
+Terms. The change is a correctness change on a pass that is led by the ANE read (D1, from p2.err: line read 460 ms + document read 566 ms, one after the
+other; host CPU ~310 ms: erase 178, frame to RGBA 124). The new work is a climb test per line and ~1200 rect tests among ~35 blocks, and only for blocks
+that climb (< 0.1 ms), and one string slicing per piece (< 0.01 ms). Translation requests stay one per paragraph. The wall is the sum of the resources,
+led by the ANE; the new terms are under its shadow: predicted change of the pass 0 ms, so no timing gate and no timing measured. No async, bulk, SIMD or
+SIMT lever applies: nothing of the change is on the critical path.
+Predicted counts (from D1's census and replay): the rule fires on 5 of 41 own renders (p2, p1-c1, p4-c2, p7-c1, p12-s1), 0 of 46 of 1706, d03 only in
+the use-case bench; pages cross_col 36 -> 4 (p5 p6 p8 p9: G10) and clipped 27 -> 10..12; crops cross_col 53 -> 0 and clipped 55 -> 11..15.
+
+## Totals (python3 -I tools/paper-bench/score.py <out dir>)
+
+                     blocks formula math_kept overlaps spill cut clipped ellipsis big cross colbreak squeezed
+  own pages  base       525      22         3        0     0   0      27        2   7    36        0
+  own pages  candidate  526      22         3        0     0   0      10        1   0     4        1        2
+  own crops  base       519      27        10        0     0   0      55        1   7    53        0
+  own crops  candidate  522      27        10        0     0   0      11        0   0     0        4        0
+  (base has no `colbreak`/`squeezed` counters: 0. edge_cut 10 / side_cut 20 on the crops, both sides. formula_translated pages 3-6: 11, debris 7, both sides.)
+  Gates: pages cross_col 36 -> 4 (<= 4), clipped 27 -> 10 (<= 12); crops cross_col 53 -> 0, clipped 55 -> 11 (<= 15); overlaps/spill/cut 0.
+
+## The five firings (`column break:` lines of the trace; census: tools/paper-bench/column-break-census.py gives the same five on the base traces)
+
+  render   trace                                                             blocks      clipped    cross_col   big
+  p2       block 19 'The lines of a block are' -> pieces [3, 4], shared [0, 0]    33 -> 34    17 -> 0    32 -> 0     7 -> 0
+  p1-c1    block 13 'The last requirement is ' -> pieces [2, 2], shared [0, 0]    11 -> 12     2 -> 0     5 -> 0     0
+  p4-c2    block 11 'and the container C = TV' -> pieces [1, 6], shared [0, 0]    10 -> 11     7 -> 0     9 -> 0     3 -> 0
+  p7-c1    block 14 'sampling every other col' -> pieces [3, 1], shared [0, 0]   20 -> 21    18 -> 0    19 -> 0     1 -> 0
+  p12-s1   block 11 'ch becomes pL (Eq. 14, f' -> pieces [1, 2], shared [0, 1]   21 -> 21    17 -> 0    20 -> 0     3 -> 0
+  (the p7-c1 and p1-c1 block numbers differ from the census's: the trace's numbers are after `readableLines`.) In p12-s1 the second piece starts with
+  `$ cd ...`: it is a paragraph of its own (`shared [0, 1]`, one translation per piece), as the prompt rule keeps it as written.
+  p2 alone: `layout: blocks=34 overlaps=0 spill=0 cut=0 clipped=0 holds=0` (base: blocks=33, clipped 17, 32 pairs held). The paragraph is translated once and drawn
+  in two pieces: patch 139,1862 662x108 ink 644x90 at the foot of column 1 ("... 라인은 읽기 순서대로") and patch 837,149 661x143 ink 614x90 at the top of
+  column 2 ("최대 세 개의 새로운 라인으로 ...").
+
+## The four that are left (G10, out of scope): a piece that stands beside the short last line of a paragraph
+
+  p5, p6, p8, p9: `layout: ... holds=1` each (base: the same pairs as cross_col 1; p5 'If the background of every line of the b' holds '2> with M', p6 'Figure 2. ...'
+  holds '16 ms, T = 150 ms) ...', p8 'PDF of this paper are written beside the' holds 'They are not re-', p9 'lie sher one one' holds 'public mutating func').
+  The new stat on the own pages: `layout: squeezed block 39 'They are not re-' core 1272,1537 221x26 territory 1268,1550 229x15` (p8: the G10 piece, cut to a
+  half of its height) and `layout: squeezed block 0 'Size.' core 146,162 57x22 territory 143,159 63x11` (p6: a one-word line whose territory a neighbour takes; not
+  a G10 pair). `layout.squeezed` is 0 on every other own render, and 1 on one page of 1706 (see below).
+
+## The other 36 renders
+
+  `core / lines / chars / source` of every `block:` line: identical to the base render in the 36 own renders that do not fire (and 45 of 46 of 1706, and
+  46 of 46 after the p13 re-run below). The full `block:` lines are NOT byte-identical in 14 of those 36 (p10, p9, p3-c1, ...): they differ in
+  `text=` (1-3 px) and `size=` only, which come from the translation of the block. The translation engine is not deterministic ("조건 A" / "조건 a", "MI-Gan" /
+  "MI-GAn"), and the base is not identical to itself: two renders of the base binary (base-own and base-own-b: p9, p10, p9-c1, p10-c1, p10-c2) differ in the
+  same fields, two renders of the candidate (cand-own, cand-own-b: p1, p1-c1) differ in the same way. The design's "byte-identical block lines" holds for
+  the fields that the pipeline decides, not for those the engine decides.
+
+## 1706.03762 (46 renders, base vs candidate)
+
+  firings 0 of 46 (`ocr.column_break` absent from every `.out`; census on the base traces: 0). Totals: pages blocks 262 / 263, clipped 7 / 7, cross 1 / 1;
+  crops blocks 264 / 264, clipped 7 / 7, cross 1 / 1 (edge_cut 2, side_cut 16 both).
+  p13: the base's first render took the VN path (`ocr.blocks.vn=1 reader.docs.suspect=1 reader.reroute.docs.lines=1`: the Docs service did not answer within S = 2 s
+  on a load of 53, so the lines were read by the grouper) and drew 2 blocks, the candidate's the document model (`ocr.blocks.swift=1`) and drew 3. A re-run of the
+  base on p13 (base-1706-b) took the document model, drew 3 blocks and its `core/lines/chars/source` equal the candidate's. The route is the reader's, under load.
+  `layout.squeezed` fires once on the 1706 pages (p11, 'Bowen': core 1269,1682 76x22, territory 1266,1679 82x9; the base cuts it the same way, it is now counted): no
+  behaviour change.
+
+## Use-case bench (52 pictures: the set has grown by the 12 `code` pictures since b113's 40; bench.sh auto, both binaries, the same bundle id)
+
+  score tables of base and candidate are IDENTICAL (diff of the two outputs is empty): chat 20/36, docs-web 59/89, games 25/38, papers 40/69, subtitles 16/19
+  = 160/251 as main's b113 run; code 0/142 on both (new category: its expectations need the code-region round; not worse).
+  `ocr.column_break` fires on d03 only (block 3 'Hikers have noticed. Sal' -> pieces [3, 1], shared [0, 0]); the paragraph stays one pair of source/translation
+  ("Hikers have noticed. ... in the country." -> one translation), drawn in two pieces.
+
+## Gates not in the bench
+
+  Core: `cd Core && swift test` rc=0 (760 tests in 69 suites; 17 new in ColumnBreakTests and FlowSplitTests). FAIL-first with `ColumnBreak.pieces` stubbed to one run per
+  block: `territoriesOfTheWholePageStayWhole` whole=0 squeezed=16 dropped=17 of 33, 7 issues in 5 tests.
+  App: Debug build rc=0 and `--capture-ui ... check-logic` "check-logic: all passed"; Release build rc=0 and `--render --check-instruments` 20 PASS, 0 FAIL, "check-instruments: all PASS";
+  Mac App Store configuration, ad-hoc (`-scheme Mwoyeo-MAS -configuration MAS MWOYEO_SIGN_IDENTITY=-`) rc=0.

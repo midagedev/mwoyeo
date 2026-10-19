@@ -626,3 +626,165 @@ Verification commands run: none (read-only design round; no builds, renders or b
    - `--max-wait 600`.
 
 Order: R0 ∥ R1 ∥ R2 → R3 → R4. Then R6 (translation dispatch), R7 (read memo) and R8 (relaunch drain).
+
+## 11. Blocks are one column, a translation is one paragraph (D1 design, I1 implementation, 2026-10-19)
+
+Appended after §10. Evidence is from main `a53646c`, our own paper (`tools/paper-own`, 13 pages), the use-case set and arXiv 1706.03762; the numbers come from
+`tools/paper-bench/RESULTS-own-2026-10-19.txt` and from a replay of `Territory.trim` with the real Core code (now the Core test `territoriesOfTheWholePageStayWhole`, on the recorded blocks of p2).
+Status and the results of the implementation round (I1) are in 11.9.
+
+### 11.1 What happens today
+
+On a two-column page the document reader sometimes returns one paragraph whose lines are in two columns: the last lines of column 1 and the first lines of
+column 2 (the sentence goes on at the top of the next column). Page 2 of our paper has one, reader paragraph 19: three lines at x 141, y 1867-1960, then four
+lines at x 837, y 154-283.
+
+| Step | What | Where |
+|---|---|---|
+| Reader | `RecognizeDocumentsRequest`, one `Container.paragraphs[i]` per paragraph; its own `boundingRegion` is already one quad (146,152)(1498,156)(1492,1964)(141,1960) | `Shared/VisionExec.swift:126-137` |
+| Block | `makeBlock`: rect = union of the lines = 1349 x 1805 px, 71 % of the page | `TextRecognizer.swift:501-511` |
+| Territory | `want` of that block holds all 32 others; `trim` cuts each pair at the middle of the overlap of their cores, on the axis with the smaller overlap | `RegionPipeline.swift:1059-1075`, `BlockLayout.swift:128-150` |
+| Draw | a patch of 0-1 px has no text area: nothing is drawn, the source stays; a patch cut at x = 470 or x = 1167 holds half of its source | `BlockRenderer.swift:76-78, :120-121` |
+
+There is no container, table, list or figure region in the path: the app reads leaf paragraphs only (`document.paragraphs`), and the big object is an ordinary
+paragraph. Vision's flat `paragraphs` list also holds the cells of tables (35 of 36 cell texts on p3) and the page-wide `document.text` container (99 lines on p2) is
+never read. The same paragraph shape is the cause on the four crops of the paper bench that show it (p1-c1, p4-c2, p7-c1, p12-s1). Page 2 has no float at all: the cause needs a
+column break and nothing else.
+
+Result on p2, 33 blocks drawn, none correct: 16 translations not drawn (patch 1 px high; their 39 source lines stay in English), 15 squeezed (12 cut in width at the middle of their overlap
+with the big block, 8 in column 1 and 4 in column 2, the big block's own patch is then x 470-1167; 3 cut in height; the cut-off part of the source stays in English), 1 cut to an ellipsis, and the paragraph itself, drawn at the middle of
+the page (ink 475,962 644x151) over 9 source lines of other blocks, while its own 7 lines stay unerased. `score.py`: cross_col 32, clipped 17 on p2; 36 and 27 on the 13
+pages; 53 and 55 on the 26+2 crops. 1706.03762 shows 1 and 15 because it is a one-column paper: no paragraph can go on at the top of another column, and no page has a
+paragraph larger than 6 % of itself (p2 here: 71 %; every other page of ours: at most 13 %).
+
+### 11.2 Invariants (each has a gate in 11.6)
+
+| ID | Invariant | Gate |
+|---|---|---|
+| B1 | A drawn block (a *piece*) is one column: its lines never climb (no line whose middle is above the top of the line before it) | `ColumnBreakTests` |
+| B2 | A piece's rect holds no other block (half of the smaller one, the `cross_col` test) except a piece that stands beside its last line (G10) | `layout: ... holds=N`, `cross_col` |
+| B3 | A paragraph that goes on in the next column has **one** translation, requested once (its text is the source of every piece); each piece draws its share (`FlowSplit`) | `FlowSplitTests`, bench pairs |
+| B4 | A cut is made only where the old path was wrong: the block climbs **and** its rect holds half of another block | firings 5/41 own renders, 0/46 on 1706, 1/40 use-case |
+| B5 | A territory smaller than half of its core is counted and traced, never silent | `layout.squeezed` stat |
+
+### 11.3 The target flow, one owner
+
+```
+document paragraph (lines in reading order)
+  → readableLines                         (as today)
+  → ColumnBreak.pieces        [new, Core] cut at a climb, only when the rect holds another block
+  → joinSplitLines, splitByStyle          (as today, now seeing pieces, not the union)
+  → piece i of n: OCRBlock(rect = union of its lines, lines, text = the paragraph's text, part = (i, weights))
+  → verdict, layoutPlaces, erase          (as today, per piece)
+  → translation of the paragraph (one request, keyed by the paragraph text, as today)
+  → renderMissing: FlowSplit.slices(translation, weights)[i]   → BlockRenderer (as today, per piece)
+```
+
+- **Owner.** `ColumnBreak` (Core, `ColumnBreak.swift`, beside `BlockMerge` and `Territory` of `BlockLayout.swift`: the files that say "which recognized blocks are one block,
+  what area each may paint"), called from one function, `RegionPipeline.readBlocks` (new; it replaces the chain written twice at `RegionPipeline.swift:828` and `:909`:
+  `readableLines → ColumnBreak → joinSplitLines → splitByStyle → flowed`; `flowed` hands the paragraph's text to the pieces that came through whole). The cut comes **before** `joinSplitLines` so that the merge rules see pieces, not a union that
+  "starts inside the width" of everything (`BlockMerge.endsWithPiece`).
+- **A piece goes on, or stands alone.** `ColumnBreak.continues(previousLast:nextFirst:)`: the sentence of the piece before was not ended (`. ! ? 。 ！ ？ … :`) and the
+  next piece starts with a lowercase letter, or a letter of a script without case. Otherwise the pieces are paragraphs of their own, each with its own text and
+  translation (today's 1.1.0 line-grouping behaviour; p12-s1: a prose line, then a shell command of the next column: `$ cd ...` stands alone and is kept as written by the
+  prompt rule). On the six firings the next piece starts with a lowercase letter in five (p2, p1-c1, p4-c2, p7-c1, d03) and with `$` in one (p12-s1); the end of the sentence before is known for p2 and d03 only (both go on).
+- **FlowSplit.** One translation, `n` pieces, weights = characters of each piece's source lines (p2: 166 and 177). Cut `k` is the nearest space to the weighted
+  position within 12 characters; text without spaces (Han, kana, hangul) is cut at the nearest character that neither starts with a closing mark nor follows an opening
+  one. The pieces joined with a space read as the translation. Pure, in Core, no engine call: a column break costs 0 extra requests (two requests would cut a sentence
+  in the middle: "Lines" alone at the foot of column 1). The p2 translation comes out cut at "… 라인은 읽기 순서대로 | 최대 세 개의 새로운 라인으로 …".
+- **Consumers.** The pieces share the paragraph's `source`, so the cache, the queue, the strikes, `checkPreempt` and the context lines are unchanged (they already
+  handle two blocks with one source). Only places that list blocks to a person or a gate need one entry per paragraph: `texts` in `emit` (Copy Text and the lens export would
+  repeat the paragraph), `debugState().blocks` (the self-test's source/translation pairs, which the use-case scorer reads), and `capBodySizes` (characters of the paragraph
+  against lines of the piece: still body-like).
+- **Containers, tables, lists, figures.** Containers are never blocks: only leaf paragraphs are read, `document.text`, `title`, `tables` and `lists` are not (keep it so; a
+  reader that starts to read a container would meet B1). Tables are read as cells, one paragraph per cell (a row would join cells across the gutter: B2); lists as the
+  paragraphs Vision gives for their items; figures have no object in Vision's document, their text comes as short paragraphs (labels, captions) and the existing
+  `LabelRule`, `LabelSize`, `VerticalText` keep them. The rule is geometric and has no case for any of these.
+
+### 11.4 Resource timeline (one seamless pass of p2, warm, from `p2.err`)
+
+| Resource | ms | What |
+|---|---|---|
+| ANE | 1027 | line read 460 + document read 566, one after the other (the decider needs the lines first) |
+| Host CPU | ~310 | erase 178, frame to RGBA 124, layout and `trim` < 1, `ColumnBreak` < 0.1 (a climb test per line, ~1200 rect tests among 35 blocks) |
+| GPU, PCIe, NVMe | ~0 | MI-GAN only on textured backgrounds; unified memory; no disk in the pass |
+
+The wall is the sum, led by the ANE read; the fix is under its shadow (0 ms either way). It is a correctness change, not a speed one, and no async, bulk, SIMD or SIMT lever
+applies. The one flow decision is the translation request: one per paragraph (B3), not one per piece.
+
+### 11.5 Gap table (main `a53646c`; line numbers in `RegionPipeline.swift` as of the design, before R3a)
+
+| # | Where | Today | Target | Size |
+|---|---|---|---|---|
+| G1 | new `ColumnBreak.swift` (Core) | nothing cuts a block that climbs | `ColumnBreak.climbs/pieces/holds/continues/chains`, pure, with tests | S |
+| G2 | `RegionPipeline.swift:828`, `:909` | the chain `readableLines → joinSplitLines → splitByStyle` is written twice | one `readBlocks` with `ColumnBreak` before `joinSplitLines`; counter `ocr.column_break`, trace line `column break: block i → pieces [3, 4]` | S |
+| G3 | `TextRecognizer.swift:9-13` `OCRBlock`; `RegionPipeline.swift:105-126` `Block` | a block is a union of lines with its own text | `part: FlowPart?` (index, weights); `text` = the paragraph's for every piece; verdict on the paragraph | M |
+| G4 | new `FlowSplit.swift` (Core: `FlowPart`, `slices`, `share`, `resolve`); `RegionPipeline.swift:1524-1545` `renderMissing` | the whole translation is laid out in the block | the piece's slice (`FlowSplit.share(of:part:)`) | S |
+| G5 | `RegionPipeline.swift:350-357` `debugState`, `:1558-1561` `emit`; `SelfTest.swift:306` | one entry per block | one entry per paragraph (the piece with index 0) | S |
+| G6 | `BlockLayout.swift:~330-374` `LayoutCheck`; `SelfTest.swift:318-335` | counts overlaps, spill, cut, clipped | `holds` pairs, `layout: ... holds=N` appended (the `score.py` regex ignores a suffix) | S |
+| G7 | `RegionPipeline.swift:1059-1075` `layoutPlaces` | `trim` may return a 0-high territory without a trace | `Trace.count("layout.squeezed")` and a line for each territory under half of its core; no behaviour change | S |
+| G8 | `BlockRenderer.swift:50` `eraseMargin` | the ring formula is in the App, so a Core test cannot share it | `Territory.ring(lineHeight:)` in Core, `eraseMargin` calls it | S |
+| G9 | `tools/ocr-probe/`, `tools/paper-bench/score.py` | the probe and the replay are in `/tmp/d1` | `structure.swift` (document dump), `column-break-census.py` (firings from the traces), `score.py` prints `colbreak` and `squeezed`; the replay became a Core test | S |
+| G10 | `RegionPipeline.swift:1082-1110` `splitByStyle` | a piece beside the short last line of a paragraph is split off again by style and lies inside the paragraph's rect (p5, p6, p8, p9: 4 pairs) | design needed: carve the paragraph's want around the piece, or keep it in the block; not in this fix | M, [later] |
+
+In scope: 1 M + 8 S (about 300 lines of code, 250 of tests); one round. G10 is the residual B2 class and keeps the paper-bench bound at 4, not 0.
+
+### 11.6 Gates for the implementation round
+
+1. **Core unit tests, FAIL-first** (fixtures recorded from p2, the 1706 figure, the d03 picture: `Core/Tests/MwoyeoCoreTests/ColumnBreak*Fixture.swift`). On the code as it is on main
+   (`ColumnBreak.pieces` stubbed to return one run per block): `territoriesOfTheWholePageStayWhole` fails with `whole=0 squeezed=16 dropped=17 of 33`, `theParagraphThatGoesOnInTheNextColumnIsCutAtTheClimb` and
+   `theMagazineParagraphThatGoesOnInTheNextColumnIsCutToo` fail; with `ColumnBreak`: 10 tests pass, whole = 34 of 34. Also: a climbing block that holds nothing is left alone
+   (1706 p14), `continues` on six recorded pairs, `FlowSplit` joins back to the translation for 1 to 6 pieces and never cuts before a closing mark.
+2. **Paper bench, our paper** (`tools/paper-bench/run.sh`, same binary build, `--warm`): `ocr.column_break` fires on exactly 5 of the 41 renders (p2, p1-c1, p4-c2, p7-c1, p12-s1);
+   the `block:` lines of the other 36 are byte-identical to a render of main at the same bundle id. Pages: **cross_col 36 → ≤ 4** (32 are the pairs of the one block of p2; the 4 left
+   are G10: p5, p6, p8, p9), **clipped 27 → ≤ 12** (10 on the pages other than p2, which G1-G4 do not touch, plus at most 2 for p2; the spec's 15 is the safe line),
+   `overlaps/spill/cut` stay 0. Crops: **cross_col 53 → 0** (all 53 pairs involve the one block of a firing crop), **clipped 55 → ≤ 15** (11 outside the four crops, plus 4).
+   p2 alone: `layout: blocks=34 overlaps=0 spill=0 cut=0 clipped≤1 holds=0`.
+3. **1706 pages and crops** (a render of main at the same bundle id; the b113 run `/tmp/lead-final/b113/main-paper` gives the same census): the counter fires 0 times (its 9 climbing blocks are rotated figure words that hold nothing), so
+   the `block:` lines of all 46 renders are byte-identical and the totals are the b113 ones: pages blocks 343, clipped 15, cross 1; crops blocks 265, clipped 7, cross 1.
+4. **Use-case bench** (`tools/usecase-bench/bench.sh`, 40 pictures, auto): the counter fires on d03 only; the segmentation scores of chat, docs-web, games, papers and subtitles
+   equal main (d03's unit "Hikers have noticed..." stays *correct*: one pair per paragraph, G5), code not worse (its 8 pictures never fire). Any other firing is a finding.
+5. `cd Core && swift test` rc=0, `xcodegen generate && xcodebuild ... build` rc=0, `--capture-ui ... check-logic` all PASS.
+
+### 11.7 Order and overlap with R3a
+
+R3a landed first (7f8d1af). It rewrites `TextRecognizer.swift` (`makeBlock` moves from :501 to :232 and is not edited by this design), deletes `DocsHost.swift` (the reader trace above then reads
+`RecognitionHost.swift`), and edits in `RegionPipeline.swift` only `:172-178`, `:253-264`, `:496-511`, `:813-820` and `:886-893` (the `lines(...)` read calls) and `noteReadFailure`. This design
+edits `Block` (:105), `splitByStyle`'s neighbours (:974-1110), `renderMissing`, `emit`, `debugState`: none of R3a's hunks. The two places that touch the same file regions are the `OCRBlock`
+struct (R3a adds three doc lines under it; G3 adds one field) and `docs/design/recognition.md` (R3a adds a status block at :542; this section goes at the end).
+
+### 11.8 Not done here
+
+- The residual class G10, and list items that Vision cuts into several paragraphs around inline mathematics (p2 item 1 comes as three blocks, `ocr-block 10-12`): the inline-math rounds own them.
+- Reading the climb from Vision's own region: it has none (the paragraph's `boundingRegion` is one quad), so the rule has to be ours.
+- A multi-frame CoreText flow instead of `FlowSplit` (the text is laid out through the pieces in one pass and the font size is fitted to all of them): better fit, L; only if the slices look wrong.
+
+### 11.9 Status after I1 (2026-10-19, main 7f8d1af + the round)
+
+Rows G1-G9 are in; G10 is not. Evidence: `tools/paper-bench/RESULTS-own-column-break-2026-10-19.txt`; base and candidate are Release builds of one bundle id.
+
+| Gate | Design | Measured |
+|---|---|---|
+| Core | FAIL-first on the recorded p2, `cd Core && swift test` rc=0 | unfixed: `whole=0 squeezed=16 dropped=17 of 33` (7 issues in 5 tests); fixed: 760 tests, 17 new, rc=0 |
+| Own paper pages | cross_col 36 → ≤ 4, clipped 27 → ≤ 12 | 36 → 4 (p5 p6 p8 p9: G10), 27 → 10; overlaps/spill/cut 0 |
+| Own paper crops | cross_col 53 → 0, clipped 55 → ≤ 15 | 53 → 0, 55 → 11 |
+| Firings | 5 of 41 | p2, p1-c1, p4-c2, p7-c1, p12-s1 (p12-s1: `shared [0, 1]`, the prompt stands alone) |
+| 1706 | 0 of 46 | 0 of 46; `core/lines/chars/source` of every block equal to a render of main |
+| Use-case | the five old categories equal, code not worse, d03 only | chat, docs-web, games, papers, subtitles 160/251 as main; code 0/142 both; d03 only |
+| Builds | check-logic, check-instruments, MAS ad-hoc | all passed; 20 PASS; rc=0 |
+
+Not byte-identical, and not a regression: the engine is not deterministic ("조건 A" / "조건 a"), so the `text=` and `size=` of a `block:` line move by a few pixels between two renders of the **same** binary. The fields
+the pipeline decides (core, lines, chars, source) are equal. A render of main also changes its reader path under load (`reader.docs.suspect` → VN lines on 1706 p13), so compare the `work[...]` line before a count.
+
+Decisions made while implementing:
+
+- `ColumnBreak.chains` carries the "goes on / stands alone" rule per pair of pieces (a block of three pieces may share the first two and leave the third alone); `FlowSplit.resolve` (Core, pure) is what `RegionPipeline.flowed` asks after
+  the chain: a paragraph whose pieces did not all come through `joinSplitLines` and `splitByStyle` whole, in order, is a set of paragraphs of their own (each with its own text and translation: today's behaviour for that piece).
+- `ocr.column_break` counts blocks cut (summed over the passes of a render); the trace line is `column break: block i '<first 24 characters>' → pieces [n, m], shared [chain ids]` (`i` is the index after `readableLines`, not the `ocr-block` number).
+- `MWOYEO_LAYOUT=off` also switches the column break off (it is a layout rule).
+- `Copy Text` and the self-test list a paragraph once, at its first piece's frame; a lens that covers only the second column does not list that paragraph, although its second piece is drawn (an edge of the choice, not measured).
+- `layout.squeezed` found two blocks of our own paper cut to under half of their core (p6 'Size.': 57x22 px beside a larger block; p8 'They are not re-': the piece of G10) and one on 1706 p11 ('Bowen'); it counts, it changes no pixel. `Size.` and `Bowen` are one-word lines whose territory a neighbour takes: the next candidates for the stat's trace.
+
+Left open: **G10**, the four pairs on p5, p6, p8 and p9 (a piece that stands beside the short last line of a paragraph is split off again by style and lies inside the paragraph's rect: design needed), the list items that Vision cuts around inline mathematics
+(p2 item 1 comes as three blocks), and the translation's cut points (`FlowSplit` cuts at a space by the share of source characters; only a vision verdict on the p2 and d03 pieces can say whether the slices read well: no vision round was run here).
+

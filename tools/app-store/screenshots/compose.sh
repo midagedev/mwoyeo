@@ -1,5 +1,5 @@
 #!/bin/bash
-# Stage 2 of the App Store screenshots: out/ko/01..06.png and out/en/01..05.png (2880 x 1800, RGB, sRGB) from renders/ only, then
+# Stage 2 of the App Store screenshots: out/ko/01..07.png and out/en/01..06.png (2880 x 1800, RGB, sRGB) from renders/ only, then
 # check.py (format, truth pixel for pixel, the paper's formulas, captions, coverage, cap height, frame count, and its own FAIL-first
 # self-test).
 # Two runs give the same bytes. out/ is gitignored; render.sh makes renders/ (committed).

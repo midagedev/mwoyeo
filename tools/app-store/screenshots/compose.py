@@ -14,7 +14,7 @@ radius 12, a 1.5 pt conic stroke in the tint (LensTint, App/Model/Settings.swift
 blurred, as the glow; ring and glow at the emphasized opacities (1.0, 0.7). The translation is clipped to the region with radius 12
 (OverlayPanel's clip) and drawn over the glow, so nothing is drawn on a translated pixel.
 """
-import hashlib, html, json, os, re, sys
+import hashlib, html, json, os, re, sys, urllib.parse
 
 from PIL import Image, ImageChops, ImageDraw
 
@@ -28,6 +28,12 @@ PANEL_AT = (984, 336)                    # the menu panel of the 'panel' layout:
                                          # inside the sidebar card it covers (10 pt under the card's top edge, 35 pt under its last
                                          # text line), so no clipped line peeks out below or above it
 PANEL_SHADOW = (18, 44)                  # its shadow: y offset and blur, CSS px
+LIVE_GAP = 48                            # between the moments of the 'live' layout
+STEP_ARROW, STEP_LABEL = 60, 50          # the arrow and the "+3s" that join two moments, font px: 2.1x and 2.9x what they were
+                                         # (28 and 17; the label's capitals 24 px high at 2880 wide, now ~70, check.py: step); too wide
+                                         # for the 48 px between two cards, so they sit in the band above the seam, never on a card
+STEP_BOX = (70, 100, 10, 62)             # arrow box width, label box width, space between, row height (CSS px)
+STEP_ABOVE = 22                          # between a step row and the cards' top edge
 CARD_RADIUS = 18
 GLOW_BLUR = 5.0                          # CSS px; fitted to the app's captures: profile.py falloff 15/14 px, peak 70/119 vs 14/15, 64/122
 HAIRLINE = 0.09                          # the white hairline 1 CSS px outside a card, alpha
@@ -51,7 +57,7 @@ def conic(colors):
     return f'conic-gradient(from 180deg, {stops})'
 
 
-# Backdrops: a deep night with the lens's own colours as soft light, one weighting per frame so the six read as a sequence.
+# Backdrops: a deep night with the lens's own colours as soft light, one weighting per frame so the set reads as a sequence.
 GLOWS = [
     [('#FF385E', 0.36, '10% -8%'), ('#BF59F2', 0.40, '92% 4%'), ('#FF9E0A', 0.28, '50% 112%')],
     [('#BF59F2', 0.40, '10% -8%'), ('#5E5CE6', 0.50, '92% 4%'), ('#FF385E', 0.30, '50% 112%')],
@@ -59,6 +65,7 @@ GLOWS = [
     [('#5E5CE6', 0.50, '10% -8%'), ('#63D1FF', 0.28, '92% 4%'), ('#BF59F2', 0.36, '50% 112%')],
     [('#63D1FF', 0.24, '10% -8%'), ('#5E5CE6', 0.48, '92% 4%'), ('#FF385E', 0.28, '50% 112%')],
     [('#BF59F2', 0.38, '10% -8%'), ('#FF385E', 0.32, '92% 4%'), ('#63D1FF', 0.24, '50% 112%')],
+    [('#FF9E0A', 0.30, '10% -8%'), ('#FF385E', 0.38, '92% 4%'), ('#BF59F2', 0.34, '50% 112%')],
 ]
 
 
@@ -82,7 +89,9 @@ body { position: relative; -webkit-font-smoothing: antialiased; }
 .cap h1 { margin: 0; font-size: 64px; line-height: 1.12; font-weight: 700; letter-spacing: -0.015em; }
 .cap .k { letter-spacing: -0.08em; padding-right: 0.08em; }
 .cap p { margin: 14px 0 0; font-size: 26px; line-height: 1.35; font-weight: 500; color: rgba(255,255,255,.74); letter-spacing: 0; }
-.card { position: absolute; overflow: hidden; background: #000; box-shadow: 0 34px 90px rgba(0,0,0,.55); }
+.card, .shade { position: absolute; box-shadow: 0 34px 90px rgba(0,0,0,.55); }
+.card { overflow: hidden; background: #000; }
+.card.flat { box-shadow: none; }
 .card > img, .lens-content, .hair { position: absolute; display: block; }
 .ring, .glow > div { position: absolute; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude; }
@@ -93,9 +102,16 @@ body { position: relative; -webkit-font-smoothing: antialiased; }
 .chip .keys { display: flex; gap: 6px; }
 .chip .keys span { width: %(K)dpx; height: %(K)dpx; display: grid; place-items: center; padding-bottom: 2px; font-size: 19px;
   font-weight: 600; background-size: 100%% 100%%; }
+.step { position: absolute; display: flex; align-items: center; gap: %(SG)dpx; width: %(SW)dpx; height: %(SH)dpx;
+  color: rgba(255,255,255,.92); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; font-weight: 700;
+  font-variant-numeric: tabular-nums; }
+.step .arrows { flex: none; width: %(SAW)dpx; text-align: center; font-size: %(SA)dpx; line-height: 1; font-weight: 500;
+  color: rgba(255,255,255,.78); }
+.step .label { flex: none; width: %(SLW)dpx; text-align: center; font-size: %(SL)dpx; line-height: 1; }
 .panel { position: absolute; border-radius: 16px; box-shadow: 0 %(SY)dpx %(SB)dpx rgba(0,0,0,.5); }
 .panel img { display: block; }
-""" % {'W': W, 'H': H, 'SY': PANEL_SHADOW[0], 'SB': PANEL_SHADOW[1], 'K': KEY}
+""" % {'W': W, 'H': H, 'SY': PANEL_SHADOW[0], 'SB': PANEL_SHADOW[1], 'K': KEY, 'SA': STEP_ARROW, 'SL': STEP_LABEL,
+         'SAW': STEP_BOX[0], 'SLW': STEP_BOX[1], 'SG': STEP_BOX[2], 'SH': STEP_BOX[3], 'SW': STEP_BOX[0] + STEP_BOX[2] + STEP_BOX[1]}
 
 
 def lens(region, colors, ring=1.0, glow=0.7):
@@ -155,8 +171,9 @@ def keycap(out):
     return path
 
 
-def card_html(out, scene, at, radius, render, colors, place):
-    """A card: the source picture, the lens frame, and the translation (when `render`) clipped to the lens."""
+def card_html(out, scene, at, radius, render, colors, place, flat=False):
+    """A card: the source picture, the lens frame, and the translation (when `render`) clipped to the lens. `flat`: without its
+    shadow, which shade_html() then draws under every card (a later card's own shadow would fall on an earlier card)."""
     s = CFG['scenes'][scene]
     cx, cy = at
     _, _, cw, ch = s['crop']
@@ -164,7 +181,7 @@ def card_html(out, scene, at, radius, render, colors, place):
     src = os.path.join(HERE, 'renders', f'{scene}.source.png')
     hair = hairline(out, cw, ch, radius_px(radius))
     parts = [f'<img class="hair" src="{rel(hair, out)}" style="left:{cx - 1}px;top:{cy - 1}px;width:{cw + 2}px;height:{ch + 2}px">',
-             f'<div class="card" style="left:{cx}px;top:{cy}px;width:{cw}px;height:{ch}px;border-radius:{radius}">',
+             f'<div class="card{" flat" if flat else ""}" style="left:{cx}px;top:{cy}px;width:{cw}px;height:{ch}px;border-radius:{radius}">',
              f'<img src="{rel(src, out)}" style="left:0;top:0;width:{cw}px;height:{ch}px">', lens(s['lens'], colors)]
     place.append({'kind': 'source', 'file': os.path.relpath(src, HERE), 'rect': [cx, cy, cw, ch], 'radius': radius_px(radius),
                   'lens': [cx + lx, cy + ly, lw, lh]})
@@ -176,22 +193,67 @@ def card_html(out, scene, at, radius, render, colors, place):
     return ''.join(parts)
 
 
+def shade_html(scene, at, radius):
+    """The shadow a flat card leaves out."""
+    _, _, cw, ch = CFG['scenes'][scene]['crop']
+    return f'<div class="shade" style="left:{at[0]}px;top:{at[1]}px;width:{cw}px;height:{ch}px;border-radius:{radius}"></div>'
+
+
 def radius_px(css):
     """A CSS border-radius as [top-left, top-right, bottom-right, bottom-left] in CSS px."""
     v = [int(t.rstrip('px')) for t in css.split()]
     return (v * 4)[:4] if len(v) == 1 else v
 
 
+def frame_scenes(f):
+    """The scenes a frame shows: one, or the moments of a 'live' frame in time order."""
+    return f['scenes'] if f['layout'] == 'live' else [f['scene']]
+
+
+def live_steps(ids):
+    """The seconds between the moments of a 'live' frame, read from their pages so the label cannot say more than the pages
+    show: one page that adds a message every `every` seconds, at history counts one apart, so moment k + 1 is what moment k's
+    page shows `every` seconds later. The moments show one lens: same card size, same lens."""
+    q = [dict(urllib.parse.parse_qsl(urllib.parse.urlsplit(CFG['scenes'][i]['page']).query)) for i in ids]
+    p = [urllib.parse.urlsplit(CFG['scenes'][i]['page']).path for i in ids]
+    rest = [{k: v for k, v in d.items() if k != 'history'} for d in q]
+    geo = [(CFG['scenes'][i]['window'], CFG['scenes'][i]['crop'], CFG['scenes'][i]['lens'], CFG['scenes'][i]['budget']) for i in ids]
+    if len(ids) < 2 or len(set(p)) != 1 or any(r != rest[0] for r in rest) or any(g != geo[0] for g in geo):
+        sys.exit(f'compose.py: live moments {ids} are not one page and one lens at different times')
+    every = int(rest[0].get('every', 0))
+    hist = [int(d['history']) for d in q]
+    if every <= 0 or any(b - a != 1 for a, b in zip(hist, hist[1:])):
+        sys.exit(f'compose.py: live moments {ids}: history {hist} every {every} (one new message apart, every > 0)')
+    return [every] * (len(ids) - 1)
+
+
 def frame_html(loc, f, out):
-    place = []
+    place, steps = [], []
     # the modifier-key glyphs come from a fallback face with wide side bearings: only their spacing is tightened
     keys = lambda t: re.sub('([⌃⌥⇧⌘]+)', r'<span class="k">\1</span>', html.escape(t))
     hl, sub = keys(f['headline']), keys(f['sub'])
     body = [f'<div class="bg" style="background:{backdrop(f["hue"])}"></div>',
             f'<header class="cap"><h1>{hl}</h1><p>{sub}</p></header>']
-    scene = f['scene']
+    scene = frame_scenes(f)[0]
     render = os.path.join(HERE, 'renders', f'{scene}.{f["tgt"]}.png')
-    if f['layout'] in ('top', 'panel'):
+    if f['layout'] == 'live':
+        # the same lens at moments of a changing page, left to right, each card its own real render, the cards running to the
+        # bottom edge; between two moments an arrow and the seconds that passed, above the seam (never on a card)
+        ids = frame_scenes(f)
+        _, _, cw, ch = CFG['scenes'][ids[0]]['crop']
+        left = (W - len(ids) * cw - (len(ids) - 1) * LIVE_GAP) // 2
+        at = [(left + k * (cw + LIVE_GAP), H - ch) for k in range(len(ids))]
+        radius = f'{CARD_RADIUS}px {CARD_RADIUS}px 0 0'
+        body += [shade_html(sid, a, radius) for sid, a in zip(ids, at)]
+        for sid, a in zip(ids, at):
+            body.append(card_html(out, sid, a, radius, os.path.join(HERE, 'renders', f'{sid}.{f["tgt"]}.png'), SPECTRUM, place, flat=True))
+        aw, lw, sg, sh = STEP_BOX
+        for k, secs in enumerate(live_steps(ids)):
+            x = left + (k + 1) * cw + k * LIVE_GAP + LIVE_GAP // 2 - (aw + sg + lw) // 2
+            y = H - ch - STEP_ABOVE - sh
+            body.append(f'<div class="step" style="left:{x}px;top:{y}px"><div class="arrows">→</div><div class="label">+{secs}s</div></div>')
+            steps.append({'text': f'+{secs}s', 'rect': [x, y, aw + sg + lw, sh], 'arrow': [x, y, aw, sh], 'label': [x + aw + sg, y, lw, sh]})
+    elif f['layout'] in ('top', 'panel'):
         body.append(card_html(out, scene, TOP_CARD, f'{CARD_RADIUS}px {CARD_RADIUS}px 0 0', render, SPECTRUM, place))
     elif f['layout'] == 'pair':
         _, _, cw, ch = CFG['scenes'][scene]['crop']
@@ -215,7 +277,7 @@ def frame_html(loc, f, out):
                       'shadow': list(PANEL_SHADOW)})
     doc = (f'<!doctype html><html lang="{loc}"><head><meta charset="utf-8"><title>{loc}-{f["n"]}</title>'
            f'<style>{CSS}</style></head><body>{"".join(body)}</body></html>\n')
-    return doc, place
+    return doc, place, steps
 
 
 def sha(path):
@@ -246,7 +308,7 @@ def provenance(layout):
     for sid, s in CFG['scenes'].items():
         where = (f'`demo/{s["page"]}`, headless Chrome at 2x' if 'page' in s else
                  f'`tools/paper-own/mwoyeo-method` main.pdf (build.sh) page {s["pdf"]} at {s["pdf_scale"]} px/pt')
-        shown = ', '.join(k for k in sorted(layout) if layout[k]['scene'] == sid) or f'retired: {s.get("retired", "no frame")}'
+        shown = ', '.join(k for k in sorted(layout) if sid in layout[k]['scenes']) or f'retired: {s.get("retired", "no frame")}'
         L.append(f'| {sid} | {where} | {s["window"][0]}x{s["window"][1]} | {s["crop"]} | {s["lens"]} | {shown} |')
     L += ['', '## Frames', '', '| frame | scene | render (scale 1.0) | render sha256 | source sha256 | lens in the frame (pt) |',
           '|---|---|---|---|---|---|']
@@ -255,19 +317,27 @@ def provenance(layout):
         srcs = [p for p in fr['placed'] if p['kind'] == 'source']
         rnds = [p for p in fr['placed'] if p['kind'] == 'render']
         panel = [p for p in fr['placed'] if p['kind'] == 'panel']
-        r = rnds[0] if rnds else None
-        L.append(f'| {key} | {fr["scene"]} {fr["src"]}>{fr["tgt"]} | {r["file"] if r else "-"} | '
-                 f'{sha(os.path.join(HERE, r["file"]))[:16] if r else "-"} | {sha(os.path.join(HERE, srcs[0]["file"]))[:16]} | '
-                 f'{r["rect"] if r else srcs[0]["lens"]} |')
+        live = fr['layout'] == 'live'
+        for k, r in enumerate(rnds if live else rnds[:1] or [None]):
+            name = f'{key} {k + 1}/{len(rnds)}' if live else key
+            src = srcs[k] if live else srcs[0]
+            L.append(f'| {name} | {fr["scenes"][k] if live else fr["scene"]} {fr["src"]}>{fr["tgt"]} | {r["file"] if r else "-"} | '
+                     f'{sha(os.path.join(HERE, r["file"]))[:16] if r else "-"} | {sha(os.path.join(HERE, src["file"]))[:16]} | '
+                     f'{r["rect"] if r else src["lens"]} |')
         for p in panel:
             L.append(f'| {key} panel | menu-default | {p["file"]} | {sha(os.path.join(HERE, p["file"]))[:16]} | - | panel at {p["rect"]} |')
     pairs = ', '.join(k for k in sorted(layout) if layout[k]['layout'] == 'pair')
+    lives = ', '.join(k for k in sorted(layout) if layout[k]['layout'] == 'live')
     kept = ', '.join(f'{k} ({layout[k]["scene"]}.keep)' for k in sorted(layout) if 'keep' in CFG['scenes'][layout[k]['scene']])
     L += ['', f'The pair frames ({pairs}) show the same lens twice: on the left showing the original (the source, grey ring), on the',
           'right translating.',
+          f'The live frames ({lives}) show one lens at moments of one page, left to right (k/n in the table): each moment is its own',
+          'page state shot and rendered on its own; the page adds a message every `every` seconds and the moments are one message',
+          'apart, so the label above the seam between two moments (+<every>s, compose.py live_steps) is the time that passed on the page.',
           f'Paper frames show our English paper translated en>ko; `check.py` measures their formula boxes in the render against the source:',
           f'{kept}. A retired scene is one no frame shows any more; its renders stay in `renders/` as the record of why.',
-          'A partial render.sh run adds a `rerun` line to RUN.txt; the last line naming a scene made its current render.', '']
+          'A partial render.sh run adds a `rerun` line to RUN.txt; the last line naming a scene made its current render. A `recut` line',
+          'says a scene\'s source card was cut again from the recorded card (new crop in scenes.json) and its renders were left as they were.', '']
     notes = [f'- {sid}: {s["note"]}' for sid, s in CFG['scenes'].items() if 'note' in s]
     if notes:
         L += ['Notes:', '', *notes, '']
@@ -279,10 +349,11 @@ def build_html(out):
     layout = {}
     for loc, frames in CFG['frames'].items():
         for f in frames:
-            doc, place = frame_html(loc, f, out)
+            doc, place, steps = frame_html(loc, f, out)
             open(work(out, 'html', f'{loc}-{f["n"]}.html'), 'w', encoding='utf-8').write(doc)
-            layout[f'{loc}-{f["n"]}'] = {'loc': loc, 'n': f['n'], 'scene': f['scene'], 'src': CFG['scenes'][f['scene']]['src'],
-                                         'tgt': f['tgt'], 'layout': f['layout'], 'placed': place}
+            ids = frame_scenes(f)
+            layout[f'{loc}-{f["n"]}'] = {'loc': loc, 'n': f['n'], 'scene': ids[0], 'scenes': ids, 'src': CFG['scenes'][ids[0]]['src'],
+                                         'tgt': f['tgt'], 'layout': f['layout'], 'placed': place, 'steps': steps}
     # the headline's face at its size, for the cap-height check
     for loc in CFG['frames']:
         open(work(out, 'html', f'probe-{loc}.html'), 'w', encoding='utf-8').write(

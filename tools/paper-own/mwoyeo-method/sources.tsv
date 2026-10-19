@@ -32,7 +32,7 @@ A document answer that is here when the VN read ends is the one used	App/Pipelin
 VN revision 3 + `ParagraphGrouper` > revision 2 > `.fast`	App/Pipeline/TextRecognizer.swift:35	2 overview	the reader falls back to the line reader and a paragraph grouper
 the first one compiles for tens of seconds	Core/Sources/MwoyeoCore/DocsRoute.swift:22	2 overview	the first document read compiles for tens of seconds
 worker 1, 2, 4 … 30 s from the answer	Core/Sources/MwoyeoCore/DocsRoute.swift:60	2 overview	successive slow answers rest the worker 1, 2, 4 ... 30 s
-return Array(ordered.prefix(3))	App/Pipeline/RegionPipeline.swift:1481	2 overview	batches of at most three new lines
+return Array(ordered.prefix(3))	App/Pipeline/RegionPipeline.swift:1604	2 overview	batches of at most three new lines
 By default everything runs on your Mac and nothing on your screen is	README.en.md:30	2 overview	by default nothing from the screen leaves the machine
 | Apple low latency | Translation framework | this Mac | 0.15 | 0.41 |	tools/engine-bench/RESULTS.md:15	2 overview	Apple low latency warm median 0.15 s per batch of 3 lines
 Machine: Apple M1 Pro, 32 GB	tools/engine-bench/RESULTS.md:3	2 overview	engine bench machine is an M1 Pro
@@ -106,7 +106,7 @@ return Double(withEvidence) / Double(content.count) >= K.denseShare	Core/Sources
 let content = members.filter { !$0.gutter }	Core/Sources/MwoyeoCore/CodeRegion.swift:242	3 keep	gutter blocks are left out of the count
 The container alone keeps nothing	Core/Sources/MwoyeoCore/CodeRegion.swift:12	3 keep	a container alone keeps nothing
 a comment in any script is code because of	Core/Sources/MwoyeoCore/CodeRegion.swift:7	3 keep	a comment in any script is code because of where it sits
-static func eraseMargin(lineHeight: CGFloat) -> Int { max(3, Int(lineHeight * 0.18)) }	App/Pipeline/BlockRenderer.swift:50	4 erase	ring r = max(3, floor(0.18 h))
+public static func ring(lineHeight: CGFloat) -> Int { max(3, Int(lineHeight * 0.18)) }	Core/Sources/MwoyeoCore/BlockLayout.swift:109	4 erase	ring r = max(3, floor(0.18 h))
 let noise = 1.4826 * Double(median(lumas.map { abs($0 - medL) }))	Core/Sources/MwoyeoCore/TextErase.swift:81	4 erase	robust noise 1.4826 MAD of the ring luma
 public var isFlatBackground: Bool { backgroundNoise < 6 }	Core/Sources/MwoyeoCore/TextErase.swift:12	4 erase	flat background: noise below 6
 let bg = medianColor(border)	Core/Sources/MwoyeoCore/TextErase.swift:78	4 erase	background colour is the median of the ring
@@ -122,21 +122,21 @@ let core = glyphColors.sorted { $0.1 > $1.1 }.prefix(max(1, glyphColors.count / 
 if outlines, let o = outline(in: patch, inner: inner, background: bg) {	Core/Sources/MwoyeoCore/TextErase.swift:166	4 erase	outlined text takes both tones
 static let frameFill = 0.35	Core/Sources/MwoyeoCore/TextErase.swift:179	4 erase	coloured frames must be thin outlines
 static let frameGlyphs = 8	Core/Sources/MwoyeoCore/TextErase.swift:181	4 erase	and hold glyph pixels inside
-dilation: max(1, Int(line.rect.height * 0.07))	App/Pipeline/RegionPipeline.swift:1178	4 erase	dilation max(1, 0.07 h)
-TextEraser.fillEnclosedHoles(&mask, width: rect.width, height: rect.height)	App/Pipeline/RegionPipeline.swift:1200	4 erase	enclosed holes of the mask are filled
-let flat = masks.allSatisfy(\.1.appearance.isFlatBackground)	App/Pipeline/RegionPipeline.swift:1201	4 erase	flat when every line is flat
-} else if !flat, options.useInpainting, let inpainter {	App/Pipeline/RegionPipeline.swift:1209	4 erase	MI-GAN where the background is not flat and inpainting is on
-let limit = min(full.width - (rect.x + rect.width), Int(Double(rect.width) * 0.8), atMost ?? .max)	App/Pipeline/RegionPipeline.swift:1232	4 erase	free width up to 80 percent of the width
-where full.color(x: x, y: y).distance(to: background) > 22 {	App/Pipeline/RegionPipeline.swift:1237	4 erase	free means no pixel differs from the background by more than 22
-let reach = place.columnRight.map { max(0, Int($0 - block.rect.maxX)) }	App/Pipeline/RegionPipeline.swift:1186	4 erase	free width ends at the column's edge
-return h / 0.88	App/Pipeline/RegionPipeline.swift:1250	4 erase	em size h/0.88 for CJK and Hangul
-return text.contains(where: { "gjpqy".contains($0) }) ? h / 0.95 : h / 0.72	App/Pipeline/RegionPipeline.swift:1252	4 erase	Latin: h/0.95 with descenders, h/0.72 otherwise
-CJK and Hangul glyphs fill ~88 % of the em	App/Pipeline/RegionPipeline.swift:1246	4 erase	CJK glyphs fill about 88 percent of the em
+dilation: max(1, Int(line.rect.height * 0.07))	App/Pipeline/RegionPipeline.swift:1279	4 erase	dilation max(1, 0.07 h)
+TextEraser.fillEnclosedHoles(&mask, width: rect.width, height: rect.height)	App/Pipeline/RegionPipeline.swift:1301	4 erase	enclosed holes of the mask are filled
+let flat = masks.allSatisfy(\.1.appearance.isFlatBackground)	App/Pipeline/RegionPipeline.swift:1302	4 erase	flat when every line is flat
+} else if !flat, options.useInpainting, let inpainter {	App/Pipeline/RegionPipeline.swift:1310	4 erase	MI-GAN where the background is not flat and inpainting is on
+let limit = min(full.width - (rect.x + rect.width), Int(Double(rect.width) * 0.8), atMost ?? .max)	App/Pipeline/RegionPipeline.swift:1342	4 erase	free width up to 80 percent of the width
+where full.color(x: x, y: y).distance(to: background) > 22 {	App/Pipeline/RegionPipeline.swift:1347	4 erase	free means no pixel differs from the background by more than 22
+let reach = place.columnRight.map { max(0, Int($0 - block.rect.maxX)) }	App/Pipeline/RegionPipeline.swift:1287	4 erase	free width ends at the column's edge
+return h / 0.88	App/Pipeline/RegionPipeline.swift:1360	4 erase	em size h/0.88 for CJK and Hangul
+return text.contains(where: { "gjpqy".contains($0) }) ? h / 0.95 : h / 0.72	App/Pipeline/RegionPipeline.swift:1362	4 erase	Latin: h/0.95 with descenders, h/0.72 otherwise
+CJK and Hangul glyphs fill ~88 % of the em	App/Pipeline/RegionPipeline.swift:1356	4 erase	CJK glyphs fill about 88 percent of the em
 let name = "MIGAN_512"	App/Pipeline/Inpainter.swift:33	4 erase	the model is MI-GAN at 512
-ptr[i] = hole ? -0.5 : 0.5	App/Pipeline/Inpainter.swift:144	4 erase	the first channel is mask - 0.5
-ptr[plane + i] = Float(c.r) / 127.5 - 1	App/Pipeline/Inpainter.swift:149	4 erase	RGB scaled to [-1, 1]
-ptr[plane + i] = 0; ptr[2 * plane + i] = 0; ptr[3 * plane + i] = 0	App/Pipeline/Inpainter.swift:146	4 erase	the hole is zeroed
-for px in only.x..<(only.x + only.width) where isHole(px, py) {	App/Pipeline/Inpainter.swift:169	4 erase	only hole pixels are written
+ptr[i] = hole ? -0.5 : 0.5	App/Pipeline/Inpainter.swift:147	4 erase	the first channel is mask - 0.5
+ptr[plane + i] = Float(c.r) / 127.5 - 1	App/Pipeline/Inpainter.swift:152	4 erase	RGB scaled to [-1, 1]
+ptr[plane + i] = 0; ptr[2 * plane + i] = 0; ptr[3 * plane + i] = 0	App/Pipeline/Inpainter.swift:149	4 erase	the hole is zeroed
+for px in only.x..<(only.x + only.width) where isHole(px, py) {	App/Pipeline/Inpainter.swift:172	4 erase	only hole pixels are written
 let step = s * 3 / 4	App/Pipeline/Inpainter.swift:97	4 erase	tiles at a step of three quarters of the window
 config.computeUnits = .cpuAndGPU // measured fastest at 512 on M-series; `.all` was 4× slower	App/Pipeline/Inpainter.swift:58	4 erase	the GPU is selected; all units was 4 times slower
 var idleSeconds: TimeInterval = 60	App/Pipeline/Inpainter.swift:27	4 erase	the model is released after 60 s idle
@@ -172,22 +172,22 @@ return 1 - rest * rest * rest	Core/Sources/MwoyeoCore/ScrollPredictor.swift:67	5
 precise (trackpad) deltas are points and browsers apply them 1:1	Core/Sources/MwoyeoCore/ScrollPredictor.swift:5	5 scroll	trackpad deltas are points that browsers apply one to one
 Momentum scrolling needs nothing special: the system keeps sending decaying events.	Core/Sources/MwoyeoCore/ScrollPredictor.swift:3	5 scroll	momentum scrolling needs nothing special
 A stop at the end	Core/Sources/MwoyeoCore/ScrollPredictor.swift:36	5 scroll	a stop at the end of the page says nothing
-predictor.wheel(delta: Double(e.scrollingDeltaY), time: e.timestamp, precise: e.hasPreciseScrollingDeltas)	App/Model/RegionSession.swift:819	5 scroll	events come from NSEvent with a time stamp and a precise flag
-guard let area = scrollArea, now - lastWheel < 1 else { return nil }	App/Model/RegionSession.swift:835	5 scroll	the prediction is used only within one second of the last event
-predictor.confirm(shift: Double(r.shift), from: r.from, to: r.to)	App/Model/RegionSession.swift:830	5 scroll	a report trains the predictor
-guard r.area.contains(p) else { return }	App/Model/RegionSession.swift:828	5 scroll	only a region that holds the pointer trains the predictor
-if window?.id != scrollWindow { predictor.reset(); scrollArea = nil; scrollWindow = window?.id }	App/Model/RegionSession.swift:814	5 scroll	a new gesture over another window resets the predictor
-if scrollArea == nil, config.rect.contains(p) { scrollArea = config.rect.intersection(window?.bounds ?? config.rect) }	App/Model/RegionSession.swift:817	5 scroll	the scroll area is first guessed as the lens's part of the window
-let p = prediction?(host.time, now)	App/Overlay/OverlayPanel.swift:110	5 scroll	the prediction runs from the capture time of the frame the blocks were placed from
-@objc private func tick(_ link: CADisplayLink) { predict(at: link.targetTimestamp) }	App/Overlay/OverlayPanel.swift:123	5 scroll	the prediction is evaluated every display frame
-hypot(error.dx, error.dy) < 80	App/Overlay/OverlayPanel.swift:242	5 scroll	errors of 80 points or more jump
-spring.mass = 1	App/Overlay/OverlayPanel.swift:245	5 scroll	spring mass 1
-spring.stiffness = 900	App/Overlay/OverlayPanel.swift:246	5 scroll	spring stiffness 900
-spring.damping = 2 * (spring.stiffness * spring.mass).squareRoot()	App/Overlay/OverlayPanel.swift:247	5 scroll	damping is the critical value
-spring.isAdditive = true	App/Overlay/OverlayPanel.swift:248	5 scroll	the correction is an additive spring animation
-let shown = l.animation(forKey: "correction") != nil ? (l.presentation() ?? l).position : l.position	App/Overlay/OverlayPanel.swift:238	5 scroll	a correction in progress carries on from where the block is seen
-// Ending a prediction is a correction too: whatever the frames have not confirmed eases away.	App/Overlay/OverlayPanel.swift:111	5 scroll	ending a prediction is a correction too
-spring.fromValue = NSValue(point: NSPoint(x: error.dx, y: error.dy))	App/Overlay/OverlayPanel.swift:249	5 scroll	the spring starts from the error
+predictor.wheel(delta: Double(e.scrollingDeltaY), time: e.timestamp, precise: e.hasPreciseScrollingDeltas)	App/Model/RegionSession.swift:836	5 scroll	events come from NSEvent with a time stamp and a precise flag
+let area = scrollArea, now - lastWheel < 1 else { return nil }	App/Model/RegionSession.swift:852	5 scroll	the prediction is used only within one second of the last event
+predictor.confirm(shift: Double(r.shift), from: r.from, to: r.to)	App/Model/RegionSession.swift:847	5 scroll	a report trains the predictor
+guard r.area.contains(p) else { return }	App/Model/RegionSession.swift:845	5 scroll	only a region that holds the pointer trains the predictor
+if window?.id != scrollWindow { predictor.reset(); scrollArea = nil; scrollWindow = window?.id }	App/Model/RegionSession.swift:831	5 scroll	a new gesture over another window resets the predictor
+if scrollArea == nil, config.rect.contains(p) { scrollArea = config.rect.intersection(window?.bounds ?? config.rect) }	App/Model/RegionSession.swift:834	5 scroll	the scroll area is first guessed as the lens's part of the window
+let p = prediction?(host.time, now)	App/Overlay/OverlayPanel.swift:114	5 scroll	the prediction runs from the capture time of the frame the blocks were placed from
+@objc private func tick(_ link: CADisplayLink) { predict(at: link.targetTimestamp) }	App/Overlay/OverlayPanel.swift:127	5 scroll	the prediction is evaluated every display frame
+hypot(error.dx, error.dy) < 80	App/Overlay/OverlayPanel.swift:246	5 scroll	errors of 80 points or more jump
+spring.mass = 1	App/Overlay/OverlayPanel.swift:249	5 scroll	spring mass 1
+spring.stiffness = 900	App/Overlay/OverlayPanel.swift:250	5 scroll	spring stiffness 900
+spring.damping = 2 * (spring.stiffness * spring.mass).squareRoot()	App/Overlay/OverlayPanel.swift:251	5 scroll	damping is the critical value
+spring.isAdditive = true	App/Overlay/OverlayPanel.swift:252	5 scroll	the correction is an additive spring animation
+let shown = l.animation(forKey: "correction") != nil ? (l.presentation() ?? l).position : l.position	App/Overlay/OverlayPanel.swift:242	5 scroll	a correction in progress carries on from where the block is seen
+// Ending a prediction is a correction too: whatever the frames have not confirmed eases away.	App/Overlay/OverlayPanel.swift:115	5 scroll	ending a prediction is a correction too
+spring.fromValue = NSValue(point: NSPoint(x: error.dx, y: error.dy))	App/Overlay/OverlayPanel.swift:253	5 scroll	the spring starts from the error
 predictor latency 16 ms, step 150 ms, initial speed 20 per s, half 31 ms, ninety percent 80 ms	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	5 scroll	predictor latency 16 ms, step 150 ms, initial speed 20 per s, half 31 ms, ninety percent 80 ms
 spring omega 30 rad/s, damping 60, down to 5% after 158 ms, to 1% after 221 ms	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	5 scroll	spring omega 30 rad/s, damping 60, down to 5% after 158 ms, to 1% after 221 ms
 ratio error after 5 reports 17%, after 10 reports 2.8%	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	5 scroll	ratio error after 5 reports 17%, after 10 reports 2.8%
@@ -200,14 +200,14 @@ to a quarter pixel: smooth scrolling moves by less than a downsampled pixel per 
 : verticalShift(from: a.cropped(to: rect), to: b.cropped(to: rect), maxShift: min(maxShift, rect.height / 4))	Core/Sources/MwoyeoCore/FrameDiff.swift:205	5 scroll	the shift is at most a quarter of the band's height
 let y0 = max(0, -k), y1 = min(a.height, b.height - k - (w1 > 0 ? 1 : 0))	Core/Sources/MwoyeoCore/FrameDiff.swift:159	5 scroll	the match is over the rows that overlap after the shift
 /// Mean |a(x, y) - b(x, y + dy)| over the overlapping rows, sampling every other column; a fractional `dy`	Core/Sources/MwoyeoCore/FrameDiff.swift:154	5 scroll	the match error is a mean absolute difference
-shift: CGFloat(r.dy) * step / scale, from: t0, to: frame.time))	App/Pipeline/RegionPipeline.swift:599	5 scroll	the report carries the shift in points and both capture times
-let scrolled = blocks.isEmpty ? [] : FrameDiff.scrollRegions(from: prev, to: gray, change: raw, maxShift: gray.height / 3)	App/Pipeline/RegionPipeline.swift:381	5 scroll	the frame is compared with the previous frame
-predictor.latency = 0   // the "app" here shows a scroll at once	App/Support/SelfTest.swift:416	5 scroll	in the self-test the latency is 0
+shift: CGFloat(r.dy) * step / scale, from: t0, to: frame.time))	App/Pipeline/RegionPipeline.swift:622	5 scroll	the report carries the shift in points and both capture times
+let scrolled = blocks.isEmpty ? [] : FrameDiff.scrollRegions(from: prev, to: gray, change: raw, maxShift: gray.height / 3)	App/Pipeline/RegionPipeline.swift:398	5 scroll	the frame is compared with the previous frame
+predictor.latency = 0   // the "app" here shows a scroll at once	App/Support/SelfTest.swift:417	5 scroll	in the self-test the latency is 0
 if wheelsPerFrame > 0 { predictor.wheel(delta: Double(scroll.dy - next.dy), time: ProcessInfo.processInfo.systemUptime, precise: true) }	App/Support/SelfTest.swift:577	5 scroll	the self-test sends the true scroll as precise events
 drift = max(drift, hypot(page.x - a!.page.x, page.y - a!.page.y))	App/Support/SelfTest.swift:515	5 scroll	drift is the largest displacement of a shown block on the page
 if a == nil || a!.size != b.frame.size {	App/Support/SelfTest.swift:509	5 scroll	a re-laid-out block is anchored again
-print(String(format: "drift: mean %.1f pt, max %.1f pt, %d of %d frames over 2 pt", drifts.reduce(0, +) / CGFloat(max(1, drifts.count)),	App/Support/SelfTest.swift:638	5 scroll	the self-test prints mean, max and frames over 2 pt
-if scrollArea?.contains(CGPoint(x: onScreen.midX, y: onScreen.midY)) == true { onScreen.origin.y += predicted }	App/Support/SelfTest.swift:502	5 scroll	the self-test moves blocks in the scroll area by the prediction
+print(String(format: "drift: mean %.1f pt, max %.1f pt, %d of %d frames over 2 pt", drifts.reduce(0, +) / CGFloat(max(1, drifts.count)),	App/Support/SelfTest.swift:652	5 scroll	the self-test prints mean, max and frames over 2 pt
+if scrollArea?.contains(CGPoint(x: onScreen.midX, y: onScreen.midY)) == true { onScreen.origin.y += predicted }	App/Support/SelfTest.swift:513	5 scroll	the self-test moves blocks in the scroll area by the prediction
 #expect(p.offset(from: 1.045, to: 2) == -20)	Core/Tests/MwoyeoCoreTests/CoreTests.swift:444	5 scroll	trackpad deltas one to one: offset -20
 for i in 0..<10 { p.wheel(delta: -4, time: 1 + Double(i) * 0.01, precise: true) }	Core/Tests/MwoyeoCoreTests/CoreTests.swift:442	5 scroll	ten events of -4 points at 10 ms intervals
 p.confirm(shift: -40, from: 0, to: 1)	Core/Tests/MwoyeoCoreTests/CoreTests.swift:468	5 scroll	a line wheel confirmed by a shift of -40
@@ -228,12 +228,12 @@ inline_ok	tools/usecase-bench/score.py:12	6 measure	the keep columns kept_ok, tr
 the odd-numbered ones (the pictures the decider was tuned on)	tools/usecase-bench/score.py:4	6 measure	the odd scenes are the tuning set, the even ones held out
 # vn = MWOYEO_OCR_PATH=vn (lines grouped by ParagraphGrouper), swift = MWOYEO_OCR_PATH=swift (document model), auto = settings default	tools/usecase-bench/bench.sh:9	6 measure	the three readers: line grouping, document model, automatic
 2.67	tools/paper-bench/pages.sh:2	6 measure	pages are rendered at a scale of 2.67
-BIG = 1.3	tools/paper-bench/score.py:39	6 measure	big_text threshold 1.3 times the median
-BODY_CHARS = 40	tools/paper-bench/score.py:38	6 measure	body-like blocks have at least 40 characters per source line
-EDGE = 4	tools/paper-bench/score.py:40	6 measure	edge cut within 4 px
-CROSS = 0.5	tools/paper-bench/score.py:41	6 measure	cross_col: half of the smaller core
+BIG = 1.3	tools/paper-bench/score.py:42	6 measure	big_text threshold 1.3 times the median
+BODY_CHARS = 40	tools/paper-bench/score.py:41	6 measure	body-like blocks have at least 40 characters per source line
+EDGE = 4	tools/paper-bench/score.py:43	6 measure	edge cut within 4 px
+CROSS = 0.5	tools/paper-bench/score.py:44	6 measure	cross_col: half of the smaller core
 a source with six or more prose words	tools/paper-bench/score.py:8	6 measure	formula_translated excludes sources with six or more prose words
-three or more one-letter Latin or Greek tokens	tools/paper-bench/score.py:21	6 measure	debris: three or more one-letter tokens
+three or more one-letter Latin or Greek tokens	tools/paper-bench/score.py:24	6 measure	debris: three or more one-letter tokens
 Every OCR word gets a label `keep` | `translate` | `either` and a `reason`	tools/keep-labels/README.md:4	6 measure	each word gets a label and a reason
 | 2310.06142v2 | hold-out |	tools/keep-labels/README.md:27	6 measure	the held-out paper is arXiv 2310.06142
 | 2310.06142v2 | hold-out | `<a href="http://creativecommons.org/licenses/by/4.0/"	tools/keep-labels/README.md:27	6 measure	the held-out paper is CC BY
@@ -278,8 +278,11 @@ positive moves content down.	Core/Sources/MwoyeoCore/ScrollPredictor.swift:24	5 
 "ollama": "0.34.2"	tools/translation-bench/runs/A-gemma3-4b/MANIFEST.json:73	6 measure	Ollama 0.34.2
 "memory_bytes": 34359738368,	tools/translation-bench/runs/A-gemma3-4b/MANIFEST.json:70	6 measure	32 GB of memory
 "quantization_level": "Q4_K_M"	tools/translation-bench/runs/A-gemma3-4b/MANIFEST.json:62	6 measure	quantisation Q4_K_M
-/// A scroll event anywhere: if it scrolls content this lens reads, it predicts the next frames.	App/Model/RegionSession.swift:807	5 scroll	a scroll event anywhere on the screen is seen, then it is decided whether it scrolls what the lens reads
+/// A scroll event anywhere: if it scrolls content this lens reads, it predicts the next frames.	App/Model/RegionSession.swift:823	5 scroll	a scroll event anywhere on the screen is seen, then it is decided whether it scrolls what the lens reads
 ## Papers (math and the typewriter text of the PDF as truth)	tools/keep-labels/README.md:22	6 measure	papers are labelled from the mathematics and the typewriter text of the PDF
 Places2 training data has its own terms	tools/inpaint/BENCH.md:70	8 limits	the weights were trained on Places2
 Synthetic patch: diagonal colour gradient + sinusoidal texture	tools/inpaint/BENCH.md:33	8 limits	the inpaint bench's quality check is on a synthetic patch
 this is a sanity check, not a photo/UI-screenshot benchmark	tools/inpaint/BENCH.md:45	8 limits	and not a benchmark of screens
+# 2026-10-19 rel-prep: `check.py --repin` moved 41 rows (needle unchanged; each old line mapped to the new one by `git diff a53646c HEAD`, 40 by line map,
+# row 177 because the line gained `if Self.predicts { ... }`). Rows 109 and 176 were re-pointed by hand: 109 eraseMargin now returns Territory.ring, whose
+# formula `max(3, Int(lineHeight * 0.18))` is the claim; 176 only gained `Self.predicts,` after `guard` (the film switch), the one-second rule is the same text.

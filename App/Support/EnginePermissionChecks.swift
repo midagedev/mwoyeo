@@ -193,8 +193,11 @@ enum EnginePermissionChecks {
             _ = await localService.translate(["Nothing leaves this Mac"], context: lens)
             check("\(path): an engine on this Mac needs no record and is called", mock.bodies.count == 2, "requests \(mock.bodies.count)")
         }
-        let applePath = await ContextChecks.service(AppSettings()).translate([text], context: nil)
-        check("Apple Translation needs no record", applePath.translations[text] == apple)
+        // A fresh AppSettings() but for the target: its default is the app's language, and `apple` is the fake's answer for "ko".
+        var appleOnly = AppSettings()
+        appleOnly.targetLanguage = "ko"
+        let applePath = await ContextChecks.service(appleOnly).translate([text], context: nil)
+        check("Apple Translation needs no record", applePath.translations[text] == apple, "answer \(applePath.translations[text] ?? "none")")
 
         // The sheet: a pasted setup is added without the permission unless the box is ticked, and ticking it writes the record.
         if let mock = ContextChecks.Mock(mode: "ok") {

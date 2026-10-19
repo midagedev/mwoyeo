@@ -39,6 +39,12 @@ public enum LensHint: Equatable, Sendable {
     case restartToFinish
     /// The language pack for the pair is not installed.
     case downloadPack(PackPair)
+    /// The system's sheet for the pack is up: nothing to ask for again, but the sheet is in a window the person may not see.
+    case downloadingPack(PackPair)
+    /// The sheet ended and the pair still does not translate (declined, interrupted, or no connection): the same ask, said so.
+    case downloadNotFinished(PackPair)
+    /// The pair has no translation at all (the same language twice): only other languages help.
+    case pairNotSupported(PackPair)
     /// The text recognizer is compiling its models the first time (65 to 119 s on a new build).
     case preparingRecognition
     /// A recognition worker was stuck for minutes, was restarted, and was stuck again (`RecognitionWait.notResponding`).
@@ -55,8 +61,10 @@ public enum LensHint: Equatable, Sendable {
         case openScreenRecordingSettings
         case restart
         case downloadPack(PackPair)
-        /// Settings on Translation, where an added engine is chosen and edited.
+        /// Settings on Translation, where an added engine is chosen and edited, and a pack's sheet is up.
         case openTranslationSettings
+        /// Settings on General, where the languages are chosen.
+        case chooseLanguages
     }
 
     /// The one thing the user can do about it, nil where there is nothing to do (waiting, or nothing to translate).
@@ -64,9 +72,19 @@ public enum LensHint: Equatable, Sendable {
         switch self {
         case .allowScreenRecording: .openScreenRecordingSettings
         case .restartToFinish: .restart
-        case let .downloadPack(pair): .downloadPack(pair)
+        case let .downloadPack(pair), let .downloadNotFinished(pair): .downloadPack(pair)
+        case .downloadingPack: .openTranslationSettings
+        case .pairNotSupported: .chooseLanguages
         case let .translationNotAnswering(_, addedEngine): addedEngine ? .openTranslationSettings : nil
         case .preparingRecognition, .recognitionNotResponding, .translationSlow, .alreadyInTarget: nil
+        }
+    }
+
+    /// The hint is about the language pair's pack or support (what the menu panel's lens row repeats and Settings can fix).
+    public var isAboutLanguages: Bool {
+        switch self {
+        case .downloadPack, .downloadingPack, .downloadNotFinished, .pairNotSupported: true
+        default: false
         }
     }
 
@@ -113,6 +131,11 @@ public struct LensSignals: Equatable, Sendable {
     public var screen = Screen.fine
     /// The pack the translator is missing for this lens's pair.
     public var missingPack: PackPair?
+    /// What became of the download of that pack (`PackLedger`); nil when it was not asked for yet.
+    public var packPhase: PackLedger.Phase?
+    /// The pair this lens translates has no translation at all. Set only for a lens whose source is chosen: on Detect an unsupported
+    /// group is one block the detector got wrong, not the lens's setup.
+    public var unsupportedPair: PackPair?
     /// The text recognizer is in its first-time setup (the menu panel's "Preparing text recognition…"). App-wide; the lens's own
     /// state is `recognition`, which says more and wins over it.
     public var recognitionPreparing = false
@@ -128,9 +151,11 @@ public struct LensSignals: Equatable, Sendable {
 
     public init(screen: Screen = .fine, missingPack: PackPair? = nil, recognitionPreparing: Bool = false,
                 recognition: RecognitionWait? = nil, showsTranslations: Bool = false, alreadyInTarget: String? = nil,
-                translation: TranslationTrouble? = nil) {
+                translation: TranslationTrouble? = nil, packPhase: PackLedger.Phase? = nil, unsupportedPair: PackPair? = nil) {
         self.screen = screen
         self.missingPack = missingPack
+        self.packPhase = packPhase
+        self.unsupportedPair = unsupportedPair
         self.recognitionPreparing = recognitionPreparing
         self.recognition = recognition
         self.showsTranslations = showsTranslations
@@ -139,7 +164,7 @@ public struct LensSignals: Equatable, Sendable {
     }
 
     /// The line for the pill: Screen Recording first (nothing works without it), then the language pack (what stops every
-    /// translation), then recognition (the lens's own wait for a reader, else the app's first-time setup: both end by themselves
+    /// translation; said as asking, downloading or not finished) and a pair that cannot be translated, then recognition (the lens's own wait for a reader, else the app's first-time setup: both end by themselves
     /// except "not responding" and "restart"), then the translator's trouble (text was read and nothing comes back translated),
     /// then "already in" (news, not a fault); nil when all is well.
     public func hint() -> LensHint? {
@@ -148,7 +173,15 @@ public struct LensSignals: Equatable, Sendable {
         case .notActive: return .restartToFinish
         case .fine: break
         }
-        if let missingPack { return .downloadPack(missingPack) }
+        if let missingPack {
+            switch packPhase {
+            case .downloading?: return .downloadingPack(missingPack)
+            case .notFinished?: return .downloadNotFinished(missingPack)
+            case nil: return .downloadPack(missingPack)
+            }
+        }
+        // A lens that translates nothing and whose pair cannot be translated: the language pickers are the only way out.
+        if let unsupportedPair, !showsTranslations { return .pairNotSupported(unsupportedPair) }
         if !showsTranslations {
             switch recognition {
             case .notResponding: return .recognitionNotResponding

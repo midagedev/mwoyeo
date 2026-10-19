@@ -128,6 +128,11 @@ actor TranslationService {
     }
 
     func update(settings new: AppSettings) {
+        // Allowing an engine ends the rest its missing permission put it on, and the notice that said so.
+        for e in new.engines where new.enginePermissions.allows(e) && !settings.enginePermissions.allows(e) {
+            cooldowns[e.id] = nil
+            if case let .engineUnavailable(name, _)? = engineIssue, name == e.name { engineIssue = nil; issueHandler?(nil) }
+        }
         settings = new
         enginesSynced = false
         cache.capacity = new.cacheSize
@@ -284,7 +289,7 @@ actor TranslationService {
     }
 
     func prewarm() async {
-        if let e = activeEngine {
+        if let e = activeEngine, isPermitted(e) {
             // Opens the connection (TLS) before the first batch; Apple warms up below as the safety net.
             if !enginesSynced { await syncEngines() }
             _ = await withDeadline(Self.deadline(items: 1)) { await self.client.prewarm(e) }
@@ -479,6 +484,17 @@ actor TranslationService {
         return .added(e)
     }
 
+    /// The gate in front of every call to an added engine's server (`translateViaEngine`, `contextGroup`, `prewarm`): an engine off this
+    /// Mac is called only while the person's permission for its host stands (`EnginePermissions`; the sheet's box writes it). Without
+    /// one the call fails as `needsPermission`, which a group handles as any engine failure: the notice names the host, Apple takes the
+    /// group, and no other engine stands in. The sheet's own model list and sample (`engineModels`, `engineProbe`) are the person
+    /// testing the engine before they allow it and send no lens text.
+    private func isPermitted(_ engine: EngineConfig) -> Bool { settings.enginePermissions.allows(engine) }
+
+    private func requirePermission(_ engine: EngineConfig) throws(EngineError) {
+        guard isPermitted(engine) else { throw .needsPermission(host: engine.endpointName) }
+    }
+
     /// One group through one route, under one deadline. What streamed in before a deadline or a throw is kept.
     /// Every result takes its display form here, whatever engine made it.
     private func attempt(_ items: [String], source: String, via route: Route,
@@ -584,6 +600,7 @@ actor TranslationService {
     /// caching is not used: the system prompt is far under the minimum size that providers cache.
     private func translateViaEngine(_ engine: EngineConfig, _ items: [String], source: String,
                                     onResult: @escaping @Sendable (String, String) -> Void) async throws -> [String: String] {
+        try requirePermission(engine)
         let clock = ContinuousClock()
         let start = clock.now
         let lines = try await client.translate(items, source: source == "und" ? nil : source, target: settings.targetLanguage,
@@ -978,6 +995,7 @@ extension TranslationService {
         Trace.count("translate.requests")
         Trace.count("translate.texts", items.count)
         Trace.count("translate.context")
+        try requirePermission(engine)
         let glossary = settings.glossaryPairs
         let request = contexts.request(lens, pass: pass, items: items, source: source == "und" ? nil : source, target: settings.targetLanguage,
                                        glossary: glossary)

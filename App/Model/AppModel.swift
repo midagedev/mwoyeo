@@ -95,6 +95,8 @@ final class AppModel {
                 settingsFile.save(s)
             }
         }
+        // The first start of the version that asks: the DMG's engines in settings.json are allowed once; the App Store build allows none.
+        s.enginePermissions.launch(engines: s.engines, grantsExisting: !Distribution.isAppStore)
         settings = s
         settingsIssues = settingsFile.issues
         #if MAS
@@ -451,6 +453,11 @@ final class AppModel {
         settings.engines[i] = updated
     }
 
+    /// The person ticked (or cleared) "Send the text the lens reads to <host>" in the engine's sheet; only the sheet calls this.
+    func setSendingAllowed(_ allowed: Bool, for engine: EngineConfig) {
+        settings.enginePermissions.set(allowed, for: engine)
+    }
+
     /// A copy under a new id, with its own (empty) key slot. It is the same user's engine, so its context is copied.
     func duplicateEngine(_ id: UUID) {
         guard let e = settings.engines.first(where: { $0.id == id }) else { return }
@@ -461,6 +468,7 @@ final class AppModel {
     func removeEngine(_ id: UUID) {
         try? secrets.setSecret(nil, for: id)
         settings.engineRejections[id] = nil
+        settings.enginePermissions.forget(id)
         if settings.customEngineID == id { settings.customEngineID = nil }
         settings.engines.removeAll { $0.id == id }
     }

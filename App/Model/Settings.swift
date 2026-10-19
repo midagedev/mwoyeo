@@ -227,6 +227,9 @@ struct AppSettings: Codable, Equatable {
     /// Security-scoped bookmark of the folder chosen in Settings (opaque bytes). Run-time state kept in UserDefaults, never
     /// in settings.json (`SettingsFileCheck.notInFile`): it only opens the folder for this install.
     var exportBookmark: Data?
+    /// Which engines off this Mac the person allowed to be sent the lens's text, and for which host (`EnginePermissions`). Run-time state
+    /// kept in UserDefaults, never in settings.json (`SettingsFileCheck.notInFile`): only the person grants it, in the engine's sheet.
+    var enginePermissions = EnginePermissions()
     /// The files the translation log is written as (settings.json only: no row in Settings).
     var transcriptFormats: [TranscriptFileFormat] = [.markdown, .srt]
     /// Languages (and engine) remembered per app; the app in front decides which applies (see `effective`).
@@ -289,6 +292,7 @@ struct AppSettings: Codable, Equatable {
         savesTranscripts = try c.decodeIfPresent(Bool.self, forKey: .savesTranscripts) ?? d.savesTranscripts
         exportFolder = try c.decodeIfPresent(String.self, forKey: .exportFolder) ?? d.exportFolder
         exportBookmark = (try? c.decodeIfPresent(Data.self, forKey: .exportBookmark)) ?? nil
+        enginePermissions = (try? c.decodeIfPresent(EnginePermissions.self, forKey: .enginePermissions)) ?? d.enginePermissions
         transcriptFormats = ((try? c.decodeIfPresent([Lossy<TranscriptFileFormat>].self, forKey: .transcriptFormats)) ?? nil)?.compactMap(\.value) ?? d.transcriptFormats
         appProfiles = ((try? c.decodeIfPresent([Lossy<AppProfile>].self, forKey: .appProfiles)) ?? nil)?.compactMap(\.value) ?? d.appProfiles
         paragraphReader = (try? c.decodeIfPresent(ParagraphReader.self, forKey: .paragraphReader)) ?? d.paragraphReader

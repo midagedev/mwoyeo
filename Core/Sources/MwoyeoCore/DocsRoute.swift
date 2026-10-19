@@ -61,13 +61,13 @@ public enum DocsRoute: Equatable, Sendable {
 /// that a Docs that always takes longer than S is not asked again by every recovery re-read, for ever (found with `docs-slow`).
 /// An answer within S ends the streak. Pure: callers pass `now` (any monotonic clock, in seconds).
 public struct DocsRest: Equatable, Sendable {
-    private var backoff = Backoff.rev3Rung
+    private var backoff: Backoff
     /// Consecutive slow answers since the last answer within S.
     public private(set) var streak = 0
     /// The rest ends at this time; nil when Docs is not resting.
     public private(set) var until: TimeInterval?
 
-    public init() {}
+    public init(timing: ReaderTiming = .standard) { backoff = timing.docsRest }
 
     /// A request answered after S. Returns how long Docs rests (0: not at all, the first time).
     @discardableResult

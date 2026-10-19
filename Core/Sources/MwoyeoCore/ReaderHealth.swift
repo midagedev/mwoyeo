@@ -214,8 +214,10 @@ public struct WorkerHealth: Sendable, Equatable {
     public private(set) var warm: Set<WarmKey> = []
     public private(set) var stats = Stats()
 
-    private var restart = Backoff.workerRestart
-    private var rung3 = Backoff.rev3Rung
+    /// The durations this worker runs on (`ReaderTiming.standard` ships; a gate passes smaller ones).
+    public let timing: ReaderTiming
+    private var restart: Backoff
+    private var rung3: Backoff
     private var rung3RestUntil: TimeInterval?
     /// The rung's rest ended and nobody was told.
     private var rung3NoticePending = false
@@ -228,7 +230,12 @@ public struct WorkerHealth: Sendable, Equatable {
     private var idleSince: TimeInterval?
     private var baselineFootprint: Double?
 
-    public init(role: WorkerRole) { self.role = role }
+    public init(role: WorkerRole, timing: ReaderTiming = .standard) {
+        self.role = role
+        self.timing = timing
+        restart = timing.restart
+        rung3 = timing.rung
+    }
 
     // MARK: asking
 
@@ -281,11 +288,11 @@ public struct WorkerHealth: Sendable, Equatable {
     public func nextDeadline(now: TimeInterval) -> TimeInterval? {
         var due: [TimeInterval] = []
         switch state {
-        case let .busy(job, since): due.append(since + job.via.patience)
-        case let .suspect(_, since): due.append(since + Self.stuckAfter)
-        case let .warming(_, since): due.append(since + Self.warmingBound)
+        case let .busy(job, since): due.append(since + timing.patience(job.via))
+        case let .suspect(_, since): due.append(since + timing.stuckAfter)
+        case let .warming(_, since): due.append(since + timing.warmingBound)
         case let .restarting(until): due.append(until)
-        case .idle: if let idleSince { due.append(idleSince + Self.idleExitAfter) }
+        case .idle: if let idleSince { due.append(idleSince + timing.idleExitAfter) }
         case .cold, .stuck, .disabled: break
         }
         if rung3NoticePending, let until = rung3RestUntil { due.append(until) }
@@ -308,15 +315,15 @@ public struct WorkerHealth: Sendable, Equatable {
     @discardableResult
     public mutating func tick(now: TimeInterval, wanted: Bool = false) -> [Event] {
         var events: [Event] = []
-        if case let .busy(job, since) = state, now - since >= job.via.patience {
+        if case let .busy(job, since) = state, now - since >= timing.patience(job.via) {
             state = .suspect(job, since: since)
             stats.suspects += 1
             events.append(.suspected(job, after: now - since))
         }
-        if case let .suspect(job, since) = state, now - since >= Self.stuckAfter {
+        if case let .suspect(job, since) = state, now - since >= timing.stuckAfter {
             events += becomeStuck(job, since: since, now: now)
         }
-        if case let .warming(job, since) = state, now - since >= Self.warmingBound {
+        if case let .warming(job, since) = state, now - since >= timing.warmingBound {
             events += becomeStuck(job, since: since, now: now)
         }
         if case let .restarting(until) = state, now >= until {
@@ -325,7 +332,7 @@ public struct WorkerHealth: Sendable, Equatable {
         }
         if case .idle = state {
             if wanted { idleSince = now }
-            if let idleSince, now - idleSince >= Self.idleExitAfter {
+            if let idleSince, now - idleSince >= timing.idleExitAfter {
                 state = .cold
                 self.idleSince = nil
                 resetProcess(clearWarm: false)
@@ -404,7 +411,7 @@ public struct WorkerHealth: Sendable, Equatable {
             }
         }
         if rung3Answered, stats.code13Streak >= Self.code13Streak, let streakStart = code13Since,
-           now - streakStart >= Self.code13Span, recycleAllowed(now: now) {
+           now - streakStart >= timing.code13Span, recycleAllowed(now: now) {
             events += recycle(.code13, now: now)
         }
         return events
@@ -422,7 +429,7 @@ public struct WorkerHealth: Sendable, Equatable {
         case .cold, .restarting, .disabled:
             return []
         case .idle, .busy, .suspect, .warming:
-            crashes = crashes.filter { now - $0 < Self.crashWindow } + [now]
+            crashes = crashes.filter { now - $0 < timing.crashWindow } + [now]
             stats.crashes += 1
             var events: [Event] = [.crashed(count: crashes.count)]
             if crashes.count >= Self.crashLimit {
@@ -439,11 +446,11 @@ public struct WorkerHealth: Sendable, Equatable {
     // MARK: private
 
     private func recycleAllowed(now: TimeInterval) -> Bool {
-        recycles.filter { now - $0 < Self.recycleWindow }.count < Self.recycleMax
+        recycles.filter { now - $0 < timing.recycleWindow }.count < Self.recycleMax
     }
 
     private mutating func recycle(_ why: RecycleWhy, now: TimeInterval) -> [Event] {
-        recycles = recycles.filter { now - $0 < Self.recycleWindow } + [now]
+        recycles = recycles.filter { now - $0 < timing.recycleWindow } + [now]
         stats.recycles += 1
         beginRestart(now: now)
         return [.recycle(why)]

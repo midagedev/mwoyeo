@@ -1,0 +1,27 @@
+<!doctype html>
+<!-- One caption of an App Store preview, on a transparent 1920×1080 frame (cut.sh renders it with headless Chrome and lays it
+     over the take). caption.html?lang=ko&t=<text>. The pill sits in the lower third, inside title safe (5 % a side: 55 px from
+     the bottom), below the lens: its top at y 934 px, the lens' bottom at y 916 px (take.sh's geometry). 71 px type: cap height
+     49 px at 1080, measured on the N of "New". -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; width: 1920px; height: 1080px; background: transparent; overflow: hidden; }
+  .pill { position: absolute; left: 50%; bottom: 55px; transform: translateX(-50%); white-space: nowrap; max-width: 1728px;
+    padding: 9px 40px; border-radius: 44px; background: rgba(16, 17, 20, 0.82); box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.10);
+    color: #fff; font: 600 71px/71px -apple-system, "SF Pro Display", "Apple SD Gothic Neo", sans-serif; letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased; }
+  .pill:lang(ko) { font-family: -apple-system, "Apple SD Gothic Neo", sans-serif; letter-spacing: -0.02em; }
+</style>
+</head>
+<body>
+<div class="pill" id="pill"></div>
+<script>
+  const p = new URLSearchParams(location.search);
+  const pill = document.getElementById("pill");
+  pill.textContent = p.get("t") || "";
+  pill.lang = p.get("lang") || "en";
+</script>
+</body>
+</html>

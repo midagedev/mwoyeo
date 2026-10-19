@@ -65,4 +65,37 @@ struct EnginePermissions: Codable, Equatable {
     static func sendsContext(_ engine: EngineConfig, profiles: [AppProfile]) -> Bool {
         LayoutKind.engine(engine.kind).tier != nil && ContextOptions.couldBeOn(engine: engine, profiles: profiles)
     }
+
+    /// The profiles whose written memory goes to `engine` (design §9, D1: writing a note or names is the opt-in): the app has a note
+    /// or names, the app does not use another engine, and the request path would send it. The question is put to the request path's own
+    /// rule (`ContextOptions.requestOptions`), so the disclosure cannot drift from what is sent: it covers an engine whose Context is
+    /// off ("memory only") and one that is on, and leaves out an app whose context is `off`, DeepL, and an engine that owns its body.
+    static func memoryProfiles(_ engine: EngineConfig, profiles: [AppProfile]) -> [AppProfile] {
+        let kind = LayoutKind.engine(engine.kind)
+        guard kind.tier != nil else { return [] }
+        return profiles.filter { p in
+            guard p.hasMemory, p.customEngineID == nil || p.customEngineID == engine.id else { return false }
+            let options = ContextOptions.requestOptions(engine: engine, profile: p)
+            return options.enabled && kind.sendsMemory(options)
+        }
+    }
+
+    /// What `engine` could be sent beyond the lines to translate, for the engine sheet's footnote and its "Sent:" line. One value, two
+    /// kinds of data: the lines of the window (the engine's switch, or an app's override, can turn them on) and the memory the person
+    /// wrote for apps (their names, which the engine can also be sent: the app's name and category, the note, the names in the text).
+    struct ContextDisclosure: Equatable {
+        /// Recent lines of the window go along (`sendsContext`).
+        var lines: Bool
+        /// The apps (profile names, in profile order) whose note and names go along.
+        var memoryApps: [String]
+
+        /// Nothing beyond the lines to translate: the footnote says nothing more.
+        var isEmpty: Bool { !lines && memoryApps.isEmpty }
+        /// The memory goes and the lines of the window do not (the engine's Context is off): "memory only".
+        var memoryOnly: Bool { !lines && !memoryApps.isEmpty }
+    }
+
+    static func disclosure(_ engine: EngineConfig, profiles: [AppProfile]) -> ContextDisclosure {
+        ContextDisclosure(lines: sendsContext(engine, profiles: profiles), memoryApps: memoryProfiles(engine, profiles: profiles).map(\.appName))
+    }
 }

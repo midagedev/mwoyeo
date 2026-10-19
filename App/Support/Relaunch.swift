@@ -7,9 +7,9 @@ import os
 enum Relaunch {
     /// The first argument of the new process; the next is the pid of the one it replaces.
     private static let flag = "--relaunched"
-    /// What the new process takes over: the files a scripted run or a capture points at.
+    /// What the new process takes over: the files a scripted run or a capture points at. The App Store build reads none of them.
     #if MAS
-    private static let carried = ["MWOYEO_SETTINGS_FILE", "MWOYEO_TRACE"]
+    private static let carried: [String] = []
     #else
     private static let carried = ["MWOYEO_SETTINGS_FILE", "MWOYEO_DEFAULTS_SUITE", "MWOYEO_MEMORY_SECRETS", "MWOYEO_TRACE"]
     #endif

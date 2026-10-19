@@ -761,7 +761,12 @@ actor TranslationService {
         return plans
     }
 
+    /// The App Store build has no such switch: it is off there, as with the variable unset.
+    #if MAS
+    private static let inlineMath = false
+    #else
     private static let inlineMath = ProcessInfo.processInfo.environment["MWOYEO_INLINE_MATH"] == "1"
+    #endif
 
     /// One source with its formulas marked: each comes back where the engine put it (`skipsTranslation`), found again by its
     /// marker. A span that did not come back once stays as the engine wrote it, and `placements` has no place for that line.

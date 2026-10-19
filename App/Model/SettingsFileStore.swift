@@ -10,7 +10,8 @@ struct SettingsImport: Equatable {
 
 /// settings.json in Application Support (the container's, inside the sandbox: the same code), the source of truth of the
 /// settings. The app writes it on every change, watches it, and applies what a person or an agent saves in it.
-/// `MWOYEO_SETTINGS_FILE=<path>` names another file (captures and tests must, never the real one).
+/// `MWOYEO_SETTINGS_FILE=<path>` names another file (captures and tests must, never the real one). The App Store build has no
+/// such switch: the captures and the self-test it serves are not in it.
 @MainActor
 final class SettingsFileStore {
     let url: URL
@@ -26,9 +27,11 @@ final class SettingsFileStore {
     private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "settings")
 
     nonisolated static var defaultURL: URL {
+        #if !MAS
         if let path = ProcessInfo.processInfo.environment["MWOYEO_SETTINGS_FILE"], !path.isEmpty {
             return URL(fileURLWithPath: (path as NSString).expandingTildeInPath)
         }
+        #endif
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? URL(fileURLWithPath: NSHomeDirectory() + "/Library/Application Support")
         return base.appendingPathComponent("Mwoyeo/settings.json")

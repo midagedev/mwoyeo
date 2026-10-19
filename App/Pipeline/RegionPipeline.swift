@@ -455,7 +455,12 @@ actor RegionPipeline {
     private var stillWindow: TimeInterval { max(Self.stillFloor, Self.stillFactor * motionInterval) }
     /// Whether content is moving, as the time-aware rules see it. `MWOYEO_PLAN=off` (for measuring against) turns the rules off:
     /// content then always counts as moving without a known speed, which is how the queue behaved before them.
+    /// The App Store build has no such switch: the rules are on there, as with the variable unset.
+    #if MAS
+    private static let planning = true
+    #else
     private static let planning = ProcessInfo.processInfo.environment["MWOYEO_PLAN"] != "off"
+    #endif
     private func isMoving(at now: TimeInterval) -> Bool { !Self.planning || !stopped(at: now) }
     private func stopped(at now: TimeInterval) -> Bool { now - lastMotionAt >= stillWindow }
     /// The velocity to plan with: known only while content moves; otherwise nil.
@@ -1130,7 +1135,12 @@ actor RegionPipeline {
 
     /// `MWOYEO_LAYOUT=off` reads and erases blocks as before the layout rules (the column break, joining split lines, `Territory`,
     /// `ColumnEdge`, the descender strip), to put the self-test's layout line of the old behaviour beside the new one.
+    /// The App Store build has no such switch: the rules are on there, as with the variable unset.
+    #if MAS
+    private static let layoutRules = true
+    #else
     private static let layoutRules = ProcessInfo.processInfo.environment["MWOYEO_LAYOUT"] != "off"
+    #endif
 
     /// What one block may paint and how far right it may write.
     private struct Place {
@@ -1741,9 +1751,13 @@ actor RegionPipeline {
     }
 }
 
-/// Stage timings on stderr when MWOYEO_TRACE is set.
+/// Stage timings on stderr when MWOYEO_TRACE is set. The App Store build has no such switch: it prints nothing.
 enum Trace {
+    #if MAS
+    static let enabled = false
+    #else
     static let enabled = ProcessInfo.processInfo.environment["MWOYEO_TRACE"] != nil
+    #endif
     static func mark(_ label: @autoclosure () -> String, since t: TimeInterval) {
         guard enabled else { return }
         let ms = Int((ProcessInfo.processInfo.systemUptime - t) * 1000)
@@ -1759,10 +1773,11 @@ enum Trace {
     static func sample(_ key: String, _ v: Double) { samples.withLock { $0[key, default: []].append(v) } }
     static func takeSamples() -> [String: [Double]] { samples.withLock { defer { $0 = [:] }; return $0 } }
     /// `MWOYEO_TRACE_LINES` adds the recognized lines of every automatic reader decision to the trace (tools/usecase-bench/tune.sh).
-    static let lineDump = enabled && ProcessInfo.processInfo.environment["MWOYEO_TRACE_LINES"] != nil
     #if MAS
+    static let lineDump = false
     static let dumpDirectory: URL? = nil
     #else
+    static let lineDump = enabled && ProcessInfo.processInfo.environment["MWOYEO_TRACE_LINES"] != nil
     static let dumpDirectory: URL? = ProcessInfo.processInfo.environment["MWOYEO_DUMP"].map { URL(fileURLWithPath: $0) }
     #endif
 }

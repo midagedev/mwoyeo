@@ -1,0 +1,54 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "srgb:0.20000,0.20784,0.24706,1.00000",
+      "srgb:0.05490,0.05490,0.07059,1.00000"
+    ],
+    "orientation" : {
+      "start" : { "x" : 0.5, "y" : 0 },
+      "stop" : { "x" : 0.5, "y" : 1 }
+    }
+  },
+  "groups" : [
+    {
+      "layers" : [
+        { "image-name" : "text-bright.png", "name" : "text-bright", "glass" : false }
+      ],
+      "name" : "Read",
+      "shadow" : { "kind" : "neutral", "opacity" : 0.35 },
+      "specular" : false,
+      "translucency" : { "enabled" : false, "value" : 0.5 }
+    },
+    {
+      "layers" : [
+        { "image-name" : "ring.png", "name" : "ring", "glass" : true },
+        { "image-name" : "lens.png", "name" : "lens", "glass" : false }
+      ],
+      "name" : "Lens",
+      "shadow" : { "kind" : "layer-color", "opacity" : 0.5 },
+      "specular" : true,
+      "translucency" : { "enabled" : false, "value" : 0.5 }
+    },
+    {
+      "layers" : [
+        { "image-name" : "glow.png", "name" : "glow", "glass" : false, "blend-mode" : "plus-lighter" }
+      ],
+      "name" : "Glow",
+      "shadow" : { "kind" : "none", "opacity" : 0 },
+      "specular" : false,
+      "translucency" : { "enabled" : false, "value" : 0.5 }
+    },
+    {
+      "layers" : [
+        { "image-name" : "text-faint.png", "name" : "text-faint", "glass" : false }
+      ],
+      "name" : "Page",
+      "shadow" : { "kind" : "none", "opacity" : 0 },
+      "specular" : false,
+      "translucency" : { "enabled" : false, "value" : 0.5 }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : [ "macOS" ]
+  }
+}

@@ -2,7 +2,10 @@
 # One condition on one Ollama model, preserved with the machine state in the note: the load average, pageouts, swap and
 # free memory at the start and the end of the run, and `ollama ps` (the CPU/GPU split of the loaded model).
 #
-#   matrix.sh <bench-run binary> <scratch dir> <engine file> <run name> <condition> [bench-run options...]
+#   [NOTE='...'] [KIND=smoke] matrix.sh <bench-run binary> <scratch dir> <engine file> <run name> <condition> [bench-run options...]
+#
+# KIND (default `model`) is the manifest kind: `smoke` for a run that is not a result by itself (a subset of the sequences taken
+# for its latency only, such as the A/A repeats of runs/RESULTS-2026-10-19-t3-product-layout.md).
 #
 # A warm-up request loads the model first, so the load time is not in the first request's latency. The run is one job at a
 # time (latency is a measured axis). The note's machine tag is what `summary.py` reads as the load caveat:
@@ -48,6 +51,6 @@ PS=$(ollama ps | awk -v m="$MODEL" 'NR>1 && $1==m {for (i = 2; i < NF; i++) if (
 TAG="[machine load1m start=$L0 end=$L1 pageouts +$((P1 - P0)) swapouts +$((S1 - S0)) swap_used_mb start=$U0 end=$U1 free_pct start=$F0 end=$F1 ollama_ps='$PS']"
 NOTE="${NOTE:-}${NOTE:+ }$TAG"
 
-python3 -I runs.py add "$OUT" --kind model --engine "$ENGINE" --binary "$BIN" --env MWOYEO_MEMORY_SECRETS=1 \
+python3 -I runs.py add "$OUT" --kind "${KIND:-model}" --engine "$ENGINE" --binary "$BIN" --env MWOYEO_MEMORY_SECRETS=1 \
   --command "MWOYEO_MEMORY_SECRETS=1 $BIN run --engine $ENGINE --condition $COND --out $OUT --root . --jobs 1 $*" \
   --note "$NOTE"

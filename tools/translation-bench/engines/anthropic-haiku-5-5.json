@@ -1,0 +1,1 @@
+{"name": "anthropic-haiku-5-5", "kind": "anthropic", "model": "claude-haiku-5-5", "thinking": "off", "keyEnv": "ANTHROPIC_API_KEY", "price": "claude-haiku-5-5", "timeoutSeconds": 60}

@@ -1,4 +1,5 @@
 import Foundation
+import MwoyeoCore
 
 // THE SEAM FOR T2.
 //
@@ -7,13 +8,10 @@ import Foundation
 //
 //   `ReferenceLayout`  a bench-local layout (below), so the bench runs end to end before T2 lands and the probes can be
 //                      checked against real models (the memory-only probes must stay near chance under A, B2, B4, C16).
-//   `T2Layout`         the stub where T2's `TranslationContext` plugs in: `build` turns a `Step` (the batch, the lines
-//                      above and below it on screen, every line translated so far with its reply and a trusted flag,
-//                      the sequence's memory) into the engine request through T2's builders, and `observe` feeds the
-//                      reply back (thread state, learned terms, trusted lines). Return the finished request body in
-//                      `Prompt.bodyOverride` and the transports send it as is; or fill `systemAddition` / `user` /
-//                      `deepLContext` and the transports splice them into today's body.
-//                      `--layout t2` selects it. Nothing else in the runner changes.
+//   `T2Layout`         the product's own request (round T3 R4): a `Step` becomes the `ContextRequest` that `ContextBook.request`
+//                      hands `EngineClient`, plus the `ContextOptions` an engine's "Use context" switch gives, and
+//                      `RequestLayout.body` for the engine's kind (the call `EngineClient.translate` makes) returns the bytes in
+//                      `Prompt.bodyOverride`. Nothing of the prompt is written here. `--layout t2` selects it.
 //
 // Conditions (names are parsed by `ConditionSpec.parse`):
 //   A                 off: today's request.
@@ -104,6 +102,8 @@ public struct Prompt: Sendable, Equatable {
     public var user: String?
     /// The part of `user` that is history (the context lines), for the size accounting.
     public var historyText = ""
+    /// Further parts of `user` that are history (the lines after the batch), for the size accounting.
+    public var historyFragments: [String] = []
     /// The user memory as rendered, a substring of `systemAddition`, for the size accounting.
     public var memoryText = ""
     /// DeepL's `context` parameter.
@@ -147,18 +147,104 @@ public enum SeamError: Error, CustomStringConvertible {
     case notConnected(String)
     public var description: String {
         switch self {
-        case let .notConnected(what): "the T2 layout is not connected: \(what)"
+        case let .notConnected(what): "the layout does not support this condition: \(what)"
         }
     }
 }
 
-/// T2's layout. Not connected yet: it fails the run before the first request, so a half-wired seam cannot score.
+/// T2's layout: the product's request on the bench's inputs (round T3 R4). Every number the bench reports under it is the product's
+/// layout (`RequestLayout`: rules, card and note in the system message, the rows, the lines before and after and the items in the
+/// last message, a reply of `{"t": [{"id", "text"}]}`), not the bench's own prompt.
+///
+/// What the product has and the corpus gives it (the layout is built for one engine kind, `T2Layout(kind:)`):
+///   - the lens knows the app, its category and the window title: the card, from `memory.window`, on every context request.
+///   - the profile's note and rows: `memory.document` (as the note) and `memory.entities` / `memory.terms` (as rows), only under `M`.
+///     A row goes out when its name occurs in the items or in the lines around them (`RequestLayout.selectRows`), not every time.
+///   - the engine switch "Use context" with N previous lines: `ContextOptions.from(engine:)`, the same function the app uses.
+/// What it does not have: a speaker channel. The app sends the OCR lines only, so no line carries who said it and `speaks_to` can
+/// reach the model only through a row whose name appears in the lines. (The reference layout sends `speakers`.)
+///
+/// Conditions: `B<n>` the card and the n previous lines; `B<n>+k` the same plus the k lines below the batch on screen (the app's
+/// `lens.below`; a context request of the app carries them whenever the lens sees lines below); `M<n>` `B<n>` plus the note and
+/// the rows. `W` is refused (the product sends the card with every context request, so `B` already is `W`), and so are `L` and `C`
+/// (learning and the long conversation are not run on the product layout in this round).
 public struct T2Layout: ContextLayout {
-    public init() {}
+    /// The engine's kind: `RequestLayout.body` lays the request out by it (the budgets by tier, the title by where the engine runs).
+    public var kind: LayoutKind
+
+    public init(kind: LayoutKind) { self.kind = kind }
+
     public func build(_ spec: ConditionSpec, step: Step, thread: ThreadState) throws -> Prompt {
-        throw SeamError.notConnected("replace T2Layout.build with TranslationContext (Core, round T2) for condition \(spec.name)")
+        if spec.isOff { return Prompt() }
+        if spec.learned { throw SeamError.notConnected("L (learned terms) is not run on the product layout") }
+        if spec.windowMeta && !spec.memory { throw SeamError.notConnected("W: the product sends the card with every context request, so B is W") }
+        guard case let .previous(n) = spec.window, n <= AppContextOverride.maxPreviousLines else {
+            throw SeamError.notConnected("C (a conversation window) is not run on the product layout")
+        }
+        let seq = step.sequence
+        let mem = step.memory
+
+        let before = step.history.suffix(ContextThread.maxLines).map {
+            ContextLine(source: $0.line.text, translation: $0.translation, trusted: $0.trusted)
+        }
+        let below = spec.below > 0 ? Array(step.batch.below.prefix(spec.below)) : []
+        let request = ContextRequest(
+            items: step.batch.items.map(\.text), before: before, after: below.map(\.text),
+            memory: spec.memory ? Self.rows(mem, speech: seq.speakerVisible) : [],
+            card: Self.card(mem), note: spec.memory ? Self.note(mem) : "",
+            source: coreLanguage(seq.source), target: coreLanguage(seq.target), glossary: [], threadKey: seq.id)
+        let options = ContextOptions.from(engine: EngineContext(enabled: true, previousLines: n))
+        let body = RequestLayout.body(kind: kind, request: request, options: options)
+
+        var prompt = Prompt()
+        prompt.bodyOverride = body
+        // What the model was shown, read back from the body: the context lines (the layout took the last N of `before` and the
+        // first few of `after`), the rows and the note.
+        let sent = Wiring.messages(ofBody: body)
+        let user = (try? JSONSerialization.jsonObject(with: Data(sent.user.utf8))) as? [String: Any] ?? [:]
+        let beforeTexts = (user["context_before"] as? [String]) ?? []
+        let afterTexts = (user["context_after"] as? [String]) ?? []
+        let seen = step.history.map(\.line) + below
+        prompt.contextIDs = (beforeTexts + afterTexts).compactMap { t in seen.last { ContextText.collapse($0.text) == t }?.id }
+        prompt.contextLines = beforeTexts + afterTexts
+        prompt.historyText = beforeTexts.isEmpty ? "" : ReferenceLayout.json(beforeTexts)
+        prompt.historyFragments = afterTexts.isEmpty ? [] : [ReferenceLayout.json(afterTexts)]
+        let note = sent.system.components(separatedBy: "\n").first { $0.hasPrefix("User's note for this app: ") } ?? ""
+        prompt.memoryText = ([note] + ((user["memory"] as? [String]) ?? [])).filter { !$0.isEmpty }.joined(separator: "\n")
+        return prompt
     }
+
     public func observe(_ spec: ConditionSpec, step: Step, translations: [String], replyText: String, thread: ThreadState) {}
+
+    /// The card the lens builds: the app, its category word, the normalised window title. nil without an app name.
+    static func card(_ m: Memory) -> DocumentCard? {
+        guard let w = m.window, let app = w.app, !app.isEmpty else { return nil }
+        let type = w.category?.lowercased().replacingOccurrences(of: " ", with: "-")
+        return DocumentCard.make(appName: app, categoryType: type, windowTitle: w.title)
+    }
+
+    /// The profile's note: what the memory says about the document, as the user would write it.
+    static func note(_ m: Memory) -> String {
+        guard let d = m.document else { return "" }
+        return [d.title, d.domain, d.summary].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: "; ")
+    }
+
+    /// The profile's rows: each entity is a person row (gender, role as the note, reading, who it speaks to and how), each term a term row.
+    /// `speech` false (subtitles: the lens cannot tell who speaks) leaves the addressing out, as the reference layout leaves `speaks to` out.
+    static func rows(_ m: Memory, speech: Bool) -> [MemoryEntry] {
+        let registers: [String: Register] = ["반말": .casual, "해요체": .polite, "합쇼체": .formal]
+        let genders: [String: Gender] = ["male": .m, "female": .f, "nonbinary": .n]
+        var out: [MemoryEntry] = []
+        for e in m.entities {
+            let to = !speech ? [] : (e.speaksTo ?? [:]).sorted {
+                Array($0.key.unicodeScalars.map(\.value)).lexicographicallyPrecedes($1.key.unicodeScalars.map(\.value))
+            }.compactMap { pair in registers[pair.value].map { Addressing(to: pair.key, register: $0) } }
+            out.append(MemoryEntry(src: e.name, dst: (e.dst?.isEmpty == false ? e.dst : nil) ?? e.name, kind: .person,
+                                   gender: e.gender.flatMap { genders[$0] }, note: e.role ?? "", reading: e.reading, addressing: to))
+        }
+        for t in m.terms { out.append(MemoryEntry(src: t.src, dst: t.dst, kind: .term)) }
+        return out
+    }
 }
 
 // MARK: - the reference layout

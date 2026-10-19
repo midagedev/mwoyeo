@@ -59,7 +59,7 @@ case "conditions":
     out("M[<n>]       B2 (or B<n>) + the user memory (entities, document, window, terms)")
     out("W[<n>]       B2 (or B<n>) + window metadata only")
     out("L[<n>]       B2 (or B<n>) + a learned memory built from earlier replies only")
-    out("layouts: reference (the bench's own prompt layout), t2 (the seam for round T2; not connected),")
+    out("layouts: reference (the bench's own prompt layout), t2 (the product's RequestLayout; B, B+k and M only),")
     out("         tg (TranslateGemma's own prompt format: one user message, a reply of one translation per line)")
 
 case "plan":
@@ -91,15 +91,21 @@ case "run":
     let batch = Int(arguments.option("--batch") ?? "3") ?? 3
     let layoutName = arguments.option("--layout") ?? "reference"
     guard let spec = ConditionSpec.parse(conditionName) else { fail("unknown condition \(conditionName); see `bench-run conditions`") }
+    let engineFile: EngineFile
+    let engine: any BenchEngine
+    do {
+        engineFile = try EngineFile.load(URL(fileURLWithPath: enginePath))
+        engine = try EngineFactory.make(engineFile)
+    } catch { fail("engine: \(error)") }
     let layout: any ContextLayout
     switch layoutName {
     case "reference": layout = ReferenceLayout()
-    case "t2": layout = T2Layout()
+    case "t2":
+        guard let kind = engineFile.layoutKind else { fail("layout t2 does not cover engine kind \(engineFile.kind)", code: 3) }
+        layout = T2Layout(kind: kind)
     case "tg": layout = TranslateGemmaLayout()
     default: fail("unknown layout \(layoutName)")
     }
-    let engine: any BenchEngine
-    do { engine = try EngineFactory.make(try EngineFile.load(URL(fileURLWithPath: enginePath))) } catch { fail("engine: \(error)") }
     if let problem = engine.preflight() { fail("engine \(engine.label) cannot run: \(problem)", code: 3) }
     if layoutName == "tg" && engine.kindName != "openAICompatible" { fail("layout tg needs an openAICompatible engine", code: 3) }
     let corpus = try Corpus.load(root: root, only: only)

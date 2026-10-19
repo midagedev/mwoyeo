@@ -345,11 +345,14 @@ private final class SilentServer: @unchecked Sendable {
         #expect(meta.condition == "B2" && meta.engine == "oracle" && meta.jobs == 1)
     }
 
-    @Test func theUnconnectedT2SeamFailsBeforeTheFirstRequest() async throws {
+    @Test func theProductLayoutRefusesWhatItDoesNotCoverBeforeTheFirstRequest() async throws {
         let seq = sequence(lines: 4, screens: [[1, 2, 3, 4]])
-        let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("bench-\(UUID().uuidString)")
-        defer { try? FileManager.default.removeItem(at: tmp) }
-        let options = RunOptions(spec: ConditionSpec.parse("M")!, layout: T2Layout(), layoutName: "t2", engine: OracleEngine(name: "oracle"), out: tmp)
-        await #expect(throws: SeamError.self) { try await Runner.run([(seq, memory)], options: options) }
+        let kind = try #require(EngineFile(name: "o", kind: "oracle").layoutKind)
+        for name in ["L", "C16", "W"] {
+            let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("bench-\(UUID().uuidString)")
+            defer { try? FileManager.default.removeItem(at: tmp) }
+            let options = RunOptions(spec: ConditionSpec.parse(name)!, layout: T2Layout(kind: kind), layoutName: "t2", engine: OracleEngine(name: "oracle"), out: tmp)
+            await #expect(throws: SeamError.self, "\(name)") { try await Runner.run([(seq, memory)], options: options) }
+        }
     }
 }

@@ -11,6 +11,8 @@ let package = Package(
     targets: [
         .target(name: "BenchKit", dependencies: [.product(name: "MwoyeoCore", package: "Core")]),
         .executableTarget(name: "bench-run", dependencies: ["BenchKit"]),
-        .testTarget(name: "BenchKitTests", dependencies: ["BenchKit"]),
+        .testTarget(name: "BenchKitTests", dependencies: [
+            "BenchKit", .product(name: "MwoyeoCore", package: "Core"), .product(name: "MwoyeoEngines", package: "Core"),
+        ]),
     ]
 )

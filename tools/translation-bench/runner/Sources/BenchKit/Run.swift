@@ -36,8 +36,9 @@ public struct LayoutRecord: Codable, Sendable, Equatable {
     }
 
     public static func measure(wire: Wire, prompt: Prompt, previous: Wire?, usage: Usage?) -> LayoutRecord {
-        let history = prompt.historyText
-        let volatile = history.isEmpty ? wire.user : wire.user.replacingOccurrences(of: history, with: "")
+        let parts = ([prompt.historyText] + prompt.historyFragments).filter { !$0.isEmpty }
+        let history = parts.joined()
+        let volatile = parts.reduce(wire.user) { $0.replacingOccurrences(of: $1, with: "") }
         let eS = Tokens.estimate(wire.system), eH = Tokens.estimate(history), eV = Tokens.estimate(volatile)
         var k = 1.0
         var calibrated: Double?

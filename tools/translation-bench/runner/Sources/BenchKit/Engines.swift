@@ -101,6 +101,23 @@ public struct EngineFile: Decodable, Sendable {
     public static func load(_ url: URL) throws -> EngineFile {
         try JSONDecoder().decode(EngineFile.self, from: Data(contentsOf: url))
     }
+
+    /// The kind `RequestLayout` lays a request out for (what the app's `EngineConfig.kind` is for this engine); nil for kinds the
+    /// product layout does not cover (`appleFoundationModels`). The oracle is laid out as a local OpenAI-compatible server.
+    public var layoutKind: LayoutKind? {
+        switch kind {
+        case "openAICompatible":
+            baseURL.map { .engine(.openAICompatible(baseURL: $0, model: model ?? "", thinking: thinking ?? .off, extraHeaders: extraHeaders ?? [:])) }
+        case "anthropic":
+            .engine(.anthropic(baseURL: baseURL ?? EngineKind.anthropicDefaultBaseURL, model: model ?? "", thinking: thinking ?? .off))
+        case "deepL":
+            baseURL.map { .engine(.deepL(baseURL: $0, formality: formality)) }
+        case "oracle":
+            .engine(.openAICompatible(baseURL: URL(string: "http://127.0.0.1:11434/v1")!, model: "oracle", thinking: .off, extraHeaders: [:]))
+        default:
+            nil
+        }
+    }
 }
 
 public enum EngineFactory {
@@ -159,6 +176,21 @@ enum Wiring {
         }
         if !prompt.systemAddition.isEmpty { s += "\n" + prompt.systemAddition }
         return Wire(system: s, user: prompt.user ?? user)
+    }
+
+    /// The system prompt and the last user message of a finished request body, for the size accounting: a chat body (`messages`), an
+    /// Anthropic body (`system` as text or blocks, `messages`) or a DeepL body (`text`, with its `context` as the system part).
+    static func messages(ofBody body: Data) -> Wire {
+        guard let o = try? JSONSerialization.jsonObject(with: body) as? [String: Any] else { return Wire(system: "", user: "") }
+        func text(_ v: Any?) -> String {
+            if let s = v as? String { return s }
+            return ((v as? [[String: Any]]) ?? []).compactMap { $0["text"] as? String }.joined()
+        }
+        if let texts = o["text"] as? [String] { return Wire(system: o["context"] as? String ?? "", user: texts.joined(separator: "\n")) }
+        let messages = o["messages"] as? [[String: Any]] ?? []
+        let system = messages.first { $0["role"] as? String == "system" }.map { text($0["content"]) } ?? text(o["system"])
+        let user = messages.last { $0["role"] as? String == "user" }.map { text($0["content"]) } ?? ""
+        return Wire(system: system, user: user)
     }
 
     static func describe(_ error: Error) -> String {
@@ -295,6 +327,7 @@ public final class ChatEngine: BenchEngine, @unchecked Sendable {
         var wire = Wiring.compose(system: baseSystem, user: baseUser, prompt: r.prompt)
         if let override = r.prompt.bodyOverride {
             body = override
+            wire = Wiring.messages(ofBody: override)
         } else if let plain = r.prompt.plain {
             wire = Wire(system: plain.head, user: plain.tail)
             obj["messages"] = [["role": "user", "content": plain.message]]
@@ -383,9 +416,10 @@ public final class AnthropicEngine: BenchEngine, @unchecked Sendable {
         var obj = (try? JSONSerialization.jsonObject(with: body) as? [String: Any]) ?? [:]
         let baseSystem = obj["system"] as? String ?? ""
         let baseUser = ((obj["messages"] as? [[String: Any]])?.last?["content"] as? String) ?? ""
-        let wire = Wiring.compose(system: baseSystem, user: baseUser, prompt: r.prompt)
+        var wire = Wiring.compose(system: baseSystem, user: baseUser, prompt: r.prompt)
         if let override = r.prompt.bodyOverride {
             body = override
+            wire = Wiring.messages(ofBody: override)
         } else {
             if r.prompt != Prompt() {
                 obj["system"] = wire.system
@@ -441,8 +475,8 @@ public final class DeepLEngine: BenchEngine, @unchecked Sendable {
         let body0 = DeepLTranslation.requestBody(lines: texts, source: coreLanguage(r.source), target: coreLanguage(r.target), formality: file.formality)
         var obj = (try? JSONSerialization.jsonObject(with: body0) as? [String: Any]) ?? [:]
         if let c = r.prompt.deepLContext, !c.isEmpty { obj["context"] = c }
-        let body = Wiring.encode(obj)
-        let wire = Wire(system: r.prompt.deepLContext ?? "", user: texts.joined(separator: "\n"))
+        let body = r.prompt.bodyOverride ?? Wiring.encode(obj)
+        let wire = r.prompt.bodyOverride.map(Wiring.messages(ofBody:)) ?? Wire(system: r.prompt.deepLContext ?? "", user: texts.joined(separator: "\n"))
         let scrub = scrubber(key)
         let base = DeepLTranslation.resolvedBaseURL(baseURL, key: key)
         let url = URL(string: base.absoluteString.trimmingSuffix("/") + DeepLTranslation.path)!
@@ -479,8 +513,8 @@ public struct OracleEngine: BenchEngine {
         let body = ChatTranslation.requestBody(lines: r.items.map(\.text), source: coreLanguage(r.source), target: coreLanguage(r.target),
                                                glossary: [], model: "oracle", baseURL: nil, thinking: .off)
         let messages = ((try? JSONSerialization.jsonObject(with: body) as? [String: Any])?["messages"] as? [[String: Any]]) ?? []
-        let wire = Wiring.compose(system: messages.first?["content"] as? String ?? "", user: messages.last?["content"] as? String ?? "",
-                                  prompt: r.prompt)
+        let wire = r.prompt.bodyOverride.map(Wiring.messages(ofBody:))
+            ?? Wiring.compose(system: messages.first?["content"] as? String ?? "", user: messages.last?["content"] as? String ?? "", prompt: r.prompt)
         let t = r.items.map(\.ref)
         let text = ReferenceLayout.json(["translations": t])
         let usage = Usage(input: Int(Tokens.estimate(wire.system + wire.user).rounded()), output: Int(Tokens.estimate(text).rounded()), estimated: true)

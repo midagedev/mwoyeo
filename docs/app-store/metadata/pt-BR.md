@@ -2,17 +2,19 @@
 
 Source: the English section of ../metadata.md, in the você form of the app. UI terms from App/Resources/Localizable.xcstrings; Screen Recording and Reduce Motion as in Brazilian Portuguese System Settings.
 
-**Name** (29): `Mwoyeo – Traduza onde você lê`
+**Name** (25): `Mwoyeo – Tradutor de tela`
 
-**Subtitle** (23): `Sua tela, no seu idioma`
+**Subtitle** (23): `Traduz sua tela ao vivo`
 
 **Promotional text** (162):
 Ao vivo, enquanto muda: mensagens novas, legendas, páginas rolando. A lente reescreve a tradução no mesmo lugar, mesmo tamanho e cor. Por padrão, tudo no seu Mac.
 
-**Keywords**: `tradutor,OCR,overlay,jogos,legendas,chat,japonês,coreano,chinês,inglês,lente`
+**Keywords**: `OCR,overlay,tempo real,jogos,legendas,chat,documentos,japonês,coreano,chinês,inglês,lente`
 
 **Description**:
-O texto estrangeiro da sua tela, traduzido exatamente onde está.
+O texto estrangeiro da sua tela, traduzido ao vivo, exatamente onde está.
+
+Mensagens novas no chat, legendas que mudam, uma página que você rola: a tradução acompanha a tela.
 
 Sem pop-up, sem barra de legendas. O Mwoyeo lê o texto sob uma lente, apaga esse texto da tela e escreve a tradução no mesmo lugar, com o mesmo tamanho e cor. Parece que a página sempre esteve no seu idioma, e a tradução acompanha quando chegam mensagens novas ou quando você rola a tela.
 

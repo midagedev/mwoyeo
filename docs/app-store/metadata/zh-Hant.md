@@ -2,17 +2,19 @@
 
 Source: the English section of ../metadata.md. UI terms from App/Resources/Localizable.xcstrings; Screen Recording and Reduce Motion as in Traditional Chinese System Settings (螢幕錄影, 減少動態效果; the app's own strings say 螢幕錄製).
 
-**Name** (15): `Mwoyeo – 螢幕就地翻譯`
+**Name** (15): `Mwoyeo – 即時螢幕翻譯`
 
-**Subtitle** (13): `透鏡一罩，外文變成你的語言`
+**Subtitle** (13): `螢幕上的外文，即時就地翻譯`
 
 **Promotional text** (78):
 畫面一變，譯文跟著變。新的聊天訊息、切換的字幕、捲動的頁面，透鏡都會持續讀取，並在原處以相同的大小和顏色重寫譯文。預設情況下，所有處理都在 Mac 上完成。
 
-**Keywords**: `OCR,翻譯器,即時,遊戲,字幕,聊天,論文,日文,韓文,英文,懸浮,取詞`
+**Keywords**: `OCR,翻譯器,實時,遊戲,字幕,聊天,論文,日文,韓文,英文,懸浮,取詞,外語`
 
 **Description**:
-螢幕上的外文，就地變成你的語言。
+螢幕上的外文，就在原處即時翻譯。
+
+新的聊天訊息、切換的字幕、捲動的頁面：譯文會一直跟上螢幕。
 
 沒有彈出視窗，也沒有字幕列。Mwoyeo 會讀取透鏡下方的文字，把它從螢幕上擦掉，再在同一位置以相同的大小和顏色寫上譯文。讀起來就像頁面本來就是你的語言，新訊息到來或捲動頁面時，譯文也會跟上。
 

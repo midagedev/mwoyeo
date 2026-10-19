@@ -2,17 +2,19 @@
 
 Source: the English section of ../metadata.md, in the Sie form of the app's welcome texts. UI terms from App/Resources/Localizable.xcstrings; Screen Recording and Reduce Motion as in German System Settings.
 
-**Name** (27): `Mwoyeo – Vor Ort übersetzen`
+**Name** (29): `Mwoyeo – Bildschirmübersetzer`
 
-**Subtitle** (28): `Ihr Bildschirm, Ihre Sprache`
+**Subtitle** (30): `Ihr Bildschirm, live übersetzt`
 
 **Promotional text** (155):
 Live: neue Nachrichten, wechselnde Untertitel, scrollende Seiten. Die Linse schreibt die Übersetzung laufend an dieselbe Stelle. Standardmäßig auf dem Mac.
 
-**Keywords**: `Übersetzer,Bildschirmübersetzer,Live,OCR,Overlay,Spiele,Untertitel,Chat,Japanisch,Koreanisch,Linse`
+**Keywords**: `Übersetzer,Echtzeit,OCR,Overlay,Spiele,Untertitel,Chat,Japanisch,Koreanisch,Chinesisch,Linse`
 
 **Description**:
-Fremdsprachiger Text auf Ihrem Bildschirm, direkt an Ort und Stelle übersetzt.
+Fremdsprachiger Text auf Ihrem Bildschirm, live und direkt an Ort und Stelle übersetzt.
+
+Neue Chatnachrichten, wechselnde Untertitel, eine Seite, die Sie scrollen: Die Übersetzung hält mit dem Bildschirm Schritt.
 
 Kein Pop-up, keine Untertitelleiste. Mwoyeo liest den Text unter einer Linse, löscht ihn vom Bildschirm und schreibt die Übersetzung an dieselbe Stelle, in gleicher Größe und Farbe. So wirkt die Seite, als wäre sie von Anfang an in Ihrer Sprache, und die Übersetzung hält Schritt, wenn neue Nachrichten eintreffen oder Sie scrollen.
 

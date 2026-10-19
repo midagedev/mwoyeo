@@ -103,8 +103,11 @@ final class Inpainter: @unchecked Sendable {
                 let cx = rect.x + tx + tileW / 2, cy = rect.y + ty + tileH / 2
                 let win = PixelRect(x: min(max(0, cx - s / 2), max(0, frame.width - s)),
                                     y: min(max(0, cy - s / 2), max(0, frame.height - s)), width: s, height: s)
-                try run(window: win, frame: frame, rect: rect, mask: mask, into: &patch,
-                        only: PixelRect(x: rect.x + tx, y: rect.y + ty, width: tileW, height: tileH))
+                let only = PixelRect(x: rect.x + tx, y: rect.y + ty, width: tileW, height: tileH)
+                #if !MAS
+                FilmDump.emit("erase") { ["win": FilmDump.box(win), "only": FilmDump.box(only), "patch": FilmDump.box(rect)] }   // tools/film/DESIGN.md, H2
+                #endif
+                try run(window: win, frame: frame, rect: rect, mask: mask, into: &patch, only: only)
                 tx += step
             } while tx < rect.width
             ty += step

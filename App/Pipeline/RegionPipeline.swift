@@ -602,6 +602,10 @@ actor RegionPipeline {
                 forcedDirty = forcedDirty.map { $0.cgRect.intersects(g.cgRect) ? PixelRect(x: $0.x, y: $0.y + gy, width: $0.width, height: $0.height) : $0 }
                     + [strip].compactMap { $0 }
             }
+            #if !MAS
+            FilmDump.emit("scroll") { ["t": frame.time, "origin": [area.minX, area.minY], "step": step, "gray": FilmDump.box(g), "dy": r.dy,
+                                       "strip": FilmDump.boxOrNull(strip), "frame": FilmDump.box(frame.rect), "scale": frame.scale] }
+            #endif
             apply(Move(area: area, dx: 0, dy: CGFloat(r.dy) * step, gx: 0, gy: gy, grayArea: g, strip: strip))
             if scrollVelocity == nil || r.rect.width * r.rect.height > scrollArea {
                 scrollArea = r.rect.width * r.rect.height
@@ -1301,6 +1305,15 @@ actor RegionPipeline {
         } else {
             TextEraser.fill(&patch, mask: mask)
         }
+        #if !MAS
+        // `MWOYEO_FILM_DUMP=erase` (tools/film/DESIGN.md, H2): what the erase saw per line (the noise that decides flat or patterned) and what it did. The
+        // dilation is the median line's; `fill` is the branch taken above (a model that throws falls back to the flat fill without saying so here).
+        FilmDump.emit("erase") {
+            ["block": FilmDump.box(block.rect), "patch": FilmDump.box(rect), "ring": ring, "dilation": max(1, Int(lineHeight * 0.07)),
+             "lines": masks.map { ["crop": FilmDump.box($0.0), "noise": $0.1.appearance.backgroundNoise, "flat": $0.1.appearance.isFlatBackground] as [String: Any] },
+             "fill": maskOnly ? "mask" : !flat && options.useInpainting && inpainter != nil ? "inpaint" : "fill"]
+        }
+        #endif
         let glyph = glyphHeights.isEmpty ? nil : glyphHeights.sorted()[glyphHeights.count / 2]
         if Trace.lineDump, block.text.count <= 16 {
             Trace.mark("erase label [\(Int(block.rect.minX)),\(Int(block.rect.minY)),\(Int(block.rect.width)),\(Int(block.rect.height))] lines=\(block.lines.count) line=\(Int(lineHeight)) glyph=\(glyph.map { Int($0) } ?? -1) \"\(block.text)\"", since: Trace.now)

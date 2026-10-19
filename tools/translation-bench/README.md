@@ -18,9 +18,14 @@ The corpus is written for the bench (no third-party text). The runner replays ea
 | `engines/*.json` | engine configs (kind, base URL, model; keys come from env only) |
 | `score.py` | scorer and shared library (`python3 -I score.py <run dir>...`) |
 | `judge.py` | blind pairwise judge prompts and the tally |
+| `judge-pairs.sh` | the judge prompt directories of the product-layout pairs, regenerated from the preserved runs (`sh judge-pairs.sh <out dir>`) |
+| `judge-report.py` | tallies of preserved judge passes: per pair and judge model, plus the consensus of the models and the split by lines copied back untranslated (`python3 -I judge-report.py runs/judge-<date> [--echo]`) |
+| `judge-run.py` | runs a `judge.py` pair through the agy CLI (`gemini-3.8-flash-high`) in batched calls, both orders; the known-answer check of the judge (`python3 -I judge-run.py run\|known-answer\|known-answer-tally`) |
 | `runs.py` | preserves a run into `runs/` with a manifest; `verify` and `list` (`python3 -I runs.py ...`) |
 | `matrix.sh` | one condition on one Ollama model, then `runs.py add` with the machine state (load, pageouts, swap, `ollama ps`) in the note |
+| `cloud.sh` | one condition on one cloud engine, then `runs.py add` (the key comes from the engine file's `keyEnv` variable in the environment) |
 | `summary.py` | regenerates `runs/SUMMARY.md` from the preserved runs (`--check` fails when it is stale) |
+| `latency.py` | the latency verdict with an A/A self-check: a condition's per-request delta against repeats of condition A, and the repeats' own spread (`python3 -I latency.py --aa <A run>... -- <run>...`) |
 | `runs/<run-name>/` | the preserved experiment data: every run worth a number, with its `MANIFEST.json` |
 | `runs/SUMMARY.md` | the tables of every model run; generated, never hand-edited |
 | `prices.json` | price table, with the source of each price |
@@ -148,12 +153,25 @@ Condition A never touches it. Every other condition goes through a `ContextLayou
   line. A count that does not match falls back to today's JSON request like any failed attempt. Condition A is left alone,
   so `A` is the same run under either layout; `L` is refused. The `tg` runs measure whether TranslateGemma uses memory when
   it is asked in its own format; they are not the product's layout.
-- `T2Layout` (`--layout t2`) is the stub for round T2's `TranslationContext`. A `Step` hands it the batch, the lines above
-  and below it on screen, every line translated so far (source, reply, trusted flag) and the sequence's memory.
-  `build` returns a `Prompt`: either `bodyOverride` (the finished request body from T2's builders in `ChatTranslation`,
-  `AnthropicTranslation`, `DeepLTranslation`, sent as is) or `systemAddition` / `user` / `deepLContext` spliced into today's
-  body; `observe` receives the reply (thread state, learned terms). It fails the run before the first request until it is
-  connected, so a half-wired seam cannot score.
+- `T2Layout` (`--layout t2`, 2026-10-19) **is the product's layout**: it does not write a prompt. A `Step` becomes the
+  `ContextRequest` that `ContextBook.request` hands `EngineClient` and the `ContextOptions` of the engine's "Use context"
+  switch (`ContextOptions.from(engine: EngineContext(enabled: true, previousLines: n))`), and `RequestLayout.body` for the engine's
+  kind (`EngineFile.layoutKind`) returns the bytes, which go out as `Prompt.bodyOverride`. The rules, the card, the note, the rows
+  and the `{"t": [{"id", "text"}]}` reply are Core's. Its inputs are what the lens can see, which is why its numbers differ from
+  `reference` for reasons other than the prompt text:
+  - the **card** (app, category word, normalised window title) is built from `memory.window` and goes out on every context
+    request, `B` included: the product always sends it. `W` is therefore refused (`B` already is `W`).
+  - `M` adds the **note** (`memory.document` as `title; domain; summary`) and the **rows** (each entity a person row with
+    gender, role as the row note, reading and, where `speaker_visible`, who it speaks to and in which register; each term a
+    term row). A row goes out only when its name occurs in the items or in the lines around them (`RequestLayout.selectRows`).
+  - there is **no speaker channel**: the app sends OCR lines, so no line carries who said it (the reference layout sends
+    `speakers` and labels its context lines). Speech-level and pronoun gains that need the speaker are lost here by design.
+  - `B2+2` adds up to 2 lines below the batch on the screen. The corpus screens add their new lines at the bottom, so only 19
+    of the 252 requests have any line below; the other 233 are byte-identical to `B2`.
+  - `L` and `C<n>` are refused (learning and the long conversation are not run on the product layout in this round).
+  `Prompt.contextIDs`, `historyText` and `memoryText` are read back from the finished body, so the leak counter and the size
+  accounting see what the model saw. `tests/` (BenchKitTests, `ProductLayoutTests`) pin the bytes against a hand-written
+  `ContextRequest` and against the app's own `EngineClient` posting to the mock server.
 
 ## Run
 
@@ -221,7 +239,7 @@ python3 -I runs.py list            # one line per run
 python3 -I score.py runs/A-gemma3-4b runs/M-gemma3-4b     # the scorer reads a preserved run like any run directory
 ```
 
-`matrix.sh <bin> <scratch> <engine file> <run name> <condition> [bench-run options]` does the run and the `add` in one go for
+`[NOTE=...] [KIND=smoke] matrix.sh <bin> <scratch> <engine file> <run name> <condition> [bench-run options]` does the run and the `add` in one go for
 an Ollama model: a warm-up request first (the load time is not in the first latency), `--jobs 1`, and a note tag
 `[machine load1m start=.. end=.. pageouts +n swapouts +n swap_used_mb start=.. end=.. free_pct start=.. end=.. ollama_ps='..']`
 that `summary.py` reads as the load caveat. `NOTE='...' matrix.sh ...` adds prose in front of the tag. Run names for models:
@@ -295,7 +313,12 @@ corpus (a new run name) to compare.
 - **Judge** (`judge.py`): blind pairwise prompts, one file per order, per line whose two translations differ, plus
   calibration items (the same text twice: the judge must say tie in both orders). The condition names are in `key.json` only.
   `judge.py tally` counts only items on which both orders agree and prints the counts, the win rate with a Wilson interval
-  and the calibration result. It never calls a judge; the lead runs it with Claude agents, one call per prompt file.
+  and the calibration result. It never calls a judge. `judge-run.py` does, through the agy CLI: the prompt files of a pair are shuffled
+  (fixed seed) into calls of 15 cases, so the two orders of an item land in different calls; a CLI exit of 0 is not success (the result
+  event's `status` and an answer that covers every case are), a retry asks only the cases still without a verdict, and every raw try is kept
+  (`calls/call-NNNN.tryK.json`). Its `known-answer` pair is the instrument check: the reference translation against the line's own source
+  text and against the reference with a probe's known wrong rendering (`bad_sub`); the reference must win in both orders on at least
+  90 % of the items and lose on at most 5 %, and identical text must be a tie, or the pass is a screen and not a verdict.
 
 ## Size accounting
 
@@ -322,7 +345,7 @@ a user memory vs a long transcript) are provisional until this bench has run the
 ## Checks
 
 `tests/run-all.sh`: the corpus validation, `tests/test_score.py` (the scorer on a golden mini-sequence with hand-written
-translations: 100 %; one name swapped drops accuracy and raises carry-over), `tests/test_judge.py` (the A-vs-A sample prompt
+translations: 100 %; one name swapped drops accuracy and raises carry-over), `tests/test_judge_report.py` (planted verdicts: position bias and one-order items are not counted, the consensus splits), `tests/test_judge_run.py` (`judge-run.py` on a fake agy: exit 0 with a failed status is no verdict, short answers are asked again, a rerun asks nobody, a judge with position bias or a wrong preference fails the known-answer check), `tests/test_judge.py` (the A-vs-A sample prompt
 pair, the tally on a fake verdict set), `tests/test_failures.py` (failed attempts by reason, leaks and echoes counted on a mini run and on a doctored real run; run again with
 `--neuter` it must fail), `tests/test_summary.py` (SUMMARY.md renders identically twice and equals the committed file), `tests/test_runs.py` (preservation: no overwrite, a manifest that verifies, and
 `verify` failing on a missing manifest, a changed file, a changed summary and a short oracle run), `runs.py verify` (every
@@ -336,5 +359,6 @@ memory are identical).
   cannot attribute speakers, the speech-level gain of the memory is an upper bound.
 - The sequences are short (15-40 lines) and the probes are planted: they measure what context decides, not general quality.
   The oracle (`ref`) is one skilled translation, not the only correct one; checks accept the renderings listed in `any`.
-- `reference` layout numbers are the bench's own prompt, not T2's; re-run on `--layout t2` before setting a default.
+- `reference` layout numbers are the bench's own prompt, not the product's. The product-layout runs (`--layout t2`, run names
+  ending `-t2`) are the ones to read before setting a default; `runs/RESULTS-2026-10-19-t3-product-layout.md` has them.
 - Local models are small; a 1-2 B model cannot use context well, so use the largest model the engine row will really run.

@@ -152,7 +152,9 @@ def render(root):
       "preserved with (`runs/_corpus/<hash>`), over %s. Conditions: `A` today's "
       "request; `B2` + the previous 2 source lines; `W` + the window title, app and category; `M` + the user memory "
       "(window, document, people with speech levels, terms). A `(tg layout)` suffix is a bench prompt variant (README, "
-      "Conditions). Memory-only probes (`memory`) are the ones only the user memory can decide; `lines` need an earlier "
+      "Conditions); a `(t2 layout)` suffix is the product's own request (`RequestLayout`, README, The seam for T2): it sends the "
+      "window card on every context request and no speaker channel, so its `B2` and `M` differ from the unsuffixed runs in more "
+      "than the prompt text. Memory-only probes (`memory`) are the ones only the user memory can decide; `lines` need an earlier "
       "line; `none` are controls any engine should get right." % (total, len(models), "" if len(models) == 1 else "s", shape))
     w("")
     w("Reading the columns. **delta** is points of probe accuracy against condition A of the same model; **p** is the exact "
@@ -163,7 +165,8 @@ def render(root):
       "design's no-regression rule); **batch leaks** repeat another item of the same batch (condition A has these too: the "
       "model's own floor); **echoed** lines are their own source text returned untranslated. Latency is per request with "
       "retries included at `--jobs 1`; the machine was shared with other work, so latencies are comparable only inside one "
-      "model's rows and carry the load shown.")
+      "model's rows and carry the load shown. A latency verdict needs the A/A self-check of `latency.py` (the same condition A "
+      "repeated; the preserved `A` and `A-r2` of gemma3:4b differ by 328 ms in the median).")
     w("")
 
     # ---- overview

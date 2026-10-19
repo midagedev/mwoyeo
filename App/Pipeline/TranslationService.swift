@@ -659,14 +659,40 @@ actor TranslationService {
         return out
     }
 
+    /// The models the chosen engine may translate with, in the order they are tried. Before macOS 26.4 a session cannot pick its model:
+    /// the language pack is the only one.
+    private var wantedStrategies: [Strategy] {
+        !TranslationEngineChoice.hasHighFidelity ? [.lowLatency]
+            : settings.engine == .highFidelity ? [.highFidelity] : [.lowLatency, .highFidelity]
+    }
+
+    /// Where `source` → `target` (the chosen target when nil) stands with the system now, asked again every time, for the models the engine
+    /// may use (`PackStatus`): what the sheet that downloads a pack, and the list of packs in Settings, ask after it ends. The list must
+    /// read the pack itself: the system's default model on a Mac with Apple Intelligence is its translation model, which reports every
+    /// pair installed whether or not the pack is.
+    func packStatus(source: String, target: String? = nil) async -> PackStatus {
+        var fast: LanguageAvailability.Status?, intelligence: LanguageAvailability.Status?
+        for strategy in wantedStrategies {
+            let status = await availability(strategy)
+                .status(from: Locale.Language(identifier: source), to: Locale.Language(identifier: target ?? settings.targetLanguage))
+            if strategy == .highFidelity { intelligence = status } else { fast = status }
+        }
+        return Self.classify(fast: fast, intelligence: intelligence)
+    }
+
+    /// `fast`: the pack's status, nil when the engine does not ask for it; `intelligence`: Apple Intelligence's model, likewise.
+    nonisolated static func classify(fast: LanguageAvailability.Status?, intelligence: LanguageAvailability.Status?) -> PackStatus {
+        if fast == .installed { return .installed }
+        if intelligence == .installed { return fast == .supported ? .viaIntelligence : .installed }
+        if fast == .supported || intelligence == .supported { return .downloadable }
+        return .unsupported
+    }
+
     /// Picks the session for `source` → target: the low-latency pack when installed (auto), otherwise
     /// Apple Intelligence's high-fidelity model.
     private func session(source: String) async throws -> (TranslationSession, Strategy) {
-        // Before macOS 26.4 a session cannot pick its model: the language pack is the only one.
-        let wanted: [Strategy] = !TranslationEngineChoice.hasHighFidelity ? [.lowLatency]
-            : settings.engine == .highFidelity ? [.highFidelity] : [.lowLatency, .highFidelity]
         var downloadable = false
-        for strategy in wanted {
+        for strategy in wantedStrategies {
             let id = "\(source)>\(settings.targetLanguage)|\(strategy == .highFidelity ? "hf" : "ll")"
             if let s = sessions[id] { return (s, strategy) }
             let status: LanguageAvailability.Status

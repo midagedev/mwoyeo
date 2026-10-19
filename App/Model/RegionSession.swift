@@ -98,6 +98,13 @@ final class RegionSession {
     private var lead = CGVector.zero
     private var lastLens: (rect: CGRect, time: TimeInterval)?
     private var predictor = ScrollPredictor()
+    /// `MWOYEO_PREDICT=off` (film takes of the overlay following the frames alone): the scroll predictor is neither fed nor asked.
+    /// The App Store build has no such switch.
+    #if MAS
+    static let predicts = true
+    #else
+    static let predicts = !DebugSwitch.isOff("MWOYEO_PREDICT", in: ProcessInfo.processInfo.environment)
+    #endif
     /// The area under the pointer that scrolled last (global Quartz points), and the window it belongs to.
     private var scrollArea: CGRect?
     private var scrollWindow: CGWindowID?
@@ -815,6 +822,7 @@ final class RegionSession {
 
     /// A scroll event anywhere: if it scrolls content this lens reads, it predicts the next frames.
     private func wheel(_ e: NSEvent) {
+        guard Self.predicts else { return }
         let p = ScreenGeometry.quartzRect(fromAppKit: NSRect(origin: NSEvent.mouseLocation, size: .zero)).origin
         guard capture.contains(p), e.scrollingDeltaY != 0 || e.phase == .began else { return }
         if e.phase == .began || e.phase == .mayBegin || (e.phase.isEmpty && e.momentumPhase.isEmpty && e.timestamp - lastWheel > 0.5) {
@@ -836,12 +844,12 @@ final class RegionSession {
         let p = ScreenGeometry.quartzRect(fromAppKit: NSRect(origin: NSEvent.mouseLocation, size: .zero)).origin
         guard r.area.contains(p) else { return }
         scrollArea = r.area
-        predictor.confirm(shift: Double(r.shift), from: r.from, to: r.to)
+        if Self.predicts { predictor.confirm(shift: Double(r.shift), from: r.from, to: r.to) }
     }
 
     /// The scroll the overlay should show on top of the frame captured at `since`, as of `now`.
     private func predictedScroll(since: TimeInterval, now: TimeInterval) -> (area: CGRect, dy: CGFloat)? {
-        guard let area = scrollArea, now - lastWheel < 1 else { return nil }
+        guard Self.predicts, let area = scrollArea, now - lastWheel < 1 else { return nil }
         return (area, CGFloat(predictor.offset(from: since, to: now)))
     }
 

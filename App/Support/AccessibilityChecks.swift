@@ -1,0 +1,481 @@
+#if !MAS
+import AppKit
+import MwoyeoCore
+import SwiftUI
+
+/// The accessibility checks of `--capture-ui … check-logic` (PASS/FAIL lines), and the probe behind them (`a11y-tree`: the accessibility
+/// tree of each audited window as a screen reader gets it, one line per element, into `a11y-<view>.txt`).
+///
+/// What is checked: Reduce Motion holds the lens glow and the SwiftUI motion still; the lens is one element a screen reader can name,
+/// read and act on; the picker can place a lens without a pointer; and no control or image of Settings, Onboarding, the menu panel and
+/// the engine sheet is without a name a screen reader can say.
+///
+/// macOS has no programmatic audit like iOS's `performAccessibilityAudit`, so the audit walks the tree itself, through the accessibility
+/// API an assistive app uses (VoiceOver, Accessibility Inspector): every view is hosted in a window as the app hosts it. What it cannot
+/// say is whether a label is a good one, or the order the elements are read in: that is the checklist for a person with VoiceOver on.
+@MainActor
+enum AccessibilityChecks {
+    /// PASS/FAIL lines and their count of failures.
+    private final class Report {
+        var failed = 0
+        func check(_ what: String, _ ok: Bool) {
+            print("check-logic: \(ok ? "PASS" : "FAIL") accessibility: \(what)")
+            if !ok { failed += 1 }
+        }
+    }
+
+    /// One element of the tree.
+    struct Item: Sendable {
+        var depth: Int
+        var role: String
+        var subrole: String
+        var label: String
+        var value: String
+        var help: String
+        var enabled: Bool
+        var actions: [String] = []
+
+        var line: String {
+            let text = [label.isEmpty ? "" : "label=\"\(label)\"", value.isEmpty ? "" : "value=\"\(value.prefix(60))\"",
+                        help.isEmpty ? "" : "help=\"\(help.prefix(40))\"", enabled ? "" : "disabled"].filter { !$0.isEmpty }.joined(separator: " ")
+            return String(repeating: "  ", count: depth) + role + (subrole.isEmpty ? "" : "/" + subrole) + (text.isEmpty ? "" : "  " + text)
+        }
+    }
+
+    /// Roles a person operates: each needs a name a screen reader can say.
+    private static let controlRoles: Set<String> = [
+        "AXButton", "AXCheckBox", "AXRadioButton", "AXPopUpButton", "AXMenuButton", "AXSlider", "AXTextField", "AXTextArea", "AXComboBox",
+        "AXDisclosureTriangle", "AXIncrementor", "AXSwitch",
+    ]
+    /// The scroll bar's own parts: the system names them.
+    private static let systemSubroles: Set<String> = ["AXIncrementArrow", "AXDecrementArrow", "AXIncrementPage", "AXDecrementPage"]
+
+    // MARK: - Walking the tree
+
+    /// One attribute of `element` as an accessibility client reads it.
+    private nonisolated static func attribute(_ element: AXUIElement, _ name: String) -> CFTypeRef? {
+        var value: CFTypeRef?
+        return AXUIElementCopyAttributeValue(element, name as CFString, &value) == .success ? value : nil
+    }
+
+    private nonisolated static func string(_ element: AXUIElement, _ name: String) -> String {
+        let value = attribute(element, name)
+        if let s = value as? String { return s }
+        if let n = value as? NSNumber { return n.stringValue }
+        return ""
+    }
+
+    /// The name a screen reader says for `element`: its description, else its title, else the text of the element that titles it.
+    private nonisolated static func name(of element: AXUIElement) -> String {
+        for attribute in [kAXDescriptionAttribute, kAXTitleAttribute] {
+            let s = string(element, attribute).trimmingCharacters(in: .whitespacesAndNewlines)
+            if !s.isEmpty { return s }
+        }
+        if let titled = attribute(element, kAXTitleUIElementAttribute), CFGetTypeID(titled) == AXUIElementGetTypeID() {
+            return string(titled as! AXUIElement, kAXValueAttribute)
+        }
+        return ""
+    }
+
+    /// Whether this process may ask the accessibility server about itself, as VoiceOver and Accessibility Inspector do.
+    /// (A process started from a terminal that has the permission has it too.)
+    static var canAsk: Bool { AXIsProcessTrusted() }
+
+    /// The tree of the window titled `title` in this process, read through the accessibility API an assistive app uses: the real tree, SwiftUI's
+    /// included, which a call on the hosting view does not give. The asking runs off the main thread, since the answers come from it.
+    static func tree(ofWindowTitled title: String) async -> [Item] {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                let app = AXUIElementCreateApplication(getpid())
+                AXUIElementSetMessagingTimeout(app, 10)
+                var items: [Item] = []
+                func walk(_ element: AXUIElement, _ depth: Int) {
+                    guard depth < 40, items.count < 4000 else { return }
+                    var names: CFArray?
+                    AXUIElementCopyActionNames(element, &names)
+                    items.append(Item(depth: depth, role: string(element, kAXRoleAttribute), subrole: string(element, kAXSubroleAttribute),
+                                      label: name(of: element), value: string(element, kAXValueAttribute), help: string(element, kAXHelpAttribute),
+                                      enabled: (attribute(element, kAXEnabledAttribute) as? Bool) ?? true,
+                                      actions: ((names as? [String]) ?? []).map { raw in
+                                          // A custom action comes as "Name:<name>\nTarget:…\nSelector:…".
+                                          let first = raw.split(separator: "\n").first.map(String.init) ?? raw
+                                          return first.hasPrefix("Name:") ? String(first.dropFirst(5)) : first
+                                      }))
+                    for child in (attribute(element, kAXChildrenAttribute) as? [AXUIElement]) ?? [] { walk(child, depth + 1) }
+                }
+                for window in (attribute(app, kAXWindowsAttribute) as? [AXUIElement]) ?? [] where string(window, kAXTitleAttribute) == title {
+                    walk(window, 0)
+                }
+                continuation.resume(returning: items)
+            }
+        }
+    }
+
+    /// The controls and images of `items` that a screen reader could not name.
+    static func unlabeled(_ items: [Item]) -> [Item] {
+        items.filter { ($0.role == "AXImage" || controlRoles.contains($0.role)) && $0.label.isEmpty && !systemSubroles.contains($0.subrole) }
+    }
+
+    /// Controls that say the same thing as another of the view and nothing to tell them apart (no value, no help): "Record Shortcut" five
+    /// times says nothing about which row. Radio buttons (tabs, segments) are told apart by their own state.
+    static func ambiguous(_ items: [Item]) -> [String] {
+        var seen: [String: Int] = [:]
+        for item in items where controlRoles.contains(item.role) && item.role != "AXRadioButton" && !item.label.isEmpty
+            && item.value.isEmpty && item.help.isEmpty && !systemSubroles.contains(item.subrole) {
+            seen["\(item.role) \"\(item.label)\"", default: 0] += 1
+        }
+        return seen.filter { $0.value > 1 }.map { "\($0.key) ×\($0.value)" }.sorted()
+    }
+
+    // MARK: - Hosting
+
+    /// A view shown in a window as the app shows it, and the tree it gives after `settle` seconds.
+    static func hostedTree<V: View>(_ view: V, size: CGSize, model: AppModel, name: String, settle: Double = 1.0) async -> [Item] {
+        let title = "mwoyeo-a11y-\(name)"
+        let w = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.titled], backing: .buffered, defer: false)
+        w.title = title
+        w.contentView = NSHostingView(rootView: view.environment(model))
+        w.setFrameTopLeftPoint(NSPoint(x: 80, y: (NSScreen.main?.frame.height ?? 900) - 60))
+        w.orderFrontRegardless()
+        try? await Task.sleep(for: .seconds(settle))
+        // SwiftUI builds its tree as it is asked and keeps filling it for a moment: the tree counts once two reads in a row agree.
+        var items = await tree(ofWindowTitled: title)
+        for _ in 0..<12 {
+            try? await Task.sleep(for: .milliseconds(400))
+            let next = await tree(ofWindowTitled: title)
+            let same = next.map(\.line) == items.map(\.line)
+            items = next
+            if same { break }
+        }
+        w.orderOut(nil)
+        return items
+    }
+
+    /// The views the audit covers: Settings (every tab), Onboarding, the menu panel (empty, a lens row), the engine sheet (the list, a form),
+    /// and the image window.
+    static func audited(_ model: AppModel) async -> [(name: String, items: [Item])] {
+        var out: [(String, [Item])] = []
+        let savedTab = model.settingsTab
+        for (name, tab) in [("settings-general", SettingsTab.general), ("settings-translation", .translation), ("settings-appearance", .appearance),
+                            ("settings-shortcuts", .shortcuts), ("settings-about", .about)] {
+            model.settingsTab = tab
+            out.append((name, await hostedTree(SettingsView(), size: CGSize(width: 560, height: 520), model: model, name: name, settle: 2)))
+        }
+        model.settingsTab = savedTab
+        out.append(("onboarding", await hostedTree(OnboardingView(close: {}), size: CGSize(width: 600, height: 760), model: model, name: "onboarding")))
+        out.append(("menu", await hostedTree(MenuPanel(), size: CGSize(width: 340, height: 400), model: model, name: "menu")))
+        var lens = RegionConfig(name: "Safari", rect: CGRect(x: 100, y: 100, width: 400, height: 200))
+        lens.follow(nil)
+        out.append(("menu-lens-row", await hostedTree(RegionRow(region: lens), size: CGSize(width: 340, height: 80), model: model, name: "menu-lens-row")))
+        out.append(("engine-sheet", await hostedTree(EngineSheet(), size: CGSize(width: 480, height: 560), model: model, name: "engine-sheet")))
+        let form = EngineConfig(name: "Gemini", kind: .openAICompatible(baseURL: URL(string: "https://gemini.example.invalid/v1beta/openai/")!,
+                                                                         model: "gemini-3.1-flash-lite", thinking: .off, extraHeaders: [:]))
+        out.append(("engine-sheet-form", await hostedTree(EngineSheet(autopilot: .init(setup: EngineShare.encode(form), key: "sk-test-a11y", allow: true)),
+                                                          size: CGSize(width: 480, height: 560), model: model, name: "engine-sheet-form", settle: 4)))
+        out.append(("image-window", await hostedTree(ImageTranslationView(model: ImageTranslationModel(), onDrop: { _ in false }),
+                                                    size: CGSize(width: 640, height: 480), model: model, name: "image-window")))
+        return out
+    }
+
+    /// The titles, roles and sizes of every window of this process as an assistive app lists them.
+    static func windowList() async -> [String] {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                let app = AXUIElementCreateApplication(getpid())
+                AXUIElementSetMessagingTimeout(app, 10)
+                let windows = (attribute(app, kAXWindowsAttribute) as? [AXUIElement]) ?? []
+                continuation.resume(returning: windows.map { w in
+                    var size = CGSize.zero
+                    if let v = attribute(w, kAXSizeAttribute), CFGetTypeID(v) == AXValueGetTypeID() { AXValueGetValue(v as! AXValue, .cgSize, &size) }
+                    return "\(string(w, kAXRoleAttribute))/\(string(w, kAXSubroleAttribute)) title=\"\(string(w, kAXTitleAttribute))\" \(Int(size.width))×\(Int(size.height))"
+                })
+            }
+        }
+    }
+
+    // MARK: - The probe
+
+    /// `a11y-tree`: writes `a11y-<view>.txt` for each audited view and prints what the audit finds.
+    static func dump(_ model: AppModel, into dir: URL) async {
+        guard canAsk else { print("a11y: this process may not ask the accessibility server (System Settings › Privacy & Security › Accessibility)"); return }
+        // The windows a lens puts on the screen, as the window list of a screen reader has them.
+        let screen = NSScreen.main ?? NSScreen.screens[0]
+        let lensRect = NSRect(x: screen.frame.maxX - 520, y: screen.frame.minY + 60, width: 400, height: 160)
+        let lens = RegionFrameWindow(region: lensRect, name: "Safari")
+        let overlay = OverlayPanel(frame: lensRect)
+        lens.orderFrontRegardless()
+        overlay.orderFrontRegardless()
+        try? await Task.sleep(for: .seconds(0.6))
+        let listed = await windowList()
+        lens.orderOut(nil)
+        overlay.orderOut(nil)
+        try? listed.joined(separator: "\n").write(to: dir.appendingPathComponent("a11y-windows.txt"), atomically: true, encoding: .utf8)
+        print("a11y windows:\n  " + listed.joined(separator: "\n  "))
+        for (name, items) in await audited(model) {
+            let path = dir.appendingPathComponent("a11y-\(name).txt")
+            try? items.map(\.line).joined(separator: "\n").write(to: path, atomically: true, encoding: .utf8)
+            let bad = unlabeled(items), same = ambiguous(items)
+            print("a11y \(name): \(items.count) elements, \(bad.count) unlabeled, \(same.count) ambiguous -> \(path.path)")
+            for b in bad { print("  unlabeled \(b.role)/\(b.subrole) at depth \(b.depth)") }
+            for s in same { print("  ambiguous \(s)") }
+        }
+    }
+
+    // MARK: - The checks
+
+    /// The accessibility checks of check-logic; returns the failures.
+    static func run(_ model: AppModel) async -> Int {
+        let report = Report()
+        defer { Motion.shared.force(nil) }
+        await reduceMotionChecks(model, report)
+        await lensChecks(model, report)
+        if canAsk { await lensSeenByAssistiveApp(report) }
+        keyboardPlacementChecks(report)
+        guard canAsk else {
+            print("check-logic: SKIP accessibility: audit of Settings, Onboarding, the menu and the engine sheet (this process may not ask the accessibility server)")
+            return report.failed
+        }
+        for (name, items) in await audited(model) {
+            let bad = unlabeled(items), same = ambiguous(items)
+            report.check("\(name): \(items.count) elements, \(bad.count) unlabeled controls or images, \(same.count) indistinguishable controls"
+                         + (same.isEmpty ? "" : " (\(same.joined(separator: ", ")))"), items.count > 2 && bad.isEmpty && same.isEmpty)
+        }
+        return report.failed
+    }
+
+    // MARK: Reduce Motion
+
+    /// The animations of `layer` and everything below it that repeat.
+    private static func repeating(_ layer: CALayer) -> [String] {
+        let own = (layer.animationKeys() ?? []).filter { key in
+            guard let a = layer.animation(forKey: key) else { return false }
+            return a.repeatCount > 1 || a.repeatDuration > 0
+        }
+        return own + (layer.sublayers ?? []).flatMap(repeating)
+    }
+
+    /// The keys of every animation on `layer` and below.
+    private static func animations(_ layer: CALayer) -> [String] {
+        (layer.animationKeys() ?? []) + (layer.sublayers ?? []).flatMap(animations)
+    }
+
+    private static func stopAnimations(_ layer: CALayer) {
+        layer.removeAllAnimations()
+        layer.sublayers?.forEach(stopAnimations)
+    }
+
+    /// A window's pixels as the screen has them (the way the captures are taken).
+    private static func pixels(of window: NSWindow) -> Data? {
+        let path = NSTemporaryDirectory() + "mwoyeo-a11y-\(getpid())-\(window.windowNumber).png"
+        defer { try? FileManager.default.removeItem(atPath: path) }
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
+        p.arguments = ["-x", "-o", "-l", "\(window.windowNumber)", path]
+        try? p.run()
+        p.waitUntilExit()
+        return FileManager.default.contents(atPath: path)
+    }
+
+    /// A view on the screen, shot twice `gap` seconds apart: whether anything in it moved.
+    private static func moves<V: View>(_ view: V, size: CGSize, model: AppModel, gap: Double = 0.7) async -> Bool {
+        let w = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.titled], backing: .buffered, defer: false)
+        w.contentView = NSHostingView(rootView: view.environment(model))
+        w.setFrameTopLeftPoint(NSPoint(x: 80, y: (NSScreen.main?.frame.height ?? 900) - 60))
+        w.orderFrontRegardless()
+        try? await Task.sleep(for: .seconds(0.8))
+        let first = pixels(of: w)
+        try? await Task.sleep(for: .seconds(gap))
+        let second = pixels(of: w)
+        w.orderOut(nil)
+        return first != second
+    }
+
+    private static func reduceMotionChecks(_ model: AppModel, _ r: Report) async {
+        let lens = RegionFrameWindow(region: NSRect(x: 200, y: 400, width: 360, height: 200), name: "Safari")
+        lens.setAppearance(style: .glow, tint: .spectrum, tabVisibility: .automatic, tabPosition: .topLeading)
+        guard let layer = lens.contentView?.layer else { r.check("the lens has a layer", false); return }
+
+        // The glow breathes while the lens reads, unless Reduce Motion is on.
+        Motion.shared.force(false)
+        lens.setBusy(true)
+        r.check("Reduce Motion off: a reading lens breathes (the instrument sees a repeating animation)", repeating(layer).count == 1)
+        Motion.shared.force(true)
+        r.check("Reduce Motion on, switched while the lens reads: the glow stops breathing", repeating(layer).isEmpty)
+        lens.setBusy(false)
+        lens.setBusy(true)
+        r.check("Reduce Motion on: a lens that starts reading has no repeating animation", repeating(layer).isEmpty)
+        Motion.shared.force(false)
+        r.check("Reduce Motion switched off while the lens reads: the glow breathes again", repeating(layer).count == 1)
+        lens.setBusy(false)
+
+        // The sweep that marks a lens coming alive or the original coming back.
+        lens.sweep()
+        r.check("Reduce Motion off: the sweep runs (the instrument sees it)", animations(layer).contains("sweep"))
+        stopAnimations(layer)
+        Motion.shared.force(true)
+        lens.sweep()
+        r.check("Reduce Motion on: the sweep does not run", !animations(layer).contains("sweep"))
+
+        // The SwiftUI motion: a ring that turns, a lens that glides. Shot twice, the pictures differ off and are the same on.
+        Motion.shared.force(false)
+        let spinningOff = await moves(LensChip(state: .busy), size: CGSize(width: 120, height: 60), model: model)
+        let glidingOff = await moves(OnboardingView(close: {}), size: CGSize(width: 600, height: 760), model: model)
+        r.check("Reduce Motion off: the reading lens chip and the Onboarding lens move (the instrument sees them)", spinningOff && glidingOff)
+        Motion.shared.force(true)
+        let spinningOn = await moves(LensChip(state: .busy), size: CGSize(width: 120, height: 60), model: model)
+        let glidingOn = await moves(OnboardingView(close: {}), size: CGSize(width: 600, height: 760), model: model)
+        r.check("Reduce Motion on: the lens chip's ring and the Onboarding lens hold still", !spinningOn && !glidingOn)
+        if model.regions.isEmpty {
+            let emptyOn = await moves(MenuPanel(), size: CGSize(width: 340, height: 400), model: model)
+            Motion.shared.force(false)
+            let emptyOff = await moves(MenuPanel(), size: CGSize(width: 340, height: 400), model: model)
+            r.check("the menu panel's empty state glides with Reduce Motion off and holds still with it on", emptyOff && !emptyOn)
+        }
+        Motion.shared.force(nil)
+    }
+
+    // MARK: The lens
+
+    private static func lensChecks(_ model: AppModel, _ r: Report) async {
+        var config = RegionConfig(name: "Safari", rect: CGRect(x: 200, y: 300, width: 360, height: 200))
+        config.follow(nil)
+        let session = RegionSession(config: config, settings: AppSettings(), translator: model.translator, inpainter: nil)
+        guard let window = session.lensWindow as? RegionFrameWindow, let view = window.contentView else {
+            r.check("the session has a lens window", false)
+            return
+        }
+        var closed = false
+        session.onCloseRequest = { closed = true }
+        // What the app wires for a lens: the hotkey, the menu item and this action all call `AppModel.toggleTranslations`.
+        let before = model.translationsVisible
+        session.onToggleOriginal = { model.toggleTranslations(); session.setTranslationsVisible(model.translationsVisible) }
+        func value() -> String { view.accessibilityValue() as? String ?? "" }
+
+        r.check("the lens window is one element: a group named Translation lens",
+                view.isAccessibilityElement() && view.accessibilityRole() == .group && view.accessibilityLabel() == String(localized: "Translation lens"))
+        r.check("it says it waits for text before anything is read", value() == String(localized: "Waiting for text"))
+        window.setBusy(true)
+        r.check("it says Reading while the lens reads", value() == String(localized: "Reading"))
+        window.setBusy(false)
+        window.translationLines = { ["ok who stayed up for the patch notes last night", "guilty."] }
+        r.check("it says Translated and gives the start of the translation in reading order",
+                value() == "\(String(localized: "Translated")): ok who stayed up for the patch notes last night guilty.")
+        window.translationLines = { [String(repeating: "word ", count: 80)] }
+        r.check("the summary is the first 200 characters, cut at a word", value().count <= String(localized: "Translated").count + 2 + 201 && value().hasSuffix("…"))
+        window.translationLines = { ["ok who stayed up for the patch notes last night", "guilty."] }
+        let children = view.accessibilityChildren()?.compactMap { $0 as? NSAccessibilityElement } ?? []
+        r.check("inside it: the translation as text, then the pill's mode and close buttons", children.map { $0.accessibilityRole() } == [.staticText, .button, .button])
+        r.check("the translation text is complete", (children.first?.accessibilityValue() as? String) == "ok who stayed up for the patch notes last night\nguilty.")
+        r.check("the pill's buttons are named and sit inside the lens window",
+                children.dropFirst().allSatisfy { ($0.accessibilityLabel() ?? "").isEmpty == false && window.frame.intersects($0.accessibilityFrame()) })
+        _ = children.last?.accessibilityPerformPress()
+        r.check("pressing the close button asks the app to close the lens", closed)
+        closed = false
+
+        // The four actions. They are found by name: "Open Lens Menu" pops a menu up and is never run here.
+        func action(_ name: String) -> NSAccessibilityCustomAction? { view.accessibilityCustomActions()?.first { $0.name == name } }
+        var actions = view.accessibilityCustomActions() ?? []
+        r.check("the lens offers Show Original, Pause all, Remove Lens and Open Lens Menu",
+                actions.map(\.name) == [String(localized: "Show Original"), String(localized: "Pause all"), String(localized: "Remove Lens"), String(localized: "Open Lens Menu")])
+        let ran = actions.first?.handler?() ?? false
+        r.check("Show Original, as an action, flips what the hotkey flips (translations hidden) and the lens says so",
+                ran && model.translationsVisible == !before && value() == String(localized: "Showing original"))
+        actions = view.accessibilityCustomActions() ?? []
+        r.check("it then offers Show Translation", actions.first?.name == String(localized: "Show Translation"))
+        _ = actions.first?.handler?()
+        r.check("Show Translation brings them back", model.translationsVisible == before && value() != String(localized: "Showing original"))
+        _ = action(String(localized: "Remove Lens"))?.handler?()
+        r.check("Remove Lens, as an action, asks the app to close the lens", closed)
+        let paused = model.isPaused
+        _ = action(String(localized: "Pause all"))?.handler?()
+        try? await Task.sleep(for: .milliseconds(400))
+        r.check("Pause all, as an action, pauses every lens as the menu's button does", model.isPaused == !paused)
+        if model.isPaused != paused { await model.togglePause() }
+        r.check("the lens has a menu to open", window.onContextMenu?()?.items.isEmpty == false)
+
+        // Notices and hints are the state in words, in the pill's order.
+        window.flash("Copied", seconds: 0.2)
+        r.check("a notice is what the lens says", value() == "Copied")
+        window.setHint("Allow screen recording", actionable: true)
+        try? await Task.sleep(for: .milliseconds(500))
+        r.check("a hint is what it says once the notice is gone", value().hasPrefix("Allow screen recording"))
+        let buttons = (view.accessibilityChildren()?.compactMap { $0 as? NSAccessibilityElement } ?? []).filter { $0.accessibilityRole() == .button }
+        r.check("a hint to click is a button inside the lens", buttons.contains { ($0.accessibilityLabel() ?? "").hasPrefix("Allow screen recording") })
+        window.setHint(nil)
+        window.setOriginal(true)
+        r.check("showing the original is what it says", value() == String(localized: "Showing original"))
+    }
+
+    /// The lens window on the screen, asked through the accessibility API a screen reader uses.
+    private static func lensSeenByAssistiveApp(_ r: Report) async {
+        let screen = NSScreen.main ?? NSScreen.screens[0]
+        // In the corner, away from the places the other captures use.
+        let lens = RegionFrameWindow(region: NSRect(x: screen.frame.maxX - 520, y: screen.frame.minY + 60, width: 400, height: 160), name: "A11y check")
+        lens.translationLines = { ["Hello there."] }
+        // The lens's overlay is up too, as in the app: it draws the translations and says nothing.
+        let overlay = OverlayPanel(frame: NSRect(x: screen.frame.maxX - 520, y: screen.frame.minY + 60, width: 400, height: 160))
+        lens.orderFrontRegardless()
+        overlay.orderFrontRegardless()
+        try? await Task.sleep(for: .seconds(0.6))
+        let title = "\(String(localized: "Translation lens")), A11y check"
+        let listed = await windowList()
+        let items = await tree(ofWindowTitled: title)
+        lens.orderOut(nil)
+        overlay.orderOut(nil)
+        r.check("a screen reader's window list names the lens (\"\(title)\") and has no nameless window beside it",
+                listed.contains { $0.contains("title=\"\(title)\"") } && !listed.contains { $0.contains("title=\"\"") })
+        let group = items.first { $0.role == "AXGroup" && $0.label == String(localized: "Translation lens") }
+        r.check("it finds the group inside, with the state as its value", group?.value == "\(String(localized: "Translated")): Hello there.")
+        let wanted = [String(localized: "Show Original"), String(localized: "Pause all"), String(localized: "Remove Lens"), String(localized: "Open Lens Menu")]
+        r.check("and the four actions on it", wanted.allSatisfy { group?.actions.contains($0) == true })
+        let inside = items.filter { $0.depth == (group?.depth ?? -2) + 1 }
+        r.check("and inside it the translation and the two buttons of the pill", inside.map(\.role) == ["AXStaticText", "AXButton", "AXButton"] && inside.first?.value == "Hello there.")
+    }
+
+    // MARK: The keyboard
+
+    private static func keyboardPlacementChecks(_ r: Report) {
+        func key(_ code: UInt16, _ flags: NSEvent.ModifierFlags = [], isRepeat: Bool = false) -> PlacementInput? {
+            NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: flags, timestamp: 0, windowNumber: 0, context: nil,
+                             characters: "", charactersIgnoringModifiers: "", isARepeat: isRepeat, keyCode: code).flatMap(PlacementInput.init)
+        }
+        r.check("the arrows are moves, ⇧ makes them resizes and ⌥ makes them fine",
+                key(124) == .move(.right, resize: false, fine: false) && key(123, [.shift]) == .move(.left, resize: true, fine: false)
+                && key(126, [.option]) == .move(.up, resize: false, fine: true) && key(125, [.shift, .option]) == .move(.down, resize: true, fine: true))
+        r.check("Return places, Esc leaves (with anything held), and a key held down does not place twice",
+                key(36) == .confirm && key(76) == .confirm && key(36, isRepeat: true) == nil && key(53) == .cancel && key(53, [.command]) == .cancel)
+        r.check("keys with ⌘ or ⌃ and letters are not the picker's (nothing else is taken)", key(124, [.command]) == nil && key(123, [.control]) == nil && key(0) == nil)
+
+        let screen = NSScreen.main ?? NSScreen.screens[0]
+        var result: RegionPicker.Result??
+        let view = PickerView(screen: screen, windows: [], done: { result = .some($0) })
+        view.handle(.move(.right, resize: false, fine: false))
+        let start = view.placement?.rect
+        r.check("the first arrow shows the default lens, centred, without moving it",
+                start == KeyboardLens(bounds: view.bounds).rect && start?.midX == view.bounds.midX && start?.size == KeyboardLens.defaultSize)
+        view.handle(.move(.right, resize: false, fine: false))
+        view.handle(.move(.right, resize: false, fine: false))
+        view.handle(.move(.up, resize: false, fine: false))
+        view.handle(.move(.down, resize: true, fine: false))
+        view.handle(.move(.left, resize: false, fine: true))
+        let moved = view.placement?.rect
+        r.check("arrows move it by 10 points (⌥: 1), ⇧ + arrow resizes it by 10",
+                moved == start.map { CGRect(x: $0.minX + 19, y: $0.minY, width: $0.width, height: $0.height + 10) })
+        // Locale-free: the value is localized (ko says "560×330 포인트"), so compare with the same localized phrase.
+        let said = (view.accessibilityValue() as? String) ?? ""
+        let w = Int(moved?.width ?? 0), h = Int(moved?.height ?? 0)
+        r.check("the view says where the lens is", w > 0 && said.hasPrefix(String(localized: "\(w) by \(h) points, \(Int(moved?.minX ?? 0)) from the left, \(Int(view.bounds.height - (moved?.maxY ?? 0))) from the top")))
+        view.handle(.confirm)
+        let expected = moved.map { ScreenGeometry.quartzRect(fromAppKit: $0.offsetBy(dx: screen.frame.minX, dy: screen.frame.minY)) }
+        r.check("Return commits a lens with that rect, the way a drag does", result.flatMap { $0 }?.rect == expected && result.flatMap { $0 }?.window == nil)
+
+        var cancelled: RegionPicker.Result??
+        let second = PickerView(screen: screen, windows: [], done: { cancelled = .some($0) })
+        second.handle(.confirm)
+        second.handle(.move(.left, resize: false, fine: false))
+        r.check("a first Return only shows the lens", cancelled == nil && second.placement != nil)
+        second.handle(.cancel)
+        r.check("Escape leaves no lens", cancelled.map { $0 == nil } == true)
+    }
+}
+#endif

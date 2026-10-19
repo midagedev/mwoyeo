@@ -153,12 +153,18 @@ enum UICapture {
             case "image-window": await imageWindow(name, showOriginal: false)
             case "image-window-original": await imageWindow(name, showOriginal: true)
             case "check-logic": await checkLogic()
+            case "a11y-tree": await AccessibilityChecks.dump(model, into: out)
+            case "onboarding": await shoot(name, OnboardingView(close: {}), CGSize(width: 600, height: 760))
             case "engine-permission-checks":
                 // Only the permission checks (the whole of check-logic takes minutes). The first line is what the launch step made of settings.json.
                 let record = model.settings.enginePermissions
                 print("engine permission: at launch \(model.settings.engines.count) engine(s) in settings, \(record.hosts.count) allowed, upgrade step ran: \(record.migrated)")
                 let failed = await EnginePermissionChecks.run(model)
                 print("engine permission: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+            case "accessibility-checks":
+                // Only the accessibility checks (the whole of check-logic takes minutes).
+                let failed = await AccessibilityChecks.run(model)
+                print("accessibility: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
             case "inpaint-footprint": await LensRobustChecks.inpaintFootprint()
             case "menu-icon": LensRobustChecks.menuIcon(into: out.appendingPathComponent("menu-icon.png"))
             case "sheet-pick": await shoot(name, EngineSheet(), CGSize(width: 480, height: 560))
@@ -386,6 +392,7 @@ enum UICapture {
             failed += await LensRobustChecks.run(model)
             failed += await ContextChecks.run()
             failed += await EnginePermissionChecks.run(model)
+            failed += await AccessibilityChecks.run(model)
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
         }
 

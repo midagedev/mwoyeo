@@ -303,7 +303,12 @@ enum TextRecognizer {
 
     /// `MWOYEO_TRACE_READS=1` prints the lines of every read (kind, size, region, then one record per line: text, rect, word
     /// rects) on stderr: what `tools/ocr-probe/same-lines.py` compares between two runs.
+    /// The App Store build has no such switch.
+    #if MAS
+    static let traceReads = false
+    #else
     static let traceReads = ProcessInfo.processInfo.environment["MWOYEO_TRACE_READS"] != nil
+    #endif
 
     static func printRead(_ kind: ReadKind, size: String, roi: CGRect?, _ out: VisionExec.Output) {
         func field(_ s: String) -> String { s.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\t", with: "\\t").replacingOccurrences(of: "\n", with: "\\n") }

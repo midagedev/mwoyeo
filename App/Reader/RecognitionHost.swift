@@ -244,6 +244,13 @@ private final class ReadDesk: @unchecked Sendable {
 actor RecognitionHost {
     static let shared = RecognitionHost()
 
+    // The environment switches below are for the equal gate, the benches and the smoke tests: the App Store build reads none of them.
+    #if MAS
+    static let inProcess = false
+    static let ocrPath: PathOverride? = nil
+    static let timing = ReaderTiming.standard
+    private static let showsRing = false
+    #else
     /// `MWOYEO_READER=inproc`: the Lines kinds run in this process (the equal gate's baseline). Documents never do.
     static let inProcess = ProcessInfo.processInfo.environment["MWOYEO_READER"] == "inproc"
     /// `MWOYEO_OCR_PATH=vn|swift` for the benches.
@@ -251,9 +258,6 @@ actor RecognitionHost {
     /// The durations of the host. `MWOYEO_READER_TIMING=doc=0.5,restart=0.2/2,…` (`ReaderTiming.applying`) scales them down for a
     /// smoke test; `MWOYEO_DOCS_WAIT=1` is the mutation of the silence gates: a layout read waits for Docs however long, as the
     /// in-process path did, and a gate that does not fail under it measures nothing.
-    #if MAS
-    static let timing = ReaderTiming.standard
-    #else
     static let timing: ReaderTiming = {
         let environment = ProcessInfo.processInfo.environment
         var (timing, unknown) = ReaderTiming.standard.applying(environment["MWOYEO_READER_TIMING"])
@@ -263,8 +267,8 @@ actor RecognitionHost {
         }
         return timing
     }()
-    #endif
     private static let showsRing = ProcessInfo.processInfo.environment["MWOYEO_READER_RING"] != nil
+    #endif
 
     private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "reader")
     private var core: ReaderHostCore

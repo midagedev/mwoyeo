@@ -36,12 +36,14 @@ final class ReaderConnection: @unchecked Sendable {
         }
     }
 
-    /// `fakes` is `MWOYEO_FAKE_READER` by default (`ReaderFakePlan`); a gate passes its own.
+    /// `fakes` is `ReaderFakePlan.environment` by default; a gate passes its own.
     init(role: ReaderRole, appID: String = Bundle.main.bundleIdentifier ?? "dev.midagedev.mwoyeo", fakes: ReaderFakePlan = .environment) {
         self.role = role
         self.serviceName = role.serviceName(appID: appID)
         self.fakes = fakes
+        #if !MAS
         for typo in fakes.unrecognized { FileHandle.standardError.write("reader: MWOYEO_FAKE_READER mode not understood: \(typo)\n".data(using: .utf8)!) }
+        #endif
     }
 
     /// The pid of the service that answered last, nil before the first answer and after an interruption.
@@ -216,4 +218,14 @@ final class ReaderConnection: @unchecked Sendable {
             c?.resume(returning: value)
         }
     }
+}
+
+extension ReaderFakePlan {
+    /// `MWOYEO_FAKE_READER`: the fakes of the reader gates and the benches. The App Store build fakes nothing, and Core only parses a
+    /// spec, so the variable is read here, under the condition that keeps it out of that build.
+    #if MAS
+    static let environment = ReaderFakePlan(nil)
+    #else
+    static let environment = ReaderFakePlan(ProcessInfo.processInfo.environment["MWOYEO_FAKE_READER"])
+    #endif
 }

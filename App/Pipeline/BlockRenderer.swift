@@ -135,7 +135,9 @@ enum BlockRenderer {
             // Busy background: a soft halo in the background colour keeps text readable.
             ctx.setShadow(offset: .zero, blur: size * 0.25, color: input.appearance.backgroundColor.cgColor)
         }
+        #if !MAS
         if ProcessInfo.processInfo.environment["MWOYEO_ERASE_ONLY"] != nil { return ctx.makeImage().map { Rendered(image: $0, text: .zero) } } // debug: background only
+        #endif
         let setter = CTFramesetterCreateWithAttributedString(string)
         let pathWidth = input.centered ? textRect.width : max(textRect.width, measured.width + 1)
         let path = CGPath(rect: CGRect(x: textRect.minX, y: textRect.minY - 2, width: pathWidth, height: textRect.height + 4), transform: nil)

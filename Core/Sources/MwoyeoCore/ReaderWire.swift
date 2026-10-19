@@ -300,7 +300,7 @@ public enum ReaderFakeAction: Codable, Sendable, Equatable {
     public static let e5rtDescription = "e5rtError(\"e5rt_execution_stream_operation_create_precompiled_compute_operation_with_options call failed\", 13)"
 }
 
-/// `MWOYEO_FAKE_READER=<mode>[,<mode>…]`, read by the client:
+/// `MWOYEO_FAKE_READER=<mode>[,<mode>…]`, read by the client (`ReaderFakePlan.environment`, App/Reader/ReaderConnection.swift):
 /// - `docs-slow:<ms>`, `lines-slow:<ms>`: every job of that role sleeps, then answers;
 /// - `lines-e5rt[:<n>]`, `docs-e5rt[:<n>]`: the first n (20) jobs of its newest model (`rev3`/`warmLines`, `doc`/`warmDoc`) fail with Code 13;
 /// - `crash`, `crash:lines`, `crash:docs`: the next job (of that role) makes its service exit(1), once;
@@ -314,8 +314,6 @@ public final class ReaderFakePlan: @unchecked Sendable {
     private var shift = false
     /// Modes of the spec this plan does not know (a typo would otherwise fake nothing, silently).
     public let unrecognized: [String]
-
-    public static let environment = ReaderFakePlan(ProcessInfo.processInfo.environment["MWOYEO_FAKE_READER"])
 
     public init(_ spec: String?) {
         var unknown: [String] = []

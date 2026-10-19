@@ -15,6 +15,7 @@ reason), **shipped** (version).
 | Context-aware translation: a per-app rolling transcript sent with each request, cached; configurable, measured defaults | The strongest wish in the research: LLM-grade quality with context and tone (13 communities). Design: `docs/design/context-translation.md` | **next** (1.1.4) |
 | Keep identifiers inside paragraphs: camelCase and code names in running prose come back with their case changed | Seen in the App Store screenshot renders (2026-10-19); today the guard works per line or block | open |
 | Join end-of-line hyphens before translating ("noth-ing") | Paper renders leave such words untranslated | open |
+| Keep a wrapped message's short last line (1–3 characters) with its paragraph | Chat renders translate such a tail on its own ("イだわ" became a separate block) | open |
 | Inline math kept inside translated lines | Display equations are kept; inline ones come out as plain text. Design: `docs/design/keep-boundary.md` | parked (keep-boundary judge) |
 
 ## Recognition (OCR)

@@ -73,6 +73,14 @@ def call(method, path, body=None):
             return json.loads(data) if data else {}
     except urllib.error.HTTPError as e:
         detail = e.read().decode()
+        # A read that meets a server error is asked again (a poll of a preview's processing got one HTTP 500, 2026-10-20).
+        if method == 'GET' and e.code >= 500 and getattr(call, 'retries', 0) < 3:
+            call.retries = getattr(call, 'retries', 0) + 1
+            time.sleep(10)
+            try:
+                return call(method, path, body)
+            finally:
+                call.retries -= 1
         sys.exit(f'{method} {path}: HTTP {e.code}\n{detail[:1500]}')
 
 
@@ -286,6 +294,13 @@ def previews(dry):
         preview_set = next((x for x in sets if x['attributes']['previewType'] == 'DESKTOP'), None)
         old = call('GET', f'/v1/appPreviewSets/{preview_set["id"]}/appPreviews')['data'] if preview_set else []
         data_size = os.path.getsize(files[lang])
+        # A rerun after a failure keeps what already went up: one preview of the same size that Apple took is not sent again.
+        kept = [o for o in old if o['attributes'].get('fileSize') == data_size
+                and ((o['attributes'].get('videoDeliveryState') or {}).get('state') in ('UPLOAD_COMPLETE', 'PROCESSING', 'COMPLETE'))]
+        if len(old) == 1 and kept:
+            print(f'{theirs}: DESKTOP set {preview_set["id"]}, already has out/{lang}.mp4 '
+                  f'({(kept[0]["attributes"].get("videoDeliveryState") or {}).get("state")}), kept')
+            continue
         print(f'{theirs}: DESKTOP set {preview_set["id"] if preview_set else "(create)"}, delete {len(old)}, upload out/{lang}.mp4 '
               f'({data_size} bytes), poster frame {posters[lang] or "(Apple default, 5 s)"}')
         if dry:

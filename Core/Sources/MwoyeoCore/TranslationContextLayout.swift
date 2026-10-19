@@ -51,10 +51,16 @@ public struct ContextOptions: Codable, Equatable, Sendable {
     public var deepLInstructions: Bool
     /// The user opted in to a conversation longer than `shortTranscript` lines.
     public var longTranscript: Bool
+    /// "Memory only" (design §9, lead decision D1 of 2026-10-19): the user wrote a note or names for the app, and that is all the
+    /// request carries besides the lines: the card (app name and category word), the note and the matching user rows. No
+    /// neighbours, no earlier lines, no window title (on-device engines too), no learned rows, no who's who, whatever the other
+    /// fields say. A case of its own, not a value of `transcriptCount` or of an app's override. Set with `enabled`, because the
+    /// body is the context body; `memoryOnlyOptions(engine:profile:)` is the one place that says when it applies.
+    public var memoryOnly: Bool
 
     public init(enabled: Bool = false, transcriptCount: Int? = nil, trusted: Trusted = .none, includeUser: Bool = true,
                 includeLearned: Bool = false, includeCard: Bool = true, includeTitle: Bool = false, format: Format = .line,
-                deepLInstructions: Bool = false, longTranscript: Bool = false) {
+                deepLInstructions: Bool = false, longTranscript: Bool = false, memoryOnly: Bool = false) {
         self.enabled = enabled
         self.transcriptCount = transcriptCount.map { min(8, max(0, $0)) }
         self.trusted = trusted
@@ -65,6 +71,7 @@ public struct ContextOptions: Codable, Equatable, Sendable {
         self.format = format
         self.deepLInstructions = deepLInstructions
         self.longTranscript = longTranscript
+        self.memoryOnly = memoryOnly
     }
 
     /// Off, spelled out: it stays Off whatever a default becomes.
@@ -72,7 +79,7 @@ public struct ContextOptions: Codable, Equatable, Sendable {
 
     enum CodingKeys: String, CodingKey {
         case enabled, transcriptCount, trusted, includeUser, includeLearned, includeCard, includeTitle, format
-        case deepLInstructions, longTranscript
+        case deepLInstructions, longTranscript, memoryOnly
     }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -86,7 +93,8 @@ public struct ContextOptions: Codable, Equatable, Sendable {
             includeTitle: (try? c.decodeIfPresent(Bool.self, forKey: .includeTitle)) ?? false,
             format: (try? c.decodeIfPresent(Format.self, forKey: .format)) ?? .line,
             deepLInstructions: (try? c.decodeIfPresent(Bool.self, forKey: .deepLInstructions)) ?? false,
-            longTranscript: (try? c.decodeIfPresent(Bool.self, forKey: .longTranscript)) ?? false)
+            longTranscript: (try? c.decodeIfPresent(Bool.self, forKey: .longTranscript)) ?? false,
+            memoryOnly: (try? c.decodeIfPresent(Bool.self, forKey: .memoryOnly)) ?? false)
     }
 }
 
@@ -126,6 +134,9 @@ public struct ContextRequest: Sendable {
     public var before: [ContextLine]
     /// The lines after the items on screen.
     public var after: [String]
+    /// The lines right above the items on screen, nearest last (`ContextNeighbours.around`). They go as `context_before` only
+    /// when no earlier lines do (`transcriptCount` 0, the "nearby" case): with earlier lines they are already the tail of `before`.
+    public var above: [String]
     /// The rows the sheet offers (`ContextMemory.rows`): user entries and usable learned entries. The layout selects.
     public var memory: [MemoryEntry]
     public var card: DocumentCard?
@@ -141,10 +152,11 @@ public struct ContextRequest: Sendable {
 
     public init(items: [String], before: [ContextLine] = [], after: [String] = [], memory: [MemoryEntry] = [],
                 card: DocumentCard? = nil, note: String = "", referents: [Referent] = [], source: String? = nil,
-                target: String, glossary: [(String, String)] = [], threadKey: String? = nil) {
+                target: String, glossary: [(String, String)] = [], threadKey: String? = nil, above: [String] = []) {
         self.items = items
         self.before = before
         self.after = after
+        self.above = above
         self.memory = memory
         self.card = card
         self.note = note
@@ -212,7 +224,7 @@ public enum LayoutKind: Equatable, Sendable {
 
     /// Whether the note, the rows and the referents go out at all. DeepL takes them only through `custom_instructions`,
     /// which is the user's opt-in (`ContextOptions.deepLInstructions`); every other kind carries them in its prompt.
-    func sendsMemory(_ options: ContextOptions) -> Bool {
+    public func sendsMemory(_ options: ContextOptions) -> Bool {
         if case .engine(.deepL) = self { return options.deepLInstructions }
         return true
     }
@@ -312,20 +324,26 @@ public enum RequestLayout {
         // Which rows are candidates, and which glossary pairs they replace.
         let userKeys = Set(request.memory.filter { $0.origin == .user }.map(\.id))
         let glossaryKeys = Set(request.glossary.map { ContextText.foldedKey($0.0) })
+        // Memory only is the user's own rows and nothing learned (design D1); the guards below keep it so whatever else is set.
+        let memoryOnly = options.memoryOnly
         var candidates = request.memory.filter { e in
             switch e.origin {
             case .user: options.includeUser
-            case .learned: options.includeLearned && !userKeys.contains(e.id) && !glossaryKeys.contains(e.id)
+            case .learned: options.includeLearned && !memoryOnly && !userKeys.contains(e.id) && !glossaryKeys.contains(e.id)
             }
         }
         candidates = candidates.filter { !$0.src.isEmpty && !$0.dst.isEmpty }
         let glossary = options.includeUser ? request.glossary.filter { !userKeys.contains(ContextText.foldedKey($0.0)) } : request.glossary
 
-        // Context lines.
+        // Context lines. Earlier lines (the thread) when the options ask for some; with none (nearby) the lines right above the
+        // items on screen, as many as the lines below. Memory only has neither.
         let cap = options.longTranscript ? budget.maxTranscript : min(ContextOptions.shortTranscript, budget.maxTranscript)
-        let count = min(options.transcriptCount ?? budget.defaultTranscript, cap)
+        let count = memoryOnly ? 0 : min(options.transcriptCount ?? budget.defaultTranscript, cap)
         let skip = Set(request.items.map(ContextText.collapse))
-        let beforeAll = request.before.filter { !skip.contains(ContextText.collapse($0.source)) }.suffix(count)
+        var beforeAll = Array(request.before.filter { !skip.contains(ContextText.collapse($0.source)) }.suffix(count))
+        if count == 0, !memoryOnly {
+            beforeAll = request.above.filter { !skip.contains(ContextText.collapse($0)) }.suffix(budget.afterLines).map { ContextLine(source: $0) }
+        }
         let useTranslations = options.trusted != .none
         let before: [ContextLine] = beforeAll.map { line in
             var l = line
@@ -334,7 +352,7 @@ public enum RequestLayout {
             l.translation = keep ? line.translation.map { ContextText.truncated(ContextText.collapse($0), toTokens: budget.lineTokens) } : nil
             return l
         }
-        let after = request.after.prefix(budget.afterLines).map { ContextText.truncated(ContextText.collapse($0), toTokens: budget.lineTokens) }
+        let after = memoryOnly ? [] : request.after.prefix(budget.afterLines).map { ContextText.truncated(ContextText.collapse($0), toTokens: budget.lineTokens) }
 
         // Rows: hits in the items, plus the speakers named in the surrounding lines.
         let surrounding = before.map(\.source) + after
@@ -343,15 +361,15 @@ public enum RequestLayout {
         // Card and note.
         var card: String?
         if options.includeCard, let c = request.card {
-            let titleAllowed = ContextPrivacy.includesTitle(onDevice: kind.isOnDevice, optedIn: options.includeTitle)
+            let titleAllowed = !memoryOnly && ContextPrivacy.includesTitle(onDevice: kind.isOnDevice, optedIn: options.includeTitle)
             card = c.rendered(includeTitle: titleAllowed, maxTokens: budget.cardTokens)
         }
         let note = request.note.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedNote = ContextText.truncated(note, toTokens: budget.noteTokens)
 
         return Prepared(rows: rows, card: card, note: trimmedNote, before: before, after: after,
-                        referents: Array(request.referents.filter { !$0.isEmpty }.prefix(Referent.maxCount)),
-                        glossary: glossary, format: options.format, wantsTerms: options.includeLearned)
+                        referents: memoryOnly ? [] : Array(request.referents.filter { !$0.isEmpty }.prefix(Referent.maxCount)),
+                        glossary: glossary, format: options.format, wantsTerms: options.includeLearned && !memoryOnly)
     }
 
     /// Rows whose `src` occurs in an item, plus (unless the tier is hits-only) persons named in the surrounding lines;
@@ -548,7 +566,7 @@ public enum RequestLayout {
         if options.includeCard, let c = request.card {
             parts.append(c.appName)
             if let d = c.domain { parts.append(d) }
-            if ContextPrivacy.includesTitle(onDevice: kind.isOnDevice, optedIn: options.includeTitle), !c.title.isEmpty {
+            if !options.memoryOnly, ContextPrivacy.includesTitle(onDevice: kind.isOnDevice, optedIn: options.includeTitle), !c.title.isEmpty {
                 parts.append("\"\(c.title)\"")
             }
         }

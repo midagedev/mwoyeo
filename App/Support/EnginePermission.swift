@@ -67,14 +67,19 @@ struct EnginePermissions: Codable, Equatable {
     }
 
     /// The profiles whose written memory goes to `engine` (design §9, D1: writing a note or names is the opt-in): the app has a note
-    /// or names, the app does not use another engine, and the request path would send it. The question is put to the request path's own
-    /// rule (`ContextOptions.requestOptions`), so the disclosure cannot drift from what is sent: it covers an engine whose Context is
-    /// off ("memory only") and one that is on, and leaves out an app whose context is `off`, DeepL, and an engine that owns its body.
+    /// or names and the request path would send it. The question is put to the request path's own rule (`ContextOptions.requestOptions`),
+    /// so the disclosure cannot drift from what is sent: it covers an engine whose Context is off ("memory only") and one that is on, and
+    /// leaves out an app whose context is `off`, DeepL, and an engine that owns its body.
+    ///
+    /// The profile's own `customEngineID` is not asked: a request pairs the engine of the app in front with the profile of the app under
+    /// the lens (`ContextRoute`), so a lens over app B while app A is in front sends B's memory to A's engine. Any engine can be the one
+    /// in front (the base choice, an app's own, or one the person is about to choose), so every profile with memory is a candidate.
+    /// `ContextChecks` walks `ContextRoute.pairings` against this.
     static func memoryProfiles(_ engine: EngineConfig, profiles: [AppProfile]) -> [AppProfile] {
         let kind = LayoutKind.engine(engine.kind)
         guard kind.tier != nil else { return [] }
         return profiles.filter { p in
-            guard p.hasMemory, p.customEngineID == nil || p.customEngineID == engine.id else { return false }
+            guard p.hasMemory else { return false }
             let options = ContextOptions.requestOptions(engine: engine, profile: p)
             return options.enabled && kind.sendsMemory(options)
         }

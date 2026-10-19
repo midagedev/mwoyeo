@@ -1,0 +1,76 @@
+\section{Constants}\label{app:constants}
+
+Table~\ref{tab:constants} collects the constants that the paper uses, with the file that defines each. They are the values at the stated revision.
+
+\begin{table*}[t]
+\centering
+\caption{Constants of the method. A line number in \texttt{sources.tsv} locates each of them; \texttt{check.py} fails if one moves or changes.}\label{tab:constants}
+\small
+\begin{tabular}{@{}p{1.55in}p{0.85in}p{2.55in}p{1.55in}@{}}
+\toprule
+Name & Value & Meaning & File\\
+\midrule
+\code{latency} ($\lambda$) & 0.016\,s & delivery latency from an event to the screen & \code{ScrollPredictor.swift}\\
+\code{stepDuration} ($T$) & 0.15\,s & duration over which an application animates one line step & \code{ScrollPredictor.swift}\\
+event window & 2\,s & older wheel events are dropped & \code{ScrollPredictor.swift}\\
+initial $\rho_P$ & 1 & points per precise unit before a frame has confirmed it & \code{ScrollPredictor.swift}\\
+learning rate & 0.3 & weight of a new sample in Eq.~(\ref{eq:confirm}) & \code{ScrollPredictor.swift}\\
+sample gate & $0.33$--$3$ & accepted range of $\hat\rho/\rho_c$ & \code{ScrollPredictor.swift}\\
+prediction horizon & 1\,s & time after the last event until the prediction ends & \code{RegionSession.swift}\\
+spring stiffness / mass & 900 / 1 & critically damped, so $\omega_0=30$\,rad/s & \code{OverlayPanel.swift}\\
+spring range & 80\,pt & larger errors jump instead of easing & \code{OverlayPanel.swift}\\
+capture rate & 8\,fps & default frames per second & \code{Settings.swift}\\
+settle delay & 0.5\,s & stillness before the seamless pass & \code{Settings.swift}\\
+change tile / delta / pixels & 16 / 24 / 2 & the tile diff & \code{FrameDiff.swift}\\
+shift acceptance & $0.25$, $0.6$, $8$ & minimum shift, error ratio and error bound & \code{FrameDiff.swift}\\
+flat background & $\hat\sigma<6$ & robust noise of the ring & \code{TextErase.swift}\\
+glyph contrast & $\max(12,2.5\hat\sigma)$ & least luma distance from the background & \code{TextErase.swift}\\
+segmentation fallback & $>0.6$ & share of the text rectangle that makes the mask the whole rectangle & \code{TextErase.swift}\\
+mask dilation & $0.07\,h$ & at least 1 pixel & \code{RegionPipeline.swift}\\
+erase margin & $0.18\,h$ & at least 3 pixels & \code{BlockRenderer.swift}\\
+inpainting window / step & 512 / 384 & pixels & \code{Inpainter.swift}\\
+model idle release & 60\,s & after the last fill & \code{Inpainter.swift}\\
+docs / accurate / fast patience & 2 / 3 / 1\,s & how long a lens waits for a reader & \code{ReaderHealth.swift}\\
+math share / signs / size & 0.30 / 2 / 20 & the test of Eq.~(\ref{eq:share}) & \code{Text.swift}\\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\section{Worked examples of the predictor}\label{app:examples}
+
+The unit tests of \url{Core/Tests/MwoyeoCoreTests/CoreTests.swift} fix the equations with numbers, and the paper uses them as worked examples.
+(i)~\emph{Trackpad deltas, one to one.} Ten events of $-4$ points at 10\,ms intervals starting at $t=1$\,s, with $\lambda=0$: the offset from the frame at
+$t_0=1.045$\,s to $2$\,s is $-20$, the five events after the frame (Proposition~\ref{prop:exact}).
+(ii)~\emph{A line wheel.} One event of $-1$ line at $t=0$: the offset is $0$ until a frame has confirmed a shift. The report $\sigma=-40$ over $[0,1]$ gives the sample
+$\hat\rho=-40/-1=40$ points per wheel unit, which becomes $\rho_L$ (Eq.~\ref{eq:confirm}, first case). A second event of $-1$ at $t=2$ then moves the content by a part of $-40$ halfway through the step,
+between $-20$ and $-40$, and by all of it, $-40$, once the step is over.
+(iii)~\emph{A stop, then a longer scroll.} One precise event of $-50$ meets a frame that shows no movement, because the page was already at its end: the sample is $0$, outside the
+gate $0.33$--$3$, and $\rho_P$ stays $1$. A later frame shows $-60$ for the same event: $\hat\rho=1.2$ is inside the gate, $\rho_P=1+0.3\cdot0.2=1.06$, and the offset for the same event is $-53$.
+
+\section{Isolating a formula}\label{app:formula}
+
+Listing~\ref{lst:formula} shows the decision of the formula test after the scan of the line (Eq.~\ref{eq:formula}). The scan fills the
+counters (\code{proseWords}, \code{relation}, \code{sign}, \dots); the decision that follows the early exits is eight lines.
+
+\begin{listing}[t]
+\lstinputlisting[firstnumber=559]{listings/Text_isFormula_decision.swift}
+\caption{The decision of \code{FormulaScan.isFormula} after its early exits, \texttt{Core/Sources/MwoyeoCore/Text.swift}, lines 559--566, as it is in the repository.}\label{lst:formula}
+\end{listing}
+
+\section{Reproducing the numbers}\label{app:repro}
+
+Each result is produced by a script in \texttt{tools/} and checked against the committed file; the commands are those of the bench READMEs.
+
+\begin{listing}[t]
+\begin{lstlisting}[style=shell]
+$ python3 -I tools/paper-own/mwoyeo-method/check.py
+$ cd tools/translation-bench
+$ python3 -I score.py runs/A-gemma3-4b runs/M-gemma3-4b
+$ python3 -I runs.py verify
+$ cd ../keep-labels && ./run-rules.sh
+$ cd ../paper-bench && ./pages.sh /tmp/paper-quality/own
+$ ./run.sh <Mwoyeo binary> /tmp/paper-quality/own-out
+$ cd ../usecase-bench && ./bench.sh <Mwoyeo binary> vn swift auto
+\end{lstlisting}
+\caption{Commands that reproduce or check the numbers of this paper, from the repository root.}\label{lst:repro}
+\end{listing}

@@ -1,0 +1,121 @@
+\documentclass[10pt,twocolumn]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.8in,bottom=0.85in,left=0.75in,right=0.75in,columnsep=0.25in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{newfloat}
+\DeclareFloatingEnvironment[fileext=lol,name=Listing]{listing}
+\captionsetup{font=small,labelfont=bf,labelsep=period,justification=justified,singlelinecheck=off}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc,shapes.geometric,backgrounds}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hyphens]{url}
+\Urlmuskip=0mu plus 1mu\relax
+\def\UrlBreaks{\do\/\do\-\do\.\do\_}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black,
+  pdftitle={Mwoyeo: In-Place Screen Translation that Keeps Up with the Scroll},
+  pdfauthor={midagedev},pdfsubject={Mwoyeo method paper},pdfkeywords={screen translation, scroll prediction, text erasure}]{hyperref}
+
+\setlist{nosep,leftmargin=1.4em}
+\setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{2em}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.75}
+\renewcommand{\dblfloatpagefraction}{0.75}
+\renewcommand{\dbltopfraction}{0.9}
+
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+% Swift listings, copied verbatim from the repository (see build.sh).
+\lstdefinelanguage{Swift}{
+  morekeywords={func,let,var,struct,enum,class,public,private,static,guard,else,if,return,for,in,where,case,switch,default,init,mutating,extension,import,some,as,is,nil,true,false,self,Self,try,throws,while,fileprivate},
+  morecomment=[l]{//},
+  morestring=[b]",
+  sensitive=true
+}
+\lstset{
+  language=Swift,
+  basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\bfseries\color{blue!45!black},
+  commentstyle=\itshape\color{black!60},
+  stringstyle=\color{red!45!black},
+  numbers=left,numberstyle=\tiny\color{black!55},numbersep=4pt,
+  frame=tb,rulecolor=\color{black!40},
+  columns=fullflexible,keepspaces=true,
+  breaklines=true,breakindent=1.2em,breakautoindent=false,
+  showstringspaces=false,
+  aboveskip=0.4em,belowskip=0.2em,
+  xleftmargin=1.6em
+}
+\lstdefinestyle{shell}{language={},basicstyle=\ttfamily\scriptsize,numbers=none,xleftmargin=0.4em}
+
+% Notation.
+\newcommand{\Real}{\mathbb{R}}
+\newcommand{\code}[1]{\texttt{#1}}
+\DeclareMathOperator{\clamp}{clamp}
+\DeclareMathOperator{\median}{median}
+\DeclareMathOperator{\MAD}{MAD}
+
+\title{\bfseries Mwoyeo: In-Place Screen Translation\\that Keeps Up with the Scroll}
+\date{2026-10-19}
+
+\begin{document}
+
+\twocolumn[
+\begin{@twocolumnfalse}
+\begin{center}
+{\LARGE\bfseries Mwoyeo: In-Place Screen Translation\\[0.2em] that Keeps Up with the Scroll\par}
+\vspace{1.1em}
+\begin{tabular}{@{}p{0.31\textwidth}@{\hspace{0.015\textwidth}}p{0.31\textwidth}@{\hspace{0.015\textwidth}}p{0.31\textwidth}@{}}
+\centering \textbf{midagedev}\\ Independent developer\\ \texttt{midagedev@gmail.com} &
+\centering \textbf{The Mwoyeo project}\\ \texttt{github.com/midagedev/mwoyeo}\\ MIT licence, source revision \texttt{499e312} &
+\centering \textbf{Correspondence}\\ \texttt{midagedev@gmail.com}\\ 2026-10-19
+\end{tabular}
+\vspace{1.0em}
+\end{center}
+\begin{center}
+\begin{minipage}{0.86\textwidth}
+\small
+\textbf{Abstract.}\enspace
+\input{sections/abstract}
+\end{minipage}
+\end{center}
+\vspace{0.8em}
+\end{@twocolumnfalse}
+]
+
+\input{sections/intro}
+\input{sections/overview}
+\input{sections/keep}
+\input{sections/erase}
+\input{sections/scroll}
+\input{sections/measure}
+\input{sections/related}
+\input{sections/limits}
+
+\bibliographystyle{unsrtnat}
+\bibliography{refs}
+
+\appendix
+\input{sections/appendix}
+
+\end{document}

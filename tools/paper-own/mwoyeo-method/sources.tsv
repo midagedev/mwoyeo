@@ -1,0 +1,285 @@
+# needle	location	section	claim   (needle: text that must be on that line of main; cmd: rows run the command from the repository root
+# and look for the needle in its output). check.py fails when a needle is no longer where it is listed.
+erases it from the picture	README.en.md:28	1 intro	Mwoyeo reads the text under a lens and erases it from the picture
+place, size and colour	README.en.md:29	1 intro	and paints the translation back in the same place, size and colour
+open source (MIT)	README.en.md:23	1 intro	the code is open source (MIT)
+Free · open source (MIT) · macOS 26 or later	README.en.md:23	1 intro	Mwoyeo is a macOS application
+compiles the line reads in until it stops reading lines in its own process	Shared/VisionExec.swift:23	1 intro	line reads still run in the application's own process
+/// (`RecognizeDocumentsRequest`) are compiled into the services only	Shared/VisionExec.swift:24	1 intro	document reads (RecognizeDocumentsRequest) are compiled into the services only
+MwoyeoReaderDocs	project.yml:76	1 intro	the Docs XPC service target
+- target: MwoyeoReaderDocs	project.yml:97	1 intro	the Docs service is embedded in the app
+var framesPerSecond = 8.0	App/Model/Settings.swift:201	2 overview	the default capture rate is 8 frames per second
+capture period 125 ms at 8 frames per second, lag at 1000 points per second 125 points	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	2 overview	capture period 125 ms at 8 frames per second, lag at 1000 points per second 125 points
+c.minimumFrameInterval = CMTime(value: 1, timescale: CMTimeScale(max(1, min(30, fps))))	App/Capture/RegionCapturer.swift:106	2 overview	minimum frame interval one over the rate, capped at 30
+c.queueDepth = 4	App/Capture/RegionCapturer.swift:107	2 overview	queue depth 4
+let gray = GrayImage(bgra: base	App/Capture/RegionCapturer.swift:151	2 overview	each frame is reduced to a gray image
+tile: Int = 16, delta: Int = 24, minPixels: Int = 2	Core/Sources/MwoyeoCore/FrameDiff.swift:109	2 overview	a 16x16 tile changes when at least 2 pixels moved by more than 24 luma levels
+Counting strong pixel changes (instead of averaging) keeps a single edited glyph from being diluted	Core/Sources/MwoyeoCore/FrameDiff.swift:107	2 overview	counting strong changes keeps one glyph from being diluted
+("fast"), follow scrolls by shifting existing blocks instead of re-reading them.	App/Pipeline/RegionPipeline.swift:101	2 overview	fast mode follows scrolls by shifting blocks
+While content moves: re-read only the changed band (tile diff), show translations on plain boxes	App/Pipeline/RegionPipeline.swift:100	2 overview	fast mode re-reads only the changed band on plain boxes
+Once still for `settleDelay`: read paragraphs, erase the source text (flat fill or MI-GAN) and write the	App/Pipeline/RegionPipeline.swift:102	2 overview	seamless pass after the page is still for settleDelay
+translation in its place ("seamless"), crossfading from the fast boxes.	App/Pipeline/RegionPipeline.swift:103	2 overview	seamless pass cross-fades from the fast boxes
+The capture covers more than the visible lens ("overscan")	App/Pipeline/RegionPipeline.swift:97	2 overview	the capture covers more than the lens
+var settleDelay = 0.5	App/Model/Settings.swift:203	2 overview	the default settleDelay is 0.5 s
+doc 0.33-0.48 s → 2 s	Core/Sources/MwoyeoCore/ReaderHealth.swift:21	2 overview	document read warm latency 0.33-0.48 s, patience 2 s
+accurate 0.25-0.88 s, ×3 → 3 s	Core/Sources/MwoyeoCore/ReaderHealth.swift:21	2 overview	accurate line read warm latency 0.25-0.88 s, patience 3 s
+`.fast` 0.06-0.1 s → 1 s	Core/Sources/MwoyeoCore/ReaderHealth.swift:21	2 overview	fast line read 0.06-0.1 s, patience 1 s
+case .doc: 2	Core/Sources/MwoyeoCore/ReaderHealth.swift:24	2 overview	document patience S = 2 s
+case .rev3, .rev2: 3	Core/Sources/MwoyeoCore/ReaderHealth.swift:25	2 overview	accurate patience 3 s
+case .fast: 1	Core/Sources/MwoyeoCore/ReaderHealth.swift:26	2 overview	fast patience 1 s
+The fast recognizer: never compiles, Latin only.	Core/Sources/MwoyeoCore/ReaderHealth.swift:17	2 overview	the fast recogniser reads Latin scripts only
+A document answer that is here when the VN read ends is the one used	App/Pipeline/TextRecognizer.swift:38	2 overview	a document answer present when the line read ends is used
+VN revision 3 + `ParagraphGrouper` > revision 2 > `.fast`	App/Pipeline/TextRecognizer.swift:35	2 overview	the reader falls back to the line reader and a paragraph grouper
+the first one compiles for tens of seconds	Core/Sources/MwoyeoCore/DocsRoute.swift:22	2 overview	the first document read compiles for tens of seconds
+worker 1, 2, 4 … 30 s from the answer	Core/Sources/MwoyeoCore/DocsRoute.swift:60	2 overview	successive slow answers rest the worker 1, 2, 4 ... 30 s
+return Array(ordered.prefix(3))	App/Pipeline/RegionPipeline.swift:1481	2 overview	batches of at most three new lines
+By default everything runs on your Mac and nothing on your screen is	README.en.md:30	2 overview	by default nothing from the screen leaves the machine
+| Apple low latency | Translation framework | this Mac | 0.15 | 0.41 |	tools/engine-bench/RESULTS.md:15	2 overview	Apple low latency warm median 0.15 s per batch of 3 lines
+Machine: Apple M1 Pro, 32 GB	tools/engine-bench/RESULTS.md:3	2 overview	engine bench machine is an M1 Pro
+Host: Apple M4 Pro 48GB	tools/inpaint/BENCH.md:3	2 overview	inpaint bench machine is an M4 Pro
+| MIGAN_512 | 14.2 MB | cpuAndGPU | 170 | 203 | 13.3 | 13.4 |	tools/inpaint/BENCH.md:15	2 overview	MI-GAN 512 on the GPU: median 13.3 ms
+("K" came back as "1천")	Core/Sources/MwoyeoCore/Text.swift:313	3 keep	a figure label K came back from the engine as a word with a digit
+return matchesLiteralPattern(t) || isFormula(t) || isIdentifier(t) || isMathHeavy(t)	Core/Sources/MwoyeoCore/Text.swift:293	3 keep	literal = pattern or formula or identifier or math-heavy
+if letters == 1 { return true }	Core/Sources/MwoyeoCore/Text.swift:554	3 keep	one letter in all is a formula
+if proseWords > 2 { return false }	Core/Sources/MwoyeoCore/Text.swift:558	3 keep	at most two prose words
+let one = proseWords == 1 && relation && rest >= 2 * proseLetters	Core/Sources/MwoyeoCore/Text.swift:561	3 keep	one prose word: relation and rest at least twice its letters
+let two = proseWords == 2 && relation && callSeen && proseRuns == [0, 1] && 2 * rest >= 3 * proseLetters	Core/Sources/MwoyeoCore/Text.swift:562	3 keep	two prose words: first two runs, relation, call, 2 rest >= 3 prose letters
+if sign { return true }	Core/Sources/MwoyeoCore/Text.swift:565	3 keep	a sign is evidence of mathematics
+if onlyAtoms && (digitLetter || (capsCluster && !digit)) { return true }	Core/Sources/MwoyeoCore/Text.swift:566	3 keep	only atoms with a digit-letter run or a capital consonant cluster without digits
+(contraction || (count >= 3 && vowel))	Core/Sources/MwoyeoCore/Text.swift:524	3 keep	a prose word is three letters or more with a vowel, or a contraction
+A prose word is a run of three letters or more with a vowel ("has"), or a contraction, that is not an operand.	Core/Sources/MwoyeoCore/Text.swift:323	3 keep	prose word definition
+static let mathShareLimit = 0.30	Core/Sources/MwoyeoCore/Text.swift:352	3 keep	math share limit 0.30
+static let mathSignLimit = 2	Core/Sources/MwoyeoCore/Text.swift:353	3 keep	at least 2 signs
+return m.supported && m.signs >= mathSignLimit && m.characters >= 20 && m.share >= mathShareLimit	Core/Sources/MwoyeoCore/Text.swift:343	3 keep	isMathHeavy: signs >= 2, at least 20 characters, share >= 0.30
+guard scalars.count >= 3, scalars.allSatisfy({ CharacterSet.letters.contains($0) && !isCJK($0) }) else { return false }	Core/Sources/MwoyeoCore/Text.swift:361	3 keep	identifier: at least three letters, no CJK
+return zip(scalars, scalars.dropFirst()).contains { CharacterSet.lowercaseLetters.contains($0) && CharacterSet.uppercaseLetters.contains($1) }	Core/Sources/MwoyeoCore/Text.swift:362	3 keep	identifier: a lowercase letter directly followed by a capital
+case .digitsOnly, .aOrI, .mixed, .caps, .twoLetters: if beside { math += size }	Core/Sources/MwoyeoCore/Text.swift:693	3 keep	neutral words count as mathematics only beside a sign
+guard attached, k > 0, case let .run(_, _, shape) = core[k - 1]	Core/Sources/MwoyeoCore/Text.swift:686	3 keep	a superscript mark after a variable counts as a sign
+A `€` next to a number is a price.	Core/Sources/MwoyeoCore/Text.swift:580	3 keep	a currency sign next to a number is a price
+It reads the text and the geometry only; no model, no per-language word list	Core/Sources/MwoyeoCore/CodeRegion.swift:7	3 keep	CodeRegion reads text and geometry only
+The constants, fitted on the dev sets of tools/keep-labels	Core/Sources/MwoyeoCore/CodeRegion.swift:45	3 keep	the constants were fitted on the keep-label development sets
+static let tint = 6	Core/Sources/MwoyeoCore/CodeRegion.swift:48	3 keep	tint threshold 6 levels
+static let gap = 1.5	Core/Sources/MwoyeoCore/CodeRegion.swift:50	3 keep	neighbour gap 1.5 line heights
+static let rowGap = 3.0	Core/Sources/MwoyeoCore/CodeRegion.swift:52	3 keep	row gap 3.0 line heights
+static let indent = 0.75	Core/Sources/MwoyeoCore/CodeRegion.swift:54	3 keep	indent 0.75 line heights
+static let marginReach = 25.0	Core/Sources/MwoyeoCore/CodeRegion.swift:56	3 keep	margin reach 25 line heights
+static let keywordCount = 1.5	Core/Sources/MwoyeoCore/CodeRegion.swift:57	3 keep	keyword count 1.5
+static let keywordShare = 0.2	Core/Sources/MwoyeoCore/CodeRegion.swift:58	3 keep	keyword share 0.2
+static let symbolShare = 0.15	Core/Sources/MwoyeoCore/CodeRegion.swift:59	3 keep	symbol share 0.15
+static let lineEndShare = 0.4	Core/Sources/MwoyeoCore/CodeRegion.swift:60	3 keep	line end share 0.4
+static let denseFrom = 4	Core/Sources/MwoyeoCore/CodeRegion.swift:62	3 keep	density from 4 content blocks
+static let denseShare = 0.3	Core/Sources/MwoyeoCore/CodeRegion.swift:63	3 keep	density share 0.3
+infos[i].indented = infos[i].x0 - margin >= K.indent * infos[i].lineHeight	Core/Sources/MwoyeoCore/CodeRegion.swift:79	3 keep	indented when the left edge is 0.75 line heights right of the margin
+for c in infos where c.words >= 2 {	Core/Sources/MwoyeoCore/CodeRegion.swift:74	3 keep	the margin is sought among blocks of at least two words
+guard abs(c.midY - infos[i].midY) <= K.marginReach * infos[i].lineHeight,	Core/Sources/MwoyeoCore/CodeRegion.swift:75	3 keep	margin among blocks within 25 line heights
+tinted = Info.delta(b.background, frame) >= K.tint	Core/Sources/MwoyeoCore/CodeRegion.swift:120	3 keep	a block is tinted when its background differs from the frame's by at least 6
+max(abs(Int(a.r) - Int(b.r)), abs(Int(a.g) - Int(b.g)), abs(Int(a.b) - Int(b.b)))	Core/Sources/MwoyeoCore/CodeRegion.swift:128	3 keep	the difference is the largest channel difference
+lineHeight = max(1, heights[heights.count / 2])	Core/Sources/MwoyeoCore/CodeRegion.swift:119	3 keep	the line height is the median of a block's line heights
+let sameRow = min(a.y1, c.y1) - max(a.y0, c.y0) > 0.5 * lh	Core/Sources/MwoyeoCore/CodeRegion.swift:135	3 keep	same row: vertical overlap more than half the line height
+let near = (vgap <= K.gap * lh && !sameRow && overlapX) || (sameRow && hgap <= K.rowGap * lh)	Core/Sources/MwoyeoCore/CodeRegion.swift:138	3 keep	near: stacked within 1.5 lh and overlapping in x, or side by side within 3.0 lh
+if a.tinted && c.tinted && delta(a.background, c.background) <= K.tint { return true }	Core/Sources/MwoyeoCore/CodeRegion.swift:140	3 keep	link by a shared tint
+if a.indented && c.indented { return true }	Core/Sources/MwoyeoCore/CodeRegion.swift:141	3 keep	link by a shared indent
+return ((a.gutter || c.gutter) && sameRow) || (a.gutter && c.gutter)	Core/Sources/MwoyeoCore/CodeRegion.swift:142	3 keep	link by a gutter
+func find(_ i: Int) -> Int {	Core/Sources/MwoyeoCore/CodeRegion.swift:83	3 keep	regions are found with a union-find
+var strong: Int { [keyword, lineEnd, comment, prompt, log, diff].filter { $0 }.count }	Core/Sources/MwoyeoCore/CodeRegion.swift:162	3 keep	strong features: keyword, line end, comment, prompt, log, diff
+var all: Int { strong + [symbol, assignment].filter { $0 }.count }	Core/Sources/MwoyeoCore/CodeRegion.swift:163	3 keep	weak features: symbol, assignment
+f.keyword = strongCount >= 1 && Double(strongCount) + 0.5 * Double(weakCount) >= K.keywordCount	Core/Sources/MwoyeoCore/CodeRegion.swift:172	3 keep	keyword feature: strong >= 1 and strong + 0.5 weak >= 1.5
+&& Double(strongCount + weakCount) / Double(tokens.count) >= K.keywordShare	Core/Sources/MwoyeoCore/CodeRegion.swift:173	3 keep	keyword feature: at least 0.2 of the tokens
+f.lineEnd = Double(hits) / Double(ends.count) >= K.lineEndShare && ends.contains { ";{}".contains($0) }	Core/Sources/MwoyeoCore/CodeRegion.swift:181	3 keep	line ends: at least 0.4 of lines, at least one ; { }
+let hits = ends.filter { ";{})]".contains($0) }.count	Core/Sources/MwoyeoCore/CodeRegion.swift:180	3 keep	line-end characters ; { } ) ]
+if ascii.count >= 6 {	Core/Sources/MwoyeoCore/CodeRegion.swift:185	3 keep	the symbol feature needs at least 6 printable ASCII characters
+let ascii = text.unicodeScalars.filter { $0.value >= 33 && $0.value < 127 }	Core/Sources/MwoyeoCore/CodeRegion.swift:184	3 keep	printable ASCII characters, spaces excluded
+f.symbol = Double(symbols) / Double(ascii.count) >= K.symbolShare	Core/Sources/MwoyeoCore/CodeRegion.swift:187	3 keep	symbol share at least 0.15
+let container = tinted || (members.count > 1 && members.allSatisfy { $0.indented || $0.gutter })	Core/Sources/MwoyeoCore/CodeRegion.swift:254	3 keep	container: tinted, or an indented or gutter run
+let keeps = (tinted && (f.strong >= 1 || weak >= 2))	Core/Sources/MwoyeoCore/CodeRegion.swift:256	3 keep	verdict: tinted with a strong feature or two weak ones
+|| (container && f.strong >= 1)	Core/Sources/MwoyeoCore/CodeRegion.swift:257	3 keep	verdict: container with a strong feature
+|| (members.count > 1 && f.strong >= 1 && f.all >= 2)	Core/Sources/MwoyeoCore/CodeRegion.swift:258	3 keep	verdict: several blocks, a strong feature and two features
+|| f.prompt	Core/Sources/MwoyeoCore/CodeRegion.swift:259	3 keep	verdict: a prompt keeps
+|| f.strong >= 2	Core/Sources/MwoyeoCore/CodeRegion.swift:260	3 keep	verdict: two strong features keep
+guard keeps, hasDensity(members, tinted: tinted) else { return nil }	Core/Sources/MwoyeoCore/CodeRegion.swift:261	3 keep	the density test gates the verdict
+if f.prompt { return .terminal }	Core/Sources/MwoyeoCore/CodeRegion.swift:262	3 keep	reason terminal for a prompt
+if f.diff { return .diff }	Core/Sources/MwoyeoCore/CodeRegion.swift:263	3 keep	reason diff
+if f.log { return .log }	Core/Sources/MwoyeoCore/CodeRegion.swift:264	3 keep	reason log
+if f.assignment && !f.keyword && !f.lineEnd { return .config }	Core/Sources/MwoyeoCore/CodeRegion.swift:265	3 keep	reason config: an assignment with no keyword and no line end
+guard content.count >= K.denseFrom else { return true }	Core/Sources/MwoyeoCore/CodeRegion.swift:243	3 keep	density applies from 4 content blocks
+return Double(withEvidence) / Double(content.count) >= K.denseShare	Core/Sources/MwoyeoCore/CodeRegion.swift:248	3 keep	density: at least 0.3 of the content blocks show evidence
+let content = members.filter { !$0.gutter }	Core/Sources/MwoyeoCore/CodeRegion.swift:242	3 keep	gutter blocks are left out of the count
+The container alone keeps nothing	Core/Sources/MwoyeoCore/CodeRegion.swift:12	3 keep	a container alone keeps nothing
+a comment in any script is code because of	Core/Sources/MwoyeoCore/CodeRegion.swift:7	3 keep	a comment in any script is code because of where it sits
+static func eraseMargin(lineHeight: CGFloat) -> Int { max(3, Int(lineHeight * 0.18)) }	App/Pipeline/BlockRenderer.swift:50	4 erase	ring r = max(3, floor(0.18 h))
+let noise = 1.4826 * Double(median(lumas.map { abs($0 - medL) }))	Core/Sources/MwoyeoCore/TextErase.swift:81	4 erase	robust noise 1.4826 MAD of the ring luma
+public var isFlatBackground: Bool { backgroundNoise < 6 }	Core/Sources/MwoyeoCore/TextErase.swift:12	4 erase	flat background: noise below 6
+let bg = medianColor(border)	Core/Sources/MwoyeoCore/TextErase.swift:78	4 erase	background colour is the median of the ring
+return RGBA(UInt8(median(cs.map { Int($0.r) })), UInt8(median(cs.map { Int($0.g) })),	Core/Sources/MwoyeoCore/TextErase.swift:420	4 erase	medianColor is per channel
+let t = otsuThreshold(hist)	Core/Sources/MwoyeoCore/TextErase.swift:85	4 erase	glyph class by Otsu's threshold
+for y in inner.y..<(inner.y + inner.height) { for x in inner.x..<(inner.x + inner.width) { hist[patch.luma(x: x, y: y)] += 1 } }	Core/Sources/MwoyeoCore/TextErase.swift:84	4 erase	the histogram is of the text rectangle
+let minContrast = max(12, Int(noise * 2.5))	Core/Sources/MwoyeoCore/TextErase.swift:87	4 erase	candidate contrast at least max(12, 2.5 sigma)
+candidate[y * w + x] = (darkGlyphs ? l <= t : l > t) && abs(l - bg.luma) >= minContrast	Core/Sources/MwoyeoCore/TextErase.swift:93	4 erase	candidates are on the glyph side of the threshold
+for dx in -1...1 where dx != 0 || dy != 0 {	Core/Sources/MwoyeoCore/TextErase.swift:119	4 erase	components are 8-connected
+guard reachesInner, !touchesOuter else { continue }	Core/Sources/MwoyeoCore/TextErase.swift:127	4 erase	a component must reach the text rectangle and not touch the outer edge
+if coverage > 0.6 || glyphColors.isEmpty {	Core/Sources/MwoyeoCore/TextErase.swift:141	4 erase	segmentation fallback above 0.6 coverage
+let core = glyphColors.sorted { $0.1 > $1.1 }.prefix(max(1, glyphColors.count / 2)).map(\.0)	Core/Sources/MwoyeoCore/TextErase.swift:153	4 erase	text colour from the most contrasting half of the glyph pixels
+if outlines, let o = outline(in: patch, inner: inner, background: bg) {	Core/Sources/MwoyeoCore/TextErase.swift:166	4 erase	outlined text takes both tones
+static let frameFill = 0.35	Core/Sources/MwoyeoCore/TextErase.swift:179	4 erase	coloured frames must be thin outlines
+static let frameGlyphs = 8	Core/Sources/MwoyeoCore/TextErase.swift:181	4 erase	and hold glyph pixels inside
+dilation: max(1, Int(line.rect.height * 0.07))	App/Pipeline/RegionPipeline.swift:1178	4 erase	dilation max(1, 0.07 h)
+TextEraser.fillEnclosedHoles(&mask, width: rect.width, height: rect.height)	App/Pipeline/RegionPipeline.swift:1200	4 erase	enclosed holes of the mask are filled
+let flat = masks.allSatisfy(\.1.appearance.isFlatBackground)	App/Pipeline/RegionPipeline.swift:1201	4 erase	flat when every line is flat
+} else if !flat, options.useInpainting, let inpainter {	App/Pipeline/RegionPipeline.swift:1209	4 erase	MI-GAN where the background is not flat and inpainting is on
+let limit = min(full.width - (rect.x + rect.width), Int(Double(rect.width) * 0.8), atMost ?? .max)	App/Pipeline/RegionPipeline.swift:1232	4 erase	free width up to 80 percent of the width
+where full.color(x: x, y: y).distance(to: background) > 22 {	App/Pipeline/RegionPipeline.swift:1237	4 erase	free means no pixel differs from the background by more than 22
+let reach = place.columnRight.map { max(0, Int($0 - block.rect.maxX)) }	App/Pipeline/RegionPipeline.swift:1186	4 erase	free width ends at the column's edge
+return h / 0.88	App/Pipeline/RegionPipeline.swift:1250	4 erase	em size h/0.88 for CJK and Hangul
+return text.contains(where: { "gjpqy".contains($0) }) ? h / 0.95 : h / 0.72	App/Pipeline/RegionPipeline.swift:1252	4 erase	Latin: h/0.95 with descenders, h/0.72 otherwise
+CJK and Hangul glyphs fill ~88 % of the em	App/Pipeline/RegionPipeline.swift:1246	4 erase	CJK glyphs fill about 88 percent of the em
+let name = "MIGAN_512"	App/Pipeline/Inpainter.swift:33	4 erase	the model is MI-GAN at 512
+ptr[i] = hole ? -0.5 : 0.5	App/Pipeline/Inpainter.swift:144	4 erase	the first channel is mask - 0.5
+ptr[plane + i] = Float(c.r) / 127.5 - 1	App/Pipeline/Inpainter.swift:149	4 erase	RGB scaled to [-1, 1]
+ptr[plane + i] = 0; ptr[2 * plane + i] = 0; ptr[3 * plane + i] = 0	App/Pipeline/Inpainter.swift:146	4 erase	the hole is zeroed
+for px in only.x..<(only.x + only.width) where isHole(px, py) {	App/Pipeline/Inpainter.swift:169	4 erase	only hole pixels are written
+let step = s * 3 / 4	App/Pipeline/Inpainter.swift:97	4 erase	tiles at a step of three quarters of the window
+config.computeUnits = .cpuAndGPU // measured fastest at 512 on M-series; `.all` was 4× slower	App/Pipeline/Inpainter.swift:58	4 erase	the GPU is selected; all units was 4 times slower
+var idleSeconds: TimeInterval = 60	App/Pipeline/Inpainter.swift:27	4 erase	the model is released after 60 s idle
+So the model loads at the first fill, not at launch	App/Pipeline/Inpainter.swift:14	4 erase	the model loads at the first fill
+(3 warmup + 20 timed	tools/inpaint/BENCH.md:8	4 erase	3 warm-up and 20 timed runs
+| MIGAN_512 | 14.2 MB | cpuOnly | 170 | 234 | 212.5 | 320.5 |	tools/inpaint/BENCH.md:14	4 erase	CPU only 212.5 / 320.5 ms
+| MIGAN_512 | 14.2 MB | cpuAndNeuralEngine | 170 | 1467 | 20.0 | 20.3 |	tools/inpaint/BENCH.md:16	4 erase	CPU and Neural Engine 20.0 / 20.3 ms
+| MIGAN_512 | 14.2 MB | all | 170 | 2248 | 55.3 | 64.1 |	tools/inpaint/BENCH.md:17	4 erase	all units 55.3 / 64.1 ms
+result = known*input + (1-known)*output	tools/inpaint/BENCH.md:44	4 erase	the result is composited with the mask
+channel 0 = `mask - 0.5`, where mask is **1 = KNOWN (keep), 0 = HOLE (to fill)**	tools/inpaint/BENCH.md:53	4 erase	mask convention
+Outside the mask the **raw model output is NOT the input**	tools/inpaint/BENCH.md:43	4 erase	the raw output differs from the input outside the hole
+/// Largest font size in [minSize, maxSize] (0.5pt resolution) whose laid-out text fits `box`.	Core/Sources/MwoyeoCore/Text.swift:160	4 erase	fit by bisection to 0.5 pt
+while hi - lo > 0.5 {	Core/Sources/MwoyeoCore/Text.swift:170	4 erase	bisection loop
+public static func truncating(_ text: String, fits: (String) -> Bool) -> String {	Core/Sources/MwoyeoCore/Text.swift:181	4 erase	a translation that does not fit is cut and ends in an ellipsis
+if hangul, prevHangul { out.append("\u{2060}") }	Core/Sources/MwoyeoCore/Text.swift:205	4 erase	a word joiner between Hangul syllables
+An erased patch reaches `eraseMargin` past the original text on each side: start the text where it started.	App/Pipeline/BlockRenderer.swift:71	4 erase	the text starts where the old text started
+public var latency = 0.016	Core/Sources/MwoyeoCore/ScrollPredictor.swift:15	5 scroll	delivery latency 16 ms
+public var stepDuration = 0.15	Core/Sources/MwoyeoCore/ScrollPredictor.swift:17	5 scroll	step duration 150 ms
+private(set) var ratios: [Bool: Double] = [true: 1]	Core/Sources/MwoyeoCore/ScrollPredictor.swift:20	5 scroll	the precise ratio starts at 1 and the line ratio is unknown
+events.removeAll { time - $0.time > 2 }	Core/Sources/MwoyeoCore/ScrollPredictor.swift:27	5 scroll	events older than 2 s are dropped
+ratios.reduce(0) { $0 + $1.value * units($1.key, from: t0, to: t1) }	Core/Sources/MwoyeoCore/ScrollPredictor.swift:33	5 scroll	the offset is the sum over kinds of ratio times units
+guard (abs(precise) >= 1) != (abs(lines) >= 1) else { return }	Core/Sources/MwoyeoCore/ScrollPredictor.swift:40	5 scroll	a report is used only if exactly one kind has at least one unit
+sample = shift / (kind ? precise : lines)	Core/Sources/MwoyeoCore/ScrollPredictor.swift:41	5 scroll	the sample is the shift over the units
+guard sample / r > 0.33, sample / r < 3 else { return }	Core/Sources/MwoyeoCore/ScrollPredictor.swift:43	5 scroll	the gate on the sample ratio
+ratios[kind] = r + 0.3 * (sample - r)	Core/Sources/MwoyeoCore/ScrollPredictor.swift:44	5 scroll	exponential update with weight 0.3
+} else if sample.isFinite, sample != 0 {	Core/Sources/MwoyeoCore/ScrollPredictor.swift:45	5 scroll	the first sample must be finite and nonzero
+events.reduce(0) { $1.precise == precise ? $0 + $1.delta * (shown($1, at: t1) - shown($1, at: t0)) : $0 }	Core/Sources/MwoyeoCore/ScrollPredictor.swift:58	5 scroll	units is the sum of delta times the change in the shown fraction
+let s = t - e.time - latency	Core/Sources/MwoyeoCore/ScrollPredictor.swift:63	5 scroll	s is the time since the event minus the latency
+guard s > 0 else { return 0 }	Core/Sources/MwoyeoCore/ScrollPredictor.swift:64	5 scroll	nothing is shown before the latency has passed
+guard !e.precise else { return 1 }	Core/Sources/MwoyeoCore/ScrollPredictor.swift:65	5 scroll	a precise delta is a step
+let u = min(1, s / stepDuration), rest = 1 - u	Core/Sources/MwoyeoCore/ScrollPredictor.swift:66	5 scroll	the step fraction is min(1, s/T)
+return 1 - rest * rest * rest	Core/Sources/MwoyeoCore/ScrollPredictor.swift:67	5 scroll	a line step is a cubic ease-out
+precise (trackpad) deltas are points and browsers apply them 1:1	Core/Sources/MwoyeoCore/ScrollPredictor.swift:5	5 scroll	trackpad deltas are points that browsers apply one to one
+Momentum scrolling needs nothing special: the system keeps sending decaying events.	Core/Sources/MwoyeoCore/ScrollPredictor.swift:3	5 scroll	momentum scrolling needs nothing special
+A stop at the end	Core/Sources/MwoyeoCore/ScrollPredictor.swift:36	5 scroll	a stop at the end of the page says nothing
+predictor.wheel(delta: Double(e.scrollingDeltaY), time: e.timestamp, precise: e.hasPreciseScrollingDeltas)	App/Model/RegionSession.swift:819	5 scroll	events come from NSEvent with a time stamp and a precise flag
+guard let area = scrollArea, now - lastWheel < 1 else { return nil }	App/Model/RegionSession.swift:835	5 scroll	the prediction is used only within one second of the last event
+predictor.confirm(shift: Double(r.shift), from: r.from, to: r.to)	App/Model/RegionSession.swift:830	5 scroll	a report trains the predictor
+guard r.area.contains(p) else { return }	App/Model/RegionSession.swift:828	5 scroll	only a region that holds the pointer trains the predictor
+if window?.id != scrollWindow { predictor.reset(); scrollArea = nil; scrollWindow = window?.id }	App/Model/RegionSession.swift:814	5 scroll	a new gesture over another window resets the predictor
+if scrollArea == nil, config.rect.contains(p) { scrollArea = config.rect.intersection(window?.bounds ?? config.rect) }	App/Model/RegionSession.swift:817	5 scroll	the scroll area is first guessed as the lens's part of the window
+let p = prediction?(host.time, now)	App/Overlay/OverlayPanel.swift:110	5 scroll	the prediction runs from the capture time of the frame the blocks were placed from
+@objc private func tick(_ link: CADisplayLink) { predict(at: link.targetTimestamp) }	App/Overlay/OverlayPanel.swift:123	5 scroll	the prediction is evaluated every display frame
+hypot(error.dx, error.dy) < 80	App/Overlay/OverlayPanel.swift:242	5 scroll	errors of 80 points or more jump
+spring.mass = 1	App/Overlay/OverlayPanel.swift:245	5 scroll	spring mass 1
+spring.stiffness = 900	App/Overlay/OverlayPanel.swift:246	5 scroll	spring stiffness 900
+spring.damping = 2 * (spring.stiffness * spring.mass).squareRoot()	App/Overlay/OverlayPanel.swift:247	5 scroll	damping is the critical value
+spring.isAdditive = true	App/Overlay/OverlayPanel.swift:248	5 scroll	the correction is an additive spring animation
+let shown = l.animation(forKey: "correction") != nil ? (l.presentation() ?? l).position : l.position	App/Overlay/OverlayPanel.swift:238	5 scroll	a correction in progress carries on from where the block is seen
+// Ending a prediction is a correction too: whatever the frames have not confirmed eases away.	App/Overlay/OverlayPanel.swift:111	5 scroll	ending a prediction is a correction too
+spring.fromValue = NSValue(point: NSPoint(x: error.dx, y: error.dy))	App/Overlay/OverlayPanel.swift:249	5 scroll	the spring starts from the error
+predictor latency 16 ms, step 150 ms, initial speed 20 per s, half 31 ms, ninety percent 80 ms	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	5 scroll	predictor latency 16 ms, step 150 ms, initial speed 20 per s, half 31 ms, ninety percent 80 ms
+spring omega 30 rad/s, damping 60, down to 5% after 158 ms, to 1% after 221 ms	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	5 scroll	spring omega 30 rad/s, damping 60, down to 5% after 158 ms, to 1% after 221 ms
+ratio error after 5 reports 17%, after 10 reports 2.8%	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	5 scroll	ratio error after 5 reports 17%, after 10 reports 2.8%
+for f in [-0.5, -0.25, 0.25, 0.5] {	Core/Sources/MwoyeoCore/FrameDiff.swift:144	5 scroll	the shift is refined by plus or minus 0.5 and 0.25
+guard abs(best.dy) >= 0.25, best.err < base * 0.6, best.err < 8 else { return nil }	Core/Sources/MwoyeoCore/FrameDiff.swift:150	5 scroll	a shift is accepted at 0.25 pixel, 0.6 of the base error, error below 8
+x += 2	Core/Sources/MwoyeoCore/FrameDiff.swift:170	5 scroll	sampling every other column
+if open, let last = regions.last, abs(last.dy - dy) <= 0.5 {	Core/Sources/MwoyeoCore/FrameDiff.swift:227	5 scroll	neighbouring bands whose shifts differ by at most 0.5 form a region
+return regions.filter { $0.rect.height >= 3 * change.tile }	Core/Sources/MwoyeoCore/FrameDiff.swift:238	5 scroll	a region shorter than three tiles is not a scroll
+to a quarter pixel: smooth scrolling moves by less than a downsampled pixel per frame	Core/Sources/MwoyeoCore/FrameDiff.swift:131	5 scroll	the shift is resolved to a quarter of a pixel
+: verticalShift(from: a.cropped(to: rect), to: b.cropped(to: rect), maxShift: min(maxShift, rect.height / 4))	Core/Sources/MwoyeoCore/FrameDiff.swift:205	5 scroll	the shift is at most a quarter of the band's height
+let y0 = max(0, -k), y1 = min(a.height, b.height - k - (w1 > 0 ? 1 : 0))	Core/Sources/MwoyeoCore/FrameDiff.swift:159	5 scroll	the match is over the rows that overlap after the shift
+/// Mean |a(x, y) - b(x, y + dy)| over the overlapping rows, sampling every other column; a fractional `dy`	Core/Sources/MwoyeoCore/FrameDiff.swift:154	5 scroll	the match error is a mean absolute difference
+shift: CGFloat(r.dy) * step / scale, from: t0, to: frame.time))	App/Pipeline/RegionPipeline.swift:599	5 scroll	the report carries the shift in points and both capture times
+let scrolled = blocks.isEmpty ? [] : FrameDiff.scrollRegions(from: prev, to: gray, change: raw, maxShift: gray.height / 3)	App/Pipeline/RegionPipeline.swift:381	5 scroll	the frame is compared with the previous frame
+predictor.latency = 0   // the "app" here shows a scroll at once	App/Support/SelfTest.swift:416	5 scroll	in the self-test the latency is 0
+if wheelsPerFrame > 0 { predictor.wheel(delta: Double(scroll.dy - next.dy), time: ProcessInfo.processInfo.systemUptime, precise: true) }	App/Support/SelfTest.swift:577	5 scroll	the self-test sends the true scroll as precise events
+drift = max(drift, hypot(page.x - a!.page.x, page.y - a!.page.y))	App/Support/SelfTest.swift:515	5 scroll	drift is the largest displacement of a shown block on the page
+if a == nil || a!.size != b.frame.size {	App/Support/SelfTest.swift:509	5 scroll	a re-laid-out block is anchored again
+print(String(format: "drift: mean %.1f pt, max %.1f pt, %d of %d frames over 2 pt", drifts.reduce(0, +) / CGFloat(max(1, drifts.count)),	App/Support/SelfTest.swift:638	5 scroll	the self-test prints mean, max and frames over 2 pt
+if scrollArea?.contains(CGPoint(x: onScreen.midX, y: onScreen.midY)) == true { onScreen.origin.y += predicted }	App/Support/SelfTest.swift:502	5 scroll	the self-test moves blocks in the scroll area by the prediction
+#expect(p.offset(from: 1.045, to: 2) == -20)	Core/Tests/MwoyeoCoreTests/CoreTests.swift:444	5 scroll	trackpad deltas one to one: offset -20
+for i in 0..<10 { p.wheel(delta: -4, time: 1 + Double(i) * 0.01, precise: true) }	Core/Tests/MwoyeoCoreTests/CoreTests.swift:442	5 scroll	ten events of -4 points at 10 ms intervals
+p.confirm(shift: -40, from: 0, to: 1)	Core/Tests/MwoyeoCoreTests/CoreTests.swift:468	5 scroll	a line wheel confirmed by a shift of -40
+#expect(abs(p.offset(from: 2, to: 3) + 40) < 1e-9)	Core/Tests/MwoyeoCoreTests/CoreTests.swift:473	5 scroll	all of the step, -40, once it is over
+#expect(mid < -20 && mid > -40)	Core/Tests/MwoyeoCoreTests/CoreTests.swift:472	5 scroll	halfway through the step, between -20 and -40
+p.confirm(shift: 0, from: -1, to: 1)       // the page was already at its end	Core/Tests/MwoyeoCoreTests/CoreTests.swift:480	5 scroll	a stop at the end of the page is ignored
+p.confirm(shift: -60, from: -1, to: 1)	Core/Tests/MwoyeoCoreTests/CoreTests.swift:481	5 scroll	a shift of -60 for the event of -50
+#expect(abs(p.offset(from: -1, to: 1) + 53) < 1e-9)	Core/Tests/MwoyeoCoreTests/CoreTests.swift:482	5 scroll	the offset becomes -53
+p.wheel(delta: -50, time: 0, precise: true)	Core/Tests/MwoyeoCoreTests/CoreTests.swift:479	5 scroll	one precise event of -50
+usecase scenes 52 in 6 use cases: chat 5, docs-web 11, games 8, papers 7, subtitles 9, code 12	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	6 measure	usecase scenes 52 in 6 use cases: chat 5, docs-web 11, games 8, papers 7, subtitles 9, code 12
+usecase units 400: chat 36, docs-web 89, games 38, papers 70, subtitles 20, code 147	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	6 measure	usecase units 400: chat 36, docs-web 89, games 38, papers 70, subtitles 20, code 147
+usecase marked keep 80 inline 21	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	6 measure	usecase marked keep 80 inline 21
+if len(parts) >= 2 and len(''.join(parts)) >= 0.8 * len(nu):	tools/usecase-bench/score.py:107	6 measure	split: pieces that cover at least 80 percent of the unit
+if best >= 0.75:	tools/usecase-bench/score.py:109	6 measure	misread: a best block at least 0.75 similar
+kept_ok	tools/usecase-bench/score.py:10	6 measure	the keep columns kept_ok, translated_ok, inline_ok
+translated_ok	tools/usecase-bench/score.py:11	6 measure	the keep columns kept_ok, translated_ok, inline_ok
+inline_ok	tools/usecase-bench/score.py:12	6 measure	the keep columns kept_ok, translated_ok, inline_ok
+the odd-numbered ones (the pictures the decider was tuned on)	tools/usecase-bench/score.py:4	6 measure	the odd scenes are the tuning set, the even ones held out
+# vn = MWOYEO_OCR_PATH=vn (lines grouped by ParagraphGrouper), swift = MWOYEO_OCR_PATH=swift (document model), auto = settings default	tools/usecase-bench/bench.sh:9	6 measure	the three readers: line grouping, document model, automatic
+2.67	tools/paper-bench/pages.sh:2	6 measure	pages are rendered at a scale of 2.67
+BIG = 1.3	tools/paper-bench/score.py:39	6 measure	big_text threshold 1.3 times the median
+BODY_CHARS = 40	tools/paper-bench/score.py:38	6 measure	body-like blocks have at least 40 characters per source line
+EDGE = 4	tools/paper-bench/score.py:40	6 measure	edge cut within 4 px
+CROSS = 0.5	tools/paper-bench/score.py:41	6 measure	cross_col: half of the smaller core
+a source with six or more prose words	tools/paper-bench/score.py:8	6 measure	formula_translated excludes sources with six or more prose words
+three or more one-letter Latin or Greek tokens	tools/paper-bench/score.py:21	6 measure	debris: three or more one-letter tokens
+Every OCR word gets a label `keep` | `translate` | `either` and a `reason`	tools/keep-labels/README.md:4	6 measure	each word gets a label and a reason
+| 2310.06142v2 | hold-out |	tools/keep-labels/README.md:27	6 measure	the held-out paper is arXiv 2310.06142
+| 2310.06142v2 | hold-out | `<a href="http://creativecommons.org/licenses/by/4.0/"	tools/keep-labels/README.md:27	6 measure	the held-out paper is CC BY
+R 0.91 [0.77,0.97]  (tp 31 fp 2 fn 3)	tools/keep-labels/RESULTS-code-region-2026-10-19.txt:255	6 measure	cases dev after: R 0.91, tp 31 fp 2 fn 3
+block keep   before P 0.95 [0.76,0.99]  R 0.56 [0.39,0.71]  (tp 19 fp 1 fn 15)	tools/keep-labels/RESULTS-code-region-2026-10-19.txt:254	6 measure	cases dev before: P 0.95 R 0.56
+after  P 0.94 [0.80,0.98]  R 0.91	tools/keep-labels/RESULTS-code-region-2026-10-19.txt:255	6 measure	cases dev after: P 0.94
+block keep   before P 1.00 [0.89,1.00]  R 0.78 [0.62,0.88]  (tp 31 fp 0 fn 9)	tools/keep-labels/RESULTS-code-region-2026-10-19.txt:260	6 measure	cases hold before: P 1.00 R 0.78
+after  P 1.00 [0.91,1.00]  R 1.00 [0.91,1.00]  (tp 40 fp 0 fn 0)	tools/keep-labels/RESULTS-code-region-2026-10-19.txt:261	6 measure	cases hold after: P 1.00 R 1.00, Wilson interval 0.91-1.00
+block keep   before P 0.90 [0.74,0.96]  R 0.59 [0.44,0.72]  (tp 26 fp 3 fn 18)	tools/keep-labels/RESULTS-code-region-2026-10-19.txt:249	6 measure	paper hold before: P 0.90 R 0.59, tp 26 fp 3 fn 18
+after  P 0.90 [0.74,0.96]  R 0.59 [0.44,0.72]  (tp 26 fp 3 fn 18)	tools/keep-labels/RESULTS-code-region-2026-10-19.txt:250	6 measure	paper hold after: unchanged
+pure-translate case blocks (read doc, dev + hold-out): 44; fired by the region (and translated today): 1  k07-algorithm-en-doc-6	tools/keep-labels/RESULTS-code-region-2026-10-19.txt:285	6 measure	one of 44 pure-translation case blocks fired
+FALSE FIRE k07-algorithm-en-doc-6 truth translate code: d + top(l¡) - bottom(lj-1) D vertical gap	tools/keep-labels/RESULTS-code-region-2026-10-19.txt:258	6 measure	the false fire is a line of an algorithm figure
+The runner forms batches of at most 3 new lines per screen in reading order	tools/translation-bench/README.md:53	6 measure	batches of at most three new lines
+A comparison needs at least 250 probes; the corpus has 312.	tools/translation-bench/README.md:239	6 measure	the corpus has 312 probes
+calibration items (the same text twice: the judge must say tie in both orders)	tools/translation-bench/README.md:248	6 measure	the judge sends calibration items that must tie in both orders
+counts only items on which both orders agree	tools/translation-bench/README.md:249	6 measure	only pairs on which both orders agree are counted
+It never calls a judge	tools/translation-bench/README.md:250	6 measure	no judge verdict is produced by the repository's scripts
+A context default chosen without measurement	tools/translation-bench/README.md:271	6 measure	the bench blocks a context default chosen without measurement
+"probes 312: 80 correct = 25.6%",	tools/translation-bench/runs/A-gemma3-4b/MANIFEST.json:137	6 measure	condition A: 80 of 312
+"  by evidence: memory 19/126 15.1%  lines 26/133 19.5%  none 35/53 66.0%",	tools/translation-bench/runs/A-gemma3-4b/MANIFEST.json:138	6 measure	condition A by evidence
+"probes 312: 80 correct = 25.6%",	tools/translation-bench/runs/A-gemma3-4b-r2/MANIFEST.json:138	6 measure	a second run of A gives the same 80 of 312
+"probes 312: 131 correct = 42.0%",	tools/translation-bench/runs/M-gemma3-4b/MANIFEST.json:138	6 measure	condition M: 131 of 312
+"  by evidence: memory 70/126 55.6%  lines 24/133 18.0%  none 37/53 69.8%",	tools/translation-bench/runs/M-gemma3-4b/MANIFEST.json:139	6 measure	condition M by evidence
+"parameter_size": "3.9B",	tools/translation-bench/runs/A-gemma3-4b/MANIFEST.json:61	6 measure	the model has 3.9 billion parameters
+bench sequences 14 (chat 5, docs 3, game 3, subtitles 3) lines 445 probes 312 (memory 126, lines 133, none 53)	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	6 measure	bench sequences 14 (chat 5, docs 3, game 3, subtitles 3) lines 445 probes 312 (memory 126, lines 133, none 53)
+bench oracle runs 14 over 7 conditions, all 312 of 312	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	6 measure	bench oracle runs 14 over 7 conditions, all 312 of 312
+memory n=126  only A right   5  only M right  56	cmd:cd tools/translation-bench && python3 -I score.py runs/A-gemma3-4b runs/M-gemma3-4b	6 measure	memory n=126  only A right   5  only M right  56
+sign test p=0.0000	cmd:cd tools/translation-bench && python3 -I score.py runs/A-gemma3-4b runs/M-gemma3-4b	6 measure	sign test p=0.0000
+sign test p=0.8145	cmd:cd tools/translation-bench && python3 -I score.py runs/A-gemma3-4b runs/M-gemma3-4b	6 measure	sign test p=0.8145
+4 pairs (ja-ko, en-ko, en-ja, zh-Hans-ko) x 12 original lines	tools/engine-bench/RESULTS.md:7	6 measure	12 lines per pair on four pairs
+Two judges from different vendors	tools/engine-bench/RESULTS.md:10	6 measure	two model judges
+Apple on-device is by far the fastest (0.15 s warm) and free, but scores about 1.2 points below the cloud engines.	tools/engine-bench/RESULTS.md:46	6 measure	Apple on device is fastest and about 1.2 points below the cloud engines
+Every cloud engine is 0.9-1.4 s per batch, mostly network.	tools/engine-bench/RESULTS.md:47	6 measure	cloud engines 0.9-1.4 s per batch
+Differences under about 0.3 are noise.	tools/engine-bench/RESULTS.md:50	6 measure	differences under about 0.3 are noise
+committed result files that report drift: 0	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	6 measure	committed result files that report drift: 0
+case 0x2070...0x209F, 0x2190...0x21FF, 0x2200...0x22FF: true // super and subscripts, arrows, mathematical operators	Core/Sources/MwoyeoCore/Text.swift:413	3 keep	signs include U+2200 to U+22FF
+worked example: sample 1.2, rho becomes 1.06, offset for the event of -50 is -53	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	5 scroll	worked example: sample 1.2, rho becomes 1.06, offset for the event of -50 is -53
+inpainting window step 384 pixels	cmd:python3 -I tools/paper-own/mwoyeo-method/facts.py	4 erase	inpainting window step 384 pixels
+positive moves content down.	Core/Sources/MwoyeoCore/ScrollPredictor.swift:24	5 scroll	a positive delta moves content down
+"chip": "Apple M1 Pro",	tools/translation-bench/runs/A-gemma3-4b/MANIFEST.json:69	6 measure	the runs were made on an Apple M1 Pro
+"macos": "27.0",	tools/translation-bench/runs/A-gemma3-4b/MANIFEST.json:71	6 measure	macOS 27.0
+"ollama": "0.34.2"	tools/translation-bench/runs/A-gemma3-4b/MANIFEST.json:73	6 measure	Ollama 0.34.2
+"memory_bytes": 34359738368,	tools/translation-bench/runs/A-gemma3-4b/MANIFEST.json:70	6 measure	32 GB of memory
+"quantization_level": "Q4_K_M"	tools/translation-bench/runs/A-gemma3-4b/MANIFEST.json:62	6 measure	quantisation Q4_K_M
+/// A scroll event anywhere: if it scrolls content this lens reads, it predicts the next frames.	App/Model/RegionSession.swift:807	5 scroll	a scroll event anywhere on the screen is seen, then it is decided whether it scrolls what the lens reads
+## Papers (math and the typewriter text of the PDF as truth)	tools/keep-labels/README.md:22	6 measure	papers are labelled from the mathematics and the typewriter text of the PDF
+Places2 training data has its own terms	tools/inpaint/BENCH.md:70	8 limits	the weights were trained on Places2
+Synthetic patch: diagonal colour gradient + sinusoidal texture	tools/inpaint/BENCH.md:33	8 limits	the inpaint bench's quality check is on a synthetic patch
+this is a sanity check, not a photo/UI-screenshot benchmark	tools/inpaint/BENCH.md:45	8 limits	and not a benchmark of screens

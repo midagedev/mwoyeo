@@ -1,0 +1,31 @@
+\begin{tikzpicture}[
+  font=\scriptsize,
+  box/.style={draw,rounded corners=2pt,fill=blue!6,minimum width=0.72in,minimum height=0.44in,text width=0.68in,align=center,inner sep=2pt},
+  side/.style={draw,rounded corners=2pt,fill=orange!10,minimum width=0.72in,minimum height=0.44in,text width=0.68in,align=center,inner sep=2pt},
+  flow/.style={-{Stealth[length=4pt]},thick},
+  sig/.style={-{Stealth[length=4pt]},thick,orange!70!black},
+  lab/.style={font=\tiny,inner sep=1pt,fill=white}
+]
+\node[box] (screen) {Screen\\ pixels};
+\node[box,right=0.12in of screen] (cap) {Capture\\ SCStream,\\ 8 fps};
+\node[box,right=0.12in of cap] (read) {Read\\ Vision lines,\\ Docs XPC blocks};
+\node[box,right=0.12in of read] (keep) {Keep?\\ \code{isLiteral}\\ \code{CodeRegion}};
+\node[box,right=0.12in of keep] (tr) {Translate\\ engine,\\ batches of 3};
+\node[box,right=0.12in of tr] (erase) {Erase\\ flat fill or\\ MI-GAN};
+\node[box,right=0.12in of erase] (set) {Re-set\\ fitted size,\\ colour};
+\node[box,right=0.12in of set] (ov) {Overlay\\ panel on\\ the lens};
+\foreach \a/\b in {screen/cap,cap/read,read/keep,keep/tr,tr/erase,erase/set,set/ov} \draw[flow] (\a) -- (\b);
+
+\node[side,below=0.62in of cap] (diff) {Frame diff\\ tiles of 16 px,\\ shift $\sigma$};
+\node[side,below=0.62in of tr] (pred) {Predictor\\ Eqs.~(\ref{eq:shown})--(\ref{eq:spring})};
+\node[side,below=0.62in of ov] (wheel) {Wheel events\\ \code{NSEvent}};
+\draw[sig] (cap) -- node[lab,right]{frames} (diff);
+\draw[sig] (diff) -- node[lab,above]{confirm $\sigma,t_0,t_1$} (pred);
+\draw[sig] (wheel) -- node[lab,above]{$(t_k,d_k,\text{kind})$} (pred);
+\draw[sig] (pred.north) -- ++(0,0.2in) -| node[lab,pos=0.2,above]{offset $\Delta(t_0,t_1)$ every display frame} (ov.south);
+
+\begin{scope}[on background layer]
+\node[draw,dashed,rounded corners=3pt,fill=black!3,inner sep=0.07in,fit=(read)(set)] (seamless) {};
+\end{scope}
+\node[lab,anchor=south west,fill=none,inner sep=2pt] at (seamless.north west) {once the page has been still for 0.5\,s (``seamless'')};
+\end{tikzpicture}

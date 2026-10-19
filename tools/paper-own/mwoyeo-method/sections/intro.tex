@@ -1,0 +1,38 @@
+\section{Introduction}\label{sec:intro}
+
+A translation shown beside the text it translates asks the reader to look twice: once at the original, once at the
+answer. A translation painted \emph{over} the original asks nothing, but it must be right in a stricter sense. The patch has to
+cover exactly the old glyphs and nothing else, the new text has to fit the room the old text had, it has to look like the
+page it sits on, and it has to stay put when the page moves. Mwoyeo\footnote{All code in this paper is copied from the
+repository at revision \texttt{499e312} (2026-10-19), the main branch when the paper was written. Paths are relative to the
+repository root; \texttt{sources.tsv} lists, for every number and every claim about the code, the file and line that carries
+it, and \texttt{check.py} fails when one of them has moved.} is a macOS application that does this for the area under a
+movable \emph{lens}.
+
+The last requirement is the one that separates a demonstration from a tool. A lens over a chat or a feed is used while the
+person scrolls it. The capture, the reading of the text, the translation and the repainting take time, so the translations
+that arrive describe a frame that is already gone. Left alone they trail the text they translate by the speed of the scroll
+times the age of the frame; the eye reads that as a shimmer, and in the worst case a translation sits on the wrong line.
+That latency matters for direct manipulation is well established \citep{latency}.
+
+\paragraph{Contributions.}
+\begin{itemize}
+\item A scroll predictor that places translations where the content will be by the time they are shown, from wheel and
+  trackpad events alone, and that learns how far one wheel unit moves the page in the application under the pointer
+  (Section~\ref{sec:scroll}). It is written as numbered equations, an algorithm and a 38-line listing, with a drift
+  measure that the self-test prints.
+\item A rule set for what must \emph{not} be translated: a formula or an identifier line, prose that is mostly inline mathematics,
+  and regions of code, terminal output, logs, configuration and diffs found from tint, indentation and line-number gutters
+  (Section~\ref{sec:keep}). The rules read text and geometry only; no model, no word list per language.
+\item An erasure and re-setting stage built on a robust estimate of the background, with MI-GAN \citep{migan} where the
+  background is not flat (Section~\ref{sec:erase}).
+\item A description of how each part is measured in the repository's benches, with numbers taken only from result files
+  that are committed there (Section~\ref{sec:measure}).
+\end{itemize}
+
+\paragraph{Scope.}
+The paper describes what the code does at the stated revision, including what it does badly (Section~\ref{sec:limits}). Text
+recognition runs in two places in this revision: document reads run in an XPC service, line reads still run in the
+application's own process; moving the line reads into a second service is in progress and is not described as done.
+We do not evaluate translation quality in general: the translation engines are interchangeable components, and the benches
+here measure what the \emph{screen} adds to the problem.

@@ -1,0 +1,20 @@
+\section{Related work}\label{sec:related}
+
+\paragraph{Translating from pixels.} Manga translation \citep{manga} shows what is hard when a picture is the input: the right translation of a speech bubble can
+depend on context that only the image holds, such as the text of other bubbles and the gender of the speakers. A fully automated system has to work from the picture alone, as a lens does.
+The setting differs in what moves and what must not be translated: a page of manga is static, while a screen scrolls and is full of text, such as code and formulas, that must
+stay as it is; Mwoyeo adds the rules of Section~\ref{sec:keep} and the scroll path.
+
+\paragraph{Inpainting.} Large-mask inpainting networks such as LaMa \citep{lama} are built to fill large missing areas with an image-wide receptive field. A text mask is thin and
+local, and the budget is a few milliseconds per patch beside a running application, which is why a generator that is about an order of magnitude cheaper and smaller than the usual
+inpainting models and designed for mobile devices, MI-GAN \citep{migan}, is used where the background is not flat, and a median of the ring where it is.
+
+\paragraph{Binarisation and robust statistics.} Splitting glyph pixels from background by the threshold of Otsu \citep{otsu} and estimating
+background noise from the median absolute deviation \citep{mad} are standard; the choices specific to the screen are the ring, the connected-component test that discards
+borders and rules, and the fall-back to the whole rectangle.
+
+\paragraph{Latency.} Studies of direct-touch pointing show that people perform worse as latency grows, even when it is small \citep{latency}. A lens that trails the
+scroll by a frame period is a latency of this kind between the finger and the text that the person is reading.
+
+\paragraph{Platform services.} The implementation rests on ScreenCaptureKit for capture \citep{sckdoc}, the Vision framework for recognition \citep{visiondoc} and the Translation framework
+for the default engine \citep{transdoc}. None of them is part of the contribution; the method does not depend on their internals, only on their interfaces.

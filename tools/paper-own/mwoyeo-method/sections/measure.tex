@@ -1,0 +1,124 @@
+\section{Measurement}\label{sec:measure}
+
+The repository keeps four benches under \texttt{tools/}. Each is built to block one failure mode, and each has a scorer that is a
+script. The numbers in this section come only from result files that are committed in the repository; each table says which. Where
+a bench has no committed result for a claim, the text says so.
+
+\subsection{Use-case bench: was the text read as a unit?}
+
+\texttt{tools/usecase-bench} renders 52 scenes in six use cases, drawn from HTML written for the bench, with the scene
+dimensions in \texttt{set/index.tsv}: 5 chats, 11 documents and web pages, 8 game screens, 7 papers, 9 subtitle frames and 12 code
+scenes. For each scene a file lists the \emph{units} that a reader should return as one block (a paragraph, a table cell, a
+title): 400 units in all (36 in chats, 89 in documents, 38 in games, 70 in papers, 20 in subtitles, 147 in code). A rendered scene is read, and
+every unit gets one of five outcomes:
+\emph{correct} (the unit is exactly one block), \emph{merged} (it is inside a longer block), \emph{split} (it is cut into pieces that
+together cover at least $80\%$ of it), \emph{misread} (the best block is at least $0.75$ similar) and \emph{missing}. Eighty of the units are marked
+as \emph{keep}, which must come back as written, and 21 carry inline substrings that must survive a translation verbatim; for these the scorer adds
+three columns, \texttt{kept\_ok}, \texttt{translated\_ok} and \texttt{inline\_ok}. The scenes with odd numbers are the ones the paragraph-reader decision was tuned
+on; the even ones are held out. The bench runs the three readers of Section~\ref{sec:overview}: line grouping, the document model, and the
+automatic choice between them.
+
+\subsection{Paper bench: does a typeset page survive?}
+
+Typeset papers are a hard page: two columns, dense inline mathematics, tables, footnotes, a title block
+with several columns of authors. \texttt{tools/paper-bench} renders every page of a paper PDF at a scale of $2.67$, as a Retina
+screen showing a page about 820 points wide would, cuts two lens-sized crops per page whose top and bottom edges run through the middle of a line of text, and
+cuts two pages with side crops that cut words at the left and right edge. Each render is scored by the metrics of
+Table~\ref{tab:paper}. From this revision on, the page source of the bench is this paper: a document whose formulas, listings and tables
+are ours to show.
+
+\begin{table*}[t]
+\centering
+\caption{Metrics of the paper bench, from the docstring of \texttt{tools/paper-bench/score.py}.}\label{tab:paper}
+\small
+\begin{tabular}{@{}p{1.25in}p{5.5in}@{}}
+\toprule
+Metric & What it counts\\
+\midrule
+\code{formula\_translated} & translated sources that hold a sign of mathematics and are not a body sentence (fewer than six prose words)\\
+\code{math\_heavy\_kept} & blocks left as written because they are mostly inline mathematics ($H$ of Eq.~\ref{eq:share})\\
+\code{overlaps, spill, cut, clipped} & sums of the render's layout line; \emph{clipped}: a translation that needs more room than its patch has at the smallest size\\
+\code{ellipsis} & of those, the translations cut to fit and ended in an ellipsis\\
+\code{big\_text} & drawn body-like blocks (at least 40 characters per source line) whose font size is over $1.3$ times the median of the page's body-like blocks\\
+\code{cross\_col} & pairs of blocks where one block's source rectangle holds at least half of the other's: a join of lines across a column gap\\
+\code{debris} & translated paragraphs whose translation carries three or more one-letter tokens or a stray symbol that the OCR made of a typeset sign\\
+\code{edge\_cut}, \code{side\_cut} & translated blocks whose source lines touch the top or bottom edge of a crop (within 4 px), or the left and right edge\\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+The results of running the bench on the PDF of this paper are written beside the tool (\texttt{RESULTS-own-2026-10-19.txt}). They are
+not repeated here: a number about this page would change the page.
+
+\subsection{Keep-label bench: where do the rules put the boundary?}
+
+\texttt{tools/keep-labels} asks the question of Section~\ref{sec:keep} directly: for every word that the reader returns, must it be
+translated, or must it stay as written? Each word gets a label (\emph{keep}, \emph{translate}, \emph{either}) and a reason (mathematics, code, command, flag, path,
+URL, identifier, hash, hotkey, log, configuration, line number, diff mark) from the typeset source: the mathematics of the PDF's
+LaTeX source and the typewriter text of its fonts for papers, and the HTML for the code cases. Papers and cases each have a development set and a held-out set, and every set is read two ways: with the document model and with line grouping. The held-out paper is a physics paper under a
+CC BY licence \citep{holdout}; the development papers are not shown here.
+
+Table~\ref{tab:keep} gives the block-level result on the held-out sets with the document reader. A block is a true keep when its truth is keep words and no translate
+word. Adding \code{CodeRegion} to the rules of one block raises the recall of the held-out code cases from $0.78$ to $1.00$ at a precision of $1.00$; on the
+development cases recall goes from $0.56$ to $0.91$ and precision from $0.95$ to $0.94$. It does not change a single block of the held-out paper: the region
+rule has nothing to say about prose with mathematics, and the one-block rules keep $26$ of its $44$ true keep blocks at three false positives. Of the $44$
+case blocks whose truth is pure translation, the region rule fired on one: a line of an algorithm figure that is mostly symbols with a prose label.
+
+\begin{table}[t]
+\centering
+\caption{Block-level keep precision and recall (document reader). Before: the rules of one block (\code{TranslationFilter}). After:
+the same rules or a \code{CodeRegion} verdict. Source: \texttt{RESULTS-code-region-2026-10-19.txt}.}\label{tab:keep}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Set & & P & R & tp/fp/fn\\
+\midrule
+Cases, development & before & 0.95 & 0.56 & 19/1/15\\
+ & after & 0.94 & 0.91 & 31/2/3\\
+Cases, held out & before & 1.00 & 0.78 & 31/0/9\\
+ & after & 1.00 & 1.00 & 40/0/0\\
+Paper, held out & before & 0.90 & 0.59 & 26/3/18\\
+ & after & 0.90 & 0.59 & 26/3/18\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Translation bench: what does context decide?}
+
+\texttt{tools/translation-bench} measures what context does to the translation of screen text. Its corpus is written for the bench: 14 sequences
+(5 chats, 3 documents, 3 games, 3 subtitles) with 445 lines, played back screen by screen the way a lens would see them, in batches of at most three new lines. In it
+312 \emph{probes} are planted: a name introduced and reused, a dropped subject, a Korean speech level, a term that must keep one rendering, a domain sense. A probe records where
+the fact that decides it lives: in the user memory only (126 probes), in earlier lines only (133), or nowhere, a control that any engine
+should get right (53). Every probe is checked by a rule on the target line that must pass on a skilled human translation and fail on the untranslated source, so an
+oracle that replays the references scores 312 of 312 under each of the seven conditions it was run with. The bench also defines a blind pairwise judge: both orders of every pair are sent, calibration items that are the same text twice
+must come back as ties, and only the pairs on which both orders agree are counted. No judge verdict is committed yet, so none is reported.
+
+Table~\ref{tab:probes} compares today's request (condition A, no context) with a request that adds the user memory (condition M) on a 4-billion-parameter model that runs on the
+machine.\footnote{Both runs were made on an Apple M1 Pro with 32\,GB under macOS 27.0 with Ollama 0.34.2, as the manifest of each run records; the model has 3.9 billion parameters, quantised to Q4\_K\_M.} A second run of A gives the same 80 of 312. The memory moves the probes that only the memory can decide from $15.1\%$ to $55.6\%$ (a sign test on the
+probes where the two runs disagree: 5 for A, 56 for M, $p<0.0001$) and leaves the controls and the probes decided by earlier lines unchanged
+($p=0.81$). That is the shape the bench is built to show; it is not a claim about the in-place method, which is
+indifferent to the engine, and the small model is a floor, not a recommendation.
+
+\begin{table}[t]
+\centering
+\caption{Probes answered correctly, \texttt{gemma3:4b} on the machine, 312 probes. A: today's request. M: with the user memory.
+Source: \texttt{runs/A-gemma3-4b} and \texttt{runs/M-gemma3-4b} of the translation bench.}\label{tab:probes}
+\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Probes decided by & n & A & M\\
+\midrule
+the memory only & 126 & 19 (15.1\%) & 70 (55.6\%)\\
+earlier lines only & 133 & 26 (19.5\%) & 24 (18.0\%)\\
+nothing (controls) & 53 & 35 (66.0\%) & 37 (69.8\%)\\
+all & 312 & 80 (25.6\%) & 131 (42.0\%)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Engine speed}
+
+The engine bench times the translation engines on four language pairs with 12 lines each, in batches of three. On the machine, Apple's low-latency
+engine answers a batch of three lines in $0.15$\,s (warm median), and the cloud engines in $0.9$--$1.4$\,s, mostly network. It scores about
+1.2 points below the cloud engines on a five-point scale of two model judges; differences under about $0.3$ are noise. That is the reason the scroll path of Section~\ref{sec:scroll}
+does not wait for any engine: the cheapest engine is already slower than a frame.

@@ -1,0 +1,91 @@
+\section{Erasing and re-setting the text}\label{sec:erase}
+
+For each block that is kept for translation, the old glyphs are removed from the picture and the translation is drawn
+into the place they left. The stage has three parts: a mask of the glyph pixels with an estimate of the background and the
+text colour, a fill (flat, or learned where the background is busy), and a fit of the translation to the room the old text had.
+
+\subsection{Mask, background and colour}
+
+For every line of the block the stage crops the line's rectangle with a ring of $r=\max(3,\lfloor0.18\,h\rfloor)$ pixels around it,
+where $h$ is the line height. The ring is the background sample. Let $\ell(p)$ be the luma of pixel $p$ and $\tilde\ell$ the median
+luma of the ring. The noise of the background is the robust spread of the ring,
+\begin{equation}\label{eq:mad}
+\hat\sigma\;=\;1.4826\;\median_{p\in\text{ring}}\bigl|\ell(p)-\tilde\ell\bigr| ,
+\end{equation}
+where the factor makes the median absolute deviation consistent with the standard deviation of a Gaussian \citep{mad}. A median
+instead of a mean keeps a box edge, or a bit of another element of the page that falls in the ring, from skewing the estimate.
+The background is \emph{flat} when $\hat\sigma<6$. The background colour is the per-channel median of the ring.
+
+Glyph pixels are one of the two classes of Otsu's threshold \citep{otsu},
+\begin{equation}\label{eq:otsu}
+t^\star\;=\;\arg\max_t\ \omega_0(t)\,\omega_1(t)\,\bigl(\mu_0(t)-\mu_1(t)\bigr)^2 ,
+\end{equation}
+computed on the luma histogram of the text rectangle: the class on the side away from the background. A pixel is a candidate when
+it is in that class and $|\ell(p)-\tilde\ell|\ge\max(12,\lfloor2.5\,\hat\sigma\rfloor)$. Candidates are grouped into 8-connected components, and a
+component is kept only when it reaches into the text rectangle and does not run off the outer edge of the crop where a ring
+exists: glyphs sit inside the ring, while box borders and rules continue past it. The mask is dilated by
+$\max(1,\lfloor0.07\,h\rfloor)$ pixels to swallow the anti-aliased edges, and enclosed holes are filled. If segmentation fails (the
+glyph class covers more than $0.6$ of the text rectangle, or there is none) the whole rectangle is the mask.
+
+The text colour is the mean colour of the half of the glyph pixels that contrast most with the background, because edge pixels
+are blended with it. Outlined text, such as video subtitles, has two tones, and either one alone would leave the other behind:
+the mask then takes both, and the outline colour is kept for the translation. Coloured frames drawn round glyphs, such as the
+box a viewer draws round a link, are taken into the mask when they are thin outlines that hold glyph pixels inside.
+
+\subsection{Fill and inpainting}
+
+If the background of every line of the block is flat, or inpainting is turned off, the masked pixels are filled with the
+background colour. Otherwise the patch is repaired with MI-GAN \citep{migan}, a generator designed for inpainting on mobile
+devices. The model takes a $4\times512\times512$ tensor whose first channel is $M-\tfrac12$, with $M=1$ for known pixels and $M=0$ for the
+hole, and whose other channels are the RGB values scaled to $[-1,1]$ and multiplied by $M$. Its output is a full-frame
+reconstruction $G$ that also differs from the input outside the hole, so the result is composited:
+\begin{equation}\label{eq:composite}
+\hat I\;=\;M\odot I\;+\;(1-M)\odot G\bigl(M-\tfrac12,\ M\odot I\bigr).
+\end{equation}
+A rectangle larger than a window is tiled with $512\times512$ windows at a step of $\tfrac34\cdot512=384$ pixels, each window centred on its
+tile and taking real frame pixels as context; only hole pixels inside the tile are written.
+
+Core ML runs the model on the CPU, the GPU or the Neural Engine. The inpaint bench measured the three on a $512^2$ patch
+(Table~\ref{tab:migan}), and the application selects the GPU: the default setting that lets Core ML choose among all units was four
+times slower there. The 14.2\,MB model is not loaded at launch; it loads at the first fill, and is released after 60\,s without one.
+
+\begin{table}[t]
+\centering
+\caption{MI-GAN $512^2$ prediction time by compute unit, one patch, median of 20 timed runs after 3 warm-up runs (inpaint bench,
+M4 Pro).}\label{tab:migan}
+\small
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Compute unit & Median (ms) & p90 (ms)\\
+\midrule
+CPU only & 212.5 & 320.5\\
+CPU and GPU & 13.3 & 13.4\\
+CPU and Neural Engine & 20.0 & 20.3\\
+All units & 55.3 & 64.1\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Re-setting the translation}
+
+The translation is laid out in the room of the old text, and the room can be larger than the old text: free background to the
+right of the block is part of the patch, up to $80\%$ of the block's width and up to the edge of its column, where free means
+that no pixel differs from the background colour by more than $22$.
+
+\paragraph{Size.}
+The size of the old text is read from the height $h_g$ of its glyphs: the em size is $h_g/0.88$ for Chinese, Japanese and
+Korean text, whose glyphs fill about $88\%$ of the em, and for Latin text $h_g/0.72$ (cap height) or $h_g/0.95$ when the text has
+descenders. The translation is then set at the largest size that fits the room. With $\mathrm{measure}(s)$ the size of the laid-out
+text at font size $s$,
+\begin{equation}\label{eq:fit}
+s^\star\;=\;\max\bigl\{\,s\in[s_{\min},s_{\max}]\ :\ \mathrm{measure}(s)\le\mathrm{box}\,\bigr\},
+\end{equation}
+which is found by bisection to a resolution of $0.5$ pt (\code{TextFitter.fitFontSize}); when nothing fits, $s_{\min}$ is returned and
+the caller wraps the text or lets it overflow. As a last resort a translation that does not fit at the smallest size is cut at a
+word boundary and ends in an ellipsis. The ellipsis is counted by the paper bench (Section~\ref{sec:measure}), because it is a
+loss: the person reads a shorter sentence than the engine returned.
+
+\paragraph{Place and colour.}
+The text starts where the old text started: the patch reaches the erase margin $r$ past the original on every side, and the text
+area is the original block. The text colour is the sampled colour above, the background is the repaired patch, and Hangul syllables
+of a word are joined with a word joiner so that the platform's line breaker does not split a word between two syllables.

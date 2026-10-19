@@ -1,0 +1,132 @@
+\section{What stays as written}\label{sec:keep}
+
+An engine that is handed a fragment of a formula returns a sentence. The source of the formula test records a case: a figure label
+``K'' came back from the engine as a word with a digit in it, and the overlay would then have painted that word over the typeset symbol. Some
+text must therefore be recognised as \emph{not for translation} before any engine is asked. Two levels of rule do this: a rule
+over one line or block (\code{TranslationFilter}), and a rule over a \emph{region} of blocks that sit together
+(\code{CodeRegion}).
+
+\subsection{Rules over one block}
+
+Let $x$ be the text of a recognised line or block. The text is kept as written when
+\begin{equation}\label{eq:literal}
+\textit{literal}(x)\;=\;P(x)\,\lor\,F(x)\,\lor\,I(x)\,\lor\,H(x),
+\end{equation}
+where $P$ matches a fixed list of patterns (a shell prompt followed by a command, a time or date stamp, a URL or a bare
+domain), $F$ is the formula test (\code{isFormula}), $I$ is the identifier test (a single word of at least three letters with a
+lowercase letter directly followed by a capital: \code{MatMul}, \code{YouTube}) and $H$ is the mathematics-heavy test
+(\code{isMathHeavy}). Table~\ref{tab:features} lists the features and thresholds.
+
+\paragraph{The formula test.}
+The line is cut into \emph{runs} of letters, digits and underscores; everything else is a sign. A \emph{prose word} is a run of
+at least three letters with a vowel, or a contraction, that is not an \emph{operand}. Operands are the names of calls whose
+arguments are variables (\code{Sublayer(x)}), the names of any call when the line holds an equals sign, and lowercase words
+beside an equals sign. Let $L$ be the number of letters, $W$ the number of prose words, $\ell_w$ their letters and
+$\ell_r=L-\ell_w$ the rest. A line is a formula when every letter is Latin, Greek or Cyrillic and
+\begin{equation}\label{eq:formula}
+F(x)\;=\;[L=1]\;\lor\;\bigl[\,W\le2\,\land\,\Lambda(x)\,\land\,\Sigma(x)\,\bigr],
+\end{equation}
+\begin{align*}
+\Lambda\;=\;&(W{=}0)\;\lor\;(W{=}1\land e\land \ell_r\ge2\ell_w)\\
+&\lor\;(W{=}2\land e\land c\land u\land 2\ell_r\ge3\ell_w).
+\end{align*}
+Here $e$ says that the line holds a relation sign, $c$ that it holds a call, and $u$ that the two prose words are its first two
+runs: one or two words of prose among many symbols are the label of a typeset line (``where $\mathrm{head}_i$ =
+Attention(\dots)''). $\Sigma$ is the evidence of mathematics: a sign (an operator, an arrow, a super- or subscript, a Greek
+letter used as a symbol, an underscore in a name, a call, a run that mixes Latin and Cyrillic, which is how an OCR misreads
+a sign), or a line that has only atoms (no run of two letters with a vowel) and holds a digit-letter run (\code{x1}) or a
+capital consonant cluster without digits (\code{QKT}); a short Cyrillic fragment beside a bracket is a third form of the same misreading.
+
+\paragraph{Prose that is mostly mathematics.}
+A block of prose with inline formulas, read off a typeset page, comes back garbled, and a translation would only set garbled
+symbols between a few translated words. The block stays as written when the share of its letters and digits that are
+mathematics is high:
+\begin{equation}\label{eq:share}
+H(x)\;=\;\Bigl[\tfrac{n_{\mathrm{math}}}{n_{\mathrm{math}}+n_{\mathrm{prose}}}\ge0.30\Bigr]\land\bigl[k_{\mathrm{sign}}\ge2\bigr]\land\bigl[n\ge20\bigr],
+\end{equation}
+with $n=n_{\mathrm{math}}+n_{\mathrm{prose}}$. Mathematics are signs, variables of one letter (not ``a'' and ``I''), runs of consonants or with an inner capital, names with an
+underscore, numbers beside a sign, and any word beside a sign. Prose is a word of three letters or more with a vowel and no inner
+capital that stands beside no sign. Numbers, names of letters with digits, two-letter words and punctuation are neutral. A
+currency sign next to a number is a price and not a sign.
+
+\begin{table*}[t]
+\centering
+\caption{Features and thresholds of the keep rules. The first block is over one line or block, the second over a region.
+Heights are median line heights of a block. The line of the source that carries each value is in \texttt{sources.tsv}.}\label{tab:features}
+\small
+\begin{tabular}{@{}p{0.95in}p{1.45in}p{4.2in}@{}}
+\toprule
+Rule & Feature & Definition and threshold\\
+\midrule
+\code{isFormula} & single letter & one letter in the line: a formula\\
+ & prose words & at most 2; with 1: relation and $\ell_r\ge2\ell_w$; with 2: first two runs, relation, call and $2\ell_r\ge3\ell_w$\\
+ & operand & a call name with variable arguments; any call name when the line has an equals sign; lowercase beside an equals sign\\
+ & signs & \texttt{=\ \^{}}\ $\pm\ {}^2\ {}^3\ {}^1\ \times\ \div$, sub- and superscripts, arrows, U+2200--22FF, Greek used as a sign, \code{\_}, a call\\
+\midrule
+\code{isMathHeavy} & share of mathematics & $\ge 0.30$ of letters and digits\\
+ & signs / size & at least 2 signs and at least 20 letters and digits\\
+\code{isIdentifier} & camelCase & letters only, at least 3, a lowercase letter then a capital\\
+\midrule
+\code{CodeRegion} & tint & background differs from the frame's by $\ge6$ levels in a channel\\
+ & neighbours & stacked within $1.5\,h$, or side by side on one row within $3.0\,h$\\
+ & indentation & left edge $\ge0.75\,h$ right of its column's margin; the margin is sought among blocks within $25\,h$\\
+ & keywords & strong count $\ge1$, strong $+\,0.5\,\cdot$ weak $\ge1.5$, and keywords $\ge0.2$ of the tokens\\
+ & line ends & $\ge0.4$ of the lines end in \code{; \{ \} ) ]}, at least one in \code{; \{ \}}\\
+ & symbols & $\ge0.15$ of at least 6 printable ASCII characters (spaces excluded) are code symbols\\
+ & density & from 4 content blocks, at least $0.3$ of them show a text feature\\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Rules over a region}\label{sec:region}
+
+A block of text alone often does not show that it is code. A document read cuts a listing into one-line blocks, and
+\code{end if} means nothing by itself. \code{CodeRegion} therefore works on a region: the blocks of one read that sit together in
+one box, one indented run or one line-number gutter. Its evidence is of two kinds. A \emph{container} says that blocks belong
+together: a tint that differs from the frame's, an indented run, a gutter. \emph{Text} features say what the blocks hold:
+keywords, line ends, symbols, a comment marker, a prompt, a hash-led line, diff marks, an assignment. A container alone keeps
+nothing, because a callout box, a bullet list and a table are containers of prose; text alone keeps only when it is strong.
+
+Let each block $i$ have a rectangle $[x^0_i,x^1_i]\times[y^0_i,y^1_i]$, a line height $h_i$ (the median of its line heights) and a
+word count $w_i$. The block is \emph{tinted}, $\tau_i=1$, when its background colour differs from the frame's by at least $6$
+levels in a channel. It is \emph{indented}, $\iota_i=1$, when
+\begin{equation}\label{eq:indent}
+\iota_i=\bigl[\,x^0_i-m_i\ge0.75\,h_i\,\bigr],\qquad m_i=\min\bigl(\{x^0_i\}\cup M_i\bigr),
+\end{equation}
+where $M_i$ holds the $x^0_c$ of the blocks $c$ with $w_c\ge2$ that overlap $i$ in $x$ and whose middle lies within $25\,h_i$ of the middle of $i$ vertically.
+Two blocks are \emph{linked} when they are neighbours and share a tint, an indent or a gutter:
+\begin{equation}\label{eq:link}
+\begin{aligned}
+i\sim j\iff{}&\mathrm{near}(i,j)\land\bigl[\,\tau_i\tau_j\,[\delta(b_i,b_j)\le6]\ \lor\ \iota_i\iota_j\\
+&\lor\ (g_i\lor g_j)\,\mathrm{row}(i,j)\ \lor\ g_ig_j\,\bigr],
+\end{aligned}
+\end{equation}
+where $\delta$ is the largest channel difference of the two background colours $b_i,b_j$, $g_i$ says that the block is a
+line-number gutter, $\mathrm{row}(i,j)$ that the blocks overlap vertically by more than half of $h=\min(h_i,h_j)$, and
+$\mathrm{near}$ holds when the blocks are stacked within $1.5\,h$ and overlap in $x$, or sit on one row within $3.0\,h$.
+Regions are the connected components of $\sim$, found with a union--find.
+
+Let $R$ be a region, $S$ the number of \emph{strong} features that its lines show (keyword, line end, comment, prompt, log
+line, diff), and $A$ the number of all features, including the weak ones (symbol, assignment). With $T=\max_i\tau_i$ and the
+container $C=T\lor\bigl(|R|>1\land\forall i\,(\iota_i\lor g_i)\bigr)$, the region is kept when
+\begin{equation}\label{eq:verdict}
+\begin{aligned}
+\mathrm{keep}(R)\;=\;&\Bigl[\,T\,(S\ge1\lor A-S\ge2)\ \lor\ C\,[S\ge1]\\
+&\lor\ \bigl(|R|>1\land S\ge1\land A\ge2\bigr)\\
+&\lor\ \mathrm{prompt}\ \lor\ S\ge2\,\Bigr]\ \land\ D(R),
+\end{aligned}
+\end{equation}
+where $D(R)$ is the density test of Table~\ref{tab:features}: a long region needs a text feature in a share of its content blocks,
+so one stray \code{end} in a page-wide indented run keeps nothing. The reason attached to a kept region is, in this order,
+terminal (a prompt), diff, log, configuration (an assignment with no keyword and no line end) and otherwise code. Listing~\ref{lst:verdict}
+is the function.
+
+\begin{listing}[t]
+\lstinputlisting[firstnumber=251]{listings/CodeRegion_verdict.swift}
+\caption{\code{CodeRegion.verdict}, \texttt{Core/Sources/MwoyeoCore/CodeRegion.swift}, lines 251--267, as it is in the
+repository.}\label{lst:verdict}
+\end{listing}
+
+Everything in this section reads text, geometry and the background colour only. There is no model and no list of words per language: a comment in any
+script is code because of where it sits. The constants were fitted on the development sets of the keep-label bench and
+checked on held-out sets (Section~\ref{sec:measure}).

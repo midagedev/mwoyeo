@@ -1,0 +1,80 @@
+\section{System overview}\label{sec:overview}
+
+A person drags a rectangle, the \emph{lens}, over a chat, a feed or a game. The application keeps a screen capture of a
+region that is larger than the lens, so that text next to the lens is already read, erased and translated when a drag or a
+scroll brings it into view. Figure~\ref{fig:pipeline} shows the data path (blue) and the scroll path (orange).
+
+\begin{figure*}[t]
+\centering
+\input{figures/pipeline}
+\caption{The pipeline. A captured frame is read into lines and blocks; blocks that must stay as written are dropped;
+the rest are translated, their old glyphs erased, and the translation re-set at the same place. Orange: the scroll path.
+Wheel events and the frame difference meet in the scroll predictor, which moves the finished blocks every display
+frame.}\label{fig:pipeline}
+\end{figure*}
+
+\subsection{Capture and change detection}
+
+The screen is captured with ScreenCaptureKit \citep{sckdoc}. The default rate is 8 frames per second, so the frame period is
+$1/8 = 125$\,ms. The stream is configured with a minimum frame interval of one over the rate (capped at 30 frames per second)
+and a queue depth of 4. Each frame is also reduced to a gray image. Two gray frames $a,b$ are compared tile by tile: a
+$16\times16$ tile counts as changed when at least 2 of its pixels moved by more than 24 luma levels. Counting strong
+changes, rather than averaging, keeps one edited glyph from being diluted by the rest of its tile and ignores compression
+noise.
+
+The pipeline works in two modes. While content moves, it re-reads only the changed band, shows each translation on a plain box
+(``fast'') and follows scrolls by shifting existing blocks instead of reading them again. After the page has been still for
+$0.5$\,s (the default \code{settleDelay}), it reads paragraphs, erases the source text and paints the translation in its place
+(``seamless''), cross-fading from the plain boxes.
+
+\subsection{Reading: lines and blocks}
+
+Text is read with the Vision framework \citep{visiondoc}. A \emph{line} is what the line recogniser returns, with its
+rectangle; a \emph{block} is a paragraph, the unit that is translated and repainted. Blocks come from one of two readers.
+\begin{enumerate}
+\item The \emph{document reader}, a document request of Vision that returns paragraphs, runs in its own XPC service (Docs) so
+  that its model compilation, which can take tens of seconds the first time, never stalls the application. The lens does not
+  wait for it: a pass that sends a request waits $S=2$\,s and then reads with the line reader while the request runs on.
+  A document answer that is there when the line read ends is used; a later one marks the service ready and the lens reads
+  once more.
+\item The \emph{line reader} followed by a geometric paragraph grouper. The line reads run in the application's own process at
+  this revision. The accurate recogniser has $S=3$\,s, the fast one $S=1$\,s.
+\end{enumerate}
+When successive slow answers show that the document reader is always late, the service is put to rest for $1,2,4,\dots,30$\,s
+before the next request, so a service that is always slower than $S$ is not asked again by every recovery read.
+
+\subsection{Translation}
+
+The lines of a block are translated by an engine the person chooses: Apple's Translation framework \citep{transdoc} with a
+language pack, or an engine added in the settings. Lines are sent in batches of at most three new lines in reading order.
+By default nothing from the screen leaves the machine; text goes to a network engine only if the person adds one.
+
+\subsection{Latency budget}
+
+Table~\ref{tab:budget} lists the stages and the times that the repository records for them. They were measured on different
+machines at different dates and are a budget, not a benchmark of the whole path.
+
+\begin{table*}[t]
+\centering
+\caption{Stages of the data path, where each runs, and the time the repository records for it. The sources are in
+\texttt{sources.tsv}.}\label{tab:budget}
+\small
+\begin{tabular}{@{}p{1.5in}p{1.75in}p{1.35in}p{1.9in}@{}}
+\toprule
+Stage & Runs in & Recorded time & Note\\
+\midrule
+Frame period & ScreenCaptureKit stream & $125$\,ms & default $8$ frames per second\\
+Document read, warm & Docs XPC service & $0.33$--$0.48$\,s & patience $S=2$\,s derived from it\\
+Line read, accurate, warm & application process & $0.25$--$0.88$\,s & patience $S=3$\,s ($\times3$ margin)\\
+Line read, fast & application process & $0.06$--$0.10$\,s & Latin scripts only, $S=1$\,s\\
+Translation, Apple low latency & on device & $0.15$\,s median per 3 lines & warm, M1 Pro (engine bench)\\
+Inpainting, MI-GAN $512^2$ & GPU, Core ML & $13.3$\,ms median & M4 Pro, one patch (inpaint bench)\\
+Settle before the seamless pass & timer & $500$\,ms & default \code{settleDelay}\\
+Scroll prediction & main thread, display link & every display frame & no read, no model call\\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+The last row is the point of Section~\ref{sec:scroll}. Every other row is a duration that a scroll cannot wait for: a frame
+captured at time $t_0$ describes content that, by the time its translations are ready, has moved. The predictor spends no
+read and no model call; it only adds up the events that the frame did not yet contain.

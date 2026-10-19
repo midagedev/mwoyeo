@@ -1,0 +1,27 @@
+\section{Limitations}\label{sec:limits}
+
+\paragraph{The predictor sees events, not the page.} It knows nothing about content that moves without a wheel event: scrolling with the
+keyboard, a script, a scroll bar drag, an autoplay carousel. The frames still follow such movement, at the frame rate, and the report they produce
+does not train the ratio (the gate of Eq.~\ref{eq:confirm} rejects what does not agree). The ratio itself is a single number per kind of event; a page whose
+scroll is non-linear in the wheel delta (acceleration curves, elastic overscroll) is followed with an error that the next frame corrects and the spring
+smooths. The animation of a line step is assumed to be a cubic ease-out of fixed length; an application that animates differently is
+modelled wrongly at the beginning and right at the end.
+
+\paragraph{No committed drift number.} The self-test prints the drift of Eq.~(\ref{eq:drift}), but no result file in the repository records drift numbers for this
+revision. The properties in Section~\ref{sec:scroll} are therefore stated for the model, and the unit tests pin their worked examples
+(\texttt{CoreTests.swift}); the end-to-end effect on a real application is not measured in this paper.
+
+\paragraph{The keep rules are approximate.} On the held-out paper the one-block rules keep 26 of 44 true keep blocks (Table~\ref{tab:keep}); recall
+is low because the reader garbles formulas before the rule sees them. The region rule helps code and nothing else, and it fired on one pure-translation block. Its constants
+were fitted on a small set of cases, and the held-out set has few blocks, so the intervals are wide (the Wilson interval of the held-out recall of the cases is $[0.91,1.00]$).
+
+\paragraph{Erasing is local.} The mask is built per line from the pixels around it. Text over photographs, gradients with text-like texture and
+animated backgrounds fall back to the learned fill or to a flat fill that is visible; the learned model was trained for photographic holes, not for screens, and the bench in
+the repository measures it on synthetic patches only.
+
+\paragraph{Reading limits everything after it.} Every later stage assumes the blocks of the reader. Where the reader joins two columns or cuts a block in two, the
+translation is set over the wrong region; the paper bench counts such joins (\code{cross\_col}), the author block of a title page being the typical case.
+Line reads still run in the application's process in this revision.
+
+\paragraph{Evidence.} The translation bench uses planted probes on a small local model and no judge verdict is committed; the engine bench uses two model judges on 12 lines per pair.
+None of this measures the experience of reading a translated screen over hours.

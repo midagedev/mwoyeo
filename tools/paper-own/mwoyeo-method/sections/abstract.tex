@@ -1,0 +1,12 @@
+Reading a screen in another language usually means leaving it: a pop-up, a side panel, a subtitle bar.
+Mwoyeo reads the text under a movable lens, erases it from the picture, and paints the translation back at the same place, in
+the same size and colour. Doing this once is a pipeline. Doing it while the page scrolls is a timing problem, because every
+stage works on a frame that the display has already left behind.
+This paper describes the method as implemented at one revision of the open-source code.
+Its core is a \emph{scroll predictor}: wheel and trackpad events become an expected content offset through a model of a delivery
+latency $\lambda$, an ease-out step of length $T$ and a learnt ratio $\rho$ of content points per wheel unit; each captured
+frame confirms the prediction, trains $\rho$, and is blended in by a critically damped spring.
+Around it sit a robust background estimate with learned inpainting where the background is busy, and a rule set that decides
+what must stay as written: formulas, identifiers, and code regions grouped by tint and indentation.
+We state the equations and constants, and report what the benches kept in the repository measure: a probe-based translation
+bench, a label-based keep bench, and a use-case bench of reading quality.

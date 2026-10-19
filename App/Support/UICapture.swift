@@ -16,7 +16,7 @@ import SwiftUI
 /// mock, then with Show Original on; when the text recognizer reads nothing the picture stands in for its translation, which
 /// still shows the toggle's two states), appearance (Settings › Appearance), lens-gallery (every lens style in every tint on a dark and
 /// a light backdrop: one PNG each, lens-<style>-<tint>-<dark|light>.png, and a grid per backdrop), lens-tab-positions (the name tag
-/// in its four places, one carrying a notice), lens-reading (the default glow while the lens reads), sheet-pick, sheet-config, sheet-config-remote, lens-badge, lens-notice, lens-menu, add-flow (adds an
+/// in its four places, one carrying a notice), lens-reading (the default glow while the lens reads), sheet-pick, sheet-config, sheet-config-remote (the box that allows sending to the host, unticked), sheet-config-remote-allowed (ticked), sheet-config-remote-context (ticked, with the context caption), translation-engines-permission (the list with an engine that needs the person's permission), about-privacy (Settings › About), lens-badge, lens-notice, lens-menu, add-flow (adds an
 /// engine through the sheet, prints where the key is), check-logic (prints PASS/FAIL for the engine selection and the
 /// engine notice's dismissal; no window). Run it with `MWOYEO_MEMORY_SECRETS=1` so it does not touch the Keychain. It keeps its
 /// preferences in a scratch suite of its own (deleted at exit; `MWOYEO_DEFAULTS_SUITE` names one to keep), never the app's real
@@ -86,6 +86,8 @@ enum UICapture {
             model.settings.targetLanguage = "ko"
             model.settings.engines = [cloud, local]
             model.settings.customEngineID = local.id
+            // Allowed, so the captures that are not about the permission read as they did; `translation-engines-permission` takes it back.
+            model.settings.enginePermissions.set(true, for: cloud)
             try? await Task.sleep(for: .milliseconds(300))
             for _ in 0..<6 { _ = await model.translator.engineProbe(local) }
             for text in ["こんにちは", "ありがとう", "おはよう"] {
@@ -116,6 +118,18 @@ enum UICapture {
             case "translation-engines":
                 await seedEngines()
                 await shoot(name, TranslationSettings(), CGSize(width: 560, height: 820))
+            case "translation-engines-permission":
+                // The list with one engine that waits for the person (Gemini) and one online engine already allowed.
+                await seedEngines()
+                let allowed = engine("OpenAI", "https://api.openai.com/v1", "gpt-5.5-mini")
+                model.settings.enginePermissions.forget(model.settings.engines[0].id)
+                model.settings.engines.insert(allowed, at: 1)
+                model.settings.enginePermissions.set(true, for: allowed)
+                await shoot(name, TranslationSettings(), CGSize(width: 560, height: 820))
+            case "about-privacy":
+                model.settingsTab = .about
+                await shoot(name, SettingsView(), CGSize(width: 560, height: 760))
+                model.settingsTab = .general
             case "engine-row-click": await engineRowClick()
             case "menu-switcher":
                 await seedEngines()
@@ -139,15 +153,30 @@ enum UICapture {
             case "image-window": await imageWindow(name, showOriginal: false)
             case "image-window-original": await imageWindow(name, showOriginal: true)
             case "check-logic": await checkLogic()
+            case "engine-permission-checks":
+                // Only the permission checks (the whole of check-logic takes minutes). The first line is what the launch step made of settings.json.
+                let record = model.settings.enginePermissions
+                print("engine permission: at launch \(model.settings.engines.count) engine(s) in settings, \(record.hosts.count) allowed, upgrade step ran: \(record.migrated)")
+                let failed = await EnginePermissionChecks.run(model)
+                print("engine permission: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
             case "inpaint-footprint": await LensRobustChecks.inpaintFootprint()
             case "menu-icon": LensRobustChecks.menuIcon(into: out.appendingPathComponent("menu-icon.png"))
             case "sheet-pick": await shoot(name, EngineSheet(), CGSize(width: 480, height: 560))
             case "sheet-config":
                 let setup = EngineShare.encode(engine("Gemini", mock, "mock-model"))
                 await shoot(name, EngineSheet(autopilot: .init(setup: setup, key: "sk-test-capture")), CGSize(width: 480, height: 560), wait: 5)
-            case "sheet-config-remote":
+            case "sheet-config-remote", "sheet-config-remote-allowed", "sheet-config-remote-context":
+                // A cloud engine: the box that allows sending to its host, unticked, then ticked; the last one also with an app whose
+                // override puts context on, so the caption adds "Recent lines are sent too".
                 let setup = EngineShare.encode(engine("Gemini", "https://gemini.example.invalid/v1beta/openai/", "gemini-3.1-flash-lite"))
-                await shoot(name, EngineSheet(autopilot: .init(setup: setup, key: "sk-test-capture")), CGSize(width: 480, height: 560), wait: 5)
+                let withContext = name.hasSuffix("context")
+                if withContext {
+                    model.settings.appProfiles = [AppProfile(bundleID: "com.example.chat", appName: "Chat", source: "ja", target: "en",
+                                                             context: AppContextOverride(mode: .nearby))]
+                }
+                await shoot(name, EngineSheet(autopilot: .init(setup: setup, key: "sk-test-capture", allow: name != "sheet-config-remote")),
+                            CGSize(width: 480, height: 560), wait: 5)
+                if withContext { model.settings.appProfiles = [] }
             case "appearance": await shoot(name, AppearanceSettings(), CGSize(width: 560, height: 520))
             case "lens-gallery": await lensGallery()
             case "lens-tab-positions": await lensTabPositions()
@@ -356,6 +385,7 @@ enum UICapture {
             failed += SandboxDataChecks.run()
             failed += await LensRobustChecks.run(model)
             failed += await ContextChecks.run()
+            failed += await EnginePermissionChecks.run(model)
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
         }
 

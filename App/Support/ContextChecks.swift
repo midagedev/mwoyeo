@@ -31,6 +31,7 @@ enum ContextChecks {
         await offChecks(t)
         await onChecks(t)
         await memoryOnlyChecks(t)
+        await routeChecks(t)
         await learnedFileRunChecks(t)
         await pinChecks(t)
         await appleChecks(t)
@@ -380,10 +381,16 @@ enum ContextChecks {
         let other = profile(mail, entries: entries)
         let nothing = [EnginePermissions.disclosure(plain, profiles: []), EnginePermissions.disclosure(plain, profiles: [profile(), profile(mail, note: "  ")]),
                        EnginePermissions.disclosure(plain, profiles: [profile(context: off, entries: entries, note: "x")]),
-                       EnginePermissions.disclosure(deepL, profiles: [written]), EnginePermissions.disclosure(template, profiles: [written]),
-                       EnginePermissions.disclosure(plain, profiles: [AppProfile(bundleID: mail, appName: mail, source: "en", target: "ko", customEngineID: UUID(), entries: entries)])]
-        t.check("disclosure: no memory, an override of off, DeepL, a template and an app on another engine say nothing beyond the lines",
+                       EnginePermissions.disclosure(deepL, profiles: [written]), EnginePermissions.disclosure(template, profiles: [written])]
+        t.check("disclosure: no memory, an override of off, DeepL and a template say nothing beyond the lines",
                 nothing.allSatisfy { $0.isEmpty })
+        // 2026-10-19 (t3m1, lead's drift fix): this line used to say that an app on another engine says nothing for this one. The request
+        // pairs the engine of the app IN FRONT with the profile of the app UNDER THE LENS (`ContextRoute`), so a lens over that app's window
+        // while an app on this engine is in front sends its memory here: the app is disclosed for every engine that can be in front. FAIL
+        // first: `routeChecks` below shows the old rule against the request itself.
+        let elsewhere = AppProfile(bundleID: mail, appName: mail, source: "en", target: "ko", customEngineID: UUID(), entries: entries)
+        t.check("disclosure: an app that names another engine is still disclosed for this one (a lens over it while this engine's app is in front)",
+                EnginePermissions.disclosure(plain, profiles: [elsewhere]).memoryApps == [mail])
         let both = EnginePermissions.disclosure(on, profiles: [written, other, profile(context: off, entries: entries, note: "x")])
         t.check("disclosure: an engine that is On says the lines and every app whose memory goes, not the app that turned context off",
                 both.lines && !both.memoryOnly && both.memoryApps == [written.appName, other.appName])
@@ -791,6 +798,86 @@ enum ContextChecks {
         t.check("nearby: an engine with previousLines 0 sends the same neighbours", z1.before == above && z1.after == below)
         let (n3, _, _) = await send(mock, nearby, [line("Zed arrived")], lens(screen: screen, below: below))
         t.check("nearby: with no line above there is no context_before", n3.before.isEmpty && n3.last["context_before"] == nil)
+    }
+
+    // MARK: the disclosure follows the request (engine of the app in front, memory of the app under the lens)
+
+    /// A request pairs the engine of the app in front with the profile of the app under the lens (`ContextRoute`). The disclosures
+    /// (`EnginePermissions.memoryProfiles`, the Memory sheet's "Also sent to …") must name what that rule sends, whichever app is in front.
+    @MainActor
+    static func routeChecks(_ t: Tally) async {
+        guard let mock = Mock(mode: "terms") else { t.check("route: the mock server starts", false); return }
+        defer { mock.stop() }
+        let dead = URL(string: "http://127.0.0.1:9")!
+        let x = engine("openai", base: mock.base), y = engine("anthropic", base: dead), d = engine("deepl", base: dead)
+        let note = "casual chat between friends"
+        // A is in front and uses engine X; B (the lens covers its window) uses Y and has written memory.
+        let a = AppProfile(bundleID: chat, appName: "A Chat", source: "en", target: "ko", customEngineID: x.id)
+        let b = AppProfile(bundleID: mail, appName: "B Mail", source: "en", target: "ko", customEngineID: y.id, note: note)
+        var s = AppSettings()
+        s.sourceLanguage = "en"; s.targetLanguage = "ko"
+        s.engines = [y, x]; s.customEngineID = y.id; s.appProfiles = [a, b]
+
+        let cross = ContextRoute.pair(settings: s.effective(frontmost: chat), lens: mail)
+        t.check("route: a lens over B while A is in front pairs A's engine with B's profile",
+                cross.engine?.id == x.id && cross.profile?.bundleID == mail && cross.options.memoryOnly)
+        t.check("route: B's memory is disclosed for A's engine, although B names another engine",
+                EnginePermissions.memoryProfiles(x, profiles: s.appProfiles).map(\.bundleID) == [mail]
+                && EnginePermissions.disclosure(x, profiles: s.appProfiles).memoryApps == ["B Mail"],
+                "\(EnginePermissions.memoryProfiles(x, profiles: s.appProfiles).map(\.bundleID))")
+        t.check("route: B's own engine is disclosed for B too", EnginePermissions.memoryProfiles(y, profiles: s.appProfiles).map(\.bundleID) == [mail])
+        t.check("route: B's sheet names its own engine first and A's engine as the other receiver",
+                ContextRoute.own(mail, in: s).engine?.id == y.id && ContextRoute.otherReceivers(of: mail, in: s).map(\.id) == [x.id])
+        var one = s
+        one.appProfiles = [b]
+        t.check("route: with one engine for every app there is no other receiver",
+                ContextRoute.otherReceivers(of: mail, in: one).isEmpty && ContextRoute.otherReceivers(of: mail, in: AppSettings()).isEmpty)
+
+        // The request itself: the service of the settings in effect while A is in front, a lens over B, A's engine is the mock.
+        let svc = service(s.effective(frontmost: chat))
+        let (sent, _, _) = await send(mock, svc, [line("Mail from Alice")], lens(mail, title: "Inbox", screen: [line("Mail from Alice")]))
+        t.check("route: the request to A's engine carries B's note, as disclosed", sent.text.contains(note) && sent.text.contains("Document: Example Mail"))
+
+        // Every state of base engine, A's profile and B's profile: the engines a lens can be paired with are the ones disclosed.
+        var variants = 0, mismatches = 0, lastMismatch = ""
+        let engines: [EngineConfig?] = [nil, x, y, d]
+        let overrides: [AppContextOverride?] = [nil, AppContextOverride(mode: .off), AppContextOverride(mode: .nearby)]
+        for base in engines {
+            for aEngine in engines {
+                for aHasMemory in [false, true] {
+                    for bEngine in engines {
+                        for bContext in overrides {
+                            var v = AppSettings()
+                            v.engines = [x, y, d]
+                            v.customEngineID = base?.id
+                            let pa = AppProfile(bundleID: chat, appName: "A Chat", source: "en", target: "ko", customEngineID: aEngine?.id,
+                                                note: aHasMemory ? "a note" : "")
+                            let pb = AppProfile(bundleID: mail, appName: "B Mail", source: "en", target: "ko", customEngineID: bEngine?.id,
+                                                note: note, context: bContext)
+                            v.appProfiles = aEngine == nil && !aHasMemory ? [pb] : [pa, pb]
+                            variants += 1
+                            let used = Set(ContextRoute.fronts(of: v).map { v.effective(frontmost: $0).customEngineID }.compactMap { $0 })
+                            for e in v.engines {
+                                let kind = LayoutKind.engine(e.kind)
+                                var got = Set<String>()
+                                for p in v.appProfiles {
+                                    for pairing in ContextRoute.pairings(lens: p.bundleID, in: v)
+                                    where pairing.engine?.id == e.id && pairing.options.enabled && kind.sendsMemory(pairing.options) && p.hasMemory {
+                                        got.insert(p.bundleID)
+                                    }
+                                }
+                                let said = Set(EnginePermissions.memoryProfiles(e, profiles: v.appProfiles).map(\.bundleID))
+                                // An engine nobody has chosen yet is disclosed as if it were chosen: a superset of what the walk finds.
+                                let ok = used.contains(e.id) ? got == said : got.isSubset(of: said)
+                                if !ok { mismatches += 1; lastMismatch = "base \(base?.name ?? "-") A \(aEngine?.name ?? "-")/\(aHasMemory) B \(bEngine?.name ?? "-")/\(bContext?.mode.rawValue ?? "-") engine \(e.name): walk \(got.sorted()) said \(said.sorted())" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        t.check("route: over \(variants) states of base engine and two profiles, the disclosed memory is the memory the request path sends",
+                mismatches == 0 && variants == 4 * 4 * 2 * 4 * 3, "\(mismatches) mismatches, last: \(lastMismatch)")
     }
 
     // MARK: the learned-memory file, written (G50)

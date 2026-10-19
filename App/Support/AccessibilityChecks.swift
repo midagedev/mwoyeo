@@ -147,7 +147,10 @@ enum AccessibilityChecks {
         for _ in 0..<12 {
             try? await Task.sleep(for: .milliseconds(400))
             let next = await tree(ofWindowTitled: title)
-            let same = next.map(\.line) == items.map(\.line)
+            // 2026-10-19 (t3m1): two empty reads in a row are not agreement. Under load the window is not in the assistive tree yet, and
+            // a view then reported "0 elements" (settings-general, engine-sheet-form, engine-sheet: 3 of 6 check-logic runs, never twice the
+            // same view). Not reproducible on demand, so there is no FAIL-first line for this one.
+            let same = !next.isEmpty && next.map(\.line) == items.map(\.line)
             items = next
             if same { break }
         }
@@ -176,6 +179,14 @@ enum AccessibilityChecks {
                                                                          model: "gemini-3.1-flash-lite", thinking: .off, extraHeaders: [:]))
         out.append(("engine-sheet-form", await hostedTree(EngineSheet(autopilot: .init(setup: EngineShare.encode(form), key: "sk-test-a11y", allow: true)),
                                                           size: CGSize(width: 480, height: 560), model: model, name: "engine-sheet-form", settle: 4)))
+        // The Memory sheet of an app with a note, a name (its details open) and a learned-free profile: every control of it is named.
+        let savedProfiles = model.settings.appProfiles
+        model.settings.appProfiles = [AppProfile(bundleID: "com.example.a11y", appName: "Example Chat", source: "en", target: "ko", note: "casual",
+                                                 entries: [MemoryEntry(src: "Alice", dst: "앨리스", addressing: [Addressing(to: "Bob", register: .polite)])],
+                                                 context: AppContextOverride(mode: .conversation))]
+        out.append(("memory-sheet", await hostedTree(AppMemorySheet(bundleID: "com.example.a11y", model: model, openDetails: [0]),
+                                                     size: CGSize(width: 520, height: 640), model: model, name: "memory-sheet", settle: 2)))
+        model.settings.appProfiles = savedProfiles
         out.append(("image-window", await hostedTree(ImageTranslationView(model: ImageTranslationModel(), onDrop: { _ in false }),
                                                     size: CGSize(width: 640, height: 480), model: model, name: "image-window")))
         return out

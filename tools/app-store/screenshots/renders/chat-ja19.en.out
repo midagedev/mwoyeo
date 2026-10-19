@@ -1,0 +1,36 @@
+inpainter: MI-GAN loaded (0 ms)
+warm-up: 976 ms
+pipeline: 2085 ms
+work[still]: erase=7 ocr.blocks=1 ocr.blocks.lines=13 ocr.blocks.swift=1 ocr.reader.auto.documentLayout=1 render=6 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=3 translate.texts=6 translate.wasted=0 lens_wait_ms[p50=449 max=574 last=574 n=7] settle=n/a parked=0
+pace: ja>en|apple:auto samples=3 first=0.17s perLine=0.02s batch[p50=0.08s p90=0.45s n=3] cancelled=0 lines[cached=0 translated=6]
+  今日 20:28
+    → Today 20:28
+  昨日の夜パッチノート待ってて起きてた人いる？
+    → Is there anyone who was awake waiting for the patch note last night?
+  今日 20:29
+    → Today 20:29
+  はい私。二段ジャンプのバグやっと直ったね、3ヶ月もかかるとは思わなかった
+    → Yes, me. The bug of the two-step jump was finally fixed. I didn't think it would take 3 months.
+  @junpark
+    → @junpark
+  今日 20:30
+    → Today 20:30
+  え、じゃあワールド4のショートカットもう使えないの？？週末ずっと練習してたのに
+    → Eh, then you can't use the shortcut of World 4 anymore?? I've been practicing all weekend
+issues=0
+layout: blocks=6 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 1776×488
+block: core=292,36,113,25 text=292,34,139,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:28"
+block: core=115,74,688,32 text=115,71,989,39 size=34.1 lines=1 chars=22 clipped=0 ellipsis=0 "昨日の夜パッチノート待ってて起きてた人いる？"
+block: core=244,164,113,26 text=244,163,139,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:29"
+block: core=116,199,1127,44 text=116,205,1201,35 size=30.7 lines=1 chars=36 clipped=0 ellipsis=0 "はい私。二段ジャンプのバグやっと直ったね、3ヶ月もかかるとは思わなかった"
+block: core=238,391,113,25 text=238,390,139,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:30"
+block: core=116,426,1219,43 text=116,431,1213,36 size=31.8 lines=1 chars=39 clipped=0 ellipsis=0 "え、じゃあワールド4のショートカットもう使えないの？？週末ずっと練習してたのに"
+wrote /Users/hckim/repo/mwoyeo-wt-as-shots/tools/app-store/screenshots/renders/chat-ja19.en.png
+silence: longest=1210 total=1210
+drain: 0 in-flight=0
+reader: docs state=idle pid=97921 warm=doc:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0
+reader: docs footprint=96 MB gui=34 MB last-ms=327 ms=438,327
+reader: lines state=idle pid=97891 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0
+reader: lines footprint=147 MB gui=34 MB last-ms=300 ms=433,300
+reader: host reads=2 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

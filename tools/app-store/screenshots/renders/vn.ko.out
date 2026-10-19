@@ -1,0 +1,37 @@
+inpainter: MI-GAN loaded (0 ms)
+warm-up: 964 ms
+pipeline: 2006 ms
+work[still]: erase=7 inpaint=2 inpaint.load=1 ocr.blocks=1 ocr.blocks.lines=8 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=7 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=3 translate.texts=7 translate.wasted=0 lens_wait_ms[p50=401 max=508 last=508 n=7] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=3 first=0.14s perLine=0.02s batch[p50=0.08s p90=0.37s n=3] cancelled=0 lines[cached=0 translated=7]
+  星降る夜の約束
+    → 별이 내리는 밤의 약속
+  忘れられた丘の上で
+    → 잊혀진 언덕 위에서
+  一緒に流れ星を探す
+    → 함께 유성을 찾다
+  今夜はもう帰ろう
+    → 오늘 밤은 이제 집에 갑시다
+  あの日のことを聞く
+    → 그날에 대해 묻다
+  ねえ、覚えてる？子供のころ、ここで約束したよね。
+    → 야, 기억하고 있어? 어렸을 때, 여기서 약속했죠?
+  「十年後の今日、またこの丘で星を見よう」って。
+    → 10년 후 오늘, 다시 이 언덕에서 별을 보자.
+issues=0
+layout: blocks=7 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2184×1200
+block: core=673,34,828,114 text=673,36,827,111 size=98.6 lines=1 chars=7 clipped=0 ellipsis=0 "星降る夜の約束"
+block: core=836,174,499,47 text=836,173,341,53 size=46.6 lines=1 chars=9 clipped=0 ellipsis=0 "忘れられた丘の上で"
+block: core=1383,427,427,54 text=1383,425,338,59 size=52.3 lines=1 chars=9 clipped=0 ellipsis=0 "一緒に流れ星を探す"
+block: core=1382,590,375,64 text=1382,599,427,47 size=41.2 lines=1 chars=8 clipped=0 ellipsis=0 "今夜はもう帰ろう"
+block: core=1385,767,416,52 text=1385,765,330,57 size=51.1 lines=1 chars=9 clipped=0 ellipsis=0 "あの日のことを聞く"
+block: core=103,977,1384,73 text=103,976,1113,69 size=61.4 lines=1 chars=24 clipped=0 ellipsis=0 "ねえ、覚えてる？子供のころ、ここで約束したよね。"
+block: core=138,1062,1233,98 text=138,1082,992,70 size=62.5 lines=1 chars=23 clipped=0 ellipsis=0 "「十年後の今日、またこの丘で星を見よう」って。"
+wrote /Users/hckim/repo/mwoyeo-wt-as-shots/tools/app-store/screenshots/renders/vn.ko.png
+silence: longest=1108 total=1108
+drain: 0 in-flight=0
+reader: docs state=idle pid=23393 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0
+reader: docs footprint=90 MB gui=90 MB last-ms=445 ms=445
+reader: lines state=idle pid=23336 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0
+reader: lines footprint=137 MB gui=90 MB last-ms=283 ms=415,283
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

@@ -1,0 +1,28 @@
+inpainter: MI-GAN loaded (0 ms)
+warm-up: 961 ms
+pipeline: 1784 ms
+work[still]: erase=4 ocr.blocks=1 ocr.blocks.lines=14 ocr.blocks.swift=1 ocr.kept.formula=1 ocr.reader.auto.documentLayout=1 render=4 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=4 translate.wasted=0 lens_wait_ms[p50=348 max=408 last=408 n=4] settle=n/a parked=0
+pace: en>ko|apple:auto samples=2 first=0.08s perLine=0.12s batch[p50=0.35s p90=0.35s n=2] cancelled=0 lines[cached=0 translated=4]
+  3 What stays as written
+    → 3 무엇이 적힌 대로 유지되는가
+  An engine that is handed a fragment of a formula returns a sentence. The source of the formula test records a case: a figure label "K" came back from the engine as a word with a digit in it, and the overlay would then have painted that word over the typeset symbol. Some text must therefore be recognised as not for translation before any engine is asked. Two levels of rule do this: a rule over one line or block (TranslationFilter), and a rule over a region of blocks that sit together (CodeRegion).
+    → 수식의 조각을 전달받은 엔진은 문장을 반환합니다. 수식 테스트의 출처는 한 경우를 기록합니다: 숫자 라벨 "K"가 엔진에서 숫자가 포함된 단어로 반환되었으며, 그 오버레이는 그 단어를 조판 기호 위에 칠했을 것입니다. 따라서 어떤 엔진도 요청하기 전에 일부 텍스트는 번역이 아닌 것으로 인식되어야 합니다. 두 단계의 규칙이 이를 수행합니다: 한 줄 또는 블록에 대한 규칙(TranslationFilter)과 블록이 함께 배치된 영역에 대한 규칙(CodeRegion).
+  3.1 Rules over one block
+    → 3.1 한 블록에 대한 규칙
+  Let x be the text of a recognised line or block. The text is kept as written when
+    → x를 인식된 줄 또는 블록의 텍스트로 두십시오. 텍스트는 작성된 그대로 유지됩니다.
+issues=0
+layout: blocks=4 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 1084×964
+block: core=34,29,754,62 text=34,28,671,64 size=56.8 lines=1 chars=23 clipped=0 ellipsis=0 "3 What stays as written"
+block: core=29,136,1022,443 text=29,168,995,380 size=41.1 lines=9 chars=501 clipped=0 ellipsis=0 "An engine that is handed a fragment of a formula returns a s"
+block: core=33,659,637,48 text=33,655,450,56 size=50.0 lines=1 chars=24 clipped=0 ellipsis=0 "3.1 Rules over one block"
+block: core=32,747,1018,90 text=32,745,984,94 size=41.1 lines=2 chars=81 clipped=0 ellipsis=0 "Let x be the text of a recognised line or block. The text is"
+wrote /Users/hckim/repo/mwoyeo-wt-as-shots/tools/app-store/screenshots/renders/paper-p2.ko.png
+silence: longest=903 total=903
+drain: 0 in-flight=0
+reader: docs state=idle pid=36116 warm=doc:en-Latn dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0
+reader: docs footprint=96 MB gui=84 MB last-ms=270 ms=425,270
+reader: lines state=idle pid=36092 warm=rev3:en-Latn dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0
+reader: lines footprint=119 MB gui=84 MB last-ms=223 ms=443,223
+reader: host reads=2 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

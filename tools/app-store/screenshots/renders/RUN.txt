@@ -1,0 +1,17 @@
+date      2026-10-19T09:16:23Z
+binary    /tmp/lead-final/final/dd-rel/Build/Products/Release/Mwoyeo.app/Contents/MacOS/Mwoyeo
+binary    sha256 84ff80082d81c8e2f91aac47fe701f986ea01f02ba492f9530366fb477f8658b
+app       1.1.0 (2)
+tree      4b30eabb8606e7ea04e0d6afed53c0f50453553a (demo/ and tools/paper-own as committed there)
+chrome    Google Chrome 155.0.8059.82 
+macOS     27.0 arm64
+paper     main.pdf sha256 2ebf808fac14905ea7372954abd782b191eb7d8c41c8e342d0ef0673a9d1bd72
+rerun     2026-10-19T10:41:16Z chat-ja7 chat-ja19 article-body paper-p2 : binary sha256 84ff80082d81c8e2f91aac47fe701f986ea01f02ba492f9530366fb477f8658b, tree 4b30eabb8606e7ea04e0d6afed53c0f50453553a, Google Chrome 155.0.8059.82, main.pdf sha256 2ebf808fac14905ea7372954abd782b191eb7d8c41c8e342d0ef0673a9d1bd72
+rerun     2026-10-19T10:45:50Z paper-p2 : binary sha256 84ff80082d81c8e2f91aac47fe701f986ea01f02ba492f9530366fb477f8658b, tree 4b30eabb8606e7ea04e0d6afed53c0f50453553a, Google Chrome 155.0.8059.82, main.pdf sha256 2ebf808fac14905ea7372954abd782b191eb7d8c41c8e342d0ef0673a9d1bd72
+rerun     2026-10-19T10:47:37Z paper-p2 : binary sha256 84ff80082d81c8e2f91aac47fe701f986ea01f02ba492f9530366fb477f8658b, tree 4b30eabb8606e7ea04e0d6afed53c0f50453553a, Google Chrome 155.0.8059.82, main.pdf sha256 2ebf808fac14905ea7372954abd782b191eb7d8c41c8e342d0ef0673a9d1bd72
+rerun     2026-10-19T10:47:45Z paper-p2 : binary sha256 84ff80082d81c8e2f91aac47fe701f986ea01f02ba492f9530366fb477f8658b, tree 4b30eabb8606e7ea04e0d6afed53c0f50453553a, Google Chrome 155.0.8059.82, main.pdf sha256 2ebf808fac14905ea7372954abd782b191eb7d8c41c8e342d0ef0673a9d1bd72
+rerun     2026-10-19T10:50:54Z paper-p2 : binary sha256 84ff80082d81c8e2f91aac47fe701f986ea01f02ba492f9530366fb477f8658b, tree 4b30eabb8606e7ea04e0d6afed53c0f50453553a, Google Chrome 155.0.8059.82, main.pdf sha256 2ebf808fac14905ea7372954abd782b191eb7d8c41c8e342d0ef0673a9d1bd72
+rerun     2026-10-19T10:51:02Z paper-p2 : binary sha256 84ff80082d81c8e2f91aac47fe701f986ea01f02ba492f9530366fb477f8658b, tree 4b30eabb8606e7ea04e0d6afed53c0f50453553a, Google Chrome 155.0.8059.82, main.pdf sha256 2ebf808fac14905ea7372954abd782b191eb7d8c41c8e342d0ef0673a9d1bd72
+rerun     2026-10-19T10:51:10Z paper-p2 : binary sha256 84ff80082d81c8e2f91aac47fe701f986ea01f02ba492f9530366fb477f8658b, tree 4b30eabb8606e7ea04e0d6afed53c0f50453553a, Google Chrome 155.0.8059.82, main.pdf sha256 2ebf808fac14905ea7372954abd782b191eb7d8c41c8e342d0ef0673a9d1bd72
+rerun     2026-10-19T10:51:18Z paper-p2 : binary sha256 84ff80082d81c8e2f91aac47fe701f986ea01f02ba492f9530366fb477f8658b, tree 4b30eabb8606e7ea04e0d6afed53c0f50453553a, Google Chrome 155.0.8059.82, main.pdf sha256 2ebf808fac14905ea7372954abd782b191eb7d8c41c8e342d0ef0673a9d1bd72
+rerun     2026-10-19T10:51:26Z paper-p2 : binary sha256 84ff80082d81c8e2f91aac47fe701f986ea01f02ba492f9530366fb477f8658b, tree 4b30eabb8606e7ea04e0d6afed53c0f50453553a, Google Chrome 155.0.8059.82, main.pdf sha256 2ebf808fac14905ea7372954abd782b191eb7d8c41c8e342d0ef0673a9d1bd72

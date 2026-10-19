@@ -1,0 +1,46 @@
+inpainter: MI-GAN loaded (0 ms)
+warm-up: 968 ms
+pipeline: 1544 ms
+work[still]: erase=10 ocr.blocks=1 ocr.blocks.lines=13 ocr.blocks.swift=1 ocr.kept.formula=1 ocr.reader.auto.documentLayout=1 render=10 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=4 translate.texts=10 translate.wasted=0 lens_wait_ms[p50=268 max=351 last=351 n=10] settle=n/a parked=0
+pace: en>ko|apple:auto samples=4 first=0.05s perLine=0.03s batch[p50=0.10s p90=0.17s n=4] cancelled=0 lines[cached=0 translated=10]
+  5h ago
+    → 5시간 전
+  Patch 1.4 finally fixed the double jump bug. What else are you hoping they fix next?
+    → 패치 1.4가 마침내 더블 점프 버그를 수정했습니다. 다음에 그들이 고쳐 주길 바라는 것이 또 무엇입니까?
+  Discussion
+    → 토론
+  After three months the bug where you could double jump off ladders is gone.
+    → 3개월이 지난 후, 사다리에서 두 번 뛰어내릴 수 있던 버그가 사라졌습니다.
+  Speedrunners are mourning, everyone else is celebrating.
+    → 스피드러너들은 애도하고, 다른 사람들은 모두 축하하고 있습니다.
+  318 comments
+    → 318개의 댓글
+  Share
+    → 공유하다
+  7h ago
+    → 7시간 전
+  The sunset behind the lighthouse is the most beautiful thing in this game
+    → 등대 뒤의 석양은 이 게임에서 가장 아름다운 것입니다.
+  Screenshot
+    → 스크린샷
+issues=0
+layout: blocks=10 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 1104×692
+block: core=243,29,72,28 text=243,31,79,26 size=23.2 lines=1 chars=6 clipped=0 ellipsis=0 "5h ago"
+block: core=32,87,980,84 text=32,94,904,71 size=31.5 lines=2 chars=84 clipped=0 ellipsis=0 "Patch 1.4 finally fixed the double jump bug. What else are y"
+block: core=50,199,122,20 text=50,198,36,22 size=21.0 lines=1 chars=10 clipped=0 ellipsis=0 "Discussion"
+block: core=32,247,958,33 text=32,248,774,31 size=27.4 lines=1 chars=75 clipped=0 ellipsis=0 "After three months the bug where you could double jump off l"
+block: core=33,291,716,31 text=33,292,686,31 size=27.4 lines=1 chars=56 clipped=0 ellipsis=0 "Speedrunners are mourning, everyone else is celebrating."
+block: core=281,367,172,24 text=281,365,134,28 size=25.0 lines=1 chars=12 clipped=0 ellipsis=0 "318 comments"
+block: core=552,367,66,21 text=552,367,73,22 size=21.1 lines=1 chars=5 clipped=0 ellipsis=0 "Share"
+block: core=245,481,72,26 text=245,481,78,26 size=23.2 lines=1 chars=6 clipped=0 ellipsis=0 "7h ago"
+block: core=32,537,1023,84 text=32,560,721,40 size=34.7 lines=2 chars=73 clipped=0 ellipsis=0 "The sunset behind the lighthouse is the most beautiful thing"
+block: core=49,649,129,20 text=49,648,72,22 size=21.0 lines=1 chars=10 clipped=0 ellipsis=0 "Screenshot"
+wrote /Users/hckim/repo/mwoyeo-wt-as-shots/tools/app-store/screenshots/renders/forum-en.ko.png
+silence: longest=610 total=610
+drain: 0 in-flight=0
+reader: docs state=idle pid=24875 warm=doc:en-Latn dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0
+reader: docs footprint=91 MB gui=33 MB last-ms=219 ms=429,219
+reader: lines state=idle pid=24834 warm=rev3:en-Latn dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0
+reader: lines footprint=114 MB gui=33 MB last-ms=165 ms=408,165
+reader: host reads=2 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

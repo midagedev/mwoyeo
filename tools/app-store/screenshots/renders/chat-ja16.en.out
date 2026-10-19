@@ -1,0 +1,46 @@
+inpainter: MI-GAN loaded (0 ms)
+warm-up: 946 ms
+pipeline: 2085 ms
+work[still]: erase=10 ocr.blocks=1 ocr.blocks.lines=19 ocr.blocks.swift=1 ocr.reader.auto.documentLayout=1 render=10 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=4 translate.texts=10 translate.wasted=0 lens_wait_ms[p50=538 max=624 last=624 n=10] settle=n/a parked=0
+pace: ja>en|apple:auto samples=4 first=0.13s perLine=0.01s batch[p50=0.06s p90=0.48s n=4] cancelled=0 lines[cached=0 translated=10]
+  今日 20:23
+    → Today 20:23
+  よし決まり、レイド終わったら釣り行こう
+    → Okay, let's go fishing after the raid is over
+  今日 20:24
+    → Today 20:24
+  マジでここが今までで一番いいコミュニティだわ
+    → Seriously, this is the best community I've ever had.
+  今日 20:25
+    → Today 20:25
+  急にしんみりするのやめてw
+    → Stop being sad all of a sudden w
+  今日 20:26
+    → Today 20:26
+  もう遅い、すでに泣いてる
+    → It's too late, I'm already crying
+  今日 20:27
+    → Today 20:27
+  レイドあと5分で始まるよ、みんな装備準備して！
+    → The raid will start in 5 minutes, everyone prepare your equipment!
+issues=0
+layout: blocks=10 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 1776×768
+block: core=306,35,112,26 text=306,34,138,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:23"
+block: core=116,71,597,41 text=116,74,591,39 size=34.1 lines=1 chars=19 clipped=0 ellipsis=0 "よし決まり、レイド終わったら釣り行こう"
+block: core=238,161,113,29 text=238,162,135,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:24"
+block: core=115,200,695,38 text=115,202,697,37 size=32.8 lines=1 chars=22 clipped=0 ellipsis=0 "マジでここが今までで一番いいコミュニティだわ"
+block: core=263,351,113,31 text=263,353,135,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:25"
+block: core=114,391,409,33 text=114,390,452,38 size=33.0 lines=1 chars=13 clipped=0 ellipsis=0 "急にしんみりするのやめてw"
+block: core=292,484,113,25 text=292,483,139,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:26"
+block: core=116,520,375,38 text=116,522,401,36 size=31.8 lines=1 chars=12 clipped=0 ellipsis=0 "もう遅い、すでに泣いてる"
+block: core=306,610,113,26 text=306,609,134,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:27"
+block: core=119,641,698,45 text=119,652,694,28 size=25.0 lines=1 chars=23 clipped=0 ellipsis=0 "レイドあと5分で始まるよ、みんな装備準備して！"
+wrote /Users/hckim/repo/mwoyeo-wt-as-shots/tools/app-store/screenshots/renders/chat-ja16.en.png
+silence: longest=1310 total=1310
+drain: 0 in-flight=0
+reader: docs state=idle pid=22974 warm=doc:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0
+reader: docs footprint=107 MB gui=37 MB last-ms=389 ms=449,389
+reader: lines state=idle pid=22946 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0
+reader: lines footprint=137 MB gui=37 MB last-ms=312 ms=421,312
+reader: host reads=2 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

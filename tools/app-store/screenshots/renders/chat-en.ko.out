@@ -1,0 +1,48 @@
+inpainter: MI-GAN loaded (0 ms)
+warm-up: 967 ms
+pipeline: 2067 ms
+work[still]: erase=11 ocr.blocks=1 ocr.blocks.lines=16 ocr.blocks.swift=1 ocr.reader.auto.documentLayout=1 render=10 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=4 translate.texts=10 translate.wasted=0 lens_wait_ms[p50=570 max=729 last=729 n=11] settle=n/a parked=0
+pace: en>ko|apple:auto samples=4 first=0.13s perLine=0.03s batch[p50=0.10s p90=0.47s n=4] cancelled=0 lines[cached=0 translated=10]
+  Today at 8:22 PM
+    → 오늘 오후 8시 22분에
+  the devs said more secret spots are coming in the next update
+    → 개발자들은 다음 업데이트에서 더 많은 비밀 장소가 추가될 것이라고 말했습니다.
+  startallvalley.game
+    → startallvalley.game
+  Patch 1.4 - The Lighthouse Update
+    → 패치 1.4 - 등대 업데이트
+  Double jump fixed, three new fishing spots, and something shiny swimming behind the lighthouse after dark.
+    → 이중 점프가 고정되고, 새로운 낚시터가 세 개 있으며, 어두워진 뒤 등대 뒤에서 반짝이는 것이 헤엄치고 있습니다.
+  Today at 8:23 PM
+    → 오늘 오후 8시 23분에
+  Okay that settles it, we're going fishing after the raid
+    → 알겠습니다, 이제 해결하겠습니다. 습격 후에 낚시를 갈 예정입니다.
+  Today at 8:24 PM
+    → 오늘 오후 8시 24분
+  this is the best community I've ever been part of, no joke
+    → 이것은 제가 지금까지 참여한 커뮤니티 중 가장 훌륭한 커뮤니티이며, 농담이 아닙니다.
+  Today at 8:25 PM
+    → 오늘 오후 8시 25분에
+  don't get sappy on us now ollie
+    → 이제 우리에게 감상적이 되지 마, 올리
+issues=0
+layout: blocks=10 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 1776×788
+block: core=243,24,186,34 text=243,28,196,26 size=23.2 lines=1 chars=16 clipped=0 ellipsis=0 "Today at 8:22 PM"
+block: core=112,69,892,30 text=112,69,888,33 size=28.9 lines=1 chars=61 clipped=0 ellipsis=0 "the devs said more secret spots are coming in the next updat"
+block: core=150,182,510,31 text=150,182,271,32 size=28.4 lines=1 chars=33 clipped=0 ellipsis=0 "Patch 1.4 - The Lighthouse Update"
+block: core=149,231,806,67 text=149,234,732,62 size=27.4 lines=2 chars=106 clipped=0 ellipsis=0 "Double jump fixed, three new fishing spots, and something sh"
+block: core=305,375,186,28 text=305,377,197,26 size=23.2 lines=1 chars=16 clipped=0 ellipsis=0 "Today at 8:23 PM"
+block: core=113,414,741,38 text=113,416,804,36 size=31.6 lines=1 chars=56 clipped=0 ellipsis=0 "Okay that settles it, we're going fishing after the raid"
+block: core=237,504,186,25 text=237,504,177,26 size=23.2 lines=1 chars=16 clipped=0 ellipsis=0 "Today at 8:24 PM"
+block: core=112,545,809,36 text=112,548,892,31 size=27.1 lines=1 chars=58 clipped=0 ellipsis=0 "this is the best community I've ever been part of, no joke"
+block: core=262,691,186,30 text=262,694,196,26 size=23.2 lines=1 chars=16 clipped=0 ellipsis=0 "Today at 8:25 PM"
+block: core=113,733,446,36 text=113,734,449,36 size=31.6 lines=1 chars=31 clipped=0 ellipsis=0 "don't get sappy on us now ollie"
+wrote /Users/hckim/repo/mwoyeo-wt-as-shots/tools/app-store/screenshots/renders/chat-en.ko.png
+silence: longest=1006 total=1006
+drain: 0 in-flight=0
+reader: docs state=idle pid=22672 warm=doc:en-Latn dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0
+reader: docs footprint=95 MB gui=42 MB last-ms=225 ms=436,225
+reader: lines state=idle pid=22584 warm=rev3:en-Latn dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0
+reader: lines footprint=111 MB gui=42 MB last-ms=177 ms=411,177
+reader: host reads=2 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

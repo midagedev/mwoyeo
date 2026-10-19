@@ -1,0 +1,28 @@
+inpainter: MI-GAN loaded (0 ms)
+warm-up: 967 ms
+pipeline: 2457 ms
+work[still]: erase=4 ocr.blocks=1 ocr.blocks.lines=11 ocr.blocks.swift=1 ocr.reader.auto.documentLayout=1 render=4 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=4 translate.wasted=0 lens_wait_ms[p50=573 max=679 last=679 n=4] settle=n/a parked=0
+pace: ja>en|apple:auto samples=2 first=0.28s perLine=0.06s batch[p50=0.57s p90=0.57s n=2] cancelled=0 lines[cached=0 translated=4]
+  「翻訳だと気づかないくらい自然なこと。それが一番の目標でした」と開発者は語る。
+    → "It's so natural that you don't notice it's a translation. That was the main goal," the developer said.
+  そのためには、元の文字をきれいに消す必要がある。単色の背景なら周りの色で塗りつぶせばよいが、写真やイラストの上の文字はそう簡単ではない。ここで活躍するのが、消した部分の背景を描き直す画像補完の技術だ。
+    → To do that, it is necessary to erase the original characters cleanly. If it is a single-color background, you can fill it with the surrounding color, but the letters on the photos and illustrations are not so easy. The image complement technology that redraws the background of the erased part is active here.
+  スクロールしても、ずれない
+    → Even if you scroll, it doesn't shift
+  ページをスクロールすると、文字の位置は一瞬で変わる。毎回すべてを読み直していては遅すぎるし、電池もすぐになくなってしまう。そこで画面全体が平行に動いたことを検出し、すでに訳した部分はそのまま一緒に動かし、新しく現れた行だけを読み取る。
+    → When you scroll the page, the position of the text changes in an instant. It's too late to reread everything every time, and the battery will run out quickly. There, it detects that the entire screen has moved in parallel, and the part that has already been translated moves together as it is, and only the newly appeared lines are read.
+issues=0
+layout: blocks=4 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 1152×1050
+block: core=81,74,968,114 text=81,88,935,86 size=38.6 lines=2 chars=39 clipped=0 ellipsis=0 "「翻訳だと気づかないくらい自然なこと。それが一番の目標でした」と開発者は語る。"
+block: core=31,299,1086,258 text=31,321,1081,214 size=38.6 lines=4 chars=100 clipped=0 ellipsis=0 "そのためには、元の文字をきれいに消す必要がある。単色の背景なら周りの色で塗りつぶせばよいが、写真やイラストの上の文字はそ"
+block: core=67,667,666,65 text=67,667,797,65 size=58.0 lines=1 chars=13 clipped=0 ellipsis=0 "スクロールしても、ずれない"
+block: core=29,776,1087,258 text=29,798,1084,214 size=38.6 lines=4 chars=117 clipped=0 ellipsis=0 "ページをスクロールすると、文字の位置は一瞬で変わる。毎回すべてを読み直していては遅すぎるし、電池もすぐになくなってしまう"
+wrote /Users/hckim/repo/mwoyeo-wt-as-shots/tools/app-store/screenshots/renders/article-body.en.png
+silence: longest=1510 total=1510
+drain: 0 in-flight=0
+reader: docs state=idle pid=98280 warm=doc:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0
+reader: docs footprint=117 MB gui=63 MB last-ms=388 ms=439,388
+reader: lines state=idle pid=98246 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0
+reader: lines footprint=153 MB gui=63 MB last-ms=389 ms=432,389
+reader: host reads=2 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

@@ -1,0 +1,56 @@
+inpainter: MI-GAN loaded (0 ms)
+warm-up: 954 ms
+pipeline: 3009 ms
+work[still]: erase=14 ocr.blocks=1 ocr.blocks.lines=39 ocr.blocks.swift=1 ocr.kept.formula=7 ocr.reader.auto.documentLayout=1 render=12 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=5 translate.texts=13 translate.wasted=0 lens_wait_ms[p50=890 max=1232 last=1232 n=14] settle=n/a parked=0
+pace: en>ko|apple:auto samples=5 first=0.15s perLine=0.06s batch[p50=0.21s p90=0.46s n=5] cancelled=0 lines[cached=0 translated=13]
+  syllables.
+    → syllables.
+  5 Scroll prediction
+    → 5 스크롤 예측
+  A lens over a feed is used while the feed scrolls. At the default rate the screen is captured every 125 ms, and the blocks that are placed from a frame captured at to are shown at a later display time t. If the content has moved by X (t) - X (to) points in between, an unpredicted block is that far from the text it translates. At a scroll speed of
+    → 피드가 스크롤되는 동안 피드 위에 렌즈가 사용됩니다. 기본 속도에서는 화면이 125밀리초마다 캡처되며, 캡처된 프레임에서 배치된 블록은 이후의 표시 시간 t에 표시됩니다. 내용이 X(t) - X(to) 지점 사이로 이동한 경우, 예측할 수 없는 블록은 번역하는 텍스트와 매우 거리가 멉니다. 스크롤 속도에서
+  v = 1000 points per second a frame that is only 125 ms
+    → v = 초당 1000점, 프레임은 단 125ms에 불과합니다.
+  old is v•0.125 = 125 points off, several lines of text. The reading and the translation of a frame take longer than that. Moving the finished blocks along with the page is therefore not an optimisation; without it the overlay is wrong whenever the page moves.
+    → old는 v•0.125 = 125포인트 오프이며, 여러 줄의 텍스트입니다. 프레임의 읽기와 번역은 그보다 더 오래 걸립니다. 완성된 블록을 페이지와 함께 이동하는 것은 최적화가 아니며, 이를 사용하지 않으면 페이지가 이동할 때마다 오버레이가 잘못됩니다.
+  5.1 Model
+    → 5.1 모델
+  The application cannot ask a page how far it has scrolled, and does not need to. It sees a scroll event anywhere on the screen (whether it scrolls what a lens reads is decided afterwards), and the system sends it with a time stamp,
+    → 애플리케이션은 페이지에 스크롤한 지를 물어볼 수 없으며, 물어볼 필요가 없습니다. 화면 어디에서든 스크롤 이벤트를 감지합니다(렌즈가 읽는 내용을 스크롤하는지는 나중에 결정됩니다), 시스템은 이를 타임스탬프와 함께 전송합니다.
+  Ф (t)
+    → Ф (t)
+  A precise delta is a step: the content has moved all at once. A line step eases out, as in a smooth-scroll
+    → 정확한 델타는 한 단계입니다: 내용이 한 번에 모두 이동했습니다. 라인 스텝이 부드러운 스크롤처럼 완화됩니다.
+  animation: it starts at speed 3/T = 20 s-1 of its to-tal and slows to zero at 1, so that half of it is on screen after T(1 - 2-1/3) ~ 31 ms, ninety percent after
+    → 애니메이션: 전체 속도 3/T = 20 s-1로 시작하고 1에서 0으로 느려져 T(1 - 2-1/3) ~ 31 ms 후에 화면에 절반이 표시되며, 그 후 90%는
+  T(1 - 0.11/3) ~ 80 ms, and all of it after T = 150 ms.
+    → T(1 - 0.11/3) ~ 80 ms이며, T 이후의 모든 값은 150 ms입니다.
+  5.2 Offset between two frames
+    → 5.2 두 프레임 사이의 오프셋
+  The wheel units of kind c that reached the screen be-tween to and t1 are
+    → 스크린과 t1 사이에 도달한 종류 c의 휠 유닛은
+  and the content movement expected between them, in points, is
+    → 그리고 그들 사이에 기대되는 콘텐츠 이동은 포인트 기준입니다.
+issues=0
+layout: blocks=12 overlaps=0 spill=0 cut=0 clipped=1 holds=0
+image: 2208×1180
+block: core=45,134,587,58 text=45,131,309,65 size=57.9 lines=1 chars=19 clipped=0 ellipsis=0 "5 Scroll prediction"
+block: core=42,228,1023,300 text=42,259,1005,237 size=41.1 lines=6 chars=348 clipped=0 ellipsis=0 "A lens over a feed is used while the feed scrolls. At the de"
+block: core=43,538,1018,42 text=43,535,833,44 size=41.1 lines=1 chars=54 clipped=1 ellipsis=0 "v = 1000 points per second a frame that is only 125 ms"
+block: core=41,576,1022,254 text=41,613,1000,189 size=41.1 lines=5 chars=259 clipped=0 ellipsis=0 "old is v•0.125 = 125 points off, several lines of text. The "
+block: core=45,900,282,42 text=45,897,143,50 size=44.8 lines=1 chars=9 clipped=0 ellipsis=0 "5.1 Model"
+block: core=42,969,1024,201 text=42,970,996,201 size=44.2 lines=4 chars=231 clipped=0 ellipsis=0 "The application cannot ask a page how far it has scrolled, a"
+block: core=1138,237,1020,99 text=1138,235,984,91 size=40.0 lines=2 chars=106 clipped=0 ellipsis=0 "A precise delta is a step: the content has moved all at once"
+block: core=1139,327,1025,157 text=1139,332,971,151 size=44.9 lines=3 chars=161 clipped=0 ellipsis=0 "animation: it starts at speed 3/T = 20 s-1 of its to-tal and"
+block: core=1140,481,964,62 text=1140,495,1018,47 size=41.6 lines=1 chars=54 clipped=0 ellipsis=0 "T(1 - 0.11/3) ~ 80 ms, and all of it after T = 150 ms."
+block: core=1142,602,778,45 text=1142,598,521,54 size=47.8 lines=1 chars=29 clipped=0 ellipsis=0 "5.2 Offset between two frames"
+block: core=1138,676,1026,99 text=1138,698,840,55 size=48.1 lines=2 chars=72 clipped=0 ellipsis=0 "The wheel units of kind c that reached the screen be-tween t"
+block: core=1140,954,1019,104 text=1140,983,968,46 size=40.0 lines=2 chars=61 clipped=0 ellipsis=0 "and the content movement expected between them, in points, i"
+wrote /Users/hckim/repo/mwoyeo-wt-as-shots/tools/app-store/screenshots/renders/paper.ko.png
+silence: longest=1606 total=1606
+drain: 0 in-flight=0
+reader: docs state=idle pid=24341 warm=doc:en-Latn dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0
+reader: docs footprint=102 MB gui=103 MB last-ms=327 ms=433,327
+reader: lines state=idle pid=24270 warm=rev3:en-Latn dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0
+reader: lines footprint=120 MB gui=103 MB last-ms=248 ms=403,248
+reader: host reads=2 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

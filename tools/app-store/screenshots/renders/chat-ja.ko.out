@@ -1,0 +1,66 @@
+inpainter: MI-GAN loaded (0 ms)
+warm-up: 980 ms
+pipeline: 2510 ms
+work[still]: erase=17 ocr.blocks=1 ocr.blocks.lines=30 ocr.blocks.swift=1 ocr.reader.auto.documentLayout=1 render=16 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=6 translate.texts=16 translate.wasted=0 lens_wait_ms[p50=526 max=771 last=771 n=17] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=6 first=0.07s perLine=0.03s batch[p50=0.09s p90=0.36s n=6] cancelled=0 lines[cached=0 translated=16]
+  今日
+    → 오늘
+  今日 20:12
+    → 오늘 20:12
+  昨日の夜パッチノート待ってて起きてた人いる？
+    → 어제 밤에 패치노트를 기다리면서 깨어 있었던 사람 있어?
+  はい私。
+    → 네, 저입니다.
+  今日 20:13
+    → 오늘 20:13
+  二段ジャンプのバグやっと直ったね、3ヶ月もかかるとは思わなかった
+    → 2단 점프 버그가 드디어 고쳐졌네요, 3개월이나 걸릴 줄은 몰랐어요.
+  @junpark
+    → @junpark
+  今日 20:14
+    → 오늘 20:14
+  え、じゃあワールド4のショートカットもう使えないの？？週末ずっと練習してたのに
+    → 어, 그럼 월드4 단축키 이제 못 쓰는 거야?? 주말 내내 연습하고 있었는데
+  今日 20:15
+    → 오늘 20:15
+  草。正直あのショートカットはバグっぽかったしね
+    → ㅋㅋ. 솔직히 그 숏컷은 버그 같았어.
+  今日 20:16
+    → 오늘 20:16
+  今夜の協力イベント行く人いる？レイドにあと2人ほしい
+    → 오늘 밤 협력 이벤트 갈 사람 있어? 레이드에 두 명이 더 필요합니다.
+  今日 20:17
+    → 오늘 20:17
+  行く！何時からにする？
+    → 가자! 몇 시부터 할까?
+  今日 20:18
+    → 오늘 20:18
+  こっちの時間で9時ごろ、つまり1時間後くらい？
+    → 이쪽 시간으로 9시 정도, 즉 한 시간 정도 후인가요?
+issues=0
+layout: blocks=16 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 1776×1112
+block: core=869,12,43,25 text=869,12,43,27 size=25.0 lines=1 chars=2 clipped=0 ellipsis=0 "今日"
+block: core=292,84,112,26 text=292,84,111,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:12"
+block: core=115,121,688,36 text=115,120,746,39 size=34.1 lines=1 chars=22 clipped=0 ellipsis=0 "昨日の夜パッチノート待ってて起きてた人いる？"
+block: core=116,252,103,36 text=116,258,106,24 size=21.1 lines=1 chars=4 clipped=0 ellipsis=0 "はい私。"
+block: core=244,213,113,27 text=244,213,110,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:13"
+block: core=242,249,1001,44 text=242,253,879,39 size=34.1 lines=1 chars=32 clipped=0 ellipsis=0 "二段ジャンプのバグやっと直ったね、3ヶ月もかかるとは思わなかった"
+block: core=238,440,113,26 text=238,440,111,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:14"
+block: core=116,474,1219,41 text=116,477,969,40 size=35.2 lines=1 chars=39 clipped=0 ellipsis=0 "え、じゃあワールド4のショートカットもう使えないの？？週末ずっと練習してたのに"
+block: core=263,567,113,25 text=263,566,110,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:15"
+block: core=114,603,730,41 text=114,605,478,40 size=35.2 lines=1 chars=23 clipped=0 ellipsis=0 "草。正直あのショートカットはバグっぽかったしね"
+block: core=306,699,113,23 text=306,696,111,28 size=24.8 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:16"
+block: core=113,733,810,44 text=113,738,843,38 size=33.0 lines=1 chars=26 clipped=0 ellipsis=0 "今夜の協力イベント行く人いる？レイドにあと2人ほしい"
+block: core=292,886,113,27 text=292,886,109,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:17"
+block: core=114,923,341,37 text=114,923,275,38 size=33.0 lines=1 chars=11 clipped=0 ellipsis=0 "行く！何時からにする？"
+block: core=306,1016,113,25 text=306,1015,112,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:18"
+block: core=118,1052,692,41 text=118,1054,641,38 size=33.0 lines=1 chars=23 clipped=0 ellipsis=0 "こっちの時間で9時ごろ、つまり1時間後くらい？"
+wrote /Users/hckim/repo/mwoyeo-wt-as-shots/tools/app-store/screenshots/renders/chat-ja.ko.png
+silence: longest=1410 total=1410
+drain: 0 in-flight=0
+reader: docs state=idle pid=21922 warm=doc:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0
+reader: docs footprint=113 MB gui=61 MB last-ms=456 ms=444,456
+reader: lines state=idle pid=21870 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0
+reader: lines footprint=162 MB gui=61 MB last-ms=406 ms=463,406
+reader: host reads=2 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

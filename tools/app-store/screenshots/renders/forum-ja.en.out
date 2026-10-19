@@ -1,0 +1,40 @@
+inpainter: MI-GAN loaded (0 ms)
+warm-up: 960 ms
+pipeline: 2086 ms
+work[still]: erase=8 ocr.blocks=1 ocr.blocks.lines=12 ocr.blocks.swift=1 ocr.kept.formula=1 ocr.reader.auto.documentLayout=1 render=8 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=3 translate.texts=8 translate.wasted=0 lens_wait_ms[p50=557 max=610 last=610 n=8] settle=n/a parked=0
+pace: ja>en|apple:auto samples=3 first=0.16s perLine=0.03s batch[p50=0.04s p90=0.53s n=3] cancelled=0 lines[cached=0 translated=8]
+  5時間前
+    → 5 hours ago
+  パッチ1.4でやっと二段ジャンプのバグが直った。次は何を直してほしい？
+    → Patch 1.4 finally fixed the bug of the two-stage jump. What do you want me to fix next?
+  3ヶ月かかったけど、はしごから二段ジャンプできるバグがついに消えた。RTA勢は悲しんでるけど、他のみんなはお祝いムード。
+    → It took 3 months, but the bug that could jump two steps from the ladder finally disappeared. The RTA team is sad, but everyone else is in a festive mood.
+  318件
+    → 318 cases
+  共有
+    → Shared
+  7時間
+    → 7 hours
+  灯台の裏の夕焼けがこのゲームで一番きれいだと思う
+    → I think the sunset behind the lighthouse is the most beautiful in this game
+  スクショ
+    → Screenshot
+issues=0
+layout: blocks=8 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 1104×692
+block: core=243,35,83,27 text=243,35,130,28 size=25.0 lines=1 chars=4 clipped=0 ellipsis=0 "5時間前"
+block: core=34,86,1013,93 text=34,90,1002,86 size=38.6 lines=2 chars=35 clipped=0 ellipsis=0 "パッチ1.4でやっと二段ジャンプのバグが直った。次は何を直してほしい？"
+block: core=33,253,1013,80 text=33,260,974,67 size=29.5 lines=2 chars=60 clipped=0 ellipsis=0 "3ヶ月かかったけど、はしごから二段ジャンプできるバグがついに消えた。RTA勢は悲しんでるけど、他のみんなはお祝いムード。"
+block: core=281,373,68,28 text=281,369,43,37 size=16.3 lines=1 chars=4 clipped=0 ellipsis=0 "318件"
+block: core=474,370,24,31 text=474,370,23,31 size=13.0 lines=1 chars=2 clipped=0 ellipsis=0 "共有"
+block: core=260,493,66,26 text=260,492,82,28 size=25.0 lines=1 chars=3 clipped=0 ellipsis=0 "7時間"
+block: core=34,542,853,42 text=34,545,1011,36 size=31.6 lines=1 chars=24 clipped=0 ellipsis=0 "灯台の裏の夕焼けがこのゲームで一番きれいだと思う"
+block: core=50,610,88,25 text=50,613,88,19 size=16.8 lines=1 chars=4 clipped=0 ellipsis=0 "スクショ"
+wrote /Users/hckim/repo/mwoyeo-wt-as-shots/tools/app-store/screenshots/renders/forum-ja.en.png
+silence: longest=1305 total=1305
+drain: 0 in-flight=0
+reader: docs state=idle pid=25222 warm=doc:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0
+reader: docs footprint=108 MB gui=41 MB last-ms=360 ms=438,360
+reader: lines state=idle pid=25177 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0
+reader: lines footprint=143 MB gui=41 MB last-ms=329 ms=413,329
+reader: host reads=2 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

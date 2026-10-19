@@ -9,8 +9,9 @@ import UniformTypeIdentifiers
 @MainActor
 @Observable
 final class ImageTranslationModel {
-    /// `needsPack`: the picture was read, and the translation waits for a language pack.
-    enum Phase: Equatable { case empty, working, done(lines: Int), needsPack(PackPair), failed(String) }
+    /// `needsPack`: the picture was read, and the translation waits for a language pack (what became of its download is
+    /// `PackDownload.ledger`'s). `unsupported`: the pair has no translation, and only other languages help.
+    enum Phase: Equatable { case empty, working, done(lines: Int), needsPack(PackPair), unsupported(PackPair), failed(String) }
 
     private(set) var title = ""
     private(set) var phase = Phase.empty
@@ -50,6 +51,9 @@ final class ImageTranslationModel {
 
     /// Shows `message` in the window's status line instead of a picture's result.
     func fail(_ message: String) { phase = .failed(message) }
+
+    /// A status line without a translation behind it, for UI captures of the states a pack or a pair can leave a picture in.
+    func showStatus(_ phase: Phase) { self.phase = phase }
 
     func open(data: Data, title: String) {
         reload = { [weak self] in self?.open(data: data, title: title) }
@@ -112,10 +116,10 @@ final class ImageTranslationModel {
             if texts.isEmpty, let issue = app.issue, issue.isTextRecognition {
                 phase = .failed(issue.message)
             } else if texts.contains(where: { $0.translation == nil }), Self.blocksTranslating(app.issue), let issue = app.issue {
-                if case let .languagePackMissing(source, target) = issue {
-                    phase = .needsPack(PackPair(source: source, target: target))
-                } else {
-                    phase = .failed(issue.message)
+                switch issue {
+                case let .languagePackMissing(source, target): phase = .needsPack(PackPair(source: source, target: target))
+                case let .unsupportedPair(source, target): phase = .unsupported(PackPair(source: source, target: target))
+                default: phase = .failed(issue.message)
                 }
             } else {
                 phase = .done(lines: texts.count)
@@ -200,8 +204,9 @@ struct ImageTranslationView: View {
             bar
         }
         .dropDestination(for: URL.self) { (urls: [URL], _: CGPoint) -> Bool in onDrop(urls) }
-        // The pack the picture waits for comes down in a sheet over this window; then the picture is translated again.
-        .packDownload(in: .image) { model.retry() }
+        // The pack the picture waits for comes down in a sheet over this window; then the picture is translated again, if the pack came:
+        // a sheet that ended without it leaves the picture as it is, with the way to ask again (`status`).
+        .packDownload(in: .image) { installed in if installed { model.retry() } }
     }
 
     private var bar: some View {
@@ -233,8 +238,22 @@ struct ImageTranslationView: View {
             Text(n == 0 ? String(localized: "No text found") : String(localized: "\(n) lines translated")).font(.caption).foregroundStyle(.secondary)
         case .needsPack(let pair):
             HStack(spacing: 8) {
-                Label("Language pack needed", systemImage: "exclamationmark.triangle.fill").font(.caption).foregroundStyle(.secondary)
-                Button(LensHintText.downloadPack(pair)) { model.downloadPack(pair) }.controlSize(.small)
+                switch PackDownload.shared.ledger.phase(of: pair) {
+                case .downloading?:
+                    ProgressView().controlSize(.small)
+                    Text(LensHintText.downloading(pair)).font(.caption).foregroundStyle(.secondary)
+                case .notFinished?:
+                    Label(LensHintText.notFinishedState(pair), systemImage: "exclamationmark.triangle.fill").font(.caption).foregroundStyle(.secondary)
+                    Button("Try again") { model.downloadPack(pair) }.controlSize(.small)
+                case nil:
+                    Label("Language pack needed", systemImage: "exclamationmark.triangle.fill").font(.caption).foregroundStyle(.secondary)
+                    Button(LensHintText.downloadPack(pair)) { model.downloadPack(pair) }.controlSize(.small)
+                }
+            }
+        case .unsupported(let pair):
+            HStack(spacing: 8) {
+                Label(LensHintText.notSupported(pair), systemImage: "exclamationmark.triangle.fill").font(.caption).foregroundStyle(.secondary)
+                Button("Choose Languages") { AppModel.shared.openSettings(on: .general) }.controlSize(.small)
             }
         case .failed(let message):
             Label(message, systemImage: "exclamationmark.triangle.fill").font(.caption).foregroundStyle(.secondary).lineLimit(2)

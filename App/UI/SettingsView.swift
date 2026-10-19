@@ -2,7 +2,6 @@ import Carbon.HIToolbox
 import MwoyeoCore
 import ServiceManagement
 import SwiftUI
-import Translation
 
 /// The tabs of Settings; the app can open it on one (`AppModel.settingsTab`).
 enum SettingsTab: Hashable {
@@ -301,9 +300,7 @@ struct TranslationSettings: View {
                 Text("Its saved key is deleted from the Keychain.")
             }
             Section {
-                LanguagePacksView(source: model.settings.sourceLanguage, target: model.settings.targetLanguage) {
-                    Task { await model.languagePacksChanged() }
-                }
+                LanguagePacksView(source: model.settings.sourceLanguage, target: model.settings.targetLanguage)
             } header: {
                 Text("Apple Translation language packs")
             } footer: {
@@ -357,14 +354,20 @@ struct TranslationSettings: View {
 }
 
 /// The pack the lenses use now (the chosen pair; none while the source is automatic) and "All Languages" with the installed
-/// count, holding every pair: the section is one or two rows, not one per language.
+/// count, holding every pair: the section is one or two rows, not one per language. A row asks `PackDownload` for its pack like a
+/// lens does, so there is one sheet, one record of what became of it, and the lens says the same as the row.
 struct LanguagePacksView: View {
     let source: String
     let target: String
-    var onChange: () -> Void
-    @State private var status: [String: LanguageAvailability.Status] = [:]
-    @State private var downloading: TranslationSession.Configuration?
-    @State private var showsAll = false
+    @State private var status: [String: PackStatus] = [:]
+    @State private var showsAll: Bool
+
+    /// `expanded`: the list of every language is open from the start (the captures of rows in each state).
+    init(source: String, target: String, expanded: Bool = false) {
+        self.source = source
+        self.target = target
+        _showsAll = State(initialValue: expanded)
+    }
 
     private var sources: [String] { Languages.sources.dropFirst().filter { $0 != target } }
     private var shown: [String] { source == "auto" || source == target ? [] : [source] }
@@ -381,29 +384,26 @@ struct LanguagePacksView: View {
         }
         .task(id: target) { await reload() }
         .onChange(of: PackDownload.shared.ended) { Task { await reload() } }
-        .translationTask(downloading) { session in
-            // Shows the system download sheet; returns once the pack is installed or the user declines.
-            try? await session.prepareTranslation()
-            await MainActor.run { downloading = nil }
-            await reload()
-            await MainActor.run { onChange() }
-        }
     }
 
     private func row(_ source: String) -> some View {
-        LabeledContent {
+        let pair = PackPair(source: source, target: target)
+        let phase = PackDownload.shared.ledger.phase(of: pair)
+        return LabeledContent {
             switch status[source] {
             case .installed?:
                 Label("Installed", systemImage: "checkmark.circle.fill").foregroundStyle(.green).labelStyle(.titleAndIcon)
-            case .supported?:
-                Button("Download") {
-                    downloading = TranslationSession.Configuration(source: Locale.Language(identifier: source),
-                                                                   target: Locale.Language(identifier: target))
+            case .viaIntelligence?:
+                // Nothing is stopped: Apple Intelligence translates this pair until the faster pack is here.
+                HStack(spacing: 8) {
+                    Text("Using Apple Intelligence").font(.caption).foregroundStyle(.secondary)
+                    download(pair, phase)
                 }
-                .disabled(downloading != nil)
+            case .downloadable?:
+                download(pair, phase)
             case nil:
                 ProgressView().controlSize(.small)
-            default:
+            case .unsupported?:
                 Text("Not supported").foregroundStyle(.secondary)
             }
         } label: {
@@ -411,12 +411,23 @@ struct LanguagePacksView: View {
         }
     }
 
-    private func reload() async {
-        let availability = LanguageAvailability()
-        var next: [String: LanguageAvailability.Status] = [:]
-        for s in sources {
-            next[s] = await availability.status(from: Locale.Language(identifier: s), to: Locale.Language(identifier: target))
+    /// The pack's ask, as far as it has got: the button, the sheet being up, or the sheet having ended without the pack.
+    @ViewBuilder private func download(_ pair: PackPair, _ phase: PackLedger.Phase?) -> some View {
+        switch phase {
+        case .downloading?:
+            ProgressView().controlSize(.small)
+            Text("Downloading…").font(.caption).foregroundStyle(.secondary)
+        case .notFinished?:
+            Text("Didn’t finish").font(.caption).foregroundStyle(.secondary)
+            Button("Try again") { PackDownload.shared.request(pair, in: .settings) }
+        case nil:
+            Button("Download") { PackDownload.shared.request(pair, in: .settings) }
         }
+    }
+
+    private func reload() async {
+        var next: [String: PackStatus] = [:]
+        for s in sources { next[s] = await PackDownload.shared.status(PackPair(source: s, target: target)) }
         await MainActor.run { status = next }
     }
 }

@@ -16,7 +16,12 @@ struct MenuPanel: View {
                     EngineNotice(headline: issue.headline, reason: issue.detail, useApple: { model.selectEngine(nil) }, dismiss: { model.dismissIssue() })
                 } else if issue.isTextRecognition {
                     RecognitionNotice(message: issue.message)
-                } else {
+                } else if let languages = LanguageNotice(issue), !model.lensesSayLanguageTrouble {
+                    // A lens that says it in its own row (RegionRow) is not told twice; this is for a trouble no lens shows (all off, or
+                    // the image window's).
+                    IssueBanner(message: languages.message(PackDownload.shared.ledger), action: languages.action(PackDownload.shared.ledger),
+                                busy: languages.isDownloading(PackDownload.shared.ledger)) { languages.perform(model) }
+                } else if LanguageNotice(issue) == nil {
                     IssueBanner(message: issue.message) { open() }
                 }
             }
@@ -168,13 +173,17 @@ struct RegionRow: View {
             LensChip(state: dotState)
             VStack(alignment: .leading, spacing: 1) {
                 Text(region.name).font(.callout.weight(.medium)).lineLimit(1)
-                HStack(spacing: 3) {
-                    if model.error(of: region.id) == nil {
-                        Image(systemName: region.anchor != nil ? "macwindow" : "pin.fill").imageScale(.small).accessibilityHidden(true)
+                if let hint = model.languageHint(of: region.id), model.error(of: region.id) == nil, region.isEnabled, !model.isPaused {
+                    languageLine(hint)
+                } else {
+                    HStack(spacing: 3) {
+                        if model.error(of: region.id) == nil {
+                            Image(systemName: region.anchor != nil ? "macwindow" : "pin.fill").imageScale(.small).accessibilityHidden(true)
+                        }
+                        Text(subtitle).lineLimit(1)
                     }
-                    Text(subtitle).lineLimit(1)
+                    .font(.caption2).foregroundStyle(.secondary)
                 }
-                .font(.caption2).foregroundStyle(.secondary)
             }
             Spacer(minLength: 4)
             if hovering {
@@ -200,6 +209,26 @@ struct RegionRow: View {
         // The trash button shows under the pointer only: a screen reader and the keyboard get it as an action of the row.
         .accessibilityElement(children: .contain)
         .accessibilityAction(named: Text("Remove Lens")) { Task { await model.remove(region.id) } }
+    }
+
+    /// What the lens's pill says about its language pair, in the row's second line: one line, the pill's words, and a click does what the
+    /// pill's click does. It replaces the size line while it lasts (the row never grows).
+    private func languageLine(_ hint: LensHint) -> some View {
+        Button { model.performHint(of: region.id) } label: {
+            HStack(spacing: 4) {
+                if case .downloadingPack = hint {
+                    ProgressView().controlSize(.mini).scaleEffect(0.7).frame(width: 10, height: 10)
+                } else {
+                    Image(systemName: hint.action == .chooseLanguages ? "exclamationmark.triangle.fill" : "arrow.down.circle.fill")
+                        .imageScale(.small).foregroundStyle(hint.action == .chooseLanguages ? .yellow : Color.accentColor)
+                }
+                Text(LensHintText.rowLine(hint) + (hint.action != nil ? " ›" : "")).lineLimit(1)
+            }
+            .font(.caption2).foregroundStyle(.primary)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint(hint.action == nil ? "" : String(localized: "Does what the lens’s name tag offers"))
     }
 
     private var dotState: LensChip.State {
@@ -402,11 +431,17 @@ struct IssueBanner: View {
     let message: String
     var detail: String?
     var action = String(localized: "Open Settings")
+    /// Something is on its way (a download): a spinner instead of the warning, and the button says where to look.
+    var busy = false
     let perform: () -> Void
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.yellow).accessibilityHidden(true)
+            if busy {
+                ProgressView().controlSize(.small).accessibilityHidden(true)
+            } else {
+                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.yellow).accessibilityHidden(true)
+            }
             VStack(alignment: .leading, spacing: 2) {
                 Text(message).font(.caption).fixedSize(horizontal: false, vertical: true)
                 if let detail { Text(detail).font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
@@ -473,5 +508,63 @@ struct KeyCap: View {
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
             .background(.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+    }
+}
+
+/// The panel's banner for a trouble with the language pair, when no lens says it in its own row: a pack to download (said as asking,
+/// downloading or not finished, `PackLedger`) or a pair with no translation. One action each, from where the person is.
+struct LanguageNotice {
+    private enum Kind {
+        case pack(PackPair)
+        case unsupported(PackPair)
+    }
+
+    private let kind: Kind
+
+    init?(_ issue: TranslationIssue) {
+        switch issue {
+        case let .languagePackMissing(source, target): kind = .pack(PackPair(source: source, target: target))
+        case let .unsupportedPair(source, target): kind = .unsupported(PackPair(source: source, target: target))
+        default: return nil
+        }
+    }
+
+    func isDownloading(_ ledger: PackLedger) -> Bool {
+        if case let .pack(pair) = kind { return ledger.phase(of: pair) == .downloading }
+        return false
+    }
+
+    func message(_ ledger: PackLedger) -> String {
+        switch kind {
+        case let .pack(pair):
+            switch ledger.phase(of: pair) {
+            case .downloading?: LensHintText.downloading(pair)
+            case .notFinished?: LensHintText.notFinishedState(pair)
+            case nil: String(localized: "The \(Languages.name(pair.source)) → \(Languages.name(pair.target)) language pack is not installed.")
+            }
+        // The pill's short words: the system's sentence wraps to three lines beside the button.
+        case let .unsupported(pair): LensHintText.notSupported(pair)
+        }
+    }
+
+    func action(_ ledger: PackLedger) -> String {
+        switch kind {
+        case let .pack(pair):
+            switch ledger.phase(of: pair) {
+            case .downloading?: String(localized: "Open Settings")
+            case .notFinished?: String(localized: "Try again")
+            case nil: String(localized: "Download")
+            }
+        case .unsupported: String(localized: "Choose Languages")
+        }
+    }
+
+    @MainActor func perform(_ model: AppModel) {
+        switch kind {
+        case let .pack(pair):
+            // While the sheet is up, the click only brings its window forward (`AppModel.downloadPack`).
+            model.downloadPack(pair)
+        case .unsupported: model.openSettings(on: .general)
+        }
     }
 }

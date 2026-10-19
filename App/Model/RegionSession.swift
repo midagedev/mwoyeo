@@ -475,6 +475,12 @@ final class RegionSession {
         if case let .languagePackMissing(source, target)? = model.issue, Self.sameLanguage(target, settings.targetLanguage),
            settings.sourceLanguage == "auto" || Self.sameLanguage(source, settings.sourceLanguage) {
             signals.missingPack = PackPair(source: source, target: target)
+            signals.packPhase = PackDownload.shared.ledger.phase(of: PackPair(source: source, target: target))
+        }
+        // A pair with no translation is the setup of a lens whose source is chosen; on Detect it is one block the detector got wrong.
+        if case let .unsupportedPair(source, target)? = model.issue, settings.sourceLanguage != "auto",
+           Self.sameLanguage(target, settings.targetLanguage), Self.sameLanguage(source, settings.sourceLanguage) {
+            signals.unsupportedPair = PackPair(source: source, target: target)
         }
         return signals
     }
@@ -487,6 +493,8 @@ final class RegionSession {
         shownHint = hint
         chrome.setHint(hint.map(LensHintText.line), actionable: hint?.action != nil, forcesTab: hint?.showsTabAlways ?? false)
         if let hint { Trace.count("lens.hint.\(Self.counterName(hint))") }
+        // The menu panel's row for this lens repeats the language hints: it reads the sessions only when told they changed.
+        onChange?()
     }
 
     /// What this lens translates now, as the translator's batches are matched to it (`TranslationRoute.serves`).
@@ -515,6 +523,9 @@ final class RegionSession {
         case .allowScreenRecording: "allow"
         case .restartToFinish: "restart"
         case .downloadPack: "pack"
+        case .downloadingPack: "pack-downloading"
+        case .downloadNotFinished: "pack-not-finished"
+        case .pairNotSupported: "pair-not-supported"
         case .preparingRecognition: "preparing"
         case .recognitionNotResponding: "not-responding"
         case .translationNotAnswering: "translation-failing"
@@ -523,17 +534,15 @@ final class RegionSession {
         }
     }
 
-    /// A click on the hint.
-    private func performHint() {
+    /// A click on the hint (the pill's, or its line in the menu panel's row).
+    func performHint() {
         let model = AppModel.shared
         switch shownHint?.action {
         case .openScreenRecordingSettings?: model.openScreenRecordingSettings()
         case .restart?: model.relaunch()
         case let .downloadPack(pair)?: model.downloadPack(pair)
-        case .openTranslationSettings?:
-            model.settingsTab = .translation
-            NSApp.activate(ignoringOtherApps: true)
-            model.openSettingsAction?()
+        case .openTranslationSettings?: model.openSettings(on: .translation)
+        case .chooseLanguages?: model.openSettings(on: .general)
         case nil: break
         }
     }

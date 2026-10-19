@@ -316,12 +316,22 @@ final class AppModel {
     /// effect only in a process started after it.
     func relaunch() { Relaunch.run() }
 
-    /// A lens's "Download <language>": Settings on Translation, with the pack's download sheet up.
+    /// A lens's "Download <language>": Settings on Translation, with the pack's download sheet up. A pair whose sheet is up already
+    /// only brings that window forward. Without a way to open Settings there is no window for the sheet: the ask ends as a download
+    /// that did not finish, which every surface then says (never a download that "runs" with nothing to show it).
     func downloadPack(_ pair: PackPair) {
         PackDownload.shared.request(pair, in: .settings)
-        settingsTab = .translation
+        if !openSettings(on: .translation) { Task { await PackDownload.shared.abandon(pair, in: .settings) } }
+    }
+
+    /// Settings on `tab` in front of the other windows; false when the app has no way to open it yet (`openSettingsAction`).
+    @discardableResult
+    func openSettings(on tab: SettingsTab) -> Bool {
+        settingsTab = tab
         NSApp.activate(ignoringOtherApps: true)
-        openSettingsAction?()
+        guard let open = openSettingsAction else { return false }
+        open()
+        return true
     }
 
     /// Opens the Settings window; set by the menu bar item's view (`SettingsOpener`), the only holder of SwiftUI's `openSettings`.
@@ -404,6 +414,23 @@ final class AppModel {
 
     func activity(of id: UUID) -> RegionActivity { sessions[id]?.activity ?? .idle }
     func error(of id: UUID) -> String? { sessions[id]?.errorMessage }
+
+    /// What this lens's pill says now when it is about the language pair (a pack to download, downloading, not finished, no translation):
+    /// the menu panel repeats it in the lens's row, with the same action. Other hints stay on the pill.
+    func languageHint(of id: UUID) -> LensHint? {
+        (capturedHints[id] ?? sessions[id]?.shownHint).flatMap { $0.isAboutLanguages ? $0 : nil }
+    }
+
+    /// `--capture-ui` puts a hint on a lens row without a running lens (a capture has no Screen Recording grant to start one with).
+    @ObservationIgnored var capturedHints: [UUID: LensHint] = [:]
+
+    /// The click on that line, wherever it was clicked: the pill's or the row's.
+    func performHint(of id: UUID) { sessions[id]?.performHint() }
+
+    /// Some lens says the language pair's trouble itself: the panel's own banner for the same issue would only say it twice.
+    var lensesSayLanguageTrouble: Bool {
+        sessions.values.contains { $0.shownHint?.isAboutLanguages == true } || capturedHints.values.contains { $0.isAboutLanguages }
+    }
     func isRunning(_ id: UUID) -> Bool { sessions[id] != nil }
 
     var isBusy: Bool { sessions.values.contains { $0.activity != .idle } }
@@ -567,6 +594,7 @@ final class AppModel {
     }
 
     func languagePacksChanged() async {
+        PackDownload.shared.packsChanged()
         received(nil)
         await refreshAll()
     }

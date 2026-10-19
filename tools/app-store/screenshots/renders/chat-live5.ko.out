@@ -1,0 +1,22 @@
+inpainter: MI-GAN loaded (0 ms)
+warm-up: 1068 ms
+pipeline: 1874 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=6 ocr.blocks.swift=1 ocr.reader.auto.documentLayout=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=2 translate.wasted=0 lens_wait_ms[p50=403 max=403 last=403 n=2] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=1 first=0.35s perLine=0.05s batch[p50=0.40s p90=0.40s n=1] cancelled=0 lines[cached=0 translated=2]
+  今日 20:16
+    → 오늘 20:16
+  今夜の協力イベント行く人いる？レイドにあと2人ほしい
+    → 오늘 밤 협력 이벤트 갈 사람 있어? 레이드에 두 명이 더 필요합니다.
+issues=0
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 800×532
+block: core=306,33,113,25 text=306,32,112,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:16"
+block: core=113,69,600,78 text=113,70,586,76 size=33.0 lines=2 chars=26 clipped=0 ellipsis=0 "今夜の協力イベント行く人いる？レイドにあと2人ほしい"
+wrote /Users/hckim/repo/mwoyeo-wt-as3-live/tools/app-store/screenshots/renders/chat-live5.ko.png
+silence: longest=1106 total=1106
+drain: 0 in-flight=0
+reader: docs state=idle pid=28114 warm=doc:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0
+reader: docs footprint=102 MB gui=22 MB last-ms=370 ms=495,370
+reader: lines state=idle pid=28088 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0
+reader: lines footprint=133 MB gui=22 MB last-ms=249 ms=450,249
+reader: host reads=2 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

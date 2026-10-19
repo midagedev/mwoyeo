@@ -1,0 +1,34 @@
+inpainter: MI-GAN loaded (1 ms)
+warm-up: 1199 ms
+pipeline: 2054 ms
+work[still]: erase=6 ocr.blocks=1 ocr.blocks.lines=14 ocr.blocks.swift=1 ocr.reader.auto.documentLayout=1 render=6 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=6 translate.wasted=0 lens_wait_ms[p50=610 max=649 last=649 n=6] settle=n/a parked=0
+pace: ja>en|apple:auto samples=2 first=0.28s perLine=0.02s batch[p50=0.57s p90=0.57s n=2] cancelled=0 lines[cached=0 translated=6]
+  今日 20:16
+    → Today 20:16
+  今夜の協力イベント行く人いる？レイドにあと2人ほしい
+    → Is there anyone going to the cooperative event tonight? I want 2 more people in the raid
+  今日 20:17
+    → Today 20:17
+  行く！何時からにする？
+    → Let's go! What time do you start?
+  今日 20:18
+    → Today 20:18
+  こっちの時間で9時ごろ、つまり1時間後くらい？
+    → Around 9 o'clock in this time, that is, about an hour later?
+issues=0
+layout: blocks=6 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 800×532
+block: core=306,33,113,24 text=306,31,136,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:16"
+block: core=113,71,600,75 text=113,76,593,67 size=30.2 lines=2 chars=26 clipped=0 ellipsis=0 "今夜の協力イベント行く人いる？レイドにあと2人ほしい"
+block: core=292,267,113,26 text=292,266,130,28 size=25.0 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:17"
+block: core=114,301,341,42 text=114,305,464,38 size=33.0 lines=1 chars=11 clipped=0 ellipsis=0 "行く！何時からにする？"
+block: core=306,397,113,22 text=306,395,131,27 size=24.1 lines=1 chars=8 clipped=0 ellipsis=0 "今日 20:18"
+block: core=118,435,596,77 text=118,437,591,75 size=33.0 lines=2 chars=23 clipped=0 ellipsis=0 "こっちの時間で9時ごろ、つまり1時間後くらい？"
+wrote /Users/hckim/repo/mwoyeo-wt-as3-live/tools/app-store/screenshots/renders/chat-live7.en.png
+silence: longest=1305 total=1305
+drain: 0 in-flight=0
+reader: docs state=idle pid=29224 warm=doc:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0
+reader: docs footprint=111 MB gui=29 MB last-ms=330 ms=531,330
+reader: lines state=idle pid=29195 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0
+reader: lines footprint=136 MB gui=29 MB last-ms=308 ms=529,308
+reader: host reads=2 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

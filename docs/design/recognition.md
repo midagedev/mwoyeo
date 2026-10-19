@@ -539,6 +539,14 @@ It runs `<copy>/Contents/MacOS/Mwoyeo --render p13.png out.png --src en --tgt ko
   - the "Language reader" step title (removed from the strings 2026-10-19);
   - the stale notes listed in G25 (the memory note ane-ocr-stall is the lead's).
 
+### Status after R3a (2026-10-19)
+
+- `App/Reader/RecognitionHost.swift` owns both services (it replaced `DocsHost`): a `WorkerHealth` per role, `ReadRouter` and `ReadScheduler`, a `ReadWait` per pipeline (`ReaderClients`, the lens's hint), `ReaderWarmup`, a 64-entry debug ring and the `reader` log category.
+- Lines are read in the Lines service by default. `MWOYEO_READER=inproc` runs the Lines kinds in the app process for the equal gate and A/B.
+- A pass that no reader can take gets `.unavailable(why)` and reads again on `readerReady` or `usableAgain`, never on a timer. `ReadBackoff` stays for hard failures only (R3c).
+- Left for R3b: the stuck recycle, the per-role idle exit (Lines 60 s with no lens on), the footprint recycle. `RecognitionHost.recycle` and `wantsWorker` are the seams.
+- Left for R3c: delete `SwiftVisionGate`, `OCRHealth`, `OCRFallback` and `ReadBackoff`, tidy the setup UI, rewrite `healthy.sh`.
+
 ### Status after 1.1.2 (2026-10-19)
 
 - R0, R1, R2 and R3-lite are on main (`857ce95`). Only document recognition runs in the Docs XPC service.

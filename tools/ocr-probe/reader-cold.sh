@@ -1,5 +1,5 @@
 #!/bin/bash
-# The decisive cold test of the Docs service (docs/design/recognition.md §1, §6 R3-lite; r3-docs-xpc, 2026-10-18).
+# The decisive cold test of the reader services (docs/design/recognition.md §1, §6; r3-docs-xpc 2026-10-18, r3a-host-lines 2026-10-19).
 #
 # FAILURE MODE IT BLOCKS: a document read compiles in the GUI process, or a lens goes silent behind it. On a figure page the first
 # document read compiles two networks (34 s + 26 s on p13) and every Vision request of the process that compiles them waits: in the
@@ -7,10 +7,14 @@
 # never leave the lens silent for more than N = 8 s.
 #
 #   usage: reader-cold.sh [p13]                      (a page of $PAGES; default p13, the figure page that compiles both networks)
+#          reader-cold.sh ja[:<picture>]             (the ja variant: a use-case picture of $PNGS, default d02-timetable-ja, read on a
+#                                                     fresh id: rev3 for ja compiles in the Lines service and the lens must say
+#                                                     `hint: preparingRecognition` within 3500 ms and never be silent for more than 8 s)
 #   env:   SRC    the tree to build and test         (default: this repository; the FAIL-first run points it at a tree before the change)
 #          OUT    where everything goes              (default /tmp/reader-cold/<stamp>)
 #          DD     derived data of the build          (default $OUT/dd; reuse one to make the next run's build incremental)
 #          PAGES  the paper pages p<N>.png           (default /tmp/paper-quality/paper)
+#          PNGS   the use-case pictures              (default /Users/hckim/.cache/mwoyeo-gates/usecases/set)
 #          BIN    skip the build, use this binary    (it must be built with MWOYEO_APP_ID=$ID, ID given as well)
 #          ID     the bundle id (default fresh: dev.midagedev.mwoyeo.cold<stamp>)
 #          WARM   "--warm" (default) or empty: see step 3
@@ -18,8 +22,8 @@
 #
 # 1. Builds the app AND its two services with a fresh id (`xcodebuild … MWOYEO_APP_ID=<id>`, the services become <id>.reader.lines
 #    and <id>.reader.docs): each has its own e5rt cache under ~/Library/Caches/<that id>/, all empty. No copied bundle is re-signed.
-# 2. Warms what a user has after the first launch: revision 3 in the GUI and the document model in the Docs service, on the drawn
-#    probe picture only (`--capture-ui vision-reads`). This does not compile the networks of a figure page (ocr-stall-112, F4).
+# 2. Warms what a user has after the first launch: revision 3 in the Lines service and the document model in the Docs service, on
+#    the drawn probe picture only (`--capture-ui vision-reads`). This does not compile the networks of a figure page (ocr-stall-112, F4).
 # 3. Renders the page in `--mode adaptive` (what a lens runs) and waits for Docs to be ready, then reads again:
 #      --render <page> --src en --tgt ko --mode adaptive --max-wait 600 --warm --then reader-ready,again
 #    `--warm` makes the pass start after the warm-up, as a lens started long after launch finds Docs: warm for the key, idle, and cold
@@ -27,8 +31,8 @@
 #    pass races the warm-up and finds Docs still warming, which falls back at once (a gentler case, also silent for no more than N).
 # 4. Prints and asserts:
 #      silence: longest <= 8000 ms                                  (the lens is never silent for more than N)
-#      the GUI's e5rt cache gained no entry                         (no document network compiled in this process)
-#      the Docs service's cache gained entries                      (it compiled them; printed where)
+#      the GUI's e5rt cache has no entry, from the fresh id on      (neither a document nor a text network compiled in this process)
+#      the Lines service's cache gained entries (the warm-up), and the Docs service's (the figure page's networks; p13 only)
 #      reader-ready: <ms>                                           (not a timeout)
 #      work[again] ocr.blocks.swift >= 1, work[still] has none      (a doc-path read after Docs was ready; the first pass was VN)
 #      drain: ... in-flight=0, and no new .tmp entry in any cache   (nothing was aborted)
@@ -37,6 +41,9 @@ set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
 SRC=${SRC:-$(cd "$HERE/../.." && pwd)}
 PAGE=${1:-p13}
+JA=0; PIC=
+case $PAGE in ja|ja:*) JA=1; PIC=${PAGE#ja}; PIC=${PIC#:}; PIC=${PIC:-d02-timetable-ja} ;; esac
+PNGS=${PNGS:-/Users/hckim/.cache/mwoyeo-gates/usecases/set}
 STAMP=$(date +%Y%m%d-%H%M%S)
 OUT=${OUT:-/tmp/reader-cold/$STAMP}
 ID=${ID:-dev.midagedev.mwoyeo.cold$(date +%s)}
@@ -76,6 +83,7 @@ say "        lines service=${caches[2]}"
 
 export MWOYEO_MEMORY_SECRETS=1 MWOYEO_SETTINGS_FILE="$OUT/s.json" MWOYEO_DEFAULTS_SUITE=readercold.test MWOYEO_TRACE=1
 # Banned by the contract: killing a process that is loading. This script only waits for its own children.
+fresh=$(snapshot); say "cache fresh:  $fresh"
 t0=$(date +%s)
 "$BIN" --capture-ui "$OUT/capW" vision-reads --src en --for 900 > "$OUT/warm.out" 2> "$OUT/warm.err" < /dev/null &
 pid=$!
@@ -85,7 +93,11 @@ before=$(snapshot); say "cache before: $before"
 
 export MWOYEO_TRACE_READS=1
 t0=$(date +%s)
-"$BIN" --render "$PAGES/$PAGE.png" "$OUT/$PAGE.png" --src en --tgt ko --mode adaptive --max-wait 600 ${WARM---warm} --then reader-ready,again > "$OUT/render.out" 2> "$OUT/render.err" < /dev/null &
+if [ $JA = 1 ]; then
+    "$BIN" --render "$PNGS/$PIC.png" "$OUT/$PIC.png" --src ja --tgt ko --mode adaptive --max-wait 600 --then reader-ready > "$OUT/render.out" 2> "$OUT/render.err" < /dev/null &
+else
+    "$BIN" --render "$PAGES/$PAGE.png" "$OUT/$PAGE.png" --src en --tgt ko --mode adaptive --max-wait 600 ${WARM---warm} --then reader-ready,again > "$OUT/render.out" 2> "$OUT/render.err" < /dev/null &
+fi
 pid=$!
 echo $pid > "$OUT/render.pid"
 # Footprint (MB, footprint -p) of the app and of the Docs service every 3 s: numbers for the report, not an assertion.
@@ -104,21 +116,27 @@ for who in gui docs; do
     [ -n "$v" ] && say "footprint $who (MB, footprint -p): first $(echo "$v" | head -1), max $(echo "$v" | sort -n | tail -1), last $(echo "$v" | tail -1)"
 done
 after=$(snapshot); say "cache after:  $after"
-grep -E '^(hint:|silence:|drain:|reader-ready:|reader: docs state)' "$OUT/render.out" | while read -r line; do say "  $line"; done
+grep -E '^(hint:|silence:|drain:|reader-ready:|reader: (docs|lines) state)' "$OUT/render.out" | while read -r line; do say "  $line"; done
 
 num() { echo "$1" | tr ' ' '\n' | sed -n "s/^$2=//p"; }
 longest=$(sed -n 's/^silence: longest=\([0-9]*\).*/\1/p' "$OUT/render.out" | head -1)
 check "render exits 0" $([ "$rc" = 0 ] && echo 1 || echo 0) "rc=$rc"
 check "silence: longest <= $LIMIT" $([ -n "$longest" ] && [ "$longest" -le $LIMIT ] && echo 1 || echo 0) "longest=${longest:-n/a} ms"
-check "the GUI's e5rt cache gained no entry" $([ "$(num "$before" gui)" = "$(num "$after" gui)" ] && echo 1 || echo 0) "gui $(num "$before" gui) -> $(num "$after" gui)"
-check "the Docs service compiled the document networks (its cache gained entries)" $([ "$(num "$after" docs)" -gt "$(num "$before" docs)" ] && echo 1 || echo 0) "docs service $(num "$before" docs) -> $(num "$after" docs), in ${caches[1]}"
-ready=$(sed -n 's/^reader-ready: \([0-9]*\)$/\1/p' "$OUT/render.out" | head -1)
-check "reader-ready came (no timeout)" $([ -n "$ready" ] && echo 1 || echo 0) "reader-ready=${ready:-$(grep '^reader-ready:' "$OUT/render.out" | head -1)} ms"
-first=$(sed -n 's/^work\[still\]: .*ocr\.blocks\.swift=\([0-9]*\).*/\1/p' "$OUT/render.out" | head -1)
-again=$(sed -n 's/^work\[again\]: .*ocr\.blocks\.swift=\([0-9]*\).*/\1/p' "$OUT/render.out" | head -1)
-check "the first pass read with VN (no document read answered before Docs was ready)" $([ -z "$first" ] || [ "$first" = 0 ] && echo 1 || echo 0) "ocr.blocks.swift in work[still]=${first:-0}"
-check "a doc-path read after Docs was ready" $([ -n "$again" ] && [ "$again" -ge 1 ] && echo 1 || echo 0) "ocr.blocks.swift in work[again]=${again:-0}"
+check "the GUI's e5rt cache has no entry (no network compiled in this process)" $([ "$(num "$fresh" gui)" = 0 ] && [ "$(num "$before" gui)" = 0 ] && [ "$(num "$after" gui)" = 0 ] && echo 1 || echo 0) "gui $(num "$fresh" gui) -> $(num "$before" gui) -> $(num "$after" gui)"
+check "the Lines service compiled the text network (its cache gained entries)" $([ "$(num "$after" lines)" -gt "$(num "$fresh" lines)" ] && echo 1 || echo 0) "lines service $(num "$fresh" lines) -> $(num "$before" lines) -> $(num "$after" lines), in ${caches[2]}"
 check "drain: in-flight=0" $(grep -q '^drain: [0-9]* in-flight=0$' "$OUT/render.out" && echo 1 || echo 0) "$(grep '^drain:' "$OUT/render.out")"
 check "no new .tmp entry in any cache" $([ "$(num "$before" tmp)" = "$(num "$after" tmp)" ] && echo 1 || echo 0) "tmp $(num "$before" tmp) -> $(num "$after" tmp)"
+ready=$(sed -n 's/^reader-ready: \([0-9]*\)$/\1/p' "$OUT/render.out" | head -1)
+check "reader-ready came (no timeout)" $([ -n "$ready" ] && echo 1 || echo 0) "reader-ready=${ready:-$(grep '^reader-ready:' "$OUT/render.out" | head -1)} ms"
+if [ $JA = 1 ]; then
+    prep=$(sed -n 's/^hint: preparingRecognition at \([0-9]*\)$/\1/p' "$OUT/render.out" | head -1)
+    check "ja: hint preparingRecognition at <= 3500 ms" $([ -n "$prep" ] && [ "$prep" -le 3500 ] && echo 1 || echo 0) "at=${prep:-n/a} ms"
+else
+    check "the Docs service compiled the document networks (its cache gained entries)" $([ "$(num "$after" docs)" -gt "$(num "$before" docs)" ] && echo 1 || echo 0) "docs service $(num "$before" docs) -> $(num "$after" docs), in ${caches[1]}"
+    first=$(sed -n 's/^work\[still\]: .*ocr\.blocks\.swift=\([0-9]*\).*/\1/p' "$OUT/render.out" | head -1)
+    again=$(sed -n 's/^work\[again\]: .*ocr\.blocks\.swift=\([0-9]*\).*/\1/p' "$OUT/render.out" | head -1)
+    check "the first pass read with VN (no document read answered before Docs was ready)" $([ -z "$first" ] || [ "$first" = 0 ] && echo 1 || echo 0) "ocr.blocks.swift in work[still]=${first:-0}"
+    check "a doc-path read after Docs was ready" $([ -n "$again" ] && [ "$again" -ge 1 ] && echo 1 || echo 0) "ocr.blocks.swift in work[again]=${again:-0}"
+fi
 say "$([ $fail = 0 ] && echo 'reader-cold: all PASS' || echo 'reader-cold: FAIL')"
 exit $fail

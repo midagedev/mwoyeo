@@ -26,6 +26,11 @@ struct ContextBook {
 
     private(set) var apps: [String: AppState] = [:]
 
+    /// Told (with the app's bundle id) when the app's learned rows that a request may use changed: a row became usable, was
+    /// dropped, or the user removed, forgot or pinned one. The app's learned-memory file and the Memory sheet follow it. Carries
+    /// no row.
+    var learnedChanged: (@Sendable (String) -> Void)?
+
     /// More lines than this on one screen are not compared (the test needs a share, not every line).
     static let screenCap = 400
 
@@ -35,7 +40,10 @@ struct ContextBook {
     /// signals ask for, and takes in the lines the lens sees right above the batch (the lens showed them: design §8.1).
     mutating func begin(_ lens: LensContext, profile: AppProfile?, pair: LanguagePair, engineID: String, now: TimeInterval) -> Pass {
         var app = apps[lens.bundleID] ?? AppState()
+        let learnedBefore = app.memory.learnedPairs
         app.memory.follow(profile)
+        // A name the user wrote (or pinned) for the profile takes the place of a learned row of the same source.
+        defer { if app.memory.learnedPairs != learnedBefore { learnedChanged?(lens.bundleID) } }
         var signals = ThreadSignals(bundleID: lens.bundleID, confirmedTitle: lens.confirmedTitle, lensID: lens.lensID, pair: pair,
                                     engineID: engineID, idleSeconds: app.threads.current.map { max(0, now - $0.lastActive) } ?? 0)
         let screen = Array(lens.screen.prefix(Self.screenCap))
@@ -65,7 +73,7 @@ struct ContextBook {
             card: DocumentCard(appName: lens.appName, domain: lens.categoryWord, title: lens.confirmedTitle ?? ""),
             note: app?.memory.note ?? "",
             referents: thread?.referents ?? [],
-            source: source, target: target, glossary: glossary, threadKey: pass.key.cacheKey)
+            source: source, target: target, glossary: glossary, threadKey: pass.key.cacheKey, above: lens.above)
     }
 
     /// An engine call under context ended well: counts its usage, records the rows it used, and, only with `includeLearned`,
@@ -74,12 +82,16 @@ struct ContextBook {
                          glossary: [(String, String)], now: Date = Date()) {
         guard var app = apps[lens.bundleID] else { return }
         app.usage.add(reply.usage)
-        if options.includeLearned {
+        let before = app.memory.learnedPairs
+        // Memory only never learns, whatever else the options say (the layout does not ask for `terms` either).
+        if options.includeLearned, !options.memoryOnly {
             let verdicts = app.memory.learn(reply.terms, items: items, reply: reply.lines, glossary: glossary, now: now)
             app.usage.noteSightings(verdicts.filter { if case .sighted = $0 { true } else { false } }.count)
         }
         app.memory.recordUse(of: used.map(\.src), now: now)
+        let changed = app.memory.learnedPairs != before
         apps[lens.bundleID] = app
+        if changed { learnedChanged?(lens.bundleID) }
     }
 
     /// The lines of a call are observed once it is over: the lines the lens showed, cache hits included (design §8.1), each with
@@ -100,7 +112,19 @@ struct ContextBook {
     /// "Start fresh" for the app's current thread: the transcript and the referents go, and the namespace generation moves on.
     mutating func startFresh(_ bundleID: String) { apps[bundleID]?.threads.startFresh() }
 
-    mutating func forgetLearned(_ bundleID: String) { apps[bundleID]?.memory.forgetLearned() }
+    mutating func forgetLearned(_ bundleID: String) {
+        guard apps[bundleID]?.memory.learned.isEmpty == false else { return }
+        apps[bundleID]?.memory.forgetLearned()
+        learnedChanged?(bundleID)
+    }
+
+    /// The user removed one learned row ("Remove"), or pinned it (the profile has it now). No such row, no effect.
+    mutating func removeLearned(src: String, for bundleID: String) {
+        let key = ContextText.foldedKey(src)
+        guard apps[bundleID]?.memory.learned.contains(where: { $0.entry.id == key }) == true else { return }
+        apps[bundleID]?.memory.removeLearned(src: src)
+        learnedChanged?(bundleID)
+    }
 
     /// The referents of the app's current thread (`ContextThread.setReferents`); no thread yet, no effect.
     mutating func setReferents(_ list: [Referent], for bundleID: String) {
@@ -110,6 +134,17 @@ struct ContextBook {
 }
 
 extension ContextMemory {
+    /// The learned rows a request may use, as the learned-memory file holds them: (src, dst, kind, gender), no counts, no times.
+    /// Two states with the same value here have the same file.
+    var learnedPairs: [LearnedPair] { usableLearned.map { LearnedPair(src: $0.src, dst: $0.dst, kind: $0.kind, gender: $0.gender) } }
+
+    struct LearnedPair: Equatable {
+        var src: String
+        var dst: String
+        var kind: EntryKind
+        var gender: Gender?
+    }
+
     /// Makes the user's part match `profile` (its note and entries, as the user keeps them now); learned rows stay. A profile
     /// that is gone empties the user's part. Entries that did not change keep their `uses`.
     mutating func follow(_ profile: AppProfile?) {

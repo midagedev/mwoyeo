@@ -23,6 +23,12 @@ struct LensContext: Equatable, Sendable {
     var above: [String] = []
     var below: [String] = []
 
+    /// The app and nothing of the document: what "memory only" needs (the card's app name and category word). No title, no lens, no
+    /// screen text, so the thread key is the app's, the pair's and the engine's alone and the screen never reaches RAM here.
+    var appOnly: LensContext {
+        LensContext(bundleID: bundleID, appName: appName, categoryWord: categoryWord, confirmedTitle: nil, lensID: "")
+    }
+
     /// This context for one batch: the same window with the batch's surroundings.
     func around(_ batch: [String], lines: [ContextNeighbours.Line]) -> LensContext {
         var c = self

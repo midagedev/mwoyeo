@@ -29,6 +29,8 @@ targetTemplates:
   # The two XPC services that run Vision outside the app (docs/design/recognition.md §4.2): one source directory, the role comes
   # from each service's Info.plist. Hardened runtime on both; Developer ID builds carry no entitlements, a Mac App Store build
   # signs them with Reader/Reader-MAS.entitlements (CODE_SIGN_ENTITLEMENTS=Reader/Reader-MAS.entitlements).
+  # Reader/PrivacyInfo.xcprivacy is the services' privacy manifest (a file of the `Reader` source path, so it lands in each
+  # service's Contents/Resources); the app's is App/Resources/PrivacyInfo.xcprivacy, of the `App` path.
   ReaderService:
     type: xpc-service
     platform: macOS

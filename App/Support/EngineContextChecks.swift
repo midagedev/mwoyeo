@@ -142,6 +142,9 @@ enum EngineContextChecks {
         let chatSheet = await shown("chat", chat)
         let chatItems = chatSheet.items
         let sentLine = EngineContextSent.line(for: chat, in: model)
+        // What starts the Sent line in the app's language: the collapsed section is checked for it below, so it has to recognise the line.
+        let sentPrefix = String(localized: "Sent: \("")")
+        check("the start the checks look for tells the Sent line in the app's language", sentLine.hasPrefix(sentPrefix), sentLine)
         let order = ["Test", "Context", "Use context", "Previous lines", "Include window title", "Learn names and terms"]
             .map { name in place(chatItems, NSLocalizedString(name, comment: "")) }
             + [chatItems.firstIndex { $0.value == sentLine }, place(chatItems, String(localized: "Advanced"))]
@@ -182,7 +185,7 @@ enum EngineContextChecks {
         let said = "AXValueDescription=\(EngineContextRules.summary(chat.context))"
         check("collapsed, the section shows its name alone: no controls, no Sent line; its value is the summary",
               place(collapsed, String(localized: "Context")) != nil && place(collapsed, String(localized: "Use context")) == nil
-              && !collapsed.contains { $0.value.hasPrefix("Sent") } && collapsedSheet.triangle.contains(said) && collapsedSheet.triangle.contains("AXDisclosing=0"),
+              && !collapsed.contains { $0.value.hasPrefix(sentPrefix) } && collapsedSheet.triangle.contains(said) && collapsedSheet.triangle.contains("AXDisclosing=0"),
               "\(collapsedSheet.triangle) in \(labels(collapsed).filter { !$0.isEmpty }.joined(separator: ", "))")
         check("open, the section keeps the same value, and the system says it is open",
               chatSheet.triangle.contains(said) && chatSheet.triangle.contains("AXDisclosing=1"), "\(chatSheet.triangle)")

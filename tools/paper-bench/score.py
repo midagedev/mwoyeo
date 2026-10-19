@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Scores the paper bench outputs of run.sh: what is wrong with the translated pages of arXiv 1706.03762.
+"""Scores the paper bench outputs of run.sh: what is wrong with the translated pages of the paper PDF (from 2026-10-19 our own
+paper, tools/paper-own/mwoyeo-method; before that arXiv 1706.03762, whose results are not comparable: another document).
 Usage: score.py <out dir> [--detail]      (python3 -I)
 
-Per page (p1..p15, whole pages) and in total:
+Per page (p1..pN, whole pages; N is the number of pages of the PDF) and in total:
   formula_translated  translated sources that hold a sign of mathematics (= ∈ × ∑ √ ^ _ ... or a call with one-letter
                       arguments, "Attention(Q, K, V)") and are not a body sentence: a source with six or more prose words (a run
                       of three letters or more with a vowel), or one that allow.txt lists, is a sentence that holds one formula
@@ -15,7 +16,7 @@ Per page (p1..p15, whole pages) and in total:
                       median of the page's body-like blocks (the `block:` lines of the render).
   cross_col           pairs of blocks where one block's source rect holds at least half of the other's: a join of lines across
                       a column gap (the author header of page 1: two columns' emails in one block) reaches over the block of the
-                      column between them. Listed in detail.txt.
+                      column between them. Listed in detail.txt. The check is geometric, so it holds for any author block.
   debris              body text with OCR formula debris: translated blocks (paragraphs, not already in formula_translated) whose
                       translation carries three or more one-letter Latin or Greek tokens, or a stray symbol from € ∈ ° × that the
                       OCR made of a typeset sign ("W° € Be xx" on page 5 comes back as "Wo € IR 모델 × dx"). Reported for pages

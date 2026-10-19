@@ -2,13 +2,13 @@
 # Paper bench (--scale 2: the pages are a 2x screen showing the page ~ 820 pt wide): renders the pages and crops of pages.sh with one binary, one render at a time (headless --render needs the Bash
 # sandbox off and the Neural Engine to itself), then scores them (score.py).
 #   usage: run.sh <Mwoyeo binary> <out dir> [pattern ...]   (patterns pick names, e.g. p5 p4-c1; default every page and crop)
-#   env:   PAGES=<dir of pages.sh output> (default /tmp/paper-quality/paper)
+#   env:   PAGES=<dir of pages.sh output> (default /tmp/paper-quality/pages-own: our own paper; the 1706.03762 pages need their own dir)
 # Outputs <out>/<name>.out (the render's stdout: sources, translations, the layout and block lines), .err (the trace: among its
 # lines `kept math`, the blocks left as written because they are mostly inline mathematics), .png, and .load (the
 # machine load and ANECompilerService CPU at start). A name whose .out exists is skipped, so a cut run resumes. Every run sets
 # MWOYEO_MEMORY_SECRETS and a scratch defaults suite: nothing of the user's settings is read or written.
 BIN=${1:?usage: run.sh <Mwoyeo binary> <out dir> [pattern ...]}; OUT=${2:?out dir}; shift 2
-PAGES=${PAGES:-/tmp/paper-quality/paper}
+PAGES=${PAGES:-/tmp/paper-quality/pages-own}
 HERE=$(cd "$(dirname "$0")" && pwd)
 mkdir -p "$OUT"
 names=$(cd "$PAGES" && ls *.png | sed 's/\.png$//' | awk '/^p[0-9]+$/{print 1, $0; next} {print 2, $0}' | sort -k1,1n -k2,2V | cut -d' ' -f2)

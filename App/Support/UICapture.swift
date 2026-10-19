@@ -17,7 +17,11 @@ import SwiftUI
 /// still shows the toggle's two states), appearance (Settings › Appearance), lens-gallery (every lens style in every tint on a dark and
 /// a light backdrop: one PNG each, lens-<style>-<tint>-<dark|light>.png, and a grid per backdrop), lens-tab-positions (the name tag
 /// in its four places, one carrying a notice), lens-reading (the default glow while the lens reads), sheet-pick, sheet-config, sheet-config-remote (the box that allows sending to the host, unticked), sheet-config-remote-allowed (ticked), sheet-config-remote-context (ticked, with the context caption), sheet-context-collapsed-off, sheet-context-collapsed-on, sheet-context-chat, sheet-context-chat-off, sheet-context-local, sheet-context-deepl, sheet-context-template and sheet-context-memory (the sheet of an engine already added, its Context section collapsed or open, the last with Context off and a note written for an app; `--lang ko` for Korean), engine-context-checks (only that section's checks; `--dump` also writes the accessibility trees it read, a11y-engine-context-*.txt), translation-engines-permission (the list with an engine that needs the person's permission), about-privacy (Settings › About), lens-badge, lens-notice, lens-menu, add-flow (adds an
-/// engine through the sheet, prints where the key is), check-logic (prints PASS/FAIL for the engine selection and the
+/// engine through the sheet, prints where the key is), pack-checks (only the language pack flow's PASS/FAIL lines), lens-hint-pack-downloading,
+/// lens-hint-pack-notfinished and lens-hint-unsupported (the pill in the states a pack or a pair can be in), menu-pack-rows (the panel's lens
+/// rows with each of those lines), menu-pack-banner-ask|downloading|notfinished|unsupported (the panel's banner when no lens says it),
+/// translation-packs-states (Settings › Translation with a row in each state), image-window-pack-ask|downloading|notfinished|unsupported
+/// (the Translate Image window's status line), check-logic (prints PASS/FAIL for the engine selection and the
 /// engine notice's dismissal; no window). Run it with `MWOYEO_MEMORY_SECRETS=1` so it does not touch the Keychain. It keeps its
 /// preferences in a scratch suite of its own (deleted at exit; `MWOYEO_DEFAULTS_SUITE` names one to keep), never the app's real
 /// ones; `CFFIXED_USER_HOME` does not move those. `--mock` is a tools/mock-openai server the sample translations go to.
@@ -158,6 +162,15 @@ enum UICapture {
             case "image-window": await imageWindow(name, showOriginal: false)
             case "image-window-original": await imageWindow(name, showOriginal: true)
             case "check-logic": await checkLogic()
+            case "pack-checks":
+                let failed = await PackChecks.run(model)
+                print("pack: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+            case "menu-pack-rows": await menuPackRows(name)
+            case "menu-pack-banner-ask", "menu-pack-banner-downloading", "menu-pack-banner-notfinished", "menu-pack-banner-unsupported":
+                await menuPackBanner(name)
+            case "translation-packs-states": await packRowStates(name)
+            case "image-window-pack-ask", "image-window-pack-downloading", "image-window-pack-notfinished", "image-window-pack-unsupported":
+                await imageWindowPackStates(name)
             case "a11y-tree": await AccessibilityChecks.dump(model, into: out)
             case "onboarding": await shoot(name, OnboardingView(close: {}), CGSize(width: 600, height: 760))
             case "engine-permission-checks":
@@ -209,7 +222,7 @@ enum UICapture {
             case "lens-notice": await lens(name, badge: "cloud", notice: "Gemini unavailable · using Apple")
             case "lens-menu": await lens(name, badge: nil, notice: nil, menu: true)
             case "lens-hint-allow", "lens-hint-restart", "lens-hint-pack", "lens-hint-preparing", "lens-hint-already", "lens-hint-notice",
-                 "lens-hint-narrow":
+                 "lens-hint-narrow", "lens-hint-pack-downloading", "lens-hint-pack-notfinished", "lens-hint-unsupported":
                 await lensHints(name)
             case "image-window-pack", "image-window-blocked": await imageWindowBlocked(name)
             case "add-flow": await addFlow()
@@ -444,6 +457,7 @@ enum UICapture {
             failed += await EnginePermissionChecks.run(model)
             failed += await EngineContextChecks.run(model)
             failed += await AccessibilityChecks.run(model)
+            failed += await PackChecks.run(model)
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
         }
 
@@ -725,12 +739,117 @@ enum UICapture {
             case "lens-hint-restart": .restartToFinish
             case "lens-hint-preparing": .preparingRecognition
             case "lens-hint-already": .alreadyInTarget(target: "en")
+            case "lens-hint-pack-downloading": .downloadingPack(PackPair(source: "ja", target: "en"))
+            case "lens-hint-pack-notfinished": .downloadNotFinished(PackPair(source: "ja", target: "en"))
+            case "lens-hint-unsupported": .pairNotSupported(PackPair(source: "ko", target: "ko"))
             default: .downloadPack(PackPair(source: "ja", target: "en"))
             }
             for dark in [true, false] {
                 await lensShot("\(name)-\(dark ? "dark" : "light")", dark: dark, notice: name == "lens-hint-notice" ? "Gemini unavailable · using Apple" : nil,
                                hint: hint, width: name == "lens-hint-narrow" ? 230 : 360)
             }
+        }
+
+        private static let packJa = PackPair(source: "ja", target: "en")
+
+        /// The panel's lens rows with the line each language hint puts in the second line (the real `RegionRow`, a hint set on it without a
+        /// running lens), over one row with none for the size line beside them.
+        private func menuPackRows(_ name: String) async {
+            let hints: [LensHint?] = [.downloadPack(Self.packJa), .downloadingPack(Self.packJa), .downloadNotFinished(Self.packJa),
+                                      .pairNotSupported(PackPair(source: "ko", target: "ko")), nil]
+            var rows: [RegionConfig] = []
+            for (i, hint) in hints.enumerated() {
+                var config = RegionConfig(name: "Screen", rect: CGRect(x: 100, y: 100, width: 520, height: 260))
+                config.follow(nil)
+                config.name = ["Safari", "Slack", "Preview", "Notes", "Terminal"][i]
+                rows.append(config)
+                model.capturedHints[config.id] = hint
+            }
+            defer { model.capturedHints = [:] }
+            await shoot(name, VStack(spacing: 6) { ForEach(rows) { RegionRow(region: $0) } }.padding(16).frame(width: 340), CGSize(width: 340, height: 330))
+        }
+
+        /// The panel with the banner for a language trouble that no lens says in its row (all lenses off, or the image window's).
+        private func menuPackBanner(_ name: String) async {
+            let state = String(name.dropFirst("menu-pack-banner-".count))
+            let download = PackDownload.shared
+            switch state {
+            case "unsupported": model.received(.unsupportedPair(source: "ko", target: "ko"))
+            case "downloading":
+                model.received(.languagePackMissing(source: "ja", target: "en"))
+                download.request(Self.packJa, in: .image)
+            case "notfinished":
+                model.received(.languagePackMissing(source: "ja", target: "en"))
+                download.status = { _ in .downloadable }
+                download.request(Self.packJa, in: .image)
+                await download.end(Self.packJa, in: .image)
+            default: model.received(.languagePackMissing(source: "ja", target: "en"))
+            }
+            await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
+            download.status = { _ in .installed }
+            if download.image != nil { await download.end(Self.packJa, in: .image) }
+            download.status = { pair in await AppModel.shared.translator.packStatus(source: pair.source, target: pair.target) }
+            download.packsChanged()
+            model.received(nil)
+        }
+
+        /// Settings › Translation with the list of packs in each state a row can be in: installed, to download, downloading, not finished, not
+        /// supported (the fake status; the real list reads the system).
+        private func packRowStates(_ name: String) async {
+            let download = PackDownload.shared
+            model.settings.sourceLanguage = "ja"
+            model.settings.targetLanguage = "ko"
+            download.status = { pair in
+                switch pair.source {
+                case "ja", "en": .installed
+                case "th": .unsupported
+                default: .downloadable
+                }
+            }
+            let ko = { (s: String) in PackPair(source: s, target: "ko") }
+            download.request(ko("fr"), in: .image)
+            download.request(ko("de"), in: .settings)
+            await download.end(ko("de"), in: .settings)   // not finished: the fake says it is still to download
+            download.request(ko("vi"), in: .settings)     // downloading
+            // The All Languages group, open, shows every row; the chosen pair is the first.
+            await shoot(name, Form { Section("Apple Translation language packs") { LanguagePacksView(source: "ja", target: "ko", expanded: true) } }
+                .formStyle(.grouped), CGSize(width: 560, height: 700))
+            download.status = { _ in .installed }
+            await download.end(ko("fr"), in: .image)
+            await download.end(ko("vi"), in: .settings)
+            download.status = { pair in await AppModel.shared.translator.packStatus(source: pair.source, target: pair.target) }
+            download.packsChanged()
+        }
+
+        /// The Translate Image window's status line in each state a missing pack or an unsupported pair can leave a picture in, over a plain
+        /// picture of its own (`--image` when given).
+        private func imageWindowPackStates(_ name: String) async {
+            let state = String(name.dropFirst("image-window-pack-".count))
+            let download = PackDownload.shared
+            let picture = option("--image").flatMap { NSImage(contentsOf: URL(fileURLWithPath: $0)) } ?? NSImage(size: NSSize(width: 640, height: 360), flipped: false) { rect in
+                NSColor(white: 0.9, alpha: 1).setFill()
+                rect.fill()
+                return true
+            }
+            let sample = ImageTranslationModel()
+            sample.showSettled(picture, lines: 0)
+            switch state {
+            case "unsupported": sample.showStatus(.unsupported(PackPair(source: "ko", target: "ko")))
+            case "downloading":
+                download.request(Self.packJa, in: .image)
+                sample.showStatus(.needsPack(Self.packJa))
+            case "notfinished":
+                download.status = { _ in .downloadable }
+                download.request(Self.packJa, in: .image)
+                await download.end(Self.packJa, in: .image)
+                sample.showStatus(.needsPack(Self.packJa))
+            default: sample.showStatus(.needsPack(Self.packJa))
+            }
+            await shoot(name, ImageTranslationView(model: sample, onDrop: { _ in false }), CGSize(width: 1040, height: 520))
+            download.status = { _ in .installed }
+            if download.image != nil { await download.end(Self.packJa, in: .image) }
+            download.status = { pair in await AppModel.shared.translator.packStatus(source: pair.source, target: pair.target) }
+            download.packsChanged()
         }
 
         /// The image window over a picture whose translation cannot happen, run for real with `MWOYEO_FAKE_ENGINE=fail` (every call fails, as

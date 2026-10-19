@@ -24,6 +24,8 @@ and no analytics.
   for that engine, the lines before and after, the window title, and your note and terms for that app are sent too.
   That provider's own privacy policy applies to what it receives. An engine on your own Mac or network (such as Ollama)
   keeps the text on that machine.
+  Before any text goes to an engine that is not on this Mac, Mwoyeo asks you to allow sending to that engine's
+  address. Nothing is sent until you do, and a changed address asks again.
 - **Language packs and Apple models** are downloaded by macOS, not by Mwoyeo.
 
 ## What is saved to files, and only when you choose it
@@ -83,6 +85,8 @@ Mwoyeo는 렌즈를 올린 곳의 글자를 번역하는 앱입니다. 개발자
 - **직접 추가한 번역 엔진.** 엔진(예: OpenAI 호환 서버, DeepL, Anthropic)을 추가하면 렌즈 아래 글자는 그 엔진에 입력한
   주소로만 갑니다. 그 엔진에 맥락 기능을 켜면 앞뒤 줄, 창 제목, 그 앱에 적어 둔 메모와 용어도 함께 갑니다. 받은 쪽에는 그
   제공자의 개인정보처리방침이 적용됩니다. 내 Mac이나 내 네트워크의 엔진(Ollama 등)을 쓰면 글자는 그 기기에 머뭅니다.
+  이 Mac 밖의 엔진으로 글자를 보내기 전에, Mwoyeo는 그 엔진의 주소로 보내도 되는지 먼저 묻습니다. 허용하기 전에는 아무것도
+  보내지 않고, 주소가 바뀌면 다시 묻습니다.
 - **언어팩과 Apple 모델**은 Mwoyeo가 아니라 macOS가 받습니다.
 
 ## 직접 고른 경우에만 파일로 저장되는 것

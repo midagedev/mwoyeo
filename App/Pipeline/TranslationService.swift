@@ -876,11 +876,11 @@ private final class HeldSources: @unchecked Sendable {
 extension TranslationService {
     /// What this call does with its context, or nil for today's path. `ContextPlan.decide` holds the rules.
     private func contextPlan(for lens: LensContext) -> ContextPlan? {
-        let engine = activeEngine
+        // The engine of the app in front with the profile of the app under the lens: `ContextRoute` owns the pairing.
+        let pairing = ContextRoute.pair(settings: settings, lens: lens.bundleID)
         var rests = false
-        if engine != nil, case .apple = route() { rests = true }
-        return ContextPlan.decide(settings: settings, engine: engine, engineRests: rests,
-                                  profile: AppProfiles.profile(for: lens.bundleID, in: settings.appProfiles))
+        if pairing.engine != nil, case .apple = route() { rests = true }
+        return ContextPlan.decide(settings: settings, engine: pairing.engine, engineRests: rests, profile: pairing.profile)
     }
 
     // MARK: the added engine, with the document's context

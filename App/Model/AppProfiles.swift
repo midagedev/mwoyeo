@@ -185,11 +185,15 @@ extension AppModel {
         EnginePermissions.disclosure(engine, profiles: settings.appProfiles)
     }
 
-    /// What the engine in effect for this app is sent, as fields (and `text`, the English line). Apple Translation takes no context.
+    /// What the engine in effect while this app is in front is sent of this app, as fields (and `text`, the English line). Apple Translation
+    /// takes no context. The pairing is the request path's (`ContextRoute`).
     func sentPreview(for bundleID: String) -> SentSummary {
-        let p = profile(for: bundleID)
-        let engine = p?.customEngineID.flatMap { id in settings.engines.first { $0.id == id } } ?? settings.activeEngineConfig
-        return ContextPreview.summary(engine: engine, profile: p, appName: p?.appName ?? bundleID,
+        let pairing = ContextRoute.own(bundleID, in: settings)
+        return ContextPreview.summary(engine: pairing.engine, profile: pairing.profile, appName: pairing.profile?.appName ?? bundleID,
                                       category: Self.category(ofApp: bundleID), learnedUsable: learnedCounts[bundleID]?.usable ?? 0)
     }
+
+    /// The other added engines that get this app's memory or context when another app is in front and a lens covers this app's window
+    /// ("Also sent to …" under the Memory sheet's "Sent:" line). Empty in the usual case: one engine for everything.
+    func otherReceivers(of bundleID: String) -> [EngineConfig] { ContextRoute.otherReceivers(of: bundleID, in: settings) }
 }

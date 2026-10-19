@@ -147,6 +147,8 @@ final class RegionSession {
         wireChrome()
         tap.handler = { [weak self] in self?.received($0) }
         chrome.onHintAction = { [weak self] in self?.performHint() }
+        // The lens's wait for a reader (`ReadWait`) changes outside the model: the pill is told when it does.
+        ReaderClients.shared.onHint(pipeline.readerClient) { [weak self] in Task { @MainActor in self?.refreshHint() } }
         setContextWanted(ContextPlan.needsWindow(settings))
     }
 
@@ -458,6 +460,7 @@ final class RegionSession {
         let model = AppModel.shared
         var signals = LensSignals(screen: .init(allowed: model.hasScreenPermission, failure: captureFailure),
                                   recognitionPreparing: model.recognitionPreparing,
+                                  recognition: ReaderClients.shared.hint(pipeline.readerClient),
                                   showsTranslations: lastSnapshot?.blocks.isEmpty == false,
                                   alreadyInTarget: targetStreak.shown ? settings.targetLanguage : nil,
                                   translation: translationWait.trouble(at: ProcessInfo.processInfo.systemUptime))

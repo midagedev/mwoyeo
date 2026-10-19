@@ -169,9 +169,12 @@ actor RegionPipeline {
     private var strikes = SourceStrikes()
     /// Consecutive failed recognition passes: the next read waits, whatever the pixels do.
     private var readBackoff = ReadBackoff()
-    /// This pipeline as the reader host knows it (`ReaderClients`): told when Docs is ready and the last layout was the grouper's.
-    private let readerClient: Int
-    /// Docs became ready since the running seamless pass began: the frame is read once more when it ends.
+    /// This pipeline as the reader host knows it (`ReaderClients`): told when a reader it waited for, or stood in for, is ready. The
+    /// session reads this client's hint (`LensSignals.recognition`) without a hop to the pipeline.
+    let readerClient: Int
+    /// The last pass found no reader (`RecognitionUnavailable`): nothing reads again until the host says one is ready.
+    private var readerWaiting = false
+    /// A reader became ready since the running seamless pass began: the frame is read once more when it ends.
     private var layoutStale = false
     private var version = 0
     private var scale: CGFloat = 2
@@ -250,7 +253,7 @@ actor RegionPipeline {
         self.inpainter = inpainter
         self.onSnapshot = onSnapshot
         let ref = WeakPipeline()
-        readerClient = ReaderClients.shared.add { Task { await ref.value?.layoutReady() } }
+        readerClient = ReaderClients.shared.add { Task { await ref.value?.readerReady() } }
         ref.value = self
     }
 
@@ -258,9 +261,11 @@ actor RegionPipeline {
 
     deinit { ReaderClients.shared.remove(readerClient) }
 
-    /// Docs is ready and this pipeline's last layout was read with the grouper while it was not (`ReaderClients`): the frame is
-    /// read once more, and now gets the document layout. Blocks whose text is unchanged keep their translations.
-    func layoutReady() {
+    /// A reader is ready: either this pipeline's last pass found none (`.unavailable`), or its last layout was read with the grouper
+    /// (or `.fast`) while the reader it wanted was not (the recovery re-read, design §10.4). The frame is read once more. Blocks
+    /// whose text is unchanged keep their translations.
+    func readerReady() {
+        readerWaiting = false
         guard latest != nil else { return }
         layoutStale = true
         seamlessDone = false
@@ -494,6 +499,8 @@ actor RegionPipeline {
             let now = ProcessInfo.processInfo.systemUptime
             // A pixel change inside the backoff waits for its end (the timer below kicks again).
             if readBackoff.isWaiting(now: now) { Trace.count("ocr.backoff_wait"); break }
+            // No reader took the last pass: the host says when one is ready (`readerReady`), not a timer.
+            if readerWaiting { Trace.count("ocr.reader_wait"); break }
             let stale = staleness(for: frame)
             // Seamless mode re-reads on change only, and a tile that stopped animating changed while it was left out.
             if options.renderMode == .seamless, seamlessDone, stale.change?.isUnchanged == false { seamlessDone = false }
@@ -501,7 +508,7 @@ actor RegionPipeline {
             let wantsSeamless = options.renderMode != .fast && !seamlessDone && (settled || options.renderMode == .seamless)
             if wantsSeamless {
                 // A failed read is not counted as done: it waits out its backoff (`noteReadFailure`) and is read again. So is a read
-                // after which Docs became ready while it ran (`layoutReady`).
+                // after which a reader became ready while it ran (`readerReady`).
                 if await seamlessPass(frame) { seamlessDone = lastChange <= frame.time && !layoutStale }
                 continue
             }
@@ -810,7 +817,7 @@ actor RegionPipeline {
                                                                    customWords: options.glossaryTerms, plan: readerPlan, client: readerClient)) ?? [] : []
             if found.isEmpty {
                 found = try await TextRecognizer.lines(in: frame.image, roi: dirty, languages: ocrLanguages, fast: useFast,
-                                                       customWords: options.glossaryTerms).map { TextRecognizer.makeBlock([$0]) }
+                                                       customWords: options.glossaryTerms, client: readerClient).map { TextRecognizer.makeBlock([$0]) }
             }
         } catch {
             log.error("fast OCR failed: \(String(describing: error), privacy: .public)")
@@ -883,7 +890,7 @@ actor RegionPipeline {
             found = try await TextRecognizer.blocks(in: frame.image, languages: ocrLanguages, customWords: options.glossaryTerms,
                                                     plan: readerPlan, client: readerClient)
             if found.isEmpty {
-                found = try await TextRecognizer.lines(in: frame.image, languages: ocrLanguages, fast: false)
+                found = try await TextRecognizer.lines(in: frame.image, languages: ocrLanguages, fast: false, client: readerClient)
                     .map { TextRecognizer.makeBlock([$0]) }
             }
         } catch {
@@ -941,13 +948,19 @@ actor RegionPipeline {
         return true
     }
 
-    /// A failed pass delays the next read (`ReadBackoff`); "programs not ready", no result, or a read that did not answer in its
-    /// time (`ReadTimeout`) is a transient of the system's recognizer and waits 1 s, doubling to 30 s per consecutive
-    /// failure (`Backoff.rev3Rung`), so the minute of it after an update or a heavy compile does not pile up, and a read that timed
-    /// out is never run again at once on the same blocked process (design F5). True when the frame counts as read (a lasting failure: the same pixels would fail again); a
-    /// transient leaves it unread, so a still picture is read again once the backoff ends instead of staying empty until
-    /// something on it changes.
+    /// A pass that found no reader (`RecognitionUnavailable`) waits for `readerReady`: no timer, no backoff, and the frame stays
+    /// unread. Any other failed pass delays the next read (`ReadBackoff`); "programs not ready" that outlived the host's retries, or
+    /// no result, is a transient of the system's recognizer and waits 1 s, doubling to 30 s per consecutive failure
+    /// (`Backoff.rev3Rung`), so the minute of it after an update or a heavy compile does not pile up (design F5). True when the frame
+    /// counts as read (a lasting failure: the same pixels would fail again); a transient leaves it unread, so a still picture is
+    /// read again once the backoff ends instead of staying empty until something on it changes.
     private func noteReadFailure(_ error: Error) -> Bool {
+        if error is RecognitionUnavailable {
+            readerWaiting = true
+            Trace.count("ocr.unavailable")
+            Trace.mark("ocr: no reader, waiting for one", since: Trace.now)
+            return false
+        }
         let transient = OCRHealth.passFailureIsTransient(error)
         let wait = readBackoff.failure(now: ProcessInfo.processInfo.systemUptime, transient: transient)
         Trace.count(transient ? "ocr.failed_pass.transient" : "ocr.failed_pass")

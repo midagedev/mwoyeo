@@ -900,7 +900,9 @@ extension SelfTest {
             } else {
                 preparing = gate.shouldShowProgress(now: now) && !VisionSetupDisplay.failed(gate) && !VisionSetupDisplay.allDone(gate)
             }
-            var signals = LensSignals(screen: .fine, recognitionPreparing: preparing, showsTranslations: drawn,
+            // The run's one pipeline is the lens; its wait for a reader (`ReadWait`) is what a session would pass on.
+            var signals = LensSignals(screen: .fine, recognitionPreparing: preparing, recognition: ReaderClients.shared.anyHint,
+                                      showsTranslations: drawn,
                                       alreadyInTarget: streak.shown ? target : nil,
                                       translation: trouble.current())
             func same(_ a: String, _ b: String) -> Bool { Locale.Language(identifier: a).languageCode == Locale.Language(identifier: b).languageCode }

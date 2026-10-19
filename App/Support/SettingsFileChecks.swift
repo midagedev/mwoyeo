@@ -958,6 +958,14 @@ enum SettingsFileChecks {
         let p = command(["--settings-path"])
         check("--settings-path prints the file path", p.0 == 0 && p.1 == model.settingsFile.url.path + "\n")
         let printed = command(["--settings-schema"])
+        if printed.0 == 0, Data(printed.1.utf8) != schemaText {
+            let ours = String(decoding: schemaText, as: UTF8.self).split(separator: "\n", omittingEmptySubsequences: false)
+            let theirs = printed.1.split(separator: "\n", omittingEmptySubsequences: false)
+            for (i, (x, y)) in zip(ours, theirs).enumerated() where x != y {
+                print("check-logic: --settings-schema differs at line \(i + 1): this run \(x.trimmingCharacters(in: .whitespaces)) | the command \(y.trimmingCharacters(in: .whitespaces))")
+                break
+            }
+        }
         check("--settings-schema prints the schema and exits 0 (a run that does not end in time fails)", printed.0 == 0 && Data(printed.1.utf8) == schemaText)
 
         // The app: a change in Settings writes the file; an edit of the file applies
@@ -992,10 +1000,12 @@ enum SettingsFileChecks {
 
     /// Runs this executable with `arguments`: (exit code, stdout). A run still going after `seconds` is ended and gives exit
     /// code -1, so a command that never exits (one the app does not dispatch starts the whole app) fails its check.
+    /// The run speaks this process's language: `--lang` sets it in memory only, which a child does not inherit, and the schema's
+    /// default for `targetLanguage` follows it (a 2026-10-19 English run printed "ko" against this run's "en").
     private static func command(_ arguments: [String], within seconds: Double = 20) -> (Int32, String) {
         let p = Process(), pipe = Pipe()
         p.executableURL = Bundle.main.executableURL
-        p.arguments = arguments
+        p.arguments = arguments + ["-AppleLanguages", "(" + Locale.preferredLanguages.map { "\"\($0)\"" }.joined(separator: ", ") + ")"]
         p.standardOutput = pipe
         p.environment = ProcessInfo.processInfo.environment
         let exited = DispatchSemaphore(value: 0), read = DispatchSemaphore(value: 0)

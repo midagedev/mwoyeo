@@ -61,6 +61,9 @@ public struct MemoryEntry: Codable, Equatable, Hashable, Identifiable, Sendable 
 
     public var id: String { ContextText.foldedKey(src) }
 
+    /// The `id` a row with this source has: two rows with the same one are the same name (`pin`, `removeLearned`, the sheet).
+    public static func id(forSource src: String) -> String { ContextText.foldedKey(ContextText.truncated(ContextText.collapse(src), toCharacters: maxName)) }
+
     public init(src: String, dst: String, kind: EntryKind = .term, gender: Gender? = nil, note: String = "",
                 reading: String? = nil, origin: EntryOrigin = .user, uses: Int = 0, lastSeen: Date? = nil,
                 addressing: [Addressing] = []) {
@@ -202,6 +205,12 @@ public struct ContextMemory: Equatable, Sendable {
         public var sightings: Int
         public var contradictions: Int
         public var isUsable: Bool { sightings >= ContextMemory.confirmAfter }
+
+        public init(entry: MemoryEntry, sightings: Int, contradictions: Int) {
+            self.entry = entry
+            self.sightings = sightings
+            self.contradictions = contradictions
+        }
     }
 
     /// The app note for the translator, at most 500 characters. Newlines are kept (it is the user's prose).

@@ -69,4 +69,34 @@ extension ContextOptions {
     public static func effective(engine: EngineConfig?, profile: AppProfile?) -> ContextOptions {
         resolved(base: .from(engine: engine?.context), override: profile?.context)
     }
+
+    // MARK: memory only (lead decision D1, 2026-10-19)
+
+    /// The options of "memory only": the card, the note and the matching rows of the app, and nothing else. Nil when it does not
+    /// apply: no engine (Apple takes no context), an engine that owns its body (a template, a command) or takes the memory only
+    /// through its own opt-in (DeepL: `deepLInstructions`), no profile or a profile with neither a note nor a name, or an app
+    /// whose override is `off` (off turns this off too).
+    ///
+    /// It is the case of an engine that is off: `requestOptions(engine:profile:)` asks only when `effective` is Off. Writing the
+    /// note or the names is the user's opt-in (design §9); the lines and the title stay behind their own switches.
+    public static func memoryOnlyOptions(engine: EngineConfig?, profile: AppProfile?) -> ContextOptions? {
+        guard let engine, let profile, profile.hasMemory, profile.context?.mode != .off,
+              LayoutKind.engine(engine.kind).tier != nil else { return nil }
+        if case .deepL = engine.kind { return nil }
+        return ContextOptions(enabled: true, transcriptCount: 0, memoryOnly: true)
+    }
+
+    /// Whether some profile could make `memoryOnlyOptions` apply to `engine`: the lens then reads the window it covers, for the
+    /// app's name and category (the card). "Possibly": the app under the lens decides.
+    public static func memoryOnlyCouldApply(engine: EngineConfig?, profiles: [AppProfile]) -> Bool {
+        profiles.contains { memoryOnlyOptions(engine: engine, profile: $0) != nil }
+    }
+
+    /// What one request to `engine` is built with for the app of `profile`: the explicit switches (`effective`) when they say
+    /// On, else memory only when the user wrote some memory for the app, else Off. Off is `ContextOptions()`: today's request.
+    public static func requestOptions(engine: EngineConfig?, profile: AppProfile?) -> ContextOptions {
+        let explicit = effective(engine: engine, profile: profile)
+        if explicit.enabled { return explicit }
+        return memoryOnlyOptions(engine: engine, profile: profile) ?? explicit
+    }
 }

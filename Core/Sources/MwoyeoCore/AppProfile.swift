@@ -92,6 +92,39 @@ public struct AppProfile: Codable, Equatable, Identifiable, Sendable {
     /// The canonical text of the note and the entries, for the translation-memory namespace (`ContextMemory.memoryFingerprint`).
     public var memoryFingerprint: String { ContextMemory(profile: self).memoryFingerprint }
 
+    /// The user wrote a note or at least one name for this app. That is the opt-in of "memory only" (`ContextOptions.memoryOnly`).
+    public var hasMemory: Bool { !note.isEmpty || !entries.isEmpty }
+
+    public enum EntryResult: Equatable, Sendable { case saved, full, invalid }
+
+    /// Adds `entry` as a user row, or replaces the row whose `src` is `replacing` (so a row can change its `src`), or the row with
+    /// the same `src`. Any other row with the entry's `src` goes: the latest edit wins. `.full` at `maxEntries` rows (nothing
+    /// changes), `.invalid` when `src` or `dst` is empty after cleaning (nothing changes).
+    @discardableResult
+    public mutating func setEntry(_ entry: MemoryEntry, replacing src: String? = nil) -> EntryResult {
+        var e = entry
+        e.origin = .user
+        guard !e.src.isEmpty, !e.dst.isEmpty else { return .invalid }
+        let target = src.map(ContextText.foldedKey) ?? e.id
+        var list = entries
+        if let i = list.firstIndex(where: { $0.id == target }) {
+            list[i] = e
+            list = list.enumerated().filter { $0.offset == i || $0.element.id != e.id }.map(\.element)
+        } else if let i = list.firstIndex(where: { $0.id == e.id }) {
+            list[i] = e
+        } else {
+            guard list.count < Self.maxEntries else { return .full }
+            list.append(e)
+        }
+        entries = list
+        return .saved
+    }
+
+    public mutating func removeEntry(src: String) {
+        let key = ContextText.foldedKey(src)
+        entries.removeAll { $0.id == key }
+    }
+
     // Decode leniently so a profile saved by another version never takes the others with it.
     enum CodingKeys: String, CodingKey, CaseIterable { case bundleID, appName, source, target, customEngineID, paragraphReader, note, entries, context }
     public init(from decoder: Decoder) throws {
@@ -139,6 +172,20 @@ public struct LanguageChoice: Equatable, Sendable {
     }
 }
 
+/// What pinning a learned row did (`pin`).
+public enum PinResult: Equatable, Sendable {
+    /// The row is a user row of the app's profile now (written to settings.json when the caller saves them).
+    case pinned
+    /// The app already had a user row for this source: the user's word stays, nothing changed.
+    case alreadyYours
+    /// The profile has `AppProfile.maxEntries` rows.
+    case full
+    /// The app has no profile; pinning never creates one (a profile also fixes the app's language pair).
+    case noProfile
+    /// The learned row is not there any more (forgotten, removed or already pinned).
+    case gone
+}
+
 public enum AppProfiles {
     public static func profile(for bundleID: String?, in profiles: [AppProfile]) -> AppProfile? {
         guard let bundleID else { return nil }
@@ -157,6 +204,19 @@ public enum AppProfiles {
     /// The paragraph reader for the app `bundleID`: its profile's choice, else `base`.
     public static func paragraphReader(base: ParagraphReader, profiles: [AppProfile], app bundleID: String?) -> ParagraphReader {
         profile(for: bundleID, in: profiles)?.paragraphReader ?? base
+    }
+
+    /// Makes `learned` a user row of the profile of `bundleID`: it is added to `entries` with `origin == .user`, so it is saved with
+    /// the profile and the translator's memory follows it. The caller then drops the learned row (`ContextMemory.removeLearned`).
+    public static func pin(_ learned: MemoryEntry?, bundleID: String, in profiles: inout [AppProfile]) -> PinResult {
+        guard let i = profiles.firstIndex(where: { $0.bundleID == bundleID }) else { return .noProfile }
+        guard let learned else { return .gone }
+        if profiles[i].entries.contains(where: { $0.id == learned.id }) { return .alreadyYours }
+        switch profiles[i].setEntry(learned) {
+        case .saved: return .pinned
+        case .full: return .full
+        case .invalid: return .gone
+        }
     }
 
     /// `profiles` with `profile` added, or replacing the one for the same app.

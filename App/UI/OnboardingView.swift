@@ -97,7 +97,8 @@ private struct StepCard<Accessory: View>: View {
                 }
             }
             .frame(width: 30, height: 30)
-            .animation(.spring(duration: 0.3), value: done)
+            .accessibilityHidden(!done)   // the number is noise; the check says the step is done
+            .animation(Motion.shared.animation(.spring(duration: 0.3)), value: done)
             VStack(alignment: .leading, spacing: 3) {
                 Text(title).font(.headline)
                 Text(detail).font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
@@ -134,10 +135,12 @@ private struct LensDemo: View {
     private let rowHeight: CGFloat = 50, top: CGFloat = 16
 
     var body: some View {
-        TimelineView(.animation) { t in
+        // Reduce Motion: the lens rests half way down, over two of the messages.
+        let still = Motion.shared.reduced
+        TimelineView(.animation(paused: still)) { t in
             GeometryReader { g in
                 // The lens glides down and back over the messages; whatever it covers reads translated, message by message.
-                let phase = (sin(t.date.timeIntervalSinceReferenceDate * 0.6 - .pi / 2) + 1) / 2
+                let phase = still ? 0.5 : (sin(t.date.timeIntervalSinceReferenceDate * 0.6 - .pi / 2) + 1) / 2
                 let lensHeight = rowHeight * 2 + 8
                 let lens = CGRect(x: 16, y: top - 4 + phase * (rowHeight * CGFloat(rows.count) - lensHeight + 8),
                                   width: g.size.width - 32, height: lensHeight)
@@ -162,6 +165,7 @@ private struct LensDemo: View {
         .frame(height: top * 2 + rowHeight * CGFloat(rows.count))
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .shadow(color: .black.opacity(0.25), radius: 16, y: 8)
+        .accessibilityElement(children: .ignore)
         .accessibilityLabel("A lens turning text into your language")
     }
 

@@ -88,7 +88,9 @@ struct GeneralSettings: View {
                     Text(ExportFolder.shownPath(model.settings).map { ($0 as NSString).abbreviatingWithTildeInPath } ?? String(localized: "None chosen"))
                         .lineLimit(1).truncationMode(.middle).foregroundStyle(.secondary)
                     Button("Choose…") { chooseFolder() }
+                        .accessibilityLabel(Text(verbatim: "\(String(localized: "Choose…")), \(String(localized: "Folder"))"))
                     Button("Show in Finder", action: showFolder).disabled(ExportFolder.shownPath(model.settings) == nil)
+                        .accessibilityLabel(Text(verbatim: "\(String(localized: "Show in Finder")), \(String(localized: "Folder"))"))
                 }
             } header: {
                 Text("Saving")
@@ -96,7 +98,9 @@ struct GeneralSettings: View {
             Section {
                 LabeledContent("Settings file") {
                     Button("Open") { model.openSettingsFile() }
+                        .accessibilityLabel(Text(verbatim: "\(String(localized: "Open")), \(String(localized: "Settings file"))"))
                     Button("Show in Finder") { model.showSettingsFile() }
+                        .accessibilityLabel(Text(verbatim: "\(String(localized: "Show in Finder")), \(String(localized: "Settings file"))"))
                 }
                 .buttonStyle(.borderless)
                 // A borderless button in a form row is drawn grey, like a disabled label; the accent says it is a button.
@@ -331,6 +335,7 @@ struct TranslationSettings: View {
             .onAppear { cached = model.translator.cachedCount }
             Section {
                 TextEditor(text: $model.settings.glossary)
+                    .accessibilityLabel("Glossary")
                     .font(.body.monospaced())
                     .frame(minHeight: 90)
                     .scrollContentBackground(.hidden)
@@ -573,9 +578,13 @@ private struct ShortcutRecorder: View {
             }
             .buttonStyle(.bordered)
             .tint(monitor != nil ? .accentColor : nil)
+            // The row's name is the button's: "Add Lens, ⌃⌥L", not five buttons that all say "Record Shortcut".
+            .accessibilityLabel(action.title)
+            .accessibilityValue(monitor != nil ? String(localized: "Type a shortcut…") : combo?.display ?? String(localized: "Record Shortcut"))
             Button { model.settings.shortcuts[action.rawValue] = nil } label: { Image(systemName: "xmark.circle.fill") }
                 .buttonStyle(.borderless).foregroundStyle(.tertiary)
                 .help("Remove Shortcut")
+                .accessibilityLabel(Text(verbatim: "\(String(localized: "Remove Shortcut")), \(action.title)"))
                 .opacity(combo != nil && monitor == nil ? 1 : 0)
                 .disabled(combo == nil || monitor != nil)
         }

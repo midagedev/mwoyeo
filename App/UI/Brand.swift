@@ -24,8 +24,10 @@ struct LensRing: View {
     var tint = LensTint.spectrum
 
     var body: some View {
-        TimelineView(.animation(paused: !spinning)) { t in
-            let angle = Angle.degrees(spinning ? (t.date.timeIntervalSinceReferenceDate / period).truncatingRemainder(dividingBy: 1) * 360 : 45)
+        // Reduce Motion: the colours stay where a lens that is not reading has them.
+        let spins = spinning && !Motion.shared.reduced
+        TimelineView(.animation(paused: !spins)) { t in
+            let angle = Angle.degrees(spins ? (t.date.timeIntervalSinceReferenceDate / period).truncatingRemainder(dividingBy: 1) * 360 : 45)
             let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
             ZStack {
                 if active, glow > 0 {

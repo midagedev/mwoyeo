@@ -48,8 +48,7 @@ struct MwoyeoApp: App {
             Group {
                 if icon.badge { Image(nsImage: MenuBarIconImage.badged(icon.symbol)) } else { Image(systemName: icon.symbol) }
             }
-            // English only: the accessibility text of an error state is not part of the translated copy.
-            .accessibilityLabel(icon.badge ? Text(verbatim: "Mwoyeo, a lens needs attention") : Text("Mwoyeo"))
+            .accessibilityLabel(icon.badge ? Text("Mwoyeo, a lens needs attention") : Text("Mwoyeo"))
             .background(SettingsOpener())
         }
         .menuBarExtraStyle(.window)

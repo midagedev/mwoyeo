@@ -68,6 +68,7 @@ struct MenuPanel: View {
             }
             .buttonStyle(.glass)
             .help(withShortcut(model.isPaused ? String(localized: "Resume") : String(localized: "Pause all"), .pause))
+            .accessibilityLabel(model.isPaused ? String(localized: "Resume") : String(localized: "Pause all"))
             .disabled(model.regions.isEmpty)
         }
     }
@@ -136,8 +137,10 @@ struct MenuPanel: View {
                 .accessibilityLabel("Translate Image…")
             Button { open() } label: { Image(systemName: "gearshape") }
                 .help("Settings")
+                .accessibilityLabel("Settings")
             Button { NSApp.terminate(nil) } label: { Image(systemName: "power") }
                 .help("Quit Mwoyeo")
+                .accessibilityLabel("Quit Mwoyeo")
         }
         .buttonStyle(.borderless)
         .labelStyle(.titleAndIcon)
@@ -155,7 +158,7 @@ struct MenuPanel: View {
     }
 }
 
-private struct RegionRow: View {
+struct RegionRow: View {
     @Environment(AppModel.self) private var model
     let region: RegionConfig
     @State private var hovering = false
@@ -167,7 +170,7 @@ private struct RegionRow: View {
                 Text(region.name).font(.callout.weight(.medium)).lineLimit(1)
                 HStack(spacing: 3) {
                     if model.error(of: region.id) == nil {
-                        Image(systemName: region.anchor != nil ? "macwindow" : "pin.fill").imageScale(.small)
+                        Image(systemName: region.anchor != nil ? "macwindow" : "pin.fill").imageScale(.small).accessibilityHidden(true)
                     }
                     Text(subtitle).lineLimit(1)
                 }
@@ -181,17 +184,22 @@ private struct RegionRow: View {
                     .buttonStyle(.borderless)
                     .foregroundStyle(.secondary)
                     .help("Remove Lens")
+                    .accessibilityLabel("Remove Lens")
                     .transition(.opacity)
             }
             Toggle("", isOn: Binding(get: { region.isEnabled }, set: { v in Task { await model.setEnabled(region.id, v) } }))
                 .toggleStyle(.switch)
                 .controlSize(.mini)
                 .labelsHidden()
+                .accessibilityLabel(region.name)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
         .background(.quaternary.opacity(hovering ? 0.75 : 0.4), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         .onHover { h in withAnimation(.easeOut(duration: 0.12)) { hovering = h } }
+        // The trash button shows under the pointer only: a screen reader and the keyboard get it as an action of the row.
+        .accessibilityElement(children: .contain)
+        .accessibilityAction(named: Text("Remove Lens")) { Task { await model.remove(region.id) } }
     }
 
     private var dotState: LensChip.State {
@@ -250,9 +258,11 @@ struct LensChip: View {
 /// The empty state: a lens gliding along faint lines, turning what it covers bright.
 private struct EmptyLens: View {
     var body: some View {
-        TimelineView(.animation) { t in
+        // Reduce Motion: the lens rests in the middle of the lines.
+        let still = Motion.shared.reduced
+        TimelineView(.animation(paused: still)) { t in
             GeometryReader { g in
-                let phase = (sin(t.date.timeIntervalSinceReferenceDate * 0.9) + 1) / 2
+                let phase = still ? 0.5 : (sin(t.date.timeIntervalSinceReferenceDate * 0.9) + 1) / 2
                 let lens = CGRect(x: phase * (g.size.width - 64), y: 4, width: 64, height: g.size.height - 8)
                 ZStack(alignment: .topLeading) {
                     lines.foregroundStyle(.primary.opacity(0.13))
@@ -283,10 +293,10 @@ struct LanguageBar: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            menu($source, Languages.sources)
+            menu($source, Languages.sources, title: String(localized: "Translate from"))
             Button {
                 guard source != "auto" else { return }
-                withAnimation(.snappy) { (source, target) = (target, source) }
+                withAnimation(Motion.shared.animation(.snappy)) { (source, target) = (target, source) }
             } label: {
                 Image(systemName: source == "auto" ? "arrow.right" : "arrow.left.arrow.right")
                     .font(.caption.weight(.semibold))
@@ -296,13 +306,14 @@ struct LanguageBar: View {
             }
             .buttonStyle(.plain)
             .help(source == "auto" ? String(localized: "Translation direction") : String(localized: "Swap languages"))
-            menu($target, Languages.targets)
+            .accessibilityLabel(source == "auto" ? String(localized: "Translation direction") : String(localized: "Swap languages"))
+            menu($target, Languages.targets, title: String(localized: "Translate to"))
         }
         .padding(.horizontal, 4)
         .glassEffect(.regular, in: Capsule())
     }
 
-    private func menu(_ selection: Binding<String>, _ options: [String]) -> some View {
+    private func menu(_ selection: Binding<String>, _ options: [String], title: String) -> some View {
         Menu {
             Picker("", selection: selection) {
                 ForEach(options, id: \.self) { Text(Languages.name($0)).tag($0) }
@@ -313,6 +324,7 @@ struct LanguageBar: View {
             HStack(spacing: 4) {
                 Text(Languages.name(selection.wrappedValue)).font(.callout.weight(.medium)).contentTransition(.opacity)
                 Image(systemName: "chevron.up.chevron.down").font(.system(size: 9, weight: .semibold)).foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 7)
@@ -322,6 +334,8 @@ struct LanguageBar: View {
         .buttonStyle(.plain)
         .menuIndicator(.hidden)
         .frame(maxWidth: .infinity)
+        .accessibilityLabel(title)
+        .accessibilityValue(Languages.name(selection.wrappedValue))
     }
 }
 
@@ -344,6 +358,7 @@ private struct EngineMenu: View {
                 if let active { Image(systemName: active.badgeSymbol).font(.caption) }
                 Text(active?.name ?? String(localized: "Apple")).font(.callout.weight(.medium)).lineLimit(1).frame(maxWidth: 96)
                 Image(systemName: "chevron.up.chevron.down").font(.system(size: 9, weight: .semibold)).foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 7)
@@ -355,6 +370,8 @@ private struct EngineMenu: View {
         .fixedSize()
         .glassEffect(.regular, in: Capsule())
         .help("Translation engine")
+        .accessibilityLabel("Translation engine")
+        .accessibilityValue(active?.name ?? String(localized: "Apple"))
     }
 }
 
@@ -365,7 +382,7 @@ private struct UpdateBanner: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Image(systemName: "arrow.down.circle.fill").foregroundStyle(Color.accentColor)
+            Image(systemName: "arrow.down.circle.fill").foregroundStyle(Color.accentColor).accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 1) {
                 Text("Mwoyeo \(version) is available").font(.caption.weight(.semibold))
                 if Updates.viaHomebrew {
@@ -389,7 +406,7 @@ struct IssueBanner: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.yellow)
+            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.yellow).accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(message).font(.caption).fixedSize(horizontal: false, vertical: true)
                 if let detail { Text(detail).font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
@@ -411,7 +428,7 @@ private struct EngineNotice: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Image(systemName: "exclamationmark.circle").foregroundStyle(.secondary)
+            Image(systemName: "exclamationmark.circle").foregroundStyle(.secondary).accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 1) {
                 Text(headline).font(.caption).fixedSize(horizontal: false, vertical: true)
                 if let reason { Text(reason).font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
@@ -437,7 +454,7 @@ private struct RecognitionNotice: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Image(systemName: "exclamationmark.circle").foregroundStyle(.secondary)
+            Image(systemName: "exclamationmark.circle").foregroundStyle(.secondary).accessibilityHidden(true)
             Text(message).font(.caption).fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         }

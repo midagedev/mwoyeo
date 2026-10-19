@@ -187,6 +187,9 @@ struct ImageTranslationView: View {
                         .scaledToFit()
                         .overlay { if model.isWorking { LensRing(cornerRadius: 4, lineWidth: 2, glow: 4, spinning: true).allowsHitTesting(false) } }
                         .padding(16)
+                        // The picture is named, and its text is what a screen reader reads: the translation, or the original with Show Original.
+                        .accessibilityLabel(model.title)
+                        .accessibilityValue(model.texts.compactMap { model.showOriginal ? $0.source : LensText.usable($0) }.joined(separator: "\n"))
                 } else {
                     Text("Drop a picture here, or press ⌘V to paste one.").foregroundStyle(.secondary)
                 }

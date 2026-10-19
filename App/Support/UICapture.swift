@@ -165,6 +165,10 @@ enum UICapture {
                 // Only the accessibility checks (the whole of check-logic takes minutes).
                 let failed = await AccessibilityChecks.run(model)
                 print("accessibility: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+            case "drift-checks":
+                // Only the drift meter's checks (the whole of check-logic takes minutes).
+                let failed = DriftChecks.run()
+                print("drift: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
             case "inpaint-footprint": await LensRobustChecks.inpaintFootprint()
             case "menu-icon": LensRobustChecks.menuIcon(into: out.appendingPathComponent("menu-icon.png"))
             case "sheet-pick": await shoot(name, EngineSheet(), CGSize(width: 480, height: 560))
@@ -391,6 +395,7 @@ enum UICapture {
             failed += SandboxDataChecks.run()
             failed += await LensRobustChecks.run(model)
             failed += await ContextChecks.run()
+            failed += DriftChecks.run()
             failed += await EnginePermissionChecks.run(model)
             failed += await AccessibilityChecks.run(model)
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")

@@ -418,6 +418,8 @@ enum SelfTest {
         var scrollArea: CGRect?
         // Content offset (points): the screen shows the page from here. Only `--scroll` changes it.
         var scroll = CGVector.zero
+        // The content offset of every frame fed, to date a block's text on the page from the frame its snapshot follows (drift).
+        var meter = DriftMeter()
         let bl = numbers("--blink"), blink = bl.count == 4 ? CGRect(x: bl[0], y: bl[1], width: bl[2], height: bl[3]) : nil
         var blinkFrame = 0
         let steps = Int(option("--steps") ?? "40") ?? 40
@@ -472,9 +474,16 @@ enum SelfTest {
         func feed() async {
             guard let crop = compose(capture), let rgba = RGBAImage(cgImage: crop), let image = rgba.cgImage else { return }
             let gray = rgba.withBGRA { GrayImage(bgra: $0, width: rgba.width, height: rgba.height, bytesPerRow: rgba.width * 4, step: 4) }
-            await pipeline.ingest(CapturedFrame(image: image, gray: gray, grayStep: 4, scale: scale, rect: capture,
-                                                time: ProcessInfo.processInfo.systemUptime))
+            let time = ProcessInfo.processInfo.systemUptime
+            meter.fed(at: time, offset: scroll)
+            await pipeline.ingest(CapturedFrame(image: image, gray: gray, grayStep: 4, scale: scale, rect: capture, time: time))
         }
+        // `MWOYEO_FILM_DUMP=capture`: the plans see the lead as the session gives it (`RegionSession.fitCapture`), so the rect is the app's.
+        var lead = CGVector.zero
+        func capturePlan(allowResize: Bool) -> Overscan.Plan {
+            Overscan.plan(lens: lens, capture: capture, wide: wide, allowResize: allowResize, display: display, lead: FilmDump.on("capture") ? lead : .zero)
+        }
+        func setLead(_ v: CGVector) async { lead = v; await pipeline.setLead(v) }
         func apply(_ plan: Overscan.Plan) async {
             switch plan {
             case .keep: return
@@ -484,8 +493,6 @@ enum SelfTest {
             await feed()
         }
         var frameIndex = 0
-        // Where each shown block sat on the page when first seen (page points), to measure drift from its text.
-        var anchors: [UUID: (page: CGPoint, size: CGSize, scrolls: Bool)] = [:]
         var drifts: [CGFloat] = []
         func shoot() async throws {
             let w = Int(lens.width * scale), h = Int(lens.height * scale)
@@ -496,24 +503,21 @@ enum SelfTest {
             ctx.draw(under, in: CGRect(x: 0, y: 0, width: w, height: h))
             var shown = 0, drift: CGFloat = 0
             if let snap = collector.latest {
-                let predicted = predicting ? CGFloat(predictor.offset(from: snap.time, to: ProcessInfo.processInfo.systemUptime)) : 0
+                let now = ProcessInfo.processInfo.systemUptime
+                let predicted = predicting ? CGFloat(predictor.offset(from: snap.time, to: now)) : 0
+                FilmDump.emit("predict") { ["frame": frameIndex, "since": snap.time, "now": now, "offset": predicted, "on": predicting] }
                 for b in snap.blocks {
                     // Snapshot frames are relative to the capture origin; the lens is the overlay panel.
-                    var onScreen = b.frame.offsetBy(dx: snap.origin.x, dy: snap.origin.y)
+                    let followed = b.frame.offsetBy(dx: snap.origin.x, dy: snap.origin.y)
+                    var onScreen = followed
                     if scrollArea?.contains(CGPoint(x: onScreen.midX, y: onScreen.midY)) == true { onScreen.origin.y += predicted }
                     let g = onScreen.offsetBy(dx: -lens.minX, dy: -lens.minY)
                     guard g.intersects(CGRect(origin: .zero, size: lens.size)) else { continue }
                     shown += 1
                     ctx.draw(b.image, in: CGRect(x: g.minX * scale, y: CGFloat(h) - g.maxY * scale, width: g.width * scale, height: g.height * scale))
-                    var a = anchors[b.id]
-                    // A re-read may re-lay a block out; measure from there.
-                    if a == nil || a!.size != b.frame.size {
-                        let scrolls = scrollRect.contains(CGPoint(x: onScreen.midX, y: onScreen.midY))
-                        a = (CGPoint(x: onScreen.minX + (scrolls ? scroll.dx : 0), y: onScreen.minY + (scrolls ? scroll.dy : 0)), b.frame.size, scrolls)
-                        anchors[b.id] = a
-                    }
-                    let page = CGPoint(x: onScreen.minX + (a!.scrolls ? scroll.dx : 0), y: onScreen.minY + (a!.scrolls ? scroll.dy : 0))
-                    drift = max(drift, hypot(page.x - a!.page.x, page.y - a!.page.y))
+                    // Against where its text is on the page (the frame the snapshot follows), not where it was first drawn.
+                    let scrolls = scrollRect.contains(CGPoint(x: followed.midX, y: followed.midY))
+                    drift = max(drift, meter.gap(id: b.id, size: b.frame.size, followed: followed, shown: onScreen, time: snap.time, now: scroll, scrolls: scrolls))
                 }
             }
             drifts.append(drift)
@@ -531,6 +535,7 @@ enum SelfTest {
                 CGImageDestinationFinalize(dest)
             }
             frameIndex += 1
+            FilmDump.emit("capture") { ["frame": frameIndex - 1, "lens": FilmDump.box(lens), "capture": FilmDump.box(capture), "wide": wide, "lead": [lead.dx, lead.dy]] }
             print(String(format: "frame %03d lens (%4.0f,%4.0f) capture (%4.0f,%4.0f %4.0f×%4.0f) blocks shown %d drift %.1f %@%@ flight [%@]",
                          frameIndex - 1, lens.minX, lens.minY, capture.minX, capture.minY, capture.width, capture.height, shown, drift,
                          String(format: "%@ v=%.0f L=%@", motion.moving ? "moving" : "still", motion.velocity.dy, motion.expected.map { String(format: "%.1f", $0) } ?? "n/a"),
@@ -571,27 +576,35 @@ enum SelfTest {
                 }
                 await printCounts("down")
             }
+            // The pointer (as RegionSession sees it) rests in the middle of the lens.
+            func steer() async {
+                for r in collector.drainReports() {
+                    // As `RegionSession.scrolled`: every report steers the lead, only the lens's own area is learned from.
+                    await setLead(CGVector(dx: 0, dy: r.shift < 0 ? 1 : -1))
+                    guard r.area.contains(CGPoint(x: lens.midX, y: lens.midY)) else { continue }
+                    scrollArea = r.area
+                    predictor.confirm(shift: Double(r.shift), from: r.from, to: r.to)
+                }
+            }
             for i in 1...(steps * sub) {
                 let t = CGFloat(i) / CGFloat(steps * sub), e = ease ? 1 - pow(1 - t, 3) : t, f = leg == 0 ? e : 1 - e
                 let next = CGVector(dx: (to[0] * f).rounded(), dy: (to[1] * f).rounded())
                 // Scrolling the page down moves its content up.
-                if wheelsPerFrame > 0 { predictor.wheel(delta: Double(scroll.dy - next.dy), time: ProcessInfo.processInfo.systemUptime, precise: true) }
+                if wheelsPerFrame > 0 {
+                    let at = ProcessInfo.processInfo.systemUptime, delta = Double(scroll.dy - next.dy)
+                    predictor.wheel(delta: delta, time: at, precise: true)
+                    FilmDump.emit("predict") { ["t": at, "delta": delta] }
+                }
                 scroll = next
                 hidden = nil
                 if i % sub == 0 {
                     if !wide, motion.latest != nil {
+                        if FilmDump.on("capture") { await steer() }   // the session's handlers run scroll, then motion: the lead is set first
                         wide = true
-                        await apply(Overscan.plan(lens: lens, capture: capture, wide: wide, allowResize: true, display: display))
+                        await apply(capturePlan(allowResize: true))
                     }
                     await feed()
-                    // The pointer (as RegionSession sees it) rests in the middle of the lens.
-                    for r in collector.drainReports() {
-                        // As `RegionSession.scrolled`: every report steers the lead, only the lens's own area is learned from.
-                        await pipeline.setLead(CGVector(dx: 0, dy: r.shift < 0 ? 1 : -1))
-                        guard r.area.contains(CGPoint(x: lens.midX, y: lens.midY)) else { continue }
-                        scrollArea = r.area
-                        predictor.confirm(shift: Double(r.shift), from: r.from, to: r.to)
-                    }
+                    await steer()
                 }
                 try await Task.sleep(for: .milliseconds(stepMs / sub))
                 try await shoot()
@@ -600,22 +613,22 @@ enum SelfTest {
         } else {
             // Drag: margins widen at once (as `noteMotion` does), then the lens moves in steps.
             wide = true
-            await apply(Overscan.plan(lens: lens, capture: capture, wide: wide, allowResize: true, display: display))
+            await apply(capturePlan(allowResize: true))
             let from = lens.origin
             // As `RegionSession` while dragging: the lead is the unit direction of the drag.
             let len = hypot(to[0] - from.x, to[1] - from.y)
-            if len > 4 { await pipeline.setLead(CGVector(dx: (to[0] - from.x) / len, dy: (to[1] - from.y) / len)) }
+            if len > 4 { await setLead(CGVector(dx: (to[0] - from.x) / len, dy: (to[1] - from.y) / len)) }
             for i in 1...steps {
                 let f = CGFloat(i) / CGFloat(steps)
                 lens.origin = CGPoint(x: from.x + (to[0] - from.x) * f, y: from.y + (to[1] - from.y) * f)
                 await pipeline.setVisible(lens)
-                await apply(Overscan.plan(lens: lens, capture: capture, wide: wide, allowResize: false, display: display))
+                await apply(capturePlan(allowResize: false))
                 try await Task.sleep(for: .milliseconds(stepMs))
                 try await shoot()
             }
         }
         // Dropped: the lead ends with the motion, then keep watching while it settles into seamless.
-        await pipeline.setLead(.zero)
+        await setLead(.zero)
         for _ in 0 ..< max(1, holdMs / 250) {
             try await Task.sleep(for: .milliseconds(250))
             try await shoot()

@@ -173,4 +173,37 @@ import Testing
         #expect(verdicts(stack(["var x = 1;", "var y = 2;"], x: 90, y: 200, bg: faint)) == [nil, nil])          // two lines alone: one feature each
         #expect(verdicts(stack(["var x = 1;", "var y = 2;"], x: 90, y: 200, bg: lightBox)) == [.code, .code])   // 9 levels: one box
     }
+
+    // MARK: what the app hands over
+
+    @Test func aBlocksBackgroundIsThePerChannelMedianOfItsLines() {
+        // Three lines in a light box and one whose ring caught the page: the block is the box, channel by channel.
+        let box = RGBA(246, 248, 250), page = RGBA(255, 255, 255)
+        #expect(CodeRegion.background(ofLines: [box, page, box, box]) == RGBA(246, 248, 250))
+        #expect(CodeRegion.background(ofLines: [RGBA(10, 200, 30), RGBA(20, 100, 60), RGBA(30, 150, 90)]) == RGBA(20, 150, 60))
+        #expect(CodeRegion.background(ofLines: [box]) == box)
+        #expect(CodeRegion.background(ofLines: [RGBA(0, 0, 0), RGBA(10, 10, 10)]) == RGBA(10, 10, 10))      // an even count takes the upper middle
+        #expect(CodeRegion.background(ofLines: []) == RGBA(0, 0, 0))
+    }
+
+    @Test func theVerdictDoesNotDependOnTheOrderOfTheBlocks() {
+        let box = stack(["const nested = [1, 12, [3, [4]]];", "// flatten every level at once", "console.log(flat); // [1, 2, 3, 4]"], x: 90, y: 200, bg: lightBox)
+        let all = [prose(100)] + box + [prose(400)]
+        let expected = verdicts(all)
+        #expect(expected == [nil, .code, .code, .code, nil])
+        for shift in 1..<all.count {
+            let order = Array(all.indices.dropFirst(shift)) + Array(all.indices.prefix(shift))
+            let got = verdicts(order.map { all[$0] })
+            #expect(order.indices.allSatisfy { got[$0] == expected[order[$0]] }, "shift \(shift)")
+        }
+    }
+
+    /// A price that starts a line ("$ 20 per month") is prose, not a shell prompt: the prompt needs a command after "$ ", and
+    /// commands do not start with a digit (c2-code-region probe, 2026-10-19: the sentence was kept as a terminal).
+    @Test func aDollarPriceIsNotAPrompt() {
+        #expect(!CodeRegion.isPrompt("$ 20 per month for the team plan"))
+        #expect(!CodeRegion.isPrompt("$ 4.99 a year"))
+        #expect(CodeRegion.isPrompt("$ cd repo"))
+        #expect(CodeRegion.isPrompt("$ ./build.sh --release"))
+    }
 }

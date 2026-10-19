@@ -213,7 +213,7 @@ public enum CodeRegion {
     }
 
     static func isPrompt(_ l: String) -> Bool {
-        l.firstMatch(of: /^\s*\$\s+\S/) != nil
+        l.firstMatch(of: /^\s*\$\s+[^\s\d]/) != nil                                          // "$ cd", not "$ 20 per month"
             || l.firstMatch(of: /^\s*\S+@\S+\s+\S+\s%\s+\S/) != nil                         // zsh's default: "dev@mbp ~ % ls"
             || l.firstMatch(of: /^\s*❯\s*\S/) != nil
             || l.firstMatch(of: /^\s*\S{0,40}[@:：~\/～]\S{0,40}[$#%]\s+\S/) != nil
@@ -264,5 +264,15 @@ public enum CodeRegion {
         if f.log { return .log }
         if f.assignment && !f.keyword && !f.lineEnd { return .config }
         return .code
+    }
+
+    // MARK: - What the app hands over
+
+    /// The background of a block of several lines: the per-channel median of the backgrounds measured per line
+    /// (`TextAppearance.backgroundColor`; the upper median of an even count). A box edge or a neighbour in the ring of one line moves
+    /// that line's value, not the block's. Black when there is no line: the same value an unreadable crop gets.
+    public static func background(ofLines lines: [RGBA]) -> RGBA {
+        func median(_ v: [UInt8]) -> UInt8 { v.isEmpty ? 0 : v.sorted()[v.count / 2] }
+        return RGBA(median(lines.map(\.r)), median(lines.map(\.g)), median(lines.map(\.b)))
     }
 }

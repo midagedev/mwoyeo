@@ -478,6 +478,165 @@ def compare(a, b):
 
 
 # ---------------------------------------------------------------------------------------------------------------------
+# failures and leaks. Kept out of `summarize`: the summary and the numbers recorded in the manifests of the preserved
+# runs must keep reproducing (`runs.py verify`), so new accounting is a separate report over the same run files.
+#
+# A failed attempt has one reason: `parse` (the reply is not the JSON we asked for), `count` (a different number of
+# lines), `leak` (the reply carries the context: it repeats a context line, seen in the stored raw reply, or it has more
+# lines than items but no more than the context has lines, which is how a model that translates the context shows up in
+# the count; `leak_inferred` counts those), `timeout`, `http` (a transport or server error) or `other`. An accepted output line is a LEAK when it repeats a context line (a `context` leak, the one
+# the design rule is about) or another item of its batch (a `batch` leak, which condition A has too: the model's own
+# floor) instead of translating its own item: it carries that line's source text, or that line's translation (the
+# model's own, as the run stored it). It is ECHOED when it is its own source text, untranslated. Design 9: a
+# condition that wins accuracy but leaks context into the output fails the no-regression rule.
+
+REASONS = ("parse", "count", "leak", "timeout", "http", "other")
+SRC_MIN = (4, 12)   # squashed letters a source text needs before repeating it counts: (CJK-dominant text, any other)
+TR_MIN = (6, 12)    # the same for a translation of another line
+
+
+def squash(text):
+    """NFKC, case-folded, letters and digits only: what two renderings of the same words have in common."""
+    return "".join(ch for ch in unicodedata.normalize("NFKC", text or "").casefold() if ch.isalnum())
+
+
+def _cjk_dominant(s):
+    n = sum(1 for ch in s if 0x3040 <= ord(ch) <= 0x30FF or 0x3400 <= ord(ch) <= 0x9FFF or 0xAC00 <= ord(ch) <= 0xD7A3
+            or 0x3131 <= ord(ch) <= 0x318E)
+    return 2 * n >= len(s)
+
+
+def _reproduces(squashed_text, squashed_part, mins):
+    return len(squashed_part) >= mins[0 if _cjk_dominant(squashed_part) else 1] and squashed_part in squashed_text
+
+
+def leaked_line_ids(out_text, item, others, translations):
+    """Ids of the `others` (context lines, the batch's other items) whose words `out_text` repeats instead of
+    translating `item`: their source text, or their translation in this run (`translations`, id -> text)."""
+    t = squash(out_text)
+    own_src = squash(item["text"])
+    own_ref = squash(item.get("ref", ""))
+    hits = set()
+    for o in others:
+        s = squash(o["text"])
+        if not s or s in own_src:            # the same words twice in the text, or part of this item: no way to tell
+            continue
+        if _reproduces(t, s, SRC_MIN):
+            hits.add(o["id"])
+            continue
+        tr = squash(translations.get(str(o["id"]), ""))
+        if tr and tr not in own_ref and tr not in own_src and _reproduces(t, tr, TR_MIN):
+            hits.add(o["id"])
+    return hits
+
+
+def is_echo(seq, item, out_text):
+    """The output is the item's own source text (up to width and punctuation) in a run that translates between languages."""
+    s = squash(item["text"])
+    return seq["source"] != seq["target"] and _reproduces(s, s, SRC_MIN) and squash(out_text) == s
+
+
+def attempt_context_ids(condition, request, seq_ids):
+    """The context line ids the attempt of a request saw. A request that fell back to the stateless request records no
+    context (the record describes the request that counted), so for a first attempt of the windowed conditions (`B<n>`,
+    `M<n>`, `W<n>`, `L<n>`: the n lines translated just before the batch, n = 2 by default) it is rebuilt from the ids;
+    conditions with a conversation window or lines below the batch cannot be rebuilt and give none."""
+    if request.get("context"):
+        return list(request["context"])
+    m = re.fullmatch(r"([BMWL]+)(\d+)?", condition or "")
+    if not m or not request.get("items"):
+        return []
+    n = int(m.group(2)) if m.group(2) else 2
+    first = min(request["items"])
+    return [i for i in range(first - n, first) if i in seq_ids]
+
+
+def attempt_reason(attempt, request, by_id, translations, context_ids=None):
+    """Why a failed attempt failed (one of REASONS) and whether that reason was inferred from the count alone."""
+    err = attempt.get("error") or ""
+    if "network: -1001" in err or "timed out" in err.lower():
+        return "timeout", False
+    if err.startswith("network:") or err.startswith("HTTP ") or err.startswith("server:"):
+        return "http", False
+    reply = attempt.get("reply")
+    ids = request.get("context", []) if context_ids is None else context_ids
+    ctx = [by_id[i] for i in ids if i in by_id] if not attempt.get("stateless") else []
+    if reply and ctx and not attempt.get("stateless"):
+        items = [by_id[i] for i in request["items"] if i in by_id]
+        squashed = squash(reply)
+        own = "".join(squash(i["text"]) for i in items)
+        own_ref = "".join(squash(i.get("ref", "")) for i in items)
+        for c in ctx:
+            s, tr = squash(c["text"]), squash(translations.get(str(c["id"]), ""))
+            if (s and s not in own and _reproduces(squashed, s, SRC_MIN)) or (
+                    tr and tr not in own_ref and tr not in own and _reproduces(squashed, tr, TR_MIN)):
+                return "leak", False
+    m = re.match(r"count mismatch: expected (\d+), got (\d+)", err)
+    if m:
+        extra = int(m.group(2)) - int(m.group(1))
+        return ("leak", True) if ctx and 0 < extra <= len(ctx) else ("count", False)
+    if err.startswith("malformed"):
+        return "parse", False
+    return "other", False
+
+
+def failure_report(run, seqs):
+    """Failed attempts by reason, and the leaked and echoed lines of the accepted output, over the whole run."""
+    reasons = dict.fromkeys(REASONS, 0)
+    rep = {"attempts_failed": 0, "reasons": reasons, "leak_inferred": 0, "count_more": 0, "raw_replies": 0, "lines": 0, "leaked_context_lines": 0,
+           "leaked_batch_lines": 0, "leaked_requests": 0, "echoed_lines": 0, "leaks": []}
+    for sid in sorted(run["outs"]):
+        seq = seqs.get(sid)
+        if not seq:
+            continue
+        by_id = {l["id"]: l for l in seq["lines"]}
+        out = run["outs"][sid]
+        trs = out.get("translations", {})
+        for r in out.get("requests", []):
+            for a in r.get("attempts", []):
+                if a.get("ok", True):
+                    continue
+                rep["attempts_failed"] += 1
+                rep["raw_replies"] += bool(a.get("reply"))
+                why, inferred = attempt_reason(a, r, by_id, trs, attempt_context_ids(run["meta"].get("condition"), r, set(by_id)))
+                reasons[why] += 1
+                rep["leak_inferred"] += inferred
+                m = re.match(r"count mismatch: expected (\d+), got (\d+)", a.get("error") or "")
+                rep["count_more"] += bool(m and int(m.group(2)) > int(m.group(1)))
+            if r.get("failed"):
+                continue
+            items = [by_id[i] for i in r["items"] if i in by_id]
+            ctx = [by_id[i] for i in r.get("context", []) if i in by_id]
+            hit = False
+            for it in items:
+                text = trs.get(str(it["id"]), "")
+                rep["lines"] += 1
+                ids = leaked_line_ids(text, it, ctx + [x for x in items if x is not it], trs)
+                if ids:
+                    hit = True
+                    from_context = bool(ids & {c["id"] for c in ctx})
+                    rep["leaked_context_lines" if from_context else "leaked_batch_lines"] += 1
+                    rep["leaks"].append([sid, it["id"], sorted(ids), "context" if from_context else "batch"])
+                rep["echoed_lines"] += is_echo(seq, it, text)
+            rep["leaked_requests"] += hit
+    return rep
+
+
+def print_failures(f, out):
+    r = f["reasons"]
+    parts = ", ".join("%s %d" % (k, r[k]) for k in REASONS)
+    if f["leak_inferred"]:
+        parts = parts.replace("leak %d" % r["leak"], "leak %d (%d inferred from the count)" % (r["leak"], f["leak_inferred"]))
+    more = " (%d of them with more lines than items)" % f["count_more"] if f["count_more"] else ""
+    kept = ("raw reply kept for %d of %d" % (f["raw_replies"], f["attempts_failed"]) if f["raw_replies"]
+            else "no raw reply stored (a run made before 2026-10-19): only leaks inferred from the count can be seen")
+    print("failed attempts by reason: %d = %s%s; %s" % (f["attempts_failed"], parts, more, kept), file=out)
+    print("output, of %d accepted lines: %d repeat a context line, %d repeat a neighbour of their batch (%d requests); %d are "
+          "their own source text, untranslated" % (f["lines"], f["leaked_context_lines"], f["leaked_batch_lines"],
+                                                  f["leaked_requests"], f["echoed_lines"]), file=out)
+
+
+# ---------------------------------------------------------------------------------------------------------------------
 # report
 
 def pct(k, n):
@@ -540,8 +699,10 @@ def main(argv=None):
     seqs, mems = load_corpus(args.root)
     prices = load_prices(args.root)
     sums = [summarize(load_run(r), seqs, mems, prices) for r in args.runs]
-    for s in sums:
+    fails = [failure_report(load_run(r), seqs) for r in args.runs]
+    for s, f in zip(sums, fails):
         print_summary(s, sys.stdout)
+        print_failures(f, sys.stdout)
     base = next((s for s in sums if s["condition"] == args.baseline), sums[0])
     jobs = {s["jobs"] for s in sums}
     models = {(s["engine"], s["model"]) for s in sums}
@@ -553,7 +714,7 @@ def main(argv=None):
         if s is not base:
             print_compare(base, s, compare(base, s), sys.stdout)
     if args.json:
-        slim = [{k: v for k, v in s.items() if k != "_probes"} for s in sums]
+        slim = [dict({k: v for k, v in s.items() if k != "_probes"}, failures=f) for s, f in zip(sums, fails)]
         with open(args.json, "w", encoding="utf-8") as f:
             json.dump(slim, f, ensure_ascii=False, indent=1, default=lambda o: sorted(o) if isinstance(o, set) else o)
     return 0

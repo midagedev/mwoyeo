@@ -95,6 +95,8 @@ public struct EngineFile: Decodable, Sendable {
     public var cache: String?
     public var extraHeaders: [String: String]?
     public var timeoutSeconds: Double?
+    /// Send the system prompt and the user message as ONE user message (a bench probe of a model that ignores the system role).
+    public var foldSystem: Bool?
 
     public static func load(_ url: URL) throws -> EngineFile {
         try JSONDecoder().decode(EngineFile.self, from: Data(contentsOf: url))
@@ -187,19 +189,32 @@ struct HTTPReply {
 }
 
 enum HTTP {
-    static let session: URLSession = {
+    /// The default idle limit of one request, in seconds. A reply that has not started after this long is a timeout.
+    static let defaultTimeout = 300.0
+
+    private static let lock = NSLock()
+    nonisolated(unsafe) private static var sessions: [Double: URLSession] = [:]
+
+    static func session(timeout: Double) -> URLSession {
+        lock.lock(); defer { lock.unlock() }
+        if let s = sessions[timeout] { return s }
         let c = URLSessionConfiguration.ephemeral
         c.urlCache = nil
         c.requestCachePolicy = .reloadIgnoringLocalCacheData
         c.httpCookieStorage = nil
         c.urlCredentialStorage = nil
-        c.timeoutIntervalForRequest = 300
-        return URLSession(configuration: c)
-    }()
+        c.timeoutIntervalForRequest = timeout
+        let s = URLSession(configuration: c)
+        sessions[timeout] = s
+        return s
+    }
 
     /// One POST. 429, 5xx and transport errors are retried up to three times with a pause (Retry-After, else 2, 4 s);
-    /// the latency is that of the last try alone, the retries are counted.
-    static func post(_ url: URL, headers: [String: String], body: Data, scrub: (String) -> String) async -> HTTPReply {
+    /// the latency is that of the last try alone, the retries are counted. A timeout is not retried: a model that has not
+    /// answered in `timeout` seconds at temperature 0 is looping, and the same request loops again (an engine file's
+    /// `timeoutSeconds` sets the limit; an Ollama model that never stops holds the server for minutes).
+    static func post(_ url: URL, headers: [String: String], body: Data, scrub: (String) -> String,
+                     timeout: Double = defaultTimeout) async -> HTTPReply {
         var retries = 0
         while true {
             var request = URLRequest(url: url)
@@ -209,7 +224,7 @@ enum HTTP {
             let clock = ContinuousClock()
             let start = clock.now
             do {
-                let (data, response) = try await session.data(for: request)
+                let (data, response) = try await session(timeout: timeout).data(for: request)
                 let ms = Int((clock.now - start) / .milliseconds(1))
                 let status = (response as? HTTPURLResponse)?.statusCode ?? 0
                 if (status == 429 || status >= 500) && retries < 3 {
@@ -221,12 +236,13 @@ enum HTTP {
                 return HTTPReply(status: status, data: data, ms: ms, retries: retries, error: nil)
             } catch {
                 let ms = Int((clock.now - start) / .milliseconds(1))
-                if retries < 3 && (error as? URLError)?.code != .cancelled {
+                let code = (error as? URLError)?.code
+                if retries < 3 && code != .cancelled && code != .timedOut {
                     retries += 1
                     try? await Task.sleep(for: .seconds(Double(2 << (retries - 1))))
                     continue
                 }
-                return HTTPReply(status: 0, data: Data(), ms: ms, retries: retries, error: scrub("network: \((error as? URLError)?.code.rawValue ?? 0)"))
+                return HTTPReply(status: 0, data: Data(), ms: ms, retries: retries, error: scrub("network: \(code?.rawValue ?? 0)"))
             }
         }
     }
@@ -276,9 +292,16 @@ public final class ChatEngine: BenchEngine, @unchecked Sendable {
         let messages = obj["messages"] as? [[String: Any]] ?? []
         let baseSystem = messages.first?["content"] as? String ?? ""
         let baseUser = messages.last?["content"] as? String ?? ""
-        let wire = Wiring.compose(system: baseSystem, user: baseUser, prompt: r.prompt)
+        var wire = Wiring.compose(system: baseSystem, user: baseUser, prompt: r.prompt)
         if let override = r.prompt.bodyOverride {
             body = override
+        } else if let plain = r.prompt.plain {
+            wire = Wire(system: plain.head, user: plain.tail)
+            obj["messages"] = [["role": "user", "content": plain.message]]
+            body = Wiring.encode(obj)
+        } else if file.foldSystem == true {
+            obj["messages"] = [["role": "user", "content": wire.system + "\n\n" + wire.user]]
+            body = Wiring.encode(obj)
         } else if r.prompt != Prompt() {
             obj["messages"] = [["role": "system", "content": wire.system], ["role": "user", "content": wire.user]]
             body = Wiring.encode(obj)
@@ -295,17 +318,19 @@ public final class ChatEngine: BenchEngine, @unchecked Sendable {
         let scrub = scrubber(key)
         let url = URL(string: baseURL.absoluteString.trimmingSuffix("/") + "/chat/completions")!
 
-        var reply = await HTTP.post(url, headers: headers, body: body, scrub: scrub)
+        let timeout = file.timeoutSeconds ?? HTTP.defaultTimeout
+        var reply = await HTTP.post(url, headers: headers, body: body, scrub: scrub, timeout: timeout)
         if reply.status == 400, let fix = ChatTranslation.withoutRejectedField(body, errorBody: reply.data) {
             body = fix.body
-            let again = await HTTP.post(url, headers: headers, body: body, scrub: scrub)
+            let again = await HTTP.post(url, headers: headers, body: body, scrub: scrub, timeout: timeout)
             rejections.add(fix.field)
             reply = HTTPReply(status: again.status, data: again.data, ms: again.ms, retries: reply.retries + again.retries, error: again.error)
         }
-        return Self.finish(reply, count: r.items.count, wire: wire, scrub: scrub)
+        return Self.finish(reply, count: r.items.count, wire: wire, scrub: scrub, plainLines: r.prompt.plain != nil)
     }
 
-    static func finish(_ reply: HTTPReply, count: Int, wire: Wire, scrub: (String) -> String) -> EngineReply {
+    /// `plainLines`: the reply is one translation per line (empty lines dropped) instead of the JSON `translations`.
+    static func finish(_ reply: HTTPReply, count: Int, wire: Wire, scrub: (String) -> String, plainLines: Bool = false) -> EngineReply {
         var out = EngineReply(translations: nil, text: "", usage: nil, latencyMs: reply.ms, retries: reply.retries, error: reply.error, wire: wire)
         if let e = reply.error { out.error = e; return out }
         let root = (try? JSONSerialization.jsonObject(with: reply.data) as? [String: Any]) ?? [:]
@@ -315,6 +340,11 @@ public final class ChatEngine: BenchEngine, @unchecked Sendable {
             return out
         }
         out.text = scrub(((root["choices"] as? [[String: Any]])?.first?["message"] as? [String: Any])?["content"] as? String ?? "")
+        if plainLines {
+            let lines = out.text.split(whereSeparator: \.isNewline).map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+            if lines.count == count { out.translations = lines } else { out.error = "count mismatch: expected \(count), got \(lines.count)" }
+            return out
+        }
         do { out.translations = try ChatTranslation.parseTranslations(reply.data, count: count) } catch { out.error = scrub(Wiring.describe(error)) }
         return out
     }

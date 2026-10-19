@@ -4,7 +4,7 @@ import Foundation
 // bench-run: replays the translation bench's sequences against an engine under one condition.
 //
 //   bench-run run --engine engines/<file>.json --condition A --out <dir> [--root <bench dir>] [--seq id,id] [--jobs N]
-//                 [--layout reference|t2] [--batch 3]
+//                 [--layout reference|t2|tg] [--batch 3]
 //   bench-run plan [--root <bench dir>] [--seq id,id] [--batch 3]      the batches of each sequence, no engine
 //   bench-run render-memory <memory.json> [--sections window,document,entities,terms] [--no-speech]
 //   bench-run conditions
@@ -59,7 +59,8 @@ case "conditions":
     out("M[<n>]       B2 (or B<n>) + the user memory (entities, document, window, terms)")
     out("W[<n>]       B2 (or B<n>) + window metadata only")
     out("L[<n>]       B2 (or B<n>) + a learned memory built from earlier replies only")
-    out("layouts: reference (the bench's own prompt layout), t2 (the seam for round T2; not connected)")
+    out("layouts: reference (the bench's own prompt layout), t2 (the seam for round T2; not connected),")
+    out("         tg (TranslateGemma's own prompt format: one user message, a reply of one translation per line)")
 
 case "plan":
     let root = arguments.option("--root").map { URL(fileURLWithPath: $0) } ?? defaultRoot()
@@ -94,11 +95,13 @@ case "run":
     switch layoutName {
     case "reference": layout = ReferenceLayout()
     case "t2": layout = T2Layout()
+    case "tg": layout = TranslateGemmaLayout()
     default: fail("unknown layout \(layoutName)")
     }
     let engine: any BenchEngine
     do { engine = try EngineFactory.make(try EngineFile.load(URL(fileURLWithPath: enginePath))) } catch { fail("engine: \(error)") }
     if let problem = engine.preflight() { fail("engine \(engine.label) cannot run: \(problem)", code: 3) }
+    if layoutName == "tg" && engine.kindName != "openAICompatible" { fail("layout tg needs an openAICompatible engine", code: 3) }
     let corpus = try Corpus.load(root: root, only: only)
     if corpus.isEmpty { fail("no sequences under \(root.path)") }
     var options = RunOptions(spec: spec, layout: layout, layoutName: layoutName, engine: engine, out: URL(fileURLWithPath: outPath))

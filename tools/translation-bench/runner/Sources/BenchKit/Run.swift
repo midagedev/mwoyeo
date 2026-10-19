@@ -8,7 +8,11 @@ public struct AttemptRecord: Codable, Sendable, Equatable {
     public var retries: Int
     public var stateless: Bool
     public var error: String?
-    enum CodingKeys: String, CodingKey { case ok, error, retries, stateless, latencyMs = "latency_ms" }
+    /// The model's text of a failed attempt that got one (a parse error, a count mismatch), so the scorer can tell a
+    /// leaked context line from a broken JSON. Absent on an attempt that counted (`RequestRecord.reply` has it) and in
+    /// runs made before 2026-10-19.
+    public var reply: String?
+    enum CodingKeys: String, CodingKey { case ok, error, retries, stateless, reply, latencyMs = "latency_ms" }
 }
 
 /// Where the tokens of one request sit. `stable` is the system prompt (rules, notes, learned terms), `history` the context
@@ -139,7 +143,8 @@ public enum Runner {
             var reply = await o.engine.translate(EngineRequest(items: batch.items, source: seq.source, target: seq.target,
                                                                prompt: prompt, sequenceID: seq.id))
             attempts.append(AttemptRecord(ok: reply.translations != nil, latencyMs: reply.latencyMs, retries: reply.retries,
-                                          stateless: false, error: reply.error))
+                                          stateless: false, error: reply.error,
+                                          reply: reply.translations == nil && !reply.text.isEmpty ? reply.text : nil))
             var usedPrompt = prompt
             var stateless = false
             if reply.translations == nil {
@@ -147,7 +152,8 @@ public enum Runner {
                 let second = await o.engine.translate(EngineRequest(items: batch.items, source: seq.source, target: seq.target,
                                                                     prompt: plain, sequenceID: seq.id))
                 attempts.append(AttemptRecord(ok: second.translations != nil, latencyMs: second.latencyMs, retries: second.retries,
-                                              stateless: true, error: second.error))
+                                              stateless: true, error: second.error,
+                                              reply: second.translations == nil && !second.text.isEmpty ? second.text : nil))
                 // The size and usage of the request that counted: both are paid, the first one's usage is kept in the log line.
                 reply = EngineReply(translations: second.translations, text: second.text, usage: merged(reply.usage, second.usage),
                                     latencyMs: second.latencyMs, retries: second.retries, error: second.error, wire: second.wire)

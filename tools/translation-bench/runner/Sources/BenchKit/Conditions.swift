@@ -81,6 +81,19 @@ public struct Step: Sendable {
     public var history: [Turn]
 }
 
+/// A request that is not today's JSON chat request: ONE user message (`head` + newline + `tail`) and a reply of one
+/// translation per line instead of `{"translations": [...]}`. `head` is the instruction and notes (the size accounting's
+/// `stable` part), `tail` the context lines, the trailer and the lines to translate. Only `ChatEngine` sends it.
+public struct PlainRequest: Sendable, Equatable {
+    public var head: String
+    public var tail: String
+    public var message: String { head + "\n" + tail }
+    public init(head: String, tail: String) {
+        self.head = head
+        self.tail = tail
+    }
+}
+
 /// What a layout adds to today's request. An empty `Prompt` is condition A.
 public struct Prompt: Sendable, Equatable {
     /// Appended to today's system prompt after a newline.
@@ -97,6 +110,8 @@ public struct Prompt: Sendable, Equatable {
     public var deepLContext: String?
     /// T2: the finished request body, sent as is.
     public var bodyOverride: Data?
+    /// One user message and a reply of one translation per line (`TranslateGemmaLayout`); replaces the system prompt and `user`.
+    public var plain: PlainRequest?
     /// Ids of the context lines shown.
     public var contextIDs: [Int] = []
     /// The context lines as labelled text, for engines that take no JSON (Apple Foundation Models).
@@ -277,6 +292,55 @@ public struct ReferenceLayout: ContextLayout {
     static func json(_ value: Any) -> String {
         guard let d = try? JSONSerialization.data(withJSONObject: value, options: [.withoutEscapingSlashes, .sortedKeys]) else { return "" }
         return String(decoding: d, as: UTF8.self)
+    }
+}
+
+// MARK: - the translategemma layout
+
+/// The prompt format of TranslateGemma (Google's model card; Ollama's template turns a system message into a second user
+/// turn, so the format is one user message): the translator instruction, the lines, and a reply that is the translation
+/// only. TranslateGemma has no documented slot for notes. This layout puts them where an instruction-tuned Gemma would read
+/// them, between the instruction and the lines: the user's notes (condition M, W), the context lines (B, M, W) and the
+/// speakers of the lines to translate. Condition A is left alone (today's JSON request), so `A` is the same run under
+/// either layout. A failed attempt falls back to today's JSON request, as everywhere. This is a bench variant, not the
+/// product's layout; it exists to answer whether TranslateGemma uses memory at all when the prompt is in its own format.
+public struct TranslateGemmaLayout: ContextLayout {
+    public init() {}
+
+    static let names = ["ja": "Japanese", "zh": "Chinese", "ko": "Korean", "en": "English"]
+
+    public func build(_ spec: ConditionSpec, step: Step, thread: ThreadState) throws -> Prompt {
+        if spec.learned { throw SeamError.notConnected("the translategemma layout has no terms reply for condition \(spec.name)") }
+        var prompt = try ReferenceLayout().build(spec, step: step, thread: thread)
+        if spec.isOff { return prompt }
+        let seq = step.sequence
+        let s = Self.names[seq.source] ?? seq.source, t = Self.names[seq.target] ?? seq.target
+        var head = "You are a professional \(s) (\(seq.source)) to \(t) (\(seq.target)) translator. Your goal is to accurately convey the "
+            + "meaning and nuances of the original \(s) text while adhering to \(t) grammar, vocabulary, and cultural sensitivities.\n"
+            + "Produce only the \(t) translation, without any additional explanations or commentary."
+        if !prompt.memoryText.isEmpty {
+            head += "\n" + ReferenceLayout.notesHeader + "\n" + prompt.memoryText
+            if seq.target == "ko", prompt.memoryText.contains("speaks to") { head += "\n" + ReferenceLayout.speechLegend }
+        }
+        var tail = ""
+        if !prompt.contextLines.isEmpty {
+            let block = prompt.contextLines.joined(separator: "\n")
+            prompt.historyText = block
+            tail += "Earlier or nearby lines of the same text, for reference only (never translate or repeat them):\n" + block + "\n"
+        }
+        if !prompt.itemSpeakers.isEmpty {
+            tail += "Speakers of the lines to translate, in order: " + prompt.itemSpeakers.map { $0 ?? "?" }.joined(separator: ", ") + "\n"
+        }
+        tail += "Please translate the following \(s) text into \(t), one translation per line:\n\n\n"
+            + step.batch.items.map(\.text).joined(separator: "\n")
+        prompt.plain = PlainRequest(head: head, tail: tail)
+        prompt.user = nil
+        prompt.systemAddition = ""
+        return prompt
+    }
+
+    public func observe(_ spec: ConditionSpec, step: Step, translations: [String], replyText: String, thread: ThreadState) {
+        ReferenceLayout().observe(spec, step: step, translations: translations, replyText: replyText, thread: thread)
     }
 }
 

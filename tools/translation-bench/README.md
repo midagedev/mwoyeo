@@ -19,7 +19,10 @@ The corpus is written for the bench (no third-party text). The runner replays ea
 | `score.py` | scorer and shared library (`python3 -I score.py <run dir>...`) |
 | `judge.py` | blind pairwise judge prompts and the tally |
 | `runs.py` | preserves a run into `runs/` with a manifest; `verify` and `list` (`python3 -I runs.py ...`) |
+| `matrix.sh` | one condition on one Ollama model, then `runs.py add` with the machine state (load, pageouts, swap, `ollama ps`) in the note |
+| `summary.py` | regenerates `runs/SUMMARY.md` from the preserved runs (`--check` fails when it is stale) |
 | `runs/<run-name>/` | the preserved experiment data: every run worth a number, with its `MANIFEST.json` |
+| `runs/SUMMARY.md` | the tables of every model run; generated, never hand-edited |
 | `prices.json` | price table, with the source of each price |
 | `tests/` | scorer and judge unit checks, golden mini-sequence |
 
@@ -138,6 +141,13 @@ Condition A never touches it. Every other condition goes through a `ContextLayou
   "speakers": [...]}`, so a window that only grows keeps a common prefix), the items last. It exists so the bench runs end to
   end now and the probes can be checked on real models (the memory-only probes must stay near chance under A, B2, B4, C16
   and rise under M). It is not the product's layout.
+- `TranslateGemmaLayout` (`--layout tg`) is a bench variant for TranslateGemma, whose prompt format is not the app's JSON
+  request: one user message (Ollama's template turns a system message into a second user turn), the model card's
+  instruction ("You are a professional X (x) to Y (y) translator ... Produce only the Y translation ..."), the user's
+  notes, the context lines and the speakers between the instruction and the lines, and a reply that is one translation per
+  line. A count that does not match falls back to today's JSON request like any failed attempt. Condition A is left alone,
+  so `A` is the same run under either layout; `L` is refused. The `tg` runs measure whether TranslateGemma uses memory when
+  it is asked in its own format; they are not the product's layout.
 - `T2Layout` (`--layout t2`) is the stub for round T2's `TranslationContext`. A `Step` hands it the batch, the lines above
   and below it on screen, every line translated so far (source, reply, trusted flag) and the sequence's memory.
   `build` returns a `Prompt`: either `bodyOverride` (the finished request body from T2's builders in `ChatTranslation`,
@@ -165,10 +175,17 @@ python3 -I judge.py prompts --a out/A-gemma3-4b --b out/M-gemma3-4b --out judge/
   on-device model when Apple Intelligence is on; one session per line as in the app; token usage is the bench's estimate).
   Cloud engines run only when their key variable is set (exit 3 otherwise). Ollama: `ollama serve`, then any model it lists
   (`ollama list`); llama-server: `llama-server -m <gguf>` and point `baseURL` at `http://127.0.0.1:8080/v1`.
+- `timeoutSeconds` (default 300) is the longest a request may wait for its reply. A timeout is **not retried** (429, 5xx and other
+  transport errors are, up to three times): a model that has not answered in that time at temperature 0 is looping and loops again.
+  Two translategemma requests of the bench corpus do this (batch 7 of chat-ko-en-1 and batch 10 of game-ja-ko-1, both under B2),
+  and without the limit the run stalled for 18 minutes on the first; the app's chat request sets no output cap. The failure report counts these as `timeout`. The translategemma and gemma4:26b engine
+  files set 90.
+- `foldSystem: true` in an engine file sends the system prompt and the user message as one user message (a probe of a model
+  that ignores the system role; `A` under it is not today's request, so its run name says so).
 - **Output** (`--out <dir>` = one condition on one engine): `meta.json` and one `<sequence id>.json` with the translation of
   every line and one record per request: the items, the context ids, every attempt (latency, retries, error), the raw reply,
   the usage (tokens in/out/cached/cache-write as the engine reports them) and the size split (below). A failed attempt
-  (HTTP, parse, count) is retried once as today's stateless request (design: break the chain on trouble); lines no attempt
+  (HTTP, parse, count; its raw reply is kept in `attempts[].reply` from 2026-10-19 on) is retried once as today's stateless request (design: break the chain on trouble); lines no attempt
   translated stay empty and count as wrong.
 - `--jobs N` replays N sequences at once (sequences are independent threads). It shortens a quality run on an engine that
   serves requests in parallel; latency is not comparable across runs with different `jobs` (the scorer says so).
@@ -203,6 +220,17 @@ python3 -I runs.py verify          # every run has a manifest, its files hash as
 python3 -I runs.py list            # one line per run
 python3 -I score.py runs/A-gemma3-4b runs/M-gemma3-4b     # the scorer reads a preserved run like any run directory
 ```
+
+`matrix.sh <bin> <scratch> <engine file> <run name> <condition> [bench-run options]` does the run and the `add` in one go for
+an Ollama model: a warm-up request first (the load time is not in the first latency), `--jobs 1`, and a note tag
+`[machine load1m start=.. end=.. pageouts +n swapouts +n swap_used_mb start=.. end=.. free_pct start=.. end=.. ollama_ps='..']`
+that `summary.py` reads as the load caveat. `NOTE='...' matrix.sh ...` adds prose in front of the tag. Run names for models:
+`<condition>-<model>` (`M-gemma4-e4b`), with `-tg` after the model for the `tg` layout (`M-translategemma-4b-tg`).
+
+`runs/SUMMARY.md` is written by `python3 -I summary.py` (never by hand): per model and run, the probe accuracy overall, by
+evidence and by type, the sign test against condition A of the same model (between runs on the same corpus snapshot only), speech-level
+consistency, failed attempts by reason, fallbacks, empty lines, leaks, echoes, tokens per request, latency and the load it was
+measured under. It has no timestamps, so the same runs give the same bytes; `tests/test_summary.py` and `run-all.sh` fail on a stale file.
 
 `MANIFEST.json` holds (`manifest_version` 1):
 
@@ -244,6 +272,15 @@ corpus (a new run name) to compare.
   (`repeat_same`), and consecutive failures of one key whatever the wrong form (`fail streaks`).
 - **Latency** p50/p95 per request, retries included. **Tokens** in/out/cached from the engine's usage, with the cost from
   `prices.json` (every price cites its source line; DeepL bills characters and has no entry).
+- **Failures and leaks** (`score.py` prints them after each summary; `summarize` and the manifests do not carry them, so
+  the recorded summaries keep reproducing). Failed attempts by reason: `parse` (not the JSON asked for), `count` (a different
+  number of lines; the report says how many had more lines than items), `leak` (the stored raw reply repeats a context line;
+  needs the raw reply, so runs before 2026-10-19 show none), `timeout`, `http`, `other`. Accepted output lines that **repeat a
+  context line** (their source text, or that line's translation as this run produced it) are context leaks: a condition that
+  wins accuracy but leaks fails design section 9's no-regression rule. Lines that repeat another item of their own batch are
+  batch leaks (condition A has them too: the model's floor). **Echoed** lines are their own source text, untranslated.
+  Thresholds (`SRC_MIN`, `TR_MIN` in `score.py`) keep short shared phrases from counting. `tests/test_failures.py` plants
+  leaks into a mini run and into a preserved run and counts them; with `--neuter` it must fail.
 - **Judge** (`judge.py`): blind pairwise prompts, one file per order, per line whose two translations differ, plus
   calibration items (the same text twice: the judge must say tie in both orders). The condition names are in `key.json` only.
   `judge.py tally` counts only items on which both orders agree and prints the counts, the win rate with a Wilson interval
@@ -275,7 +312,8 @@ a user memory vs a long transcript) are provisional until this bench has run the
 
 `tests/run-all.sh`: the corpus validation, `tests/test_score.py` (the scorer on a golden mini-sequence with hand-written
 translations: 100 %; one name swapped drops accuracy and raises carry-over), `tests/test_judge.py` (the A-vs-A sample prompt
-pair, the tally on a fake verdict set), `tests/test_runs.py` (preservation: no overwrite, a manifest that verifies, and
+pair, the tally on a fake verdict set), `tests/test_failures.py` (failed attempts by reason, leaks and echoes counted on a mini run and on a doctored real run; run again with
+`--neuter` it must fail), `tests/test_summary.py` (SUMMARY.md renders identically twice and equals the committed file), `tests/test_runs.py` (preservation: no overwrite, a manifest that verifies, and
 `verify` failing on a missing manifest, a changed file, a changed summary and a short oracle run), `runs.py verify` (every
 preserved run), the runner's Swift tests, and `tests/check_render.py` (the runner's and the scorer's renderings of every
 memory are identical).

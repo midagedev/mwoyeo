@@ -187,6 +187,100 @@ private let memory = Memory(
     }
 }
 
+@Suite struct TranslateGemmaTests {
+    private func step(_ seq: BenchSequence, upTo n: Int) -> Step {
+        let plan = Replay.plan(seq)
+        let batch = plan.first { $0.items.first!.id == n }!
+        let history = seq.lines.filter { $0.id < n }.map { Turn(line: $0, translation: "t\($0.id)", trusted: true) }
+        return Step(sequence: seq, memory: memory, batch: batch, history: history)
+    }
+
+    @Test func conditionAIsTodaysRequestAndMIsOneMessageInTheModelsOwnFormat() throws {
+        let seq = sequence(lines: 9, screens: [[1, 2, 3, 4, 5, 6, 7, 8, 9]])
+        let layout = TranslateGemmaLayout()
+        #expect(try layout.build(ConditionSpec.parse("A")!, step: step(seq, upTo: 7), thread: ThreadState()) == Prompt())
+        let p = try layout.build(ConditionSpec.parse("M")!, step: step(seq, upTo: 7), thread: ThreadState())
+        let plain = try #require(p.plain)
+        #expect(p.user == nil && p.systemAddition.isEmpty && p.contextIDs == [5, 6])
+        #expect(plain.head.hasPrefix("You are a professional Japanese (ja) to Korean (ko) translator."))
+        #expect(plain.head.contains("Produce only the Korean translation"))
+        #expect(plain.head.contains(p.memoryText) && plain.head.contains("Notes from the user") && plain.head.contains("Speech levels:"))
+        #expect(plain.tail.contains("B: text 5\nA: text 6\n"))
+        #expect(plain.tail.contains("Speakers of the lines to translate, in order: B, A, B"))
+        #expect(plain.tail.hasSuffix("into Korean, one translation per line:\n\n\ntext 7\ntext 8\ntext 9"))
+        #expect(plain.tail.contains(p.historyText))
+        #expect(plain.message == plain.head + "\n" + plain.tail)
+    }
+
+    @Test func b2HasNoNotesAndTheLearnedConditionIsRefused() throws {
+        let seq = sequence(lines: 9, screens: [[1, 2, 3, 4, 5, 6, 7, 8, 9]])
+        let p = try TranslateGemmaLayout().build(ConditionSpec.parse("B2")!, step: step(seq, upTo: 7), thread: ThreadState())
+        #expect(!p.plain!.head.contains("Notes from the user"))
+        #expect(throws: SeamError.self) { try TranslateGemmaLayout().build(ConditionSpec.parse("L")!, step: step(seq, upTo: 7), thread: ThreadState()) }
+    }
+
+    @Test func aPlainReplyIsOneTranslationPerLine() {
+        func reply(_ text: String) -> HTTPReply {
+            let body = try! JSONSerialization.data(withJSONObject: ["choices": [["message": ["content": text]]]])
+            return HTTPReply(status: 200, data: body, ms: 5, retries: 0, error: nil)
+        }
+        let wire = Wire(system: "s", user: "u")
+        let ok = ChatEngine.finish(reply("가나\n\n다라 \n"), count: 2, wire: wire, scrub: { $0 }, plainLines: true)
+        #expect(ok.translations == ["가나", "다라"] && ok.error == nil)
+        let short = ChatEngine.finish(reply("가나"), count: 2, wire: wire, scrub: { $0 }, plainLines: true)
+        #expect(short.translations == nil && short.error == "count mismatch: expected 2, got 1")
+        // the same text through the JSON path is a parse failure: the two paths are not mixed up
+        #expect(ChatEngine.finish(reply("가나\n다라"), count: 2, wire: wire, scrub: { $0 }).translations == nil)
+    }
+}
+
+/// A TCP server on 127.0.0.1 that accepts a connection and never answers: a model that loops and never replies.
+private final class SilentServer: @unchecked Sendable {
+    let port: UInt16
+    private let fd: Int32
+    private let lock = NSLock()
+    private var held: [Int32] = []
+
+    init() {
+        let s = socket(AF_INET, SOCK_STREAM, 0)
+        var addr = sockaddr_in()
+        addr.sin_family = sa_family_t(AF_INET)
+        addr.sin_addr.s_addr = inet_addr("127.0.0.1")
+        addr.sin_port = 0
+        var len = socklen_t(MemoryLayout<sockaddr_in>.size)
+        withUnsafePointer(to: &addr) { $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { _ = bind(s, $0, len); listen(s, 4) } }
+        withUnsafeMutablePointer(to: &addr) { $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { _ = getsockname(s, $0, &len) } }
+        fd = s
+        port = UInt16(bigEndian: addr.sin_port)
+        Thread.detachNewThread { [self] in
+            while true {
+                let c = accept(s, nil, nil)
+                if c < 0 { return }
+                lock.lock(); held.append(c); lock.unlock()   // never read, never write
+            }
+        }
+    }
+
+    deinit {
+        close(fd)
+        for c in held { close(c) }
+    }
+}
+
+@Suite struct HTTPTests {
+    @Test func aTimeoutIsReportedAsNetworkMinus1001AndIsNotRetried() async {
+        let server = SilentServer()
+        let url = URL(string: "http://127.0.0.1:\(server.port)/v1/chat/completions")!
+        let clock = ContinuousClock()
+        let start = clock.now
+        let reply = await HTTP.post(url, headers: [:], body: Data("{}".utf8), scrub: { $0 }, timeout: 1)
+        let seconds = Double((clock.now - start) / .milliseconds(1)) / 1000
+        #expect(reply.error == "network: -1001")
+        #expect(reply.retries == 0)
+        #expect(seconds < 4)   // one try of 1 s; three retries with pauses would take 7 s or more
+    }
+}
+
 @Suite struct EngineTests {
     @Test func openAIUsageIncludingLlamaTimings() throws {
         let plain = try JSONSerialization.jsonObject(with: Data(#"{"usage": {"prompt_tokens": 111, "completion_tokens": 70, "prompt_tokens_details": {"cached_tokens": 56}}}"#.utf8)) as! [String: Any]

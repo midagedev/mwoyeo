@@ -29,7 +29,7 @@ reason), **shipped** (version).
 | Idea | Why (evidence) | Status |
 |---|---|---|
 | Language pack flow that cannot get stuck: clear state, retry, what works meanwhile | The system translation app's reviews are dominated by packs that will not download; our default engine depends on the same packs | **next** |
-| Lower the macOS floor below 26 | Comparable apps run on macOS 14–15; needs a check of which APIs we use only exist on 26 | open (investigate) |
+| Lower the macOS floor to 15 (14 is impossible: the Translation framework starts at 15) | Comparable apps run on macOS 14–15. Measured 2026-10-19: size L; the blocker is `TranslationSession(installedSource:target:)` (26.0), so 15 needs sessions from a hosted `.translationTask`; Foundation Models engine, Liquid Glass and the document reader need guards or fallbacks; must be verified on a real 15 machine | open (own track, needs a macOS 15 machine) |
 | Check behaviour on the newest macOS releases before each update | Rival tools lose ratings to breakage after OS updates | open |
 
 ## Games, video and chat

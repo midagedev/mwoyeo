@@ -119,10 +119,17 @@ actor RegionPipeline {
         var ink: CGRect?
         /// Where in `rect` the translation may be laid out, relative to `rect`; nil = all of it.
         var textArea: CGRect?
+        /// Set when this block is one piece of a paragraph that goes on in the next column: `source` is the paragraph's, and the
+        /// block draws its share of the one translation (`FlowSplit`).
+        var part: FlowPart?
         /// What the last render drew: its font size (pixels), whether the translation needed more room than the patch has, and
         /// whether it was cut to fit.
         var drawnSize: CGFloat = 0
         var clipped = false, ellipsis = false
+
+        /// Whether this block stands for its paragraph where blocks are listed to a person or a gate (Copy Text, the self-test's
+        /// source/translation pairs): the first piece of a paragraph, or a block that is a paragraph of its own.
+        var startsParagraph: Bool { (part?.index ?? 0) == 0 }
     }
 
     private let translator: TranslationService
@@ -354,7 +361,7 @@ actor RegionPipeline {
     /// For the headless self-test: whether work is pending, and what each block reads.
     func debugState() -> (busy: Bool, translating: Bool, paused: Bool, parked: Int, blocks: [(String, String?)], flight: [String], motion: (moving: Bool, velocity: CGVector, expected: Double?), lens: (total: Int, untranslated: Int)) {
         (working || translating || settleTask != nil && !seamlessDone, translating, paused, strikes.parkedCount,
-         blocks.map { ($0.source, $0.translation) }, (flight?.batch ?? []).map { source in
+         blocks.filter(\.startsParagraph).map { ($0.source, $0.translation) }, (flight?.batch ?? []).map { source in
              let s = blocks.filter { $0.source == source }.map { TranslationScheduling.standing(of: $0.rect, lens: lensRect, lead: lead) }
              return s.contains(.lens) ? "lens" : s.contains(.leading) ? "lead" : s.isEmpty ? "gone" : "other"
          }, (isMoving(at: ProcessInfo.processInfo.systemUptime), velocity, translator.expectedSeconds(lines: 3)),
@@ -832,7 +839,7 @@ actor RegionPipeline {
             _ = finishPass(start, frame: frame)
             return
         }
-        found = splitByStyle(joinSplitLines(readableLines(found, in: frame.image)), in: frame.image)
+        found = readBlocks(found, in: frame.image)
         Trace.mark("fast: OCR \(Int(dirty.width))×\(Int(dirty.height))px → \(found.count) blocks", since: t)
         let verdicts = found.map { TextRecognizer.verdict($0.text, target: options.targetLanguage) }
         onRead?(TextRecognizer.tally(verdicts, partial: dirty.width < CGFloat(frame.image.width) || dirty.height < CGFloat(frame.image.height)))
@@ -850,14 +857,14 @@ actor RegionPipeline {
             var b: Block
             if let full, let e = erase(ocr, in: full, place: places[i]) {
                 b = Block(id: prior?.id ?? UUID(), rect: e.rect.cgRect, lines: ocr.lines.map(\.rect), source: ocr.text, appearance: e.look,
-                          fontSize: e.fontSize, spareWidth: e.spare, textArea: e.textArea)
+                          fontSize: e.fontSize, spareWidth: e.spare, textArea: e.textArea, part: ocr.part)
                 b.erased = e.patch
             } else {
                 let r = ocr.rect, pad = ocr.lines.map(\.rect.height).min() ?? r.height
                 let boxRect = r.insetBy(dx: -max(2, pad * 0.12), dy: -max(1, pad * 0.08))
                     .intersection(CGRect(x: 0, y: 0, width: frame.image.width, height: frame.image.height))
                 b = Block(id: prior?.id ?? UUID(), rect: boxRect, lines: ocr.lines.map(\.rect), source: ocr.text,
-                          appearance: appearance(of: ocr.lines[0].rect, in: frame.image))
+                          appearance: appearance(of: ocr.lines[0].rect, in: frame.image), part: ocr.part)
             }
             if let prior, prior.source == ocr.text { b.translation = prior.translation }
             made.append(b)
@@ -913,7 +920,7 @@ actor RegionPipeline {
             emit(animated: false)
             return true
         }
-        let read = splitByStyle(joinSplitLines(readableLines(found, in: frame.image)), in: frame.image)
+        let read = readBlocks(found, in: frame.image)
         let verdicts = read.map { TextRecognizer.verdict($0.text, target: options.targetLanguage) }
         onRead?(TextRecognizer.tally(verdicts))
         found = zip(read, verdicts).filter { $1 == .needs }.map(\.0)
@@ -931,7 +938,7 @@ actor RegionPipeline {
             guard let e = erase(ocr, in: full, place: places[i]) else { continue }
             let id = matches[i].map { prior[$0].id } ?? UUID()
             var b = Block(id: id, rect: e.rect.cgRect, lines: ocr.lines.map(\.rect), source: ocr.text, appearance: e.look,
-                          fontSize: e.fontSize, spareWidth: e.spare, textArea: e.textArea)
+                          fontSize: e.fontSize, spareWidth: e.spare, textArea: e.textArea, part: ocr.part)
             if let oi = matches[i], prior[oi].source == ocr.text { b.translation = prior[oi].translation }
             b.erased = e.patch
             next.append(b)
@@ -979,6 +986,57 @@ actor RegionPipeline {
         }
         if !tall { verticalNoticed = false }
         return tall
+    }
+
+    /// The one chain from the recognizer's blocks to the blocks the pipeline lays out, for the lens and the seamless pass alike (design:
+    /// docs/design/recognition.md section 11): lines worth reading, a paragraph that goes on in the next column cut into one block per
+    /// column, split lines joined, style splits. The cut comes before the joins so that their rules see columns, not the union of two.
+    /// `flowed` last: it needs to know which pieces came through the chain whole.
+    private func readBlocks(_ found: [OCRBlock], in image: CGImage) -> [OCRBlock] {
+        flowed(splitByStyle(joinSplitLines(columnBreak(readableLines(found, in: image))), in: image))
+    }
+
+    /// A paragraph that goes on at the top of the next column comes back as one block of lines in two columns, whose rect holds the
+    /// blocks of both: it is cut at the line that starts the next column, but only when its rect holds another block (`ColumnBreak`).
+    /// The pieces that carry the sentence on get a `FlowPart`; one that starts a paragraph of its own (a prompt, a heading) does not.
+    private func columnBreak(_ blocks: [OCRBlock]) -> [OCRBlock] {
+        guard blocks.count > 1, Self.layoutRules else { return blocks }
+        let runs = ColumnBreak.pieces(blocks.map { $0.lines.map(\.rect) })
+        guard runs.contains(where: { $0.count > 1 }) else { return blocks }
+        var group = 0
+        return blocks.enumerated().flatMap { i, block -> [OCRBlock] in
+            guard runs[i].count > 1 else { return [block] }
+            Trace.count("ocr.column_break")
+            let pieces = runs[i].map { TextRecognizer.makeBlock($0.map { block.lines[$0] }) }
+            let chain = ColumnBreak.chains(pieces.map { (first: $0.lines[0].text, last: $0.lines[$0.lines.count - 1].text) })
+            Trace.mark("column break: block \(i) '\(block.text.prefix(24))' → pieces \(runs[i].map(\.count)), shared \(chain)", since: Trace.now)
+            defer { group += (chain.last ?? 0) + 1 }
+            return pieces.enumerated().map { k, piece in
+                var piece = piece
+                let mates = chain.indices.filter { chain[$0] == chain[k] }
+                if mates.count > 1 { piece.part = FlowPart(group: group + chain[k], index: mates.firstIndex(of: k) ?? 0, count: mates.count) }
+                return piece
+            }
+        }
+    }
+
+    /// The pieces of a paragraph that came through `joinSplitLines` and `splitByStyle` whole are blocks of one text, the paragraph's,
+    /// so it is translated once and each piece draws its share; a paragraph that lost a piece on the way (merged with a neighbour,
+    /// split by style, taken for a label) is a set of paragraphs of their own, each with its own text (`FlowSplit.resolve`).
+    private func flowed(_ blocks: [OCRBlock]) -> [OCRBlock] {
+        guard blocks.contains(where: { $0.part != nil }) else { return blocks }
+        let parts = FlowSplit.resolve(blocks.map(\.part), characters: blocks.map(\.text.count))
+        var out = blocks
+        var members: [Int: [Int]] = [:]
+        for i in out.indices {
+            out[i].part = parts[i]
+            if let part = parts[i] { members[part.group, default: []].append(i) }
+        }
+        for positions in members.values {
+            let text = TextRecognizer.makeBlock(positions.flatMap { blocks[$0].lines }).text
+            for i in positions { out[i].text = text }
+        }
+        return out
     }
 
     /// A line the recognizer could not read across (an inline sum, a fraction) comes back as pieces on one text row, in
@@ -1053,8 +1111,8 @@ actor RegionPipeline {
         }
     }
 
-    /// `MWOYEO_LAYOUT=off` reads and erases blocks as before the layout rules (joining split lines, `Territory`, `ColumnEdge`,
-    /// the descender strip), to put the self-test's layout line of the old behaviour beside the new one.
+    /// `MWOYEO_LAYOUT=off` reads and erases blocks as before the layout rules (the column break, joining split lines, `Territory`,
+    /// `ColumnEdge`, the descender strip), to put the self-test's layout line of the old behaviour beside the new one.
     private static let layoutRules = ProcessInfo.processInfo.environment["MWOYEO_LAYOUT"] != "off"
 
     /// What one block may paint and how far right it may write.
@@ -1081,6 +1139,14 @@ actor RegionPipeline {
         }
         let wants = blocks.indices.map { Territory.want(core: cores[$0], lineHeight: lineHeights[$0], ring: rings[$0]).intersection(bounds) }
         let territories = Territory.trim(cores: cores, wants: wants)
+        // A territory under half of its core leaves the block drawn in half of its place, or (a patch of 0-1 px) not at all with its
+        // source still on the page: counted and traced, never silent.
+        for i in blocks.indices where Territory.squeezed(core: cores[i], territory: territories[i]) {
+            Trace.count("layout.squeezed")
+            Trace.mark("layout: squeezed block \(i) '\(blocks[i].text.prefix(24))' core \(TraceNumber.px(cores[i].minX)),\(TraceNumber.px(cores[i].minY)) "
+                       + "\(TraceNumber.px(cores[i].width))x\(TraceNumber.px(cores[i].height)) territory \(TraceNumber.px(territories[i].minX)),\(TraceNumber.px(territories[i].minY)) "
+                       + "\(TraceNumber.px(territories[i].width))x\(TraceNumber.px(territories[i].height))", since: Trace.now)
+        }
         let others = read.map(\.rect)
         return blocks.indices.map { i in
             Place(territory: territories[i], columnRight: ColumnEdge.right(of: cores[i], among: others.filter { $0 != cores[i] }),
@@ -1103,7 +1169,7 @@ actor RegionPipeline {
                     parts += runs.map { [$0] } + [[]]
                 }
             }
-            return parts.filter { !$0.isEmpty }.flatMap { lines -> [OCRBlock] in
+            let made = parts.filter { !$0.isEmpty }.flatMap { lines -> [OCRBlock] in
                 guard lines.count > 1 else { return [TextRecognizer.makeBlock(lines)] }
                 let styles = lines.map { (color: appearance(of: $0.rect, in: image).textColor, size: LineSize.Line(height: $0.rect.height, width: $0.rect.width, text: $0.text)) }
                 if Trace.enabled {
@@ -1117,6 +1183,11 @@ actor RegionPipeline {
                 }
                 return groups.map(TextRecognizer.makeBlock)
             }
+            // A piece of a paragraph that goes on in the next column stays one only if the style pass left it whole.
+            guard made.count == 1, let part = block.part else { return made }
+            var whole = made[0]
+            whole.part = part
+            return [whole]
         }
         let items = split.map { LabelRule.Item(rect: $0.rect, text: $0.text, color: appearance(of: $0.lines[0].rect, in: image).textColor,
                                                  lineHeight: $0.lines[0].rect.height) }
@@ -1538,7 +1609,10 @@ actor RegionPipeline {
         for i in blocks.indices where blocks[i].image == nil {
             let b = blocks[i]
             // A translation equal to the source means "leave it": no box, no erase, the original stays.
-            guard let text = b.translation, !text.isEmpty, text != b.source else { continue }
+            guard let translation = b.translation, !translation.isEmpty, translation != b.source else { continue }
+            // A piece of a paragraph that goes on in the next column draws its share of the paragraph's one translation.
+            let text = b.part.map { FlowSplit.share(of: translation, part: $0) } ?? translation
+            guard !text.isEmpty else { continue }
             let heights = b.lines.map(\.height).sorted()
             let lineHeight = heights.isEmpty ? b.rect.height : heights[heights.count / 2]
             let background: BlockRenderer.Background = b.erased.map { .erased($0) }
@@ -1572,7 +1646,7 @@ actor RegionPipeline {
             return OverlayBlock(id: b.id, frame: CGRect(x: b.rect.minX / s, y: b.rect.minY / s, width: b.rect.width / s, height: b.rect.height / s),
                                 image: img, seamless: b.erased != nil)
         }
-        let texts = blocks.map { BlockText(frame: CGRect(x: $0.rect.minX / s, y: $0.rect.minY / s, width: $0.rect.width / s, height: $0.rect.height / s),
+        let texts = blocks.filter(\.startsParagraph).map { BlockText(frame: CGRect(x: $0.rect.minX / s, y: $0.rect.minY / s, width: $0.rect.width / s, height: $0.rect.height / s),
                                            source: $0.source, translation: $0.translation) }
         // What the self-test's layout line counts: every drawn block, in draw order.
         let drawn = blocks.compactMap { b -> DrawnBlock? in

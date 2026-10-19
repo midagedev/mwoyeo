@@ -315,7 +315,7 @@ enum SelfTest {
         try keeping.finish(still.latest, lens: lensRect, time: phase + 1)
     }
 
-    /// `layout: blocks=N overlaps=K spill=S cut=C clipped=Q` (LayoutCheck) and one line per finding with the sources involved: the
+    /// `layout: blocks=N overlaps=K spill=S cut=C clipped=Q holds=H` (LayoutCheck) and one line per finding with the sources involved: the
     /// gate and the debug view of a page whose translated blocks run into each other. After it, `image: W×H` and one `block:`
     /// line per drawn block (core and text rects in image pixels, drawn font size, source lines, characters, clipped, ellipsis) for
     /// `tools/paper-bench/score.py`.
@@ -333,6 +333,7 @@ enum SelfTest {
         for (a, b) in report.overlaps { print("  overlap: \(name(a)) x \(name(b))") }
         for (a, b) in report.cut { print("  cut: \(name(a)) painted over by \(name(b))") }
         for a in report.spill { print("  spill: \(name(a)) past its column") }
+        for (a, b) in report.holds { print("  holds: \(name(a)) holds \(name(b))") }
     }
 
     private final class Counter: @unchecked Sendable {

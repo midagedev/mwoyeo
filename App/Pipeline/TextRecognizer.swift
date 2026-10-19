@@ -10,6 +10,9 @@ struct OCRBlock: Sendable {
     var rect: CGRect
     var lines: [OCRLine]
     var text: String
+    /// Set on each of the blocks a paragraph that goes on in the next column was cut into (`ColumnBreak`): `text` is then the whole
+    /// paragraph's, translated once, and the block draws its share of the translation (`FlowSplit`).
+    var part: FlowPart?
 }
 
 /// What the pipelines call to read a picture. A facade over `RecognitionHost`: the Vision requests run in the reader services

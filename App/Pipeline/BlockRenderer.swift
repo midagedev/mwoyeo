@@ -47,7 +47,7 @@ enum BlockRenderer {
     }
 
     /// Background around the text (pixels) that an erased block takes in, for the glyph mask's ring.
-    static func eraseMargin(lineHeight: CGFloat) -> Int { max(3, Int(lineHeight * 0.18)) }
+    static func eraseMargin(lineHeight: CGFloat) -> Int { Territory.ring(lineHeight: lineHeight) }
 
     static func render(_ input: Input) -> Rendered? {
         let w = Int(input.size.width.rounded(.up)), h = Int(input.size.height.rounded(.up))

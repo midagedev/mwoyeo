@@ -12,7 +12,9 @@ A version is tagged only when what it promises is usable in the app, UI included
   with one click; "Forget learned" and "Start fresh".
 - **Language packs that never leave you stuck.** The first translation must not wait on a download that silently fails:
   a clear state, a retry, and what works meanwhile.
-- **Investigation:** can Mwoyeo run below macOS 26, and at what cost.
+- **Store page leads with live translation.** New name and subtitle ("Mwoyeo – 실시간 화면 번역", "Mwoyeo – Screen
+  Translator"), keywords, and a hero screenshot that shows the translation following a changing screen.
+- **Investigation (done):** macOS 15 is possible at size L, 14 is not; own track once a macOS 15 machine is available.
 
 ## 1.1.5 — reading what is hard to read
 

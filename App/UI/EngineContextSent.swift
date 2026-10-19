@@ -13,10 +13,11 @@ enum EngineContextSent {
 
     // MARK: the words
 
-    /// The words of the "Sent:" line, in the app's language. The fields come from `SentSummary`; an app's name and its category word are
-    /// already in the language.
+    /// The words of the "Sent:" line, in the app's language. The fields come from `SentSummary`; an app's name is the app's own, its
+    /// category (Core's id, `CategoryDomain.words`) goes through `category`.
     struct Words {
         var sent: (String) -> String
+        var category: (String) -> String
         var linesOnly: String
         var windowTitle: String
         var note: String
@@ -26,7 +27,7 @@ enum EngineContextSent {
         var after: (Int) -> String
 
         @MainActor static var current: Words {
-            Words(sent: { String(localized: "Sent: \($0)") }, linesOnly: String(localized: "lines only"),
+            Words(sent: { String(localized: "Sent: \($0)") }, category: { EngineContextSent.categoryWord($0) }, linesOnly: String(localized: "lines only"),
                   windowTitle: String(localized: "window title"), note: String(localized: "note"),
                   names: { String(localized: "up to \($0) names") }, namesLearned: { String(localized: "up to \($0) names (learned too)") },
                   before: { String(localized: "\($0) lines before") }, after: { String(localized: "\($0) lines after") })
@@ -37,7 +38,7 @@ enum EngineContextSent {
     /// in the order Core's English line (`SentSummary.text`) gives them; "lines only" when nothing but the lines to translate goes.
     static func said(_ summary: SentSummary, in words: Words) -> String {
         var parts: [String] = []
-        if let app = summary.appName { parts.append(summary.domain.map { "\(app) · \($0)" } ?? app) }
+        if let app = summary.appName { parts.append(summary.domain.map { "\(app) · \(words.category($0))" } ?? app) }
         if summary.windowTitle { parts.append(words.windowTitle) }
         if summary.hasNote { parts.append(words.note) }
         if summary.names > 0 { parts.append(summary.learned ? words.namesLearned(summary.names) : words.names(summary.names)) }
@@ -45,6 +46,42 @@ enum EngineContextSent {
         if summary.linesAfter > 0 { parts.append(words.after(summary.linesAfter)) }
         return words.sent(parts.isEmpty ? words.linesOnly : parts.joined(separator: " · "))
     }
+
+    /// The display word of a category id Core sends (the values of `CategoryDomain.words`), in the app's language; nil for an id this
+    /// version has no word for. Every id has its own `String(localized:)`, so the catalog sees each as a key.
+    static func knownCategoryWord(_ id: String) -> String? {
+        switch id {
+        case "books": return String(localized: "books", comment: "App category in the Sent: line")
+        case "business": return String(localized: "business", comment: "App category in the Sent: line")
+        case "design": return String(localized: "design", comment: "App category in the Sent: line")
+        case "dev": return String(localized: "dev", comment: "App category in the Sent: line (developer tools)")
+        case "education": return String(localized: "education", comment: "App category in the Sent: line")
+        case "entertainment": return String(localized: "entertainment", comment: "App category in the Sent: line")
+        case "finance": return String(localized: "finance", comment: "App category in the Sent: line")
+        case "food": return String(localized: "food", comment: "App category in the Sent: line (food and drink)")
+        case "games": return String(localized: "games", comment: "App category in the Sent: line")
+        case "health": return String(localized: "health", comment: "App category in the Sent: line (health and fitness)")
+        case "lifestyle": return String(localized: "lifestyle", comment: "App category in the Sent: line")
+        case "maps": return String(localized: "maps", comment: "App category in the Sent: line (navigation)")
+        case "medical": return String(localized: "medical", comment: "App category in the Sent: line")
+        case "music": return String(localized: "music", comment: "App category in the Sent: line")
+        case "news": return String(localized: "news", comment: "App category in the Sent: line")
+        case "photo": return String(localized: "photo", comment: "App category in the Sent: line (photography)")
+        case "productivity": return String(localized: "productivity", comment: "App category in the Sent: line")
+        case "reference": return String(localized: "reference", comment: "App category in the Sent: line")
+        case "shopping": return String(localized: "shopping", comment: "App category in the Sent: line")
+        case "social": return String(localized: "social", comment: "App category in the Sent: line (social networking)")
+        case "sports": return String(localized: "sports", comment: "App category in the Sent: line")
+        case "travel": return String(localized: "travel", comment: "App category in the Sent: line")
+        case "utilities": return String(localized: "utilities", comment: "App category in the Sent: line")
+        case "video": return String(localized: "video", comment: "App category in the Sent: line")
+        case "weather": return String(localized: "weather", comment: "App category in the Sent: line")
+        default: return nil
+        }
+    }
+
+    /// The category word of the line: the display word of a known id, an id with no word as it is.
+    static func categoryWord(_ id: String) -> String { knownCategoryWord(id) ?? id }
 
     // MARK: what the sheet asks
 
@@ -80,8 +117,8 @@ enum EngineContextSent {
         let template = EngineKind.httpTemplate(HTTPTemplate(url: "https://service.example.invalid/translate", resultPath: "text"))
         let on3 = EngineContext(enabled: true, previousLines: 3)
         let offKept = EngineContext(enabled: false, previousLines: 5, includeTitle: true, useLearned: true, deepLInstructions: true)
-        let words = Words(sent: { "S[\($0)]" }, linesOnly: "LO", windowTitle: "WT", note: "NOTE", names: { "N\($0)" }, namesLearned: { "L\($0)" },
-                          before: { "B\($0)" }, after: { "A\($0)" })
+        let words = Words(sent: { "S[\($0)]" }, category: { "C(\($0))" }, linesOnly: "LO", windowTitle: "WT", note: "NOTE", names: { "N\($0)" },
+                          namesLearned: { "L\($0)" }, before: { "B\($0)" }, after: { "A\($0)" })
         func engine(_ kind: EngineKind, _ context: EngineContext?) -> EngineConfig {
             var e = EngineConfig(name: "Sent check", kind: kind)
             e.context = context
@@ -98,7 +135,7 @@ enum EngineContextSent {
         check("Off says lines only, for every kind, whatever the other switches hold",
               [cloud, local, anthropic, deepL].allSatisfy { marked($0, nil) == "S[LO]" && marked($0, offKept) == "S[LO]" }, marked(cloud, offKept))
         check("On says the sample app and its category, the lines before and the lines after",
-              marked(cloud, on3) == "S[Example Chat · social · B3 · A2]" && marked(anthropic, EngineContext(enabled: true, previousLines: 0)) == "S[Example Chat · social · B2 · A2]",
+              marked(cloud, on3) == "S[Example Chat · C(social) · B3 · A2]" && marked(anthropic, EngineContext(enabled: true, previousLines: 0)) == "S[Example Chat · C(social) · B2 · A2]",
               "\(marked(cloud, on3)) | \(marked(anthropic, EngineContext(enabled: true, previousLines: 0)))")
         check("the window title is in the line only where the request would carry it: the local server always, a cloud engine on opt-in",
               marked(local, on3).contains("WT") && !marked(cloud, on3).contains("WT") && !marked(deepL, on3).contains("WT")
@@ -108,9 +145,22 @@ enum EngineContextSent {
         var learned = full
         learned.learned = true
         check("every field of a summary has its word, in the order of Core's English line, and the line says only the fields that are set",
-              said(full, in: words) == "S[Mail · email · WT · NOTE · N3 · B4 · A2]" && said(learned, in: words) == "S[Mail · email · WT · NOTE · L3 · B4 · A2]"
+              said(full, in: words) == "S[Mail · C(email) · WT · NOTE · N3 · B4 · A2]" && said(learned, in: words) == "S[Mail · C(email) · WT · NOTE · L3 · B4 · A2]"
               && said(SentSummary(mode: .memoryOnly, appName: "Mail", hasNote: true), in: words) == "S[Mail · NOTE]"
               && said(SentSummary(mode: .linesOnly), in: words) == "S[LO]")
+
+        // The category word: Core's ids go through the app's language, in every language the app ships.
+        let ids = Set(CategoryDomain.words.values)
+        let unknown = ids.filter { knownCategoryWord($0) == nil }.sorted()
+        check("every category id Core can send has a display word here, and an id nobody knows is shown as it is",
+              !ids.isEmpty && unknown.isEmpty && categoryWord("email") == "email" && knownCategoryWord("email") == nil, "no word for \(unknown)")
+        let languages = Bundle.main.localizations.filter { $0 != "en" && $0 != "Base" }
+        let missing = languages.flatMap { language -> [String] in
+            guard let path = Bundle.main.path(forResource: language, ofType: "lproj"), let table = Bundle(path: path) else { return [language] }
+            return ids.sorted().filter { table.localizedString(forKey: $0, value: "\u{1}", table: nil) == "\u{1}" }.map { "\(language):\($0)" }
+        }
+        check("every language the app ships has a word for every category id, a copy to review at least", !languages.isEmpty && missing.isEmpty,
+              "missing \(missing) of \(languages)")
 
         // The line and the footnote of the sheet.
         let lineOff = line(for: engine(cloud, nil), in: model)

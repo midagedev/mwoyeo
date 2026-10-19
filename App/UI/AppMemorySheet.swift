@@ -161,7 +161,7 @@ struct AppMemorySheet: View {
                 .font(.caption).foregroundStyle(.secondary)
             // What the engine in effect is sent, by the request path's own rule; never cut, it wraps.
             VStack(alignment: .leading, spacing: 4) {
-                Text(AppMemorySent.line(editor.sent))
+                Text(EngineContextSent.said(editor.sent, in: .current))
                     .font(.callout)
                     .fixedSize(horizontal: false, vertical: true)
                     .textSelection(.enabled)
@@ -320,21 +320,6 @@ private struct NameRow: View {
                     .buttonStyle(.borderless)
             }
         }
-    }
-}
-
-/// The words of the "Sent:" line in the app's language, built from the fields of `SentSummary` the way the engine sheet builds its own
-/// (the same keys, so the two read alike).
-enum AppMemorySent {
-    static func line(_ s: SentSummary) -> String {
-        var parts: [String] = []
-        if let app = s.appName { parts.append(s.domain.map { "\(app) · \($0)" } ?? app) }
-        if s.windowTitle { parts.append(String(localized: "window title")) }
-        if s.hasNote { parts.append(String(localized: "note")) }
-        if s.names > 0 { parts.append(s.learned ? String(localized: "up to \(s.names) names (learned too)") : String(localized: "up to \(s.names) names")) }
-        if s.linesBefore > 0 { parts.append(String(localized: "\(s.linesBefore) lines before")) }
-        if s.linesAfter > 0 { parts.append(String(localized: "\(s.linesAfter) lines after")) }
-        return String(localized: "Sent: \(parts.isEmpty ? String(localized: "lines only") : parts.joined(separator: " · "))")
     }
 }
 

@@ -246,12 +246,12 @@ block keep   before P 0.90 [0.74,0.96]  R 0.59 [0.44,0.72]  (tp 26 fp 3 fn 18)	t
 after  P 0.90 [0.74,0.96]  R 0.59 [0.44,0.72]  (tp 26 fp 3 fn 18)	tools/keep-labels/RESULTS-code-region-2026-10-19.txt:250	6 measure	paper hold after: unchanged
 pure-translate case blocks (read doc, dev + hold-out): 44; fired by the region (and translated today): 1  k07-algorithm-en-doc-6	tools/keep-labels/RESULTS-code-region-2026-10-19.txt:285	6 measure	one of 44 pure-translation case blocks fired
 FALSE FIRE k07-algorithm-en-doc-6 truth translate code: d + top(l¡) - bottom(lj-1) D vertical gap	tools/keep-labels/RESULTS-code-region-2026-10-19.txt:258	6 measure	the false fire is a line of an algorithm figure
-The runner forms batches of at most 3 new lines per screen in reading order	tools/translation-bench/README.md:53	6 measure	batches of at most three new lines
-A comparison needs at least 250 probes; the corpus has 312.	tools/translation-bench/README.md:239	6 measure	the corpus has 312 probes
-calibration items (the same text twice: the judge must say tie in both orders)	tools/translation-bench/README.md:248	6 measure	the judge sends calibration items that must tie in both orders
-counts only items on which both orders agree	tools/translation-bench/README.md:249	6 measure	only pairs on which both orders agree are counted
-It never calls a judge	tools/translation-bench/README.md:250	6 measure	no judge verdict is produced by the repository's scripts
-A context default chosen without measurement	tools/translation-bench/README.md:271	6 measure	the bench blocks a context default chosen without measurement
+The runner forms batches of at most 3 new lines per screen in reading order	tools/translation-bench/README.md:56	6 measure	batches of at most three new lines
+A comparison needs at least 250 probes; the corpus has 312.	tools/translation-bench/README.md:278	6 measure	the corpus has 312 probes
+calibration items (the same text twice: the judge must say tie in both orders)	tools/translation-bench/README.md:296	6 measure	the judge sends calibration items that must tie in both orders
+counts only items on which both orders agree	tools/translation-bench/README.md:297	6 measure	only pairs on which both orders agree are counted
+It never calls a judge	tools/translation-bench/README.md:298	6 measure	no judge verdict is produced by the repository's scripts
+A context default chosen without measurement	tools/translation-bench/README.md:319	6 measure	the bench blocks a context default chosen without measurement
 "probes 312: 80 correct = 25.6%",	tools/translation-bench/runs/A-gemma3-4b/MANIFEST.json:137	6 measure	condition A: 80 of 312
 "  by evidence: memory 19/126 15.1%  lines 26/133 19.5%  none 35/53 66.0%",	tools/translation-bench/runs/A-gemma3-4b/MANIFEST.json:138	6 measure	condition A by evidence
 "probes 312: 80 correct = 25.6%",	tools/translation-bench/runs/A-gemma3-4b-r2/MANIFEST.json:138	6 measure	a second run of A gives the same 80 of 312

@@ -8,6 +8,7 @@
 #   MWOYEO_MAS_IDENTITY   "Apple Distribution: Name (TEAMID)"
 #   MWOYEO_MAS_PROFILE    the name of the Mac App Store provisioning profile of dev.midagedev.mwoyeo.appstore
 #   MWOYEO_MAS_INSTALLER  optional, the installer certificate (default "3rd Party Mac Developer Installer")
+#   MWOYEO_MAS_VERSION    optional, the version (default: the newest v* tag, as the GitHub release takes it from its tag)
 #   xcodegen
 set -euo pipefail
 
@@ -18,6 +19,7 @@ IDENTITY=${MWOYEO_MAS_IDENTITY:?set MWOYEO_MAS_IDENTITY to your Apple Distributi
 PROFILE=${MWOYEO_MAS_PROFILE:?set MWOYEO_MAS_PROFILE to the name of the Mac App Store provisioning profile}
 INSTALLER=${MWOYEO_MAS_INSTALLER:-3rd Party Mac Developer Installer}
 TEAM=${IDENTITY##*\(}; TEAM=${TEAM%\)}
+VERSION=${MWOYEO_MAS_VERSION:-$(git -C "${0:A:h:h}" describe --tags --abbrev=0 --match 'v*')}; VERSION=${VERSION#v}
 [[ "$TEAM" != "$IDENTITY" && -n "$TEAM" ]] || { echo "MWOYEO_MAS_IDENTITY must end in the team id: \"Apple Distribution: Name (TEAMID)\"" >&2; exit 1; }
 
 cd "$ROOT"
@@ -28,7 +30,7 @@ rm -rf "$OUT"; mkdir -p "$OUT"
 xcodegen generate >/dev/null
 xcodebuild -project Mwoyeo.xcodeproj -scheme Mwoyeo-MAS -configuration MAS -destination 'generic/platform=macOS' \
   -archivePath "$OUT/Mwoyeo.xcarchive" -derivedDataPath "$OUT/dd" \
-  CURRENT_PROJECT_VERSION="$(git rev-list --count HEAD)" \
+  MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$(git rev-list --count HEAD)" \
   MWOYEO_SIGN_IDENTITY="$IDENTITY" MWOYEO_TEAM="$TEAM" MWOYEO_PROFILE="$PROFILE" \
   archive > "$OUT/archive.log" 2>&1 || { tail -30 "$OUT/archive.log"; exit 1; }
 APP=$OUT/Mwoyeo.xcarchive/Products/Applications/Mwoyeo.app

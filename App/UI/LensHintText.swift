@@ -13,6 +13,7 @@ enum LensHintText {
         case let .pairNotSupported(pair): notSupported(pair)
         case .preparingRecognition: String(localized: "Preparing text recognition — first time only")
         case .recognitionNotResponding: String(localized: "Text recognition isn’t responding")
+        case .recognitionNeedsDiskSpace: String(localized: "Not enough free space for text recognition")
         case let .translationNotAnswering(engine, _): String(localized: "Translation isn’t answering (\(engine))")
         case let .translationSlow(engine): String(localized: "Translation is slow (\(engine)) — retrying")
         case let .alreadyInTarget(target): String(localized: "Already in \(Languages.name(target))")

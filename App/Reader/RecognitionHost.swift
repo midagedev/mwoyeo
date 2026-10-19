@@ -286,6 +286,7 @@ actor RecognitionHost {
         var core = ReaderHostCore(timing: Self.timing, path: Self.ocrPath)
         let desk = desk
         core.pack = { desk.pack($0) }
+        core.freeSpace = { HomeVolume.freeBytes() }
         self.core = core
         for role in WorkerRole.allCases {
             // The stream exists before anything is sent: a late listener missed events in R1's first fakes run.
@@ -579,6 +580,9 @@ actor RecognitionHost {
                 + "dispatched=\(s.dispatched.values.reduce(0, +)) answered=\(s.answered.values.reduce(0, +)) failed=\(s.failed.values.reduce(0, +)) "
                 + "suspects=\(s.suspects) stuck=\(s.stuck) crashes=\(s.crashes) recycles=\(s.recycles)"
             if role == .docs { line += " slow-streak=\(core.rest.streak)" }
+            line += " free=\(h.freeBytes.map { "\(mb($0)) MB" } ?? "-") compile-fails=\(h.compileFailuresInWindow) "
+                + "last-compile-fail=\(h.lastCompileFailure.map { String(format: "%.0f", $0) } ?? "-") "
+                + "rest-until=\(h.restUntil.map { String(format: "%.0f", $0) } ?? "-") nospace=\(h.lacksDiskSpace)"
             out.append(line)
             out.append("reader: \(role.rawValue) footprint=\(mb(lastFootprint[role] ?? 0)) MB gui=\(mb(ReaderWire.physFootprint())) MB "
                 + "last-ms=\(Int((lastServiceMs[role] ?? 0).rounded())) ms=\((readMs[role] ?? []).map(String.init).joined(separator: ","))")
@@ -589,6 +593,16 @@ actor RecognitionHost {
             + "dropped=\(core.scheduler.dropped.map { "\($0.key.rawValue):\($0.value)" }.sorted().joined(separator: ","))")
         if Self.showsRing { out += core.ring.map { "reader: ring \($0)" } }
         return out
+    }
+}
+
+/// The free space the compiler can use: the home volume's raw available capacity, not the "for important usage" figure (which counts
+/// purgeable space as free): the compiler service is a root daemon whose `F_PREALLOCATE` does not purge anything. A sandboxed app reads
+/// the attributes of its own container's volume without an entitlement. Nil when it cannot be read.
+enum HomeVolume {
+    static func freeBytes() -> UInt64? {
+        let values = try? URL(fileURLWithPath: NSHomeDirectory()).resourceValues(forKeys: [.volumeAvailableCapacityKey])
+        return values?.volumeAvailableCapacity.flatMap { UInt64(exactly: $0) }
     }
 }
 

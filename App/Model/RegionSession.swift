@@ -528,6 +528,7 @@ final class RegionSession {
         case .pairNotSupported: "pair-not-supported"
         case .preparingRecognition: "preparing"
         case .recognitionNotResponding: "not-responding"
+        case .recognitionNeedsDiskSpace: "disk-space"
         case .translationNotAnswering: "translation-failing"
         case .translationSlow: "translation-slow"
         case .alreadyInTarget: "already"
@@ -543,6 +544,7 @@ final class RegionSession {
         case let .downloadPack(pair)?: model.downloadPack(pair)
         case .openTranslationSettings?: model.openSettings(on: .translation)
         case .chooseLanguages?: model.openSettings(on: .general)
+        case .openStorageSettings?: model.openStorageSettings()
         case nil: break
         }
     }

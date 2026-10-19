@@ -300,6 +300,11 @@ final class AppModel {
         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
     }
 
+    /// System Settings on General › Storage, where the person frees space (the pane's id is the bundle id of Storage.appex).
+    func openStorageSettings() {
+        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.settings.Storage")!)
+    }
+
     /// The grant came or went while the app ran. After a grant, saved lenses that could not start do now (until now they
     /// stayed dead until the next launch), and a lens whose capture was refused tries once more: if this process cannot use
     /// the grant yet, the lens says to restart.

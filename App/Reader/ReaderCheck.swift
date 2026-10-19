@@ -183,6 +183,15 @@ enum ReaderCheck {
         note("lines-e5rt is what OCRHealth classifies", a.error.map { OCRHealth.programsNotReady($0) } ?? false)
         note("an e5rt job is not an answer", c.lines.count == local.lines.count && compare(local, .lines(c.lines.map(VisionExec.unwire))).same)
 
+        // lines-nospace:2 — the first two newest-model jobs fail like a Mac short of disk space (the compile throws, Code 11): a type of
+        // their own, which the health rules still treat as a transient of the pass; the third reads.
+        let nospace = ReaderConnection(role: .lines, fakes: ReaderFakePlan("lines-nospace:2"))
+        let d = await nospace.perform(job(), surface: packed.surface), e = await nospace.perform(job(), surface: packed.surface)
+        let f = await nospace.perform(job(), surface: packed.surface)
+        let compile: (ReadReply) -> Bool = { r in if case .compileFailed? = r.error { true } else { false } }
+        note("lines-nospace:2", compile(d) && compile(e) && f.error == nil, "jobs: \(d.error.map { "\($0)".prefix(24) } ?? "none") / \(e.error.map { "\($0)".prefix(24) } ?? "none") / \(f.error == nil ? "read" : "error")")
+        note("lines-nospace is its own case, still a transient of the pass", d.error.map { OCRHealth.passFailureIsTransient($0) && $0.isCompileFailed && $0.isModelNotReady } ?? false)
+
         // lines-slow / docs-slow — the answer is late, not different.
         let slowLines = ReaderConnection(role: .lines, fakes: ReaderFakePlan("lines-slow:400"))
         let t1 = Date()

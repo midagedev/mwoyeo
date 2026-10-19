@@ -737,6 +737,7 @@ extension SelfTest {
         check("a lens silent to the exit measures the whole run", abs(always.longest - 2.05) < 1e-9 && always.longest == always.total)
         check("no hint is none", hintName(nil) == "none")
         check("a hint without a payload", hintName(.preparingRecognition) == "preparingRecognition")
+        check("the disk hint keeps its case name", hintName(.recognitionNeedsDiskSpace) == "recognitionNeedsDiskSpace")
         check("a hint with a payload loses it", hintName(.alreadyInTarget(target: "ko")) == "alreadyInTarget"
               && hintName(.downloadPack(PackPair(source: "ja", target: "ko"))) == "downloadPack")
         check("the translation hints keep their case names", hintName(.translationSlow(engine: "Apple")) == "translationSlow"

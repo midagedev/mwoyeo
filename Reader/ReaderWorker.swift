@@ -52,7 +52,7 @@ final class ReaderWorker: NSObject, ReaderXPC {
         if job.fake.contains(.crash) { exit(1) }
         guard role.serves(job.kind) else { return reply(job.id, error: .badJob("\(role.rawValue) does not run \(job.kind.rawValue)")) }
         for case let .slow(ms) in job.fake { Thread.sleep(forTimeInterval: Double(ms) / 1000) }
-        if job.fake.contains(.e5rt) { return reply(job.id, error: .programsNotReady(ReaderFakeAction.e5rtDescription)) }
+        if let failure = job.fake.lazy.compactMap(\.failure).first { return reply(job.id, error: failure) }
 
         var image: CGImage?
         if job.kind.needsPicture {

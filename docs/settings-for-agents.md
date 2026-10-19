@@ -60,7 +60,18 @@ An unknown key is reported with the closest known one and is ignored. A list ove
 
 ## Per-app memory
 
-Inside `appProfiles`, a profile can carry a note for the translator, names and terms, and a context override. All of these fields are optional. A profile still needs `bundleID`, `source` and `target`. The app uses them to translate while context is on for that app (the engine's `context` below, or this profile's own `context`); with context off, a request carries none of them.
+Inside `appProfiles`, a profile can carry a note for the translator, names and terms, and a context override. All of these fields are optional. A profile still needs `bundleID`, `source` and `target`.
+
+What a request to an added engine (an OpenAI-compatible server or Anthropic) carries from them:
+
+| The app has | The engine's `context` | The app's `context.mode` | The request carries |
+|---|---|---|---|
+| nothing written | off | left out | the lines to translate, as always |
+| a `note` or `entries` | off | left out, `nearby` or `conversation` unset | the **memory only**: the app's name and category, the note, and the names whose `src` is in the text. No screen lines, no earlier lines, no window title. |
+| anything | on, or the app says `nearby` or `conversation` | | all of the above, and the lines around the text on screen (`nearby`: the two lines above and the two below; `conversation`: also the last `previousLines` lines read) |
+| anything | any | `off` | the lines to translate, as always. `off` turns the memory off too. |
+
+Writing a `note` or `entries` is the opt-in for the memory-only request. DeepL, an HTTP template, a command engine and Apple Translation get nothing from it (DeepL takes the memory only through its own `context.deepLInstructions`; Apple follows `appleUsesPinnedTerms`).
 
 ```json
 {
@@ -101,7 +112,7 @@ Inside `appProfiles`, a profile can carry a note for the translator, names and t
 | `context.mode` | `off`, `nearby` or `conversation`; required when `context` is there |
 | `context.previousLines` | whole number, 0 to 8; left out, 3 |
 
-`context` is how much surrounding text goes along with each line of that app. Left out, the app follows the default, which is off. `previousLines` counts only in `conversation` mode.
+`context` is how much surrounding text goes along with each line of that app. Left out, the app follows the default, which is off. `previousLines` counts only in `conversation` mode. `nearby` sends the lines right above and below the text on screen (two each), and no lines read before.
 
 ## Context for an engine
 
@@ -139,9 +150,31 @@ A second global key, `appleUsesPinnedTerms` (`true` or `false`), lets Apple Tran
 
 The app keeps and checks these keys. With context off, which is the default, a request is exactly the one earlier versions sent.
 
-## What is never in the file
+## The learned names, as a file to read
 
-- **Learned entries.** Terms the app picks up while translating live in memory only. A term is in the file only as a row of `appProfiles[].entries`, which you or the user wrote.
+Terms the app picks up while translating (`context.useLearned`) live in memory. While `savesTranscripts` is `true` the app also writes the ones it uses to one file per app, beside the translation log:
+
+```
+<exportFolder>/Memory/<bundle id>.json
+```
+
+```json
+{
+  "about": "Names and terms Mwoyeo learned while translating in this app ...",
+  "app": "com.example.chat",
+  "appName": "Example Chat",
+  "rows": [{ "dst": "Tanaka", "gender": "m", "kind": "person", "src": "田中" }],
+  "updated": "2026-10-19T12:34:56Z"
+}
+```
+
+- There is no setting for it: it is part of what `savesTranscripts` saves. Off, nothing is written; a file already there stays.
+- A row is a pair (`src`, `dst`) with its `kind` and `gender`. There are no sentences, no window titles and no counts.
+- The app writes it at most once every 5 seconds per app, and never reads it back. To keep a row, add it to `appProfiles[].entries` (or press Pin in the app's Memory sheet).
+
+## What is never in settings.json
+
+- **Learned entries.** Terms the app picks up while translating live in memory only (and in the file above while `savesTranscripts` is on). A term is in settings.json only as a row of `appProfiles[].entries`, which you or the user wrote.
 - **Referents** (who "he" is in the current document) and **screen text**. They belong to one document and one session, so they are never saved.
 - **API keys.** They stay in the Keychain. An engine in `engines` has no key field; a header that must carry the key holds the placeholder `{{key}}`.
 - **Run-time state** such as engine rejections and the onboarding flag.

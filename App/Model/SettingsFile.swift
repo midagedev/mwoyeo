@@ -56,13 +56,13 @@ struct SettingSpec {
               doc: "Global keyboard shortcuts by action name; an action left out has no shortcut. Each has a Carbon keyCode, a Carbon modifiers mask and a display text. Easier to set in Settings > Shortcuts."),
         .init(key: "checksForUpdates", kind: .bool, doc: "Ask GitHub once a day whether a newer version is out."),
         .init(key: "savesTranscripts", kind: .bool,
-              doc: "Translation log: every lens writes what it read and its translation to <exportFolder>/Transcripts (Markdown and SRT, see transcriptFormats) while this is true."),
+              doc: "Translation log: every lens writes what it read and its translation to <exportFolder>/Transcripts (Markdown and SRT, see transcriptFormats) while this is true. The names and terms the app learned for an app (engines[].context.useLearned) are written to <exportFolder>/Memory/<bundle id>.json while this is true; the file is never read back."),
         .init(key: "exportFolder", kind: .string,
-              doc: "Folder of the translation log (its Transcripts folder, while savesTranscripts is true) and of saved lens images. The App Store version shows the folder chosen in Settings; a path typed here does not open one there."),
+              doc: "Folder of the translation log (its Transcripts folder, while savesTranscripts is true), of the learned names (its Memory folder, same condition) and of saved lens images. The App Store version shows the folder chosen in Settings; a path typed here does not open one there."),
         .init(key: "transcriptFormats", kind: .choiceList(TranscriptFileFormat.allCases.map(\.rawValue)),
               doc: "Files of the translation log: markdown, srt, and jsonl (one JSON line per translated line with time, lens, app, source, target, engine, original and translation, added as it happens so tail -f works)."),
         .init(key: "appProfiles", kind: .appProfiles,
-              doc: "Languages, engine and paragraph reader remembered per app; the app in front decides which applies. Easier to set from a lens's menu. A profile can also carry a note for the translator, names and terms with their translations, and a context override for that app; the app uses them to translate while context is on for that app.",
+              doc: "Languages, engine and paragraph reader remembered per app; the app in front decides which applies. Easier to set from a lens's menu. A profile can also carry a note for the translator, names and terms with their translations, and a context override for that app. Writing a note or names is enough: an added engine (OpenAI-compatible or Anthropic) is sent the app's name and category, the note and the names that occur in the text, even when its own context is off; no screen lines and no window title go with them. A context mode of off turns that off too.",
               examples: SettingExamples.appProfiles),
         .init(key: "paragraphReader", kind: .choice(ParagraphReader.allCases.map(\.rawValue)),
               doc: "How text is cut into paragraphs: automatic, documentLayout (the macOS document model) or lineGrouping (the app's own line rules)."),
@@ -216,12 +216,12 @@ extension FieldKind {
                   "Names and terms of this app with their translations, up to \(AppProfile.maxEntries) rows. A bad row is reported and dropped; the rest apply. A second row with the same src is left out."),
         FieldSpec("context", .object([
             FieldSpec("mode", .choice(AppContextOverride.Mode.allCases.map(\.rawValue)),
-                      "How much surrounding text goes along with each line: off (none), nearby (the lines around it on screen) or conversation (also the lines read before).",
+                      "How much surrounding text goes along with each line: off (none, and the app's note and names are not sent either), nearby (the two lines above it and the two below it on screen) or conversation (also the lines read before).",
                       required: true, example: "nearby"),
             FieldSpec("previousLines", .integer(0...AppContextOverride.maxPreviousLines),
                       "How many earlier lines go along in conversation mode, 0 to \(AppContextOverride.maxPreviousLines).",
                       example: 3, default: AppContextOverride.defaultPreviousLines),
-        ]), "Context for this app's translations. Left out, the app follows the default, which is off."),
+        ]), "Context for this app's translations. Left out, the app follows the engine's own context switch, which is off by default; a note or names written for the app are still sent (the app's name, the note and the names in the text, nothing from the screen). off sends nothing but the lines."),
     ]))
 }
 

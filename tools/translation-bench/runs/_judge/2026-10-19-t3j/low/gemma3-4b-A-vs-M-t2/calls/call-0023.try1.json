@@ -1,0 +1,31 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0374.2",
+  "item-0076.1",
+  "item-0189.2",
+  "item-0067.1",
+  "item-0302.2",
+  "item-0370.2",
+  "item-0360.2",
+  "item-0319.2",
+  "item-0033.2",
+  "item-0318.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "265e124c-4ac0-41ec-93b0-1f3facedd076",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"소장 translates 所長 correctly, unlike 선장 (captain).\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both mistranslate 'should we invite' as 'will he come'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Properly uses the specified name 저우 이모 and 해요체 speech level.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Both translations are completely accurate and natural.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"1 mistranslates 'us' and sounds like a request to Rory.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly romanizes Takanashi (たかなし), whereas 1 invents Otani.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Rent is 집세 (not deposit), and correctly keeps term 카운슬 택스.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"1 left the text in Japanese without translating.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Akira told Hikaru not to use inspector/警部.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both completely mistranslate 'quit saluting me' and mistranscribe Dex.\"}\n]\n```\n",
+  "duration_seconds": 4.867109,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17347,
+   "output_tokens": 337,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17684
+  }
+ }
+}

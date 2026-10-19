@@ -1,0 +1,31 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0379.1",
+  "item-0349.1",
+  "item-0109.2",
+  "item-0382.2",
+  "item-0369.2",
+  "item-0216.2",
+  "item-0230.2",
+  "item-0008.1",
+  "item-0035.2",
+  "item-0103.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "781711d4-6bde-4947-88c2-e10fa02bd34d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"The person with the letter is Shan Yunzhou (male, 'his sleeve').\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and appropriately use informal 반말.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"In Git version control terminology, 'branch' is standardly translated as 브랜치.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"More natural phrasing and appropriate polite speech level (해요체/하십시오체).\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'Morning both' is naturally translated, and uses proper 해요체 register.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses the specified term 'fleet allocation' and omits incorrect literal 'guide'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translates 蓑衣 to raincoat, unlike translation 1.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both appropriately use natural 해요체 endings for Yu's speech.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Uses standard Korean number formatting and polite speech level properly.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both capture the meaning and style of the software manual well.\"}\n]\n```\n",
+  "duration_seconds": 5.722127,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17168,
+   "output_tokens": 335,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17503
+  }
+ }
+}

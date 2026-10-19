@@ -1,0 +1,27 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0346.2",
+  "item-0379.1",
+  "item-0206.1",
+  "item-0269.2",
+  "item-0238.1",
+  "item-0354.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "bee05f68-e7db-464b-9e8c-72d6459574f4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 adheres to the specified term 'Bureau' for 事務所.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly uses female pronouns instead of referring to her as 'it'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly uses informal banmal when Siobhan speaks to Rory.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 18.818031,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16331,
+   "output_tokens": 2556,
+   "thinking_tokens": 2354,
+   "cache_read_tokens": 0,
+   "total_tokens": 18887
+  }
+ }
+}

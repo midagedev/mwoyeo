@@ -1,0 +1,31 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0370.2",
+  "item-0141.1",
+  "item-0077.1",
+  "item-0019.2",
+  "item-0373.1",
+  "item-0337.1",
+  "item-0220.1",
+  "item-0190.2",
+  "item-0004.1",
+  "item-0254.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2bd3a10f-9ce7-4619-8656-0528448fa571",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Gareth speaks to tenants in 해요체, so 점검해요 matches the facts.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"별 좋아 naturally conveys 星いいね in casual spoken Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Kaoru speaks to Inspector Akira politely using the Japanese honorific -san.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"우리 버전 naturally contrasts with Aoife의 버전 in technical documentation.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"제럴드는 transliterates Gerald into Korean consistently with the dialogue.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"도움이 됩니다 accurately reflects present relief in 합쇼체 without awkward future tense.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Thorne speaks to Rook in 해요체, which Translation 1 uses.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Spoken to Zhou Yi in 해요체 rather than awkward written 반말.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Hikaru is female according to the facts, so 'he' is incorrect.\"}\n]\n```\n",
+  "duration_seconds": 5.196762,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17236,
+   "output_tokens": 329,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17565
+  }
+ }
+}

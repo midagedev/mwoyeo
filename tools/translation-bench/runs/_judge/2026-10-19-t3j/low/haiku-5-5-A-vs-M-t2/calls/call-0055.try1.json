@@ -1,0 +1,31 @@
+{
+ "call": 55,
+ "try": 1,
+ "ids": [
+  "item-0214.1",
+  "item-0379.2",
+  "item-0060.1",
+  "item-0327.2",
+  "item-0042.1",
+  "item-0037.2",
+  "item-0007.1",
+  "item-0195.1",
+  "item-0196.2",
+  "item-0008.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "810ed9a0-51ab-4423-83bd-895d19b570a0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both incorrectly use polite/formal speech instead of specified 반말.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both correctly use 합쇼체; native vs Arabic numerals are equally natural.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses required term 'qi stone' and translates 三成 as 'Three parts'.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both capture meaning identically well; article difference is minor.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Fully translates into English, whereas Translation 2 left Korean untranslated.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately render the Japanese present/future tense.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 uses natural phrasing; Translation 2 incorrectly uses '~께 약속을 잡다'.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both convey meaning accurately and naturally in Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correctly uses 해요체 speech level to 周婷, unlike Translation 1's 반말.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Thorne speaks to Rook in 해요체; Translation 2 uses 반말.\"}\n]\n```\n",
+  "duration_seconds": 5.056138,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17489,
+   "output_tokens": 341,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17830
+  }
+ }
+}

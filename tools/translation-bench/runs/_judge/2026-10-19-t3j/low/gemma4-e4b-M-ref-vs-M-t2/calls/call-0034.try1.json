@@ -1,0 +1,31 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0163.1",
+  "item-0051.2",
+  "item-0065.1",
+  "item-0104.2",
+  "item-0084.2",
+  "item-0062.2",
+  "item-0195.2",
+  "item-0114.1",
+  "item-0198.1",
+  "item-0088.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "55227d13-3bc8-41bd-9b00-5120adf27ee4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations accurately convey the question with polite register.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 mistakes Nagi for the speaker instead of third person.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both '네' and '예' are natural and follow hapsho-che.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'세 명 기준' sounds more natural and clear in Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly uses indefinite articles and natural phrasing for definitions.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 translates the mention tag properly into Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 inverts the meaning of '誰にも負けない' (second to none).\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated in Chinese.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both '조종실' and '조타실' are valid translations for spaceship bridge.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both express the question naturally using appropriate honorifics.\"}\n]\n```\n",
+  "duration_seconds": 5.754226,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17399,
+   "output_tokens": 329,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17728
+  }
+ }
+}

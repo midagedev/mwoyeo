@@ -1,0 +1,31 @@
+{
+ "call": 53,
+ "try": 1,
+ "ids": [
+  "item-0107.2",
+  "item-0312.2",
+  "item-0039.1",
+  "item-0038.2",
+  "item-0291.1",
+  "item-0152.2",
+  "item-0169.1",
+  "item-0005.2",
+  "item-0133.1",
+  "item-0227.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9c7455f2-a0dc-46ca-a198-1fbf4c8a96ff",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Mina speaks in banmal to both group chat members.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Sogoh speaks to Hyuga using haeyo-che.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations accurately convey the meaning of the line.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the line into Korean.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both sentence case and title case are acceptable for title translation.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 incorrectly translates a statement about oneself as an imperative.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"The speaker tells Seoyoon to rest, not both of them.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 captures the explanatory nuance of '이사하는데'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 misspells Tessai's name and adds an unnecessary speaker prefix.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'聞こう' means 'Let's hear it / Tell me', not 'Listen'.\"}\n]\n```\n",
+  "duration_seconds": 5.670451,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5297,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11811,
+   "total_tokens": 5621
+  }
+ }
+}

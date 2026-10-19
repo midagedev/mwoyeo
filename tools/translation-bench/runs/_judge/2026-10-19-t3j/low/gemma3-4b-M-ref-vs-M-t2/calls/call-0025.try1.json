@@ -1,0 +1,31 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0352.2",
+  "item-0172.2",
+  "item-0281.2",
+  "item-0068.2",
+  "item-0276.1",
+  "item-0360.1",
+  "item-0092.2",
+  "item-0377.1",
+  "item-0159.1",
+  "item-0318.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "59a6f88c-629b-462b-b912-034e5859e39c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"1 leaves kanji untranslated and mistakes uncle for aunt.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"1 addresses the captain correctly and uses proper terminology.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"1 is completely untranslated Japanese.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the meaning similarly, though both misinterpret気をつけます.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"2 uses the correct name '저우 이모' matching facts.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"1 translates into Korean without leaving Chinese characters untranslated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"1 correctly transliterates '메리골드' and matches Thorne's 반말 to Dex.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"1 correctly translates 寿星 as 생일 주인공 and uses 해요체.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"2 is completely untranslated Chinese; 1 at least partially translates.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"2 explains ours/theirs branches more naturally in Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.85747,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17479,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17803
+  }
+ }
+}

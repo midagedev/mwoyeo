@@ -1,0 +1,27 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0171.2",
+  "item-0130.1",
+  "item-0041.1",
+  "item-0139.2",
+  "item-0086.2",
+  "item-0166.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6a0e902a-849f-4f2e-a86d-98dfa174a058",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"海 refers to the character 카이, not the sea.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Notes is standard and more natural than memos for note apps.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and use appropriate polite speech.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 쉬눠 and translates 房子 as 숙소.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 follows the specified name 텟사이 without unwanted kanji.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 flows more naturally by connecting clauses with -이고.\"}\n]\n```\n",
+  "duration_seconds": 28.226802,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16168,
+   "output_tokens": 3332,
+   "thinking_tokens": 3135,
+   "cache_read_tokens": 0,
+   "total_tokens": 19500
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0207.1",
+  "item-0236.2",
+  "item-0047.1",
+  "item-0088.2",
+  "item-0107.1",
+  "item-0002.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "60dd0dc8-5ae0-4b36-a75d-c8d536da6cc7",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"선생님 is far more appropriate than 아주머니 for a coworker.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly uses informal speech (반말) matching the required speech level.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 uses Dan; Translation 2 incorrectly uses Duan.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Faithfully translates the line and correctly uses informal speech (반말).\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Follows the required term 마정석 specified in the facts.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Follows the required term 포켓 깃 from the facts.\"}\n]\n",
+  "duration_seconds": 37.455341,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16080,
+   "output_tokens": 4123,
+   "thinking_tokens": 3928,
+   "cache_read_tokens": 0,
+   "total_tokens": 20203
+  }
+ }
+}

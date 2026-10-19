@@ -1,0 +1,27 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0319.2",
+  "item-0259.2",
+  "item-0252.1",
+  "item-0168.1",
+  "item-0001.2",
+  "item-0292.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b064bb16-8fe2-42d6-b393-7df624f985f8",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the name Rook to 루크.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 uses the specified term 수호막 for 結界.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 reads more naturally for granting permission in Korean.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural in English.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"품의를 올리다 is the standard Korean idiom for 稟議を回す.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 as required by the facts.\"}\n]\n",
+  "duration_seconds": 77.727605,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16070,
+   "output_tokens": 9378,
+   "thinking_tokens": 9185,
+   "cache_read_tokens": 0,
+   "total_tokens": 25448
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 61,
+ "try": 1,
+ "ids": [
+  "item-0256.2",
+  "item-0151.2",
+  "item-0120.2",
+  "item-0266.2",
+  "item-0101.1",
+  "item-0303.2",
+  "item-0226.2",
+  "item-0168.1",
+  "item-0238.2",
+  "item-0016.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "933a8644-1d28-46b1-93ba-c12d625d29e3",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both are accurate and natural translations.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"周婷 speaks in 반말; Translation 1 uses 해요체/존댓말.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"没问 means 没问题; 챙길게/챙길게 fits context better than 성공할게.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"More natural phrasing avoiding redundant repetition of 'listed... list'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Target language is Korean; Translation 1 is Japanese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"老师傅 means master craftsmen/veteran workers, not 장인어른 (father-in-law).\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are standard Korean heading styles for gerund titles.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both are accurate; difference in comma is negligible.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Target language is Korean; Translation 2 was untranslated Japanese.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Identical except for a trivial trailing period.\"}\n]\n```\n",
+  "duration_seconds": 6.133697,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 12112,
+   "output_tokens": 329,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 12441
+  }
+ }
+}

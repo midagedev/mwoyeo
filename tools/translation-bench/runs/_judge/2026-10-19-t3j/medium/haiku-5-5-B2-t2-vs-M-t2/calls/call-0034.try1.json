@@ -1,0 +1,27 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0208.1",
+  "item-0043.2",
+  "item-0292.2",
+  "item-0019.1",
+  "item-0049.1",
+  "item-0363.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8aa5fc6a-2114-464e-b242-7e0087f38bb1",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 and transliterates Siobhan to 시본.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translate teammate and footer accurately and naturally in this context.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 matching the speaker's assigned speech level.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses natural phrasing and translates coolant as 냉각수.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 sounds much more natural and idiomatic for spoken dialogue.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the line untranslated in Japanese.\"}\n]\n",
+  "duration_seconds": 42.194652,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16166,
+   "output_tokens": 5062,
+   "thinking_tokens": 4864,
+   "cache_read_tokens": 0,
+   "total_tokens": 21228
+  }
+ }
+}

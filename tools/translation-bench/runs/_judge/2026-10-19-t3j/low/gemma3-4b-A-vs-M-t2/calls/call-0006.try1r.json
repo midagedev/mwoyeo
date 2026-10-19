@@ -1,0 +1,26 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0015.1",
+  "item-0073.1",
+  "item-0266.1",
+  "item-0256.1",
+  "item-0222.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a01f7539-3a0f-40fb-a8fc-d972c054296a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correctly translates the request to thank on his behalf.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses the established term '포켓 깃' from the facts.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are completely accurate and natural.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Avoids first-person 'I' in an app user manual.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Matches the document title 'New hire onboarding' more precisely.\"}\n]\n```\n",
+  "duration_seconds": 3.466749,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15540,
+   "output_tokens": 158,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15698
+  }
+ }
+}

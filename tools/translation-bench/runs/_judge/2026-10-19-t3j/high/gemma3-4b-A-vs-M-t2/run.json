@@ -1,0 +1,4 @@
+{"started": "2026-10-19T21:44:35+0900", "pair": "/tmp/t3j/judge/gemma3-4b-A-vs-M-t2", "model": "gemini-3.8-flash-high", "batch": 15, "jobs": 4, "seed": 11, "tries": 3, "max_items": 0, "prompts": 764, "calls": 51}
+{"started": "2026-10-19T22:03:28+0900", "pair": "/tmp/t3j/judge/gemma3-4b-A-vs-M-t2", "model": "gemini-3.8-flash-high", "batch": 15, "jobs": 4, "seed": 11, "tries": 3, "max_items": 180, "prompts": 368, "calls": 25}
+{"started": "2026-10-19T22:20:22+0900", "pair": "/tmp/t3j/judge/gemma3-4b-A-vs-M-t2", "model": "gemini-3.8-flash-high", "batch": 15, "jobs": 1, "seed": 11, "tries": 3, "max_items": 180, "prompts": 368, "calls": 25}
+{"started": "2026-10-19T22:26:17+0900", "pair": "/tmp/t3j/judge/gemma3-4b-A-vs-M-t2", "model": "gemini-3.8-flash-high", "batch": 6, "jobs": 4, "seed": 11, "tries": 3, "max_items": 180, "prompts": 368, "calls": 62}

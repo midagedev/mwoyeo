@@ -1,0 +1,36 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0041.2",
+  "item-0007.1",
+  "item-0016.2",
+  "item-0009.2",
+  "item-0072.1",
+  "item-0063.1",
+  "item-0065.2",
+  "item-0022.1",
+  "item-0020.2",
+  "item-0006.2",
+  "item-0022.2",
+  "item-0018.1",
+  "item-0044.1",
+  "item-0013.2",
+  "item-0041.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "25325a05-67aa-4250-88e2-c17acd371a16",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both Chaeyool and Chaeyul are valid romanizations of 채율.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both Seojin Um and Seojin Eom are valid romanizations.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"오빠 refers to her older brother, not her boyfriend.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Uses the established term 모차 from the facts.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Transcribes the Chinese name 解辰 correctly as 셰천.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Bridge on a spaceship means 조종실, not 다리.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left the Korean sentence completely untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Follows the established term 师姐 = Shijie from facts.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Follows the established term Pocket Git = 포켓 깃.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Uses proper subject honorific 두고 가셨어 for the client.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Follows the established term 师姐 = Shijie from facts.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Follows the established term council tax = 카운슬 택스.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 2 left the Chinese sentence completely untranslated.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Cat's name is Bori; Barley was only for a form.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both Chaeyul and Chaeyool are valid romanizations of 채율.\"}\n]\n",
+  "duration_seconds": 192.330178,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 19093,
+   "output_tokens": 24138,
+   "thinking_tokens": 23653,
+   "cache_read_tokens": 0,
+   "total_tokens": 43231
+  }
+ }
+}

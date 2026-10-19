@@ -1,0 +1,31 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0212.1",
+  "item-0251.1",
+  "item-0028.1",
+  "item-0326.1",
+  "item-0089.1",
+  "item-0278.1",
+  "item-0040.1",
+  "item-0115.2",
+  "item-0177.2",
+  "item-0185.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f175e777-e265-4092-80b6-3bc5c96d3327",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both missed specified term 'boss' for 先輩 and are otherwise equivalent.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"More natural idiom and accurately translates '从山下' as foot of mountain.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Speaker Dex talks to Rook in 반말 and Gerald is transliterated.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"More natural Korean omitting unnecessary second-person pronoun '당신의'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Punctuation in Translation 1 properly completes the sentence.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.9536999999999995,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17181,
+   "output_tokens": 307,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17488
+  }
+ }
+}

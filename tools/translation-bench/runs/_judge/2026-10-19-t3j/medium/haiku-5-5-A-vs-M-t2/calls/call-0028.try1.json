@@ -1,0 +1,27 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0008.2",
+  "item-0237.1",
+  "item-0121.1",
+  "item-0205.2",
+  "item-0367.2",
+  "item-0359.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4c8f9078-05f6-4414-8670-6008858fab30",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 translates names into Korean instead of leaving English alphabet.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly transliterates 桐生 as 키류 per facts.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 speech level specified in facts.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly transliterates Japanese names instead of using Hanja readings.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 is natural and avoids untranslated 'eh,'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 transliterates the name instead of leaving Japanese hiragana.\"}\n]\n",
+  "duration_seconds": 30.491662,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16352,
+   "output_tokens": 3844,
+   "thinking_tokens": 3645,
+   "cache_read_tokens": 0,
+   "total_tokens": 20196
+  }
+ }
+}

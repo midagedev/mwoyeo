@@ -1,0 +1,31 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0175.1",
+  "item-0223.2",
+  "item-0288.1",
+  "item-0154.1",
+  "item-0331.2",
+  "item-0013.2",
+  "item-0015.1",
+  "item-0227.2",
+  "item-0325.1",
+  "item-0083.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4959c45f-6fd4-4ad5-898d-e9b13cb89ebb",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural phrasing for '検索では' in UI/help docs.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both incorrectly translate '보리' (Barley) as 'Borri'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 completely hallucinates and fails to translate the target line.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both incorrectly use 존댓말 instead of 반말 between crewmates.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both mistranslate 'hot tub' as '온천' and use mismatched speech levels.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the established term '호타루' ('ホタル').\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 sounds much more natural and drops the Korean vocative marker.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both failed to translate the Chinese line into Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 mistranslates the name 변준호 as 'Byeon-ho'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 includes '토요일' and uses the correct polite register (해요체).\"}\n]\n```\n",
+  "duration_seconds": 5.967145,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17474,
+   "output_tokens": 349,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17823
+  }
+ }
+}

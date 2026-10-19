@@ -1,0 +1,27 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0318.1",
+  "item-0149.2",
+  "item-0228.1",
+  "item-0152.2",
+  "item-0241.1",
+  "item-0318.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5eaa0697-e0c8-4aea-a175-31e599b9e046",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Uses the specified term 'Dawn Team'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in informal non-polite speech (반말).\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translates the name into Korean instead of leaving Chinese characters.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Uses the specified name spelling 'Jiu' from the facts.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'찾아봐 달라고' is more natural than '조사해 달라고' for lost property.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses the specified term 'Dawn Team'.\"}\n]\n```\n",
+  "duration_seconds": 36.820007,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16209,
+   "output_tokens": 4549,
+   "thinking_tokens": 4350,
+   "cache_read_tokens": 0,
+   "total_tokens": 20758
+  }
+ }
+}

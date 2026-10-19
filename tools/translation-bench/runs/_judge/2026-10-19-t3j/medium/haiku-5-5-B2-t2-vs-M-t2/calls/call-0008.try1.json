@@ -1,0 +1,27 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0156.2",
+  "item-0148.1",
+  "item-0365.2",
+  "item-0369.2",
+  "item-0033.1",
+  "item-0306.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e6c7c286-597c-4178-a31f-d57e6b02248d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the designated term 작업 디렉터리.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 uses Korean script instead of untranslated Chinese characters.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses informal speech (반말) between flatmates.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 follows the required terms Pathfinder and fleet allocation.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 writes the name in Hangul rather than raw Japanese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"푸터 is the natural software development term, unlike 바닥글.\"}\n]\n```\n",
+  "duration_seconds": 25.805694,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16026,
+   "output_tokens": 3025,
+   "thinking_tokens": 2825,
+   "cache_read_tokens": 0,
+   "total_tokens": 19051
+  }
+ }
+}

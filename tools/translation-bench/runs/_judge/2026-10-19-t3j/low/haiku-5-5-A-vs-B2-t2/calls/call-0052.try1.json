@@ -1,0 +1,31 @@
+{
+ "call": 52,
+ "try": 1,
+ "ids": [
+  "item-0187.1",
+  "item-0214.1",
+  "item-0291.2",
+  "item-0060.1",
+  "item-0363.2",
+  "item-0042.1",
+  "item-0037.2",
+  "item-0007.1",
+  "item-0195.1",
+  "item-0196.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c9b5302d-8faa-4960-afec-83936a88b6ee",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are identical and accurate.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 did not translate into Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"More natural phrasing and punctuation for narrative text.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"More natural Korean phrasing and proper ending punctuation.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Much more natural Korean phrasing for an informal conversation.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Sounds more natural in English for moving context.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Explicitly clarifies 'that tag' from the preceding context.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 includes meta-commentary artifacts.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"More natural and concise documentation phrasing.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Uses the specified term '납품일' indirectly or better honorific '님께'.\"}\n]\n```\n",
+  "duration_seconds": 4.937746,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17548,
+   "output_tokens": 290,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17838
+  }
+ }
+}

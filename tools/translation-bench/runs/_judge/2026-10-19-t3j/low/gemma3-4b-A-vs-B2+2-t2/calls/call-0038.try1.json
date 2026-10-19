@@ -1,0 +1,31 @@
+{
+ "call": 38,
+ "try": 1,
+ "ids": [
+  "item-0137.2",
+  "item-0251.1",
+  "item-0239.2",
+  "item-0183.2",
+  "item-0046.2",
+  "item-0066.2",
+  "item-0122.2",
+  "item-0226.1",
+  "item-0375.1",
+  "item-0176.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "14b08c5a-1897-469f-a6f2-9b7a390e3267",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Chinese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 naturally includes 'My grandfather' for 祖父.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both failed to translate into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 contains the typo '어이미?'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translates Git 'branch' correctly as 브랜치 instead of 가지.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 translated an entirely different line.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Gareth is a landlord, not a team lead (팀장님).\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"}\n]\n```\n",
+  "duration_seconds": 4.274599,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17231,
+   "output_tokens": 298,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17529
+  }
+ }
+}

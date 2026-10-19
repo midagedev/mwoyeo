@@ -1,0 +1,31 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0159.1",
+  "item-0074.2",
+  "item-0210.1",
+  "item-0237.1",
+  "item-0270.1",
+  "item-0321.2",
+  "item-0255.2",
+  "item-0084.1",
+  "item-0228.1",
+  "item-0034.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "78a20c2b-244d-422a-be1c-9bb95e7103d3",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly uses female pronoun 'her' for the injured woman.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the source text in Chinese.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated despite mistranslation in 2.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Appropriately matches the polite register (해요체) toward the elder/manager.\"}\n]\n```\n",
+  "duration_seconds": 4.631646,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17553,
+   "output_tokens": 312,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17865
+  }
+ }
+}

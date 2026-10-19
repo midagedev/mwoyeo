@@ -1,0 +1,31 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0180.2",
+  "item-0097.2",
+  "item-0002.1",
+  "item-0172.1",
+  "item-0030.1",
+  "item-0192.2",
+  "item-0178.1",
+  "item-0279.2",
+  "item-0221.2",
+  "item-0185.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "534e867c-774d-4f46-bdcb-c45234c9eec7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Home is more natural than at the house for Korean 집.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Chinese text into English.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly transliterates the Japanese name into Korean hangul.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally in Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Preserves original Korean name Bori and explains writing Barley.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and convey the context well.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses banmal appropriate for Licia speaking to Saku.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Accurately uses specified name 저우 이모 and natural tea terms.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both 담당합니다 and 관리합니다 accurately translate looks after.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both 가볼게요 and 갈게요 appropriately convey the meaning and polite register.\"}\n]\n```\n",
+  "duration_seconds": 4.542243,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17427,
+   "output_tokens": 315,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17742
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0259.1",
+  "item-0327.2",
+  "item-0057.1",
+  "item-0332.2",
+  "item-0320.2",
+  "item-0163.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "344fb500-5659-407d-9a39-ffc66f427440",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both candidates left the text completely untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly transcribes Tomasz following the pronunciation guide.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 is in Korean, while Translation 2 remains in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 nonsensically translates '俺です' as '저는 당신입니다'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 preserves the correct speech level and avoids misreading the bridge.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 uses the correct name instead of corrupted English characters.\"}\n]\n",
+  "duration_seconds": 49.94261,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16166,
+   "output_tokens": 5984,
+   "thinking_tokens": 5787,
+   "cache_read_tokens": 0,
+   "total_tokens": 22150
+  }
+ }
+}

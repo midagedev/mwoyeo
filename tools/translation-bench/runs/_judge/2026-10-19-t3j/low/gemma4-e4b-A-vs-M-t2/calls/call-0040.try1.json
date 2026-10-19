@@ -1,0 +1,25 @@
+{
+ "call": 40,
+ "try": 1,
+ "ids": [
+  "item-0046.2",
+  "item-0176.1",
+  "item-0298.1",
+  "item-0168.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "31ea4a46-6671-48ac-83f8-d7179798b64f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Chinese text.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese text.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese text.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Day 1 is standard onboarding documentation terminology.\"}\n]\n```\n",
+  "duration_seconds": 3.9260479999999998,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15307,
+   "output_tokens": 120,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15427
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0195.1",
+  "item-0112.2",
+  "item-0033.2",
+  "item-0090.1",
+  "item-0137.2",
+  "item-0067.2",
+  "item-0182.2",
+  "item-0292.2",
+  "item-0199.1",
+  "item-0285.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "92613ff5-64d8-4ecd-bbe8-cd33f4a152a1",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"誰にも負けない means unmatched, not 'no match for anyone'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Speaker uses 반말 to Lin Xia; Translation 2 uses 해요체.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"민박집 sounds natural; 민슈 transliterates without reason and 1 adds confusing parentheses.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translate the sentence naturally with proper 반말; subject is optional.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말, but Translation 2 uses 해요체.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both correctly translate the line using 해요체; spacing difference is negligible.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the line.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Neither translation matches the specific app features accurately.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and convey the exact meaning.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly adheres to the term 先輩 = boss.\"}\n]\n```\n",
+  "duration_seconds": 5.228244,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17429,
+   "output_tokens": 333,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17762
+  }
+ }
+}

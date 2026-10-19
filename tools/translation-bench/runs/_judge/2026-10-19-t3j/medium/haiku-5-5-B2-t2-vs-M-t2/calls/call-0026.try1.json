@@ -1,0 +1,27 @@
+{
+ "call": 26,
+ "try": 1,
+ "ids": [
+  "item-0044.2",
+  "item-0036.2",
+  "item-0091.1",
+  "item-0143.2",
+  "item-0212.1",
+  "item-0149.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "990fb55b-9ddc-408b-b22c-67b95b0acd57",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"More natural phrasing and widely accepted term for the dish.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More faithful; avoids hallucinating the directional word 'out'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly uses informal speech level and transliterates the name Gareth.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly uses the specified name 저우 이모 from the facts.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translates the person's name instead of leaving it in Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Much more natural conversational flow than the literal '말한 적이 있어'.\"}\n]\n```\n",
+  "duration_seconds": 65.612319,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16306,
+   "output_tokens": 7804,
+   "thinking_tokens": 7606,
+   "cache_read_tokens": 0,
+   "total_tokens": 24110
+  }
+ }
+}

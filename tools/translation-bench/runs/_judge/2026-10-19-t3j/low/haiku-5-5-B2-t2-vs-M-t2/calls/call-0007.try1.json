@@ -1,0 +1,31 @@
+{
+ "call": 7,
+ "try": 1,
+ "ids": [
+  "item-0140.1",
+  "item-0087.1",
+  "item-0192.1",
+  "item-0315.2",
+  "item-0214.2",
+  "item-0332.1",
+  "item-0122.1",
+  "item-0050.1",
+  "item-0304.2",
+  "item-0353.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5370ee5e-9464-4761-9593-d399263896ea",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Refers to Xie Xuan in third person, matching speaker context.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses the specified term 납품일 instead of 납기.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"More natural phrasing for submitting a report for approval.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correct pinyin reading for surname 仇 (Chóu).\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses specified terms 'ward' (结界) and 'qi stone' (灵石).\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Faithfully reflects the truncated ending of the source sentence.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses respectful honorifics (그분이, 하셨어) when referring to their father.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"More natural word order and punctuation matching the incomplete source line.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Naturally translates name title to '벨 씨' and maintains consistent 해요체.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Transliterates 'Gerald' into Korean (제럴드) rather than leaving English untranslated.\"}\n]\n```\n",
+  "duration_seconds": 4.828289,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17649,
+   "output_tokens": 337,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17986
+  }
+ }
+}

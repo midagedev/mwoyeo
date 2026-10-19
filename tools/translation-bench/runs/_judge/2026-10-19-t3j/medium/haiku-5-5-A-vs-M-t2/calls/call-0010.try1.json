@@ -1,0 +1,27 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0303.1",
+  "item-0338.2",
+  "item-0206.1",
+  "item-0327.1",
+  "item-0132.1",
+  "item-0102.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dbb26932-7e8b-4f4a-8e3d-966728b66293",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses honorifics for the professor.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 is more faithful and avoids adding unnecessary words.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly uses female pronouns for the injured person.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are equally accurate, natural, and appropriate.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly uses informal speech (반말) for the speaker.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 naturally uses the title suffix -님 for direct address.\"}\n]\n",
+  "duration_seconds": 44.171802,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16213,
+   "output_tokens": 5077,
+   "thinking_tokens": 4889,
+   "cache_read_tokens": 0,
+   "total_tokens": 21290
+  }
+ }
+}

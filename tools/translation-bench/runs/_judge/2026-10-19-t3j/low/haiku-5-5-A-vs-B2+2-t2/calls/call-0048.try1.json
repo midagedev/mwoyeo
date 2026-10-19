@@ -1,0 +1,31 @@
+{
+ "call": 48,
+ "try": 1,
+ "ids": [
+  "item-0322.2",
+  "item-0124.1",
+  "item-0023.1",
+  "item-0154.2",
+  "item-0080.1",
+  "item-0301.1",
+  "item-0286.1",
+  "item-0331.2",
+  "item-0133.2",
+  "item-0360.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0d396356-50c3-46c0-a7ff-06e64cb1aac7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches the specified spelling '타카나시' and 해요체 register.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately with natural Korean word order.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses 해요체 appropriate for Sogou speaking to Hyuga.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correct 합쇼체 without awkwardly translating 'sir' as '선생님'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 contains unnatural phrasing ('두 백 상자', '증람이').\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly interprets 기사 as driver in logistics context, not reporter.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Dex speaks to Thorne in 합쇼체; uses '씁니다'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly transliterates the Chinese name Moqi Jing instead of untranslated Hanzi.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Tessan's elderly 반말 tone fits '돌아가마' better than younger '있을게'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both 'company messenger' and 'internal messenger' accurately translate '사내 메신저'.\"}\n]\n```\n",
+  "duration_seconds": 5.153006,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17403,
+   "output_tokens": 354,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17757
+  }
+ }
+}

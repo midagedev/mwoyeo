@@ -1,0 +1,31 @@
+{
+ "call": 57,
+ "try": 1,
+ "ids": [
+  "item-0294.1",
+  "item-0065.2",
+  "item-0036.1",
+  "item-0090.2",
+  "item-0267.1",
+  "item-0151.1",
+  "item-0252.1",
+  "item-0314.1",
+  "item-0132.2",
+  "item-0201.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "581647af-5e59-4514-b7eb-0c3f84c01361",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates name Dex into Korean as 덱스.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in 반말, correctly reflected in 1.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 도망가 without adding 'out'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the line untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the Korean source text completely untranslated.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Zhou Ting speaks to friends in 반말, correctly reflected in 2.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both 강아지 and 개 are natural and accurate translations for dog.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Uses required term 'boss' for 先輩 instead of unlocalized 'senpai'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Follows the specified glossary term Dawn Team for 새벽팀.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are grammatically natural, accurate, and equivalent in meaning.\"}\n]\n```\n",
+  "duration_seconds": 5.299169,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17409,
+   "output_tokens": 329,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17738
+  }
+ }
+}

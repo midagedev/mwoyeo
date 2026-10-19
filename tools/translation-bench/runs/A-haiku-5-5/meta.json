@@ -1,0 +1,28 @@
+{
+  "batch_size" : 3,
+  "condition" : "A",
+  "engine" : "anthropic-haiku-5-5",
+  "jobs" : 1,
+  "kind" : "anthropic",
+  "layout" : "t2",
+  "model" : "claude-haiku-5-5",
+  "price" : "claude-haiku-5-5",
+  "seconds" : 317.875194625,
+  "sequences" : [
+    "chat-en-ko-1",
+    "chat-ja-ko-1",
+    "chat-ja-ko-2",
+    "chat-ko-en-1",
+    "chat-zh-ko-1",
+    "docs-en-ko-1",
+    "docs-ja-en-1",
+    "docs-ko-en-1",
+    "game-ja-en-1",
+    "game-ja-ko-1",
+    "game-zh-en-1",
+    "subs-en-ko-1",
+    "subs-ja-ko-1",
+    "subs-zh-ko-1"
+  ],
+  "started" : "2026-10-19T12:42:58Z"
+}

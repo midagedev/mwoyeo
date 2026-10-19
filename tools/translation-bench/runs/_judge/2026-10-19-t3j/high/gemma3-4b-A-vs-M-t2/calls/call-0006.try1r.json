@@ -1,0 +1,34 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0110.1",
+  "item-0349.2",
+  "item-0259.1",
+  "item-0327.2",
+  "item-0057.1",
+  "item-0332.2",
+  "item-0320.2",
+  "item-0163.1",
+  "item-0016.1",
+  "item-0300.2",
+  "item-0028.2",
+  "item-0170.1",
+  "item-0036.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6105ac55-6ef9-43cc-acb1-4ae159ee31f3",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 mistranslates 'いいね' as '인싸'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 faithfully translates 'こりゃあ' as '이건'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both candidates failed to translate the Japanese text into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly transliterates Tomasz based on the pronunciation guide.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 is in Japanese and mistranslates the text.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 absurdly translates '俺です' as 'I am you'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 uses correct 반말 speech level and avoids misreading 鵲橋.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly translates Siobhan without broken English characters.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly translates '两成' as 20% rather than 2배.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 left the line entirely untranslated in Chinese.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 1 left the line entirely untranslated in Japanese.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 2 left the line entirely untranslated in Japanese.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 accurately renders 'だよね' as '잖아' and sounds natural.\"}\n]\n",
+  "duration_seconds": 113.805962,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 18488,
+   "output_tokens": 14096,
+   "thinking_tokens": 13659,
+   "cache_read_tokens": 0,
+   "total_tokens": 32584
+  }
+ }
+}

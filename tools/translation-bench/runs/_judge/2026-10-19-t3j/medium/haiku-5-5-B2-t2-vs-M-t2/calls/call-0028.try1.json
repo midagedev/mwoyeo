@@ -1,0 +1,27 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0338.2",
+  "item-0211.1",
+  "item-0208.2",
+  "item-0045.2",
+  "item-0170.2",
+  "item-0194.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "760115e6-8fbc-4843-8209-0408c38f3939",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 uses the specified name spelling Jiu instead of Jiwoo.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Subin is male; Translation 1 incorrectly uses the female pronoun she.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses banmal and the translated name 시본.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses the defined terms Pathfinder and fleet allocation.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 uses the specified term Memotto instead of Memot.\"}\n]\n",
+  "duration_seconds": 12.141561,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15953,
+   "output_tokens": 1339,
+   "thinking_tokens": 1152,
+   "cache_read_tokens": 0,
+   "total_tokens": 17292
+  }
+ }
+}

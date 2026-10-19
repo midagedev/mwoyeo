@@ -1,0 +1,26 @@
+{
+ "call": 75,
+ "try": 1,
+ "ids": [
+  "item-0333.2",
+  "item-0335.2",
+  "item-0203.2",
+  "item-0305.2",
+  "item-0325.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2c362878-5360-4f51-8314-e4e5b6b0a801",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates Thorne to 쏜 as specified in facts; Translation 2 leaves it English.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correct pinyin Shàn Yúnzhōu from facts, whereas 2 uses incorrect Dan.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean with correct speech level; 2 is untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean with correct speech level; 2 is untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translates tub as 통 (cheese tub/freezer container) rather than bathtub (욕조).\"}\n]\n```\n",
+  "duration_seconds": 4.03729,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15945,
+   "output_tokens": 192,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16137
+  }
+ }
+}

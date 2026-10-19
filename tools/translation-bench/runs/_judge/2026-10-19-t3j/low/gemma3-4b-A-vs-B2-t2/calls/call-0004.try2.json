@@ -1,0 +1,28 @@
+{
+ "call": 4,
+ "try": 2,
+ "ids": [
+  "item-0345.2",
+  "item-0166.2",
+  "item-0149.1",
+  "item-0015.1",
+  "item-0199.1",
+  "item-0085.1",
+  "item-0114.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a11458de-a4bd-48b1-baf1-93457eabb02e",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Tomasz is pronounced 'TOH-mash' (토마시), not 토마시스.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are accurate translations, differing only in title capitalization.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'And' coordinates the two actions better than contrastive '지만'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"The subject who must pay is 'you' (당신/네가), not 'she'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 uses natural particle markers, unlike Translation 2's ungrammatical phrasing.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'무슨 얘기 하고 있어?' is much more natural Korean phrasing.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 correctly conveys an imperative command matching 텟사이's 반말 register.\"}\n]\n",
+  "duration_seconds": 5.072131,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16255,
+   "output_tokens": 247,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16502
+  }
+ }
+}

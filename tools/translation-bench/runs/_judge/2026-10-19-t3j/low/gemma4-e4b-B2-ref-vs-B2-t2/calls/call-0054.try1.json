@@ -1,0 +1,31 @@
+{
+ "call": 54,
+ "try": 1,
+ "ids": [
+  "item-0283.2",
+  "item-0229.1",
+  "item-0211.2",
+  "item-0138.2",
+  "item-0272.2",
+  "item-0009.1",
+  "item-0105.1",
+  "item-0353.1",
+  "item-0144.1",
+  "item-0292.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fa2cd638-4ee9-4494-939a-6fd0c1f0ff87",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Jiu asks if they should invite Subin together to join them.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Active voice with 'we' is more natural for onboarding guides.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Dex speaks to Rook in banmal; Gerald is translated properly.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses proper informal address and naturally translates the sentence.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the source Japanese text untranslated.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 is in Chinese; Translation 2 translates into Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translates the proper noun and 点一下 correctly as checking inventory.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translates Rory into Korean; closer speech register than Translation 1.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both awkward military/service translations; neither clearly better.\"}\n]\n```\n",
+  "duration_seconds": 5.006453,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17309,
+   "output_tokens": 317,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17626
+  }
+ }
+}

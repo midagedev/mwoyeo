@@ -1,0 +1,31 @@
+{
+ "call": 41,
+ "try": 1,
+ "ids": [
+  "item-0201.2",
+  "item-0268.1",
+  "item-0012.1",
+  "item-0259.2",
+  "item-0221.2",
+  "item-0140.2",
+  "item-0116.2",
+  "item-0208.2",
+  "item-0229.1",
+  "item-0035.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f1ef55d7-624c-485e-8097-29cab88bbfa6",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in 반말.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 你们 as 너희들.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Zhou Ting speaks to Xu Nuo and Lu Ming in 반말.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Cloning is the action/process, correctly rendered as 클로닝.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both appropriately express blunt informal imperative in Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 sounds more natural for onboarding documentation.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Hinata speaks to Takanashi in 반말, so 씨? is appropriate.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both narrate the truncated descriptive sentence equally well.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Past tense fits standard English narrative context.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both are equally fitting Korean workplace/honorific address forms for 'sir'.\"}\n]\n```\n",
+  "duration_seconds": 5.887634,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17476,
+   "output_tokens": 310,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17786
+  }
+ }
+}

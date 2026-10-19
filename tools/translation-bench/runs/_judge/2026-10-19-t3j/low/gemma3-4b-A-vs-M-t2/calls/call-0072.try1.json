@@ -1,0 +1,27 @@
+{
+ "call": 72,
+ "try": 1,
+ "ids": [
+  "item-0336.1",
+  "item-0340.1",
+  "item-0256.2",
+  "item-0328.2",
+  "item-0120.2",
+  "item-0266.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "193ff97b-07d1-4f46-92b8-f9044ace85e9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly interprets the question as asking what the problem is.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Active voice with 'we' sounds more natural for onboarding guides.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"The subject is generic/third-person, not first-person 'I'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Captain is correctly translated as 선장님 rather than 주장 (sports captain).\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 incorrectly uses 'you' instead of Seoyoon ('me').\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both correctly convey the sentence and speech level with identical meaning.\"}\n]\n```\n",
+  "duration_seconds": 4.515149,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16020,
+   "output_tokens": 206,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16226
+  }
+ }
+}

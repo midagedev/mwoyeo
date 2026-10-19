@@ -1,0 +1,31 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0047.2",
+  "item-0030.1",
+  "item-0035.1",
+  "item-0016.1",
+  "item-0024.1",
+  "item-0036.2",
+  "item-0033.1",
+  "item-0061.1",
+  "item-0052.2",
+  "item-0023.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cb631ce8-0a88-46ee-a5a3-0e27cef0f81d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"パトカー means patrol car, not ambulance.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Rory is male, so his older sister is 누나, not 언니.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"오빠 refers to Seoyoon's older brother Minjae.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Bori was previously established as female.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Matches defined term ワークスペース = Space.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Zēng Lán is correctly transcribed as 쩡란 in Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Matches specified character name Rook = 루크.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Matches the provided reading 朔 (さく = 사쿠).\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean with the proper 해요체 register.\"}\n]\n```\n",
+  "duration_seconds": 4.536861,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17305,
+   "output_tokens": 307,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17612
+  }
+ }
+}

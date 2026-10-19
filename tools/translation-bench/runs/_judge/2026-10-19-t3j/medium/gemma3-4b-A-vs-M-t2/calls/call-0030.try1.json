@@ -1,0 +1,24 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0253.1",
+  "item-0164.1",
+  "item-0082.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "706897b9-44cd-43c2-828b-5ebc44250d6d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 is in Korean, while Translation 2 is untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 preserves subject and object; Translation 2 reverses them.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the required honorific speech level.\"}\n]\n```\n",
+  "duration_seconds": 21.568737,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15202,
+   "output_tokens": 2121,
+   "thinking_tokens": 2016,
+   "cache_read_tokens": 0,
+   "total_tokens": 17323
+  }
+ }
+}

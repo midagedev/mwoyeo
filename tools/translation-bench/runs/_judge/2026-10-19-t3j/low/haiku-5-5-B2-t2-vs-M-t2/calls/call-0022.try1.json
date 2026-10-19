@@ -1,0 +1,31 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0141.1",
+  "item-0228.2",
+  "item-0016.2",
+  "item-0307.1",
+  "item-0295.2",
+  "item-0279.1",
+  "item-0014.1",
+  "item-0064.2",
+  "item-0320.2",
+  "item-0132.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a41ad703-d4e5-4eee-9a8e-e3de46eb3c44",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correctly romanizes/transliterates 雷蔵 (らいぞう) as 라이조.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Follows the specified term 納期 = 납품일.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Direct past statement matches the source without reported speech marker 대.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally and accurately.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"More natural phrasing and accurately conveys the intended meaning.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates the proper name into English and avoids untranslated Korean text.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translates 周姨 into Korean 저우 이모 per facts.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and faithful.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Follows the designated term 魔石 = 마정석.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Follows the specified term 새벽팀 = Dawn Team.\"}\n]\n```\n",
+  "duration_seconds": 4.164221,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17269,
+   "output_tokens": 312,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17581
+  }
+ }
+}

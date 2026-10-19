@@ -1,0 +1,36 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0038.1",
+  "item-0023.1",
+  "item-0011.1",
+  "item-0017.2",
+  "item-0039.1",
+  "item-0079.1",
+  "item-0076.2",
+  "item-0077.2",
+  "item-0035.2",
+  "item-0075.1",
+  "item-0032.2",
+  "item-0074.2",
+  "item-0042.1",
+  "item-0029.1",
+  "item-0028.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "23d15a6a-c945-4e79-bacb-b90dd616d7d3",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly transliterates the character name Raizou.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 is untranslated.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the name Karasuma instead of 오마루.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 translates into English, while Translation 1 is untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly transcribes the name Zēng Lán as 쩡란.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 is untranslated.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while Translation 1 is untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 馬車 as carriage (마차), not car.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Rory is male, so his older sister is 누나, not 언니.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 translates into English, while Translation 2 is untranslated.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while Translation 1 is untranslated.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 translates into English, while Translation 1 is untranslated.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 preserves the honorific and respectful register of Akira-san.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 translates into English, while Translation 2 is untranslated.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 is untranslated.\"}\n]\n",
+  "duration_seconds": 190.171036,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 19207,
+   "output_tokens": 24024,
+   "thinking_tokens": 23506,
+   "cache_read_tokens": 0,
+   "total_tokens": 43231
+  }
+ }
+}

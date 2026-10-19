@@ -1,0 +1,27 @@
+{
+ "call": 63,
+ "try": 1,
+ "ids": [
+  "item-0295.1",
+  "item-0248.2",
+  "item-0191.1",
+  "item-0189.2",
+  "item-0340.2",
+  "item-0125.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b8e30a57-2aaf-4637-b358-187fd80896c4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 translates the messenger/channel name '모닥불' literally as 'bonfire'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Hearth is the established translation for the '모닥불' channel.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 is in Chinese instead of target language Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly transliterates name 海 as 카이 and uses 반말 register.\"}\n]\n```\n",
+  "duration_seconds": 4.068513,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16225,
+   "output_tokens": 205,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16430
+  }
+ }
+}

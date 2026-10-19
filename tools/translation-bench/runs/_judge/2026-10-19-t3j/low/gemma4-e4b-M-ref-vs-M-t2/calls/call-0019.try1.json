@@ -1,0 +1,31 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0234.1",
+  "item-0274.2",
+  "item-0140.1",
+  "item-0029.1",
+  "item-0113.1",
+  "item-0317.1",
+  "item-0075.1",
+  "item-0064.1",
+  "item-0107.1",
+  "item-0089.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0c2cdfae-8e87-4023-8535-ecdc8d1ed798",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Neither translation accurately translates ひろば (Commons), mistakenly using Space/space instead.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both use correct 해요체 and convey the same natural meaning.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally in English onboarding context.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"请我吃饭 means treat me to a meal, matching 밥 사줘.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Follows the specified terminology mapping 履歴 = Revisions.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are identical except for an optional final period in casual chat.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Transliterates Gerald into Korean 제럴드 rather than leaving English untranslated.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"ミナ speaks in 반말 to fellow club members 海 and ユウ.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Gareth speaks to tenants in 해요체, not 반말.\"}\n]\n```\n",
+  "duration_seconds": 5.548456,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17172,
+   "output_tokens": 330,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17502
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 40,
+ "try": 1,
+ "ids": [
+  "item-0260.1",
+  "item-0318.2",
+  "item-0020.2",
+  "item-0122.1",
+  "item-0176.1",
+  "item-0267.1",
+  "item-0091.1",
+  "item-0088.1",
+  "item-0034.1",
+  "item-0239.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f637573e-1ebf-47d7-bbb9-71aa45ed097b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Siobhan speaks to Rory in 반말, making Translation 2 correct.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'올려줘' is more natural than '알려줘' for posting in a group chat.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 'on' as '켜져' (turned on).\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Matches the heading style of '첫날' without an unnecessary definite article.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"The kanji surname 小鳥遊 is correctly read as Takanashi, not Kotori.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'警部はやめろ' means 'stop calling me Inspector', not addressing the inspector.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are natural, polite, and accurately convey the meaning.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Gareth speaks to tenants in 해요체, making Translation 1 correct.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both 'took' and 'took out' accurately translate '取出'.\"}\n]\n```\n",
+  "duration_seconds": 5.392062,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17351,
+   "output_tokens": 349,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17700
+  }
+ }
+}

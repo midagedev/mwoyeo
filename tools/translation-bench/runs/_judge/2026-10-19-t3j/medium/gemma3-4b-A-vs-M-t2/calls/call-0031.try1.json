@@ -1,0 +1,26 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0209.2",
+  "item-0045.2",
+  "item-0178.2",
+  "item-0035.1",
+  "item-0360.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8b7214a4-9fd7-43f3-8d8b-137294ae2f76",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 is in Korean, while Translation 2 is not.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 is in Korean, while Translation 1 is untranslated.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 is much more natural and accurate than Translation 2.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly translates rent and uses the required term.\"}\n]\n",
+  "duration_seconds": 26.012449,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15932,
+   "output_tokens": 3392,
+   "thinking_tokens": 3236,
+   "cache_read_tokens": 0,
+   "total_tokens": 19324
+  }
+ }
+}

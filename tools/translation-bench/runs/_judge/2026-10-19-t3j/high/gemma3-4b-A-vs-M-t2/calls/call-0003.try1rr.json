@@ -1,0 +1,24 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0307.2",
+  "item-0055.2",
+  "item-0347.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cb811289-3c6c-4de3-bc4a-5b5973738fb4",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Accurately translates 叮嘱 and avoids the incorrect name Luòchuān.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly translates bridge as 브리지 and toolkit as 도구 세트.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 is left untranslated in Japanese.\"}\n]\n",
+  "duration_seconds": 30.452902,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15226,
+   "output_tokens": 3644,
+   "thinking_tokens": 3543,
+   "cache_read_tokens": 0,
+   "total_tokens": 18870
+  }
+ }
+}

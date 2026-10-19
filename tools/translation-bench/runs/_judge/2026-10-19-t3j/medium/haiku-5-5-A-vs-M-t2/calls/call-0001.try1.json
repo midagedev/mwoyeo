@@ -1,0 +1,27 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0035.2",
+  "item-0359.1",
+  "item-0140.1",
+  "item-0322.2",
+  "item-0387.2",
+  "item-0031.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7f5ce1a2-4a98-4d32-bb84-f5b459901798",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 translates 川遊び naturally as 물놀이 rather than literal phrasing.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 transcribes the name into Korean rather than keeping Japanese hiragana.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates 'pickup' naturally instead of using awkward literal phrasing.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 accurately translates 'hot tub' and uses natural spoken dialogue.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Rory is male, so his sister is 누나, not 언니.\"}\n]\n```\n",
+  "duration_seconds": 197.097134,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16089,
+   "output_tokens": 7609,
+   "thinking_tokens": 7407,
+   "cache_read_tokens": 0,
+   "total_tokens": 23698
+  }
+ }
+}

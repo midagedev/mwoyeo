@@ -1,0 +1,31 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0081.2",
+  "item-0005.2",
+  "item-0008.2",
+  "item-0009.1",
+  "item-0068.2",
+  "item-0002.2",
+  "item-0021.1",
+  "item-0083.1",
+  "item-0051.2",
+  "item-0006.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "43e8311f-f72d-4b9c-a64d-13225fad36cb",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Follows the defined glossary term 付箋 = Sticky.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly follows the defined glossary term 毛茶 = 모차.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Proper noun place name should be transliterated rather than translated literally.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"The speaker is his sister's daughter, making him her 외삼촌.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Context explains tags stay fixed while branches move; that one refers to tag.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"The internal project/product codename was specifically specified as 'ホタル'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Client 桐生 deserves subject honorifics (-시-) while speaking to the uncle in 반말.\"}\n]\n```\n",
+  "duration_seconds": 5.129232,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17357,
+   "output_tokens": 317,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17674
+  }
+ }
+}

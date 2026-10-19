@@ -1,0 +1,26 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0103.1",
+  "item-0009.2",
+  "item-0339.2",
+  "item-0318.2",
+  "item-0196.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "83fb6a84-87eb-467b-96f1-88f11f2fd38e",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly makes the notes the subject of syncing.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 avoids hallucinating the vocative and using past tense.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified terms 메리골드 and 세레스.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses the correct informal speech level (반말).\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into the target language Korean.\"}\n]\n",
+  "duration_seconds": 55.222389,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15732,
+   "output_tokens": 6256,
+   "thinking_tokens": 6095,
+   "cache_read_tokens": 0,
+   "total_tokens": 21988
+  }
+ }
+}

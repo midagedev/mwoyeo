@@ -1,0 +1,31 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0087.2",
+  "item-0050.1",
+  "item-0247.1",
+  "item-0256.1",
+  "item-0272.1",
+  "item-0233.2",
+  "item-0347.2",
+  "item-0236.1",
+  "item-0250.2",
+  "item-0329.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "341114db-5d6b-4620-8a3f-a655a8547926",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally and accurately in Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly refers to Nagi in the third person.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Uses correct informal register (반말) between Rory and Siobhan.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses correct informal register (반말) spoken from Lin Yuan to Lin Xia.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Reflects the established English name Barley from the context.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Neither gender is established in context; both are valid.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Translation 1 translates the surname Qiu, but mistranslates the conditional as already happened; 2 leaves Chinese char.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both fail to use the specified name 텟사이.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both '에' and '로' are natural and correct here.\"}\n]\n",
+  "duration_seconds": 6.138577,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17382,
+   "output_tokens": 316,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17698
+  }
+ }
+}

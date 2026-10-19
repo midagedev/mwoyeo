@@ -1,0 +1,27 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0338.1",
+  "item-0022.2",
+  "item-0125.1",
+  "item-0195.1",
+  "item-0289.1",
+  "item-0243.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4fd9600f-e610-43ea-92c6-8ce09d46af74",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 does not add extraneous words like '함께'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"The guide addresses the new hire ('you') rather than 'we'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates naturally without adding an unwarranted '-도' to Saturday.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'삼백 상자' naturally uses the counter unit, unlike '상자 300개'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'옮기다' correctly takes the directional particle '-로' rather than '-에'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'도장 찍었어' is active stamping or signing, not receiving a stamp.\"}\n]\n```\n",
+  "duration_seconds": 65.686078,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16037,
+   "output_tokens": 8173,
+   "thinking_tokens": 7955,
+   "cache_read_tokens": 0,
+   "total_tokens": 24210
+  }
+ }
+}

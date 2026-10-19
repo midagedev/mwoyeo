@@ -1,0 +1,31 @@
+{
+ "call": 66,
+ "try": 1,
+ "ids": [
+  "item-0148.2",
+  "item-0263.2",
+  "item-0118.2",
+  "item-0162.1",
+  "item-0131.1",
+  "item-0043.2",
+  "item-0283.1",
+  "item-0209.1",
+  "item-0143.1",
+  "item-0235.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b03c7b8e-71e7-499d-805a-a9a26f6ccebf",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 translates to Korean and uses appropriate 해요체.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Chinese.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 capitalizes 'Commons' matching the context's explicit definition.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly translates into Korean rather than Japanese script.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 sounds much more natural for a detective uncle speaking.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Should we call' fits group brunch plans with coworkers much better.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly transliterates names 'Rook' and 'Ceres' into Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'In their first week' sounds more natural and idiomatic in English.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'Return the deposit' avoids the awkward repetition 'deposit the deposit'.\"}\n]\n```\n",
+  "duration_seconds": 5.113819,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17278,
+   "output_tokens": 328,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17606
+  }
+ }
+}

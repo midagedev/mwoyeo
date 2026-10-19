@@ -1,0 +1,31 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0265.2",
+  "item-0140.1",
+  "item-0220.2",
+  "item-0359.2",
+  "item-0350.2",
+  "item-0233.2",
+  "item-0013.2",
+  "item-0036.1",
+  "item-0275.1",
+  "item-0178.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d12c97f3-a982-49f6-ab15-0e935dfe4842",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates '끝입니다' accurately instead of omitting the conclusion.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Maintains required 합쇼체 speech level towards landlord Gareth.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translates 'that one' as '그걸' referring to Git tag.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Candidate 1 left source untranslated in Chinese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Candidate 1 left the Japanese source untranslated.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Natural heading format matching the preceding '첫날' context.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Candidate 1 left text untranslated in Japanese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Matches natural nuance for '-da yo ne'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Candidate 2 left the line in Korean untranslated.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"}\n]\n```\n",
+  "duration_seconds": 5.294015,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17183,
+   "output_tokens": 305,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17488
+  }
+ }
+}

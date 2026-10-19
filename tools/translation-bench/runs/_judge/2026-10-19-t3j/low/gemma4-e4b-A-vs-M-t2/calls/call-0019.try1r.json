@@ -1,0 +1,28 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0249.2",
+  "item-0026.2",
+  "item-0276.1",
+  "item-0147.2",
+  "item-0234.2",
+  "item-0114.2",
+  "item-0050.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1c0cf3c3-4798-4186-9703-1650b5b2884d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly parses the OCR typo $4O and uses closer speech.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"‘좀 쉬어’ is an imperative/suggestion telling Seoyoon to rest, not let's rest.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Follows the specified term mapping 先輩 = boss.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Follows the specified term mapping working tree = 작업 디렉터리.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese text untranslated.\"}\n]\n```\n",
+  "duration_seconds": 5.27905,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 4398,
+   "output_tokens": 233,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11813,
+   "total_tokens": 4631
+  }
+ }
+}

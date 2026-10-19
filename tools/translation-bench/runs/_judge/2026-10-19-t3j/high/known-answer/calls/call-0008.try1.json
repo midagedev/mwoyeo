@@ -1,0 +1,36 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0019.2",
+  "item-0055.1",
+  "item-0026.2",
+  "item-0007.2",
+  "item-0050.1",
+  "item-0037.1",
+  "item-0005.1",
+  "item-0073.2",
+  "item-0077.1",
+  "item-0033.2",
+  "item-0015.2",
+  "item-0049.2",
+  "item-0074.1",
+  "item-0017.1",
+  "item-0046.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f4afa990-00f5-4c68-a310-fe4fe64a050d",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Murata is correctly transcribed as 무라타, not 무라다.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly uses honorific 하셨어 when referring to the professor.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Chinese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Eom correctly uses standard Revised Romanization for 엄.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Dex is correctly transliterated as 덱스, not 덱서.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Surname 仇 is correctly romanized in pinyin as Qiu.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"A younger sister calls her older brother 오빠, not 형.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"馬車 means carriage (마차), not car (자동차).\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Zēng Lán is correctly transcribed as 쩡란 in Korean.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Irish name Aoife is pronounced EE-fa, transcribed as 이파.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"红茶 should be translated as 홍차, not 붉은 차.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Chinese.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Facts state 单云舟 is romanized as Shàn Yúnzhōu.\"}\n]\n",
+  "duration_seconds": 48.251764,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 19164,
+   "output_tokens": 7767,
+   "thinking_tokens": 7283,
+   "cache_read_tokens": 0,
+   "total_tokens": 26931
+  }
+ }
+}

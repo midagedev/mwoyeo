@@ -1,0 +1,31 @@
+{
+ "call": 58,
+ "try": 1,
+ "ids": [
+  "item-0144.1",
+  "item-0310.1",
+  "item-0246.1",
+  "item-0300.2",
+  "item-0065.2",
+  "item-0036.1",
+  "item-0090.2",
+  "item-0267.1",
+  "item-0151.1",
+  "item-0252.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "83d397f6-5411-47e7-b06b-d7852e188464",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Git branches are standardly called 브랜치, not 가지 분기.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the detective's line in 해요체.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 completely mistranslates 'won't know' and 'away'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 sounds much more natural in Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 sounds more natural for expressing the condition.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Technical documentation uses plural 'we', not 'I'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly includes 'The rest' (나머지는).\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Pocket Git ends with an alphanumeric consonant sound, taking topic marker 은.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 is unreadable romaji gibberish.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 correctly translates the question directed at Seoyoon.\"}\n]\n```\n",
+  "duration_seconds": 4.841639,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17055,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17380
+  }
+ }
+}

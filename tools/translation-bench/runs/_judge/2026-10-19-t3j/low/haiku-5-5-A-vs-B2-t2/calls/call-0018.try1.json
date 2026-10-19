@@ -1,0 +1,31 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0219.1",
+  "item-0050.2",
+  "item-0254.2",
+  "item-0345.2",
+  "item-0120.1",
+  "item-0281.2",
+  "item-0191.2",
+  "item-0196.1",
+  "item-0280.2",
+  "item-0174.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4a32d683-a567-4f86-9f64-4004f26b457a",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both incorrectly use 'Her' for male Yuki; otherwise equally good.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Rook speaks to Dex in banmal.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both incorrectly use 'He' for female Hikaru; otherwise equally accurate.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 properly transliterates Japanese names into Korean hangul.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both Day 2 and Day Two are natural and accurate translations.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Gareth speaks to tenants in haeyo-che, not banmal.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Dex speaks to Captain Thorne in hapsyo-che.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Matches specified term 納期 = 납기/납품일 and speech register.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Rook speaks to Captain Thorne in hapsyo-che, not banmal.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are completely natural, accurate, and faithful equivalents.\"}\n]\n",
+  "duration_seconds": 4.49568,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17392,
+   "output_tokens": 323,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17715
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0129.2",
+  "item-0146.2",
+  "item-0141.2",
+  "item-0318.2",
+  "item-0002.2",
+  "item-0330.1",
+  "item-0051.1",
+  "item-0301.1",
+  "item-0289.2",
+  "item-0034.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "52693d91-156b-4451-9af8-6c1e7b6bb65f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Matches instructional section heading style in user manuals naturally.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Thorne speaks to Rook using 해요체, but 1 is closer than 2's honorific reversal.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"雷蔵 (らいぞう) is correctly transcribed as 라이조.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"‘~께 약속을 잡아 뒀어요’ is slightly more natural for 约好两位老师傅.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Source sentence is truncated; 1 completes the clause smoothly and naturally.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"‘그 과정에서’ is much more natural than ‘그때’ for 'If that goes wrong'.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations accurately convey meaning, tone, and correct speech levels.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Facts state Akira is female; 'her' is the correct pronoun.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Rook speaks to Thorne in 합쇼체, but 1's '다 부어버렸어' translates 'drained into' better.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translating Chinese name characters into Korean pronunciation is preferable to raw hanzi.\"}\n]\n```\n",
+  "duration_seconds": 5.772538,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17401,
+   "output_tokens": 369,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17770
+  }
+ }
+}

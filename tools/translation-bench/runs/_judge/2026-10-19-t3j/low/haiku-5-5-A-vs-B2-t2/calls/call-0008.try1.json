@@ -1,0 +1,31 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0192.1",
+  "item-0360.1",
+  "item-0208.1",
+  "item-0245.1",
+  "item-0074.2",
+  "item-0040.1",
+  "item-0062.1",
+  "item-0217.2",
+  "item-0253.1",
+  "item-0073.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e2e0223d-17c7-4c45-98a4-7bd195db9e0b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Matches the tone of 그러게 better with 'Right.' instead of a question.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses correct 해요체 register for Zhou talking to Lin Yuan.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Better captures Tessai's elderly dialect and speaking style (わし, 돌아가마).\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Refers to future onboarding steps where badge is yet to be received.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"More natural phrasing for ~でちょうだい in casual polite conversation.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"자쿠지 is the natural conversational term for a hot tub here.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Jiu and Seoyoon are planning brunch together, so 'we' fits context.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Spoken dialogue between siblings/family friend calls for conversational 반말, not 해라체 written form.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Faithfully preserves the cutoff of the incomplete source line.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Sounds much more natural in conversational Korean than the literal 협력을 부탁하겠습니다.\"}\n]\n```\n",
+  "duration_seconds": 5.572111,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17628,
+   "output_tokens": 344,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17972
+  }
+ }
+}

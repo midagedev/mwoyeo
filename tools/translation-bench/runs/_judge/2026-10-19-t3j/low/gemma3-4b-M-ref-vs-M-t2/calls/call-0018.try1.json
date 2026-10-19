@@ -1,0 +1,31 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0260.2",
+  "item-0014.2",
+  "item-0255.1",
+  "item-0222.1",
+  "item-0378.2",
+  "item-0253.1",
+  "item-0367.2",
+  "item-0120.1",
+  "item-0301.1",
+  "item-0015.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "15ed9f5f-cdde-4339-ba04-b399e5339d01",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey the schedule/plan naturally and accurately.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 leaves the name untranslated in Chinese characters.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Transliterates Tomasz correctly as 토마시 per pronunciation guide.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'Unloading work' is much more natural for logistics than 'discharge operations'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Preserves the question tone of the original sentence.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly translates '有空' as having time, unlike Translation 2.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"More concise and natural documentation style without redundant wording.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Korean text into English.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both 'On Day 2' and 'On the second day' are accurate and natural.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"More natural conversational phrasing than literal romanized vocative suffix.\"}\n]\n```\n",
+  "duration_seconds": 5.234901,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17022,
+   "output_tokens": 321,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17343
+  }
+ }
+}

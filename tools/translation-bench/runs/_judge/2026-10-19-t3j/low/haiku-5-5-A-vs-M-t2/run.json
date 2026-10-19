@@ -1,0 +1,1 @@
+{"started": "2026-10-19T23:07:18+0900", "pair": "/tmp/t3j/judge/haiku-5-5-A-vs-M-t2", "model": "gemini-3.8-flash-low", "batch": 10, "jobs": 4, "seed": 11, "tries": 3, "max_items": 0, "prompts": 796, "calls": 80}

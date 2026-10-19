@@ -1,0 +1,24 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0166.1",
+  "item-0245.2",
+  "item-0137.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6cdc63d2-6f14-4989-9fd5-d9534055cdd8",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 did not translate the Korean text into English.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Tsukimisato is a real Japanese surname; Translation 2 mistranscribes it awkwardly.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left Japanese untranslated; Translation 2 translated into Korean.\"}\n]\n",
+  "duration_seconds": 4.457087,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15168,
+   "output_tokens": 105,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15273
+  }
+ }
+}

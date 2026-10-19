@@ -1,0 +1,31 @@
+{
+ "call": 29,
+ "try": 1,
+ "ids": [
+  "item-0122.1",
+  "item-0064.1",
+  "item-0345.1",
+  "item-0104.1",
+  "item-0391.2",
+  "item-0118.1",
+  "item-0358.1",
+  "item-0017.2",
+  "item-0266.1",
+  "item-0293.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "82236ee9-1097-4e2b-80c0-2bb56df9e493",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly asks about presence using natural polite honorifics.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 sounds more natural and fits the male detective's tone.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into English entirely.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 uses natural phrasing and keeps the proper name form Akira-san.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Gareth speaks to tenants in 해요체; Translation 2 uses 반말.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 contains garbled grammar and inappropriate honorifics for the boiler guy.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 is natural, grammatically correct 반말; Translation 2 is broken.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 contains untranslated Japanese characters and severe mistranslations.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly translates '전철' and uses proper 해요체 ending.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 fully translates '할 게 너무 많아' (so much to do).\"}\n]\n```\n",
+  "duration_seconds": 4.956328,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17489,
+   "output_tokens": 346,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17835
+  }
+ }
+}

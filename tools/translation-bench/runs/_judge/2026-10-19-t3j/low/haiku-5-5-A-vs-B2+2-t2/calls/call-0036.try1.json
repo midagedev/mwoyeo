@@ -1,0 +1,31 @@
+{
+ "call": 36,
+ "try": 1,
+ "ids": [
+  "item-0041.2",
+  "item-0299.2",
+  "item-0129.1",
+  "item-0337.1",
+  "item-0313.2",
+  "item-0089.2",
+  "item-0288.1",
+  "item-0058.2",
+  "item-0182.2",
+  "item-0268.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9fd46e9a-39c5-4abb-9d00-dc9afd0c534f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates '모닥불' as the literal 'campfire' instead of an app name.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Neither uses the specified term '수호막' for 結界.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'Old Mr. Takanashi' is more natural English for 小鳥遊老人.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly translates spaceship 'bridge' as 브리지, not literal bridge (다리).\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Neither uses the specified term '마정석' for 魔石.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Properly uses 반말 and conversational tone matching the speaker's relation.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Matches the conditional warning in context (늦으면 안 돼/주의).\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Earlier context establishes Akira prefers dropped honorifics ('アキラでいい').\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both fail to translate or transliterate the name 海 (카이).\"}\n]\n```\n",
+  "duration_seconds": 6.162639,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17402,
+   "output_tokens": 342,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17744
+  }
+ }
+}

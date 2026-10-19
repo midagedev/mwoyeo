@@ -1,0 +1,31 @@
+{
+ "call": 43,
+ "try": 1,
+ "ids": [
+  "item-0231.1",
+  "item-0339.1",
+  "item-0035.2",
+  "item-0054.2",
+  "item-0292.2",
+  "item-0249.1",
+  "item-0057.1",
+  "item-0099.1",
+  "item-0055.2",
+  "item-0351.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5be80e3c-ba83-462d-9c00-4ed9e066a728",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both '엷은' and '옅은' accurately translate '淡い'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Natural translation of idiom; uses required 반말 and correct name.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Uses designated term '펜션' instead of '민박'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly adheres to the 해요체 speech level.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Lin Yuan speaks to Zhou Yi using 해요체, not 합쇼체.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 naturally translates the sentiment without adding unmentioned words.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both appropriately translate polite customer greeting into Korean.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both accurately translate the sentence into natural English documentation style.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are completely accurate and natural.\"}\n]\n```\n",
+  "duration_seconds": 5.443907,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17414,
+   "output_tokens": 313,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17727
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 65,
+ "try": 1,
+ "ids": [
+  "item-0216.1",
+  "item-0203.1",
+  "item-0060.2",
+  "item-0197.1",
+  "item-0336.2",
+  "item-0068.1",
+  "item-0098.2",
+  "item-0261.2",
+  "item-0230.1",
+  "item-0097.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6b0efc82-e28c-4887-ace7-a85fafdd1baa",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 sounds more natural in Korean for letting someone in.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both convey the meaning and polite register well.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both 'attached to' and 'added to' accurately translate 添える.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both capture Siobhan's response well with minor style variations.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 accurately translates 又裂了一道缝.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both natural and accurate English translations for conversational messaging.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"도착하신대 correctly reflects honorific reference to Professor Han.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Dex speaks in polite register to Captain Thorne.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"}\n]\n```\n",
+  "duration_seconds": 4.959489,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17187,
+   "output_tokens": 307,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17494
+  }
+ }
+}

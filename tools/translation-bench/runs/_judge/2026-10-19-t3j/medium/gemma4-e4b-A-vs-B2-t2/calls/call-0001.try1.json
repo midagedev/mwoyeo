@@ -1,0 +1,28 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0279.2",
+  "item-0338.2",
+  "item-0053.2",
+  "item-0290.1",
+  "item-0266.2",
+  "item-0070.2"
+ ],
+ "problem": "status ERROR",
+ "event": {
+  "conversation_id": "65f43a7a-0d02-406b-a85d-e4c1544811cd",
+  "status": "ERROR",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 is properly translated into Korean using correct speech level.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both candidates failed to translate the text into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 translated into Korean, while Translation 2 left it untranslated.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 and reads much more naturally.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translated into Korean, whereas Translation 2 remained untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the female pronoun her based on context.\"}\n]\n```\n",
+  "error": "The stream was interrupted. Please continue the task you were working on.",
+  "duration_seconds": 48.597219,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 32587,
+   "output_tokens": 4793,
+   "thinking_tokens": 4594,
+   "cache_read_tokens": 0,
+   "total_tokens": 37380
+  }
+ }
+}

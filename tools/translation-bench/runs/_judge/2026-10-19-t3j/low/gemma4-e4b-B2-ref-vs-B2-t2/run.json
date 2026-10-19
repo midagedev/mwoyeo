@@ -1,0 +1,1 @@
+{"started": "2026-10-19T23:37:57+0900", "pair": "/tmp/t3j/judge/gemma4-e4b-B2-ref-vs-B2-t2", "model": "gemini-3.8-flash-low", "batch": 10, "jobs": 4, "seed": 11, "tries": 3, "max_items": 0, "prompts": 710, "calls": 71}

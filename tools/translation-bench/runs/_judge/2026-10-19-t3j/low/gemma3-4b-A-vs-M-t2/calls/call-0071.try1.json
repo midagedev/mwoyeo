@@ -1,0 +1,26 @@
+{
+ "call": 71,
+ "try": 1,
+ "ids": [
+  "item-0148.2",
+  "item-0263.2",
+  "item-0131.1",
+  "item-0283.1",
+  "item-0143.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "541e9ed6-8cb9-452f-bee1-2c2d28aac089",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly uses name '저우 이모', whereas 2 leaves untranslated Chinese characters.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both fail critically: 1 mistakes husband for wife; 2 mistranslates name and term.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses correct term '호타루' and '납품일', avoiding 1's hallucinated '회전목마'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translates cleanly to Korean, whereas 2 leaves Japanese kanji unadapted.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translates the full line, whereas 2 leaves Chinese untranslated.\"}\n]\n```\n",
+  "duration_seconds": 4.605902,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15903,
+   "output_tokens": 199,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16102
+  }
+ }
+}

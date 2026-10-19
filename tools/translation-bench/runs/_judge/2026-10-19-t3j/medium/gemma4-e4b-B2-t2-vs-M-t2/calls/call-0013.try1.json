@@ -1,0 +1,27 @@
+{
+ "call": 13,
+ "try": 1,
+ "ids": [
+  "item-0172.1",
+  "item-0184.1",
+  "item-0162.1",
+  "item-0044.1",
+  "item-0049.1",
+  "item-0094.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ec0fa44c-d919-4028-b607-2966d57abccc",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Uses the specified term 'Revisions' for 履歴.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'공주님' is much more natural in Korean than '왕녀님'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Follows the specified term 'qi stone' for 灵石.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Uses the required term '마정석' for 魔石.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'Carrier' is more natural than 'carrier cage' for pet carriers.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"The two candidate translations are identical.\"}\n]\n",
+  "duration_seconds": 21.52996,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16050,
+   "output_tokens": 2672,
+   "thinking_tokens": 2483,
+   "cache_read_tokens": 0,
+   "total_tokens": 18722
+  }
+ }
+}

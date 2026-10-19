@@ -1,0 +1,31 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0199.1",
+  "item-0087.2",
+  "item-0029.1",
+  "item-0109.1",
+  "item-0059.1",
+  "item-0224.2",
+  "item-0145.2",
+  "item-0150.2",
+  "item-0087.1",
+  "item-0255.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7cbea597-1421-4ce9-af0c-573d2c90e946",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 avoids redundant parenthetical repetition and sounds natural.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 uses natural conversational 반말 suited to his niece.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"The source is an exclamation ('헐...남았내'), not an inquisitive question.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'货' refers to tea goods/batches, not a financial loan ('대출').\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations accurately convey the meaning with natural workplace phrasing.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Female speaker should not call her brother '형' (should be 오빠).\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are faithful and natural; punctuation difference is trivial in chat.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translates the Korean name rather than leaving Hangul untranslated.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 uses natural conversational 반말 between close uncle and niece.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 translates the Chinese name instead of leaving Chinese characters.\"}\n]\n```\n",
+  "duration_seconds": 5.185342,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17389,
+   "output_tokens": 334,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17723
+  }
+ }
+}

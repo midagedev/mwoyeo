@@ -1,0 +1,31 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0196.1",
+  "item-0132.2",
+  "item-0133.2",
+  "item-0311.2",
+  "item-0139.2",
+  "item-0119.1",
+  "item-0113.2",
+  "item-0118.1",
+  "item-0291.2",
+  "item-0178.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "acb2aac2-c2da-4160-bebb-2d3bd6dd8ed5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"'Meet in person' is much more natural English for 직거래.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 uses the wrong name '철사이' instead of '텟사이'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Akira is female, so 'her' is the correct pronoun.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Target language is Korean; Translation 2 left the text in Japanese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Akira explicitly asked not to be addressed formally earlier.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"请我吃饭 means to treat someone to a meal (밥 사줘).\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Dex is talking to Rook, so 반말 (informal speech) is correct.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Title Case is standard and appropriate for a wiki page title.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both represent '小鳥遊老人' accurately and naturally in English.\"}\n]\n```\n",
+  "duration_seconds": 4.906763,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17332,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17657
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 38,
+ "try": 1,
+ "ids": [
+  "item-0167.2",
+  "item-0084.2",
+  "item-0119.2",
+  "item-0088.2",
+  "item-0129.2",
+  "item-0276.1",
+  "item-0146.2",
+  "item-0141.2",
+  "item-0345.2",
+  "item-0002.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "28e5622f-fff6-439b-b363-717c9b955850",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 accurately captures 'that' referring to the merge process.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Matches Rook's tone to Captain Thorne and correctly uses '선장님'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both correctly convey the informal 반말 register and original meaning.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly follows specified terms 'ward' and 'qi stone'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Accurately translates the subject (the report approver) confirming it.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly captures '又' (again) as he previously ran from the base.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Sounds much more natural for informal spoken Korean between uncle/niece.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 sounds much more natural in Korean dialogue.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 uses standard, natural Korean '다다음 달' instead of '재내달'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Better captures the conditional emphasis of '才算'.\"}\n]\n```\n",
+  "duration_seconds": 5.350106,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17622,
+   "output_tokens": 335,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17957
+  }
+ }
+}

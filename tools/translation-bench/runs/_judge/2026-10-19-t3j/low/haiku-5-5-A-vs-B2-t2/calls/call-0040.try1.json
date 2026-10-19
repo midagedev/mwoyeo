@@ -1,0 +1,31 @@
+{
+ "call": 40,
+ "try": 1,
+ "ids": [
+  "item-0013.1",
+  "item-0037.1",
+  "item-0061.2",
+  "item-0069.1",
+  "item-0197.2",
+  "item-0259.2",
+  "item-0049.2",
+  "item-0117.1",
+  "item-0230.2",
+  "item-0222.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3213895c-14cd-41f6-87db-005e1fab3e79",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately, though neither used the glossary term.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates 'that one' accurately without unnecessarily assuming and inserting 'tag'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both correctly observe the required speech level and differ only insignificantly.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately render the casual Korean chat.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both 'added to' and 'attached to' accurately translate '添える'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses the established term 'Commons' rather than translating it as 'plaza'.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both provide natural and faithful translations of the casual question.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both accurately translate the phrase; comma placement is a minor stylistic difference.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Neither speaker follows the required 합쇼체 honorific register for Thorne.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both 'Old Takanashi' and 'The elderly Takanashi' are natural and accurate.\"}\n]\n```\n",
+  "duration_seconds": 5.022855,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17207,
+   "output_tokens": 336,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17543
+  }
+ }
+}

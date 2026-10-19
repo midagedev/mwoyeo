@@ -1,0 +1,31 @@
+{
+ "call": 53,
+ "try": 1,
+ "ids": [
+  "item-0214.1",
+  "item-0296.2",
+  "item-0060.1",
+  "item-0314.2",
+  "item-0042.1",
+  "item-0037.2",
+  "item-0007.1",
+  "item-0195.1",
+  "item-0196.2",
+  "item-0008.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e80f5081-f644-4075-b9f8-a9f34b30a7b9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Proper noun 'Modakbul' is accurately transliterated rather than literally translated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the line untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Matches informal speech level (반말) between crewmates Rook and Dex.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"The surname 仇 is correctly Romanized as Qiu, not Chou.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Gerund heading 'Saving your changes' is naturally translated as a noun/action heading.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'Go well' is much more natural English for contracts/negotiations than 'finish well'.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally convey the inspector's blunt command.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 4.959224,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17087,
+   "output_tokens": 326,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17413
+  }
+ }
+}

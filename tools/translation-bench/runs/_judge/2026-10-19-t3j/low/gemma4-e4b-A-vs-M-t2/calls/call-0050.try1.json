@@ -1,0 +1,25 @@
+{
+ "call": 50,
+ "try": 1,
+ "ids": [
+  "item-0255.1",
+  "item-0088.2",
+  "item-0193.2",
+  "item-0174.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fa7913b6-b5ec-43c8-b81e-c831a3c52fad",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese line into Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses correct 해요체 speech level and natural Korean naming.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translates name into Korean script rather than leaving it in Latin.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally in English.\"}\n]\n```\n",
+  "duration_seconds": 3.819648,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 3604,
+   "output_tokens": 127,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11819,
+   "total_tokens": 3731
+  }
+ }
+}

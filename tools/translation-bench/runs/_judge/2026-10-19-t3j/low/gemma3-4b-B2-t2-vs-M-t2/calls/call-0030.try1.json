@@ -1,0 +1,31 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0139.2",
+  "item-0119.1",
+  "item-0113.2",
+  "item-0118.1",
+  "item-0199.1",
+  "item-0172.2",
+  "item-0278.1",
+  "item-0191.2",
+  "item-0231.2",
+  "item-0215.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ecfd461c-b036-4664-8475-3b9f947654f5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 leaves Japanese character 'ね' untranslated at the end.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 uses the correct name 'Seoyoon' instead of 'Suyeon'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately convey the meaning.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are clear, faithful, and differ only by contraction.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 uses the specified name '루크' for Rook.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 completely failed to translate the line.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the source Japanese line completely untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 is natural, while 1 is ungrammatical ('친구들인데로 하자').\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated Chinese text.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 uses the natural speech level for 朔 to リーシア (해요체: 지켜왔어요/왔습니다).\"}\n]\n```\n",
+  "duration_seconds": 4.703154,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17205,
+   "output_tokens": 344,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17549
+  }
+ }
+}

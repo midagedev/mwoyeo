@@ -1,0 +1,27 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0184.1",
+  "item-0235.2",
+  "item-0206.2",
+  "item-0019.2",
+  "item-0020.2",
+  "item-0099.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "390e638c-a2ba-4d6e-9fa2-8b07026c7a96",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly translates driving and the road name.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 mistranslates ma'am as excuse me.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correct name and tense matching the onboarding context.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly retains the established term Quick Note.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both miss the defined term Commons and are equally valid.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Uses correct polite register (haeyo-che) and natural phrasing.\"}\n]\n```\n",
+  "duration_seconds": 29.252265,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16015,
+   "output_tokens": 3561,
+   "thinking_tokens": 3377,
+   "cache_read_tokens": 0,
+   "total_tokens": 19576
+  }
+ }
+}

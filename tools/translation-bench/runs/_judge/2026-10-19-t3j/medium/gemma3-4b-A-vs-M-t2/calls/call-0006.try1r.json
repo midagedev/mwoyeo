@@ -1,0 +1,22 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0027.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "91c9b3d4-d4bc-4b7d-9b54-647ed672a109",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly uses 반말 and the required term 조합.\"}\n]\n```\n",
+  "duration_seconds": 6.577379,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14479,
+   "output_tokens": 586,
+   "thinking_tokens": 548,
+   "cache_read_tokens": 0,
+   "total_tokens": 15065
+  }
+ }
+}

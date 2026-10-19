@@ -1,0 +1,27 @@
+{
+ "call": 16,
+ "try": 1,
+ "ids": [
+  "item-0201.1",
+  "item-0201.2",
+  "item-0283.1",
+  "item-0071.2",
+  "item-0226.1",
+  "item-0060.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ec7caa24-aae2-45c1-9164-400c97c0ed95",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 was not translated into English.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 was not translated into English.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly translates the vocative and uses the specified term 'ward'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 was not translated into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 was not translated into Korean.\"}\n]\n",
+  "duration_seconds": 20.566524,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16264,
+   "output_tokens": 2539,
+   "thinking_tokens": 2367,
+   "cache_read_tokens": 0,
+   "total_tokens": 18803
+  }
+ }
+}

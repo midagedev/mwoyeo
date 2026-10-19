@@ -1,0 +1,31 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0313.2",
+  "item-0190.1",
+  "item-0063.2",
+  "item-0302.2",
+  "item-0343.1",
+  "item-0267.2",
+  "item-0339.1",
+  "item-0143.2",
+  "item-0330.2",
+  "item-0278.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "87dcde26-97b3-46f1-80d6-9d878c350ee5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both candidate translations are identical and accurate.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Thorne speaks to Dex in banmal; 1 correctly uses informal speech.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'모든 내용' reads more naturally than '모든 것' for staged changes.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Natural instructional guide tone using active address instead of awkward passive.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Ricia speaks to Saku in banmal; 1 incorrectly uses polite language.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Siobhan is female speaking to Rory in banmal; uses 오빠 and 반말.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Takanashi speaks to Kiryu in haeyo-che; '유품이네요' is natural and correct.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Kiryu speaks to Takanashi in haeyo-che; 2 incorrectly uses blunt banmal.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Zeng Ruoshui refers to Xie Xuan in third person, not first.\"}\n]\n```\n",
+  "duration_seconds": 5.37805,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17471,
+   "output_tokens": 351,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17822
+  }
+ }
+}

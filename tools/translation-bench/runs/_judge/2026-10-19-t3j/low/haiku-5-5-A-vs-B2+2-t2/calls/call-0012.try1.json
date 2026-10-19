@@ -1,0 +1,31 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0099.2",
+  "item-0012.2",
+  "item-0013.2",
+  "item-0055.1",
+  "item-0103.1",
+  "item-0327.1",
+  "item-0122.1",
+  "item-0001.2",
+  "item-0083.2",
+  "item-0243.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a7fa377d-091e-4ced-bf31-cbc7220a4302",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Completes the unfinished sentence naturally while keeping emoji placement faithful.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More faithful to '순서대로' and the professional internal wiki tone.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses standard Korean translation '결혼식용 치즈' and natural 반말 ending.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"In Korean, '거기' correctly refers to a previously mentioned place.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Rory speaks in 해요체 to his landlord Gareth.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Takanashi explicitly demands not using honorifics, so '소장' fits best.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Zhou Ting speaks in 반말 to her friends, matching Translation 2.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Licia speaks in 반말 to Saku, matching Translation 1.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 actually translates the Japanese text into Korean with 해요체.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"}\n]\n```\n",
+  "duration_seconds": 4.772331,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17570,
+   "output_tokens": 333,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17903
+  }
+ }
+}

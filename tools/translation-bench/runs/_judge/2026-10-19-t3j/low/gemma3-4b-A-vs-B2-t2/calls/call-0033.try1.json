@@ -1,0 +1,31 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0305.2",
+  "item-0297.2",
+  "item-0193.1",
+  "item-0003.2",
+  "item-0329.1",
+  "item-0082.1",
+  "item-0239.1",
+  "item-0238.1",
+  "item-0053.1",
+  "item-0201.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "46b3bb79-a0ac-4f67-91dc-1600f86441c7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 'nothing' as '아무것도 사라지지' rather than omitting 'nothing'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 invents the name Nagisa; the character is Nagi.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 uses standard Korean UI heading style without an awkward object marker.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 hallucinates window metadata instead of translating the line.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly translates '堅苦しいのはなし' as '딱딱한 얘기는 그만'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Both are awkward, but Translation 1 handles 'は、はい' more naturally.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 mistranslates the character's name 朔 as the noun '새'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'a previous state' is more natural than 'the previous state'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 sounds more natural and concise in English dialogue.\"}\n]\n```\n",
+  "duration_seconds": 5.067966,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17270,
+   "output_tokens": 357,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17627
+  }
+ }
+}

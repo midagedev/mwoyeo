@@ -1,0 +1,31 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0225.2",
+  "item-0371.1",
+  "item-0367.1",
+  "item-0233.2",
+  "item-0013.2",
+  "item-0036.1",
+  "item-0286.1",
+  "item-0178.1",
+  "item-0006.1",
+  "item-0134.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4675411c-0481-4d74-ad26-433ac203e9f5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"The surname 仇 is pronounced Qiu, not Chou.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 sounds much more natural in Korean than translating 'by the way' literally at the end.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"The source sentence is truncated; translation 1 faithfully preserves the truncation without adding a period.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"The source sentence is cut off mid-sentence; translation 1 reflects the incomplete sentence.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"小鳥遊 is read as Takanashi, not Kotori.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated.\"}\n]\n```\n",
+  "duration_seconds": 8.564328,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17555,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17879
+  }
+ }
+}

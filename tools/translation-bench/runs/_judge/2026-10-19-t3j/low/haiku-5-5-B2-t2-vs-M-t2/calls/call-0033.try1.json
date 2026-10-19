@@ -1,0 +1,31 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0172.1",
+  "item-0100.2",
+  "item-0063.1",
+  "item-0205.2",
+  "item-0032.2",
+  "item-0026.1",
+  "item-0053.1",
+  "item-0220.2",
+  "item-0119.2",
+  "item-0223.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3f3aa8e6-0dfd-48e7-9103-96659d0d8140",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the source Japanese text untranslated.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations accurately convey the meaning naturally in Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly translates and transliterates Japanese names into Korean.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translate the sentence accurately and naturally without gender context.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both convey the instruction naturally and accurately.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"In Korean, '화장실을 쓰다/이용하다' is much more natural than '빌리다'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 adheres to the specified term Pocket Git = 포켓 깃.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 misinterprets Modakbul as the team channel itself.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Translation 1 uses the wrong speech level; Translation 2 mistranslates the modality.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both bags and pouches naturally translate 袋 in this context.\"}\n]\n```\n",
+  "duration_seconds": 4.359775,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5328,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11813,
+   "total_tokens": 5660
+  }
+ }
+}

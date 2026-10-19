@@ -1,0 +1,31 @@
+{
+ "call": 59,
+ "try": 1,
+ "ids": [
+  "item-0041.1",
+  "item-0248.1",
+  "item-0199.2",
+  "item-0101.2",
+  "item-0284.2",
+  "item-0082.1",
+  "item-0353.1",
+  "item-0128.2",
+  "item-0117.2",
+  "item-0326.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3ec9c605-799e-4082-8a12-963af61746ed",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both 'organizes' and 'sorts' naturally translate 分けています.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translate the line naturally into casual Korean 반말.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Lu Ming speaks to Xu Nuo in 반말, correctly used in 1.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"고맙습니다 is much more natural business Korean for 助かります than 도움이 됩니다.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both correctly translate the sentence using polite 합쇼체.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are accurate and natural translations into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Cake refers to food (먹어보고), whereas 2 mistranslates as 써보고.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both accurately translate the pronunciation note and shared server.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Matches the defined term MoaLogis closely without splitting into Moaro.\"}\n]\n```\n",
+  "duration_seconds": 5.061396,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17191,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17516
+  }
+ }
+}

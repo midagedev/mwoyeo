@@ -1,0 +1,31 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0370.1",
+  "item-0280.2",
+  "item-0375.1",
+  "item-0127.2",
+  "item-0187.2",
+  "item-0191.2",
+  "item-0319.1",
+  "item-0105.2",
+  "item-0179.1",
+  "item-0274.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f398fc39-9c14-4d99-9cac-ed43189d1257",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 has redundant phrasing and overly formal honorifics toward a brother.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"기사 in logistics refers to driver, not equipment operator.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translate the line accurately and naturally.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 translates the wrong line entirely.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 霜 (Shuang) as Fang.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the source Japanese untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Uses the specified term 마정석 instead of 마석.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"More natural 반말 imperative for an elder guild master to an apprentice.\"}\n]\n```\n",
+  "duration_seconds": 5.299413,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17485,
+   "output_tokens": 305,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17790
+  }
+ }
+}

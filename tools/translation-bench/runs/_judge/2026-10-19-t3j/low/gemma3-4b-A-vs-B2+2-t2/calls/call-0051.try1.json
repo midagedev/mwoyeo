@@ -1,0 +1,31 @@
+{
+ "call": 51,
+ "try": 1,
+ "ids": [
+  "item-0335.1",
+  "item-0119.1",
+  "item-0113.2",
+  "item-0118.1",
+  "item-0342.1",
+  "item-0178.2",
+  "item-0354.2",
+  "item-0240.1",
+  "item-0100.1",
+  "item-0085.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d4ef01f0-be67-401e-a757-e7ea1038504f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates the team name and structures the sentence naturally.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Female speaker calls her older brother '오빠', but Translation 2 uses '형'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Siobhan speaks 반말 to Rory; Translation 2 incorrectly says 'my bed'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 completely failed to translate into English.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 leaves untranslated Japanese characters at the end.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both fail to use 반말 between crewmates and are equally awkward.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"警部 means Inspector, which Translation 1 correctly translates.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 leaves untranslated Chinese characters for 婷姐.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly conveys passing along thanks rather than thanking for waking.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 left the entire line untranslated in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 6.120232,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17353,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17685
+  }
+ }
+}

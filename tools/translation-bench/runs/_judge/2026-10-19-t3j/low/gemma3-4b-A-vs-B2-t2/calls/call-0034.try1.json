@@ -1,0 +1,31 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0216.1",
+  "item-0037.1",
+  "item-0100.1",
+  "item-0206.2",
+  "item-0063.2",
+  "item-0324.1",
+  "item-0264.1",
+  "item-0283.1",
+  "item-0292.1",
+  "item-0167.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0bf0f118-c0df-4bd3-8efa-f5c0d2ebe53e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"兩成 means 20%, whereas Translation 2 misinterprets it as 2 times.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both correctly translate the sentence accurately into natural English.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 leaves Japanese characters untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 naturally translates 'ついてる' as having one's back.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly conveys Mom wants them there; 2 misattributes the request.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 警部 as Inspector.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 uses the prescribed 합쇼체 speech level correctly.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately in natural informal Korean (반말).\"}\n]\n```\n",
+  "duration_seconds": 4.854754,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17291,
+   "output_tokens": 318,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17609
+  }
+ }
+}

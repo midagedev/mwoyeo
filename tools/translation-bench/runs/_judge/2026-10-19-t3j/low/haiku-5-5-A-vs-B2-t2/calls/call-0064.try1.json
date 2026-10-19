@@ -1,0 +1,31 @@
+{
+ "call": 64,
+ "try": 1,
+ "ids": [
+  "item-0309.1",
+  "item-0202.2",
+  "item-0096.2",
+  "item-0108.2",
+  "item-0011.1",
+  "item-0156.2",
+  "item-0304.1",
+  "item-0334.1",
+  "item-0351.2",
+  "item-0109.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "72c3f960-dc34-46fa-b0e7-18a3306b7f6c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Honorific 잘하세요 fits junior-to-senior respect better than 잘해요.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and convey the sentence equally well.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates the names and kanji into Korean properly.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Thorne speaks to Rook in 해요체; Translation 2 reflects this correctly.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 sounds much more natural for casual chat.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 romanizes the compound surname 万俟 (Moqi/Wanqi) into English characters.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 left Japanese untranslated.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Neither used the term 'Revisions', making both equally acceptable title translations.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Hiroba is a feature/space name in the app context.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Context is tea stock/goods (货/贷 typo), not a bank loan (대출).\"}\n]\n```\n",
+  "duration_seconds": 4.91223,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17338,
+   "output_tokens": 346,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17684
+  }
+ }
+}

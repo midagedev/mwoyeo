@@ -1,0 +1,31 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0385.2",
+  "item-0004.1",
+  "item-0059.1",
+  "item-0275.2",
+  "item-0050.2",
+  "item-0305.1",
+  "item-0260.1",
+  "item-0192.1",
+  "item-0067.2",
+  "item-0320.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8946ecca-1b6a-41fa-9e65-70c2be2e4584",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English and changed the title.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Faithfully includes the exhausted spiritual energy clause omitted by Translation 2.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly translates the location Ceres as 세레스 rather than 시에스.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"More accurate and natural rendering of 'where you put it'.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both incorrectly use 형 instead of 오빠 for a female speaker.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 uses unnatural phrasing like '두 백 박스' and inaccurate meanings.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both reasonably complete and translate the truncated Korean onboarding sentence.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translates the full line, whereas Translation 2 is cut off.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Uses the correct romanized surname Shàn instead of Duan.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Follows the required 합쇼체 speech level to the section chief.\"}\n]\n```\n",
+  "duration_seconds": 4.802858,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17510,
+   "output_tokens": 326,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17836
+  }
+ }
+}

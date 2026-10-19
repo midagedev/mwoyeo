@@ -1,0 +1,26 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0360.1",
+  "item-0342.1",
+  "item-0288.1",
+  "item-0125.2",
+  "item-0310.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fa8dea58-3303-469a-8daa-48ac83bfa004",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Candidate 2 left the Japanese text completely untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Natural Korean phrasing for staging files in Git.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correct informal speech level, though both mistranslated two nights.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Candidate 1 mistranslated the name and used incorrect informal speech.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Same row' is much more natural and standard than 'same line'.\"}\n]\n",
+  "duration_seconds": 4.464332,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15677,
+   "output_tokens": 156,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15833
+  }
+ }
+}

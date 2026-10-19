@@ -1,0 +1,31 @@
+{
+ "call": 59,
+ "try": 1,
+ "ids": [
+  "item-0199.2",
+  "item-0101.2",
+  "item-0284.2",
+  "item-0082.1",
+  "item-0352.1",
+  "item-0128.2",
+  "item-0117.2",
+  "item-0359.2",
+  "item-0079.2",
+  "item-0094.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5c6fea19-2d5b-4eb9-b742-8da7baf4e568",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Lu Ming speaks to Zhou Ting in 해요체.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Kai speaks to club juniors in 반말.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Lin Yuan addresses his younger sister Lin Xia in 반말.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Qiu Shuang is female, so 'her sleeve' is correct.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly translates Zeng Lan and uses appropriate register.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left the source Korean untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Follows the specified term 事務所 = Bureau.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Hikaru is female; 'she' is the correct pronoun.\"}\n]\n```\n",
+  "duration_seconds": 4.302026,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5656,
+   "output_tokens": 296,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11824,
+   "total_tokens": 5952
+  }
+ }
+}

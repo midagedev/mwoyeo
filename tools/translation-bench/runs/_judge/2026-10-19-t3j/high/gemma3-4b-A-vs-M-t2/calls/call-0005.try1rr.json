@@ -1,0 +1,26 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0100.1",
+  "item-0062.2",
+  "item-0232.2",
+  "item-0082.2",
+  "item-0024.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0415b929-5f64-4f1d-b754-dcff43abb588",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"1 uses natural workplace phrasing for leave instead of translationese.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"2 translates 'Fine, but' correctly and avoids mispronouncing Aoife.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"1 correctly uses 해요체 as required by the facts.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"1 correctly uses 합쇼체; 2 inappropriately uses 반말 ('그래').\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"2 preserves the active voice and reads more naturally in English.\"}\n]\n",
+  "duration_seconds": 86.352872,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15739,
+   "output_tokens": 10865,
+   "thinking_tokens": 10703,
+   "cache_read_tokens": 0,
+   "total_tokens": 26604
+  }
+ }
+}

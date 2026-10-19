@@ -1,0 +1,31 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0166.2",
+  "item-0219.2",
+  "item-0136.1",
+  "item-0384.2",
+  "item-0370.1",
+  "item-0225.1",
+  "item-0127.2",
+  "item-0330.1",
+  "item-0181.2",
+  "item-0099.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "01382e50-12e3-4c15-9cd7-c5820f947cec",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both capture the meaning and names naturally and accurately.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly includes the job title 'Manager'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both are natural Korean translations in correct 반말 register.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the designated 반말 speech level.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 adheres to the specified term 納期 = 납품일.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 accurately translates 俺です and matches incomplete speech.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both natural, fluent 반말 renderings matching the casual group chat.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both correctly observe the required 합쇼체 honorific register.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both accurately translate the sentence with natural phrasing.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean and uses correct 반말.\"}\n]\n```\n",
+  "duration_seconds": 4.854813,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17164,
+   "output_tokens": 308,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17472
+  }
+ }
+}

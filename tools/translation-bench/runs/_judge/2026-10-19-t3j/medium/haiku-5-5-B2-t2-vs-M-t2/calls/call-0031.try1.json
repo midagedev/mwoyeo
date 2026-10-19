@@ -1,0 +1,27 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0009.2",
+  "item-0243.1",
+  "item-0217.1",
+  "item-0003.1",
+  "item-0331.1",
+  "item-0068.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4a993ac3-8087-4ecc-baad-ff12ecf490b8",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses informal speech (반말) matching the facts.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 reads much more naturally and avoids awkward translationese.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and use the correct speech level.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 translates the name into Korean rather than keeping Japanese.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both 'said' and 'says' are natural, accurate translations of the line.\"}\n]\n```\n",
+  "duration_seconds": 118.360539,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 4421,
+   "output_tokens": 14411,
+   "thinking_tokens": 14209,
+   "cache_read_tokens": 11813,
+   "total_tokens": 18832
+  }
+ }
+}

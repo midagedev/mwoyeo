@@ -1,0 +1,27 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0002.1",
+  "item-0056.2",
+  "item-0025.2",
+  "item-0019.2",
+  "item-0055.1",
+  "item-0026.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f3fb7c1f-b889-405a-820b-dc28685b92a4",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Sister's daughter refers to her mother's brother as 외삼촌.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"기사 refers to delivery drivers in a logistics context.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"ホタル is a product code name and should not be translated literally.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"The surname 村田 (Murata) is correctly transcribed as 무라타.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly uses subject honorific (하셨어) when referring to the professor's statement.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 was left entirely untranslated.\"}\n]\n",
+  "duration_seconds": 16.748833,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15927,
+   "output_tokens": 1843,
+   "thinking_tokens": 1644,
+   "cache_read_tokens": 0,
+   "total_tokens": 17770
+  }
+ }
+}

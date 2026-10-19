@@ -1,0 +1,31 @@
+{
+ "call": 36,
+ "try": 1,
+ "ids": [
+  "item-0089.2",
+  "item-0262.1",
+  "item-0058.2",
+  "item-0180.1",
+  "item-0267.2",
+  "item-0137.2",
+  "item-0217.1",
+  "item-0228.1",
+  "item-0046.2",
+  "item-0245.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "35f7821a-441a-4a51-8384-e3ac923fe1c2",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey the Git conflict instructions accurately and naturally.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural Japanese-to-Korean direction and polite restroom farewell.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses the specified term '선장' for Captain instead of '함장'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translates the Japanese name rather than leaving raw kanji.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 accurately translates the Korean source into English.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses the specified term 엠티 instead of untranslated terms.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Faithful translation adhering to the casual register and meaning.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Uses the specified term '납품일' for 納期.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both capture the casual princess speech and meaning accurately.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translates Chinese into English instead of leaving untranslated source text.\"}\n]\n```\n",
+  "duration_seconds": 5.71963,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17667,
+   "output_tokens": 315,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17982
+  }
+ }
+}

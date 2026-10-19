@@ -1,0 +1,31 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0320.2",
+  "item-0283.2",
+  "item-0114.2",
+  "item-0314.1",
+  "item-0282.1",
+  "item-0074.1",
+  "item-0327.2",
+  "item-0304.2",
+  "item-0317.1",
+  "item-0285.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6dd7c897-f2fa-46c3-b5ae-1128bee104d0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 leaves 阁主 untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Dan Yunzhou should be Shan Yunzhou, but 1 is more natural.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"More natural phrasing and accurately uses active voice.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Qiu is the correct surname pronunciation per context.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 did not translate into Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 did not translate into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 wrongly translates 'At my older brother's place'.\"}\n]\n```\n",
+  "duration_seconds": 4.725383,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17546,
+   "output_tokens": 295,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17841
+  }
+ }
+}

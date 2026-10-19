@@ -1,0 +1,31 @@
+{
+ "call": 76,
+ "try": 1,
+ "ids": [
+  "item-0049.1",
+  "item-0096.1",
+  "item-0315.1",
+  "item-0323.1",
+  "item-0244.2",
+  "item-0263.1",
+  "item-0095.2",
+  "item-0098.1",
+  "item-0301.2",
+  "item-0261.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d6dff411-ede3-43e6-8a46-5fdd65c58de1",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both correctly translate meaning, honorifics, and speech level (해요체).\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated in Chinese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Naturally applies appropriate honorifics for a third party in polite register.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 is in Japanese rather than Korean.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both are accurate and natural English translations of the sentence.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both are equally natural and accurate English renderings.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correctly interprets ひとこと as the note feature defined in context.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese; Translation 2 correctly uses 반말.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Chinese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 is in Japanese instead of Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.516803,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17542,
+   "output_tokens": 313,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17855
+  }
+ }
+}

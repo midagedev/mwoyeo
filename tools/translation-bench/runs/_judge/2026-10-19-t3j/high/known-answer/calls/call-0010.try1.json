@@ -1,0 +1,36 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0057.1",
+  "item-0042.2",
+  "item-0060.1",
+  "item-0004.2",
+  "item-0031.2",
+  "item-0081.2",
+  "item-0005.2",
+  "item-0008.2",
+  "item-0009.1",
+  "item-0068.2",
+  "item-0002.2",
+  "item-0021.1",
+  "item-0083.1",
+  "item-0051.2",
+  "item-0006.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c6cfa624-4fc6-4bb2-a283-7df5ba0e663a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"\\\"보증금\\\" translates to deposit, not guarantee.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Faithfully preserves the \\\"-san\\\" honorific Hikaru used.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Hikaru is female, so \\\"she\\\" is correct.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Korean text.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"\\\"見積書\\\" means 견적서, not 추정서.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left Japanese text untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Matches the defined term \\\"付箋 = Sticky\\\".\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Matches the defined term \\\"毛茶 = 모차\\\".\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Japanese bridge names should be transliterated.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Mother's brother is 외삼촌, not 작은아버지.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"\\\"That one\\\" refers to tag, not branch.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"\\\"호타루\\\" is a sensor's internal product name.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Uses subject honorific \\\"-시-\\\" for client Kiryu.\"}\n]\n```\n",
+  "duration_seconds": 49.600047,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 18863,
+   "output_tokens": 6818,
+   "thinking_tokens": 6369,
+   "cache_read_tokens": 0,
+   "total_tokens": 25681
+  }
+ }
+}

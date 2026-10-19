@@ -1,0 +1,31 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0325.1",
+  "item-0135.1",
+  "item-0140.1",
+  "item-0307.2",
+  "item-0078.2",
+  "item-0311.2",
+  "item-0157.1",
+  "item-0236.1",
+  "item-0080.2",
+  "item-0252.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d6dd01c2-97b6-486c-8568-4fc05823d6bd",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Past tense 'said' accurately reflects the landlord's prior instruction (하래서).\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates the kanji surname 小鳥遊 to Takanashi instead of leaving untranslated characters.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Naturally translates 'Does she want a pickup?' into natural casual Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Respectfully uses proper honorifics ('관리인분', '계신가요') appropriate for speaking to the landlord.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and accurate renderings of the line.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses the specified name spelling '루밍' instead of Sino-Korean reading '육명'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'그럼 뭔데?' is more concise, idiomatic, and natural in spoken Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Follows the specified romanization 'Seoyoon' given in the facts.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Phrasing '무라타 씨의 회신에 따라 달라집니다' flows much more naturally in Korean.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are completely faithful, fluent, and accurate.\"}\n]\n```\n",
+  "duration_seconds": 5.629366,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17448,
+   "output_tokens": 371,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17819
+  }
+ }
+}

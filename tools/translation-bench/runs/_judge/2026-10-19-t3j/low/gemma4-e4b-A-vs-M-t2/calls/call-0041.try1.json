@@ -1,0 +1,25 @@
+{
+ "call": 41,
+ "try": 1,
+ "ids": [
+  "item-0138.1",
+  "item-0115.1",
+  "item-0030.2",
+  "item-0037.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "80bcf7c8-5fa1-4dd6-9a06-efad1c271d2f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Moving crates is a task to do ('하겠습니다'), not go ('가겠습니다').\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 was left untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translates the pronunciation guide naturally into Korean ('이파라고 발음').\"}\n]\n```\n",
+  "duration_seconds": 3.61279,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15403,
+   "output_tokens": 133,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15536
+  }
+ }
+}

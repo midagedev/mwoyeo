@@ -1,0 +1,27 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0007.2",
+  "item-0050.1",
+  "item-0037.1",
+  "item-0005.1",
+  "item-0073.2",
+  "item-0077.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ff4c7e41-4170-468c-807d-5d3b39fbcdc7",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both Eom and Um are valid romanizations of the surname 엄.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly transliterates Dex as 덱스 instead of 덱서.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"The surname 仇 is correctly romanized as Qiu, not Chou.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"The listener is female, so her older brother is 오빠, not 형.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"馬車 translates to carriage (마차), not automobile (자동차).\"}\n]\n",
+  "duration_seconds": 21.216731,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16151,
+   "output_tokens": 2404,
+   "thinking_tokens": 2204,
+   "cache_read_tokens": 0,
+   "total_tokens": 18555
+  }
+ }
+}

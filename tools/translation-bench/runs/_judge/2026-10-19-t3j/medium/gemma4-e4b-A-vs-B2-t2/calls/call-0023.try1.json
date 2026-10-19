@@ -1,0 +1,27 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0241.1",
+  "item-0050.1",
+  "item-0376.2",
+  "item-0046.2",
+  "item-0145.2",
+  "item-0376.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "bc162afb-09f7-4327-a3fd-71e88c3e0928",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates the pronunciation guide into Korean for the target audience.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Accurately preserves 'one branch', which is omitted in candidate 2.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'The access card you receive' is much more natural English.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Candidate 2 is left untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Candidate 2 is left untranslated in Japanese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'The access card you receive' is much more natural English.\"}\n]\n```\n",
+  "duration_seconds": 23.345652,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15805,
+   "output_tokens": 2833,
+   "thinking_tokens": 2642,
+   "cache_read_tokens": 0,
+   "total_tokens": 18638
+  }
+ }
+}

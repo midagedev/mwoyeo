@@ -1,0 +1,31 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0031.1",
+  "item-0048.2",
+  "item-0012.2",
+  "item-0013.1",
+  "item-0038.2",
+  "item-0033.2",
+  "item-0050.2",
+  "item-0030.2",
+  "item-0036.2",
+  "item-0029.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9bc9d889-744c-4355-9440-e88878a7103e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the standard software term '브랜치' rather than '가지'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the company name '모아로지스' rather than 'Moores'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese text untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 uses the defined term 'Commons' for ひろば.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the provided reading Yamanashi for 月見里.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left the source Japanese text untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated in Japanese.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 follows the source phrasing more accurately and naturally.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are accurate; they differ only in title capitalization.\"}\n]\n```\n",
+  "duration_seconds": 5.716982,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16596,
+   "output_tokens": 334,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16930
+  }
+ }
+}

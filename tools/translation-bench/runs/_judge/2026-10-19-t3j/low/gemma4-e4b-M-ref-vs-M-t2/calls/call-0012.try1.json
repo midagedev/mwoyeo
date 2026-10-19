@@ -1,0 +1,31 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0119.2",
+  "item-0155.1",
+  "item-0078.2",
+  "item-0079.2",
+  "item-0242.1",
+  "item-0099.2",
+  "item-0308.2",
+  "item-0002.1",
+  "item-0319.1",
+  "item-0109.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0d3e0d46-1b4e-464c-aaed-8196bd6488ae",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Inspector Akira is an official colleague; 'Akira' is more natural than 'Ms. Akira'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Modakbul is an app/channel name, not literally a campfire.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Subject marker '-이' sounds much more natural here than topic marker '-은'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Takanashi's gender is unspecified; 'sales plans' avoids assuming gender.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Concise imperative without 'please' fits software help guides more naturally.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"陆明 speaks to 周婷 in 해요체; however, both used 반말 and 1 transliterates 婷 naturally.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Speaker is unspecified, so speech level cannot be strictly determined.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are natural and convey identical meaning and tone.\"}\n]\n```\n",
+  "duration_seconds": 5.353178,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16982,
+   "output_tokens": 343,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17325
+  }
+ }
+}

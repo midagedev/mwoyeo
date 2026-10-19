@@ -1,0 +1,31 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0043.1",
+  "item-0075.1",
+  "item-0113.1",
+  "item-0057.2",
+  "item-0326.1",
+  "item-0246.2",
+  "item-0143.2",
+  "item-0210.1",
+  "item-0294.2",
+  "item-0291.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2db1310e-4dbf-4a88-99b2-4df1f1abffdf",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"소장이 조카에게 일상적인 반말(해요/해체)로 말하는 자연스러운 톤 반영\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"1번은 한국어로 번역되지 않고 원문이 그대로 출력됨\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"1번은 메타 설명 문구가 포함되어 있으며 온전한 번역이 아님\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"2번은 한국어로 번역되지 않고 일본어 원문이 유지됨\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'山下'는 산기슭(foot of the mountain)을 정확히 표현함\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"친구/동생에게 말하므로 부자연스러운 '당신이' 없이 자연스러운 반말 구사\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"두 번역 모두 의미와 표현이 자연스럽고 우열이 없음\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"1번은 한국어로 번역되지 않고 일본어 원문이 유지됨\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"2번은 한국어로 번역되지 않고 일본어 원문이 유지됨\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"2번은 한국어로 번역되지 않고 중국어 원문이 유지됨\"}\n]\n```\n",
+  "duration_seconds": 8.859651,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17655,
+   "output_tokens": 378,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18033
+  }
+ }
+}

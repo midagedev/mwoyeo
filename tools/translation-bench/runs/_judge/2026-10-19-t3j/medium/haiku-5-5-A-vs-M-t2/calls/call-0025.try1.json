@@ -1,0 +1,27 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0252.1",
+  "item-0285.2",
+  "item-0097.1",
+  "item-0337.1",
+  "item-0240.1",
+  "item-0322.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "93c04431-2346-4ff5-bcea-28ddfa07ec49",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"2 reads more naturally with 'gazed out the window at'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"2 is more natural without the unnecessary comma.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both are natural, accurate headings for an onboarding guide.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"1 properly transliterates the road name into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"2 correctly uses the third-person pronoun 'she' for Nagi.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"2 translates 'hot tub' accurately and uses natural spoken phrasing.\"}\n]\n",
+  "duration_seconds": 89.455106,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16177,
+   "output_tokens": 10595,
+   "thinking_tokens": 10410,
+   "cache_read_tokens": 0,
+   "total_tokens": 26772
+  }
+ }
+}

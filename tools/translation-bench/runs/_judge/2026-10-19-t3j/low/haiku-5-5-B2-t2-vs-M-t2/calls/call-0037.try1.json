@@ -1,0 +1,31 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0122.2",
+  "item-0350.1",
+  "item-0218.2",
+  "item-0176.1",
+  "item-0369.1",
+  "item-0227.2",
+  "item-0280.2",
+  "item-0168.2",
+  "item-0138.1",
+  "item-0187.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "054953c9-9905-43bd-871c-b60cce52988a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Uses honorific for the father while keeping informal speech between siblings.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately convey the message.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'3년 만에' naturally expresses 'for the first time in three years'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Honorific '잘하세요?' is appropriate when addressing a senior club member.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly retains the defined terms 'fleet allocation' and 'Pathfinder'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'검은 안개' and '북문을 지키게' read much more naturally in Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Uses specified name '타카나시' and naturally translates the polite inquiry.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both 'all of your devices' and 'all your devices' are natural and accurate.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"More natural phrasing and proper sentence ending punctuation.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'Your day off' correctly captures context as Seoyoon is cleaning her apartment.\"}\n]\n```\n",
+  "duration_seconds": 5.7537199999999995,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5626,
+   "output_tokens": 340,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11816,
+   "total_tokens": 5966
+  }
+ }
+}

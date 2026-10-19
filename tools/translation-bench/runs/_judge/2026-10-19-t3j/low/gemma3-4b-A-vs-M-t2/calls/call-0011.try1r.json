@@ -1,0 +1,26 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0283.2",
+  "item-0114.2",
+  "item-0282.1",
+  "item-0317.1",
+  "item-0285.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4a9d924f-9159-42e6-9b9f-66634c16bb51",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 contains an unnatural typo/calque '맡せて'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 invents 'my pocket watch' not in the source.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Qin is an Elder, and 榻 is a daybed/mat, not table.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 translates the previous line instead of the line to translate.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both incorrectly translate the name 小鳥遊 (타카나시).\"}\n]\n```\n",
+  "duration_seconds": 4.387848,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15875,
+   "output_tokens": 175,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16050
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0060.2",
+  "item-0023.2",
+  "item-0199.2",
+  "item-0015.1",
+  "item-0163.2",
+  "item-0168.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b022b419-fa59-4ac7-afa0-6c812f7b90ea",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly uses specified terms '블렌딩' and '모차'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly uses the specified term '마정석' instead of '마석'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Matches the 'New hire' phrasing from the facts block.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and convey the same meaning.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly uses the specified character name '루크' instead of '룩'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses the correct speech level (반말) for Siobhan addressing Rory.\"}\n]\n",
+  "duration_seconds": 166.991153,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15944,
+   "output_tokens": 21329,
+   "thinking_tokens": 21125,
+   "cache_read_tokens": 0,
+   "total_tokens": 37273
+  }
+ }
+}

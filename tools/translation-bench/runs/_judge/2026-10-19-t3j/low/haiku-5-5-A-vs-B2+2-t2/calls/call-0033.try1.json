@@ -1,0 +1,31 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0310.2",
+  "item-0187.2",
+  "item-0316.2",
+  "item-0292.1",
+  "item-0100.2",
+  "item-0063.1",
+  "item-0208.1",
+  "item-0032.2",
+  "item-0195.1",
+  "item-0026.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b4a1c7d9-b7be-41ba-92c6-e2a180937eef",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Zhou Yi speaks to Lin Xia in 반말, or here answering Lin Xia.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate in meaning and register.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 sounds more natural and idiomatic in a software tutorial context.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말; Translation 2 uses natural informal Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'온수 욕조' is a direct and faithful translation of hot tub.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"仇 as a surname is pronounced Qiú, not Chóu.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Siobhan speaks to Gareth in 합쇼체; Translation 1 correctly uses formal speech.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 naturally translates 'They promised Tuesday' in conversational Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'Synced across all your devices' is standard and natural technical English.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'Should we invite' accurately captures the joint suggestion between coworkers.\"}\n]\n```\n",
+  "duration_seconds": 4.647287,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17472,
+   "output_tokens": 338,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17810
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0027.2",
+  "item-0016.1",
+  "item-0206.1",
+  "item-0212.2",
+  "item-0337.2",
+  "item-0038.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1cc84e3e-f248-4c73-a1ec-a3ac5191b09e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses conversational 반말 instead of written style.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly uses third-person pronouns for Nagi.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 uses the correct intention ending and natural phrasing.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 leaves the name Bori untranslated in Hangul.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 reverses who receives help with an incorrect ending.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 accurately translates 守住 as guard rather than hold.\"}\n]\n```\n",
+  "duration_seconds": 67.002673,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16256,
+   "output_tokens": 7901,
+   "thinking_tokens": 7705,
+   "cache_read_tokens": 0,
+   "total_tokens": 24157
+  }
+ }
+}

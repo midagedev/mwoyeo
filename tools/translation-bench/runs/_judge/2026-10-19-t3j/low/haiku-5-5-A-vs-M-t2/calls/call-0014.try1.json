@@ -1,0 +1,31 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0076.2",
+  "item-0178.1",
+  "item-0105.2",
+  "item-0374.2",
+  "item-0293.1",
+  "item-0093.1",
+  "item-0369.1",
+  "item-0205.1",
+  "item-0109.1",
+  "item-0210.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ba8b8006-9c25-4e1e-9c21-030790cec4bf",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations accurately convey the meaning of the search instruction.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"The context discusses a lost watch (an object, not a place).\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both incorrectly use 형 instead of 오빠 for a female speaker.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"泡 here refers to steeping/brewing tea for a guest.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate renderings of the Korean sentence.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 uses the established term '카운슬 택스' from the facts block.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses correct 반말 speech level and the specified term '마정석'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Accurately transliterates the Japanese character names instead of using Hanja readings.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Uses natural Korean honorifics and 해요체 register for talking about the super.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 captures the sarcastic idiom 'volunteer someone' far better.\"}\n]\n```\n",
+  "duration_seconds": 4.706713,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17419,
+   "output_tokens": 337,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17756
+  }
+ }
+}

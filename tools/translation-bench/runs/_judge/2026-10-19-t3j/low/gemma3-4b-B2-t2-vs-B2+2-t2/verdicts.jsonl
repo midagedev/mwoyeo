@@ -1,0 +1,100 @@
+{"id": "item-0042.1", "better": "1", "why": "Translation 1 uses the correct topic particle '은' after consonant 't'.", "call": 1}
+{"id": "item-0037.1", "better": "2", "why": "Translation 2 uses natural phrasing and appropriate plural form 'Quick Notes'.", "call": 1}
+{"id": "item-0026.2", "better": "2", "why": "Translation 1 failed to translate the Korean source into English.", "call": 1}
+{"id": "item-0030.1", "better": "1", "why": "Translation 2 left the text in Japanese without translating to Korean.", "call": 1}
+{"id": "item-0028.1", "better": "1", "why": "Translation 1 correctly translates 'メモ' naturally in plural form.", "call": 1}
+{"id": "item-0024.2", "better": "1", "why": "Translation 1 translated into English; Translation 2 left it in Korean.", "call": 1}
+{"id": "item-0025.2", "better": "2", "why": "Translation 1 left text in Korean; Translation 2 attempted English translation.", "call": 1}
+{"id": "item-0044.2", "better": "1", "why": "Translation 1 is more faithful to 'stays in the working tree for now'.", "call": 1}
+{"id": "item-0035.2", "better": "1", "why": "Translation 1 gets Yamanashi's name right based on context furigana.", "call": 1}
+{"id": "item-0027.2", "better": "1", "why": "Translation 1 accurately translates '할 일을 순서대로' and preserves the arrow symbol.", "call": 1}
+{"id": "item-0008.2", "better": "1", "why": "Translation 1 sounds more natural and idiomatic in Korean.", "call": 4}
+{"id": "item-0041.2", "better": "1", "why": "\"On site\" as an adverbial phrase is typically unhyphenated.", "call": 4}
+{"id": "item-0017.2", "better": "tie", "why": "Both failed to translate the Korean source into English.", "call": 4}
+{"id": "item-0007.2", "better": "tie", "why": "Both are identical except for an optional comma.", "call": 4}
+{"id": "item-0038.1", "better": "2", "why": "Uses the established term 'Commons' instead of untranslated 'Hiroba'.", "call": 4}
+{"id": "item-0023.1", "better": "1", "why": "Preserves the original sentence-ending glyph symbol ◆.", "call": 4}
+{"id": "item-0022.2", "better": "2", "why": "Translation 2 translates into English; Translation 1 left it untranslated.", "call": 4}
+{"id": "item-0036.1", "better": "2", "why": "Matches the source text more faithfully and naturally.", "call": 4}
+{"id": "item-0045.1", "better": "1", "why": "\"Deliverables\" is much closer to onboarding steps than \"landing page\".", "call": 4}
+{"id": "item-0028.2", "better": "2", "why": "Plural 'notes' and 'tags' read more naturally than singular 'memo'.", "call": 4}
+{"id": "item-0046.1", "better": "1", "why": "Translation 2 leaves untranslated Chinese text and has heavy mistranslations.", "call": 2}
+{"id": "item-0019.2", "better": "1", "why": "Correct Git terminology '브랜치' instead of literal '가지'.", "call": 2}
+{"id": "item-0027.1", "better": "tie", "why": "Both translations are natural, accurate, and preserve meaning.", "call": 2}
+{"id": "item-0014.2", "better": "2", "why": "Refers respectfully to the boiler technician with '그분'.", "call": 2}
+{"id": "item-0015.1", "better": "tie", "why": "Both candidate translations are completely identical.", "call": 2}
+{"id": "item-0018.1", "better": "2", "why": "Translation 1 failed to translate the Korean source into English.", "call": 2}
+{"id": "item-0010.2", "better": "2", "why": "Translation 1 failed to translate Japanese into English.", "call": 2}
+{"id": "item-0005.2", "better": "tie", "why": "Both translations are virtually identical and accurately capture the meaning.", "call": 2}
+{"id": "item-0032.1", "better": "2", "why": "'Practical work' fits '실무' better than 'practical session'.", "call": 2}
+{"id": "item-0006.1", "better": "tie", "why": "Both candidates left the source text completely untranslated.", "call": 2}
+{"id": "item-0037.2", "better": "1", "why": "Matches plural 'short notes' naturally and reflects UI term formatting.", "call": 3}
+{"id": "item-0011.2", "better": "1", "why": "Uses the established English term 'Commons' from context.", "call": 3}
+{"id": "item-0020.2", "better": "1", "why": "Translation 2 is severely mistranslated and ungrammatical.", "call": 3}
+{"id": "item-0025.1", "better": "1", "why": "Translation 2 failed to translate into English entirely.", "call": 3}
+{"id": "item-0043.1", "better": "1", "why": "Translation 2 leaves Chinese untranslated and uses incorrect subject phrasing.", "call": 3}
+{"id": "item-0002.1", "better": "2", "why": "Translation 2 sounds much more natural and concise in Korean.", "call": 3}
+{"id": "item-0024.1", "better": "2", "why": "Translation 1 failed to translate into English.", "call": 3}
+{"id": "item-0046.2", "better": "tie", "why": "Both fail on tone, place names, and National Day (十一) meaning.", "call": 3}
+{"id": "item-0012.1", "better": "2", "why": "Moa Logistics correctly reflects the company name '모아' unlike Moores.", "call": 3}
+{"id": "item-0044.1", "better": "1", "why": "Uses '작업 트리' which is closer to the terminology guidelines.", "call": 3}
+{"id": "item-0016.2", "better": "tie", "why": "Both incorrectly romanize Takanashi as Kotori and differ only slightly.", "call": 7}
+{"id": "item-0042.2", "better": "2", "why": "Git takes the topic marker 은 due to ending in consonant t.", "call": 7}
+{"id": "item-0021.1", "better": "1", "why": "Translation 2 left the Japanese source text untranslated.", "call": 7}
+{"id": "item-0015.2", "better": "tie", "why": "Both translations are identical.", "call": 7}
+{"id": "item-0013.2", "better": "2", "why": "Translation 1 left the Japanese source text untranslated.", "call": 7}
+{"id": "item-0029.1", "better": "tie", "why": "Both are accurate translations differing only in capitalization.", "call": 7}
+{"id": "item-0021.2", "better": "2", "why": "Translation 1 left the Japanese source text untranslated.", "call": 7}
+{"id": "item-0049.2", "better": "2", "why": "Translation 1 left the Korean source text untranslated.", "call": 7}
+{"id": "item-0002.2", "better": "1", "why": "Translation 1 reads more naturally than the passive phrasing in 2.", "call": 7}
+{"id": "item-0016.1", "better": "tie", "why": "Both fail to translate Takanashi properly, with minor aspect differences.", "call": 7}
+{"id": "item-0023.2", "better": "2", "why": "More natural phrasing matching the original text's tone and symbol.", "call": 6}
+{"id": "item-0039.2", "better": "1", "why": "Announcements and conversations 'happen' in a channel naturally.", "call": 6}
+{"id": "item-0018.2", "better": "1", "why": "Translation 2 failed to translate the sentence into English.", "call": 6}
+{"id": "item-0014.1", "better": "1", "why": "Rory speaks 해요체 to landlord Gareth; 그분 is more polite than 그.", "call": 6}
+{"id": "item-0009.2", "better": "2", "why": "Translation 1 failed to translate the Japanese text into English.", "call": 6}
+{"id": "item-0034.1", "better": "tie", "why": "Both translations are identical, accurate, and concise.", "call": 6}
+{"id": "item-0032.2", "better": "1", "why": "'Practical work' fits '실무' much better than 'practical session'.", "call": 6}
+{"id": "item-0045.2", "better": "tie", "why": "Both incorrectly translate the internal onboarding program '발판' (Launchpad).", "call": 6}
+{"id": "item-0022.1", "better": "1", "why": "Translation 2 did not translate the text into English.", "call": 6}
+{"id": "item-0001.1", "better": "1", "why": "Uses 해요체 for 周婷 and correctly translates 民宿 and 酒店.", "call": 6}
+{"id": "item-0047.2", "better": "2", "why": "Translation 1 mistranslates morning/boiler; 2 is far more accurate.", "call": 8}
+{"id": "item-0003.1", "better": "1", "why": "Translation 2 left the source text completely untranslated.", "call": 8}
+{"id": "item-0004.2", "better": "1", "why": "Translation 2 left the text untranslated in Korean.", "call": 8}
+{"id": "item-0005.1", "better": "tie", "why": "Both convey the meaning accurately and naturally with negligible stylistic difference.", "call": 8}
+{"id": "item-0034.2", "better": "tie", "why": "Both translations are identical.", "call": 8}
+{"id": "item-0001.2", "better": "2", "why": "Translation 1 leaves Chinese characters and mistranslates 民宿 as barbecue place.", "call": 8}
+{"id": "item-0011.1", "better": "2", "why": "Earlier context establishes 『ひろば』 as Commons.", "call": 8}
+{"id": "item-0043.2", "better": "1", "why": "Translation 2 mistranslates 有空 (I have time) as honorific asking someone else.", "call": 8}
+{"id": "item-0026.1", "better": "1", "why": "Translation 2 left the line completely untranslated in Korean.", "call": 8}
+{"id": "item-0039.1", "better": "2", "why": "Happen is much more natural English for announcements and conversations occurring.", "call": 8}
+{"id": "item-0033.1", "better": "2", "why": "Translation 2 correctly reads the name 月見里 as Yamanashi.", "call": 5}
+{"id": "item-0004.1", "better": "2", "why": "Translation 1 failed to translate the Korean source into English.", "call": 5}
+{"id": "item-0019.1", "better": "2", "why": "Translation 2 uses standard Git terminology ('브랜치') rather than literal '가지'.", "call": 5}
+{"id": "item-0050.1", "better": "1", "why": "Translation 2 left the text in Japanese without translating to Korean.", "call": 5}
+{"id": "item-0048.1", "better": "2", "why": "Translation 2 uses standard Git terminology ('브랜치') rather than literal '가지'.", "call": 5}
+{"id": "item-0031.2", "better": "2", "why": "Translation 1 left the text untranslated in Japanese.", "call": 5}
+{"id": "item-0017.1", "better": "tie", "why": "Both candidates left the Korean text completely untranslated.", "call": 5}
+{"id": "item-0008.1", "better": "2", "why": "Translation 2 reads more naturally in Korean technical documentation context.", "call": 5}
+{"id": "item-0040.2", "better": "1", "why": "'Unloading' correctly translates logistics 하차, unlike 'disembarking'.", "call": 5}
+{"id": "item-0009.1", "better": "1", "why": "Translation 2 left the text completely untranslated in Japanese.", "call": 5}
+{"id": "item-0003.2", "better": "2", "why": "Translation 1 failed to translate into Korean.", "call": 9}
+{"id": "item-0035.1", "better": "2", "why": "Uses correct name reading Yamanashi and established term Quick Notes.", "call": 9}
+{"id": "item-0006.2", "better": "tie", "why": "Both candidates left the source text completely untranslated.", "call": 9}
+{"id": "item-0010.1", "better": "1", "why": "Translation 2 failed to translate the Japanese text into English.", "call": 9}
+{"id": "item-0020.1", "better": "2", "why": "Accurately conveys the condition and meaning, whereas 1 is nonsensical.", "call": 9}
+{"id": "item-0049.1", "better": "1", "why": "Translation 2 left the line completely untranslated in Korean.", "call": 9}
+{"id": "item-0007.1", "better": "1", "why": "A comma between coordinate clauses is slightly more natural here.", "call": 9}
+{"id": "item-0047.1", "better": "1", "why": "Translation 2 mistranslates boiler as burn boiler and sounds unnatural.", "call": 9}
+{"id": "item-0040.1", "better": "2", "why": "Accurately translates logistics term 하차 as unloading rather than disembarking.", "call": 9}
+{"id": "item-0041.1", "better": "tie", "why": "Both 'on-site' and 'on site' are accurate and natural translations.", "call": 9}
+{"id": "item-0031.1", "better": "1", "why": "Translation 2 left the line completely untranslated in Japanese.", "call": 10}
+{"id": "item-0048.2", "better": "1", "why": "Translation 1 correctly uses the standard software term '브랜치' rather than '가지'.", "call": 10}
+{"id": "item-0012.2", "better": "1", "why": "Translation 1 correctly translates the company name '모아로지스' rather than 'Moores'.", "call": 10}
+{"id": "item-0013.1", "better": "1", "why": "Translation 2 left the Japanese text untranslated.", "call": 10}
+{"id": "item-0038.2", "better": "1", "why": "Translation 1 uses the defined term 'Commons' for ひろば.", "call": 10}
+{"id": "item-0033.2", "better": "1", "why": "Translation 1 correctly uses the provided reading Yamanashi for 月見里.", "call": 10}
+{"id": "item-0050.2", "better": "2", "why": "Translation 1 left the source Japanese text untranslated.", "call": 10}
+{"id": "item-0030.2", "better": "2", "why": "Translation 1 left the line untranslated in Japanese.", "call": 10}
+{"id": "item-0036.2", "better": "1", "why": "Translation 1 follows the source phrasing more accurately and naturally.", "call": 10}
+{"id": "item-0029.2", "better": "tie", "why": "Both translations are accurate; they differ only in title capitalization.", "call": 10}

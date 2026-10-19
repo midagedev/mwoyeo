@@ -1,0 +1,31 @@
+{
+ "call": 66,
+ "try": 1,
+ "ids": [
+  "item-0171.1",
+  "item-0160.1",
+  "item-0045.2",
+  "item-0173.1",
+  "item-0139.1",
+  "item-0102.2",
+  "item-0365.2",
+  "item-0290.2",
+  "item-0038.1",
+  "item-0215.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "31c42416-ecd9-4b6a-886b-abd19efe4387",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Matches Korean offer register better than literal first-person question.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translates the incomplete/cut-off sentence naturally without leaving raw English text.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Keeps name order and natural phrasing for detective scene dialogue.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Hinata speaks in banmal to Takanashi.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Siobhan uses hapsyoche to landlord; '선생님' is awkward contextually.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Gareth speaks to tenants using haeyoche/polite forms.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Hiroba is a defined term introduced in the document context.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Rook/speaker uses polite speech to Captain Thorne.\"}\n]\n```\n",
+  "duration_seconds": 5.98912,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17445,
+   "output_tokens": 320,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17765
+  }
+ }
+}

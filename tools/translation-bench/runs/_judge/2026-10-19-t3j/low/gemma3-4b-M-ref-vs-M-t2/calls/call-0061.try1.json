@@ -1,0 +1,31 @@
+{
+ "call": 61,
+ "try": 1,
+ "ids": [
+  "item-0065.2",
+  "item-0036.1",
+  "item-0090.2",
+  "item-0267.1",
+  "item-0151.1",
+  "item-0252.1",
+  "item-0381.1",
+  "item-0132.2",
+  "item-0201.2",
+  "item-0123.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "03f9054a-dfd5-4c0f-96ca-c298c1c02b20",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 'Sorry' and uses the proper name spelling.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 invents the name 'Kazu', while Translation 1 avoids it.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"兩成 means 20%, not 2 times; also translates name correctly.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Rory speaks 반말 to Siobhan, and '말해줘' fits the recipient.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses correct term 수호막 and consistent 반말 speech level.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 completely failed to translate from Japanese.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Day 2' naturally parallels '첫날' (Day 1) in onboarding guides.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translates the tagged name into Korean correctly.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Thorne speaks 해요체 to Rook ('뭘까요?').\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'모를 거야' captures the epistemic future/modal nuance of 'won't know'.\"}\n]\n```\n",
+  "duration_seconds": 5.172782,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17293,
+   "output_tokens": 343,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17636
+  }
+ }
+}

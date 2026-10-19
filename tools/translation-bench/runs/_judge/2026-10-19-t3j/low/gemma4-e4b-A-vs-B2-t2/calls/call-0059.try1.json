@@ -1,0 +1,31 @@
+{
+ "call": 59,
+ "try": 1,
+ "ids": [
+  "item-0315.2",
+  "item-0332.1",
+  "item-0246.1",
+  "item-0371.2",
+  "item-0065.2",
+  "item-0036.1",
+  "item-0090.2",
+  "item-0267.1",
+  "item-0151.1",
+  "item-0252.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d2de944c-9133-454a-a736-383a6a4c4a1f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Siobhan uses honorific 합쇼체/존칭 to landlord Gareth.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while 1 left it in Japanese.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 completely mistranslates the name, title, and speech level.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both use 해요체, but Siobhan should speak to Rory in 반말.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while 2 left it in Chinese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean with correct 해요체.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Lin Yuan speaks to his sister in 반말, not 존댓말.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while 1 left it in Chinese.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while 1 left it in Japanese.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 'deal with Gerald' as doing it together.\"}\n]\n```\n",
+  "duration_seconds": 4.264404,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17542,
+   "output_tokens": 343,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17885
+  }
+ }
+}

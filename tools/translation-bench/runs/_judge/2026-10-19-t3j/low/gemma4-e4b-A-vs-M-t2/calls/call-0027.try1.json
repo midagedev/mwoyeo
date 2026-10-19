@@ -1,0 +1,31 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0122.1",
+  "item-0135.2",
+  "item-0216.1",
+  "item-0218.2",
+  "item-0243.1",
+  "item-0027.2",
+  "item-0069.2",
+  "item-0040.2",
+  "item-0270.2",
+  "item-0052.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1f7052fb-fad9-4727-aae7-68ce7f2a299a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Siobhan speaks to Gareth in 합쇼체; Translation 2 uses 해요체.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and convey the original meaning well.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Thorne uses 반말, and Gerald is transliterated into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 completely mistranslates the feature name ひとこと as 'One thing is'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the text in Japanese.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Chinese.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Translation 1 is untranslated, but Translation 2 incorrectly uses 해요체 instead of 반말.\"}\n]\n```\n",
+  "duration_seconds": 5.094546,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17321,
+   "output_tokens": 327,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17648
+  }
+ }
+}

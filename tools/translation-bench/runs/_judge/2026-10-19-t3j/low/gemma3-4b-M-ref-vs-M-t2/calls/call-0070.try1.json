@@ -1,0 +1,31 @@
+{
+ "call": 70,
+ "try": 1,
+ "ids": [
+  "item-0210.2",
+  "item-0378.1",
+  "item-0171.1",
+  "item-0160.1",
+  "item-0045.2",
+  "item-0173.1",
+  "item-0139.1",
+  "item-0346.2",
+  "item-0102.2",
+  "item-0388.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "970af756-99ff-471d-96ba-4250357b09b1",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly translates older brother as 오빠 and avoids nonsensical 말아요.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Accurately translates the question asking if the contract finished well.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"보증금 correctly translates deposit, unlike 입금 (deposit/payment into account).\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Uses proper formal speech level (합쇼체) to the landlord.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Preserves informal speech level (반말) between siblings; 2 incorrectly uses 해요체.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correct pronunciation of 乐 (Yuè) matches the provided facts.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Git 'branch' should be 브랜치, not translated literally as 가지.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Chinese text.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Matches the informal speech level (반말) and translates Chinese smoothly.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both incorrectly romanize the surname 小鳥遊 (Takanashi).\"}\n]\n```\n",
+  "duration_seconds": 4.891029,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17271,
+   "output_tokens": 338,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17609
+  }
+ }
+}

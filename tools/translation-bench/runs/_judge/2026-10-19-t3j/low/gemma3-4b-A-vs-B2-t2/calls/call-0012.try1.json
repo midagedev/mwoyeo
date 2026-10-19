@@ -1,0 +1,31 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0077.2",
+  "item-0286.1",
+  "item-0162.1",
+  "item-0173.1",
+  "item-0303.2",
+  "item-0305.1",
+  "item-0060.1",
+  "item-0369.2",
+  "item-0235.2",
+  "item-0102.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d6b55612-3aea-4091-9201-a4728f1fe849",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly romanizes 月見里 as Yamashiri/Yamanashi and capitalizes Quick Note.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 reads more naturally and accurately conveys the message.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the source Korean text untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translates 체험 보고서 faithfully as experience report instead of this report.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 translates nothing is truly lost more completely.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses the correct polite speech level (해요체) toward older club members.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly transliterates 朔 as 삭 rather than 숙.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Better captures the change in intensity implied by 強くなった.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Chinese.\"}\n]\n```\n",
+  "duration_seconds": 5.146313,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17365,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17690
+  }
+ }
+}

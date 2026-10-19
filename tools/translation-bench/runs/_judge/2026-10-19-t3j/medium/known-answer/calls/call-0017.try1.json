@@ -1,0 +1,27 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0031.1",
+  "item-0004.1",
+  "item-0014.1",
+  "item-0014.2",
+  "item-0001.1",
+  "item-0044.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7be96aa2-01f4-4bc4-af7b-14405095ec76",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"견적서 is the correct term for quotation, not 추정서.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 translates into English, whereas translation 2 is untranslated.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean with the correct speech level.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean with the correct speech level.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"보증금 is the standard term for rental deposit, not 예치금.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, whereas translation 1 is untranslated.\"}\n]\n",
+  "duration_seconds": 12.20043,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15934,
+   "output_tokens": 1509,
+   "thinking_tokens": 1310,
+   "cache_read_tokens": 0,
+   "total_tokens": 17443
+  }
+ }
+}

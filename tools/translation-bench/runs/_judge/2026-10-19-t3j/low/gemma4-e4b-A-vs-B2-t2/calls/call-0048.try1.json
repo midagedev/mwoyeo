@@ -1,0 +1,30 @@
+{
+ "call": 48,
+ "try": 1,
+ "ids": [
+  "item-0207.1",
+  "item-0206.2",
+  "item-0111.1",
+  "item-0163.1",
+  "item-0051.2",
+  "item-0065.1",
+  "item-0338.1",
+  "item-0104.2",
+  "item-0084.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f9dda15f-21ce-45e5-a44c-c8a4546a4e90",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Chinese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Passive instructional tone fits onboarding wiki guidelines better than 'We'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Chinese.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both failed to translate the sentence into the target language Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Zeng Ruoshui speaks about Xie Xuan, not herself; Translation 1 misused 'I'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Chinese.\"}\n]\n```\n",
+  "duration_seconds": 4.653818,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17157,
+   "output_tokens": 289,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17446
+  }
+ }
+}

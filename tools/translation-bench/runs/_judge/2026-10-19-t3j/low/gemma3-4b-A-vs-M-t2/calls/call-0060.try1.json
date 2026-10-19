@@ -1,0 +1,26 @@
+{
+ "call": 60,
+ "try": 1,
+ "ids": [
+  "item-0123.1",
+  "item-0131.2",
+  "item-0056.2",
+  "item-0054.1",
+  "item-0025.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b44c522c-8efd-4023-ba10-9d82e8cc4326",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"许诺 speaks 해요체 to 周婷; Translation 2 wrongly uses 반말.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses correct term 납품일; Translation 2 mistranslates ホタル as carousel.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left Japanese untranslated into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left part of the sentence untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 is entirely untranslated Japanese.\"}\n]\n```\n",
+  "duration_seconds": 4.356275,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15877,
+   "output_tokens": 168,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16045
+  }
+ }
+}

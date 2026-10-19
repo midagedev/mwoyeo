@@ -1,0 +1,31 @@
+{
+ "call": 64,
+ "try": 1,
+ "ids": [
+  "item-0309.1",
+  "item-0202.2",
+  "item-0096.2",
+  "item-0108.2",
+  "item-0011.1",
+  "item-0156.2",
+  "item-0304.1",
+  "item-0334.1",
+  "item-0351.2",
+  "item-0109.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ac37e581-768d-4901-b71e-d3e4b274c973",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"1 invents 'my'; the watch belonged to the shop, not Kaoru.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Both mistranslate Hotaru, but 1 does not add arbitrary symbols.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"1 left the text in Japanese without translating it to Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"1 left the text in Korean without translating to English.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"2 mistranslates onboarding 'steps/stepping stones' (발판) as 'landing page'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"1 correctly captures the nuance of resealing (봉해 다시는).\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"2 leaves untranslated Chinese text and has nonsensical garbled words.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Hyuga speaks to the section chief in required 합쇼체 register.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"1 sounds more natural and avoids awkward literal translation '당신의'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Passive construction is accurately preserved; 2 turns it into an imperative.\"}\n]\n```\n",
+  "duration_seconds": 5.880201,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17158,
+   "output_tokens": 340,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17498
+  }
+ }
+}

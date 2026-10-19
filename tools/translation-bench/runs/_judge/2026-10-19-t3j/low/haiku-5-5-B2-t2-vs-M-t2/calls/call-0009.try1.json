@@ -1,0 +1,31 @@
+{
+ "call": 9,
+ "try": 1,
+ "ids": [
+  "item-0157.1",
+  "item-0283.2",
+  "item-0047.2",
+  "item-0210.1",
+  "item-0175.1",
+  "item-0269.1",
+  "item-0240.2",
+  "item-0307.2",
+  "item-0317.2",
+  "item-0105.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7aa7fc4a-458b-4e35-8cff-f2875558bf6a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses MoaLogis instead of Morningstar Logistics.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Matches the context's established Romanization Joonho Byun.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly romanizes the name 乐川 as Yuè Chuān.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translates the untranslated Chinese characters from the source text.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Natural Korean phrasing; '네 저우 이모' is unnatural.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both are equally natural and accurate translations.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly maintains the speaker's specified 해요체 speech level.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both render the honorific title and meaning naturally and accurately.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Follows the specified terminology mapping 合宿 = 엠티.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translates the interjection 'え' naturally as '어'.\"}\n]\n```\n",
+  "duration_seconds": 5.243044,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17418,
+   "output_tokens": 319,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17737
+  }
+ }
+}

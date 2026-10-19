@@ -1,0 +1,28 @@
+{
+ "call": 9,
+ "try": 1,
+ "ids": [
+  "item-0082.2",
+  "item-0361.2",
+  "item-0120.2",
+  "item-0129.1",
+  "item-0269.1",
+  "item-0044.1"
+ ],
+ "problem": "status ERROR",
+ "event": {
+  "conversation_id": "54f43dca-7cb6-41e8-8036-a17ce3f36ad5",
+  "status": "ERROR",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 naturally translates the stutter as '네, 네!'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 is left untranslated in Japanese.\"},\n\n```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 naturally translates the stutter 'は、はい!' as '네, 네!'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, whereas Translation 1 left it untranslated.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly formats the question and matches the polite request.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean and avoids hallucinating '예약할 수 있고'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 left it in Chinese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 translates into English, whereas Translation 2 remained in Korean.\"}\n]\n```\n",
+  "error": "The stream was interrupted. Please continue the task you were working on.",
+  "duration_seconds": 54.381982,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 32799,
+   "output_tokens": 5937,
+   "thinking_tokens": 5659,
+   "cache_read_tokens": 0,
+   "total_tokens": 38736
+  }
+ }
+}

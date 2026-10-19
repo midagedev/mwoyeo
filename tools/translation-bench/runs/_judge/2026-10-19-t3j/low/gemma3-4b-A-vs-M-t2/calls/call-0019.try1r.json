@@ -1,0 +1,26 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0231.1",
+  "item-0298.1",
+  "item-0127.2",
+  "item-0094.1",
+  "item-0139.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "eff3c71f-105d-43e1-b5c8-f5b9114db06d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"\\\"스테이지에 추가된\\\" is more natural Git terminology in Korean than \\\"스테이지하는\\\".\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"\\\"Internal messenger registration\\\" correctly translates \\\"사내 메신저 가입\\\".\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are completely inaccurate or mistranslated.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Onboarding guides address the reader as \\\"you\\\", not \\\"we\\\".\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Target language is English; Translation 1 is in Korean.\"}\n]\n```\n",
+  "duration_seconds": 5.513829,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15654,
+   "output_tokens": 172,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15826
+  }
+ }
+}

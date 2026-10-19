@@ -1,0 +1,23 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0146.1",
+  "item-0364.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c2dea122-b769-43ae-8c02-d51bbc52b6c7",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Used the required term 마정석 instead of 마석.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Xiè Xuán is female, but translation 2 used 'He'.\"}\n]\n",
+  "duration_seconds": 3.434776,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14956,
+   "output_tokens": 67,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15023
+  }
+ }
+}

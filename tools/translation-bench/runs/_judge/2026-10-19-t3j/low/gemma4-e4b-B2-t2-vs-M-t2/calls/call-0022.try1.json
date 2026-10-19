@@ -1,0 +1,31 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0068.2",
+  "item-0203.2",
+  "item-0199.1",
+  "item-0023.2",
+  "item-0006.2",
+  "item-0175.1",
+  "item-0032.2",
+  "item-0058.1",
+  "item-0053.2",
+  "item-0160.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8a0e6474-ed26-41c8-a113-ee5a14420de9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are identical except for whitespace, which instructions say to ignore.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Matches the defined term 'working tree = 작업 디렉터리'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both 'New Employee' and 'New Hire' accurately translate 신규 입사자.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Uses the specified term '마정석' for 魔石.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses the specified term '카운슬 택스' for Council tax.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Yuki is male, so the pronoun 'His' is correct.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correctly follows the term mapping '先輩 = boss'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'Brief note' accurately translates ひとこと in the context of note-taking apps.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Matches Rook's natural 반말 response style to Dex.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Reads more naturally and uses appropriate present tense for onboarding instructions.\"}\n]\n```\n",
+  "duration_seconds": 5.66695,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17180,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17512
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 54,
+ "try": 1,
+ "ids": [
+  "item-0160.2",
+  "item-0184.1",
+  "item-0244.1",
+  "item-0010.1",
+  "item-0018.2",
+  "item-0072.2",
+  "item-0268.1",
+  "item-0170.1",
+  "item-0231.2",
+  "item-0071.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "68a21799-3d4f-49d6-a076-914c5657e210",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates 还有 accurately with '아직 얼마나'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'Should we invite' fits group plans better than 'I'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Uses established term 모차 and correct speech level 반말.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses correct name reading 가라스마 (not 가라스마루).\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"In context, the tub refers to a hot tub.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Thorne speaks in 해요체 to Rook; translates name correctly.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both 옅은 and 엷은 are equally valid and natural.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Matches Japanese hearsay ending '〜そうですよ' more faithfully.\"}\n]\n```\n",
+  "duration_seconds": 5.779136,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17619,
+   "output_tokens": 310,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17929
+  }
+ }
+}

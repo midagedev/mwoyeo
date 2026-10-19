@@ -1,0 +1,28 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0228.1",
+  "item-0130.2",
+  "item-0187.2",
+  "item-0077.1",
+  "item-0273.1",
+  "item-0191.2",
+  "item-0073.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "23a416d0-263d-4b07-b331-7c45eb19bb19",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the text into Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into the target language Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'Packing moving service' accurately conveys full-service moving (포장이사).\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the text in Japanese without translating to Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Modakbul is an internal tool name, not a literal 'bonfire'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'Bridge' of a spaceship is properly translated as 조타실, not 다리.\"}\n]\n```\n",
+  "duration_seconds": 4.051656,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16482,
+   "output_tokens": 233,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16715
+  }
+ }
+}

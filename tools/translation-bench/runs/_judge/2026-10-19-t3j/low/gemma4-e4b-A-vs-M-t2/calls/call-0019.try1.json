@@ -1,0 +1,31 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0188.1",
+  "item-0315.1",
+  "item-0299.2",
+  "item-0235.2",
+  "item-0156.1",
+  "item-0066.1",
+  "item-0040.1",
+  "item-0336.1",
+  "item-0159.1",
+  "item-0199.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f284927c-4afb-452e-b49a-c4860607c08c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly transliterates Siobhan to 시본 according to facts.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both contain untranslated Japanese text.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"린위안 speaks 반말 to younger sister 린시아.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left text entirely untranslated in Japanese.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left text untranslated in Japanese.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Uses correct term 'watch' instead of 'clock'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Properly transliterates character names into Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left text untranslated in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 5.469459,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17498,
+   "output_tokens": 300,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17798
+  }
+ }
+}

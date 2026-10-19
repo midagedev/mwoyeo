@@ -1,0 +1,28 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0353.2",
+  "item-0185.2",
+  "item-0381.1",
+  "item-0340.2",
+  "item-0154.2",
+  "item-0059.1",
+  "item-0366.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "415423c1-4d32-4475-ab60-5d6f3c698582",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 invents '형' without basis; Translation 2 is more accurate.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 adheres to the designated term MoaLogis instead of Mora Logistics.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Japanese source text into English.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses active voice and sounds far more natural in English.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'A previous state' correctly captures non-specific earlier revisions.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 accurately translates 체험 보고서 as experience report.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 untranslated; Translation 1 translates into Korean with appropriate speech level.\"}\n]\n```\n",
+  "duration_seconds": 5.62035,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16053,
+   "output_tokens": 239,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16292
+  }
+ }
+}

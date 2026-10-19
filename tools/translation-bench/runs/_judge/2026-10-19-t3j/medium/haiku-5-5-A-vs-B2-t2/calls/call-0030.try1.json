@@ -1,0 +1,27 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0253.1",
+  "item-0169.1",
+  "item-0001.2",
+  "item-0293.1",
+  "item-0082.1",
+  "item-0212.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e8556390-4958-4602-9bea-d47095f743c6",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 completes the cut-off text naturally and uses proper speech.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 reads more naturally with '좀' for a casual request.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly uses informal speech (반말) appropriate for Rory.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 translates 'put' and 'moves along with' much more naturally.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 failed to translate and left the source Chinese text.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 translates the name '보리' into English instead of Hangul.\"}\n]\n```\n",
+  "duration_seconds": 57.967592,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16200,
+   "output_tokens": 6699,
+   "thinking_tokens": 6490,
+   "cache_read_tokens": 0,
+   "total_tokens": 22899
+  }
+ }
+}

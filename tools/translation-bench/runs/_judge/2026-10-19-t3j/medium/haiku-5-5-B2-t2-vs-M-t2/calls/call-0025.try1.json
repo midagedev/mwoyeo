@@ -1,0 +1,27 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0360.2",
+  "item-0131.2",
+  "item-0311.1",
+  "item-0308.1",
+  "item-0101.1",
+  "item-0095.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "88e9df3d-9895-4847-9ab4-0554e1248b0d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Korean source into English.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 avoids awkwardly addressing the landlord as 사장님.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 accurately captures the certainty of 遅れる without unneeded hedging.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 reads more naturally and avoids adding an unwarranted 도.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly uses informal speech matching the speaker's established relationship.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 appropriately uses the subject honorific 보신 게 for the client.\"}\n]\n```\n",
+  "duration_seconds": 53.121711,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16284,
+   "output_tokens": 6112,
+   "thinking_tokens": 5911,
+   "cache_read_tokens": 0,
+   "total_tokens": 22396
+  }
+ }
+}

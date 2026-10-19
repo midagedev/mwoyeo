@@ -1,0 +1,31 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0103.1",
+  "item-0123.2",
+  "item-0218.1",
+  "item-0293.1",
+  "item-0185.2",
+  "item-0144.2",
+  "item-0089.1",
+  "item-0012.2",
+  "item-0063.2",
+  "item-0016.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5b752029-2f9c-4692-9dfa-2476de2e62b5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both missed Karrot; otherwise both translations are equally clear and natural.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'For team use' is more natural as a concise documentation heading.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'Packing service' is more idiomatic and natural than 'packing move'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the source text into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 accurately includes '대신' for 'instead'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified informal/해요체 register towards Rory.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left the text in Japanese without translating.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese source untranslated.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"日向 is pronounced Hyūga/Hinata, rendered as 히나타, not 히나카.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified character name 저우 이모.\"}\n]\n```\n",
+  "duration_seconds": 9.82824,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17167,
+   "output_tokens": 331,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17498
+  }
+ }
+}

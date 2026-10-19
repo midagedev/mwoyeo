@@ -1,0 +1,20 @@
+{"id": "case05.2", "better": "1", "why": "Yuki is male according to the facts, so His is correct.", "call": 1}
+{"id": "case16.1", "better": "1", "why": "Translation 2 left the text untranslated in Korean.", "call": 1}
+{"id": "case06.2", "better": "1", "why": "Onboarding guides instruct the reader rather than speaking in first person.", "call": 1}
+{"id": "case01.2", "better": "2", "why": "Translation 2 correctly preserves moving service rather than just packing.", "call": 1}
+{"id": "case12.2", "better": "1", "why": "Yunzhou correctly matches the single-word given name Yúnzhōu in facts.", "call": 1}
+{"id": "case14.2", "better": "2", "why": "Translation 1 left the character name untranslated in Chinese characters.", "call": 1}
+{"id": "case18.2", "better": "tie", "why": "Both translations are faithful and natural, differing only by a comma.", "call": 4}
+{"id": "case15.2", "better": "2", "why": "'부탁드립니다' correctly translates accepting an offer, unlike '요청드립니다'.", "call": 4}
+{"id": "case09.1", "better": "2", "why": "Follows the specified term by translating 時計 as watch.", "call": 3}
+{"id": "case13.1", "better": "1", "why": "Preserves 'how much' and correctly uses 해요체 speech level.", "call": 3}
+{"id": "case03.1", "better": "2", "why": "More natural Korean phrasing for an errand to fetch herbs.", "call": 3}
+{"id": "case07.1", "better": "1", "why": "Translation 2 failed to translate the text into Korean.", "call": 3}
+{"id": "case19.1", "better": "2", "why": "Correctly uses 반말 speech level between Dex and Rook.", "call": 3}
+{"id": "case20.2", "better": "tie", "why": "Both candidates left the text untranslated in Chinese.", "call": 3}
+{"id": "case04.1", "better": "2", "why": "Translation 1 is untranslated Japanese.", "call": 2}
+{"id": "case02.2", "better": "1", "why": "Uses the defined feature term Quick Note.", "call": 2}
+{"id": "case17.1", "better": "1", "why": "Correctly uses the established English name Barley.", "call": 2}
+{"id": "case10.1", "better": "1", "why": "Uses required 합쇼체 speech level and accurately translates around.", "call": 2}
+{"id": "case11.2", "better": "tie", "why": "Both fail the required 반말 speech level and are comparable.", "call": 2}
+{"id": "case08.2", "better": "2", "why": "Translation 1 is untranslated Japanese.", "call": 2}

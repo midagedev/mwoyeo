@@ -1,0 +1,27 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0212.2",
+  "item-0300.1",
+  "item-0218.1",
+  "item-0046.2",
+  "item-0232.1",
+  "item-0036.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "903ab46b-891e-4afc-824a-5aa5a85707a4",
+  "status": "SUCCESS",
+  "response": "[\n  {\n    \"case\": 1,\n    \"better\": \"2\",\n    \"why\": \"Translation 2 naturally translates 'Morning both', unlike the literal mistranslation in 1.\"\n  },\n  {\n    \"case\": 2,\n    \"better\": \"tie\",\n    \"why\": \"Both candidate translations are identical.\"\n  },\n  {\n    \"case\": 3,\n    \"better\": \"2\",\n    \"why\": \"Translation 2 reads much more naturally; 'practical work' is uncountable and awkward here.\"\n  },\n  {\n    \"case\": 4,\n    \"better\": \"tie\",\n    \"why\": \"Both translations accurately convey the meaning with appropriate tone and natural phrasing.\"\n  },\n  {\n    \"case\": 5,\n    \"better\": \"1\",\n    \"why\": \"Translation 1 faithfully translates 'before then', whereas 2 says 'until then'.\"\n  },\n  {\n    \"case\": 6,\n    \"better\": \"2\",\n    \"why\": \"Translation 2 preserves '배차' (dispatch), which Translation 1 completely omits.\"\n  }\n]\n",
+  "duration_seconds": 60.805897,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15885,
+   "output_tokens": 7942,
+   "thinking_tokens": 7679,
+   "cache_read_tokens": 0,
+   "total_tokens": 23827
+  }
+ }
+}

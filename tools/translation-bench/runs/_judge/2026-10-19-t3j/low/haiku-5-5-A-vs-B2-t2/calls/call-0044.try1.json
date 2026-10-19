@@ -1,0 +1,31 @@
+{
+ "call": 44,
+ "try": 1,
+ "ids": [
+  "item-0116.1",
+  "item-0273.2",
+  "item-0235.2",
+  "item-0211.1",
+  "item-0277.1",
+  "item-0017.1",
+  "item-0183.1",
+  "item-0318.1",
+  "item-0218.1",
+  "item-0215.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "06d68659-16e8-4a29-9d94-f16be36a3720",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"十河 is male, so his older sister is '누나', not '언니'.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the line.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Speaker uses 반말 to 林夏; Translation 1 incorrectly uses 해요체.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the line into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"The surname 仇 is conventionally romanized as Qiú.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations accurately convey the casual register and meaning.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the line untranslated in Japanese.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'모닥불' is the tool/platform name and should not be translated literally.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are identical except for standard Korean spacing around '살려 주는'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both convey the instructional instruction naturally and accurately.\"}\n]\n```\n",
+  "duration_seconds": 5.470422,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17483,
+   "output_tokens": 323,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17806
+  }
+ }
+}

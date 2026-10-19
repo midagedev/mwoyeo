@@ -1,0 +1,27 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0120.1",
+  "item-0099.2",
+  "item-0096.1",
+  "item-0324.1",
+  "item-0145.1",
+  "item-0241.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "59226bdd-7a69-4ba1-830f-9b5ac4e12ab0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 uses natural phrasing for requesting time off.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 was left completely untranslated in Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly separates the name and subject particle.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated Japanese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 is a completely irrelevant title hallucination.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 translates idiomatically rather than using awkward literal phrasing.\"}\n]\n```\n",
+  "duration_seconds": 27.173775,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16348,
+   "output_tokens": 3114,
+   "thinking_tokens": 2929,
+   "cache_read_tokens": 0,
+   "total_tokens": 19462
+  }
+ }
+}

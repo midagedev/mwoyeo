@@ -1,0 +1,31 @@
+{
+ "call": 63,
+ "try": 1,
+ "ids": [
+  "item-0152.2",
+  "item-0169.1",
+  "item-0005.2",
+  "item-0133.1",
+  "item-0227.1",
+  "item-0339.2",
+  "item-0075.2",
+  "item-0022.2",
+  "item-0052.1",
+  "item-0296.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "07ea1695-15c5-4421-8384-9fb1ee36b371",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates the pronunciation into Korean and avoids inappropriate honorifics for the name.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally in banmal.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'In the early morning' reads more naturally as an opening clause.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Appropriately shows respect to Professor Han (-시더라).\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate in context.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Siobhan is female (오빠) and speaks banmal to Rory.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Gareth speaks to the tenants in haeyoche.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Adheres to the specified term stash = 임시 저장/스태시 보관.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both appropriately use haeyoche and convey the meaning accurately.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'불어넣고 있습니다' sounds more natural and idiomatic in Korean fantasy settings.\"}\n]\n```\n",
+  "duration_seconds": 5.344876,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17376,
+   "output_tokens": 322,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17698
+  }
+ }
+}

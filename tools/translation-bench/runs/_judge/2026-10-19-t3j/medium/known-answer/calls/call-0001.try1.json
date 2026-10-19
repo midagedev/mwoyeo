@@ -1,0 +1,27 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0047.2",
+  "item-0030.1",
+  "item-0035.1",
+  "item-0016.1",
+  "item-0024.1",
+  "item-0036.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d61b5938-2f2f-4e94-b42a-0a3862c6b039",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Patrol car correctly translates パトカー instead of ambulance.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 is translated into Korean, whereas Translation 2 is untranslated.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Rory is male, so his older sister is 누나, not 언니.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"오빠 refers to Seoyoon's older brother, not her boyfriend.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Bori is female, so the pronoun must be 'she', not 'he'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Follows the specified term translating ワークスペース as Space.\"}\n]\n```\n",
+  "duration_seconds": 14.235,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15988,
+   "output_tokens": 1766,
+   "thinking_tokens": 1557,
+   "cache_read_tokens": 0,
+   "total_tokens": 17754
+  }
+ }
+}

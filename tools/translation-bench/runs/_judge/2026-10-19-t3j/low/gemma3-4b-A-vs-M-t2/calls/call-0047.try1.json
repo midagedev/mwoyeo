@@ -1,0 +1,25 @@
+{
+ "call": 47,
+ "try": 1,
+ "ids": [
+  "item-0054.2",
+  "item-0226.1",
+  "item-0321.1",
+  "item-0194.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a181f219-3eda-469c-827f-adaad74a5b34",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left most of the source Chinese untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 mistranslated 기사 (technician/driver) as 'articles'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Follows the specified term mapping 先輩 = boss and correct pronoun.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 is pinyin transcription instead of English translation.\"}\n]\n```\n",
+  "duration_seconds": 4.457114,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15528,
+   "output_tokens": 139,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15667
+  }
+ }
+}

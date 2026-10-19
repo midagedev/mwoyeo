@@ -1,0 +1,31 @@
+{
+ "call": 66,
+ "try": 1,
+ "ids": [
+  "item-0125.1",
+  "item-0299.1",
+  "item-0107.2",
+  "item-0390.1",
+  "item-0039.1",
+  "item-0038.2",
+  "item-0362.2",
+  "item-0152.2",
+  "item-0169.1",
+  "item-0313.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4da8ac40-a579-4f0f-bbda-2c69319376df",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말, fitting translation 2.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Follows specified term '작업 디렉터리' for working tree.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly follows specified terms Pathfinder and fleet allocation.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Faithfully preserves the cut-off unfinished sentence in the source text.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Faithfully reflects the abrupt/unfinished grammatical ending and 해요체 tone.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translates Korean name '보리' into English alphabet 'Bori'.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are valid with identical meaning and negligible comma difference.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Follows the specified romanization 'Jiu' for 지우.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correct conditional meaning ('when she wakes up'), translation 1 mistranslates as already awake.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translates into the target language Korean rather than staying in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 5.394763,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17435,
+   "output_tokens": 335,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17770
+  }
+ }
+}

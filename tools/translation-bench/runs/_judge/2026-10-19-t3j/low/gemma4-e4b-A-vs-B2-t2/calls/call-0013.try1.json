@@ -1,0 +1,31 @@
+{
+ "call": 13,
+ "try": 1,
+ "ids": [
+  "item-0255.1",
+  "item-0280.1",
+  "item-0076.2",
+  "item-0282.2",
+  "item-0136.1",
+  "item-0123.2",
+  "item-0269.1",
+  "item-0099.2",
+  "item-0087.1",
+  "item-0006.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fc289e44-d5d2-4794-aa4a-b96edb4b4a5f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Chinese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 sounds more natural and professional for wiki onboarding documentation.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly transliterated the Chinese name 林远 to 린위안.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"The subject is the report reviewed by the team lead, not 'you'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in 반말, as established in the facts.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 matches the specified spelling 'Seoyoon'.\"}\n]\n```\n",
+  "duration_seconds": 5.447083,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17447,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17772
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0056.2",
+  "item-0247.2",
+  "item-0159.1",
+  "item-0094.2",
+  "item-0143.2",
+  "item-0032.2",
+  "item-0161.1",
+  "item-0172.1",
+  "item-0206.2",
+  "item-0178.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7dda22e8-5c1b-414d-9dc5-ccbe9820255b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both 청구서 and 고지서 are natural and accurate translations for bill.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the line untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are completely identical except for an optional comma.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 to Princess Lysia.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'그 전에' is natural Korean, whereas '그때 전에' is awkward.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both correctly use 반말 between tenants; phrasing difference is negligible.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Active voice is much more natural in onboarding guides than passive voice.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Avoids a comma splice when addressing someone after 'haha'.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both correctly use 해요체 to 周姨 and are natural Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'Old man Takanashi' naturally captures the nuance of 小鳥遊老人.\"}\n]\n```\n",
+  "duration_seconds": 5.124845,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17474,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17799
+  }
+ }
+}

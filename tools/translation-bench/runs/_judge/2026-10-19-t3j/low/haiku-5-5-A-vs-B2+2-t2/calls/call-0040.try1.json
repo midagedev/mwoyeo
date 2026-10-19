@@ -1,0 +1,31 @@
+{
+ "call": 40,
+ "try": 1,
+ "ids": [
+  "item-0274.2",
+  "item-0167.1",
+  "item-0238.1",
+  "item-0320.2",
+  "item-0147.1",
+  "item-0269.2",
+  "item-0182.1",
+  "item-0228.2",
+  "item-0266.1",
+  "item-0251.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "aad846d5-84b6-4ba5-a149-98bf47f37b59",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both missed ギルド=조합, 鉄斎=텟사이, and 합쇼체.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the line.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"More natural phrasing for 'Morning both' in Korean.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both incorrectly use 'his' for Akira, who is female.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both wrongly use 형 instead of 오빠 for female speaker Siobhan.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are acceptable interpretations of the Japanese context.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Sounds much more natural for conversational dialogue in 반말.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both use 존댓말 despite the instruction and speaker fact (반말).\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both use 해요체 instead of 합쇼체 to client 桐生.\"}\n]\n```\n",
+  "duration_seconds": 6.444269,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17464,
+   "output_tokens": 320,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17784
+  }
+ }
+}

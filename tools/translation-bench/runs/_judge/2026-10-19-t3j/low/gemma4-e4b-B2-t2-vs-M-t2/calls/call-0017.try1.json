@@ -1,0 +1,31 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0177.1",
+  "item-0132.2",
+  "item-0134.1",
+  "item-0002.2",
+  "item-0161.1",
+  "item-0133.1",
+  "item-0139.1",
+  "item-0140.1",
+  "item-0090.1",
+  "item-0097.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "635a2ee8-1fb2-40e4-b721-b4ebf37f20c5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the specified term 'Karrot'.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both 'on-site' and 'on site' are equally valid translations.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"林夏 addresses 周姨 with 해요체 and refers to her father respectfully.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Beginning with 'ぞ' indicates Akira is declaring her own action.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 uses the specified term '엠티' for 合宿.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"'In searches' and 'In search' are equally acceptable here.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 uses correct name 쉬눠 and natural phrasing.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both are virtually identical with minor, acceptable spacing variation.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 correctly transliterates 日向 (ひゅうが) as 히우가.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified term '엠티'.\"}\n]\n```\n",
+  "duration_seconds": 5.355134,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17273,
+   "output_tokens": 329,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17602
+  }
+ }
+}

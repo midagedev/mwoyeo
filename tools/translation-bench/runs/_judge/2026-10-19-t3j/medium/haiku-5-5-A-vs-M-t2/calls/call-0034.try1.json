@@ -1,0 +1,27 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0217.1",
+  "item-0212.2",
+  "item-0045.2",
+  "item-0174.2",
+  "item-0350.1",
+  "item-0200.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "360b8b30-92eb-4294-a96b-2a150acda256",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"'I know' captures '그러게' much more naturally than 'Right'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 leaves the Japanese name in untranslated kanji '澪'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"The surname 仇 is correctly romanized as Qiu, not Chou.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Uses correct past narrative tense and translates sect gate idiomatically.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both 'That's a relief' and 'Good to hear' fit naturally here.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'ああ' correctly translates to affirmative '응' rather than exclamation '아'.\"}\n]\n",
+  "duration_seconds": 101.445172,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16055,
+   "output_tokens": 12361,
+   "thinking_tokens": 12157,
+   "cache_read_tokens": 0,
+   "total_tokens": 28416
+  }
+ }
+}

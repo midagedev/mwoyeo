@@ -1,0 +1,31 @@
+{
+ "call": 69,
+ "try": 1,
+ "ids": [
+  "item-0043.2",
+  "item-0283.1",
+  "item-0209.1",
+  "item-0143.1",
+  "item-0336.1",
+  "item-0235.1",
+  "item-0044.2",
+  "item-0340.1",
+  "item-0003.1",
+  "item-0256.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9b11fe63-5879-48fc-9202-4cb912a45efb",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"In web/software context, '푸터' is much more natural and standard than '바닥글'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Matches the specified romanization 'Byun Jun-ho' from earlier context.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Faithfully uses the specified term 'qi stone' for 灵石.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Uses the correct name '저우 이모' specified in the facts block.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"The uncle explicitly ordered her not to use honorifics (반말).\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'그 태그' correctly resolves 'that one' referring to the tag.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'샤차면' is the standard Korean transcription for shāchámiàn.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Reads much more naturally in English and clearly translates the pill name.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are natural and polite expressions in 해요체 matching speaker roles.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Transliterates Japanese kanji name 湊 to Korean hangul '미나토'.\"}\n]\n```\n",
+  "duration_seconds": 6.304501,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17323,
+   "output_tokens": 352,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17675
+  }
+ }
+}

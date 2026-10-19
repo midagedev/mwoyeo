@@ -1,0 +1,31 @@
+{
+ "call": 26,
+ "try": 1,
+ "ids": [
+  "item-0243.2",
+  "item-0342.2",
+  "item-0247.2",
+  "item-0217.1",
+  "item-0377.1",
+  "item-0232.1",
+  "item-0171.2",
+  "item-0054.2",
+  "item-0324.2",
+  "item-0259.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d9e3c0b4-e2dc-469d-be61-e8ac8be72661",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correct speech level and transliterates Gerald into Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the line in Japanese without translating to Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"An onboarding guide directs the reader, making 'you' correct rather than 'I'.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate representations of the casual chat message.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both render the section heading naturally and accurately in English.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the text in Japanese; 2 translated correctly to Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correctly follows the defined terms 'Space' and 'Commons'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly uses the defined term 'Space' for ワークスペース.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the text in Japanese without translating to Korean.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both accurately translate the phrase into natural Korean 반말.\"}\n]\n```\n",
+  "duration_seconds": 5.198612,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17130,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17454
+  }
+ }
+}

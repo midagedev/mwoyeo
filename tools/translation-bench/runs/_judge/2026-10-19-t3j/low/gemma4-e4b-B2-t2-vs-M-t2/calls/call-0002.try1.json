@@ -1,0 +1,31 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0086.2",
+  "item-0123.1",
+  "item-0141.2",
+  "item-0148.2",
+  "item-0113.1",
+  "item-0155.1",
+  "item-0056.1",
+  "item-0135.1",
+  "item-0042.2",
+  "item-0007.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "50f7c560-3862-4832-b79b-469b44fe2057",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches designated name 텟사이 without unnecessary kanji annotations.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural phrasing and particle usage for Korean dialogue.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correct female pronoun for Hikaru as established in facts.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both incorrectly use 반말; difference is only minor punctuation.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"More natural, professional tone for internal documentation/guidelines.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Uses the specified character name 루크 instead of 룩.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Identical meaning and quality differing only by contraction.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both incorrectly use 반말 instead of Rook's 합쇼체 to Thorne.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'포함됩니다' is more natural and idiomatic for software commit contents.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Accurately follows the specified terminology 모차.\"}\n]\n```\n",
+  "duration_seconds": 5.400831,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17351,
+   "output_tokens": 310,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17661
+  }
+ }
+}

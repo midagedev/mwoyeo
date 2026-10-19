@@ -1,0 +1,31 @@
+{
+ "call": 68,
+ "try": 1,
+ "ids": [
+  "item-0069.2",
+  "item-0061.1",
+  "item-0210.2",
+  "item-0367.2",
+  "item-0171.1",
+  "item-0160.1",
+  "item-0045.2",
+  "item-0173.1",
+  "item-0139.1",
+  "item-0102.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f37dc48f-3a55-4778-9f25-7526b12951b9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Speaker uses 반말 and Translation 1 uses correct speech level and grammar.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말; Translation 1 incorrectly uses honorifics.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese; Translation 2 translates into Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates the name to Korean and accurately translates 请我吃饭.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the text completely untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese source untranslated.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'On site' is more natural than 'at the site' here.\"}\n]\n```\n",
+  "duration_seconds": 4.809587,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17592,
+   "output_tokens": 322,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17914
+  }
+ }
+}

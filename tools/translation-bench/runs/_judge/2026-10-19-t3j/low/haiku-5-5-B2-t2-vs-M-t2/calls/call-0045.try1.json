@@ -1,0 +1,31 @@
+{
+ "call": 45,
+ "try": 1,
+ "ids": [
+  "item-0062.2",
+  "item-0252.2",
+  "item-0114.1",
+  "item-0362.2",
+  "item-0088.2",
+  "item-0193.2",
+  "item-0257.2",
+  "item-0237.1",
+  "item-0322.1",
+  "item-0157.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "25a1010e-367c-418d-b0ec-c56139b8973e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Fits English narrative tense and correctly translates 山门 outside a sect context.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately match informal Korean speech levels.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Matches active decision nuance of 決まりだね in casual group planning.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 leaves the truncated source fragment untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses the specified term watch instead of clock.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Follows the specified term mapping stash = 임시 저장.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Romanizes 小鳥遊 (Takanashi) into English rather than leaving raw kanji.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Adheres to the specified name 周姨 = 저우 이모 and polite 해요체.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both natural Korean renderings capturing Rory's informal speech to Siobhan.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Follows the specified term 모아로지스 = MoaLogis.\"}\n]\n```\n",
+  "duration_seconds": 5.507959,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17139,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17471
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 69,
+ "try": 1,
+ "ids": [
+  "item-0203.1",
+  "item-0060.2",
+  "item-0197.1",
+  "item-0330.2",
+  "item-0357.1",
+  "item-0068.1",
+  "item-0098.2",
+  "item-0261.2",
+  "item-0230.1",
+  "item-0097.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8e34b303-41df-49ea-9869-7267f284b3fc",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates Thorne to 쏜 and uses appropriate polite honorifics.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates 三成 correctly as a percentage/proportion and uses standard terms.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Accurately reflects informal address Akira-san rather than adding an unstated title.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are grammatically correct and natural Korean renderings.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translates the Chinese name into Korean phonetic reading instead of raw hanja.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Adheres to the specified term Captain = 선장 rather than 함장.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Uses the correct feminine pronoun 'she' for Nagi (identified as 少女).\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Reads much more naturally for formal wiki guidance.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'Want me to ask him' captures the conversational nuance more naturally.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both are natural headings corresponding to the subsequent '둘째 날'.\"}\n]\n```\n",
+  "duration_seconds": 5.394366,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17403,
+   "output_tokens": 330,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17733
+  }
+ }
+}

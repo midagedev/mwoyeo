@@ -1,0 +1,31 @@
+{
+ "call": 26,
+ "try": 1,
+ "ids": [
+  "item-0092.2",
+  "item-0382.1",
+  "item-0315.2",
+  "item-0322.2",
+  "item-0332.2",
+  "item-0155.2",
+  "item-0178.2",
+  "item-0359.1",
+  "item-0297.2",
+  "item-0063.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "60a77720-5857-4509-a43c-73c258c88183",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly conveys the reported speech (-대 / said she'll).\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Target language is Korean; Translation 2 left it in Japanese.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally and accurately.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Rook speaks to Captain Thorne in 합쇼체, but Dex is absent; T1 fits dialogue.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Book a moving company' is much more natural English for '불렀어'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'보증금' is the accurate translation for deposit in this housing context.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"The context is an old woman's lost watch (물건), not a place.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Transliterates Japanese reading into Korean script for a Korean target text.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Imperative instruction reads much more naturally in an onboarding guide.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Thorne speaks in 반말; bridge of a ship is 브리지.\"}\n]\n```\n",
+  "duration_seconds": 4.513901,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5523,
+   "output_tokens": 340,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11822,
+   "total_tokens": 5863
+  }
+ }
+}

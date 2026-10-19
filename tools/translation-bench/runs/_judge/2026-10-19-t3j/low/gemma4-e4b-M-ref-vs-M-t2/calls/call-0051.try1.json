@@ -1,0 +1,31 @@
+{
+ "call": 51,
+ "try": 1,
+ "ids": [
+  "item-0049.2",
+  "item-0186.2",
+  "item-0064.2",
+  "item-0157.1",
+  "item-0210.1",
+  "item-0059.1",
+  "item-0233.2",
+  "item-0080.2",
+  "item-0040.1",
+  "item-0161.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2594beb8-e3ba-4bde-99e4-a6750aa0a3a4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Faithful to Kaoru asking permission; Translation 2 mistranslates the grammatical subject.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Transliterates Gerald into Korean Hangeul naturally.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 translated an earlier line instead of the target line.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately, differing only slightly in quote marks.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Faithfully captures 'that noise' and progressive aspect.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'-만 보면' is more naturally translated as 'as soon as/whenever'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"More natural active phrasing in English onboarding documentation.\"}\n]\n```\n",
+  "duration_seconds": 7.090412,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17143,
+   "output_tokens": 319,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17462
+  }
+ }
+}

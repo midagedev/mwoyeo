@@ -1,0 +1,27 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0078.2",
+  "item-0055.1",
+  "item-0052.2",
+  "item-0012.1",
+  "item-0109.2",
+  "item-0184.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d8f537a9-92d5-49af-bf27-bd3396587fc3",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates Japanese jargon ヤマ naturally into Korean rather than keeping it.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses 정 to match the established name 주정 from the facts.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both are accurate and natural English translations of the Japanese sentence.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Follows the established name 저우 이모 from the facts.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and appropriate for informal speech.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"공주님 is more natural in Korean fantasy dialogue than literal 왕녀님.\"}\n]\n",
+  "duration_seconds": 69.641932,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15912,
+   "output_tokens": 8281,
+   "thinking_tokens": 8088,
+   "cache_read_tokens": 0,
+   "total_tokens": 24193
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 46,
+ "try": 1,
+ "ids": [
+  "item-0193.2",
+  "item-0258.2",
+  "item-0245.1",
+  "item-0329.1",
+  "item-0157.2",
+  "item-0174.2",
+  "item-0037.2",
+  "item-0078.1",
+  "item-0095.1",
+  "item-0003.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a8e7b1eb-2f0c-48c5-b063-924a280790e2",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"In English translation, the English term should be primary.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly transliterates the Japanese name into Hangul.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"The destination particle '로' is more natural with '옮겨 두겠습니다'.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both incorrectly use honorific/polite speech toward Rory.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both correctly apply speech levels and accurate phrasing.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"The cleaning duty belongs to Seoyoon, so 'your' is correct.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both missed the prescribed terms 'ward' and 'qi stone'.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both use incorrect speech level (Thorne speaks 해요체 to Rook).\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are completely equivalent and accurate.\"}\n]\n```\n",
+  "duration_seconds": 4.906437,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17554,
+   "output_tokens": 313,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17867
+  }
+ }
+}

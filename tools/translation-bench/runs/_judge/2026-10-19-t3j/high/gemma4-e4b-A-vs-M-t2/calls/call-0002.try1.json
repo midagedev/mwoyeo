@@ -1,0 +1,36 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0007.2",
+  "item-0209.2",
+  "item-0139.2",
+  "item-0260.1",
+  "item-0076.2",
+  "item-0379.2",
+  "item-0245.2",
+  "item-0155.2",
+  "item-0227.2",
+  "item-0300.1",
+  "item-0251.1",
+  "item-0355.1",
+  "item-0107.1",
+  "item-0152.1",
+  "item-0158.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "21446f38-789c-469e-8824-23127a32198f",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'deposit back from the old place' is much more natural.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Gareth is a landlord, so addressing him as 부장님 is incorrect.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Get started with Memotto' is idiomatic for software guides.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 令 as token.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'If you confirm' misidentifies who confirms the report.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'선배님' properly matches the honorific '좋아하세요'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 avoids awkward pronoun '그녀는' and tense mistranslation.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 2 mistakenly addresses Senior Sister Zeng as Wanqi.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 1 left the line completely untranslated.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 1 is in Japanese instead of Korean.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 1 left the line completely untranslated.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"'네, 알겠습니다' is natural and uses correct speech level.\"}\n]\n",
+  "duration_seconds": 91.172333,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 19060,
+   "output_tokens": 12150,
+   "thinking_tokens": 11690,
+   "cache_read_tokens": 0,
+   "total_tokens": 31210
+  }
+ }
+}

@@ -1,0 +1,28 @@
+{
+ "call": 7,
+ "try": 1,
+ "ids": [
+  "item-0316.2",
+  "item-0288.2",
+  "item-0284.1",
+  "item-0341.1",
+  "item-0192.1",
+  "item-0154.1",
+  "item-0274.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9453fd57-b615-41f2-a9fe-e42024d16c79",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Narrative exposition typically uses plain form (해라체), not polite endings.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly keeps pronunciation guide xiè/jiě and translates name better.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Speaker uses 합쇼체/해요체 to Thorne, matching Translation 1's polite level.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Neither translated the text into the requested target language (Korean).\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Gerald is actively failing ('dying'), better captured as progressive/imminent.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Restoring 'a previous state' is more natural English documentation phrasing.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both failed to translate the line into Korean.\"}\n]\n```\n",
+  "duration_seconds": 3.971659,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16548,
+   "output_tokens": 238,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16786
+  }
+ }
+}

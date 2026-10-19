@@ -1,0 +1,26 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0353.2",
+  "item-0086.2",
+  "item-0137.1",
+  "item-0282.2",
+  "item-0125.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cc408127-79a7-4b74-9a8d-7e8f9d1e9502",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural phrasing for '失礼のないようにな'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly uses the defined term 'Commons' instead of literal 'plaza'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Chinese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translates name '海' as 카이 and uses 반말 register correctly.\"}\n]\n```\n",
+  "duration_seconds": 4.199004,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15804,
+   "output_tokens": 169,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15973
+  }
+ }
+}

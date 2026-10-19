@@ -1,0 +1,31 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0006.2",
+  "item-0380.1",
+  "item-0346.1",
+  "item-0178.2",
+  "item-0280.1",
+  "item-0365.1",
+  "item-0244.1",
+  "item-0005.2",
+  "item-0344.1",
+  "item-0098.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "da72af8c-33d3-4748-939e-b18c21328b84",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly interprets the onboarding instruction and channel name.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly translates '아직' as not yet, not 'You said'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses the established spelling 'Subin' from the facts.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Transliterates Thorne as 쏜 according to the facts.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"More natural and completely conveys 'nothing is truly lo(st)'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"More natural phrasing for the conditional clause in Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly applies defined terms 'Pathfinder' and 'fleet allocation'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"雷蔵 (らいぞう) is Raizou, closer than 레이구이, though both mistranscribe.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Much more natural and accurate English phrasing.\"}\n]\n```\n",
+  "duration_seconds": 5.901309,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17492,
+   "output_tokens": 317,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17809
+  }
+ }
+}

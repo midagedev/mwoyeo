@@ -1,0 +1,31 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0052.1",
+  "item-0111.1",
+  "item-0249.1",
+  "item-0065.1",
+  "item-0104.2",
+  "item-0084.2",
+  "item-0062.2",
+  "item-0224.1",
+  "item-0220.2",
+  "item-0088.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "388c0f0a-0a80-4011-a4d3-fd35b96a5f32",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Thorne uses 해요체 to Rook; Translation 2 maintains the correct honorific level.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 sounds natural and accurately conveys the detective's internal observation.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 to Gareth and translates let him in.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both left the Japanese source untranslated into Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Gareth speaks to tenants in 해요체; Translation 1 uses correct speech level.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 uses natural Korean phrasing for addressing a younger sister.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 uses correct pinyin romanization Chu Shuang instead of Vietnamese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 left Japanese untranslated.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Takanashi speaks to Hinata in 반말; Translation 1 incorrectly uses honorifics.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 accurately translates the full sentence in correct 반말 register.\"}\n]\n```\n",
+  "duration_seconds": 5.290385,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17464,
+   "output_tokens": 345,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17809
+  }
+ }
+}

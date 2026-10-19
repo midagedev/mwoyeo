@@ -1,0 +1,24 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0060.2",
+  "item-0072.2",
+  "item-0058.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2147ff57-0f56-4998-8e62-a79e0b9013ef",
+  "status": "SUCCESS",
+  "response": "[\n  {\n    \"case\": 1,\n    \"better\": \"2\",\n    \"why\": \"Hikaru is female, so the pronoun 'she' is correct.\"\n  },\n  {\n    \"case\": 2,\n    \"better\": \"2\",\n    \"why\": \"Modern Chinese names use pinyin transcription (셰천), not hanja.\"\n  },\n  {\n    \"case\": 3,\n    \"better\": \"2\",\n    \"why\": \"Translation 1 was left entirely untranslated in Chinese.\"\n  }\n]\n",
+  "duration_seconds": 32.946865,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15212,
+   "output_tokens": 3814,
+   "thinking_tokens": 3686,
+   "cache_read_tokens": 0,
+   "total_tokens": 19026
+  }
+ }
+}

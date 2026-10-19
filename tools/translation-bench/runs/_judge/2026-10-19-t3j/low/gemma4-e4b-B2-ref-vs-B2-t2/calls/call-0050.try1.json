@@ -1,0 +1,31 @@
+{
+ "call": 50,
+ "try": 1,
+ "ids": [
+  "item-0181.1",
+  "item-0247.1",
+  "item-0249.1",
+  "item-0240.2",
+  "item-0231.1",
+  "item-0012.1",
+  "item-0326.2",
+  "item-0095.1",
+  "item-0140.2",
+  "item-0116.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "33efa693-ade2-4101-b45d-b0f24e8fa373",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both are accurate and natural with correct honorifics and speech level.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly understands '三红' as black teas and uses natural phrasing.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'ひとこと' refers to a short/brief note in note-taking apps.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 sounds much more natural in Korean greeting style.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the text completely untranslated in Japanese.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translates the idiom '话音未落' and '从山下' more naturally.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Chinese.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'해둘게' accurately translates 'しとく' (しておく).\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 4.882051,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17439,
+   "output_tokens": 334,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17773
+  }
+ }
+}

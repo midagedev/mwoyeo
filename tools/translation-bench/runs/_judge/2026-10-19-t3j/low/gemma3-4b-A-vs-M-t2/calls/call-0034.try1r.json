@@ -1,0 +1,26 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0113.2",
+  "item-0372.1",
+  "item-0130.1",
+  "item-0090.1",
+  "item-0354.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "05e2a899-2229-4adf-8f63-f0011cb2bd2b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 consistently for speaker Zhou Ting.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 translates terms accurately instead of leaving Japanese untranslated.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both candidates failed to translate the sentence into Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 is a more natural Korean heading title.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 uses correct 해요체 honorifics for Lu Ming speaking to Zhou Ting.\"}\n]\n```\n",
+  "duration_seconds": 3.8077389999999998,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15835,
+   "output_tokens": 165,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16000
+  }
+ }
+}

@@ -1,0 +1,168 @@
+{"id": "item-0052.1", "better": "1", "why": "\"사쿠\" correctly transliterates the Japanese name さく.", "call": 4}
+{"id": "item-0059.1", "better": "1", "why": "Follows the specified term mapping for 先輩 as \"boss\".", "call": 4}
+{"id": "item-0057.2", "better": "2", "why": "\"Deposit\" is the accurate term for housing 보증금.", "call": 4}
+{"id": "item-0021.2", "better": "2", "why": "Context indicates tags stay fixed, whereas branches move.", "call": 4}
+{"id": "item-0020.1", "better": "1", "why": "Correctly uses the specified term \"포켓 깃\".", "call": 4}
+{"id": "item-0048.1", "better": "1", "why": "Follows the specified term mapping of 納期 to 납품일.", "call": 4}
+{"id": "item-0043.1", "better": "1", "why": "Correctly uses the specified term \"품의\" for 稟議.", "call": 4}
+{"id": "item-0049.1", "better": "1", "why": "\"홍차\" correctly translates 红茶 (black tea), not \"붉은 차\".", "call": 4}
+{"id": "item-0080.2", "better": "2", "why": "\"이파\" correctly transliterates the Irish name Aoife.", "call": 4}
+{"id": "item-0010.2", "better": "2", "why": "\"Pin\" is the standard UI term for note apps.", "call": 4}
+{"id": "item-0053.2", "better": "2", "why": "Translation 1 left the text untranslated in Chinese.", "call": 4}
+{"id": "item-0080.1", "better": "1", "why": "\"이파\" correctly reflects the Irish pronunciation of Aoife.", "call": 4}
+{"id": "item-0028.2", "better": "2", "why": "Translation 1 left the source text completely untranslated.", "call": 4}
+{"id": "item-0040.1", "better": "1", "why": "懐中時計 means pocket watch (회중시계), not wristwatch.", "call": 4}
+{"id": "item-0051.1", "better": "1", "why": "\"호타루\" preserves the sensor's internal code name.", "call": 4}
+{"id": "item-0082.2", "better": "tie", "why": "Both translations are identical and correct.", "call": 3}
+{"id": "item-0040.2", "better": "2", "why": "Translation 2 correctly translates 懐中時計 as pocket watch (회중시계).", "call": 3}
+{"id": "item-0043.2", "better": "2", "why": "Translation 2 adheres to the specified term 稟議 = 품의.", "call": 3}
+{"id": "item-0003.2", "better": "2", "why": "Translation 2 uses the required term 수호막 with correct grammar.", "call": 3}
+{"id": "item-0063.2", "better": "2", "why": "Translation 2 correctly translates spaceship bridge as 조종실, not 다리.", "call": 3}
+{"id": "item-0003.1", "better": "1", "why": "Translation 1 follows the specified term 結界 = 수호막.", "call": 3}
+{"id": "item-0034.2", "better": "2", "why": "Translation 2 correctly translates commercial order 订单 as 주문.", "call": 3}
+{"id": "item-0010.1", "better": "1", "why": "Translation 1 uses natural note app terminology 'pin' instead of 'fix'.", "call": 3}
+{"id": "item-0065.1", "better": "1", "why": "Translation 1 translates into English, whereas Translation 2 does not.", "call": 3}
+{"id": "item-0064.1", "better": "tie", "why": "Nagi's gender is unspecified in the context and facts.", "call": 3}
+{"id": "item-0037.2", "better": "2", "why": "Translation 2 correctly romanizes the surname 仇 as Qiu.", "call": 3}
+{"id": "item-0034.1", "better": "1", "why": "Translation 1 correctly translates commercial 订单 as 주문, not 명령.", "call": 3}
+{"id": "item-0015.1", "better": "1", "why": "Translation 1 correctly transcribes the Irish name Aoife as 이파.", "call": 3}
+{"id": "item-0045.2", "better": "2", "why": "Translation 2 uses the defined feature name Quick Notes from context.", "call": 3}
+{"id": "item-0046.2", "better": "2", "why": "Translation 2 follows the specified romanization Shan for surname 单.", "call": 3}
+{"id": "item-0054.1", "better": "1", "why": "삼홍 is the natural and proper spelling for the tea name.", "call": 5}
+{"id": "item-0055.2", "better": "2", "why": "Correctly applies honorifics to Professor Han in reported speech.", "call": 5}
+{"id": "item-0045.1", "better": "1", "why": "Accurately uses the defined feature name 'Quick Notes'.", "call": 5}
+{"id": "item-0008.1", "better": "1", "why": "Follows the specified terminology 'Sticky' from the facts.", "call": 5}
+{"id": "item-0053.1", "better": "1", "why": "Translation 2 is completely untranslated Chinese text.", "call": 5}
+{"id": "item-0047.1", "better": "1", "why": "'パトカー' means patrol car, not ambulance.", "call": 5}
+{"id": "item-0084.1", "better": "tie", "why": "Both translations are identical.", "call": 5}
+{"id": "item-0062.2", "better": "2", "why": "Respects Akira's request to drop formal titles and use just Akira.", "call": 5}
+{"id": "item-0078.1", "better": "1", "why": "Accurately reflects the explicitly specified pronunciation 'TOH-mash' as 토마시.", "call": 5}
+{"id": "item-0029.2", "better": "2", "why": "Translation 1 is completely untranslated Korean text.", "call": 5}
+{"id": "item-0078.2", "better": "2", "why": "Accurately reflects the explicitly specified pronunciation 'TOH-mash' as 토마시.", "call": 5}
+{"id": "item-0012.1", "better": "1", "why": "Correctly translates 同期 as Sync rather than Classmates.", "call": 5}
+{"id": "item-0032.1", "better": "1", "why": "Translation 2 is completely untranslated Japanese text.", "call": 5}
+{"id": "item-0067.2", "better": "2", "why": "Correctly uses the provided reading 'Yamanashi' for 月見里.", "call": 5}
+{"id": "item-0070.1", "better": "1", "why": "Translation 2 is completely untranslated Japanese text.", "call": 5}
+{"id": "item-0056.1", "better": "1", "why": "기사 refers to delivery drivers, not engineers.", "call": 7}
+{"id": "item-0071.2", "better": "2", "why": "海 is the character's name Kai, not the ocean.", "call": 7}
+{"id": "item-0027.2", "better": "2", "why": "Translation 1 was left untranslated in English.", "call": 7}
+{"id": "item-0068.1", "better": "1", "why": "鵲橋 is a Japanese bridge name, correctly transliterated as 카사사기바시.", "call": 7}
+{"id": "item-0062.1", "better": "1", "why": "Akira previously asked to be addressed simply as Akira without honorifics.", "call": 7}
+{"id": "item-0071.1", "better": "1", "why": "海 is the character's name Kai, not the sea.", "call": 7}
+{"id": "item-0031.1", "better": "1", "why": "見積書 correctly translates to 견적서, not 추정서.", "call": 7}
+{"id": "item-0004.1", "better": "1", "why": "Translation 2 was left untranslated in Korean.", "call": 7}
+{"id": "item-0014.1", "better": "1", "why": "Translation 2 was left untranslated in English.", "call": 7}
+{"id": "item-0014.2", "better": "2", "why": "Translation 1 was left untranslated in English.", "call": 7}
+{"id": "item-0001.1", "better": "1", "why": "보증금 is the proper term for rental deposits, not 예치금.", "call": 7}
+{"id": "item-0044.2", "better": "2", "why": "Translation 1 was left untranslated in Chinese.", "call": 7}
+{"id": "item-0002.1", "better": "1", "why": "He is her mother's brother, making 외삼촌 correct over 작은아버지.", "call": 7}
+{"id": "item-0056.2", "better": "2", "why": "기사 refers to delivery drivers, not engineers.", "call": 7}
+{"id": "item-0025.2", "better": "2", "why": "ホタル is a product code name and should be transliterated.", "call": 7}
+{"id": "item-0019.2", "better": "2", "why": "Murata is correctly transcribed as 무라타, not 무라다.", "call": 8}
+{"id": "item-0055.1", "better": "1", "why": "Correctly uses honorific 하셨어 when referring to the professor.", "call": 8}
+{"id": "item-0026.2", "better": "2", "why": "Translation 1 left the text untranslated in Chinese.", "call": 8}
+{"id": "item-0007.2", "better": "1", "why": "Eom correctly uses standard Revised Romanization for 엄.", "call": 8}
+{"id": "item-0050.1", "better": "1", "why": "Dex is correctly transliterated as 덱스, not 덱서.", "call": 8}
+{"id": "item-0037.1", "better": "1", "why": "Surname 仇 is correctly romanized in pinyin as Qiu.", "call": 8}
+{"id": "item-0005.1", "better": "1", "why": "Translation 2 left the text untranslated in Japanese.", "call": 8}
+{"id": "item-0073.2", "better": "2", "why": "A younger sister calls her older brother 오빠, not 형.", "call": 8}
+{"id": "item-0077.1", "better": "1", "why": "馬車 means carriage (마차), not car (자동차).", "call": 8}
+{"id": "item-0033.2", "better": "2", "why": "Zēng Lán is correctly transcribed as 쩡란 in Korean.", "call": 8}
+{"id": "item-0015.2", "better": "2", "why": "Irish name Aoife is pronounced EE-fa, transcribed as 이파.", "call": 8}
+{"id": "item-0049.2", "better": "2", "why": "红茶 should be translated as 홍차, not 붉은 차.", "call": 8}
+{"id": "item-0074.1", "better": "1", "why": "Translation 2 left the text untranslated in Chinese.", "call": 8}
+{"id": "item-0017.1", "better": "1", "why": "Translation 2 left the text untranslated in Japanese.", "call": 8}
+{"id": "item-0046.1", "better": "1", "why": "Facts state 单云舟 is romanized as Shàn Yúnzhōu.", "call": 8}
+{"id": "item-0038.1", "better": "1", "why": "Translation 1 correctly transliterates the character name Raizou.", "call": 2}
+{"id": "item-0023.1", "better": "1", "why": "Translation 1 translates into Korean, while Translation 2 is untranslated.", "call": 2}
+{"id": "item-0011.1", "better": "1", "why": "Translation 1 correctly uses the name Karasuma instead of 오마루.", "call": 2}
+{"id": "item-0017.2", "better": "2", "why": "Translation 2 translates into English, while Translation 1 is untranslated.", "call": 2}
+{"id": "item-0039.1", "better": "1", "why": "Translation 1 correctly transcribes the name Zēng Lán as 쩡란.", "call": 2}
+{"id": "item-0079.1", "better": "1", "why": "Translation 1 translates into Korean, while Translation 2 is untranslated.", "call": 2}
+{"id": "item-0076.2", "better": "2", "why": "Translation 2 translates into Korean, while Translation 1 is untranslated.", "call": 2}
+{"id": "item-0077.2", "better": "2", "why": "Translation 2 correctly translates 馬車 as carriage (마차), not car.", "call": 2}
+{"id": "item-0035.2", "better": "2", "why": "Rory is male, so his older sister is 누나, not 언니.", "call": 2}
+{"id": "item-0075.1", "better": "1", "why": "Translation 1 translates into English, while Translation 2 is untranslated.", "call": 2}
+{"id": "item-0032.2", "better": "2", "why": "Translation 2 translates into Korean, while Translation 1 is untranslated.", "call": 2}
+{"id": "item-0074.2", "better": "2", "why": "Translation 2 translates into English, while Translation 1 is untranslated.", "call": 2}
+{"id": "item-0042.1", "better": "2", "why": "Translation 2 preserves the honorific and respectful register of Akira-san.", "call": 2}
+{"id": "item-0029.1", "better": "1", "why": "Translation 1 translates into English, while Translation 2 is untranslated.", "call": 2}
+{"id": "item-0028.1", "better": "1", "why": "Translation 1 translates into Korean, while Translation 2 is untranslated.", "call": 2}
+{"id": "item-0057.1", "better": "1", "why": "\"보증금\" translates to deposit, not guarantee.", "call": 10}
+{"id": "item-0042.2", "better": "1", "why": "Faithfully preserves the \"-san\" honorific Hikaru used.", "call": 10}
+{"id": "item-0060.1", "better": "1", "why": "Hikaru is female, so \"she\" is correct.", "call": 10}
+{"id": "item-0004.2", "better": "2", "why": "Translation 1 is untranslated Korean text.", "call": 10}
+{"id": "item-0031.2", "better": "2", "why": "\"見積書\" means 견적서, not 추정서.", "call": 10}
+{"id": "item-0081.2", "better": "tie", "why": "Both translations are completely identical.", "call": 10}
+{"id": "item-0005.2", "better": "2", "why": "Translation 1 left Japanese text untranslated.", "call": 10}
+{"id": "item-0008.2", "better": "2", "why": "Matches the defined term \"付箋 = Sticky\".", "call": 10}
+{"id": "item-0009.1", "better": "1", "why": "Matches the defined term \"毛茶 = 모차\".", "call": 10}
+{"id": "item-0068.2", "better": "2", "why": "Japanese bridge names should be transliterated.", "call": 10}
+{"id": "item-0002.2", "better": "2", "why": "Mother's brother is 외삼촌, not 작은아버지.", "call": 10}
+{"id": "item-0021.1", "better": "1", "why": "\"That one\" refers to tag, not branch.", "call": 10}
+{"id": "item-0083.1", "better": "tie", "why": "Both translations are completely identical.", "call": 10}
+{"id": "item-0051.2", "better": "2", "why": "\"호타루\" is a sensor's internal product name.", "call": 10}
+{"id": "item-0006.1", "better": "1", "why": "Uses subject honorific \"-시-\" for client Kiryu.", "call": 10}
+{"id": "item-0075.2", "better": "2", "why": "Translation 1 was not translated into English.", "call": 9}
+{"id": "item-0054.2", "better": "2", "why": "삼홍 in Hangul is more natural than 3홍.", "call": 9}
+{"id": "item-0083.2", "better": "tie", "why": "Both translations are identical.", "call": 9}
+{"id": "item-0036.1", "better": "1", "why": "Translation 1 adheres to the term glossary.", "call": 9}
+{"id": "item-0027.1", "better": "1", "why": "Translation 2 left the text untranslated.", "call": 9}
+{"id": "item-0018.2", "better": "2", "why": "Translation 2 adheres to the defined term.", "call": 9}
+{"id": "item-0069.1", "better": "1", "why": "Translation 1 maintains proper subject honorific agreement.", "call": 9}
+{"id": "item-0059.2", "better": "2", "why": "Translation 2 uses the defined term boss.", "call": 9}
+{"id": "item-0011.2", "better": "2", "why": "Translation 2 correctly transliterates 烏丸 as 카라스마.", "call": 9}
+{"id": "item-0001.2", "better": "2", "why": "보증금 is the standard term for rental deposit.", "call": 9}
+{"id": "item-0064.2", "better": "tie", "why": "Nagi's gender is unspecified, making both options equally valid.", "call": 9}
+{"id": "item-0038.2", "better": "2", "why": "Translation 2 correctly transliterates 雷蔵 as 라이조.", "call": 9}
+{"id": "item-0030.2", "better": "2", "why": "Translation 1 left the text untranslated.", "call": 9}
+{"id": "item-0067.1", "better": "1", "why": "月見里 is correctly read as the surname Yamanashi.", "call": 9}
+{"id": "item-0026.1", "better": "1", "why": "Translation 2 left the text untranslated.", "call": 9}
+{"id": "item-0060.2", "better": "2", "why": "Hikaru is female, so the pronoun 'she' is correct.", "call": 12}
+{"id": "item-0072.2", "better": "2", "why": "Modern Chinese names use pinyin transcription (셰천), not hanja.", "call": 12}
+{"id": "item-0058.2", "better": "2", "why": "Translation 1 was left entirely untranslated in Chinese.", "call": 12}
+{"id": "item-0069.2", "better": "2", "why": "Correct subject honorific (걸으셨는지도) for the client's late husband.", "call": 11}
+{"id": "item-0012.2", "better": "2", "why": "'同期' means sync in software, not classmates.", "call": 11}
+{"id": "item-0019.1", "better": "1", "why": "Japanese surname Murata (村田) is correctly transcribed as 무라타.", "call": 11}
+{"id": "item-0039.2", "better": "2", "why": "Accurately transcribes the specified pinyin Zēng Lán as 쩡란.", "call": 11}
+{"id": "item-0058.1", "better": "1", "why": "Translation 2 is left entirely untranslated.", "call": 11}
+{"id": "item-0013.1", "better": "1", "why": "Uses the cat's established English name Barley from context.", "call": 11}
+{"id": "item-0081.1", "better": "tie", "why": "Both translations are identical.", "call": 11}
+{"id": "item-0079.2", "better": "2", "why": "Translation 1 is left entirely untranslated.", "call": 11}
+{"id": "item-0061.2", "better": "2", "why": "Facts specify Rook is translated as 루크.", "call": 11}
+{"id": "item-0066.2", "better": "2", "why": "Correctly spells Seoyoon as given in the facts.", "call": 11}
+{"id": "item-0024.2", "better": "2", "why": "The cat is female, making 'She' the correct pronoun.", "call": 11}
+{"id": "item-0025.1", "better": "1", "why": "Product code name ホタル should be transliterated as 호타루.", "call": 11}
+{"id": "item-0076.1", "better": "1", "why": "Translation 2 is left entirely untranslated.", "call": 11}
+{"id": "item-0066.1", "better": "1", "why": "Correctly spells Seoyoon as specified in the facts.", "call": 11}
+{"id": "item-0084.2", "better": "tie", "why": "Both translations are identical.", "call": 11}
+{"id": "item-0047.2", "better": "2", "why": "パトカー means patrol car, not ambulance.", "call": 1}
+{"id": "item-0030.1", "better": "1", "why": "Translation 2 was left untranslated.", "call": 1}
+{"id": "item-0035.1", "better": "1", "why": "Rory is male, so his older sister is 누나.", "call": 1}
+{"id": "item-0016.1", "better": "1", "why": "Facts establish Seoyoon has an older brother, not boyfriend.", "call": 1}
+{"id": "item-0024.1", "better": "1", "why": "Boli was established as female in the context.", "call": 1}
+{"id": "item-0036.2", "better": "2", "why": "Follows the specified term mapping ワークスペース = Space.", "call": 1}
+{"id": "item-0033.1", "better": "1", "why": "Zēng Lán is correctly transcribed as 쩡란, not 청란.", "call": 1}
+{"id": "item-0061.1", "better": "1", "why": "Uses the specified character name 루크 instead of 룩.", "call": 1}
+{"id": "item-0052.2", "better": "2", "why": "Transcribes さく phonetically as 사쿠 rather than Sino-Korean 삭.", "call": 1}
+{"id": "item-0023.2", "better": "2", "why": "Translation 1 was left untranslated.", "call": 1}
+{"id": "item-0070.2", "better": "2", "why": "Translation 1 was left untranslated.", "call": 1}
+{"id": "item-0050.2", "better": "2", "why": "Translates Dex correctly as 덱스, not 덱서.", "call": 1}
+{"id": "item-0073.1", "better": "1", "why": "Lin Xia is female, so her older brother is 오빠.", "call": 1}
+{"id": "item-0048.2", "better": "2", "why": "Follows the specified term mapping 納期 = 납품일.", "call": 1}
+{"id": "item-0082.1", "better": "tie", "why": "Both translations are identical and accurate.", "call": 1}
+{"id": "item-0041.2", "better": "tie", "why": "Both Chaeyool and Chaeyul are valid romanizations of 채율.", "call": 6}
+{"id": "item-0007.1", "better": "tie", "why": "Both Seojin Um and Seojin Eom are valid romanizations.", "call": 6}
+{"id": "item-0016.2", "better": "2", "why": "오빠 refers to her older brother, not her boyfriend.", "call": 6}
+{"id": "item-0009.2", "better": "2", "why": "Uses the established term 모차 from the facts.", "call": 6}
+{"id": "item-0072.1", "better": "1", "why": "Transcribes the Chinese name 解辰 correctly as 셰천.", "call": 6}
+{"id": "item-0063.1", "better": "1", "why": "Bridge on a spaceship means 조종실, not 다리.", "call": 6}
+{"id": "item-0065.2", "better": "2", "why": "Translation 1 left the Korean sentence completely untranslated.", "call": 6}
+{"id": "item-0022.1", "better": "1", "why": "Follows the established term 师姐 = Shijie from facts.", "call": 6}
+{"id": "item-0020.2", "better": "2", "why": "Follows the established term Pocket Git = 포켓 깃.", "call": 6}
+{"id": "item-0006.2", "better": "2", "why": "Uses proper subject honorific 두고 가셨어 for the client.", "call": 6}
+{"id": "item-0022.2", "better": "2", "why": "Follows the established term 师姐 = Shijie from facts.", "call": 6}
+{"id": "item-0018.1", "better": "1", "why": "Follows the established term council tax = 카운슬 택스.", "call": 6}
+{"id": "item-0044.1", "better": "1", "why": "Translation 2 left the Chinese sentence completely untranslated.", "call": 6}
+{"id": "item-0013.2", "better": "1", "why": "Cat's name is Bori; Barley was only for a form.", "call": 6}
+{"id": "item-0041.1", "better": "tie", "why": "Both Chaeyul and Chaeyool are valid romanizations of 채율.", "call": 6}

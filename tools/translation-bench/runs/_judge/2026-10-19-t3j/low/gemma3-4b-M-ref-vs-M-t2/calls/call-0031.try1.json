@@ -1,0 +1,31 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0002.1",
+  "item-0187.1",
+  "item-0030.1",
+  "item-0291.2",
+  "item-0193.2",
+  "item-0251.1",
+  "item-0243.2",
+  "item-0147.2",
+  "item-0242.2",
+  "item-0135.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fc834274-2634-4da1-85c2-deb2c38e9ab5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Aoife's dog cleaning isn't 'dog luggage' (짐); 1 translates correctly.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 completely mistranslated the line using unrelated previous context.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left Japanese untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 preserves context and meaning far better than 2.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 mangled names and pronouns severely.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Thorne speaks to Dex (singular 'Kid', 반말); 2 wrongly uses plural 애들아.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Move' means take action before 3, not relocate/move house (이사).\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Hinata speaks 반말 to her uncle Takanashi; 2 incorrectly uses 해요체.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"毎晩 means 'every night' (매일 밤), which Translation 2 accurately translates.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left the source Chinese text completely untranslated.\"}\n]\n```\n",
+  "duration_seconds": 5.060107,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17739,
+   "output_tokens": 347,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18086
+  }
+ }
+}

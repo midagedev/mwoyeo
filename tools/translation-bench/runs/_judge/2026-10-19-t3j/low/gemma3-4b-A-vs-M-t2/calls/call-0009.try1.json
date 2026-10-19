@@ -1,0 +1,31 @@
+{
+ "call": 9,
+ "try": 1,
+ "ids": [
+  "item-0057.1",
+  "item-0332.2",
+  "item-0320.2",
+  "item-0163.1",
+  "item-0016.1",
+  "item-0300.2",
+  "item-0028.2",
+  "item-0170.1",
+  "item-0036.2",
+  "item-0062.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8ec79192-71a8-41f0-ba62-03c61433695f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left Japanese untranslated and hallucinated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 mistranslates '俺です' as 'I am you'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Speaker uses informal speech (반말) and Translation 2 misreads the bridge name.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말; Translation 2 uses 해요체.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"周姨 speaks to 林夏 in 반말; 两成 means 20%, not double.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the entire sentence untranslated in Chinese.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Japanese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Target language is English; Translation 2 kept Japanese.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2's phrasing matches だよね naturally in 반말.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 mistranslates cleaning up after a dog as cleaning luggage.\"}\n]\n```\n",
+  "duration_seconds": 5.331426,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17658,
+   "output_tokens": 340,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17998
+  }
+ }
+}

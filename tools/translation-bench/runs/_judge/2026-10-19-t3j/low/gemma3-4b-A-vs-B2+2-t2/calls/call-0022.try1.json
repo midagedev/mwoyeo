@@ -1,0 +1,31 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0311.2",
+  "item-0092.2",
+  "item-0360.2",
+  "item-0202.1",
+  "item-0240.2",
+  "item-0016.2",
+  "item-0314.1",
+  "item-0302.1",
+  "item-0228.1",
+  "item-0014.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "86703342-cd59-454f-8296-6d7dc2505c81",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Natural phrasing without awkward literal translation of 'she'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 left text untranslated and garbled the name.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses correct polite honorific pronoun 제가 matching the 해요체 register.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both mistranslated the prototype name ホタル as unrelated creatures.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left Chinese characters untranslated.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 uses 해요체 to Zhou Yi, matching the facts.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese source text completely untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates '来たか' much closer than 'Welcome'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 preserves Saturday, whereas Translation 1 incorrectly says weekend.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 correctly understands the channel name Hearth instead of literal fire.\"}\n]\n```\n",
+  "duration_seconds": 4.7926210000000005,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17498,
+   "output_tokens": 321,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17819
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0053.1",
+  "item-0305.2",
+  "item-0125.1",
+  "item-0024.2",
+  "item-0150.2",
+  "item-0193.2",
+  "item-0229.1",
+  "item-0021.1",
+  "item-0119.2",
+  "item-0247.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "42944c54-8b9b-4c8f-822a-ec5038d51bc0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 accurately translates '실무에 들어갑니다' and context.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 is much more natural English for signing a contract.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"醒了 means already awake; 昏 means passed out/confused, not asleep.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 translates the wrong line entirely.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Terms specify '時計 = watch', not clock.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 'Sorry' and uses appropriate 반말 speech.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.808467,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17227,
+   "output_tokens": 305,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17532
+  }
+ }
+}

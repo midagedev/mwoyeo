@@ -1,0 +1,31 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0113.1",
+  "item-0057.2",
+  "item-0162.2",
+  "item-0205.2",
+  "item-0228.1",
+  "item-0307.1",
+  "item-0306.2",
+  "item-0265.2",
+  "item-0121.1",
+  "item-0338.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cc1bc2f5-8a58-4a80-b218-d0c2a9ee5e84",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates Gareth to 개러스 instead of leaving it in English.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both correctly convey the meaning and respect the required speech level.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"抢 here means grabbing/securing tickets, not stealing/taking by force.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Neither translation reliably reflects the gender, but both interpret the action well.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses natural conversational 반말 matching the cut-off spoken dialogue.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both convey the meaning, though both missed the defined term qi stone.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both incorrectly use male pronouns for female apprentice Hikaru.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both fail to use the defined term 텟사이 and 수호막.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Uses natural phrasing '네 저우 이모' and colloquial Korean 반말.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Reads much more naturally in Korean than translation 2.\"}\n]\n```\n",
+  "duration_seconds": 5.971004,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17679,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18004
+  }
+ }
+}

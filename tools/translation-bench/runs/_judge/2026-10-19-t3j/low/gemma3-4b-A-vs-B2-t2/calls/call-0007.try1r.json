@@ -1,0 +1,28 @@
+{
+ "call": 7,
+ "try": 1,
+ "ids": [
+  "item-0140.1",
+  "item-0087.1",
+  "item-0192.1",
+  "item-0315.2",
+  "item-0214.2",
+  "item-0304.2",
+  "item-0353.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e15d756f-3843-430c-9805-bcfca66c71fb",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 did not translate the line into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural phrasing for casual Korean conversation.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 hallucinates the name 'Otani'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly translates '覃长老' as Elder Qin and '三成' as 30%.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 mistranslates '電話番' (answering phone calls) as phone number.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Natural Korean spacing; Translation 2 has an unnatural space in '그 것을'.\"}\n]\n",
+  "duration_seconds": 3.842189,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16405,
+   "output_tokens": 228,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16633
+  }
+ }
+}

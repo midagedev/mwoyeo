@@ -1,0 +1,27 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0123.1",
+  "item-0252.2",
+  "item-0083.1",
+  "item-0220.1",
+  "item-0174.1",
+  "item-0001.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "aafbc393-2075-41b6-8d55-f8e5e1e6d653",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 translates to English, while Translation 2 left Japanese untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 is window metadata, while Translation 1 actually translates the line.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 is in Korean, while Translation 1 is untranslated Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly uses informal speech (반말) required by the facts.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly translates Captain as 선장 per the specified terms.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 translates the laughter instead of leaving untranslated Korean characters.\"}\n]\n",
+  "duration_seconds": 43.335884,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16204,
+   "output_tokens": 5292,
+   "thinking_tokens": 5085,
+   "cache_read_tokens": 0,
+   "total_tokens": 21496
+  }
+ }
+}

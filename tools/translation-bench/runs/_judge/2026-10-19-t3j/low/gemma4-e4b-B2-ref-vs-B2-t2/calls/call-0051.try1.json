@@ -1,0 +1,31 @@
+{
+ "call": 51,
+ "try": 1,
+ "ids": [
+  "item-0255.1",
+  "item-0019.2",
+  "item-0035.2",
+  "item-0082.2",
+  "item-0080.2",
+  "item-0188.1",
+  "item-0257.1",
+  "item-0124.1",
+  "item-0020.1",
+  "item-0163.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d687a494-1fb2-4686-92eb-8d40a241bc21",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the source Japanese text untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'my new place' is natural and matches Korean context well.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated; 1 translated it into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Uses the specified surname Yamanashi without honorific for English app guide.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both miss the spaceship bridge context, translating bridge literally as a bridge.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese; 2 is properly translated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'mountain gate' is the standard xianxia term for 山门.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'tucked ... close to him' is more natural English phrasing.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Translation 1 is untranslated; Translation 2 contains unedited Japanese characters.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both correctly translate the line into Korean using proper 합쇼체 register.\"}\n]\n```\n",
+  "duration_seconds": 6.452298,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17440,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17772
+  }
+ }
+}

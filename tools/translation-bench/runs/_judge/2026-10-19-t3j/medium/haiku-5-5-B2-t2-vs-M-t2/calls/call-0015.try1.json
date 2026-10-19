@@ -1,0 +1,27 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0326.2",
+  "item-0031.1",
+  "item-0052.1",
+  "item-0038.1",
+  "item-0131.1",
+  "item-0073.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "492066fc-a817-4014-96a2-33b47137b6a5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 時計 as watch per the term fact.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 accurately captures older brother and the conversational offer.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates naturally without unnatural Hanja in parentheses.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 follows the term Marigold and transliterates names.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly translates chase and avoids inappropriate 사장님.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 uses natural 결계석 instead of awkward literal phrasing.\"}\n]\n```\n",
+  "duration_seconds": 92.217068,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16347,
+   "output_tokens": 11345,
+   "thinking_tokens": 11150,
+   "cache_read_tokens": 0,
+   "total_tokens": 27692
+  }
+ }
+}

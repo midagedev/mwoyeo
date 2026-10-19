@@ -1,0 +1,31 @@
+{
+ "call": 58,
+ "try": 1,
+ "ids": [
+  "item-0132.2",
+  "item-0201.2",
+  "item-0123.1",
+  "item-0131.2",
+  "item-0366.2",
+  "item-0020.2",
+  "item-0056.2",
+  "item-0054.1",
+  "item-0025.1",
+  "item-0216.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e8ad2182-2959-4285-ab32-8eb9da8bc142",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both missed the mandated term '마정석' for 魔石.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 includes standard sentence-ending punctuation.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Context is tea stock/goods (货/批), not a loan (贷); uses 해요체.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly transliterates the Japanese kanji name 湊 to Korean 미나토.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses natural address, whereas Translation 2 wrongly adds 'officer'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Matches the specified 해요체 speech level for ユウ speaking to seniors.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"저우 이모 speaking to the siblings uses 너희 아버지 naturally.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translates 三百盒 cleanly and naturally in conversational context.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"More natural professional register for formal onboarding wiki guidelines.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translates the names into Korean rather than leaving English untranslated.\"}\n]\n```\n",
+  "duration_seconds": 6.557572,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17436,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17768
+  }
+ }
+}

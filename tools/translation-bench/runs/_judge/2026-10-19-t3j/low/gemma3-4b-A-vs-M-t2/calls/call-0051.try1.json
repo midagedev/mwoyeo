@@ -1,0 +1,27 @@
+{
+ "call": 51,
+ "try": 1,
+ "ids": [
+  "item-0236.2",
+  "item-0169.2",
+  "item-0029.2",
+  "item-0292.1",
+  "item-0059.2",
+  "item-0334.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3799133d-bbf6-41fa-9eaa-2e2340968c78",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Hyuga speaks in 합쇼체 to the section chief.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural phrasing and clearer clause structure.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations accurately convey the pronunciation note and meaning.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 hallucinates a completely different earlier line.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly translates '체험 보고서' (experience report).\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'오빠' refers to her brother Minjae, not a boyfriend.\"}\n]\n```\n",
+  "duration_seconds": 4.001804,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15981,
+   "output_tokens": 189,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16170
+  }
+ }
+}

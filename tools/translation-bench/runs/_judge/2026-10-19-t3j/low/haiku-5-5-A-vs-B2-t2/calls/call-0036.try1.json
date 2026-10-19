@@ -1,0 +1,31 @@
+{
+ "call": 36,
+ "try": 1,
+ "ids": [
+  "item-0297.2",
+  "item-0291.1",
+  "item-0034.1",
+  "item-0255.1",
+  "item-0106.1",
+  "item-0246.2",
+  "item-0058.1",
+  "item-0298.1",
+  "item-0041.2",
+  "item-0242.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "47b40b60-b69d-4057-83ad-4b1672da0317",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Asking permission uses '~해도 돼?' naturally rather than asking ability.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly finishes the sentence smoothly and naturally.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Zhou Ting speaks to friends in 반말 per facts.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translates the character name Xie Xuan instead of leaving raw Chinese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses established term 'Hearth' instead of literal 'campfire'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly uses 해요체 ('~있나요?') matching section chief's speech level to junior.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses correct name transliteration '주 이모' (or '저우 이모') over '조'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"The incomplete source '遅れる' represents 'if we're late' before cutting off.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Uses established name '철사이' (텟사이/철사이) rather than Hanja reading '철재'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Uses correct fact name '저우 이모' and natural phrasing.\"}\n]\n```\n",
+  "duration_seconds": 5.60415,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17492,
+   "output_tokens": 352,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17844
+  }
+ }
+}

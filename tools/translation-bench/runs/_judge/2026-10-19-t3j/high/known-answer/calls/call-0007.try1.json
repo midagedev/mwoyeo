@@ -1,0 +1,36 @@
+{
+ "call": 7,
+ "try": 1,
+ "ids": [
+  "item-0056.1",
+  "item-0071.2",
+  "item-0027.2",
+  "item-0068.1",
+  "item-0062.1",
+  "item-0071.1",
+  "item-0031.1",
+  "item-0004.1",
+  "item-0014.1",
+  "item-0014.2",
+  "item-0001.1",
+  "item-0044.2",
+  "item-0002.1",
+  "item-0056.2",
+  "item-0025.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1dc67097-fab2-4024-a786-d7d58763e038",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"기사 refers to delivery drivers, not engineers.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"海 is the character's name Kai, not the ocean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated in English.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"鵲橋 is a Japanese bridge name, correctly transliterated as 카사사기바시.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Akira previously asked to be addressed simply as Akira without honorifics.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"海 is the character's name Kai, not the sea.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"見積書 correctly translates to 견적서, not 추정서.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 was left untranslated in Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 was left untranslated in English.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated in English.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"보증금 is the proper term for rental deposits, not 예치금.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated in Chinese.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"He is her mother's brother, making 외삼촌 correct over 작은아버지.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"기사 refers to delivery drivers, not engineers.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"ホタル is a product code name and should be transliterated.\"}\n]\n",
+  "duration_seconds": 32.218063,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 18678,
+   "output_tokens": 4790,
+   "thinking_tokens": 4313,
+   "cache_read_tokens": 0,
+   "total_tokens": 23468
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 36,
+ "try": 1,
+ "ids": [
+  "item-0321.1",
+  "item-0187.2",
+  "item-0113.2",
+  "item-0010.2",
+  "item-0388.1",
+  "item-0130.1",
+  "item-0090.1",
+  "item-0005.1",
+  "item-0294.1",
+  "item-0230.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "44cb4a56-87a7-432d-8193-4198bdd7897f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'Foundation tasks' reads much more naturally than 'scaffolding tasks'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses established term 'Commons' instead of mistranslating as 'plaza'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Transliterates 朔 to 삭 and uses 반말 as required.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and faithful to the context.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses 반말 between crewmates and translates ship bridge correctly.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Transliterates 雨宮 into Korean phonetics based on preceding dialogue.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly identifies Akira's female gender with pronoun 'her'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Rook speaks in 합쇼체 to Captain Thorne, not 반말.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations accurately capture the meaning and natural tone.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both offer natural, equivalent English translations for casual conversation.\"}\n]\n```\n",
+  "duration_seconds": 4.870971,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17345,
+   "output_tokens": 326,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17671
+  }
+ }
+}

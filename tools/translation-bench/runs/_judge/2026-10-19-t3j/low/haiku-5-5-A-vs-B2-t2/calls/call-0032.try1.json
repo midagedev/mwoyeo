@@ -1,0 +1,31 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0340.2",
+  "item-0110.2",
+  "item-0218.2",
+  "item-0294.2",
+  "item-0374.2",
+  "item-0125.2",
+  "item-0220.2",
+  "item-0317.2",
+  "item-0173.2",
+  "item-0171.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2b4a72fb-ceb4-439e-afb2-f72ada73bdd9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate; '가' is optional.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both fail on tone, proper names, and register.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both leave 'Thorne' untranslated; spacing difference is negligible.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly transliterates 夏夏 to 샤샤 instead of leaving Chinese characters.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"More concise and natural Korean technical documentation style.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Properly transliterates Rook to 룩 and uses natural 반말.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both are polite, natural, and accurately reflect required speech level.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translates pinyin names properly instead of leaving Chinese characters.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'Single word or phrase' better captures the nuance of ひとこと.\"}\n]\n```\n",
+  "duration_seconds": 5.069882,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17142,
+   "output_tokens": 313,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17455
+  }
+ }
+}

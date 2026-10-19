@@ -1,0 +1,31 @@
+{
+ "call": 51,
+ "try": 1,
+ "ids": [
+  "item-0236.2",
+  "item-0169.2",
+  "item-0158.1",
+  "item-0200.2",
+  "item-0128.1",
+  "item-0029.2",
+  "item-0179.2",
+  "item-0292.1",
+  "item-0059.2",
+  "item-0334.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "31da31c1-4327-44cd-bc54-8429476f1537",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"기사 means driver/delivery worker, not article.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are accurate and natural renderings for a heading.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the line entirely untranslated in Chinese.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both capture the meaning and informal tone accurately.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'Ride in the car' is much more natural for pets than 'take a car'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Uses correct 해요체 register, whereas 2 uses 합쇼체 and leaves name untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese source completely untranslated.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 is much more natural Korean dialogue without redundant pronouns.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Transliterating the name first matches the pronunciation guide structure better.\"}\n]\n```\n",
+  "duration_seconds": 4.978654,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17250,
+   "output_tokens": 321,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17571
+  }
+ }
+}

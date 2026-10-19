@@ -1,0 +1,31 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0137.2",
+  "item-0343.1",
+  "item-0230.2",
+  "item-0046.2",
+  "item-0291.2",
+  "item-0122.2",
+  "item-0218.1",
+  "item-0221.1",
+  "item-0176.1",
+  "item-0288.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "65d4e9b5-2c83-4868-82d6-7fee1f3f36f0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 as specified in the facts.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 transliterates the Chinese names into English pinyin instead of characters.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 uses the natural idiom 'cracked again'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses informal 반말 and natural Korean phrasing.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are completely valid and natural Korean UI headings.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 accurately reflects Zhou Ting's speech level (반말) and natural phrasing.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the specified 해요체 register.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 transliterates Gerald into Korean Hangul instead of leaving English.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in casual register, and Translation 2 is much more natural.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Zhou Auntie speaks in conversational 반말 ('너희 할아버지가... 했어') to Lin Xia.\"}\n]\n```\n",
+  "duration_seconds": 12.12355,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17568,
+   "output_tokens": 345,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17913
+  }
+ }
+}

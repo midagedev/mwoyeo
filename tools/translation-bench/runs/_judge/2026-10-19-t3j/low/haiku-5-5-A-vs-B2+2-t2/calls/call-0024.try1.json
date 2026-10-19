@@ -1,0 +1,31 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0195.2",
+  "item-0199.1",
+  "item-0220.2",
+  "item-0213.1",
+  "item-0341.2",
+  "item-0205.1",
+  "item-0242.1",
+  "item-0254.2",
+  "item-0188.1",
+  "item-0215.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6427eb91-c7b8-411d-bdcb-e3c9907c8e5f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"'synced across all your devices' is more natural for multi-device sync.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Lu Ming speaks to Xu Nuo in banmal, matching translation 2.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Nagi was previously introduced as an 18-year-old girl, so 'she' is correct.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both appropriately use old-style banmal speech for Tessai.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Book a full-service moving company' is much more natural English.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Bori's gender is unknown, making both translations equally valid.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Identical translations differing only in an optional sentence-ending period.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"More respectful honorific phrasing matching Siobhan's formal register toward Gareth.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Spoken by Captain Thorne to Rook, correctly using haeyo-che.\"}\n]\n```\n",
+  "duration_seconds": 5.081256,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17508,
+   "output_tokens": 343,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17851
+  }
+ }
+}

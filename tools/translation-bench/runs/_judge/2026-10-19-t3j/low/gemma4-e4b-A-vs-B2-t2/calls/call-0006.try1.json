@@ -1,0 +1,31 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0015.1",
+  "item-0380.2",
+  "item-0073.1",
+  "item-0266.1",
+  "item-0291.1",
+  "item-0256.1",
+  "item-0359.2",
+  "item-0222.1",
+  "item-0365.2",
+  "item-0013.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e3b312af-c5eb-41d0-858a-54950ac65d5a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both misinterpret the request to pass thanks when she wakes up.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both 'added' and 'attached' accurately translate 添える.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Uses the established term 'Commons' instead of literal 'plaza'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Facts state Yuki is male, but Translation 1 uses 'Her'.\"}\n]\n```\n",
+  "duration_seconds": 4.459179,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17393,
+   "output_tokens": 299,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17692
+  }
+ }
+}

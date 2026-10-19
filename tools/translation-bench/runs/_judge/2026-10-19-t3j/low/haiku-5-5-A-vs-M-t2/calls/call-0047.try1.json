@@ -1,0 +1,31 @@
+{
+ "call": 47,
+ "try": 1,
+ "ids": [
+  "item-0116.2",
+  "item-0398.1",
+  "item-0312.2",
+  "item-0343.1",
+  "item-0288.1",
+  "item-0384.1",
+  "item-0353.2",
+  "item-0349.2",
+  "item-0134.1",
+  "item-0161.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dcfa69a8-9f57-4224-b9a8-90dd6b3d8565",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Tenriver is speaking to a subordinate; 해요체 fits, and -씨 is natural.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Modakbul is the proper noun app/service name, not a campfire.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both convey the meaning and pronunciation accurately and naturally.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly transliterates 林远 to 린위안 in Korean text.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"万俟 is the compound surname Moqi, not 'Wan Qi'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Line is dialogue spoken to Lin Xia in informal speech (반말).\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both correctly use 합쇼체 and translate the line accurately.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both '그런 다음' and '그다음' are natural and accurate translations.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"사쿠 correctly transcribes Japanese reading さく, unlike 삭.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both 'your cat' and 'the cat' naturally fit the Korean context.\"}\n]\n```\n",
+  "duration_seconds": 6.334075,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17492,
+   "output_tokens": 340,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17832
+  }
+ }
+}

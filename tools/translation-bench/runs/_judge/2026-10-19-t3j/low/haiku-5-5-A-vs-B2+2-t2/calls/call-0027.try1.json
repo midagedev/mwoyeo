@@ -1,0 +1,31 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0017.2",
+  "item-0342.1",
+  "item-0275.2",
+  "item-0126.2",
+  "item-0032.1",
+  "item-0103.2",
+  "item-0149.1",
+  "item-0012.1",
+  "item-0237.2",
+  "item-0097.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "52294be0-de2a-4fe9-9c40-e49eeb7e1e2d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both mangle MoaLogis (Moaroji vs Moaro Logis) equally poorly.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both miss the defined term 'Pathfinder' and mistranslate the meaning.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both awkwardly repeat the name in parentheses; quality is equivalent.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말, which Translation 1 uses.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 naturally captures 'yet' and conveys the line more idiomatically.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Rory responds to landlord Gareth using appropriate 해요체.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both use correct 해요체 and are equally natural in Korean.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and read naturally.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both appropriately use 반말 with natural tone to his niece.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Xu Nuo speaks to Lu Ming in 반말, not 존댓말.\"}\n]\n```\n",
+  "duration_seconds": 5.078268,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17316,
+   "output_tokens": 330,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17646
+  }
+ }
+}

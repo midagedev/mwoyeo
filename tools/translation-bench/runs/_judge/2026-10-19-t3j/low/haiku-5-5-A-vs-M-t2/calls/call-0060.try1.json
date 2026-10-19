@@ -1,0 +1,31 @@
+{
+ "call": 60,
+ "try": 1,
+ "ids": [
+  "item-0091.1",
+  "item-0024.2",
+  "item-0348.1",
+  "item-0317.1",
+  "item-0229.1",
+  "item-0211.2",
+  "item-0138.2",
+  "item-0304.2",
+  "item-0009.1",
+  "item-0105.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "577f8c11-e6cd-450e-8850-d0b4562b67db",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately convey the meaning.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Matches the mid-sentence cut-off in the source dialogue.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Siobhan speaks to Rory in 반말, not 해요체.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly uses the defined term Hearth and matches the instructional tone.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both convey the meaning and tone equally well; comma difference is negligible.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses the specified term 'Revisions' for 履歴.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"货 (cargo/goods, typoed as 贷) means goods, not a loan.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both are faithful and natural translations of the source sentence.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correctly translates ワークスペース to the defined term Space.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations use 형 instead of 오빠 for a female speaker.\"}\n]\n```\n",
+  "duration_seconds": 4.574075,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17184,
+   "output_tokens": 321,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17505
+  }
+ }
+}

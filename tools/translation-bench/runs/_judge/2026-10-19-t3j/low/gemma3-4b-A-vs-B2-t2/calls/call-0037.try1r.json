@@ -1,0 +1,28 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0350.1",
+  "item-0176.1",
+  "item-0227.2",
+  "item-0280.2",
+  "item-0168.2",
+  "item-0138.1",
+  "item-0187.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "97f8e8ee-17b1-43b7-bd51-0deeadeafc8d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"More accurate for 'is dying' and 'by morning'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Closer romanization for 채율 than Jae-yeol.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"More natural phrasing and avoids clumsy literal pronoun translation.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both misspell the brand name Memotto from the facts.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both mistranslate soda bread and incorrectly use honorific/polite speech to Rory.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Recognizes 若水 as a person's name rather than literal 'water'.\"}\n]\n```\n",
+  "duration_seconds": 5.350584,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16428,
+   "output_tokens": 226,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16654
+  }
+ }
+}

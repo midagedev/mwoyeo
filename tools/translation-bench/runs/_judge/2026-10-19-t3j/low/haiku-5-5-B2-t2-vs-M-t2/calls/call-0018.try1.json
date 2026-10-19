@@ -1,0 +1,31 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0195.2",
+  "item-0281.1",
+  "item-0275.1",
+  "item-0111.2",
+  "item-0188.1",
+  "item-0182.2",
+  "item-0366.1",
+  "item-0186.2",
+  "item-0274.1",
+  "item-0306.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "84063a82-7a72-4103-8624-aabc29678c70",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 sounds much more natural and polite for 해요체.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly translates Thorne's name into Korean and uses proper honorifics.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally using appropriate 해요체.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 contains an incorrect reading typo for かささぎばし.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 adheres to the specified terminology 'Space' for ワークスペース.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both incorrectly use 형 instead of 오빠 for a female speaker.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 captures the conditional meaning of 才算 much better.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly preserves the trailing punctuation.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translating ヤマ as 사건 fits the detective drama context better.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 uses '푸터', which matches the earlier context 'footer file'.\"}\n]\n```\n",
+  "duration_seconds": 4.530063,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17412,
+   "output_tokens": 330,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17742
+  }
+ }
+}

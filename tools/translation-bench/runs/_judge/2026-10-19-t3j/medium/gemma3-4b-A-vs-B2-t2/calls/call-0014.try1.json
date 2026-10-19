@@ -1,0 +1,27 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0274.1",
+  "item-0269.2",
+  "item-0286.1",
+  "item-0112.2",
+  "item-0046.1",
+  "item-0173.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fc4e9e1b-4468-42b2-a79e-82cfe62ccdc7",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 案件 as project instead of case.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while Translation 1 remains in Chinese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the defined term Quick Note.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 translates into English, whereas Translation 2 remains in Korean.\"}\n]\n",
+  "duration_seconds": 23.657413,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15844,
+   "output_tokens": 2765,
+   "thinking_tokens": 2586,
+   "cache_read_tokens": 0,
+   "total_tokens": 18609
+  }
+ }
+}

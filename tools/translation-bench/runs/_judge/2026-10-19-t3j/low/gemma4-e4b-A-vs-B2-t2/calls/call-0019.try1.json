@@ -1,0 +1,30 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0231.1",
+  "item-0298.1",
+  "item-0050.2",
+  "item-0127.2",
+  "item-0178.1",
+  "item-0094.1",
+  "item-0139.2",
+  "item-0286.1",
+  "item-0102.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6b30d07b-bf06-4e38-aa7e-1bea33a24c7f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate representations of the Korean message.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 reads much more naturally in Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Chinese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Chinese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly mirrors the cut-off incomplete ending of the source.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly translates into Korean using the required speech level (합쇼체).\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'on site' is more natural and idiomatic in English onboarding guides.\"}\n]\n```\n",
+  "duration_seconds": 4.88894,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16852,
+   "output_tokens": 288,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17140
+  }
+ }
+}

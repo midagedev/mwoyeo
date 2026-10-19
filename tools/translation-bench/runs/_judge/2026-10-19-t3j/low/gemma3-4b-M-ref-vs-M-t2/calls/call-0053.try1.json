@@ -1,0 +1,31 @@
+{
+ "call": 53,
+ "try": 1,
+ "ids": [
+  "item-0249.2",
+  "item-0255.2",
+  "item-0058.2",
+  "item-0362.2",
+  "item-0012.1",
+  "item-0247.1",
+  "item-0348.1",
+  "item-0159.2",
+  "item-0274.2",
+  "item-0264.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "97e42e6f-f044-4559-aed0-bf2a9c09e1f2",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly renders the Chinese name instead of Vietnamese-like spelling.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correct Polish pronunciation 'Tomasz' (토마시) and natural Git phrasing.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated in Chinese.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Section chief expresses his own trouble, making -시- inappropriate in 1.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 mispronounces Tomasz as 토마시스; 1 uses correct pronunciation.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Rook speaks to Thorne in 합쇼체, matching Translation 1.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated; 2 attempted Korean translation.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Tesshai's archaic speech (〜じゃ, 〜やれ) is captured better by -렴.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 5.897321,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17491,
+   "output_tokens": 346,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17837
+  }
+ }
+}

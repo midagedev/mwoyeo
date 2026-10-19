@@ -1,0 +1,31 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0214.1",
+  "item-0103.1",
+  "item-0197.2",
+  "item-0111.2",
+  "item-0093.1",
+  "item-0013.2",
+  "item-0027.1",
+  "item-0084.1",
+  "item-0042.2",
+  "item-0060.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f8ad06ee-d0fd-442e-8c15-46f8eddef37f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Active 'until you merge' corresponds to '병합하기 전까지는'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are natural and convey the meaning accurately.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both incorrectly use 해요체 instead of 반말; otherwise equivalent.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both mistranslate third-person Xie Xuan as first-person 'I'.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translate the line accurately with correct meaning and style.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Xu Nuo speaks to Lu Ming in 반말.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both convey the definition accurately and naturally in English.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Saku speaks to Licia in 해요체.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Zhou Ting speaks in 반말 and Xie is pronounced '셰'.\"}\n]\n```\n",
+  "duration_seconds": 5.584663,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17571,
+   "output_tokens": 311,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17882
+  }
+ }
+}

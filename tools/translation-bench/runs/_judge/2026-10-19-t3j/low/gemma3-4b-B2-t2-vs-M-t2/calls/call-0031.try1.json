@@ -1,0 +1,31 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0021.2",
+  "item-0272.1",
+  "item-0004.1",
+  "item-0214.1",
+  "item-0273.2",
+  "item-0098.2",
+  "item-0212.2",
+  "item-0147.2",
+  "item-0128.2",
+  "item-0274.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2d13f91d-2552-4831-9835-4ec9ad5f2c77",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Hinata speaks to Takanashi in banmal.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Faithfully translates 'tub' rather than hallucinating opening the fridge.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"More natural phrasing and correct Korean spacing for '그곳'.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both incorrectly romanize the Japanese surname 小鳥遊.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"More natural Korean phrasing for '처음 하는'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Uses correct name translation '저우 이모' and appropriate polite speech level.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'압축기' is more standard and natural Korean than '컴프레서'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'알면' is the correct conditional translation for '知ったら'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both are accurate and natural variations of 'this'.\"}\n]\n```\n",
+  "duration_seconds": 4.845553,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17138,
+   "output_tokens": 320,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17458
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0363.1",
+  "item-0019.2",
+  "item-0144.2",
+  "item-0142.2",
+  "item-0211.1",
+  "item-0236.2",
+  "item-0251.2",
+  "item-0181.2",
+  "item-0223.2",
+  "item-0180.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e84015de-7bbb-4f68-b656-4aea6ca1082d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"닦고 is a more natural translation of 磨いている for polishing a stone.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses the specified term Hearth channel instead of translating literally.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Natural phrasing and correctly reflects single-person context (I'm moving, my stuff).\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"ひとこと in note apps refers to a short note or phrase.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Neither adheres to character name transliteration guidelines or natural dialogue tone.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 mistakenly translates a conditional/future waking as already happened.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both appropriately convey polite customer-facing language in Korean.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correctly uses 해요체 speech level spoken by Thorne to Rook.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Uses the specified term Karrot instead of untranslated Danggeun.\"}\n]\n```\n",
+  "duration_seconds": 6.99476,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17478,
+   "output_tokens": 322,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17800
+  }
+ }
+}

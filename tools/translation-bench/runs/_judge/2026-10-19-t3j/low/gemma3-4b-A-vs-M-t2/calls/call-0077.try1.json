@@ -1,0 +1,22 @@
+{
+ "call": 77,
+ "try": 1,
+ "ids": [
+  "item-0239.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5682f7fe-ad7d-42dd-80e5-4af20bde8a26",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"2 mistranslates 封じ as 봉지 and distorts the grammar and register.\"}\n]\n```\n",
+  "duration_seconds": 12.028622,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14581,
+   "output_tokens": 904,
+   "thinking_tokens": 858,
+   "cache_read_tokens": 0,
+   "total_tokens": 15485
+  }
+ }
+}

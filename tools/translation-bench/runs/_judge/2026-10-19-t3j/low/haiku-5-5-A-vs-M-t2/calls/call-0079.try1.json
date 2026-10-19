@@ -1,0 +1,31 @@
+{
+ "call": 79,
+ "try": 1,
+ "ids": [
+  "item-0156.1",
+  "item-0229.2",
+  "item-0049.1",
+  "item-0096.1",
+  "item-0315.1",
+  "item-0323.1",
+  "item-0244.2",
+  "item-0263.1",
+  "item-0095.2",
+  "item-0098.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0014e56d-0c8a-4b4a-b80d-8016f305a1de",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Facts state 朔 reading is さく (사쿠), not 삭.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are completely identical except for a minor comma.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both correctly translate Thorne's 반말 command; particle omission is natural.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"ひとこと in note apps means short comment/note, not single word.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both 'organizes' and 'sorts' naturally translate 分けています in context.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 adds 'still' which is not in the source text.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left 小鳥遊 untranslated; 2 transliterates it properly.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"The watch belongs to the client, not the deceased husband's honorific.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"기사 means driver at a logistics startup, not reporter.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly uses female pronoun 'she' for Nagi (十八の少女).\"}\n]\n```\n",
+  "duration_seconds": 5.099927,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17253,
+   "output_tokens": 343,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17596
+  }
+ }
+}

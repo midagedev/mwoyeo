@@ -1,0 +1,31 @@
+{
+ "call": 56,
+ "try": 1,
+ "ids": [
+  "item-0322.1",
+  "item-0294.2",
+  "item-0229.1",
+  "item-0211.2",
+  "item-0138.2",
+  "item-0342.2",
+  "item-0009.1",
+  "item-0105.1",
+  "item-0314.2",
+  "item-0144.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3389497a-f831-429e-9cbc-f3e96ce15e16",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Matches the specified spelling '타카나시' and polite 해요체 register.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Takanashi is an old man, so 'Ms.' is incorrect.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Reflects honorifics toward Professor Han and casual peer dialogue naturalness.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both miss the defined pinyin/spelling '린위안/린시아' and casual register.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly uses the defined term '블렌딩' and 반말 to his sister.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both mistranslate using '길잡이' (Pathfinder) tool as acting as a guide.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 leaves the name in untranslated Chinese characters.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Exclamatory ending reflects the Korean statement particle '내' (네).\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'In the early morning' reads more naturally as an opening clause.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly uses singular 'I'm moving' rather than 'We'.\"}\n]\n```\n",
+  "duration_seconds": 6.308183,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17314,
+   "output_tokens": 354,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17668
+  }
+ }
+}

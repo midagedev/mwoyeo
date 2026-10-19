@@ -1,0 +1,31 @@
+{
+ "call": 43,
+ "try": 1,
+ "ids": [
+  "item-0279.2",
+  "item-0095.1",
+  "item-0154.2",
+  "item-0245.1",
+  "item-0063.1",
+  "item-0163.2",
+  "item-0150.1",
+  "item-0054.1",
+  "item-0024.1",
+  "item-0020.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0622dfa4-13df-42b0-9ce7-6c4779cd3cea",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly translates 'rent' and uses the required term '카운슬 택스'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the sentence into Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left the text in untranslated Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 contains untranslated Japanese characters.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'기사' refers to the equipment operator/driver, not the equipment itself.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Accurately translates '泡' in the context of preparing tea.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 hallucinated extra context and lines not in the source.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both incorrectly use honorifics (speakers use 반말) and are equally flawed.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"More accurately captures the conditional phrasing and timeline than Translation 1.\"}\n]\n```\n",
+  "duration_seconds": 6.026975,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17551,
+   "output_tokens": 328,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17879
+  }
+ }
+}

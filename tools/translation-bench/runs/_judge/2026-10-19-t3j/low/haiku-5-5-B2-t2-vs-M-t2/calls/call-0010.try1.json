@@ -1,0 +1,31 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0249.2",
+  "item-0077.1",
+  "item-0067.2",
+  "item-0262.2",
+  "item-0174.1",
+  "item-0217.2",
+  "item-0006.1",
+  "item-0286.2",
+  "item-0059.1",
+  "item-0062.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1e125d55-c92c-4f56-8041-3060ed4f3b9a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Lin Yuan speaks to Zhou Yi using 해요체.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly uses the defined term 'ward' instead of 'barrier'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'Partial service' is more natural than the literal 'semi-packing'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Hinata speaks to Kiryu using 합쇼체; 복도 끝 is natural.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Accurately translates 川遊び as playing in the river.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Captures 忘了记 (forgot to record) and 都 (at all) more faithfully.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Naturally translates 고양이 as 'your cat' in casual conversation.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"More faithful to '모닥불에' without redundantly adding 'channel'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"More natural phrasing for an app documentation guide.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Reads much more naturally and idiomatically as narrative exposition.\"}\n]\n```\n",
+  "duration_seconds": 4.760963,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17177,
+   "output_tokens": 328,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17505
+  }
+ }
+}

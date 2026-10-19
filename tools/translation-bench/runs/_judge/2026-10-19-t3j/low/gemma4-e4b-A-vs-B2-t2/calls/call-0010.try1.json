@@ -1,0 +1,31 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0249.2",
+  "item-0355.1",
+  "item-0184.2",
+  "item-0148.1",
+  "item-0227.2",
+  "item-0349.1",
+  "item-0141.1",
+  "item-0279.1",
+  "item-0292.2",
+  "item-0205.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5e1e3eb1-4efe-4e84-b544-80a833cd4be8",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both miss the defined terms 'ward' and 'qi stone' equally.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Proper punctuation with a trailing period.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly uses 반말 to Dex and preserves the cut-off sentence.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.860447,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17599,
+   "output_tokens": 290,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17889
+  }
+ }
+}

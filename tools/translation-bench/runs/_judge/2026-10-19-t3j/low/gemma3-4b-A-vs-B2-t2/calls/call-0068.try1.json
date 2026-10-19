@@ -1,0 +1,26 @@
+{
+ "call": 68,
+ "try": 1,
+ "ids": [
+  "item-0350.2",
+  "item-0148.2",
+  "item-0263.2",
+  "item-0118.2",
+  "item-0131.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f9955dcf-f7ec-4718-840a-20e24fa388fc",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 accurately captures 'by morning' (아침까지) and 'dying'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 sounds natural for onboarding guide instructions.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 is completely hallucinated; 2 actually translates the narrative sentence.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses the natural software term 'pin' for 固定.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly understands 'it's a hot tub', unlike translation 1.\"}\n]\n```\n",
+  "duration_seconds": 3.7258839999999998,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15682,
+   "output_tokens": 177,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15859
+  }
+ }
+}

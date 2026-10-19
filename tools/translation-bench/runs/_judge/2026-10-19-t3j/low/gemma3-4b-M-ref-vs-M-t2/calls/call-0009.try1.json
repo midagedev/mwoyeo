@@ -1,0 +1,31 @@
+{
+ "call": 9,
+ "try": 1,
+ "ids": [
+  "item-0086.1",
+  "item-0242.1",
+  "item-0196.1",
+  "item-0278.2",
+  "item-0001.2",
+  "item-0217.2",
+  "item-0376.2",
+  "item-0228.2",
+  "item-0258.2",
+  "item-0085.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "01e7c87d-48ea-4a68-a75b-2e2a292a416e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural phrasing and avoids clumsy passive construction.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"毎晩 is correctly translated as '매일 밤' rather than just '매일'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean; Translation 1 is in Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 has broken, unnatural English syntax and word order.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Matches the polite tutorial register of the earlier lines.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Includes the natural subject marker 가 for clarity and flow.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses the established English term 'Commons' from context.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally render the meaning and term.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated in Japanese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly uses 합쇼체 speech level toward Thorne as specified.\"}\n]\n```\n",
+  "duration_seconds": 5.379678,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17078,
+   "output_tokens": 316,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17394
+  }
+ }
+}

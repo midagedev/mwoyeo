@@ -1,0 +1,22 @@
+{
+ "call": 61,
+ "try": 2,
+ "ids": [
+  "item-0248.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "101881b1-4081-4020-9ebd-a7cb64a5652a",
+  "status": "SUCCESS",
+  "response": "[{\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese, while 2 translates it correctly.\"}]\n",
+  "duration_seconds": 3.04937,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14604,
+   "output_tokens": 34,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 14638
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0153.2",
+  "item-0161.2",
+  "item-0221.1",
+  "item-0132.1",
+  "item-0272.1",
+  "item-0002.1",
+  "item-0029.1",
+  "item-0042.2",
+  "item-0221.2",
+  "item-0212.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7c01c7bf-80e9-43c5-9b87-3dc7db6538bc",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 leaves Chinese untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 leaves Chinese untranslated.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both failed to translate the Japanese text into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'손실되지 않습니다' translates 'lo[st]' more naturally than '잃어버리지'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses correct name '저우 이모' matching facts and Chinese full stop.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and equally good.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 correctly translates '林远' to '린위안'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'실수' fits 意外 in context better than '우연' (coincidence).\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both failed to translate the Japanese text into Korean.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"十河 (そごう) is transcribed closer as 토가 than 토카.\"}\n]\n",
+  "duration_seconds": 6.658468,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17656,
+   "output_tokens": 336,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17992
+  }
+ }
+}

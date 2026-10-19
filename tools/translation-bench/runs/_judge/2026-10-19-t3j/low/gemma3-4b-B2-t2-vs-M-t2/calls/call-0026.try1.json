@@ -1,0 +1,31 @@
+{
+ "call": 26,
+ "try": 1,
+ "ids": [
+  "item-0233.1",
+  "item-0188.2",
+  "item-0179.1",
+  "item-0160.2",
+  "item-0164.1",
+  "item-0226.1",
+  "item-0082.1",
+  "item-0057.1",
+  "item-0282.2",
+  "item-0221.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9d2f803d-1034-44e5-91b0-b1d4a0ce4d17",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 translates into English, whereas 2 leaves it in Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly translates 'freezer' as 냉동고 instead of 냉장고.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Omitting the unnecessary pronoun '나를' sounds much more natural in Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"万俟 is a two-character surname (Wòqí/Mòqí); 2 has fewer hallucinated characters.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, whereas 1 leaves it in Japanese.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both fail: 1 didn't translate, 2 mistranslated the speaker, tense, and date.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both mistranslate the person name 海 (Kai) as 'the sea' (바다).\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"고객용 주차장 is more natural and standard business Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"hot tub is accurately translated as 뜨거운 욕조.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Uses correct name transliteration and appropriate 반말 register for brother-to-sister.\"}\n]\n```\n",
+  "duration_seconds": 5.751465,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17354,
+   "output_tokens": 366,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17720
+  }
+ }
+}

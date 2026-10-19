@@ -1,0 +1,31 @@
+{
+ "call": 7,
+ "try": 1,
+ "ids": [
+  "item-0113.1",
+  "item-0264.2",
+  "item-0068.2",
+  "item-0183.1",
+  "item-0185.2",
+  "item-0149.1",
+  "item-0139.1",
+  "item-0063.2",
+  "item-0043.1",
+  "item-0278.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0545ee1b-b1f5-4145-a1a2-635f336c6896",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both capture the meaning accurately and naturally.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly uses 해요체 speech level toward Rook.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Uses correct term 조합, proper name, and speech level.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 contains untranslated Japanese text.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 misinterprets the person 기사 as equipment.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Uses the specified name 저우 이모 instead of raw characters.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Japanese.\"}\n]\n```\n",
+  "duration_seconds": 4.386444,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17155,
+   "output_tokens": 293,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17448
+  }
+ }
+}

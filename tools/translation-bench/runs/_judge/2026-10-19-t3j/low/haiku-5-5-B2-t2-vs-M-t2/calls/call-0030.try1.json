@@ -1,0 +1,31 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0254.1",
+  "item-0362.1",
+  "item-0224.2",
+  "item-0358.2",
+  "item-0264.2",
+  "item-0121.1",
+  "item-0337.2",
+  "item-0086.2",
+  "item-0137.1",
+  "item-0045.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c7a6abfd-83a9-44ba-b1ee-93fb9138b26a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 naturally completes the truncated thought without leaving untranslated source fragments.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified term '조합' for ギルド.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 accurately renders the indirect command without adding an unnatural object.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 and the specified term '카운슬 택스'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 accurately translates '어떻게 써' as 'how do you spell'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 uses the correct speech level (해요체) to 周婷.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 ('아니에요') as specified in the facts.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 correctly adheres to the specified term '엠티' for 合宿.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the specified terms 'Pathfinder' and 'fleet allocation'.\"}\n]\n```\n",
+  "duration_seconds": 5.029157,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17461,
+   "output_tokens": 349,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17810
+  }
+ }
+}

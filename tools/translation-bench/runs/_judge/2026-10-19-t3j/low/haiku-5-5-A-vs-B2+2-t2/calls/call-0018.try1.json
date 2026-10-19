@@ -1,0 +1,31 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0123.2",
+  "item-0143.2",
+  "item-0130.2",
+  "item-0276.1",
+  "item-0094.1",
+  "item-0190.2",
+  "item-0159.2",
+  "item-0364.2",
+  "item-0115.2",
+  "item-0197.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "454f260e-e153-4247-9c81-256feba681ac",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"In context '货' means tea inventory/goods, not a loan.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"The onboarding guide addresses the reader ('Your seat'), not 'My seat'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Context explicitly states the name is pronounced '아메미야', not '아마미야'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Police inspector questioning a suspect/case fits 'questioning' over 'interview'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses honorific '-시-' when referring to professor Hahn arriving.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates the idiom '别光嘴上说好听的' more naturally and accurately.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Habitual profession/job inquiry is naturally phrased with simple present 'Does he'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'자도 돼?' correctly asks for permission ('Can she sleep').\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Casual spoken dialogue between peers matches conversational style in 1.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translates the Japanese names 朔 and 澪 into Korean reading/names.\"}\n]\n```\n",
+  "duration_seconds": 5.415872,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17532,
+   "output_tokens": 352,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17884
+  }
+ }
+}

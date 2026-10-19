@@ -1,0 +1,31 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0259.1",
+  "item-0166.1",
+  "item-0357.2",
+  "item-0183.2",
+  "item-0259.2",
+  "item-0218.2",
+  "item-0111.2",
+  "item-0006.1",
+  "item-0321.1",
+  "item-0235.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "70288468-5786-41b5-9134-233ddafefb78",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates 도장 찍었어 naturally as signed the contract.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese sentence completely untranslated.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Refers to the rival envoy Xie Xuan, not the speaker.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Lin Yuan addresses Lin Xia in banmal/informal tone.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translates 도장 찍었어 idiomatically in the context of signing a contract.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses 해요체 matching Sogo's defined speech level to Hyuga.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Dex or Thorne speaks to Rook in banmal; transliterates Gerald.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Clarifies 署 as 경찰서 instead of unnatural literal 서.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Uses noun phrase ending suitable for a section heading.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Properly transliterates the character's name 解玄 instead of leaving hanzi.\"}\n]\n```\n",
+  "duration_seconds": 5.934963,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17371,
+   "output_tokens": 329,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17700
+  }
+ }
+}

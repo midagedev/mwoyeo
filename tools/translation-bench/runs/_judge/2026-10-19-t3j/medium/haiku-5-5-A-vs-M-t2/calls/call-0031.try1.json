@@ -1,0 +1,27 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0103.1",
+  "item-0096.1",
+  "item-0044.2",
+  "item-0317.1",
+  "item-0036.2",
+  "item-0092.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5cc87b3b-e10d-463f-95aa-5b6cc15e49f6",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"가라스마 correctly reflects the furigana reading からすま.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"ひとこと refers to a short note or line, not a single word.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both capture the meaning, timeframe, and surprised casual tone well.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Hearth correctly uses the established channel name from context.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"닦고 correctly translates 磨いている for polishing a stone, unlike 갈고.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly conveys the indirect speech ending 온대.\"}\n]\n```\n",
+  "duration_seconds": 53.036188,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16062,
+   "output_tokens": 6640,
+   "thinking_tokens": 6442,
+   "cache_read_tokens": 0,
+   "total_tokens": 22702
+  }
+ }
+}

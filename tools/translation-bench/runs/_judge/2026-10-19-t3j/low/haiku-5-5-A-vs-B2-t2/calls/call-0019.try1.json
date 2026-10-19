@@ -1,0 +1,31 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0349.1",
+  "item-0347.2",
+  "item-0357.1",
+  "item-0296.2",
+  "item-0024.1",
+  "item-0155.2",
+  "item-0081.1",
+  "item-0260.1",
+  "item-0272.1",
+  "item-0076.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d09ec7dc-70be-4e8d-a79d-94d5815a5f50",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both appropriately translate the informal promise/intention in Korean ban말.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Earlier context explicitly introduced ひとこと as note, not comment.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"The given reading for 湊 is そう (소우).\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally using valid Korean phrasing in 해요/합쇼체.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"기사 refers to logistics delivery driver, not a journalist/reporter.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both 회의실에 and 회의실로 are natural Korean locative/directional particles here.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both incorrectly use 형 instead of 오빠 for a female speaker.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into the target language Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"On a spaceship, bridge refers to the control bridge, not a bridge/다리.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly adopts the specified terminology 모차 and natural ban말.\"}\n]\n```\n",
+  "duration_seconds": 5.292249,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17449,
+   "output_tokens": 337,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17786
+  }
+ }
+}

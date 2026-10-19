@@ -1,0 +1,31 @@
+{
+ "call": 54,
+ "try": 1,
+ "ids": [
+  "item-0364.2",
+  "item-0237.2",
+  "item-0372.2",
+  "item-0367.1",
+  "item-0310.2",
+  "item-0288.2",
+  "item-0214.1",
+  "item-0304.2",
+  "item-0060.1",
+  "item-0322.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fb727416-9711-4cc6-8ff9-fe77a1f887fd",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Imperative fits onboarding guide instructions much more naturally than passive voice.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 leaves untranslated English text in parentheses.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Pell/Dex/Rook speak casually to each other, and tub refers to the freezer.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"More natural UI phrasing; avoids redundant 'listed at the top of the list'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Natural Korean phrasing for checking/monitoring a batch; '롯' is unnatural.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 contains severe hallucinations and untranslated French/Chinese tokens.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Dex is speaking to Rook; both use 반말 with each other.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese source line.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Accurately captures the contrastive nuance of '~는데' ('I asked, but...').\"}\n]\n```\n",
+  "duration_seconds": 6.902897,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17279,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17611
+  }
+ }
+}

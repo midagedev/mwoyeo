@@ -1,0 +1,24 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0201.2",
+  "item-0027.1",
+  "item-0096.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "22e5eb7d-ddda-403e-b4a2-99b0f23c83af",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Candidate 1 left the text completely untranslated in Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Candidate 2 correctly uses informal speech and required term 조합.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Candidate 1 is accurate; Candidate 2 mistranslates stays where you put it.\"}\n]\n```\n",
+  "duration_seconds": 13.416559,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15117,
+   "output_tokens": 1398,
+   "thinking_tokens": 1291,
+   "cache_read_tokens": 0,
+   "total_tokens": 16515
+  }
+ }
+}

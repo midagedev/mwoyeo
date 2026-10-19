@@ -1,0 +1,27 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0030.2",
+  "item-0067.1",
+  "item-0026.1",
+  "item-0057.1",
+  "item-0042.2",
+  "item-0060.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3cb24ec2-e4c4-4556-a29b-c7ab1e09ab0b",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is left untranslated in English.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"月見里 is correctly read as Yamanashi.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 is left untranslated in Chinese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Housing 보증금 is correctly translated as deposit, not guarantee.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Faithfully preserves the honorific -san and respectful register Hikaru used.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Hikaru is female, so the pronoun she is correct.\"}\n]\n",
+  "duration_seconds": 36.273436,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15965,
+   "output_tokens": 4258,
+   "thinking_tokens": 4074,
+   "cache_read_tokens": 0,
+   "total_tokens": 20223
+  }
+ }
+}

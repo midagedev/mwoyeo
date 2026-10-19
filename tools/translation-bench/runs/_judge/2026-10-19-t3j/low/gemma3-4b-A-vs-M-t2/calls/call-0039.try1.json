@@ -1,0 +1,29 @@
+{
+ "call": 39,
+ "try": 1,
+ "ids": [
+  "item-0343.2",
+  "item-0137.2",
+  "item-0223.2",
+  "item-0249.1",
+  "item-0183.2",
+  "item-0066.2",
+  "item-0122.2",
+  "item-0234.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5f585d20-e382-42d1-a42e-c347269f1377",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates the honorific title naturally instead of leaving '씨'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses the specified term '수호막' instead of leaving Japanese untranslated.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly uses the established name '저우 이모'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 leaves '成' untranslated and mistranslates the rhetorical question.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly reads 小鳥遊 as '타카나시' and uses correct speech level.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the entire line untranslated in Japanese.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are accurate, natural, and virtually identical in meaning.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'스테이지에 추가하세요' is a clearer and more natural translation of 'stage it'.\"}\n]\n```\n",
+  "duration_seconds": 5.182651,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16795,
+   "output_tokens": 278,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17073
+  }
+ }
+}

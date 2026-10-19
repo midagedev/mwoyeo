@@ -1,0 +1,31 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0324.1",
+  "item-0053.2",
+  "item-0148.1",
+  "item-0392.1",
+  "item-0205.2",
+  "item-0173.2",
+  "item-0184.2",
+  "item-0068.2",
+  "item-0245.1",
+  "item-0185.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "50171b61-5514-4c16-9418-b686b3f31117",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both incorrectly use 해요체 instead of 반말; otherwise equally good.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Standard pinyin without tone marks fits English translation convention better.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are natural and completely accurate.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'얘' naturally addresses a peer/younger person, whereas '얘야' sounds overly maternal.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses correct Japanese name readings 텟사이 and 사쿠 instead of Sino-Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Matches the informal chat style without trailing period like source text.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Consistently uses 해요체 as specified in the facts.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Uses '선장' as explicitly specified in the facts.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Reads more naturally as technical documentation example.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both are accurate, natural, and equivalent translations.\"}\n]\n```\n",
+  "duration_seconds": 5.205339,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17420,
+   "output_tokens": 314,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17734
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 9,
+ "try": 1,
+ "ids": [
+  "item-0003.2",
+  "item-0035.1",
+  "item-0006.2",
+  "item-0010.1",
+  "item-0020.1",
+  "item-0049.1",
+  "item-0007.1",
+  "item-0047.1",
+  "item-0040.1",
+  "item-0041.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7e32394a-750a-4181-8508-c3859e0ae45e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses correct name reading Yamanashi and established term Quick Notes.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both candidates left the source text completely untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Japanese text into English.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Accurately conveys the condition and meaning, whereas 1 is nonsensical.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"A comma between coordinate clauses is slightly more natural here.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 mistranslates boiler as burn boiler and sounds unnatural.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Accurately translates logistics term 하차 as unloading rather than disembarking.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both 'on-site' and 'on site' are accurate and natural translations.\"}\n]\n```\n",
+  "duration_seconds": 4.658473,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16799,
+   "output_tokens": 322,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17121
+  }
+ }
+}

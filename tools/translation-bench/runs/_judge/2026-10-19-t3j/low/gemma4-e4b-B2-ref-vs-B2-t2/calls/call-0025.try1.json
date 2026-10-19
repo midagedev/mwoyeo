@@ -1,0 +1,31 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0212.2",
+  "item-0001.2",
+  "item-0204.2",
+  "item-0015.2",
+  "item-0311.1",
+  "item-0053.2",
+  "item-0026.2",
+  "item-0064.2",
+  "item-0074.1",
+  "item-0343.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "233d0936-e6a9-4388-921c-56309090a587",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both mistranscribe Sogo (そごう) similarly; other parts are identical.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the line untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'개 자체를 치우다'보다 '치우는 거야'가 뒤처리 의미로 자연스럽습니다.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the line untranslated in Japanese.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both 'write it as' and 'use' translate the line accurately.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Omitting the unnatural pronoun '그녀는' sounds much more natural in Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translate the sentence accurately and naturally with equivalent phrasing.\"}\n]\n```\n",
+  "duration_seconds": 9.452236,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17459,
+   "output_tokens": 336,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17795
+  }
+ }
+}

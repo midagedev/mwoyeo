@@ -1,0 +1,31 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0190.1",
+  "item-0197.2",
+  "item-0367.2",
+  "item-0234.2",
+  "item-0219.2",
+  "item-0260.2",
+  "item-0354.1",
+  "item-0195.1",
+  "item-0253.1",
+  "item-0142.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "248d4a33-d6ee-4494-b374-ff4ce82bc975",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Inspector Akira accurately reflects her known role as police inspector.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates the name 解辰 into Korean instead of leaving Chinese hanzi.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"More natural phrasing than literal and stiff '그녀의 편집이 당신의 작업을'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Hinata speaks to her uncle in banmal per facts.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Context is a tea business; translates tea leaves and roasting correctly.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"호타루 건 is much more natural Korean business phrasing than 호타루 분.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Target language is Korean; translation 2 is in Japanese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Zhou Yi speaks to Lin Yuan in haeyoche/polite tone; better register.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Transliterates 三红 into Korean 산홍 rather than leaving Chinese characters.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both make the exact same speech-level choice; only spacing differs.\"}\n]\n```\n",
+  "duration_seconds": 4.955557,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5478,
+   "output_tokens": 335,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11813,
+   "total_tokens": 5813
+  }
+ }
+}

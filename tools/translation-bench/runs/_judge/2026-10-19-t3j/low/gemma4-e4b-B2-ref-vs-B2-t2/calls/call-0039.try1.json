@@ -1,0 +1,31 @@
+{
+ "call": 39,
+ "try": 1,
+ "ids": [
+  "item-0351.1",
+  "item-0106.2",
+  "item-0276.1",
+  "item-0071.1",
+  "item-0121.2",
+  "item-0116.1",
+  "item-0217.1",
+  "item-0209.2",
+  "item-0345.1",
+  "item-0017.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3373d996-c867-41c1-9d0e-f1780a78bfb6",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese; Translation 2 translates into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말, which Translation 2 correctly uses.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly translates into natural Korean 해요체, unlike Japanese Translation 1.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left text untranslated; Translation 2 correctly translates into Korean 반말.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 left text untranslated.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean with correct name transliteration and 반말.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while Translation 1 is untranslated Japanese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates proper nouns, whereas Translation 2 leaves them in English.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean 해요체, while Translation 1 is untranslated Japanese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, whereas Translation 1 is untranslated Japanese.\"}\n]\n```\n",
+  "duration_seconds": 6.901868,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17437,
+   "output_tokens": 361,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17798
+  }
+ }
+}

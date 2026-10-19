@@ -1,0 +1,29 @@
+{
+ "call": 36,
+ "try": 1,
+ "ids": [
+  "item-0089.2",
+  "item-0262.1",
+  "item-0058.2",
+  "item-0180.1",
+  "item-0267.2",
+  "item-0137.2",
+  "item-0228.1",
+  "item-0245.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "107b3357-861f-485d-9630-acf7a7303283",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Siobhan speaks to Gareth using 합쇼체 (감사합니다).\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly translates the channel name Hearth instead of literal fire.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Xie Xuan is female, so 'He' in 2 is wrong.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 remained in Chinese instead of translating to Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 形見 as 소장품 and gets the ending wrong.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Dex speaks to Rook using informal speech (반말).\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates 灵石 as spirit stones rather than pinyin Lingshi.\"}\n]\n```\n",
+  "duration_seconds": 4.357071,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16978,
+   "output_tokens": 267,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17245
+  }
+ }
+}

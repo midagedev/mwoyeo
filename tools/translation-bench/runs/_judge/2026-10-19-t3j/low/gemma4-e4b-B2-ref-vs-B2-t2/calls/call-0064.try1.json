@@ -1,0 +1,31 @@
+{
+ "call": 64,
+ "try": 1,
+ "ids": [
+  "item-0290.2",
+  "item-0038.1",
+  "item-0215.2",
+  "item-0204.1",
+  "item-0193.1",
+  "item-0241.2",
+  "item-0027.2",
+  "item-0108.1",
+  "item-0110.1",
+  "item-0001.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "37d20697-3b47-4deb-a404-672c2450ba40",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates the name Thorne into Korean (쏜).\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are virtually identical and leave 阁主 untranslated.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Xie Xuan is female; Translation 1 incorrectly uses 'his'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese; Translation 1 uses correct speech level.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 sounds much more natural in onboarding instructions.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"}\n]\n```\n",
+  "duration_seconds": 5.221111,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17570,
+   "output_tokens": 303,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17873
+  }
+ }
+}

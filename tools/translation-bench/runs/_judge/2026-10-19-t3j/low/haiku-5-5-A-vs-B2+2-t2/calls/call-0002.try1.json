@@ -1,0 +1,31 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0344.2",
+  "item-0089.1",
+  "item-0073.1",
+  "item-0220.1",
+  "item-0077.2",
+  "item-0343.2",
+  "item-0034.2",
+  "item-0186.2",
+  "item-0136.1",
+  "item-0370.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fd0d653f-8000-4d6a-a867-8aa1a31fe123",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural English phrasing than repeating 'on Sunday' at the end.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translate the casual request accurately and naturally.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Avoids awkward duplicate parenthetical name and phrases more naturally.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly refers to Nagi with female pronoun 'she'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translates Japanese kanji/names naturally into Korean without raw Japanese text.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Transliterates Chinese names instead of leaving raw Chinese characters.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Matches the established romanization '저우 이모' and uses proper 해요체.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly transliterates 雷蔵 as 라이조 rather than leaving raw kanji.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both convey the meaning, tone, and polite 해요체 register naturally.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and properly structured in Korean.\"}\n]\n```\n",
+  "duration_seconds": 6.156922,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17540,
+   "output_tokens": 326,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17866
+  }
+ }
+}

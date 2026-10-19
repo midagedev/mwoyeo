@@ -1,0 +1,31 @@
+{
+ "call": 53,
+ "try": 1,
+ "ids": [
+  "item-0189.1",
+  "item-0358.2",
+  "item-0039.2",
+  "item-0330.1",
+  "item-0070.2",
+  "item-0164.1",
+  "item-0295.2",
+  "item-0335.1",
+  "item-0247.2",
+  "item-0349.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a571be56-bdbe-4852-8781-0c75045f92c7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Lu Ming speaks to Zhou Ting in 해요체; Translation 1 uses honorifics.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Lu Ming speaks to Zhou Ting in 해요체, which Translation 2 reflects.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left the source text completely untranslated into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말, correctly captured in Translation 1.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 translates Zhou Ting naturally instead of leaving raw Chinese hanzi.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 avoids wrongly referring to Siobhan's mother as his own mom.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 sounds more natural and polite for a workplace request.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"In web and software development contexts, '푸터' is the standard term.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 transliterates Bori and correctly uses 'you' regarding Seoyoon's move.\"}\n]\n```\n",
+  "duration_seconds": 4.451891,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17442,
+   "output_tokens": 346,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17788
+  }
+ }
+}

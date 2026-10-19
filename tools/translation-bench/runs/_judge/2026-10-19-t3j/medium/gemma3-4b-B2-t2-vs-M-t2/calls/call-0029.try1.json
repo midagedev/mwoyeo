@@ -1,0 +1,27 @@
+{
+ "call": 29,
+ "try": 1,
+ "ids": [
+  "item-0233.2",
+  "item-0046.1",
+  "item-0065.2",
+  "item-0097.2",
+  "item-0186.2",
+  "item-0071.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7899d916-a4c5-4f20-9b7b-376c44460a59",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses appropriate 반말 and preserves the interrupted dialogue.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both candidates are identical and left untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Follows the specified term 'ward' for 结界.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses natural conversational 반말 and accurately translates 押さえた.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"}\n]\n",
+  "duration_seconds": 28.430739,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16093,
+   "output_tokens": 3497,
+   "thinking_tokens": 3321,
+   "cache_read_tokens": 0,
+   "total_tokens": 19590
+  }
+ }
+}

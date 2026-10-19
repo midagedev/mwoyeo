@@ -1,0 +1,31 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0247.2",
+  "item-0129.1",
+  "item-0190.1",
+  "item-0300.2",
+  "item-0089.2",
+  "item-0070.2",
+  "item-0058.2",
+  "item-0180.2",
+  "item-0259.1",
+  "item-0137.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c826b5d4-7291-47ba-8343-92118cf0a660",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 and translates the tea term accurately.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Rook speaks to Thorne in 합쇼체; Translation 1 uses honorific register.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the source line; Translation 2 translates previous context.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 left Japanese untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Adheres to defined term Sticky and drops Japanese honorific suffix in English.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 left Japanese untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 left Japanese untranslated.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Omits redundant character name prefix from the dialogue line.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"}\n]\n```\n",
+  "duration_seconds": 7.013718,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17556,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17881
+  }
+ }
+}

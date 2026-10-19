@@ -1,0 +1,36 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0141.1",
+  "item-0219.1",
+  "item-0087.1",
+  "item-0166.1",
+  "item-0142.2",
+  "item-0146.1",
+  "item-0283.2",
+  "item-0262.2",
+  "item-0093.1",
+  "item-0047.2",
+  "item-0339.2",
+  "item-0291.1",
+  "item-0028.1",
+  "item-0362.2",
+  "item-0112.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f8611218-49e1-4791-a2e2-ab027a6abfd2",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese text.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 incorrectly changes the subject to I.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 transliterates the name and translates the idiom naturally.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese text.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Chinese text.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese text.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translates \\\"신입\\\" (new hire), which Translation 2 omits.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the female pronoun \\\"her\\\".\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 correctly identifies the brother and the dog.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 naturally translates the idiom \\\"どう見る\\\".\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese text.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 correctly translates \\\"ああ\\\" as affirmative \\\"응\\\".\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 uses the required term \\\"Space\\\" from facts.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 adheres to the defined term \\\"qi stone\\\".\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and equally good.\"}\n]\n",
+  "duration_seconds": 79.048356,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 19117,
+   "output_tokens": 12759,
+   "thinking_tokens": 12300,
+   "cache_read_tokens": 0,
+   "total_tokens": 31876
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 9,
+ "try": 1,
+ "ids": [
+  "item-0274.2",
+  "item-0220.1",
+  "item-0059.2",
+  "item-0257.2",
+  "item-0077.2",
+  "item-0285.1",
+  "item-0086.1",
+  "item-0059.1",
+  "item-0176.2",
+  "item-0102.1",
+  "item-0301.1",
+  "item-0006.1",
+  "item-0126.1",
+  "item-0048.2",
+  "item-0347.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "525ee7ad-daaf-47ff-adc4-69df487368e9",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Identical translations; punctuation differences are ignored.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses the correct spelling Seoyoon from facts.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Uses the correct spelling Seoyoon from facts.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Avoids adding an incorrect pronoun 'We'.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Correctly uses banmal for Rory speaking to Siobhan.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"}\n]\n",
+  "duration_seconds": 92.072778,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 19143,
+   "output_tokens": 12359,
+   "thinking_tokens": 11939,
+   "cache_read_tokens": 0,
+   "total_tokens": 31502
+  }
+ }
+}

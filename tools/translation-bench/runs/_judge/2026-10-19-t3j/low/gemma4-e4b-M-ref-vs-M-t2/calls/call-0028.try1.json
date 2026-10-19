@@ -1,0 +1,31 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0259.1",
+  "item-0174.2",
+  "item-0046.2",
+  "item-0207.1",
+  "item-0212.2",
+  "item-0165.1",
+  "item-0166.2",
+  "item-0273.2",
+  "item-0174.1",
+  "item-0138.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "be0cd989-9d7e-4e26-a1cd-b15799da204a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Cloning is a gerund noun, translated accurately as '클로닝'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'She' refers to Aoife ('걔'), not Siobhan ('너').\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both naturally translate the informal Japanese dialogue into Korean 반말.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both miss the facts: Lin Xia is female speaking 반말.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"'Passed on' and 'forwarded' are equally accurate and natural.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"A question mark fits the interrogative sentence structure naturally.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the source line about the deposit.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'재다음 달' is unnatural; '다음 달 말' is much more natural.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'She' refers to Aoife ('걔'), not Siobhan ('너').\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both fail Thorne's required speech level to Rook (해요체).\"}\n]\n```\n",
+  "duration_seconds": 4.63864,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17336,
+   "output_tokens": 334,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17670
+  }
+ }
+}

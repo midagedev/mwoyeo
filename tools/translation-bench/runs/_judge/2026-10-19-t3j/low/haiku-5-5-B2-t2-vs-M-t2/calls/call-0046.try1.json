@@ -1,0 +1,31 @@
+{
+ "call": 46,
+ "try": 1,
+ "ids": [
+  "item-0174.2",
+  "item-0037.2",
+  "item-0078.1",
+  "item-0095.1",
+  "item-0003.2",
+  "item-0298.1",
+  "item-0300.2",
+  "item-0169.2",
+  "item-0158.1",
+  "item-0200.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "60819448-3eba-4577-b2ba-fa963915ffb4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"川遊び means playing in the river, naturally translated as 강에서 놀아서.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Appropriately uses honorific form (도착하시면) for the visiting client.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Siobhan speaks to Rory in 반말, correctly used in 2.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Respectful honorific form (보신 게) is appropriate for the client.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally in the correct 해요체 register.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly follows the defined terminology rule 履歴 = Revisions.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Rook is replying to Dex and uses 반말 as specified.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Speaker 十河 is male, so his older sister is 누나.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Rory speaks to Gareth in 해요체; 2 uses unnecessary honorific 주실.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly translates the Chinese name 林远 to Korean 린위안.\"}\n]\n```\n",
+  "duration_seconds": 4.863772,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17331,
+   "output_tokens": 339,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17670
+  }
+ }
+}

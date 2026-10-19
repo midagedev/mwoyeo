@@ -1,0 +1,27 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0034.2",
+  "item-0069.1",
+  "item-0151.1",
+  "item-0196.1",
+  "item-0122.1",
+  "item-0259.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a5a93a81-26dd-4570-b19d-3f3df208d324",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is left entirely untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 mistranslates 'she's out' as resigning from a job.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 is left entirely untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 leaves untranslated Chinese characters and pinyin terms.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 hallucinates fake names instead of using the provided readings.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'Day 2' is far more natural as an onboarding section header.\"}\n]\n```\n",
+  "duration_seconds": 37.042687,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16169,
+   "output_tokens": 4322,
+   "thinking_tokens": 4120,
+   "cache_read_tokens": 0,
+   "total_tokens": 20491
+  }
+ }
+}

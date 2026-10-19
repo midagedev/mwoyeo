@@ -1,0 +1,31 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0300.1",
+  "item-0136.1",
+  "item-0105.2",
+  "item-0285.1",
+  "item-0167.1",
+  "item-0184.1",
+  "item-0231.1",
+  "item-0313.1",
+  "item-0313.2",
+  "item-0314.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cee7a077-902f-411c-9ac3-770e942257a7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural phrasing and accurately conveys 'stay out of your way'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Xu Nuo speaks to Lu Ming in banmal as specified in facts.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Present perfect/resultative state fits habitual/completed note-taking guide better than progressive.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Follows the specified term mapping '先輩 = boss'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Follows term '마정석' and Princess Ricia speaks to Saku in banmal.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'카라스마에게' is grammatically natural for calling a person.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'in their first week' sounds more natural and idiomatic in English.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 leaves '好的' untranslated and uses unnatural terms.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 leaves '好的' untranslated and uses unnatural terminology.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are identical.\"}\n]\n```\n",
+  "duration_seconds": 5.536707,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17250,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17582
+  }
+ }
+}

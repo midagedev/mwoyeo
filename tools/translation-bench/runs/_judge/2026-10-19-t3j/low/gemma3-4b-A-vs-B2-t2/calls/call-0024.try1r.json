@@ -1,0 +1,28 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0368.1",
+  "item-0161.2",
+  "item-0225.2",
+  "item-0250.2",
+  "item-0251.2",
+  "item-0025.2",
+  "item-0014.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b7f50302-2c98-4f49-8017-a9a0d43409e8",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Includes the label '발음' and transliterates accurately.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Gareth is a landlord, not a team manager ('팀장님').\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 is in Korean instead of the target English.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Siobhan correctly speaks to Gareth in 합쇼체.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 mistakenly asks 'shall I show you' instead of asking.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 leaves the word 'anyway' untranslated.\"}\n]\n```\n",
+  "duration_seconds": 4.267915,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16384,
+   "output_tokens": 228,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16612
+  }
+ }
+}

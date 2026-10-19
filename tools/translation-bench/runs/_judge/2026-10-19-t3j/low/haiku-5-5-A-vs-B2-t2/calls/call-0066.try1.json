@@ -1,0 +1,31 @@
+{
+ "call": 66,
+ "try": 1,
+ "ids": [
+  "item-0287.1",
+  "item-0091.2",
+  "item-0250.1",
+  "item-0375.2",
+  "item-0031.2",
+  "item-0006.2",
+  "item-0052.2",
+  "item-0127.1",
+  "item-0069.2",
+  "item-0061.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "714fb3a7-d1d0-49ea-80cc-a2845c87c7a5",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"꼬시다 here means to bribe/coax, not lure out of hiding.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the onboarding guide instruction accurately and naturally.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both 짙은 and 자욱한 are natural, accurate translations of 霧の深い.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"간식 담당 is the standard Korean rendering for お菓子係 in this context.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Go on and then capture 聞こう and な more faithfully.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2's ~거든 matches the explanatory し in context naturally.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"The speaker speaks to Zhou in 해요체; Translation 2 matches proper tone.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 mistranslates the company term MoaLogis as Morningstar Logistics.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and convey tone properly.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Siobhan speaks to Gareth in 합쇼체; 죄송합니다 is more formal/faithful.\"}\n]\n",
+  "duration_seconds": 5.209324,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17301,
+   "output_tokens": 340,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17641
+  }
+ }
+}

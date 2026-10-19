@@ -1,0 +1,31 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0182.2",
+  "item-0237.1",
+  "item-0025.2",
+  "item-0279.2",
+  "item-0078.1",
+  "item-0342.2",
+  "item-0024.1",
+  "item-0171.2",
+  "item-0220.2",
+  "item-0081.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1c005b24-3789-4c7b-8ff3-6d974711055f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Speaker is 林远 addressing his sister 林夏, so 반말 is correct.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Kiryu is a client, and Hinata speaks to her in 해요체/존댓말.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Terms specify 民宿 = 펜션, and '우리 언니' fits male speaker's sister.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural and convey the meaning accurately.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"鵲橋 corresponds to 작교, not the mythological 오작교.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Rook speaks to Dex in natural spoken 반말, unlike Translation 1's bookish tone.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translate the sentence accurately and naturally for onboarding instructions.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both render the technical manual sentence accurately and naturally.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'병합해 들어오는' accurately captures 'merging in' contrasting with current branch.\"}\n]\n```\n",
+  "duration_seconds": 5.130371,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17300,
+   "output_tokens": 340,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17640
+  }
+ }
+}

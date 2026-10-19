@@ -1,0 +1,25 @@
+{
+ "call": 68,
+ "try": 1,
+ "ids": [
+  "item-0210.2",
+  "item-0171.1",
+  "item-0160.1",
+  "item-0139.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dd1b4513-f288-4269-b196-9492cc3c5b13",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches 林远's ban말 register to 林夏 and accurate name '린시아'.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the meaning, tone, and pronunciation note equally well.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 translates into English, whereas Translation 2 is untranslated Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 translates into English, whereas Translation 2 remains in Korean.\"}\n]\n",
+  "duration_seconds": 3.208782,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15563,
+   "output_tokens": 140,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15703
+  }
+ }
+}

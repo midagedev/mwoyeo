@@ -1,0 +1,31 @@
+{
+ "call": 47,
+ "try": 1,
+ "ids": [
+  "item-0128.1",
+  "item-0029.2",
+  "item-0179.2",
+  "item-0059.2",
+  "item-0321.2",
+  "item-0124.1",
+  "item-0023.1",
+  "item-0154.2",
+  "item-0080.1",
+  "item-0253.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6e3ca3d1-5dcc-411e-8cea-45a9fbaf5694",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Uses correct pinyin transliteration 쩡란 instead of Sino-Korean reading 증람.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both prepositions 'to' and 'in' are natural and accurate.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly follows the specified term translations 다방 and 부엉이.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both natural, accurate translations capturing the meaning well.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"'Admin' and 'administrator' are both natural, accurate translations.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly uses 반말 and the defined term 부엉이.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both 'get' and 'pick up' are natural and accurate.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are natural and use appropriate 반말 register.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Transliterates 仇 as Qiú instead of leaving Chinese character untranslated.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translates 三红 into Korean hangul 산홍 instead of leaving Hanzi.\"}\n]\n```\n",
+  "duration_seconds": 4.501258,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17332,
+   "output_tokens": 331,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17663
+  }
+ }
+}

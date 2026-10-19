@@ -1,0 +1,105 @@
+### gemma3-4b-A-vs-B2-t2
+judge tally: A (A) vs B2 (B)
+  agreeing in both orders: A wins 170, B2 wins 94, tie 29
+  orders disagree (position bias, not counted): 72; missing verdicts: 0; identical translations not asked: 55
+  decided pairs 264 (need at least 150): enough
+  B2 win rate among decided 35.6%  95% CI 30.1-41.6%  sign test p=0.0000
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK
+### gemma3-4b-A-vs-B2+2-t2
+judge tally: A (A) vs B2+2 (B)
+  agreeing in both orders: A wins 176, B2+2 wins 116, tie 22
+  orders disagree (position bias, not counted): 58; missing verdicts: 0; identical translations not asked: 48
+  decided pairs 292 (need at least 150): enough
+  B2+2 win rate among decided 39.7%  95% CI 34.3-45.4%  sign test p=0.0005
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK
+### gemma3-4b-A-vs-M-t2
+judge tally: A (A) vs M (B)
+  agreeing in both orders: A wins 146, M wins 131, tie 22
+  orders disagree (position bias, not counted): 79; missing verdicts: 0; identical translations not asked: 42
+  decided pairs 277 (need at least 150): enough
+  M win rate among decided 47.3%  95% CI 41.5-53.2%  sign test p=0.4003
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK
+### gemma3-4b-B2-t2-vs-B2+2-t2
+judge tally: B2 (A) vs B2+2 (B)
+  agreeing in both orders: B2 wins 18, B2+2 wins 18, tie 3
+  orders disagree (position bias, not counted): 7; missing verdicts: 0; identical translations not asked: 399
+  decided pairs 36 (need at least 150): NOT ENOUGH
+  B2+2 win rate among decided 50.0%  95% CI 34.5-65.5%  sign test p=1.0000
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK
+### gemma3-4b-B2-t2-vs-M-t2
+judge tally: B2 (A) vs M (B)
+  agreeing in both orders: B2 wins 76, M wins 138, tie 16
+  orders disagree (position bias, not counted): 49; missing verdicts: 0; identical translations not asked: 166
+  decided pairs 214 (need at least 150): enough
+  M win rate among decided 64.5%  95% CI 57.9-70.6%  sign test p=0.0000
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK
+### gemma3-4b-M-ref-vs-M-t2
+judge tally: M (A) vs M (B)
+  agreeing in both orders: M wins 165, M wins 110, tie 29
+  orders disagree (position bias, not counted): 85; missing verdicts: 0; identical translations not asked: 48
+  decided pairs 275 (need at least 150): enough
+  M win rate among decided 40.0%  95% CI 34.4-45.9%  sign test p=0.0011
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK
+### gemma4-e4b-A-vs-B2-t2
+judge tally: A (A) vs B2 (B)
+  agreeing in both orders: A wins 21, B2 wins 265, tie 40
+  orders disagree (position bias, not counted): 52; missing verdicts: 0; identical translations not asked: 58
+  decided pairs 286 (need at least 150): enough
+  B2 win rate among decided 92.7%  95% CI 89.0-95.1%  sign test p=0.0000
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK
+### gemma4-e4b-A-vs-M-t2
+judge tally: A (A) vs M (B)
+  agreeing in both orders: A wins 18, M wins 287, tie 28
+  orders disagree (position bias, not counted): 48; missing verdicts: 0; identical translations not asked: 55
+  decided pairs 305 (need at least 150): enough
+  M win rate among decided 94.1%  95% CI 90.9-96.2%  sign test p=0.0000
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK
+### gemma4-e4b-B2-ref-vs-B2-t2
+judge tally: B2 (A) vs B2 (B)
+  agreeing in both orders: B2 wins 34, B2 wins 218, tie 38
+  orders disagree (position bias, not counted): 61; missing verdicts: 0; identical translations not asked: 94
+  decided pairs 252 (need at least 150): enough
+  B2 win rate among decided 86.5%  95% CI 81.7-90.2%  sign test p=0.0000
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK
+### gemma4-e4b-B2-t2-vs-M-t2
+judge tally: B2 (A) vs M (B)
+  agreeing in both orders: B2 wins 28, M wins 112, tie 31
+  orders disagree (position bias, not counted): 32; missing verdicts: 0; identical translations not asked: 242
+  decided pairs 140 (need at least 150): NOT ENOUGH
+  M win rate among decided 80.0%  95% CI 72.6-85.8%  sign test p=0.0000
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK
+### gemma4-e4b-M-ref-vs-M-t2
+judge tally: M (A) vs M (B)
+  agreeing in both orders: M wins 77, M wins 115, tie 50
+  orders disagree (position bias, not counted): 74; missing verdicts: 0; identical translations not asked: 129
+  decided pairs 192 (need at least 150): enough
+  M win rate among decided 59.9%  95% CI 52.8-66.6%  sign test p=0.0074
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK
+### haiku-5-5-A-vs-B2-t2
+judge tally: A (A) vs B2 (B)
+  agreeing in both orders: A wins 101, B2 wins 125, tie 59
+  orders disagree (position bias, not counted): 87; missing verdicts: 0; identical translations not asked: 64
+  decided pairs 226 (need at least 150): enough
+  B2 win rate among decided 55.3%  95% CI 48.8-61.6%  sign test p=0.1258
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK
+### haiku-5-5-A-vs-B2+2-t2
+judge tally: A (A) vs B2+2 (B)
+  agreeing in both orders: A wins 101, B2+2 wins 107, tie 75
+  orders disagree (position bias, not counted): 83; missing verdicts: 0; identical translations not asked: 68
+  decided pairs 208 (need at least 150): enough
+  B2+2 win rate among decided 51.4%  95% CI 44.7-58.1%  sign test p=0.7289
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK
+### haiku-5-5-A-vs-M-t2
+judge tally: A (A) vs M (B)
+  agreeing in both orders: A wins 64, M wins 177, tie 62
+  orders disagree (position bias, not counted): 91; missing verdicts: 0; identical translations not asked: 42
+  decided pairs 241 (need at least 150): enough
+  M win rate among decided 73.4%  95% CI 67.5-78.6%  sign test p=0.0000
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK
+### haiku-5-5-B2-t2-vs-M-t2
+judge tally: B2 (A) vs M (B)
+  agreeing in both orders: B2 wins 61, M wins 163, tie 64
+  orders disagree (position bias, not counted): 77; missing verdicts: 0; identical translations not asked: 74
+  decided pairs 224 (need at least 150): enough
+  M win rate among decided 72.8%  95% CI 66.6-78.2%  sign test p=0.0000
+  calibration (identical text, both orders must say tie): passed 4, failed 0, missing 0 => OK

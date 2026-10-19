@@ -1,0 +1,31 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0352.2",
+  "item-0034.1",
+  "item-0152.2",
+  "item-0185.2",
+  "item-0243.2",
+  "item-0157.1",
+  "item-0077.1",
+  "item-0218.1",
+  "item-0365.1",
+  "item-0120.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5bc9e7e1-c4cc-4fa4-8ed3-45a531af35a0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches instructional imperative onboarding guide tone and correct Hearth channel reference.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left Japanese untranslated.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left Korean untranslated, though Translation 2 mistranslates the subject.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly interprets 老人 as 'old man' instead of mangling it.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left Japanese untranslated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left Japanese untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Reads much more naturally for an onboarding guide.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'Pinned pages' is standard UI terminology for 固定したページ.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"More natural phrasing and appropriate polite question register in Korean.\"}\n]\n```\n",
+  "duration_seconds": 6.231085,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17180,
+   "output_tokens": 304,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17484
+  }
+ }
+}

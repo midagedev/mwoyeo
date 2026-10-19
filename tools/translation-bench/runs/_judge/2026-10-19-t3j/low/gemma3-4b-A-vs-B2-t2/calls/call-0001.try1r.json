@@ -1,0 +1,29 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0143.2",
+  "item-0331.2",
+  "item-0280.1",
+  "item-0214.1",
+  "item-0040.1",
+  "item-0179.1",
+  "item-0172.2",
+  "item-0154.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9262e41e-9980-434a-8176-c8cb87a901ae",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the source Japanese text completely untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"More natural phrasing in English onboarding documentation.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Rory speaks 반말 to Siobhan, and natural Korean omits unnatural pronouns.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses 해요체 as specified; 宿 is an inn/shelter, not 저택.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the source Chinese text completely untranslated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'알았을 때' is more natural than '알 경우' in spoken dialogue.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"}\n]\n```\n",
+  "duration_seconds": 5.702873,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16915,
+   "output_tokens": 265,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17180
+  }
+ }
+}

@@ -1,0 +1,28 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0172.1",
+  "item-0224.2",
+  "item-0120.1",
+  "item-0181.2",
+  "item-0343.1",
+  "item-0083.2",
+  "item-0351.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "36838eaf-5156-4449-825c-56bb39b00c25",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 leaves 'anyway' untranslated in English.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 mistakenly adds 'help you' instead of helping Seoyoon.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both use wrong honorific speech level between Rook and Dex.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 transcribes 채율 accurately as Cha-eul.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 'bay four' to '4번 베이'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 寿星 (birthday person) and uses 해요체.\"}\n]\n```\n",
+  "duration_seconds": 4.107569,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16571,
+   "output_tokens": 234,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16805
+  }
+ }
+}

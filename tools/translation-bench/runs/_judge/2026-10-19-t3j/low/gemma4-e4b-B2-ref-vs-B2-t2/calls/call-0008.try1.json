@@ -1,0 +1,31 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0048.2",
+  "item-0333.1",
+  "item-0130.2",
+  "item-0087.2",
+  "item-0253.2",
+  "item-0275.1",
+  "item-0327.1",
+  "item-0332.2",
+  "item-0077.2",
+  "item-0234.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8917d2b5-4877-4884-949d-4de675d1dea5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"In logistics/delivery context, '기사' refers to drivers rather than generic workers.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Chinese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말; Aoife pronunciation is ee-fa.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'지천이도' naturally adds the vocative/nominative particle -이 after a consonant.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the text completely untranslated.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'Ask for some know-how' sounds more natural in English than 'his know-how'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Chinese.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'실수 되돌리기' is more concise and idiomatic for a heading/title.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'Getting started with Memotto' is standard phrasing for user guide documentation.\"}\n]\n```\n",
+  "duration_seconds": 6.257873,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17387,
+   "output_tokens": 346,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17733
+  }
+ }
+}

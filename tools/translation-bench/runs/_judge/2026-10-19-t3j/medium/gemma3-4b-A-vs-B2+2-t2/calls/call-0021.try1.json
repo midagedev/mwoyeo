@@ -1,0 +1,28 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0140.2",
+  "item-0232.2",
+  "item-0161.2",
+  "item-0204.1",
+  "item-0049.2",
+  "item-0120.2"
+ ],
+ "problem": "rc 3",
+ "event": {
+  "conversation_id": "afc1bb2f-fa87-4b72-b972-7a507c8bad00",
+  "status": "ERROR",
+  "response": "",
+  "error": "Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 2h37m21s.",
+  "duration_seconds": 0,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 0
+  }
+ }
+}

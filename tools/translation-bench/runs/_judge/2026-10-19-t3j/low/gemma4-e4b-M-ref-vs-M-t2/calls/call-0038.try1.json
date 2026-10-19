@@ -1,0 +1,31 @@
+{
+ "call": 38,
+ "try": 1,
+ "ids": [
+  "item-0246.2",
+  "item-0217.2",
+  "item-0187.1",
+  "item-0196.2",
+  "item-0305.1",
+  "item-0030.2",
+  "item-0164.2",
+  "item-0024.1",
+  "item-0021.2",
+  "item-0307.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fb75352c-bef1-43d8-b787-37670fbcabc4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the meaning; punctuation difference is negligible.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Accurately translates the subject ひとこと (Quick Note/note).\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'Meet in person' is much more natural than 'direct transaction'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translates the ending condition '끝입니다' properly.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Equally accurate translations with minor punctuation difference.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both 'pretty strict' and 'quite strict' translate 깐깐하셨잖아 well.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"여행 계획 translates 攻略 much better than 가이드라인.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"The female speaker refers to an older brother as 오빠, not 형.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 mistakenly transliterates Irish name Aoife as 아이파.\"}\n]\n```\n",
+  "duration_seconds": 4.68828,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17603,
+   "output_tokens": 320,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17923
+  }
+ }
+}

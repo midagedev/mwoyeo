@@ -1,0 +1,24 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0012.2",
+  "item-0326.1",
+  "item-0148.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "641f667f-054a-4f91-b840-96337cef251a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Rook speaks 반말 to Dex; Translation 1 uses correct speech level.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the surname and proper title placement.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 uses natural active voice for onboarding guidelines.\"}\n]\n```\n",
+  "duration_seconds": 4.190159,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15058,
+   "output_tokens": 102,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15160
+  }
+ }
+}

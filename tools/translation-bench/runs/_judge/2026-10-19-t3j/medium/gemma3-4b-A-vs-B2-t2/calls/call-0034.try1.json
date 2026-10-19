@@ -1,0 +1,27 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0207.1",
+  "item-0039.2",
+  "item-0292.2",
+  "item-0019.1",
+  "item-0048.1",
+  "item-0363.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3ab47a96-3190-427f-9df9-3992b1b8f892",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly identifies the pronoun 'she' instead of 'you'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses the required 합쇼체 speech level and better phrasing.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses the required 합쇼체 speech level for speaking to a superior.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Maintains consistent speech level and uses a more natural idiom.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses natural simple present tense and accurate sales terminology.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly conveys hearsay using the required 해요체 speech level.\"}\n]\n```\n",
+  "duration_seconds": 71.57214,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16097,
+   "output_tokens": 9304,
+   "thinking_tokens": 9113,
+   "cache_read_tokens": 0,
+   "total_tokens": 25401
+  }
+ }
+}

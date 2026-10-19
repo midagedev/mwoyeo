@@ -1,0 +1,24 @@
+{
+ "call": 42,
+ "try": 1,
+ "ids": [
+  "item-0197.2",
+  "item-0117.1",
+  "item-0234.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cc2a85f2-4441-44bf-8b3c-4f000841e601",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Chinese text.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 'on' as turned on ('켜져').\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses the specified term '작업 디렉터리' and accurately translates 'stays'.\"}\n]\n",
+  "duration_seconds": 3.976425,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15024,
+   "output_tokens": 104,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15128
+  }
+ }
+}

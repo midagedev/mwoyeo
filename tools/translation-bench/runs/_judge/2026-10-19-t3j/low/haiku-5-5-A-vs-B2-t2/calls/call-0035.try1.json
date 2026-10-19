@@ -1,0 +1,31 @@
+{
+ "call": 35,
+ "try": 1,
+ "ids": [
+  "item-0119.2",
+  "item-0234.1",
+  "item-0129.2",
+  "item-0356.2",
+  "item-0146.2",
+  "item-0141.2",
+  "item-0366.2",
+  "item-0002.2",
+  "item-0212.2",
+  "item-0051.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2157a446-29c9-4ff4-85ff-29934b91b44a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left Japanese untranslated.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the meaning and correct speech level well.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 transliterates Dex into Korean properly.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both capture the meaning and tone accurately.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Hinata speaks to Takanashi in banmal.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both are natural Korean translations in banmal.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 is in Japanese, not Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translates the name into Korean script.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left Bori untranslated in Hangul.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translate the incomplete sentence naturally into English.\"}\n]\n```\n",
+  "duration_seconds": 4.300131,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17474,
+   "output_tokens": 290,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17764
+  }
+ }
+}

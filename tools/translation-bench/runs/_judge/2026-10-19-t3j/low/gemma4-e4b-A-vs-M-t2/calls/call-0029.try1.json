@@ -1,0 +1,31 @@
+{
+ "call": 29,
+ "try": 1,
+ "ids": [
+  "item-0098.1",
+  "item-0274.1",
+  "item-0141.2",
+  "item-0296.1",
+  "item-0308.1",
+  "item-0061.1",
+  "item-0156.2",
+  "item-0100.1",
+  "item-0205.2",
+  "item-0158.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "35d358dc-3895-40c3-8953-6837fe8ac4cd",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 follows the defined term '저장소' for repository.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 and adheres to designated names.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and accurate.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"The speaker speaks to the others using 해요체.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 sounds much more natural for a tenant acknowledging a landlord.\"}\n]\n```\n",
+  "duration_seconds": 4.587161,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17363,
+   "output_tokens": 307,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17670
+  }
+ }
+}

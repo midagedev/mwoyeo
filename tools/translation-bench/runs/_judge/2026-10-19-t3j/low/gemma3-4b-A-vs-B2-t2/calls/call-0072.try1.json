@@ -1,0 +1,26 @@
+{
+ "call": 72,
+ "try": 1,
+ "ids": [
+  "item-0333.2",
+  "item-0316.1",
+  "item-0203.2",
+  "item-0325.2",
+  "item-0276.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cc5b3304-88b9-43fe-8020-8679982603ef",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"이동장 is a pet carrier/cart, not a chest of drawers.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Deposit receipts translates to 예금 증서 better than checks (수표).\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"호타루 is the product name; translation 2 hallucinated carousel.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English entirely.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Thorne speaks to Rook in 해요체; translation 2 uses 반말.\"}\n]\n",
+  "duration_seconds": 3.888913,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15967,
+   "output_tokens": 167,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16134
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 70,
+ "try": 1,
+ "ids": [
+  "item-0287.1",
+  "item-0091.2",
+  "item-0250.1",
+  "item-0397.2",
+  "item-0031.2",
+  "item-0006.2",
+  "item-0052.2",
+  "item-0127.1",
+  "item-0069.2",
+  "item-0061.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9e846b8b-7c86-4f7c-8bd1-a95788f3866b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"濡れた translates precisely to wet rather than soaked.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the pronunciation note naturally and accurately.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left Korean name untranslated; 2 romanized Chaeyul.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Identical translations with negligible punctuation difference.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Rory speaks banmal to Siobhan, and is male (sister=누나/언니 error).\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are natural and fully faithful.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both correctly use banmal and translate the meaning naturally.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 translates names into Korean whereas 2 kept English.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"The specified term is 時計 = watch.\"}\n]\n```\n",
+  "duration_seconds": 4.818667,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17219,
+   "output_tokens": 308,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17527
+  }
+ }
+}

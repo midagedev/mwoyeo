@@ -1,0 +1,31 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0201.2",
+  "item-0110.1",
+  "item-0097.2",
+  "item-0050.2",
+  "item-0042.1",
+  "item-0092.1",
+  "item-0159.2",
+  "item-0242.2",
+  "item-0165.2",
+  "item-0264.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "50def861-3bf0-42ac-bd7b-0c71fa8edd29",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the line.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly preserves the trailing symbol and makes fewer lexical errors.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both misname 'MoaLogis', but are otherwise comparable.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'냉동고' correctly translates 'freezer', matching the earlier context.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'스테이지에 추가하세요' is the standard, natural Korean Git terminology.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Thorne speaks to Rook using 해요체, which translation 1 matches.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left the Chinese text completely untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"日向 uses 합쇼체 with chief 十河, which translation 2 respects.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 uses 반말 as 林夏 addresses her brother 林远.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Siobhan correctly conveys Mom's wish to Rory; translation 2 translates mechanically.\"}\n]\n```\n",
+  "duration_seconds": 5.710402,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17196,
+   "output_tokens": 336,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17532
+  }
+ }
+}

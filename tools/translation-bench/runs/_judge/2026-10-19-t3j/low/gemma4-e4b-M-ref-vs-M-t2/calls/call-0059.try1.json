@@ -1,0 +1,31 @@
+{
+ "call": 59,
+ "try": 1,
+ "ids": [
+  "item-0198.2",
+  "item-0149.2",
+  "item-0293.1",
+  "item-0206.1",
+  "item-0056.1",
+  "item-0289.1",
+  "item-0036.2",
+  "item-0311.1",
+  "item-0148.2",
+  "item-0263.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6d268ca5-b565-4c10-b989-720e91023474",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate 반말 equivalents.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly translates 十一 as National Day holiday and names Zhou Ting properly.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both accurately translate Akira's line into natural English.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both appropriately use 해요체 toward 周姨.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Siobhan speaks 반말 to Rory; translation 2 uses appropriate terminology.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 as specified in the facts.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 uses 해요체, matching the speaker's speech level toward 周姨.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Akira is female, so 'her' is the correct pronoun.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 is translated into Korean; Translation 2 was untranslated.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 as Zhou Ting speaks to friends.\"}\n]\n```\n",
+  "duration_seconds": 6.487056,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17408,
+   "output_tokens": 326,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17734
+  }
+ }
+}

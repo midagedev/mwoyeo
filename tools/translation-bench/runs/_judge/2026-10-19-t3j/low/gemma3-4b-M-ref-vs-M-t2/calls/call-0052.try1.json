@@ -1,0 +1,31 @@
+{
+ "call": 52,
+ "try": 1,
+ "ids": [
+  "item-0294.2",
+  "item-0327.1",
+  "item-0176.1",
+  "item-0087.2",
+  "item-0104.2",
+  "item-0074.1",
+  "item-0155.1",
+  "item-0279.1",
+  "item-0343.2",
+  "item-0306.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "71065761-6e65-406b-a62d-e21c8943c548",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"\\\"Call him\\\" means tell them to call Bell, not contact Gareth.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"许诺 speaks 해요체 to 周婷; Translation 2 correctly uses 해요체.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translating Korean internet laugh \\\"ㅋㅋ\\\" to \\\"haha\\\" is natural; no raw untranslated text.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"In Git terminology, \\\"branch\\\" is conventionally transliterated as 브랜치.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Specified term for 先輩 is boss; Translation 1 keeps Akira-san naturally.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 is translated into Korean, while Translation 2 left Japanese intact.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left Japanese untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Narrative line; Translation 2 mistranslates 悲鳴 into bizarre gibberish '슬푸오'.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both failed to translate the Chinese line into Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left Japanese completely untranslated.\"}\n]\n```\n",
+  "duration_seconds": 4.737446,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17471,
+   "output_tokens": 347,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17818
+  }
+ }
+}

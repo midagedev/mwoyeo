@@ -1,0 +1,23 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0267.1",
+  "item-0312.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f8cfb2cd-5029-4904-ad4c-fc8f54959684",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 accurately captures the meaning of the source sentence.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 is written in Chinese and Japanese, not Korean.\"}\n]\n",
+  "duration_seconds": 10.762563,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14715,
+   "output_tokens": 1075,
+   "thinking_tokens": 1010,
+   "cache_read_tokens": 0,
+   "total_tokens": 15790
+  }
+ }
+}

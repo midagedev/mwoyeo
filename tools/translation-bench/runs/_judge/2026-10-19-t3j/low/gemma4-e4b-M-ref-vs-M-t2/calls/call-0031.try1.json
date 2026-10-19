@@ -1,0 +1,31 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0009.1",
+  "item-0204.2",
+  "item-0083.1",
+  "item-0286.2",
+  "item-0309.2",
+  "item-0280.1",
+  "item-0299.2",
+  "item-0287.1",
+  "item-0106.2",
+  "item-0189.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3c6f9d09-a093-47d0-ae6b-0e65737bc768",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left Japanese untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly retains the defined term 'Sticky notes' as markers.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Identical translations except for a minor trailing period.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses the specified term '포켓 깃'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly uses female pronoun and specified pinyin Xiè Xuán.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Spoken by Zhou Yi to Lin Yuan in 해요체.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Japanese.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are equally natural and acceptable in context.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally and accurately in Korean.\"}\n]\n```\n",
+  "duration_seconds": 6.048487,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17524,
+   "output_tokens": 300,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17824
+  }
+ }
+}

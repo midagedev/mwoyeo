@@ -1,0 +1,27 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0016.1",
+  "item-0300.2",
+  "item-0028.2",
+  "item-0170.1",
+  "item-0036.2",
+  "item-0062.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9b38a7ce-1139-4ad1-bcce-49602dcc0589",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly translates 两成 as 20% and translates the name into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Chinese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated Japanese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Accurately captures だよね with 잖아 and phrases more naturally.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 severely mistranslates the meaning with 개 짐.\"}\n]\n",
+  "duration_seconds": 42.113155,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16257,
+   "output_tokens": 4887,
+   "thinking_tokens": 4699,
+   "cache_read_tokens": 0,
+   "total_tokens": 21144
+  }
+ }
+}

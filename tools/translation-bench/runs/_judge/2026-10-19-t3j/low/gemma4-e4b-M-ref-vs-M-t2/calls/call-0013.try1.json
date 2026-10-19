@@ -1,0 +1,31 @@
+{
+ "call": 13,
+ "try": 1,
+ "ids": [
+  "item-0276.1",
+  "item-0017.2",
+  "item-0302.1",
+  "item-0002.2",
+  "item-0086.2",
+  "item-0085.1",
+  "item-0257.2",
+  "item-0014.2",
+  "item-0181.2",
+  "item-0265.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "92f2d147-0239-4b61-9e4d-818a1ad6af69",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly conveys hearsay with '도착한다고 해'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 naturalizes the pronunciation guide into Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 to Lin Xia and natural phrasing.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified name 주정.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Japanese text.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 as Mina speaks to the group.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 is more natural and idiomatic for a documentation heading.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 曾师姐 as Senior Sister Zeng.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 completes the customer-facing spoken line naturally.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally in correct 반말 register.\"}\n]\n```\n",
+  "duration_seconds": 5.907793,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17290,
+   "output_tokens": 315,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17605
+  }
+ }
+}

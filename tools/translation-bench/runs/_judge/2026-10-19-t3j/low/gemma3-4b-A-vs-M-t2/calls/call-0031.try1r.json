@@ -1,0 +1,26 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0075.1",
+  "item-0341.2",
+  "item-0135.2",
+  "item-0113.1",
+  "item-0149.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "981c2ea7-78cd-4c2b-a78b-32b197b04ea2",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correctly translates Zhou Yi to 저우 이모 and lines to 라인.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both failed to translate into the target language Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Accurately conveys 母 (mother) from the original text.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly maintains 반말 speech level used by 周婷 to 陆明.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"More natural heading style for wiki onboarding documentation.\"}\n]\n```\n",
+  "duration_seconds": 3.5186070000000003,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15811,
+   "output_tokens": 163,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15974
+  }
+ }
+}

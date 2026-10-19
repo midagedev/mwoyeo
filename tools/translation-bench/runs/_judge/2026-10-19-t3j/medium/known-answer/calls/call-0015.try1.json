@@ -1,0 +1,27 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0006.2",
+  "item-0022.2",
+  "item-0018.1",
+  "item-0044.1",
+  "item-0013.2",
+  "item-0041.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "bf94e10b-d13a-4ad1-92d4-766c9e7f42bd",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Kiryu is an elderly client; subject honorific -시- is appropriate.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses the specified term Shijie instead of Senior Sister.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses the specified term 카운슬 택스 for council tax.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the line untranslated in Chinese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"The cat's actual name is Bori, not Barley.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both Chaeyul and Chaeyool are valid romanizations of 채율.\"}\n]\n",
+  "duration_seconds": 46.598936,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16330,
+   "output_tokens": 5726,
+   "thinking_tokens": 5532,
+   "cache_read_tokens": 0,
+   "total_tokens": 22056
+  }
+ }
+}

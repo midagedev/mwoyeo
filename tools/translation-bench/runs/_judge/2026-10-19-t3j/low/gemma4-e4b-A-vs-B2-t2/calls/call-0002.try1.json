@@ -1,0 +1,31 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0376.2",
+  "item-0175.1",
+  "item-0144.1",
+  "item-0230.1",
+  "item-0152.2",
+  "item-0307.2",
+  "item-0055.2",
+  "item-0347.2",
+  "item-0293.1",
+  "item-0285.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3da44d9f-77a3-4956-8c1a-d83d1a3717f2",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"More natural phrasing for an onboarding guide instruction.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural phrasing expressing condition ('대신 ~하는 거야').\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Candidate 1 left text untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Candidate 1 left text untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Candidate 2 left text untranslated in Japanese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Candidate 2 left text untranslated in Chinese.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Candidate 2 left text untranslated in Chinese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"More natural and neutral tone for onboarding documentation.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'골치 아픈' naturally captures the idiomatic meaning of 骨の折れる.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both incorrectly use 형 instead of 오빠 for a female speaker.\"}\n]\n```\n",
+  "duration_seconds": 4.189173,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17543,
+   "output_tokens": 307,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17850
+  }
+ }
+}

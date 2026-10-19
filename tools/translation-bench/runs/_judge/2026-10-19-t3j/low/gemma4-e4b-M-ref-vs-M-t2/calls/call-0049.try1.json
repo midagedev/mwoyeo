@@ -1,0 +1,31 @@
+{
+ "call": 49,
+ "try": 1,
+ "ids": [
+  "item-0258.1",
+  "item-0132.1",
+  "item-0010.2",
+  "item-0028.2",
+  "item-0288.1",
+  "item-0013.1",
+  "item-0269.1",
+  "item-0021.1",
+  "item-0155.2",
+  "item-0306.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fce78c10-8690-4bfb-b4f6-e17d1b2e280b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'looking out at' naturally translates '望向窗外'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 transliterates Tomasz as guided by the pronunciation context.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"English translations typically do not use pinyin tone marks for names.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 helpfully provides the Korean reading along with hanzi.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are completely accurate and natural.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"十河 is read そごう (Sogo), correctly transcribed as 소고.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"The speaker is female, so older brother (兄) is 오빠.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 mistranslated the name 霜 as the word 'frost'.\"}\n]\n```\n",
+  "duration_seconds": 5.569459,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17442,
+   "output_tokens": 322,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17764
+  }
+ }
+}

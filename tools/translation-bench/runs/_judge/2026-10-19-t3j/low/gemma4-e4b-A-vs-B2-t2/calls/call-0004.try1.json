@@ -1,0 +1,31 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0093.1",
+  "item-0294.2",
+  "item-0086.1",
+  "item-0142.2",
+  "item-0359.1",
+  "item-0267.2",
+  "item-0275.1",
+  "item-0242.1",
+  "item-0336.2",
+  "item-0085.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e1201172-97f6-474f-939a-758cacafcaa9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Captures the nuances of 〜ないように better and sounds more natural.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses the English name Barley established in the context.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the line untranslated in Chinese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Chinese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Chinese.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural English renderings.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the person's name untranslated in Korean hangul.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'Packing service' or 'full-service movers' is much more natural than Translation 2.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 uses proper coordination ('and') avoiding a comma splice.\"}\n]\n```\n",
+  "duration_seconds": 4.488737,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17353,
+   "output_tokens": 322,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17675
+  }
+ }
+}

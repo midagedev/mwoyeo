@@ -1,0 +1,31 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0136.2",
+  "item-0161.2",
+  "item-0257.2",
+  "item-0089.1",
+  "item-0297.1",
+  "item-0099.2",
+  "item-0365.2",
+  "item-0355.1",
+  "item-0224.1",
+  "item-0177.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3bec9aab-a1a6-405d-aa40-de7aefc6d09c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches female princess register (해요체 to 텟사이); 2 mistranslates 鉄斎 as 철재.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately convey the meaning.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly uses 반말 to 朔; 2 mixes honorifics inappropriately.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and read naturally.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"자도 돼 asks for permission naturally; 1 asks about physical ability.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'My brother' sounds more natural in English conversational context.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Speaks casually to Dex; uses natural Korean pronouns and phrasing.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translates the reading Yamanashi-san rather than leaving raw kanji.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translates 三红 into Korean phonetic 삼홍 rather than leaving raw hanzi.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Faithfully preserves the original pattern of Japanese term followed by English.\"}\n]\n```\n",
+  "duration_seconds": 4.757639,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17230,
+   "output_tokens": 334,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17564
+  }
+ }
+}

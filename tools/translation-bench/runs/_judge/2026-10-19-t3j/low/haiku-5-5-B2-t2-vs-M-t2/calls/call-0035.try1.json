@@ -1,0 +1,31 @@
+{
+ "call": 35,
+ "try": 1,
+ "ids": [
+  "item-0254.2",
+  "item-0106.1",
+  "item-0234.1",
+  "item-0058.1",
+  "item-0291.2",
+  "item-0041.2",
+  "item-0318.1",
+  "item-0129.1",
+  "item-0358.1",
+  "item-0312.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f50ac838-414f-4220-8ff8-8aa5b3b25555",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are identical and accurate.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the polite 합쇼체/해요체 interrogative honorific tone.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Hinata speaks to Takanashi in 반말, which Translation 1 uses.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Captain is defined as 선장 in the facts.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translates the Chinese name into Korean and natural Korean 반말 dialogue.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 actually translates the line into Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'장인 두 분과 약속을 잡아 뒀어요' is more natural Korean grammar.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both are valid and natural manual section header translations.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'하래서' reported a past instruction ('She said...').\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'Wants us there' translates naturally and idiomatically to '오래'.\"}\n]\n```\n",
+  "duration_seconds": 5.231768,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17307,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17632
+  }
+ }
+}

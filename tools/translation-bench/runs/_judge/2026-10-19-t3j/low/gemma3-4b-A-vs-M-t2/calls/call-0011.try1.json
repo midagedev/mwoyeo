@@ -1,0 +1,31 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0142.1",
+  "item-0009.1",
+  "item-0016.2",
+  "item-0063.2",
+  "item-0151.2",
+  "item-0322.1",
+  "item-0219.1",
+  "item-0081.1",
+  "item-0184.1",
+  "item-0235.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e155ac8d-1cff-4813-be40-4a21a795edde",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 后天 to the future, unlike Translation 2.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 两成 as 20% (Translation 1 mistakenly says 2배).\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses natural Korean phrasing '그때까지', whereas '그때 전에' is awkward.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 is much closer to the name Takanashi than Translation 2.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 快抬上来 as lift up, though both mistranslate Ruoshui.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 reads much more naturally for internal onboarding documentation.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 is in Korean, while Translation 2 left the text in Japanese.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 accurately translates driving and the name of Huandao Road.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 'Yes, ma'am' as an affirmative reply.\"}\n]\n```\n",
+  "duration_seconds": 5.32659,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17489,
+   "output_tokens": 355,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17844
+  }
+ }
+}

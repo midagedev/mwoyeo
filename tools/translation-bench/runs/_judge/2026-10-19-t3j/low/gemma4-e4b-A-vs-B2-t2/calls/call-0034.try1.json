@@ -1,0 +1,30 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0113.2",
+  "item-0010.2",
+  "item-0372.1",
+  "item-0130.1",
+  "item-0090.1",
+  "item-0005.1",
+  "item-0354.2",
+  "item-0217.2",
+  "item-0209.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3c8366be-9d1e-4310-9b23-5966d5bec436",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 captures the past decision nuance more naturally.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly includes 'the new hire' (신입).\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"In app context, 'ひとこと' refers to a short note/item, not single word.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean using the proper 해요체 speech level.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 uses the correct 반말 speech level and Korean names.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates the name, 'that noise', and sounds natural in Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'at work' is much more natural English than 'at the company'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 sounds natural in Korean; translation 2 unnaturally uses '그녀는'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 is translated into Korean, whereas translation 2 remained untranslated.\"}\n]\n```\n",
+  "duration_seconds": 4.985286,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16931,
+   "output_tokens": 312,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17243
+  }
+ }
+}

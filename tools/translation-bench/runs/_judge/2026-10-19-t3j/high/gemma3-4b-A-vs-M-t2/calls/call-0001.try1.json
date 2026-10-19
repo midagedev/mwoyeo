@@ -1,0 +1,36 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0159.1",
+  "item-0074.2",
+  "item-0210.1",
+  "item-0237.1",
+  "item-0270.1",
+  "item-0321.2",
+  "item-0255.2",
+  "item-0084.1",
+  "item-0228.1",
+  "item-0034.2",
+  "item-0067.2",
+  "item-0198.1",
+  "item-0088.1",
+  "item-0077.2",
+  "item-0029.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "afee0d1f-589c-4454-9d78-a7ee51f4797e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"\\\"Unloading\\\" correctly translates logistics \\\"하차\\\", unlike \\\"disembarking\\\".\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 left the text completely untranslated.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly uses the specified name \\\"린시아\\\" and appropriate 반말 register.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 accurately and naturally translates \\\"他们家的\\\" in context.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 faithfully preserves \\\"Saturday\\\" instead of changing it to \\\"weekend\\\".\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly uses the specified term \\\"boss\\\" for 先輩.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations hallucinate unrelated animal names for the project code name.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly transliterates \\\"仇\\\" as \\\"Qiu\\\" following the provided pinyin.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"\\\"Here you are\\\" correctly translates \\\"来たか\\\", unlike the imperative \\\"Come\\\".\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly translates the pronoun \\\"you\\\" instead of mistranslating it as \\\"she\\\".\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are equally accurate, differing only in contraction.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Correctly identifies the addressee, preserves Mio, and uses appropriate 반말.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 2 left the text completely untranslated.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Correctly transliterates the character name \\\"さく\\\" as \\\"사쿠\\\".\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations accurately and appropriately convey the meaning and pronunciation guide.\"}\n]\n```\n",
+  "duration_seconds": 154.132531,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 18947,
+   "output_tokens": 19903,
+   "thinking_tokens": 19392,
+   "cache_read_tokens": 0,
+   "total_tokens": 38850
+  }
+ }
+}

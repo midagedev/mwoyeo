@@ -1,0 +1,31 @@
+{
+ "call": 75,
+ "try": 1,
+ "ids": [
+  "item-0203.2",
+  "item-0305.2",
+  "item-0022.1",
+  "item-0325.2",
+  "item-0356.1",
+  "item-0276.2",
+  "item-0047.1",
+  "item-0073.2",
+  "item-0156.1",
+  "item-0229.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f8377d65-7600-4f24-ad29-1771e1ca91e3",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally convey the casual tone and meaning.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Step accurately translates 발판 in this checklist context, whereas Platform is literal.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Sync and history is a more natural standard heading in app guides.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 leaves the first clause untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the entire line untranslated in Japanese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"선생님 fits addressing a landlord; 부장님 (department manager) is completely incorrect.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left the entire line untranslated in Japanese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 is entirely untranslated Japanese.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Past tense 'had not yet dispersed' fits narrative descriptive storytelling better.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Modakbul keeps the internal channel name, while Translation 2 translates it to bonfire.\"}\n]\n```\n",
+  "duration_seconds": 5.567286,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17228,
+   "output_tokens": 330,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17558
+  }
+ }
+}

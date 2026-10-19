@@ -1,0 +1,31 @@
+{
+ "call": 69,
+ "try": 1,
+ "ids": [
+  "item-0162.1",
+  "item-0131.1",
+  "item-0043.2",
+  "item-0283.1",
+  "item-0209.1",
+  "item-0143.1",
+  "item-0336.1",
+  "item-0235.1",
+  "item-0044.2",
+  "item-0340.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1d087163-e92c-4ae1-b0fd-c73bec0fddbe",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"抢票 refers to booking/snagging tickets, not stealing (뺏다).\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 properly transliterates the Japanese name 湊 into Korean (미나토).\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Matches the heading style and context of user guide features naturally.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translates the pet name 夏夏 properly to 샤샤 rather than leaving hanja.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 completely failed to translate the Japanese text into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 mistakenly translates the onboarding guide as first-person 'My seat'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Speaking to a client requires polite/해요/하십시오 forms, and completed punctuation fits properly.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates the character name 解玄 into English (Xie Xuan).\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and convey the original informal chat nuance.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"十河 (そごう) is correctly transliterated as 소고, not 토고.\"}\n]\n",
+  "duration_seconds": 5.513897,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17403,
+   "output_tokens": 352,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17755
+  }
+ }
+}

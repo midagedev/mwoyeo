@@ -1,0 +1,31 @@
+{
+ "call": 51,
+ "try": 1,
+ "ids": [
+  "item-0108.1",
+  "item-0102.2",
+  "item-0182.1",
+  "item-0251.2",
+  "item-0097.1",
+  "item-0121.1",
+  "item-0014.1",
+  "item-0234.1",
+  "item-0238.1",
+  "item-0054.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8f8a8c32-3a30-4a5b-b82e-8a61409fef5c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the line in Chinese untranslated.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly spells Subin as specified in the facts.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese source untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Grammatically sound past tense; translation 2 has tense errors and run-on.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Natural phrasing and correct transliteration of Thorne.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correct name Saku and accurate translation of 王都.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translates only the specified line without hallucinating earlier context.\"}\n]\n```\n",
+  "duration_seconds": 4.512363,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17513,
+   "output_tokens": 305,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17818
+  }
+ }
+}

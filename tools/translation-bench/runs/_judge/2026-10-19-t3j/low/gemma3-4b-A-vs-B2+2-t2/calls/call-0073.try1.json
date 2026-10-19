@@ -1,0 +1,31 @@
+{
+ "call": 73,
+ "try": 1,
+ "ids": [
+  "item-0271.2",
+  "item-0008.2",
+  "item-0320.1",
+  "item-0081.2",
+  "item-0333.2",
+  "item-0316.1",
+  "item-0335.2",
+  "item-0376.2",
+  "item-0203.2",
+  "item-0305.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f503f97e-850e-4acd-8273-2c7390e78d0e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 contains an absurd mistranslation ('화상 보일러').\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"小鳥遊 is a known surname; Translation 1 is completely garbled.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Siobhan speaks 합쇼체 to Gareth; Translation 2 uses 해요체 and mistranslates 'in'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Dex speaks 반말 to Rook; Translation 1 uses correct speech level.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 did not translate into Korean at all.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese source text untranslated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 is natural English; Translation 2 has ungrammatical phrasing.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the Chinese source text completely untranslated.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and are equally acceptable.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Tomasz is Polish (TOH-mash), accurately rendered as 토마슈 / 토-마시.\"}\n]\n```\n",
+  "duration_seconds": 4.76222,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 11810,
+   "output_tokens": 347,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 12157
+  }
+ }
+}

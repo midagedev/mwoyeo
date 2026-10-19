@@ -1,0 +1,26 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0230.2",
+  "item-0008.1",
+  "item-0035.2",
+  "item-0103.2",
+  "item-0009.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0747fbc2-f2c2-4eba-8c64-99c1538a5de2",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 translates 'raincoat' instead of leaving untranslated characters.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"-네요 correctly captures the reactive nuance of -ですね.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 transliterates names and avoids broken phrasing like '두 백'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly identifies notes as the subject syncing automatically.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 misidentifies the speaker and incorrectly uses past tense.\"}\n]\n```\n",
+  "duration_seconds": 67.585558,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15803,
+   "output_tokens": 9261,
+   "thinking_tokens": 9095,
+   "cache_read_tokens": 0,
+   "total_tokens": 25064
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0230.1",
+  "item-0059.2",
+  "item-0133.2",
+  "item-0311.2",
+  "item-0133.1",
+  "item-0369.2",
+  "item-0331.1",
+  "item-0319.2",
+  "item-0304.2",
+  "item-0312.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3812cc20-abe2-4864-821c-121a89f1b9fd",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 translates the Chinese name 林远 to 린위안.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Matches the specified spelling 'Seoyoon'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'Ride in the car' is much more natural for a dog.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Matches specified spelling 'Seoyoon' and translates '회사' naturally as 'office'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'현재 작업 중인 브랜치' conveys 'the branch you are on' more naturally.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly translates '警部' (Inspector), whereas 1 mistranslates it as 'detective'.\"}\n]\n```\n",
+  "duration_seconds": 4.94323,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17394,
+   "output_tokens": 331,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17725
+  }
+ }
+}

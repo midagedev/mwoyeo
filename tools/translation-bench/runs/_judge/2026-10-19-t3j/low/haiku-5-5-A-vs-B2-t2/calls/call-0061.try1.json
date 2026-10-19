@@ -1,0 +1,31 @@
+{
+ "call": 61,
+ "try": 1,
+ "ids": [
+  "item-0332.2",
+  "item-0079.2",
+  "item-0094.2",
+  "item-0310.2",
+  "item-0070.1",
+  "item-0295.1",
+  "item-0248.2",
+  "item-0374.1",
+  "item-0066.1",
+  "item-0233.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5200c9ed-334a-4877-8885-925170c20857",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches the truncated source verb without inventing extra text.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말 as specified in facts.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly translates the company channel name 'Hearth' from context.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Mina speaks to the group/members in 반말.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Xu Nuo speaks to Lu Ming in 반말.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are virtually identical and equally accurate.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Reads much more naturally and idiomatically in Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Uses correct reading '아메미야' established directly in earlier context lines.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Rook speaks to Dex in 반말, not 해요체.\"}\n]\n```\n",
+  "duration_seconds": 5.858301,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17461,
+   "output_tokens": 312,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17773
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 68,
+ "try": 1,
+ "ids": [
+  "item-0203.1",
+  "item-0060.2",
+  "item-0197.1",
+  "item-0330.2",
+  "item-0352.1",
+  "item-0068.1",
+  "item-0098.2",
+  "item-0261.2",
+  "item-0230.1",
+  "item-0097.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b59d6c53-cde7-427e-9799-6a198f23f800",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correctly translates 稟議 as 품의 and uses proper terminology.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Naturally translates the line using appropriate 반말 among siblings.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 hallucinates unrelated text from earlier lines.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 叔父 and leaves Japanese characters untranslated.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 offers a more natural translation of はい.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 uses the more natural subject marker 이.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 mistranslates 所長 (director/head) as 선장 (captain).\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 is more fluent and accurately conveys the Chinese meaning.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 contains untranslated Japanese text (ですから).\"}\n]\n```\n",
+  "duration_seconds": 4.522505,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17390,
+   "output_tokens": 318,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17708
+  }
+ }
+}

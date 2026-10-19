@@ -1,0 +1,31 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0037.2",
+  "item-0034.1",
+  "item-0015.1",
+  "item-0045.2",
+  "item-0046.2",
+  "item-0052.1",
+  "item-0059.1",
+  "item-0057.2",
+  "item-0021.2",
+  "item-0020.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6b8464d9-a8d7-447b-baa7-a01a67923926",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Chinese surname 仇 is pronounced Qiu, not Chou.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"In business drama context, 订单 means order (주문), not command (명령).\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"The Irish name Aoife is pronounced ee-fa (이파).\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Follows the defined term 『ひとこと』(Quick Note).\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"The facts specify the pinyin for 单 is Shàn.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"The facts specify 朔 is read さく (사쿠).\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Follows the defined term 先輩 = boss.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Housing rental 보증금 is translated as deposit, not guarantee.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Context states a tag stays put while a branch moves.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Follows the specified term Pocket Git = 포켓 깃.\"}\n]\n```\n",
+  "duration_seconds": 5.105569,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17190,
+   "output_tokens": 323,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17513
+  }
+ }
+}

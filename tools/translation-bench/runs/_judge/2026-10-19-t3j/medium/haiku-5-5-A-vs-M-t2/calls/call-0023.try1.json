@@ -1,0 +1,27 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0119.2",
+  "item-0048.1",
+  "item-0132.2",
+  "item-0092.2",
+  "item-0172.2",
+  "item-0335.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "725e8848-c64e-4118-8916-26af4ab97d41",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural Korean phrasing using the proper collocation 격식 차리다.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"The two candidate translations are completely identical.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly uses 반말 to Lu Ming as specified in facts.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly translates the reported speech verb ending 온대.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses the prescribed term MoaLogis instead of Moaro Logis.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly translates 辛い as spicy and uses 엠티 for 合宿.\"}\n]\n```\n",
+  "duration_seconds": 51.300172,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16166,
+   "output_tokens": 6244,
+   "thinking_tokens": 6049,
+   "cache_read_tokens": 0,
+   "total_tokens": 22410
+  }
+ }
+}

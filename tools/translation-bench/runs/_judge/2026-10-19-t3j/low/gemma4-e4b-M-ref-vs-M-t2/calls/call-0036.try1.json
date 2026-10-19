@@ -1,0 +1,31 @@
+{
+ "call": 36,
+ "try": 1,
+ "ids": [
+  "item-0169.2",
+  "item-0314.1",
+  "item-0128.1",
+  "item-0029.2",
+  "item-0059.2",
+  "item-0279.1",
+  "item-0208.1",
+  "item-0023.1",
+  "item-0154.2",
+  "item-0080.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e0fbc288-b3a3-4fc4-9f8e-b0764aa32248",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"지우 advises Seoyoon to rest, not suggesting resting together.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean in 해요체, while Translation 1 is Japanese.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while Translation 1 remains in Japanese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly translates into Korean using 합쇼체; 2 is Japanese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean using 반말; Translation 1 is Japanese.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both convey the incomplete narrative sentence equally well.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Siobhan speaks to Rory in 반말, and captures 'anyway'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Takanashi speaks to Hinata in 반말 and addresses her task accurately.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Captain Thorne speaks to Rook in 해요체; 1 captures 'that noise'.\"}\n]\n```\n",
+  "duration_seconds": 5.597327,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17404,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17736
+  }
+ }
+}

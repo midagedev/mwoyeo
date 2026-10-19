@@ -1,0 +1,31 @@
+{
+ "call": 29,
+ "try": 1,
+ "ids": [
+  "item-0289.2",
+  "item-0219.1",
+  "item-0080.2",
+  "item-0212.1",
+  "item-0321.2",
+  "item-0134.2",
+  "item-0043.1",
+  "item-0075.1",
+  "item-0280.2",
+  "item-0135.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "42550a49-e6b1-4652-9cb8-3626b89a192a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally in Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 辛い as spicy and transliterates 湊.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 uses the correct 해요체 speech level for 周姨 to 林远.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are virtually identical and use appropriate 해요체.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Noun form '-기' fits section heading style much better.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 uses the correct pinyin 'Xie Xuan' per facts.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 naturally captures the heading meaning 'Using it with your team'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 speech level for ミナ.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 transcribes the street name into Korean naturally.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both accurately translate the sentence, though both missed the defined term.\"}\n]\n```\n",
+  "duration_seconds": 5.011028,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17387,
+   "output_tokens": 327,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17714
+  }
+ }
+}

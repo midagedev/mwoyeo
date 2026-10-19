@@ -1,0 +1,27 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0190.1",
+  "item-0197.2",
+  "item-0234.2",
+  "item-0260.2",
+  "item-0195.1",
+  "item-0142.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e2afaa84-5a70-4f34-99aa-697d3fc1e6f1",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 translated context lines instead of the target line.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both omit the second sentence and are similarly incomplete.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both leave Chinese characters untranslated and mistranslate 没大没小.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly translates 'pillow' as 베개 and uses informal speech to Siobhan.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Natural Korean honorific 벨 씨 matches the context better than 미스터 벨.\"}\n]\n```\n",
+  "duration_seconds": 4.330907,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16131,
+   "output_tokens": 198,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16329
+  }
+ }
+}

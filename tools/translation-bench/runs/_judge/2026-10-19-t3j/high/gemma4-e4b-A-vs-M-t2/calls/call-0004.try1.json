@@ -1,0 +1,36 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0306.1",
+  "item-0270.1",
+  "item-0286.1",
+  "item-0092.1",
+  "item-0136.2",
+  "item-0015.1",
+  "item-0217.1",
+  "item-0074.1",
+  "item-0259.1",
+  "item-0235.2",
+  "item-0153.1",
+  "item-0143.2",
+  "item-0040.1",
+  "item-0368.2",
+  "item-0013.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "abcf16ed-8709-44fc-9d3b-76c8baa772d6",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural phrasing for the access card.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 is untranslated source text.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 is untranslated source text.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Accurately conveys the condition rather than a future prediction.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly identifies the brother as the subject, not 'I'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'병합되기 전까지는' reads much more naturally in Korean technical writing.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are accurate; differences are only minor formatting.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 is untranslated source text.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate in the correct speech level.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 is untranslated source text.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 1 is untranslated source text.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Correctly translates the surname Takanashi and defined term 'Commons'.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 1 is untranslated source text.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Uses the correct speech level (반말) and preserves the cutoff.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 2 is untranslated source text.\"}\n]\n```\n",
+  "duration_seconds": 77.970855,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 19093,
+   "output_tokens": 10153,
+   "thinking_tokens": 9696,
+   "cache_read_tokens": 0,
+   "total_tokens": 29246
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0337.2",
+  "item-0114.2",
+  "item-0067.2",
+  "item-0179.1",
+  "item-0348.2",
+  "item-0298.2",
+  "item-0164.1",
+  "item-0033.2",
+  "item-0040.1",
+  "item-0268.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3ce1faec-54a5-4c35-b40b-5ad41241004c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches Gareth's haeyo-che speech level and translates the name and pronouns.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'Place that' correctly serves as the object of 'see'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both hyphenated and unhyphenated Korean romanizations are acceptable.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translates the proper name into Korean phonetically as established in context.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the source Japanese text untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Zhou Yi speaks to Lin Xia using banmal.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left the source Japanese text untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the source Chinese text untranslated.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 mistranslated the person's name Kai (海) as sea (바다).\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both comma and no-comma styles are grammatically natural and accurate.\"}\n]\n```\n",
+  "duration_seconds": 5.722552,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17453,
+   "output_tokens": 331,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17784
+  }
+ }
+}

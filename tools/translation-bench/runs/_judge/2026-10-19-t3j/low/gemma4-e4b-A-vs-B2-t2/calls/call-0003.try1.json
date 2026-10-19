@@ -1,0 +1,31 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0311.2",
+  "item-0220.1",
+  "item-0046.1",
+  "item-0268.2",
+  "item-0100.1",
+  "item-0062.2",
+  "item-0232.2",
+  "item-0082.2",
+  "item-0077.2",
+  "item-0024.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d08076c2-8090-423b-86a5-479d04325d3c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"\\\"Search scope\\\" is more natural software terminology than \\\"search range\\\".\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Appropriately addresses the reader with 'You' rather than 'We'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Chinese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"\\\"Let me hear it\\\" correctly captures the prompt to report.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Captain speaks to Dex in 반말 and uses Korean terms.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Uses proper Korean honorifics and natural phrasing for Dex to Captain.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 5.159995,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17374,
+   "output_tokens": 317,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17691
+  }
+ }
+}

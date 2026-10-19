@@ -1,0 +1,31 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0072.1",
+  "item-0150.1",
+  "item-0154.2",
+  "item-0064.1",
+  "item-0323.1",
+  "item-0045.1",
+  "item-0354.2",
+  "item-0319.1",
+  "item-0383.1",
+  "item-0205.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dde2c0bf-5043-4f7b-8748-aaace961fafa",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly transcribes the name 林远 into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 left text untranslated.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean; Translation 1 left text untranslated.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 omits the pronunciation gloss naturally in English.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'Brief note' fits the app context much better than 'single word'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 left text untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean; Translation 1 left text untranslated.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean using appropriate 해요체.\"}\n]\n```\n",
+  "duration_seconds": 5.142391,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17415,
+   "output_tokens": 318,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17733
+  }
+ }
+}

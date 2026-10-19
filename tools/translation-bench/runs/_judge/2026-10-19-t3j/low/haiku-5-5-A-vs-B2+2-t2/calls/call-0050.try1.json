@@ -1,0 +1,31 @@
+{
+ "call": 50,
+ "try": 1,
+ "ids": [
+  "item-0085.2",
+  "item-0187.1",
+  "item-0302.2",
+  "item-0226.1",
+  "item-0066.2",
+  "item-0030.2",
+  "item-0164.2",
+  "item-0024.1",
+  "item-0021.2",
+  "item-0353.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fd42fe20-15ee-4097-86e7-13b6725098dd",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey the meaning well; note matches earlier defined concept.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural phrasing in Korean without redundant direct-action particles.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both '그런 다음' and '그다음' are equally natural and accurate.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translates 周姨 properly and flows much more naturally.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Dex should speak to Thorne in 합쇼체, neither uses it.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Accurately uses the defined term 'Commons' from context.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Natural Korean honorific omission of pronoun when subject is obvious.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 uses natural conversational phrasing; 1 is an unnatural literal calque.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both speak to Lysia in 해요체 with slightly different punctuation/particles.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Omits redundant second-person pronoun '여러분의' for natural Korean instructions.\"}\n]\n```\n",
+  "duration_seconds": 5.32973,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17281,
+   "output_tokens": 328,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17609
+  }
+ }
+}

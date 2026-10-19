@@ -1,0 +1,31 @@
+{
+ "call": 35,
+ "try": 1,
+ "ids": [
+  "item-0119.2",
+  "item-0234.1",
+  "item-0129.2",
+  "item-0356.2",
+  "item-0146.2",
+  "item-0141.2",
+  "item-0366.2",
+  "item-0002.2",
+  "item-0212.2",
+  "item-0051.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4e518d83-8954-4c89-ae08-9fef6a5f7a91",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Calls older brother '형' (oppa/hyeong) instead of nonsense '거'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates the text into Korean, unlike Translation 2.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'turns out wrong' is accurately translated as '틀린 경우'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translates 'Then what is it?' naturally in context.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Pinned' is the standard UI term for '固定した'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"More natural phrasing for 'toolkit' as '도구 상자'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 is an untranslated title; 2 actually translates the line.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 actually translates the line into Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'ついてる' is idiomatically translated as '곁에 있다/지켜준다'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly uses informal speech (반말) matching the speaker's relationship.\"}\n]\n```\n",
+  "duration_seconds": 5.354014,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17196,
+   "output_tokens": 337,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17533
+  }
+ }
+}

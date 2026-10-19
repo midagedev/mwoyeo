@@ -1,0 +1,31 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0022.1",
+  "item-0111.2",
+  "item-0223.1",
+  "item-0050.1",
+  "item-0069.1",
+  "item-0178.2",
+  "item-0064.1",
+  "item-0309.2",
+  "item-0311.1",
+  "item-0332.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "eeac359b-cf0f-4a41-a263-16b4b8269c25",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Chou correctly transcribes the surname 仇; hall fits 殿里 better than palace.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 leaves Chinese characters untranslated and misreads 仇 as Qiu.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Onboarding guides address the reader, not first-person 'I'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Freezer translates correctly to 냉동고; 냉장고 means refrigerator.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Rory speaks 반말 to Siobhan, and 퇴사 means company resignation.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the line into Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"構え means holding/readied a weapon; 휘두르며 means swinging.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the text in Japanese without translating.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Hinata speaks 반말/casual tone; translation 2 contains hanja and untranslated terms.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 left most of the sentence in untranslated Chinese.\"}\n]\n```\n",
+  "duration_seconds": 5.150098,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17544,
+   "output_tokens": 347,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17891
+  }
+ }
+}

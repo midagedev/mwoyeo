@@ -1,0 +1,25 @@
+{
+ "call": 69,
+ "try": 1,
+ "ids": [
+  "item-0160.1",
+  "item-0139.1",
+  "item-0380.2",
+  "item-0215.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cdc64705-1478-4959-8c11-4d27b94ebfd9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both misinterpret the app features (ひろば/ひとこと vs tags/words).\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Identical meaning and tone, differing only by contraction.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Follows the glossary term '포켓 깃' and captures 'never'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into the target language Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.23761,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15358,
+   "output_tokens": 140,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15498
+  }
+ }
+}

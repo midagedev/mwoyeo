@@ -1,0 +1,31 @@
+{
+ "call": 65,
+ "try": 1,
+ "ids": [
+  "item-0009.2",
+  "item-0035.1",
+  "item-0198.2",
+  "item-0149.2",
+  "item-0324.1",
+  "item-0206.1",
+  "item-0056.1",
+  "item-0289.1",
+  "item-0036.2",
+  "item-0337.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e9a0fb96-4e2c-446f-ba54-1f8aad8ff4a6",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 is untranslated, while Translation 2 translates into Korean.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both are natural and faithful English translations of the source line.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 mistranslates husband (主人) as store owner (주인분).\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Day 1 is standard English wiki documentation style for 첫날.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Reads more naturally and idiomatically in English.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 is untranslated, while Translation 2 is properly translated.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Uses correct 반말 speech level and translates Chinese names into Korean.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Properly uses 해요체 and translates Mr. Bell naturally into Korean.\"}\n]\n```\n",
+  "duration_seconds": 5.049364,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17591,
+   "output_tokens": 329,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17920
+  }
+ }
+}

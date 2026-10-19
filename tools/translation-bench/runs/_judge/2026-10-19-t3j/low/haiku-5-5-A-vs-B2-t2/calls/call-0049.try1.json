@@ -1,0 +1,31 @@
+{
+ "call": 49,
+ "try": 1,
+ "ids": [
+  "item-0307.2",
+  "item-0236.2",
+  "item-0169.2",
+  "item-0158.1",
+  "item-0200.2",
+  "item-0128.1",
+  "item-0029.2",
+  "item-0179.2",
+  "item-0059.2",
+  "item-0353.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9d35d9a2-4ee5-4c7f-933a-8bf204070d43",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Xu Nuo is female and refers to Zhou Ting as 언니.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally convey the original meaning.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations accurately capture the informal speech level and meaning.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"The context established the cat's English name as Barley.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"The speakers are siblings who address each other informally using 반말.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both appropriately use formal business Korean (합쇼체).\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both natural casual chat translations accurately capture the exclamation.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both are faithful, grammatically sound, and natural narrative translations.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both accurately translate the instructional guideline into natural English.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations correctly identify Elder Qin and render the sentence accurately.\"}\n]\n```\n",
+  "duration_seconds": 4.181009,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17429,
+   "output_tokens": 307,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17736
+  }
+ }
+}

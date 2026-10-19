@@ -1,0 +1,31 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0101.2",
+  "item-0122.2",
+  "item-0243.1",
+  "item-0013.1",
+  "item-0312.2",
+  "item-0167.1",
+  "item-0020.2",
+  "item-0110.2",
+  "item-0026.2",
+  "item-0134.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fc4753b0-1034-4c5b-95f9-e102a1e1baa4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Keeps the proper name Xie Xuan and translates more accurately.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly reads the furigana readings Yamanashi and Takanashi.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly interprets 老人 as old man rather than mangling it.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 mistranslates driver (기사) as equipment.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally in informal Korean (반말).\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both accurately capture the meaning and informal register.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both hallucinate animal names (달팽이/가재미) for the prototype name ホタル.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 uses a respectful form fitting 합쇼체 to a superior.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both are identical except for minor punctuation, and ignore formatting applies.\"}\n]\n```\n",
+  "duration_seconds": 4.611951,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17187,
+   "output_tokens": 326,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17513
+  }
+ }
+}

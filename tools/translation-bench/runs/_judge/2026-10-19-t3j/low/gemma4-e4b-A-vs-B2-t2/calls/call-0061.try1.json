@@ -1,0 +1,31 @@
+{
+ "call": 61,
+ "try": 1,
+ "ids": [
+  "item-0216.2",
+  "item-0041.1",
+  "item-0248.1",
+  "item-0199.2",
+  "item-0101.2",
+  "item-0284.2",
+  "item-0082.1",
+  "item-0365.1",
+  "item-0128.2",
+  "item-0117.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "999741cf-4820-4268-a5ef-67e1becc3711",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are identical and correct.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally in Korean tutorial context.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'Return the deposit' sounds natural; 'deposit the deposit' is awkward repetition.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'연락해 볼게요' captures the intent of 'chase' much better than '따져보겠습니다'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Speaker Rook speaks to Dex in 반말; 1 transliterates Thorne correctly.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'알겠습니다' fits the tenant-to-landlord context better than '사장님'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Thorne speaks to crew in 반말; transliterations match terms and names.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated in Japanese.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"小鳥遊 is read Takanashi, not Kotori.\"}\n]\n```\n",
+  "duration_seconds": 5.046077,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17194,
+   "output_tokens": 330,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17524
+  }
+ }
+}

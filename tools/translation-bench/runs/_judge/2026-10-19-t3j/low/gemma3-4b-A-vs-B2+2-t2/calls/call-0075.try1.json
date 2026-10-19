@@ -1,0 +1,31 @@
+{
+ "call": 75,
+ "try": 1,
+ "ids": [
+  "item-0315.1",
+  "item-0323.1",
+  "item-0244.2",
+  "item-0263.1",
+  "item-0095.2",
+  "item-0098.1",
+  "item-0301.2",
+  "item-0261.1",
+  "item-0232.1",
+  "item-0239.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4b0dd59c-dcb3-42cc-ac88-e28db2afd179",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly translates 'freezer' (냉동고) and 'that noise' (그 소리).\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both mistranslate 'dresser' and Rory's relationship/speech level.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 translates the formation eye command more accurately.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Unloading' correctly translates logistics 하차, unlike 'disembarking'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 has ungrammatical Korean ('아무리 좋지 않습니다').\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 mistranslates the name and misidentifies ホタル as 회전목마.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both leave 周姨 untranslated and fail to use 반말.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 is grammatical and accurately conveys the condition.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 naturally uses 'My grandfather' for 祖父.\"}\n]\n```\n",
+  "duration_seconds": 5.511729,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17411,
+   "output_tokens": 341,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17752
+  }
+ }
+}

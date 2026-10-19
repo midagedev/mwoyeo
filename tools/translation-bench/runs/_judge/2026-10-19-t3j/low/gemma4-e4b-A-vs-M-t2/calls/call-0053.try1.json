@@ -1,0 +1,28 @@
+{
+ "call": 53,
+ "try": 1,
+ "ids": [
+  "item-0237.2",
+  "item-0365.1",
+  "item-0305.1",
+  "item-0357.2",
+  "item-0214.1",
+  "item-0317.1",
+  "item-0042.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "344c0812-f129-4270-9d26-f033f254b028",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are natural and convey identical meaning and tone.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese; Translation 2 correctly uses 반말.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 sounds more natural and idiomatic in English.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 misinterprets female speaker's older brother as 형 instead of 오빠.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"}\n]\n```\n",
+  "duration_seconds": 5.689642,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16572,
+   "output_tokens": 221,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16793
+  }
+ }
+}

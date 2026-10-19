@@ -1,0 +1,31 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0361.1",
+  "item-0200.2",
+  "item-0060.1",
+  "item-0001.1",
+  "item-0346.2",
+  "item-0057.2",
+  "item-0235.1",
+  "item-0044.2",
+  "item-0064.2",
+  "item-0022.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "079b5360-1019-45be-9637-5055a3ce5c9d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates Git 'conflict' correctly as 충돌 rather than 갈등.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses required terms 품의서 and transliterates ホタル without leaving Japanese characters.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Faithfully translates '순서대로' (in order), which Translation 2 omits.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly translates 모닥불 as the channel name 'Hearth', not literally.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses correct established spelling Subin and accurately conveys reported speech.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 is in Japanese and mistranslates 突き当たり.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both fail to translate informal/military banter naturally into appropriate Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the text in Japanese without translating it.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 left the text in Japanese without translating it.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 leaves Chinese characters untranslated, while Translation 1 uses 해요체.\"}\n]\n```\n",
+  "duration_seconds": 4.902432,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17392,
+   "output_tokens": 340,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17732
+  }
+ }
+}

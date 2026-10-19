@@ -1,0 +1,31 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0100.1",
+  "item-0185.1",
+  "item-0041.2",
+  "item-0154.1",
+  "item-0064.2",
+  "item-0059.1",
+  "item-0162.2",
+  "item-0040.1",
+  "item-0047.2",
+  "item-0197.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9bf36654-40c1-4220-98f6-2ac53c1ad552",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Uses the specified term '마정석' for 魔石.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly reads 月見里 as Yamanashi, not Yamanishi.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally and faithfully in 해요체.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Korean grammar requires the particle '에' with 엄격하다.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Follows the specified name '텟사이' and term '수호막'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates the elliptical request naturally into 해요체.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Follows the specified term 'qi stone' for 灵石.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Follows the specified terms 'Pathfinder' and 'fleet allocation'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Uses the correct pinyin surname 'Shan' instead of 'Dan'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Follows the specified term 'Space' for ワークスペース.\"}\n]\n```\n",
+  "duration_seconds": 5.338135,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17436,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17761
+  }
+ }
+}

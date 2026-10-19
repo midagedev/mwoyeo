@@ -1,0 +1,31 @@
+{
+ "call": 56,
+ "try": 1,
+ "ids": [
+  "item-0243.1",
+  "item-0044.1",
+  "item-0181.1",
+  "item-0175.2",
+  "item-0067.1",
+  "item-0023.2",
+  "item-0189.1",
+  "item-0381.2",
+  "item-0039.2",
+  "item-0384.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "655b945b-a5f0-4a75-aa19-68a6b6fef841",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"In context 'move' means relocate/act, not move house.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Chinese.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'Messages' fits 'ひとこと' much better than generic 'items'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly transcribes Shan Yunzhou instead of Duan Yunzhou.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 contains untranslated Japanese kanji '맡せて'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translating the UI concept 'ひろば' as 'hub' is more natural.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'Day 2' parallels '첫날' (Day 1) in onboarding guides.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'욕조를 계속 사용해' is natural and grammatically complete.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both miss imperative/singular Sunday, but are equally flawed.\"}\n]\n```\n",
+  "duration_seconds": 5.24563,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17334,
+   "output_tokens": 335,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17669
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 43,
+ "try": 1,
+ "ids": [
+  "item-0230.2",
+  "item-0028.2",
+  "item-0115.1",
+  "item-0030.2",
+  "item-0364.1",
+  "item-0013.1",
+  "item-0204.2",
+  "item-0037.1",
+  "item-0200.1",
+  "item-0061.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d1b97645-df66-4545-a033-1c4e1b8bfe81",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural phrasing and accurate sentence structure.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 mistranslates the subject as '당신' and is ungrammatical.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 completely mistranslates using earlier context lines instead.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 leaves Japanese untranslated.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Imperative fits onboarding guide instructions much more naturally.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses numeric '10부' and proper speech ending.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'表' accurately translates to 'tables' rather than 'charts'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 incorrectly pairs present perfect with 'last night'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'yet' accurately captures the meaning of '还没'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 accurately reflects 'only one pocket watch was stolen'.\"}\n]\n```\n",
+  "duration_seconds": 4.427678,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16976,
+   "output_tokens": 318,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17294
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 41,
+ "try": 1,
+ "ids": [
+  "item-0205.1",
+  "item-0286.2",
+  "item-0269.1",
+  "item-0137.2",
+  "item-0237.1",
+  "item-0342.1",
+  "item-0003.2",
+  "item-0183.2",
+  "item-0046.2",
+  "item-0066.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1ef98172-1429-4b0f-be5a-8990519baa69",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 contains an obvious typo ('건넽냈다').\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the question, whereas 2 translates as a statement.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 translates 三成 into English instead of leaving untranslated Chinese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses the correct honorific register (해요체).\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 invents an unmentioned honorific ('형').\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 translates into English; 2 outputs untranslated Japanese.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 hallucinates the speaker's name in the response.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates into English; 2 leaves Japanese untranslated.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"许诺 speaks to 周婷 in 해요체; Translation 1 uses 해요체.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Siobhan speaks to Rory in 반말; Translation 2 uses 반말.\"}\n]\n```\n",
+  "duration_seconds": 4.699812,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17466,
+   "output_tokens": 343,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17809
+  }
+ }
+}

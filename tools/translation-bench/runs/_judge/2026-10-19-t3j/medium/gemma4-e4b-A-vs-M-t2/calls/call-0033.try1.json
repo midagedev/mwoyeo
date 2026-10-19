@@ -1,0 +1,27 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0211.2",
+  "item-0045.2",
+  "item-0170.2",
+  "item-0336.1",
+  "item-0195.2",
+  "item-0035.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "87c8a70c-ee35-44f2-9a88-2b1703af3c01",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 and translates 저우 이모.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates ひとこと as a brief note.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 follows the defined term translating 時計 as watch.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally and faithfully in 반말.\"}\n]\n```\n",
+  "duration_seconds": 48.424769,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 4320,
+   "output_tokens": 5544,
+   "thinking_tokens": 5353,
+   "cache_read_tokens": 11805,
+   "total_tokens": 9864
+  }
+ }
+}

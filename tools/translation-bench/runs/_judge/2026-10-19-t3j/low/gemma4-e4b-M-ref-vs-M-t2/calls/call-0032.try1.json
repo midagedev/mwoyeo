@@ -1,0 +1,31 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0071.1",
+  "item-0121.2",
+  "item-0218.1",
+  "item-0272.1",
+  "item-0282.2",
+  "item-0071.2",
+  "item-0017.1",
+  "item-0269.2",
+  "item-0090.2",
+  "item-0177.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f4aaa86d-f84a-424a-bcdb-889574037bf9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural and correctly use 해요체.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are identical except for punctuation, which is ignored.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 transliterates the character name Dex into Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 adapts the pronunciation guide into Korean naturally.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"十河 (そごう) is correctly transliterated as 소고, not 토고.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations accurately convey the meaning in natural 반말.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both incorrectly use 존댓말 instead of 반말 between tenants.\"}\n]\n```\n",
+  "duration_seconds": 4.702138,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17302,
+   "output_tokens": 308,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17610
+  }
+ }
+}

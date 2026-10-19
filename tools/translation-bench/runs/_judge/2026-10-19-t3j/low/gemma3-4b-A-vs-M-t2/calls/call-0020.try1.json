@@ -1,0 +1,31 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0360.1",
+  "item-0209.1",
+  "item-0045.2",
+  "item-0159.2",
+  "item-0133.1",
+  "item-0158.2",
+  "item-0044.1",
+  "item-0374.1",
+  "item-0035.1",
+  "item-0156.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7e3853fd-a822-455e-a2f4-accb6bb5aa9a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the term '카운슬 택스' and '집세'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese; Translation 2 translates the tea context.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Chinese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'Unloading' correctly translates logistics cargo '하차', unlike 'disembarking'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 哥 as '형' and uses 반말.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 uses the prescribed ship name '메리골드' and appropriate 반말.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 is entirely untranslated Japanese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 所長 to '소장' instead of '선장님'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 uses proper Korean speech level (해요체) and natural phrasing.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"}\n]\n```\n",
+  "duration_seconds": 5.112495,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17427,
+   "output_tokens": 345,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17772
+  }
+ }
+}

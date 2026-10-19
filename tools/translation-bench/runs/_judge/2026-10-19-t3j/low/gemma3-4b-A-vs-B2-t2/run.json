@@ -1,0 +1,2 @@
+{"started": "2026-10-19T22:43:44+0900", "pair": "/tmp/t3j/judge/gemma3-4b-A-vs-B2-t2", "model": "gemini-3.8-flash-low", "batch": 10, "jobs": 3, "seed": 11, "tries": 3, "max_items": 180, "prompts": 368, "calls": 37}
+{"started": "2026-10-19T23:48:50+0900", "pair": "/tmp/t3j/judge/gemma3-4b-A-vs-B2-t2", "model": "gemini-3.8-flash-low", "batch": 10, "jobs": 4, "seed": 11, "tries": 3, "max_items": 0, "prompts": 738, "calls": 74}

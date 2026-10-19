@@ -1,0 +1,31 @@
+{
+ "call": 78,
+ "try": 1,
+ "ids": [
+  "item-0335.2",
+  "item-0398.2",
+  "item-0203.2",
+  "item-0305.2",
+  "item-0022.1",
+  "item-0325.2",
+  "item-0356.1",
+  "item-0276.2",
+  "item-0047.1",
+  "item-0073.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "871c2dce-80a9-41d1-ba0d-87af055137ed",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates 辛い (spicy) and 合宿 (엠티) correctly per context and terms.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Modakbul is an internal tool name and should not be translated literally.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Rook/Dex speaks to Thorne in 합쇼체/해요체, and names Thorne properly.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the sentence equally well; minor punctuation difference.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Second-person perspective matches standard onboarding guide instructional style.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Past tense 'said' accurately reflects the landlord's prior instruction.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly follows the specified term 灵石 = qi stone.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translates 又 (again) accurately according to context.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and maintain appropriate register.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Noun/gerund heading style (-기) fits a section title better.\"}\n]\n```\n",
+  "duration_seconds": 5.42913,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17204,
+   "output_tokens": 334,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17538
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 74,
+ "try": 1,
+ "ids": [
+  "item-0143.1",
+  "item-0336.1",
+  "item-0235.1",
+  "item-0044.2",
+  "item-0340.1",
+  "item-0003.1",
+  "item-0256.2",
+  "item-0151.2",
+  "item-0328.2",
+  "item-0120.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dc9eadb5-cf13-43a9-8a18-76953ad819d6",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both incorrectly translate soda bread and inappropriately use honorific 해요체 to Rory.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 leaves Chinese characters untranslated.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses the established term 'Commons' instead of Hiroba.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Chinese.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both 복사 and 복제 are acceptable translations in this context.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 misattributes the speaker and misinterprets the tense entirely.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese text.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Uses the term 수호막 and correct 반말 speech level.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 completely mistranslates the idiom お言葉に甘えて.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Korean text.\"}\n]\n```\n",
+  "duration_seconds": 4.741977,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17485,
+   "output_tokens": 315,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17800
+  }
+ }
+}

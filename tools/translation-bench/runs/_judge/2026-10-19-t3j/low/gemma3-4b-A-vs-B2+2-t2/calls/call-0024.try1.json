@@ -1,0 +1,31 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0306.1",
+  "item-0264.2",
+  "item-0292.1",
+  "item-0256.1",
+  "item-0166.2",
+  "item-0221.1",
+  "item-0132.1",
+  "item-0177.1",
+  "item-0251.2",
+  "item-0004.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2a717bdf-d1e1-41e9-abfc-5c8b35bf9f18",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated in Chinese.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"스테이지에 추가하세요 is standard and natural in Git contexts.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 was left untranslated in Chinese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 leaves Chinese characters and uses awkward archaic phrasing.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Accurately translates 체험 보고서 as experience report.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Instructional onboarding guide naturally addresses the reader as 'you'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 was left entirely untranslated in Chinese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated in Chinese.\"}\n]\n```\n",
+  "duration_seconds": 4.557888,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17209,
+   "output_tokens": 302,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17511
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 68,
+ "try": 1,
+ "ids": [
+  "item-0149.2",
+  "item-0337.2",
+  "item-0206.1",
+  "item-0056.1",
+  "item-0289.1",
+  "item-0036.2",
+  "item-0351.2",
+  "item-0148.2",
+  "item-0263.2",
+  "item-0118.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d9312d21-c980-4201-b532-7934c9a90d9b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"ユウ speaks to seniors politely; 잘하세요 is appropriate honorific 해요체.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Old Mr. Takanashi naturally translates 小鳥遊老人.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"The patient is female (Qiu Shuang); Translation 1 incorrectly uses 'him'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Speaker is Aunt Zhou speaking to Lin Xia, so '너희 아버지가' is correct.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both are accurate and natural Korean translations of the instruction.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and convey the original meaning well.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translate the casual KakaoTalk text naturally and accurately.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both capture the instructional tone and meaning fluently in Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Speaker is Thorne speaking to Dex/crew in 반말; tub is 통 not 욕조.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Hiroba is a named app feature/space, not literal 'plaza'.\"}\n]\n```\n",
+  "duration_seconds": 5.175648,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17227,
+   "output_tokens": 340,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17567
+  }
+ }
+}

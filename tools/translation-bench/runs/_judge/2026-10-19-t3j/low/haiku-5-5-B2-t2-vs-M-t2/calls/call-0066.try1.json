@@ -1,0 +1,31 @@
+{
+ "call": 66,
+ "try": 1,
+ "ids": [
+  "item-0045.2",
+  "item-0173.1",
+  "item-0139.1",
+  "item-0102.2",
+  "item-0364.2",
+  "item-0290.2",
+  "item-0038.1",
+  "item-0215.2",
+  "item-0204.1",
+  "item-0193.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3754d8cd-49db-4bed-84ca-2ead183fcf88",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches defined terms 'fleet allocation' and 'Pathfinder'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates the Japanese name 湊(そう) into Korean naturally as 소우.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses correct standard loanword spelling 브리지 and sounds more natural in context.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Follows the specified term Pocket Git = 포켓 깃.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Follows specified term translations 'Space' and 'Commons'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 completely failed to translate from Japanese into Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translates names into Korean script, matching specified term Marigold = 메리골드.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Uses correct polite 해요체 speech level to older peer 周婷.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Follows the specified glossary term stash = 임시 저장.\"}\n]\n```\n",
+  "duration_seconds": 5.603864,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17279,
+   "output_tokens": 322,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17601
+  }
+ }
+}

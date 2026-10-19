@@ -1,0 +1,31 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0025.2",
+  "item-0014.2",
+  "item-0185.1",
+  "item-0359.1",
+  "item-0278.1",
+  "item-0340.2",
+  "item-0155.1",
+  "item-0348.1",
+  "item-0279.2",
+  "item-0172.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "bc757ac9-45de-4915-bd4a-f42090b43fee",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations accurately convey the meaning in natural English onboarding guides.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Context shows the collapsed person is a young woman, requiring 'her'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately convey the Git instruction.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Neither speaker/speech level matches Thorne's voice, though both convey the meaning.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"In context, '확인하시면' refers to the team leader reviewing the report.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"十河 (そごう) is correctly transliterated as 소고, not 토고.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Translation 1 is descriptive narrative; Translation 2 uses polite speech instead of informal.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both appropriately translate Gareth's statement using 해요체.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Translation 1 leaves Japanese characters untranslated; Translation 2 uses wrong name/tone.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 incorrectly segments the compound surname 万俟 (Mòqí) as 'Wan Qi'.\"}\n]\n```\n",
+  "duration_seconds": 5.4947420000000005,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17397,
+   "output_tokens": 350,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17747
+  }
+ }
+}

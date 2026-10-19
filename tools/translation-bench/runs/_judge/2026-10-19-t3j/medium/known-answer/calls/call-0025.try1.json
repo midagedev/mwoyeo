@@ -1,0 +1,27 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0068.2",
+  "item-0002.2",
+  "item-0021.1",
+  "item-0083.1",
+  "item-0051.2",
+  "item-0006.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cd03eb13-1a70-483c-b367-2f9b4fce64ee",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Proper bridge name should be transliterated rather than translated literally.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"He is her mother's brother, making 외삼촌 the correct term.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Context indicates 'that one' refers to tag, not branch.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Product codename should be transliterated, not translated into common noun.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Subject honorific '-시-' is properly used for the elderly client.\"}\n]\n```\n",
+  "duration_seconds": 18.184379,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16008,
+   "output_tokens": 1989,
+   "thinking_tokens": 1794,
+   "cache_read_tokens": 0,
+   "total_tokens": 17997
+  }
+ }
+}

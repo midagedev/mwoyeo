@@ -1,0 +1,31 @@
+{
+ "call": 71,
+ "try": 1,
+ "ids": [
+  "item-0290.2",
+  "item-0038.1",
+  "item-0215.2",
+  "item-0204.1",
+  "item-0193.1",
+  "item-0241.2",
+  "item-0027.2",
+  "item-0108.1",
+  "item-0110.1",
+  "item-0001.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "bdbe6310-cd64-43e8-b9fd-39fcd7257ddd",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 bizarrely mistranslates the project name ホタル as '달팽이' (snail).\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 leaves '인사팀' untranslated in the English target text.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations severely garble the names and text explaining the surname pronunciation.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'表' in UI/documents refers to 'tables', not charts.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly preserves 'say thank you for me' (替我道声谢).\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are virtually identical in meaning and quality.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'榻' is a daybed or couch/mat, not a 'table'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 uses Korean honorific '씨' instead of Japanese '상'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'응' answers '아직 회사야?' affirmatively; 1 translates the meaning more naturally.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Tutorial documentation in Korean naturally uses 해요체/하십시오체 over blunt 해라체.\"}\n]\n```\n",
+  "duration_seconds": 6.113264,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17222,
+   "output_tokens": 360,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17582
+  }
+ }
+}

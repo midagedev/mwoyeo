@@ -1,0 +1,31 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0348.2",
+  "item-0175.1",
+  "item-0236.1",
+  "item-0312.2",
+  "item-0271.1",
+  "item-0121.1",
+  "item-0344.2",
+  "item-0086.2",
+  "item-0137.1",
+  "item-0045.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5198d50d-c6b4-45f4-a7fc-efb4c3975b9e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches section chief's 해요체 speech level to junior employee.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are equally natural and accurate translations.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"More natural English phrasing than Translation 2.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both 'set' and 'put' are accurate and natural translations.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses proper honorific and polite speech level toward the landlord.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translates the Japanese name into Korean hangul correctly.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"More natural heading style in Korean UI/tutorials.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly uses 해요체 speech level toward the princess.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correctly interprets 辛い as spicy rather than painful/hard.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Properly romanizes the character's Japanese name into English.\"}\n]\n```\n",
+  "duration_seconds": 6.336541,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17252,
+   "output_tokens": 305,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17557
+  }
+ }
+}

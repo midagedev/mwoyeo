@@ -1,0 +1,31 @@
+{
+ "call": 59,
+ "try": 1,
+ "ids": [
+  "item-0321.1",
+  "item-0132.2",
+  "item-0201.2",
+  "item-0123.1",
+  "item-0131.2",
+  "item-0372.2",
+  "item-0020.2",
+  "item-0056.2",
+  "item-0054.1",
+  "item-0025.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1db61cc4-0252-4877-bd0f-404e2503f4ad",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both are accurate and natural; parenthetical English is a stylistic choice.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Yu speaks in 해요체 to club seniors, matching translation 1.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Rory speaks 반말 to Siobhan and names should be transliterated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Rory is addressing landlord Gareth, so polite speech (해요체) is correct.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Lysia speaks in 해요체 to Tessai; Translation 2 uses 합쇼체.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"The gender of Yamanashi is unstated in the context.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"The injured person being treated is explicitly a female (女子).\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly transliterates ハン教授 into Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 properly transliterates the character name into Korean (미오).\"}\n]\n```\n",
+  "duration_seconds": 5.053708,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17586,
+   "output_tokens": 335,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17921
+  }
+ }
+}

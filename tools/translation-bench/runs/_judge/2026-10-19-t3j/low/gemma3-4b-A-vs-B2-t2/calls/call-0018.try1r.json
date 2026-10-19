@@ -1,0 +1,28 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0195.2",
+  "item-0281.1",
+  "item-0275.1",
+  "item-0188.1",
+  "item-0182.2",
+  "item-0186.2",
+  "item-0306.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "91fba07b-e830-4da8-828c-69fbc12292d8",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Rory speaks 반말 to Siobhan; Translation 1 uses 반말.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Chinese.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both failed the specified glossary term '작업 디렉터리' for working tree.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 'stash' as temporary save/storage.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the line into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Better translation of destination '세레스' and ships Marigold/due time.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese, though 1 has severe corruption.\"}\n]\n```\n",
+  "duration_seconds": 5.664293,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16469,
+   "output_tokens": 240,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16709
+  }
+ }
+}

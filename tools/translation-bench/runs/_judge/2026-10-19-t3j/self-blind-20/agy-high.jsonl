@@ -1,0 +1,15 @@
+{"id": "case05.2", "better": "1", "why": "Yuki is male according to the facts, so 'his' is correct.", "call": 1}
+{"id": "case16.1", "better": "1", "why": "Translation 2 is left entirely untranslated in Korean.", "call": 1}
+{"id": "case06.2", "better": "1", "why": "Onboarding guides instruct the reader ('you'), not first-person ('I').", "call": 1}
+{"id": "case01.2", "better": "1", "why": "Translation 1 is natural; 'packing moving service' is awkward translationese.", "call": 1}
+{"id": "case12.2", "better": "tie", "why": "Each translation gets one name's spacing right and the other wrong.", "call": 1}
+{"id": "case14.2", "better": "2", "why": "Translation 2 romanizes the character's name instead of leaving Chinese characters.", "call": 2}
+{"id": "case04.1", "better": "2", "why": "Translation 2 translates into Korean, while Translation 1 remains in Japanese.", "call": 2}
+{"id": "case02.2", "better": "1", "why": "Translation 1 uses the defined term Quick Note.", "call": 2}
+{"id": "case17.1", "better": "1", "why": "Translation 1 correctly uses the established English name Barley.", "call": 2}
+{"id": "case10.1", "better": "tie", "why": "Translation 1 has right speech level; Translation 2 has right title.", "call": 2}
+{"id": "case11.2", "better": "1", "why": "Translation 1 correctly translates '可以' as '좋아요' rather than '네'.", "call": 3}
+{"id": "case08.2", "better": "2", "why": "Translation 1 was left entirely untranslated in Japanese.", "call": 3}
+{"id": "case09.1", "better": "2", "why": "Translation 2 adheres to the specified term '時計 = watch'.", "call": 3}
+{"id": "case13.1", "better": "2", "why": "Translation 2 correctly translates the character and tea names.", "call": 3}
+{"id": "case03.1", "better": "tie", "why": "Both translations are accurate, natural, and use correct speech level.", "call": 3}

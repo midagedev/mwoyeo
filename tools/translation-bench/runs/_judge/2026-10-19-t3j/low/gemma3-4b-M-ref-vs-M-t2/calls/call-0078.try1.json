@@ -1,0 +1,31 @@
+{
+ "call": 78,
+ "try": 1,
+ "ids": [
+  "item-0156.1",
+  "item-0229.2",
+  "item-0049.1",
+  "item-0096.1",
+  "item-0315.1",
+  "item-0323.1",
+  "item-0244.2",
+  "item-0263.1",
+  "item-0095.2",
+  "item-0098.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5ea1d949-fa42-4bea-9ce8-3727dc87a8a0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Speaker talks to younger sister using banmal; translation 1 correctly uses banmal.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Accurately capitalizes Dao and captures the xianxia terminology.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"More natural phrasing and complete sentence ending in Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Korean source text into English.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both completely failed to translate the Japanese text into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"More natural Korean word order, though both missed the banmal speech level.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'이건' accurately translates 'こりゃあ' (this).\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 構え as 들고 rather than 휘두르며 (swinging).\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 partially translated into Korean, whereas translation 1 left it untranslated.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"The topic marker 은 fits better, though both mistranslated future/scheduled to past tense.\"}\n]\n```\n",
+  "duration_seconds": 6.005853,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17512,
+   "output_tokens": 344,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17856
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0319.2",
+  "item-0305.1",
+  "item-0231.1",
+  "item-0157.1",
+  "item-0311.1",
+  "item-0140.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9f7f1028-6c7d-43fb-b57f-d649ae40505f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the text completely untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 accurately translates the pronunciation explanation.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 translates the noun into English instead of repeating Chinese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 avoids unnatural pronoun translationese and awkward tense.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated.\"}\n]\n```\n",
+  "duration_seconds": 20.463991,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16112,
+   "output_tokens": 2285,
+   "thinking_tokens": 2105,
+   "cache_read_tokens": 0,
+   "total_tokens": 18397
+  }
+ }
+}

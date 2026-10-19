@@ -1,0 +1,36 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0077.1",
+  "item-0004.2",
+  "item-0316.2",
+  "item-0288.2",
+  "item-0219.1",
+  "item-0284.1",
+  "item-0341.1",
+  "item-0192.1",
+  "item-0154.1",
+  "item-0274.1",
+  "item-0353.2",
+  "item-0185.2",
+  "item-0381.1",
+  "item-0225.2",
+  "item-0340.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a6bb391b-6999-46f6-8e90-eb1130556313",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates the character's name Saku.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 uses the correct speech level and number reading.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 preserves the narrative register and plain literary style.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 accurately explains the surname without hallucinating characters.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 reads naturally and avoids assuming an unspecified gender.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 uses correct speech level and translates contextually.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 avoids adding an erroneous aspect marker.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates 'is dying' and 'by morning'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 uses 'a previous state' appropriately for history restoration.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both candidates fail to translate the source text into Korean.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 avoids hallucinating an honorific title for a machine.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 adheres to the designated company term MoaLogis.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 translates into English, whereas Translation 2 remains untranslated.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 uses the correct animate particle for a person.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 uses natural phrasing instead of awkward passive voice.\"}\n]\n",
+  "duration_seconds": 73.355537,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 18936,
+   "output_tokens": 9815,
+   "thinking_tokens": 9344,
+   "cache_read_tokens": 0,
+   "total_tokens": 28751
+  }
+ }
+}

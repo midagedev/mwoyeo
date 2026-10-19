@@ -1,0 +1,27 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0269.1",
+  "item-0122.2",
+  "item-0376.1",
+  "item-0038.2",
+  "item-0247.2",
+  "item-0133.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "79fbaca0-523b-45dc-b82a-b7f07bb38389",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Japanese.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the required 합쇼체 speech level.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 reads more naturally without repeating the verb.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly addresses the reader instead of using first person.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated Chinese.\"}\n]\n",
+  "duration_seconds": 30.032592,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16241,
+   "output_tokens": 3319,
+   "thinking_tokens": 3144,
+   "cache_read_tokens": 0,
+   "total_tokens": 19560
+  }
+ }
+}

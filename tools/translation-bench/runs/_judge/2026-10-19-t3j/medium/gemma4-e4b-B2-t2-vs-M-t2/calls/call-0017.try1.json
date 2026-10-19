@@ -1,0 +1,27 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0102.1",
+  "item-0109.1",
+  "item-0050.2",
+  "item-0164.2",
+  "item-0116.2",
+  "item-0155.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cdec74ac-e8dc-44fc-861d-28d703a44c75",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates the name as 타카나시.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly captures the explanatory nuance of '~し' with '~거든'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 泡 as 우릴까요 for brewing tea.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both completely mistranslate the conditional meaning and who is thanking whom.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the speakers volunteering to transfer money.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified name 루크.\"}\n]\n```\n",
+  "duration_seconds": 43.998793,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16217,
+   "output_tokens": 4991,
+   "thinking_tokens": 4792,
+   "cache_read_tokens": 0,
+   "total_tokens": 21208
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0240.1",
+  "item-0073.2",
+  "item-0318.2",
+  "item-0174.2",
+  "item-0342.2",
+  "item-0360.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d60223fc-0aac-4c1b-a3e9-81dbe2138f2b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified 해요체 speech level.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 uses the more natural term 결계석 instead of 결계의 돌.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 uses the correct particle 과 instead of 께.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 faithfully translates 川 instead of omitting it as 물놀이.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 transliterates Gerald into Korean instead of leaving English.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Korean source into English.\"}\n]\n```\n",
+  "duration_seconds": 41.520358,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16139,
+   "output_tokens": 5190,
+   "thinking_tokens": 4989,
+   "cache_read_tokens": 0,
+   "total_tokens": 21329
+  }
+ }
+}

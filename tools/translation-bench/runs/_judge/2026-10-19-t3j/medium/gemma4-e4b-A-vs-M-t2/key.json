@@ -1,0 +1,2702 @@
+{
+ "a": "A",
+ "b": "M",
+ "identical": 55,
+ "items": {
+  "item-0001": {
+   "seq": "game-ja-en-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "Outside the window, the rain suddenly grew stronger.",
+   "b_text": "Outside the window, the rain grew particularly heavy."
+  },
+  "item-0002": {
+   "seq": "game-zh-en-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "Yunzhou, you're finally back. Did you bring enough spirit stones?",
+   "b_text": "Yun Zhou, you're finally back. Did you bring enough qi stones?"
+  },
+  "item-0003": {
+   "seq": "chat-en-ko-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "자원해 줘서 고마워, Rory.",
+   "b_text": "나를 자원해 줘서 고마워, 로리."
+  },
+  "item-0004": {
+   "seq": "subs-zh-ko-1",
+   "line": 23,
+   "kind": "real",
+   "a_text": "给她尝三颗红的。头采的留着。",
+   "b_text": "세 가지 홍차를 그녀에게 맛보게 해 줘. 첫 수확분은 남겨 둬."
+  },
+  "item-0005": {
+   "seq": "subs-zh-ko-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "叶子一到就得炒，一天都不能放。",
+   "b_text": "잎이 도착하면 바로 볶아야 하고, 하루도 보관할 수 없다."
+  },
+  "item-0006": {
+   "seq": "chat-zh-ko-1",
+   "line": 28,
+   "kind": "real",
+   "a_text": "对,我也看到了。礼物就买那个吧 ◆",
+   "b_text": "응, 나도 봤어. 선물은 그거 사자 ◆"
+  },
+  "item-0007": {
+   "seq": "chat-ko-en-1",
+   "line": 25,
+   "kind": "real",
+   "a_text": "Did you get the deposit for the old house? The landlady was quite strict.",
+   "b_text": "Did you get the deposit back from the old place? The landlady was pretty strict."
+  },
+  "item-0008": {
+   "seq": "chat-ja-ko-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "私も山に賛成です。星が見たいです",
+   "b_text": "나도 산에 찬성이야. 별 보고 싶어"
+  },
+  "item-0009": {
+   "seq": "subs-ja-ko-1",
+   "line": 23,
+   "kind": "real",
+   "a_text": "あの人、時計の話をする時だけ、目が違うな。",
+   "b_text": "저 사람, 시계 얘기할 때만 눈빛이 달라져."
+  },
+  "item-0010": {
+   "seq": "chat-ko-en-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "Oh really? Do you still do it?",
+   "b_text": "Oh, really? Does he still work there?"
+  },
+  "item-0011": {
+   "seq": "chat-ja-ko-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "そうだ、ハン教授も誘ってみる?",
+   "b_text": "そうだ、ハン教授も誘ってみる？"
+  },
+  "item-0012": {
+   "seq": "game-zh-en-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "In the early morning, the mist outside the mountain gate has not yet dispersed.",
+   "b_text": "In the early morning, the mist outside the mountain gate had not yet dispersed."
+  },
+  "item-0013": {
+   "seq": "chat-zh-ko-1",
+   "line": 20,
+   "kind": "real",
+   "a_text": "你就知道猫。我只想吃那家老字号沙茶面,解辰也说想吃",
+   "b_text": "너는 고양이만 알지. 나는 그 오래된 맛집의 사차면만 먹고 싶어. 지천이도 먹고 싶다고 했어"
+  },
+  "item-0014": {
+   "seq": "chat-ko-en-1",
+   "line": 29,
+   "kind": "real",
+   "a_text": "My older brother used to work at a moving company. Should I ask him for his know-how?",
+   "b_text": "My older brother used to work at a moving company. Should I ask him for some know-how?"
+  },
+  "item-0015": {
+   "seq": "docs-en-ko-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "그녀가 거기서 하는 어떤 것도 병합하기 전까지는 main에 영향을 미치지 않습니다.",
+   "b_text": "그녀가 거기서 하는 어떤 것도 병합되기 전까지는 main에 영향을 미치지 않습니다."
+  },
+  "item-0016": {
+   "seq": "chat-ja-ko-2",
+   "line": 13,
+   "kind": "real",
+   "a_text": "お願いします。雨宮さんは甘いものが苦手だそうなので、お菓子はやめておきましょう。",
+   "b_text": "부탁드립니다. 아메미야 씨는 단 것을 싫어한다고 하니, 과자는 피하도록 하죠."
+  },
+  "item-0017": {
+   "seq": "game-ja-ko-1",
+   "line": 20,
+   "kind": "real",
+   "a_text": "ええ。澪も毎日、石の世話を手伝ってくれるんです",
+   "b_text": "네. 미오도 매일 돌 관리를 도와줘요"
+  },
+  "item-0018": {
+   "seq": "game-ja-en-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "You've come, detectives. Let me tell you beforehand, don't touch anything on your own.",
+   "b_text": "You've come, detectives. Let me tell you upfront, don't touch anything on your own."
+  },
+  "item-0019": {
+   "seq": "subs-en-ko-1",
+   "line": 7,
+   "kind": "real",
+   "a_text": "그녀는 지난주에 내 부츠를 빌려 갔고 돌려주지 않았어.",
+   "b_text": "지난주에 내 부츠를 빌려 갔는데 돌려주지 않았어."
+  },
+  "item-0020": {
+   "seq": "chat-ko-en-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "ㅋㅋㅋㅋ I always get confused whether Barley is male or female",
+   "b_text": "Hahaha, I always get confused whether Bori is male or female"
+  },
+  "item-0021": {
+   "seq": "subs-ja-ko-1",
+   "line": 25,
+   "kind": "real",
+   "a_text": "烏丸に電話してみるか。署の落とし物を調べてもらおう。",
+   "b_text": "카라스마에 전화해 볼까. 경찰서 분실물 조사를 부탁해 보자."
+  },
+  "item-0022": {
+   "seq": "chat-ja-ko-2",
+   "line": 6,
+   "kind": "real",
+   "a_text": "申し訳ございません。今日中にもう一度連絡します。",
+   "b_text": "죄송합니다. 오늘 중으로 다시 연락드리겠습니다."
+  },
+  "item-0023": {
+   "seq": "game-ja-en-1",
+   "line": 9,
+   "kind": "real",
+   "a_text": "Old man Kotori slowly raised his face.",
+   "b_text": "Old Takanashi slowly raised his face."
+  },
+  "item-0024": {
+   "seq": "subs-en-ko-1",
+   "line": 25,
+   "kind": "real",
+   "a_text": "Dex, 치즈 상자를 4번 구역으로 옮겨. 지금.",
+   "b_text": "덱스, 치즈 상자들을 4번 격실로 옮겨. 당장."
+  },
+  "item-0025": {
+   "seq": "chat-zh-ko-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "寿星的钱我们出。我先建个公账，我和陆明每人先转三百进来",
+   "b_text": "생일 주인공 비용은 저희가 낼게요. 제가 먼저 공용 계좌를 만들게요. 저랑 루밍이 각자 300위안씩 먼저 송금할게요."
+  },
+  "item-0026": {
+   "seq": "chat-en-ko-1",
+   "line": 23,
+   "kind": "real",
+   "a_text": "참고로 식료품값으로 저한테 $4O 빚지셨어요",
+   "b_text": "참고로 식료품값으로 40달러 빚졌어요."
+  },
+  "item-0027": {
+   "seq": "subs-ja-ko-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "おじさん、もう開店の時間だよ。",
+   "b_text": "삼촌, 벌써 가게 문 여는 시간이야."
+  },
+  "item-0028": {
+   "seq": "docs-ja-en-1",
+   "line": 9,
+   "kind": "real",
+   "a_text": "Takanashi's sales team first created a workspace.",
+   "b_text": "Takanashi's sales team first created a Space."
+  },
+  "item-0029": {
+   "seq": "chat-ko-en-1",
+   "line": 14,
+   "kind": "real",
+   "a_text": "Okay! Hyejin unnie is coming to help with the cleanup on Sunday.",
+   "b_text": "Sounds good! Hyejin unnie is coming to help with the unpacking on Sunday."
+  },
+  "item-0030": {
+   "seq": "subs-ja-ko-1",
+   "line": 26,
+   "kind": "real",
+   "a_text": "え、烏丸さん？あの怖そうな刑事さん？",
+   "b_text": "네, 카라스마 씨요? 저 무서워 보이는 형사님?"
+  },
+  "item-0031": {
+   "seq": "chat-ko-en-1",
+   "line": 24,
+   "kind": "real",
+   "a_text": "Right ㅠㅠ But my new house is small, so I had no choice.",
+   "b_text": "Right ㅠㅠ But the new house is small, so there's nothing I can do"
+  },
+  "item-0032": {
+   "seq": "game-ja-en-1",
+   "line": 25,
+   "kind": "real",
+   "a_text": "Nagi rushed in holding a wet umbrella.",
+   "b_text": "Nagi rushed in, holding a wet umbrella."
+  },
+  "item-0033": {
+   "seq": "chat-ko-en-1",
+   "line": 28,
+   "kind": "real",
+   "a_text": "I know. They said they'll deposit the deposit right after the inspection.",
+   "b_text": "I know. They said they'll return the deposit right after the inspection."
+  },
+  "item-0034": {
+   "seq": "chat-en-ko-1",
+   "line": 14,
+   "kind": "real",
+   "a_text": "알겠습니다, 선생님. 관리인이 주말에도 있나요?",
+   "b_text": "알겠습니다, 선생님. 관리인분은 주말에도 계시나요?"
+  },
+  "item-0035": {
+   "seq": "subs-ja-ko-1",
+   "line": 20,
+   "kind": "real",
+   "a_text": "이건 생각보다 힘든 이야기네.",
+   "b_text": "이거 생각보다 골치 아픈 이야기네."
+  },
+  "item-0036": {
+   "seq": "docs-ja-en-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "You can edit offline, and it will sync as soon as you connect,",
+   "b_text": "You can edit offline, and it will sync as soon as you connect."
+  },
+  "item-0037": {
+   "seq": "docs-en-ko-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "당신의 팀원 Aoife (발음: \"EE-fa\")는 푸터의 오타를 수정하고 싶어 합니다.",
+   "b_text": "당신의 팀원 Aoife(이파라고 발음)는 푸터의 오타를 수정하고 싶어 합니다."
+  },
+  "item-0038": {
+   "seq": "chat-ko-en-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "She's female. She's three years old but is still shy",
+   "b_text": "She's female. She's three years old but still shy"
+  },
+  "item-0039": {
+   "seq": "game-ja-ko-1",
+   "line": 9,
+   "kind": "real",
+   "a_text": "お久しぶりです、鉄斎殿。結界は無事ですか?",
+   "b_text": "오랜만입니다, 텟사이 님. 수호막은 무사하십니까?"
+  },
+  "item-0040": {
+   "seq": "game-ja-ko-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "きれいね。でも、ひびが入ってるわ",
+   "b_text": "예쁘네. 하지만 금이 갔어."
+  },
+  "item-0041": {
+   "seq": "game-zh-en-1",
+   "line": 25,
+   "kind": "real",
+   "a_text": "Thank you, Senior Brother Wanqi. Miss Qiu has woken up, and she says thank you for me.",
+   "b_text": "Thank you, Senior Brother Wanqi. Miss Qiu has woken up and asked me to thank you."
+  },
+  "item-0042": {
+   "seq": "game-ja-ko-1",
+   "line": 33,
+   "kind": "real",
+   "a_text": "洞窟の入口で、澪が薬草の包みを差し出した。",
+   "b_text": "洞窟の入り口で、ミオが薬草の包みを差し出した。"
+  },
+  "item-0043": {
+   "seq": "game-ja-en-1",
+   "line": 26,
+   "kind": "real",
+   "a_text": "Panting, he left a message on the phone.",
+   "b_text": "Gasping for breath, he relayed the phone message."
+  },
+  "item-0044": {
+   "seq": "game-ja-ko-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "先月から、毎晩魔石に魔力を注いでいます",
+   "b_text": "지난달부터 매일 밤 마정석에 마력을 불어넣고 있습니다"
+  },
+  "item-0045": {
+   "seq": "docs-ja-en-1",
+   "line": 28,
+   "kind": "real",
+   "a_text": "The same tag can be used for a single word.",
+   "b_text": "The same tag can be used for a brief note."
+  },
+  "item-0046": {
+   "seq": "chat-zh-ko-1",
+   "line": 10,
+   "kind": "real",
+   "a_text": "带院子的好！一晚多少线？",
+   "b_text": "마당이 있는 곳이 좋네요! 하룻밤에 얼마예요?"
+  },
+  "item-0047": {
+   "seq": "game-ja-en-1",
+   "line": 20,
+   "kind": "real",
+   "a_text": "Hikaru, how do you see these footprints?",
+   "b_text": "Hikaru, what do you make of these footprints?"
+  },
+  "item-0048": {
+   "seq": "chat-en-ko-1",
+   "line": 25,
+   "kind": "real",
+   "a_text": "아직요. 그리고 Aoife에게 자기 베개를 가져오라고 전해주세요.",
+   "b_text": "아직 안 왔어. 그리고 Aoife한테 자기 베개 가져오라고 전해줘."
+  },
+  "item-0049": {
+   "seq": "subs-zh-ko-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "周姨,真的吗?那我放心了。",
+   "b_text": "저우 이모, 정말요? 그럼 안심이 되네요."
+  },
+  "item-0050": {
+   "seq": "chat-ja-ko-2",
+   "line": 23,
+   "kind": "real",
+   "a_text": "ええ。ところで、お客様用の駐車場は確保しましたか？",
+   "b_text": "네. 그런데 고객용 주차장은 확보하셨나요?"
+  },
+  "item-0051": {
+   "seq": "subs-en-ko-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "냉각수를 지불할 때까지는 안 됩니다.",
+   "b_text": "냉각수를 대가를 치르기 전까지는 안 그럴 거야."
+  },
+  "item-0052": {
+   "seq": "chat-ja-ko-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "返事、すぐ来た。参加してくださるって",
+   "b_text": "답장이 바로 왔어요. 참가하신대요"
+  },
+  "item-0053": {
+   "seq": "game-ja-ko-1",
+   "line": 21,
+   "kind": "real",
+   "a_text": "戻ってきた鉄斎が、朔の肩を叩いた。",
+   "b_text": "돌아온 텟사이가 사쿠의 어깨를 두드렸다."
+  },
+  "item-0054": {
+   "seq": "docs-ja-en-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "You can invite members to the workspace via email.",
+   "b_text": "You can invite members to a Space via email."
+  },
+  "item-0055": {
+   "seq": "game-ja-en-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "Yes, Inspector. I'll be careful.",
+   "b_text": "Yes, Inspector. We'll be careful."
+  },
+  "item-0056": {
+   "seq": "subs-zh-ko-1",
+   "line": 21,
+   "kind": "real",
+   "a_text": "상대방 구매 담당자는 曾岚, Zēng Lán입니다. 잘못 발음하지 마세요.",
+   "b_text": "상대방 구매 담당자는 쩡란(曾岚)이니, 잘못 발음하지 마세요."
+  },
+  "item-0057": {
+   "seq": "chat-zh-ko-1",
+   "line": 15,
+   "kind": "real",
+   "a_text": "行啊,人多热闹。解辰开车的话,环岛路就轻松多了",
+   "b_text": "좋아요, 사람이 많으면 더 활기차죠. 제천이 운전하면 순환도로가 훨씬 편할 거예요"
+  },
+  "item-0058": {
+   "seq": "subs-ja-ko-1",
+   "line": 16,
+   "kind": "real",
+   "a_text": "先週の水曜、鵲橋(かささぎばし)を散歩した時までは確かに。",
+   "b_text": "지난주 수요일, 까치다리에서 산책했을 때까지는 확실히요."
+  },
+  "item-0059": {
+   "seq": "chat-ko-en-1",
+   "line": 23,
+   "kind": "real",
+   "a_text": "Wow, that's fast. Seoyun, you really cherished that sofa.",
+   "b_text": "Wow, that's fast. Seoyoon, you really cherished that sofa."
+  },
+  "item-0060": {
+   "seq": "docs-ko-en-1",
+   "line": 28,
+   "kind": "real",
+   "a_text": "The code review results will be shared in the campfire team channel.",
+   "b_text": "Code review results will be shared in the Modakbul team channel."
+  },
+  "item-0061": {
+   "seq": "docs-ja-en-1",
+   "line": 25,
+   "kind": "real",
+   "a_text": "Notes in the plaza are easier to find if you add tags.",
+   "b_text": "It is easier to find notes in the plaza if you add tags."
+  },
+  "item-0062": {
+   "seq": "game-ja-ko-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "霧深い朝。ルーンベルの村に、一台の馬車が到着した。",
+   "b_text": "안개가 짙게 낀 아침. 루넨벨 마을에 마차가 도착했다."
+  },
+  "item-0063": {
+   "seq": "subs-zh-ko-1",
+   "line": 25,
+   "kind": "real",
+   "a_text": "还有两百盒,够曾岚第一批。去仓库点一下。",
+   "b_text": "두백 상자 남았어요. 쩡란 첫 번째 물량에 충분해요. 창고에 가서 확인해 보세요."
+  },
+  "item-0064": {
+   "seq": "game-ja-ko-1",
+   "line": 25,
+   "kind": "real",
+   "a_text": "朔!黒霧だ!雷蔵に北門を固めさせろ！",
+   "b_text": "사쿠! 검은 안개다! 라이조에게 북문을 지키게 해라!"
+  },
+  "item-0065": {
+   "seq": "chat-ko-en-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "Yeah ㅠㅠ The meeting isn't over. Jiwoo, did you leave work?",
+   "b_text": "Yeah ㅠㅠ The meeting isn't over. Jiu, did you leave work?"
+  },
+  "item-0066": {
+   "seq": "chat-ja-ko-1",
+   "line": 9,
+   "kind": "real",
+   "a_text": "はい、ちょっとだけ。でも楽しみです",
+   "b_text": "네, 조금요. 그래도 기대돼요"
+  },
+  "item-0067": {
+   "seq": "subs-en-ko-1",
+   "line": 8,
+   "kind": "real",
+   "a_text": "그냥 가져와. Gerald는 내가 처리할게.",
+   "b_text": "그냥 가져와. 내가 제럴드 처리할게."
+  },
+  "item-0068": {
+   "seq": "docs-ko-en-1",
+   "line": 21,
+   "kind": "real",
+   "a_text": "Leave a short self-introduction by the bonfire.",
+   "b_text": "Leave a short self-introduction in Hearth."
+  },
+  "item-0069": {
+   "seq": "docs-ja-en-1",
+   "line": 7,
+   "kind": "real",
+   "a_text": "One thing is, you can add up to ten items per page.",
+   "b_text": "Each page can have up to ten items."
+  },
+  "item-0070": {
+   "seq": "subs-en-ko-1",
+   "line": 23,
+   "kind": "real",
+   "a_text": "토른, 저 욕조가 내 무릎을 살려주는 유일한 것이야.",
+   "b_text": "쏜, 저 욕조가 제 무릎을 살려주는 유일한 거예요."
+  },
+  "item-0071": {
+   "seq": "game-zh-en-1",
+   "line": 29,
+   "kind": "real",
+   "a_text": "Chou Shuang struggled to sit up, looking at the cracked sky outside the window.",
+   "b_text": "Chou Shuang struggled to sit up, looking out at the cracked sky outside the window."
+  },
+  "item-0072": {
+   "seq": "docs-ko-en-1",
+   "line": 15,
+   "kind": "calibration",
+   "a_text": "The experience report is submitted to the team leader for approval.",
+   "b_text": "The experience report is submitted to the team leader for approval."
+  },
+  "item-0073": {
+   "seq": "subs-en-ko-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "다리에서 내 도구 상자 좀 가져다줄래?",
+   "b_text": "조타실에서 내 공구 상자 좀 가져다줄래?"
+  },
+  "item-0074": {
+   "seq": "chat-ja-ko-2",
+   "line": 9,
+   "kind": "real",
+   "a_text": "それより明日です。先方の担当は雨宮さんです。時間にとても厳しい方ですよ。",
+   "b_text": "그보다 내일입니다. 상대방 담당자는 아메미야 씨입니다. 시간에 매우 엄격한 분이세요."
+  },
+  "item-0075": {
+   "seq": "chat-ja-ko-1",
+   "line": 29,
+   "kind": "real",
+   "a_text": "ハン教授にも連絡してみたよ",
+   "b_text": "한 교수님께도 연락해 봤어요"
+  },
+  "item-0076": {
+   "seq": "docs-ja-en-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "Start with Memotto",
+   "b_text": "Get started with Memotto"
+  },
+  "item-0077": {
+   "seq": "subs-ja-ko-1",
+   "line": 28,
+   "kind": "real",
+   "a_text": "小鳥遊さん、よろしくお願いしますね。",
+   "b_text": "타카나시 씨, 잘 부탁드립니다."
+  },
+  "item-0078": {
+   "seq": "game-ja-en-1",
+   "line": 8,
+   "kind": "real",
+   "a_text": "Understood, Akira-san",
+   "b_text": "Understood, Akira."
+  },
+  "item-0079": {
+   "seq": "chat-ja-ko-2",
+   "line": 19,
+   "kind": "real",
+   "a_text": "再来月だと困ります。私から村田さんに電話してみましょうか。",
+   "b_text": "다음 달 말이면 곤란합니다. 제가 무라타 씨에게 전화해 볼까요?"
+  },
+  "item-0080": {
+   "seq": "subs-en-ko-1",
+   "line": 29,
+   "kind": "real",
+   "a_text": "그녀가 나를 용서해 줄 거라고 생각하세요?",
+   "b_text": "그녀가 나를 용서해 줄 거라고 생각해?"
+  },
+  "item-0081": {
+   "seq": "chat-ko-en-1",
+   "line": 26,
+   "kind": "real",
+   "a_text": "Not yet ㅠㅠ She told me to clean properly, so I have to wipe everything before Sunday.",
+   "b_text": "Not yet ㅠㅠ She said I have to clean it properly, so I have to wipe everything down before Sunday."
+  },
+  "item-0082": {
+   "seq": "chat-ja-ko-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "みんな、今週末の合宿どうする？",
+   "b_text": "얘들아, 이번 주말 엠티 어떻게 할까?"
+  },
+  "item-0083": {
+   "seq": "chat-ja-ko-2",
+   "line": 5,
+   "kind": "real",
+   "a_text": "困りましたね。見積書がないと、稟議が回せません。",
+   "b_text": "곤란하네요. 견적서가 없으면 품의를 진행할 수 없습니다."
+  },
+  "item-0084": {
+   "seq": "game-ja-en-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "A rainy port town. A police car is parked in front of an old clock shop.",
+   "b_text": "A rainy harbor town. A police car is parked in front of an old watch shop."
+  },
+  "item-0085": {
+   "seq": "chat-en-ko-1",
+   "line": 6,
+   "kind": "calibration",
+   "a_text": "그리고 보증금 영수증은 이메일로 발송됐어. 받은 편지함 확인해 봐.",
+   "b_text": "그리고 보증금 영수증은 이메일로 발송됐어. 받은 편지함 확인해 봐."
+  },
+  "item-0086": {
+   "seq": "subs-ja-ko-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "先月も、鵲橋で落とし物の騒ぎがあったよね。",
+   "b_text": "지난달에도 까치다리에서 분실물 소동이 있었지."
+  },
+  "item-0087": {
+   "seq": "subs-en-ko-1",
+   "line": 16,
+   "kind": "real",
+   "a_text": "Gerald의 압축기가 고장나고 있어요. 아침까지 고칠 수 있지만, 함정이 있어요.",
+   "b_text": "제럴드의 압축기가 고장나고 있어요. 아침까지 고칠 수 있지만, 문제가 하나 있어요."
+  },
+  "item-0088": {
+   "seq": "chat-en-ko-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "참고로, Mr. Bell은 건물 관리인입니다. 그는 1A에 삽니다. 복도 불이 꺼지면 그에게 전화하세요.",
+   "b_text": "참고로, 벨 씨는 건물 관리인이에요. 1A에 살아요. 복도 불이 꺼지면 그분께 전화하세요."
+  },
+  "item-0089": {
+   "seq": "chat-zh-ko-1",
+   "line": 31,
+   "kind": "real",
+   "a_text": "好,解辰那份也别忘了算",
+   "b_text": "네, 지천 건도 계산하는 거 잊지 마세요"
+  },
+  "item-0090": {
+   "seq": "chat-ja-ko-2",
+   "line": 30,
+   "kind": "real",
+   "a_text": "気をつけます。あの、明日の午後に半休をいただけないでしょうか。",
+   "b_text": "조심하겠습니다. 저기, 내일 오후에 반차를 받을 수 있을까요."
+  },
+  "item-0091": {
+   "seq": "subs-en-ko-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "알았어, 알았어. Rook, Gerald가 방금 기침했어.",
+   "b_text": "알았어, 알았어. 루크, 제럴드가 방금 기침했어."
+  },
+  "item-0092": {
+   "seq": "chat-en-ko-1",
+   "line": 20,
+   "kind": "real",
+   "a_text": "좋아, 하지만 Aoife가 그 개를 직접 치워야 해.",
+   "b_text": "좋아, 하지만 Aoife가 그 개를 직접 치울 거야."
+  },
+  "item-0093": {
+   "seq": "chat-ko-en-1",
+   "line": 16,
+   "kind": "real",
+   "a_text": "Yeah, oppa said he'll take me on Sunday morning.",
+   "b_text": "Yeah, my brother is taking her on Sunday morning."
+  },
+  "item-0094": {
+   "seq": "game-ja-en-1",
+   "line": 27,
+   "kind": "real",
+   "a_text": "Akira-san, the forensic results are out. I will share them with the senior staff immediately.",
+   "b_text": "Akira, the forensics results are in. I'll share them with the boss right away."
+  },
+  "item-0095": {
+   "seq": "subs-ja-ko-1",
+   "line": 8,
+   "kind": "real",
+   "a_text": "すみません。ここは、喫茶ふくろうさんですか？",
+   "b_text": "실례합니다. 여기 다방 부엉이 맞나요?"
+  },
+  "item-0096": {
+   "seq": "game-ja-en-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "I'm Nagi. I'm still an eighteen-year-old girl, but I'm responsible. Akira-san, please don't worry.",
+   "b_text": "I'm Nagi. I'm only eighteen, but I'm a responsible person. Please don't worry, Akira."
+  },
+  "item-0097": {
+   "seq": "game-zh-en-1",
+   "line": 17,
+   "kind": "real",
+   "a_text": "Jie Xuan sneered, turned and left, without looking back.",
+   "b_text": "Jie Xuan sneered, turned and left without looking back."
+  },
+  "item-0098": {
+   "seq": "chat-zh-ko-1",
+   "line": 14,
+   "kind": "real",
+   "a_text": "婷姐,我朋友解辰也想来。他姓解(xiè),不是jiě。他有车",
+   "b_text": "팅 언니, 제 친구 제천도 오고 싶어 해요. 성은 해(xiè)예요, 지에(jiě)가 아니에요. 차가 있어요."
+  },
+  "item-0099": {
+   "seq": "subs-en-ko-1",
+   "line": 24,
+   "kind": "real",
+   "a_text": "좋아. Rook, Ceres에 도착할 때까지 욕조를 가지고 있어.",
+   "b_text": "좋아. 루크, 세레스에 도착할 때까지 그 욕조를 보관해 둬."
+  },
+  "item-0100": {
+   "seq": "subs-zh-ko-1",
+   "line": 31,
+   "kind": "real",
+   "a_text": "哥也相信你。三红的新包装,就拜托了。",
+   "b_text": "형도 당신을 믿어요. 삼홍 새 포장, 부탁드립니다."
+  },
+  "item-0101": {
+   "seq": "subs-en-ko-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "죄송해요. Gerald가 또 그 소리를 내고 있어요.",
+   "b_text": "미안. 제럴드가 또 그 소리를 내고 있어."
+  },
+  "item-0102": {
+   "seq": "docs-ko-en-1",
+   "line": 10,
+   "kind": "real",
+   "a_text": "We will eat lunch with the team members.",
+   "b_text": "Lunch is eaten with the team members"
+  },
+  "item-0103": {
+   "seq": "chat-ja-ko-2",
+   "line": 26,
+   "kind": "real",
+   "a_text": "承知しました。では、入口でお待ちします。",
+   "b_text": "알겠습니다. 그럼 입구에서 기다리고 있겠습니다."
+  },
+  "item-0104": {
+   "seq": "subs-ja-ko-1",
+   "line": 31,
+   "kind": "real",
+   "a_text": "俺が届ける。日向、店番と烏丸への連絡を頼む。",
+   "b_text": "제가 전달할게요. 히나타, 가게 지키고 카라스마에게 연락해 줘."
+  },
+  "item-0105": {
+   "seq": "docs-ko-en-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "Please contact Manager Joonho Byun in the HR team for inquiries.",
+   "b_text": "For inquiries, please contact HR Manager Joonho Byun."
+  },
+  "item-0106": {
+   "seq": "chat-en-ko-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "한 시간 안에 우리를 원해.",
+   "b_text": "한 시간 안에 와달래."
+  },
+  "item-0107": {
+   "seq": "subs-ja-ko-1",
+   "line": 10,
+   "kind": "real",
+   "a_text": "小鳥遊さんという探偵さんは、いらっしゃいますか？",
+   "b_text": "타카나시 씨라는 탐정님은 계신가요?"
+  },
+  "item-0108": {
+   "seq": "subs-ja-ko-1",
+   "line": 14,
+   "kind": "real",
+   "a_text": "亡くなった主人の、懐中時計なんです。",
+   "b_text": "돌아가신 남편의 회중시계예요."
+  },
+  "item-0109": {
+   "seq": "subs-zh-ko-1",
+   "line": 7,
+   "kind": "real",
+   "a_text": "夏夏,过来看这一栏。毛茶的收购价涨了两成。",
+   "b_text": "샤샤, 이 항목 좀 봐봐. 모차의 매입 가격이 20% 올랐어."
+  },
+  "item-0110": {
+   "seq": "docs-ja-en-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "A short note attached to a page is called a 'Quick Note'.",
+   "b_text": "A short note added to a page is called a 'Quick Note'."
+  },
+  "item-0111": {
+   "seq": "chat-ko-en-1",
+   "line": 20,
+   "kind": "real",
+   "a_text": "He said to use Chaeyul. Not 'Chaeyool' haha.",
+   "b_text": "He said to write it as Chaeyul. Not 'Chaeyool' haha."
+  },
+  "item-0112": {
+   "seq": "docs-ko-en-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "Seojin Um will help you with the development environment setup.",
+   "b_text": "Seojin Um will help you set up the development environment."
+  },
+  "item-0113": {
+   "seq": "game-zh-en-1",
+   "line": 14,
+   "kind": "real",
+   "a_text": "Elder Qin, how have you been? I come under the orders of the Pavilion Master to collect thirty percent of the spirit stones.",
+   "b_text": "Elder Qin, it has been a while. I come under the阁主's orders to take three-tenths of the qi stones."
+  },
+  "item-0114": {
+   "seq": "subs-ja-ko-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "店では所長と呼べ。ただし敬語は使うな、背中がむずむずする。",
+   "b_text": "가게에서는 소장이라고 불러. 단, 존댓말은 쓰지 마. 등이 간질간질해서 말이야."
+  },
+  "item-0115": {
+   "seq": "subs-en-ko-1",
+   "line": 26,
+   "kind": "real",
+   "a_text": "네, 선장님. 바로 가겠습니다.",
+   "b_text": "예, 선장님. 바로 하겠습니다."
+  },
+  "item-0116": {
+   "seq": "chat-zh-ko-1",
+   "line": 27,
+   "kind": "real",
+   "a_text": "可以。她上次盯着那个拍立得看了好久",
+   "b_text": "좋아. 그녀가 지난번에 그 폴라로이드 사진기를 한참 동안 쳐다봤었어"
+  },
+  "item-0117": {
+   "seq": "subs-en-ko-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "왜 다리 위에 있죠?",
+   "b_text": "왜 선교에 켜져 있는 거죠?"
+  },
+  "item-0118": {
+   "seq": "docs-ko-en-1",
+   "line": 26,
+   "kind": "real",
+   "a_text": "After finishing all the scaffolding, we will start the practical work from the second week.",
+   "b_text": "Once you finish all the stepping stones, you'll start the practical work from the second week."
+  },
+  "item-0119": {
+   "seq": "chat-ko-en-1",
+   "line": 15,
+   "kind": "real",
+   "a_text": "Oh, that's good. So Bori will be home that day too?",
+   "b_text": "Oh, that's great. So Bori will be home that day too?"
+  },
+  "item-0120": {
+   "seq": "chat-en-ko-1",
+   "line": 15,
+   "kind": "real",
+   "a_text": "토요일 정오까지요. 그는 소음을 싫어하니 조용히 하세요.",
+   "b_text": "토요일 정오까지요. 소음을 싫어하시니 조용히 해주세요."
+  },
+  "item-0121": {
+   "seq": "subs-ja-ko-1",
+   "line": 15,
+   "kind": "real",
+   "a_text": "形見ですね。最後に見たのはいつですか？",
+   "b_text": "유품이군요. 마지막으로 보신 건 언제예요?"
+  },
+  "item-0122": {
+   "seq": "chat-en-ko-1",
+   "line": 22,
+   "kind": "real",
+   "a_text": "네, 알겠습니다. 계량기 문제에 대해 전기 회사에 따져보겠습니다.",
+   "b_text": "네, 알겠습니다. 제가 전기 회사에 계량기 건으로 연락해 볼게요."
+  },
+  "item-0123": {
+   "seq": "chat-ko-en-1",
+   "line": 10,
+   "kind": "real",
+   "a_text": "I leave Barley at the pet hotel on Saturdays. They asked for an English name on the reservation form, so I wrote Barley haha",
+   "b_text": "On Saturday, leave Bori at the pet hotel. They asked for the English name on the reservation form, so I wrote Barley haha"
+  },
+  "item-0124": {
+   "seq": "docs-ja-en-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "Tsukimisato-san puts sticky notes on important parts as markers.",
+   "b_text": "Yamanashi-san has placed Sticky notes on important parts as markers."
+  },
+  "item-0125": {
+   "seq": "chat-ja-ko-1",
+   "line": 18,
+   "kind": "real",
+   "a_text": "초콜릿! 그리고, 바다 술은 금지예요.",
+   "b_text": "초콜릿! 그리고, 카이의 술은 금지야"
+  },
+  "item-0126": {
+   "seq": "subs-zh-ko-1",
+   "line": 10,
+   "kind": "real",
+   "a_text": "那就换个思路,用拼配,把低价的毛茶混进去。",
+   "b_text": "그럼 다른 생각을 해봐요. 블렌딩을 이용해서 저렴한 모차를 섞어 넣는 거죠."
+  },
+  "item-0127": {
+   "seq": "subs-zh-ko-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "你爸昨天还在问这事呢。",
+   "b_text": "아버지께서 어제도 이 일에 대해 물어보셨어요."
+  },
+  "item-0128": {
+   "seq": "game-zh-en-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "Unnoticed, the letter in her sleeve bore the seal of Jie Xuan.",
+   "b_text": "Unnoticed, the letter in her sleeve bore Xie Xuan's seal."
+  },
+  "item-0129": {
+   "seq": "subs-zh-ko-1",
+   "line": 26,
+   "kind": "real",
+   "a_text": "好的，我现在就去。",
+   "b_text": "네, 지금 바로 갈게요."
+  },
+  "item-0130": {
+   "seq": "chat-zh-ko-1",
+   "line": 25,
+   "kind": "real",
+   "a_text": "好的，我下午去订。她一直想试试他们家的",
+   "b_text": "좋아, 내가 오후에 주문할게. 그녀가 계속 그 집 것을 시도해보고 싶어 했어"
+  },
+  "item-0131": {
+   "seq": "chat-en-ko-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "저는 5시까지 일할 예정이지만, Siobhan이 그분을 들여보낼 수 있습니다.",
+   "b_text": "저는 5시까지 일하러 가는데, 시본이 그분께 문을 열어줄 수 있어요."
+  },
+  "item-0132": {
+   "seq": "game-ja-en-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "Yuki hasn't been able to sleep since last night. Her fingertips have been trembling the whole time.",
+   "b_text": "Yuki hasn't been able to sleep since last night. His fingertips have been trembling constantly."
+  },
+  "item-0133": {
+   "seq": "chat-zh-ko-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "民宿吧,有院子的那种。陆明订高铁,许诺找房子",
+   "b_text": "민슈(민박)로 하자, 마당 있는 곳으로. 루밍이 고속열차 예약하고, 쉬눠가 숙소 찾을게"
+  },
+  "item-0134": {
+   "seq": "subs-zh-ko-1",
+   "line": 27,
+   "kind": "real",
+   "a_text": "曾岚要三百盒。你来设计新盒子。",
+   "b_text": "쩡란이 300상자 필요해. 네가 새 상자 디자인해."
+  },
+  "item-0135": {
+   "seq": "chat-ja-ko-2",
+   "line": 16,
+   "kind": "real",
+   "a_text": "ホタルの仕様書は、十部印刷しておきます。",
+   "b_text": "호타루 사양서는 10부 인쇄해 두겠습니다."
+  },
+  "item-0136": {
+   "seq": "chat-ko-en-1",
+   "line": 31,
+   "kind": "real",
+   "a_text": "No, I quit last year and now I run a cafe. But I'll still give you tips.",
+   "b_text": "No, he quit last year and now he runs a cafe. But I'll still give you some tips."
+  },
+  "item-0137": {
+   "seq": "docs-ja-en-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "Anyone can post a memo in the plaza.",
+   "b_text": "In the Commons, anyone can post notes."
+  },
+  "item-0138": {
+   "seq": "subs-ja-ko-1",
+   "line": 32,
+   "kind": "real",
+   "a_text": "はいはい、所長。行ってらっしゃい。",
+   "b_text": "네, 네, 소장님. 다녀오세요."
+  },
+  "item-0139": {
+   "seq": "game-ja-en-1",
+   "line": 21,
+   "kind": "real",
+   "a_text": "Akira-san, these are not the culprit's. The shoes are too big.",
+   "b_text": "Akira-san, these aren't the culprit's. The shoes are too big."
+  },
+  "item-0140": {
+   "seq": "chat-ja-ko-1",
+   "line": 22,
+   "kind": "real",
+   "a_text": "やめて！合宿で辛いのは無理！湊は平気だけど",
+   "b_text": "그만해! 엠티에서 매운 건 무리야! 미나(湊)는 괜찮지만"
+  },
+  "item-0141": {
+   "seq": "subs-zh-ko-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "他怎么说的？",
+   "b_text": "그분은 뭐라고 하셨어요?"
+  },
+  "item-0142": {
+   "seq": "subs-zh-ko-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "林夏,超市那边又来催了。明天必须答复。",
+   "b_text": "린시아, 슈퍼마켓 쪽에서 또 재촉해. 내일 꼭 답해야 해."
+  },
+  "item-0143": {
+   "seq": "docs-ja-en-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "Kotori-san shares the business schedule in the plaza every morning.",
+   "b_text": "Takanashi shares his sales schedule in the Commons every morning."
+  },
+  "item-0144": {
+   "seq": "subs-zh-ko-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "哥,那个价格,我们的茶根本做不出来。",
+   "b_text": "형, 그 가격으로는 우리 차를 도저히 만들 수가 없어요."
+  },
+  "item-0145": {
+   "seq": "game-ja-ko-1",
+   "line": 14,
+   "kind": "real",
+   "a_text": "そこへ、薬草籠を抱えた澪(みお)が駆け寄ってきた。",
+   "b_text": "그때, 약초 바구니를 든 미오가 달려왔다."
+  },
+  "item-0146": {
+   "seq": "game-ja-ko-1",
+   "line": 10,
+   "kind": "real",
+   "a_text": "魔石の力が弱まっております。あまり良くはございません",
+   "b_text": "마정석의 힘이 약해지고 있습니다. 별로 좋지 않습니다"
+  },
+  "item-0147": {
+   "seq": "game-ja-en-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "Kaoru-senpai, the scene is here. The door was still locked.",
+   "b_text": "Boss Kaoru, the scene is here. The door was still locked"
+  },
+  "item-0148": {
+   "seq": "game-ja-en-1",
+   "line": 22,
+   "kind": "real",
+   "a_text": "Hikaru's observational skills are certain. He's still a rookie, but he's no one's equal.",
+   "b_text": "Hikaru's observational skills are reliable. She's still a rookie, but she's unmatched."
+  },
+  "item-0149": {
+   "seq": "chat-ja-ko-1",
+   "line": 26,
+   "kind": "real",
+   "a_text": "そうだ、ネット確認しといてくれ",
+   "b_text": "そうだ、ネットで確認しておいてくれ"
+  },
+  "item-0150": {
+   "seq": "subs-zh-ko-1",
+   "line": 32,
+   "kind": "real",
+   "a_text": "林远, 말로만 좋다고 하지 말고, 퇴근하고 나랑 밥 먹어.",
+   "b_text": "린위안, 말로만 좋게 말하지 말고, 퇴근하고 나랑 밥 먹어."
+  },
+  "item-0151": {
+   "seq": "game-ja-ko-1",
+   "line": 26,
+   "kind": "real",
+   "a_text": "雷蔵は一人で大丈夫なの？",
+   "b_text": "라이조는 혼자 괜찮아?"
+  },
+  "item-0152": {
+   "seq": "subs-ja-ko-1",
+   "line": 27,
+   "kind": "real",
+   "a_text": "見た目ほど怖くない。…よし、俺は鵲橋を見てくる。",
+   "b_text": "생각보다 무섭지 않아. ...좋아, 나는 까치다리(鵲橋)를 보러 갈게."
+  },
+  "item-0153": {
+   "seq": "game-ja-ko-1",
+   "line": 22,
+   "kind": "real",
+   "a_text": "朔、澪に薬草を分けてもらえ。補強に使う",
+   "b_text": "사쿠, 미오에게 약초를 좀 받아와. 보강에 쓸 거야."
+  },
+  "item-0154": {
+   "seq": "chat-ja-ko-1",
+   "line": 7,
+   "kind": "real",
+   "a_text": "安いですね!ありがとうございます!",
+   "b_text": "싸네요! 감사합니다!"
+  },
+  "item-0155": {
+   "seq": "docs-ko-en-1",
+   "line": 16,
+   "kind": "real",
+   "a_text": "If you confirm, it will be forwarded to Manager Byun Jun-ho.",
+   "b_text": "Once confirmed, it will be passed on to Manager Byun Jun-ho."
+  },
+  "item-0156": {
+   "seq": "subs-zh-ko-1",
+   "line": 28,
+   "kind": "real",
+   "a_text": "300상자? 그럼 라인을 하나 더 추가해야겠네요. ○",
+   "b_text": "300상자요? 그럼 라인을 하나 더 추가해야겠네요. ○"
+  },
+  "item-0157": {
+   "seq": "chat-ja-ko-1",
+   "line": 15,
+   "kind": "real",
+   "a_text": "はい、気をつけます!",
+   "b_text": "네, 조심할게요!"
+  },
+  "item-0158": {
+   "seq": "chat-en-ko-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "네, 알겠습니다. 저는 오전 내내 있을게요.",
+   "b_text": "네, 사장님. 저는 오전 내내 있을게요."
+  },
+  "item-0159": {
+   "seq": "subs-en-ko-1",
+   "line": 31,
+   "kind": "real",
+   "a_text": "좋아. 너는 천재야, Rook. Gerald는 너를 두게 되어 운이 좋아.",
+   "b_text": "좋아. 너는 천재야, 루크. 제럴드는 너를 얻어서 운이 좋아."
+  },
+  "item-0160": {
+   "seq": "docs-ja-en-1",
+   "line": 29,
+   "kind": "real",
+   "a_text": "In the search, you can search for both places and words at the same time.",
+   "b_text": "In search, you can look for both tags and short notes at the same time."
+  },
+  "item-0161": {
+   "seq": "game-ja-ko-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "村を包む淡い光の壁が、かすかに揺ら",
+   "b_text": "마을을 감싸는 옅은 빛의 벽이 희미하게 흔들리고 있습니다"
+  },
+  "item-0162": {
+   "seq": "chat-ja-ko-2",
+   "line": 10,
+   "kind": "real",
+   "a_text": "そのお名前は「あまみや」とお読みするのでしょうか？",
+   "b_text": "그 성함은 '아마미야'라고 읽습니까?"
+  },
+  "item-0163": {
+   "seq": "subs-ja-ko-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "あ、所長!桐生さん、傘忘れてったよ!",
+   "b_text": "아, 소장님! 키류 씨, 우산 두고 가셨어요!"
+  },
+  "item-0164": {
+   "seq": "chat-ja-ko-2",
+   "line": 33,
+   "kind": "real",
+   "a_text": "ああ、引っ越しですか。うちも去年、姉の手伝いで大変でした。もちろん、いいですよ。",
+   "b_text": "아, 이사하시는군요. 저희도 작년에 누나 돕느라 힘들었어요. 물론 괜찮아요."
+  },
+  "item-0165": {
+   "seq": "game-ja-ko-1",
+   "line": 8,
+   "kind": "real",
+   "a_text": "姫様、ようこそ。ギルド長の鉄斎でございます",
+   "b_text": "공주님, 어서 오세요. 조합장 텟사이입니다"
+  },
+  "item-0166": {
+   "seq": "subs-zh-ko-1",
+   "line": 16,
+   "kind": "real",
+   "a_text": "你根本没去过茶山。",
+   "b_text": "당신은 차산에 가본 적이 없잖아요."
+  },
+  "item-0167": {
+   "seq": "docs-ja-en-1",
+   "line": 15,
+   "kind": "real",
+   "a_text": "You can join immediately once approved by the administrator.",
+   "b_text": "Once approved by the administrator, you can join immediately."
+  },
+  "item-0168": {
+   "seq": "docs-ko-en-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "First day",
+   "b_text": "Day 1"
+  },
+  "item-0169": {
+   "seq": "game-zh-en-1",
+   "line": 20,
+   "kind": "real",
+   "a_text": "Elder, let me guard the barrier. Miss Qiu has Lechuan to look after, I can leave.",
+   "b_text": "Elder, let me guard the ward. Miss Qiu has Lechuan to look after her, so I can leave."
+  },
+  "item-0170": {
+   "seq": "subs-ja-ko-1",
+   "line": 17,
+   "kind": "real",
+   "a_text": "所長、鵲橋ってあの古い石橋でしょ？",
+   "b_text": "소장님, 까치다리 말씀이 그 오래된 돌다리 맞죠?"
+  },
+  "item-0171": {
+   "seq": "docs-ja-en-1",
+   "line": 10,
+   "kind": "real",
+   "a_text": "The place where everyone can see inside the workspace is called 'Hiroba' (Commons).",
+   "b_text": "A place that everyone can see within a Space is called a 'Commons'."
+  },
+  "item-0172": {
+   "seq": "docs-ko-en-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "On the second day, we spend the whole day at the site.",
+   "b_text": "On the second day, we spend the whole day on-site."
+  },
+  "item-0173": {
+   "seq": "docs-en-ko-1",
+   "line": 7,
+   "kind": "real",
+   "a_text": "변경 사항 저장 중",
+   "b_text": "변경 사항 저장하기"
+  },
+  "item-0174": {
+   "seq": "docs-ja-en-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "If you can't find it, please try broadening your search range.",
+   "b_text": "If you can't find it, try broadening your search scope."
+  },
+  "item-0175": {
+   "seq": "docs-ja-en-1",
+   "line": 20,
+   "kind": "real",
+   "a_text": "You can revert to a previous state from the page history.",
+   "b_text": "From the page's Revisions, you can revert to a previous state."
+  },
+  "item-0176": {
+   "seq": "chat-ja-ko-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "俺は山がいいな。去年は川遊びで寒かったし",
+   "b_text": "나는 산이 좋은데. 작년에는 강에서 놀아서 추웠잖아"
+  },
+  "item-0177": {
+   "seq": "chat-en-ko-1",
+   "line": 21,
+   "kind": "real",
+   "a_text": "월세는 1일에 내야 해. 지방세 고지서도 왔으니 둘이서 나눠 내.",
+   "b_text": "월세는 1일에 내야 해. 카운슬 택스 청구서도 왔으니까 둘이 나눠 내자."
+  },
+  "item-0178": {
+   "seq": "docs-ja-en-1",
+   "line": 27,
+   "kind": "real",
+   "a_text": "Takanashi-san divides tags by project.",
+   "b_text": "Kotori-san divides tags by project."
+  },
+  "item-0179": {
+   "seq": "docs-ko-en-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "Second day",
+   "b_text": "The second day"
+  },
+  "item-0180": {
+   "seq": "docs-ja-en-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "In this guide, we will explain with examples from Yamanishi in PR and Takanashi in Sales.",
+   "b_text": "In this guide, we will use examples from Yamanashi-san in PR and Takanashi-san in Sales."
+  },
+  "item-0181": {
+   "seq": "chat-ja-ko-2",
+   "line": 11,
+   "kind": "real",
+   "a_text": "いいえ、「あめみや」です。よく間違えられるそうです。",
+   "b_text": "아닙니다, '아메미야'입니다. 자주 잘못 읽으신다고 합니다."
+  },
+  "item-0182": {
+   "seq": "docs-en-ko-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "Pocket Git은 새로운 아이디어를 시도하는 동안 당신의 작업을 안전하게 보관합니다.",
+   "b_text": "포켓 깃은 새로운 아이디어를 시도하는 동안 작업 내용을 안전하게 보관합니다."
+  },
+  "item-0183": {
+   "seq": "chat-en-ko-1",
+   "line": 27,
+   "kind": "real",
+   "a_text": "물론이죠. 하지만 경비원이 개에 대해 불평하면 그녀는 나가야 해요.",
+   "b_text": "물론이지. 근데 경비원이 개 때문에 불평하면 넌 나가야 해."
+  },
+  "item-0184": {
+   "seq": "docs-en-ko-1",
+   "line": 28,
+   "kind": "real",
+   "a_text": "Aoife의 버전이 틀린 것으로 밝혀지면, 대신 저희 버전을 사용하세요.",
+   "b_text": "Aoife의 버전이 잘못되면, 대신 우리의 것을 유지하세요."
+  },
+  "item-0185": {
+   "seq": "chat-ko-en-1",
+   "line": 34,
+   "kind": "real",
+   "a_text": "He runs away as soon as he sees a carrier lol. I'll lure him with snacks.",
+   "b_text": "She runs away as soon as she sees a carrier haha. I'll lure her with snacks."
+  },
+  "item-0186": {
+   "seq": "docs-ja-en-1",
+   "line": 21,
+   "kind": "real",
+   "a_text": "Tsukimisato-san recovered the text she accidentally deleted.",
+   "b_text": "Tsukimisato recovered the text she accidentally deleted."
+  },
+  "item-0187": {
+   "seq": "chat-ko-en-1",
+   "line": 7,
+   "kind": "real",
+   "a_text": "Did you call a packing moving service?",
+   "b_text": "Did you call a packing service?"
+  },
+  "item-0188": {
+   "seq": "subs-ja-ko-1",
+   "line": 29,
+   "kind": "real",
+   "a_text": "お任せください。烏丸にも協力してもらいます。",
+   "b_text": "맡겨주세요. 카라스마에게도 협력해달라고 할게요."
+  },
+  "item-0189": {
+   "seq": "docs-ko-en-1",
+   "line": 24,
+   "kind": "real",
+   "a_text": "Do not put the practice screen on the bonfire.",
+   "b_text": "Do not post the practice screen on Hearth."
+  },
+  "item-0190": {
+   "seq": "subs-ja-ko-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "그럼, 말씀에 응하겠습니다. 무엇을 찾고 계신가요?",
+   "b_text": "그럼, 말씀에 감사해서. 무엇을 찾고 계신가요?"
+  },
+  "item-0191": {
+   "seq": "docs-ko-en-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "Finally, leave a line of your thoughts in the bonfire and you're done.",
+   "b_text": "Finally, just leave a line about your impressions on Modakbul."
+  },
+  "item-0192": {
+   "seq": "chat-ja-ko-2",
+   "line": 2,
+   "kind": "real",
+   "a_text": "十河課長、お疲れさまです。会議室は押さえました。資料は今夜中に仕上げます。",
+   "b_text": "토고 과장님, 수고하셨습니다. 회의실은 확보했습니다. 자료는 오늘 밤 안에 마무리하겠습니다."
+  },
+  "item-0193": {
+   "seq": "subs-en-ko-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "냉동고라고 부르지 마. Gerald가 싫어해.",
+   "b_text": "그걸 냉동고라고 부르지 마. 제럴드는 그걸 싫어해."
+  },
+  "item-0194": {
+   "seq": "subs-zh-ko-1",
+   "line": 22,
+   "kind": "real",
+   "a_text": "曾岚来了，我们泡什么？",
+   "b_text": "쩡란이 왔는데, 뭐 우릴까요?"
+  },
+  "item-0195": {
+   "seq": "game-ja-ko-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "あ、はい！王女様とは知らず、失礼しました",
+   "b_text": "아, 네! 왕녀님인 줄 모르고 실례했습니다"
+  },
+  "item-0196": {
+   "seq": "game-ja-en-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "Hmm. Was only one pocket watch stolen?",
+   "b_text": "Hmm. Only one pocket watch was stolen?"
+  },
+  "item-0197": {
+   "seq": "subs-zh-ko-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "后天到。我已经约好两位老师傅了。",
+   "b_text": "모레 도착해요. 이미 두 분의 장인어른과 약속했어요."
+  },
+  "item-0198": {
+   "seq": "game-zh-en-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "Brought three bags, all from the best in the back mountain.",
+   "b_text": "I brought three bags, all from the best in the back mountain."
+  },
+  "item-0199": {
+   "seq": "game-ja-ko-1",
+   "line": 15,
+   "kind": "real",
+   "a_text": "ねえ、鉄斎殿はずっとこの村に？",
+   "b_text": "저기, 텟사이 님은 계속 이 마을에 계신 건가요?"
+  },
+  "item-0200": {
+   "seq": "chat-en-ko-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "좋은 아침입니다. 보일러 기사님이 금요일 오전 9시에서 정오 사이에 오실 겁니다.",
+   "b_text": "둘 다 좋은 아침이에요. 보일러 기사님이 금요일 오전 9시에서 정오 사이에 오실 거예요."
+  },
+  "item-0201": {
+   "seq": "subs-ja-ko-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "はいはい。所長のは、ふくろうブレンドでいい？",
+   "b_text": "네네. 소장님 건, 부엉이 블렌드로 괜찮으세요?"
+  },
+  "item-0202": {
+   "seq": "chat-ja-ko-1",
+   "line": 16,
+   "kind": "real",
+   "a_text": "ユウ、お菓子係お願いね。あと湊にも連絡しといて",
+   "b_text": "유우, 과자 담당 부탁해. 그리고 미나에게도 연락해 줘"
+  },
+  "item-0203": {
+   "seq": "chat-zh-ko-1",
+   "line": 21,
+   "kind": "real",
+   "a_text": "沙茶面第二天中午吃,我都安排好了。我先去开个会,你们聊",
+   "b_text": "사차면은 둘째 날 점심에 먹기로 했어. 내가 다 준비해 뒀어. 나는 먼저 회의하러 갈게, 너희들 얘기해"
+  },
+  "item-0204": {
+   "seq": "subs-ja-ko-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "私です。ご用件をお伺いします",
+   "b_text": "저입니다. 용건을 여쭙고자"
+  },
+  "item-0205": {
+   "seq": "game-ja-ko-1",
+   "line": 29,
+   "kind": "real",
+   "a_text": "危険です。澪が知ったら、きっと泣きます",
+   "b_text": "위험해요. 미오가 알면 분명 울 거예요"
+  },
+  "item-0206": {
+   "seq": "game-zh-en-1",
+   "line": 9,
+   "kind": "real",
+   "a_text": "The injury is not serious, it's just that the spiritual power is exhausted. Feed it a Spirit Recovery Pill.",
+   "b_text": "The injuries aren't serious; it's just that her spiritual power is depleted. Give her a Spirit Recovery Pill."
+  },
+  "item-0207": {
+   "seq": "docs-en-ko-1",
+   "line": 29,
+   "kind": "real",
+   "a_text": "절대 움직여서는 안 되는 지점을 표시하려면 그것을 사용하세요.",
+   "b_text": "절대 움직여서는 안 되는 지점을 표시하려면, 그것을 사용하세요."
+  },
+  "item-0208": {
+   "seq": "chat-ko-en-1",
+   "line": 22,
+   "kind": "real",
+   "a_text": "I put it on Carrot and got contacted right away. We decided to meet in person tomorrow evening.",
+   "b_text": "I posted it on Karrot and someone contacted me right away. We decided to meet in person tomorrow evening."
+  },
+  "item-0209": {
+   "seq": "chat-ja-ko-1",
+   "line": 31,
+   "kind": "real",
+   "a_text": "えっ、本当に?来られるのか",
+   "b_text": "어, 정말? 오시는 거야?"
+  },
+  "item-0210": {
+   "seq": "chat-ja-ko-1",
+   "line": 27,
+   "kind": "real",
+   "a_text": "了解。あっ、湊にも言っとくね ◆",
+   "b_text": "了解。あ、湊にも言っておくね ◆"
+  },
+  "item-0211": {
+   "seq": "subs-zh-ko-1",
+   "line": 29,
+   "kind": "real",
+   "a_text": "두려워 마세요. 당신의 Zhou 이모는 예전에 혼자서 다섯 개 라인을 관리했어요.",
+   "b_text": "두려워 마. 저우 이모가 예전에 혼자서 다섯 개 라인을 관리했었어."
+  },
+  "item-0212": {
+   "seq": "chat-ja-ko-2",
+   "line": 31,
+   "kind": "real",
+   "a_text": "何かありましたか？",
+   "b_text": "무슨 일 있으세요?"
+  },
+  "item-0213": {
+   "seq": "chat-en-ko-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "나도 그래. 누나가 옷장 옮기는 거 도와주러 오고 있어.",
+   "b_text": "나도 그래. 내 누나가 옷장 옮기는 거 도와주러 와."
+  },
+  "item-0214": {
+   "seq": "chat-zh-ko-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "哎,不用,我也出,AA",
+   "b_text": "아니에요, 저도 낼게요, 더치페이로 해요."
+  },
+  "item-0215": {
+   "seq": "game-ja-ko-1",
+   "line": 16,
+   "kind": "real",
+   "a_text": "はい。三十年、この村を守ってきました",
+   "b_text": "네. 삼십 년 동안 이 마을을 지켜왔습니다"
+  },
+  "item-0216": {
+   "seq": "docs-ko-en-1",
+   "line": 29,
+   "kind": "real",
+   "a_text": "If you have any questions, please contact Manager Byun Jun-ho at any time.",
+   "b_text": "If you have any questions, feel free to ask Manager Byun Jun-ho."
+  },
+  "item-0217": {
+   "seq": "chat-ko-en-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "I know ㅠㅠ There's so much to do.",
+   "b_text": "I knowㅠㅠ There's so much to do"
+  },
+  "item-0218": {
+   "seq": "subs-zh-ko-1",
+   "line": 4,
+   "kind": "calibration",
+   "a_text": "알아요. 하지만 이건 3년 만에 가장 큰 주문이에요.",
+   "b_text": "알아요. 하지만 이건 3년 만에 가장 큰 주문이에요."
+  },
+  "item-0219": {
+   "seq": "chat-en-ko-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "나 형 집에서 자고 있어. 형이 자기 침대 빌려줬어.",
+   "b_text": "내 형네 집에서. 형이 자기 침대 빌려줬어."
+  },
+  "item-0220": {
+   "seq": "game-ja-en-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "Akira-san, please leave your umbrella here.",
+   "b_text": "Akira-san, please leave your umbrella here"
+  },
+  "item-0221": {
+   "seq": "game-ja-ko-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "わかっとる。お前はよくやっとるよ。わしは先に戻っとる",
+   "b_text": "알고 있어. 너는 정말 잘하고 있어. 나는 먼저 갔어"
+  },
+  "item-0222": {
+   "seq": "game-ja-ko-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "堅苦しい話じゃない。昔一緒に遊んだ仲でしょ",
+   "b_text": "딱딱한 얘기는 그만둬. 옛날에 같이 놀던 사이잖아"
+  },
+  "item-0223": {
+   "seq": "docs-ja-en-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "Tsukimisato-san leaves meeting decisions in a Quick Note.",
+   "b_text": "Yamanashi-san has left meeting decisions as Quick Notes."
+  },
+  "item-0224": {
+   "seq": "chat-en-ko-1",
+   "line": 17,
+   "kind": "real",
+   "a_text": "Aoife도 금요일에 와. EE-fa라고 발음해, 묻지 마.",
+   "b_text": "아이파도 금요일에 와. EE-fa라고 발음해, 묻지 마."
+  },
+  "item-0225": {
+   "seq": "game-zh-en-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "Elder Qin stroked his beard and looked at Qiu Shuang, who was sleeping on the couch.",
+   "b_text": "Elder Qin stroked his beard and looked at Chou Shuang, who was sleeping on the couch."
+  },
+  "item-0226": {
+   "seq": "game-ja-ko-1",
+   "line": 18,
+   "kind": "real",
+   "a_text": "朔は懐から、青く脈打つ石を取り出した。澪が毎日磨いている石だ。",
+   "b_text": "사쿠는 주머니에서 푸르게 맥동하는 돌을 꺼냈다. 미오가 매일 닦는 돌이었다."
+  },
+  "item-0227": {
+   "seq": "chat-ja-ko-1",
+   "line": 17,
+   "kind": "real",
+   "a_text": "맡겨주세요. 미나 선배는 무엇을 좋아하세요?",
+   "b_text": "맡겨 주세요. 미나 선배님은 무엇을 좋아하세요?"
+  },
+  "item-0228": {
+   "seq": "subs-zh-ko-1",
+   "line": 14,
+   "kind": "real",
+   "a_text": "他说三红是你爷爷留下的老配方,三种红茶按三、二、一调成的,不能乱改。",
+   "b_text": "그는 삼홍이 할아버지가 남기신 옛 레시피라고 했어. 세 가지 홍차를 3:2:1 비율로 맞춘 것이니 함부로 바꿀 수 없다고 했어."
+  },
+  "item-0229": {
+   "seq": "docs-ko-en-1",
+   "line": 22,
+   "kind": "real",
+   "a_text": "Platform 2 is for taking the dispatch system guide training.",
+   "b_text": "Step 2 is taking the Pathfinder training for the fleet allocation system."
+  },
+  "item-0230": {
+   "seq": "subs-zh-ko-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "林远, 서두르지 마, 먼저 장부를 보자.",
+   "b_text": "린위안, 서두르지 말고 먼저 장부를 좀 보자."
+  },
+  "item-0231": {
+   "seq": "chat-ja-ko-1",
+   "line": 32,
+   "kind": "real",
+   "a_text": "夕方には着くって。それまでに準備しよう",
+   "b_text": "저녁에는 도착한다고 해. 그때까지 준비하자"
+  },
+  "item-0232": {
+   "seq": "chat-ja-ko-2",
+   "line": 14,
+   "kind": "real",
+   "a_text": "承知しました。では、お茶だけにいたします。",
+   "b_text": "알겠습니다. 그럼 차만 준비하겠습니다."
+  },
+  "item-0233": {
+   "seq": "subs-ja-ko-1",
+   "line": 24,
+   "kind": "real",
+   "a_text": "桐生さん、旦那さんとの思い出が詰まってるんだよ、きっと。",
+   "b_text": "키류 씨, 남편분과의 추억이 담겨 있을 거예요, 분명."
+  },
+  "item-0234": {
+   "seq": "docs-en-ko-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "나머지는 일단 작업 트리에 그대로 둡니다.",
+   "b_text": "나머지는 일단 작업 디렉터리에 그대로 있습니다."
+  },
+  "item-0235": {
+   "seq": "subs-zh-ko-1",
+   "line": 24,
+   "kind": "real",
+   "a_text": "周姨,三红的库存还有多少?",
+   "b_text": "저우 이모, 삼홍 재고가 얼마나 남았어요?"
+  },
+  "item-0236": {
+   "seq": "docs-en-ko-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "Aoife가 브랜치를 만들어서 그녀의 편집이 당신의 길을 방해하지 않아요.",
+   "b_text": "Aoife가 브랜치를 만들면, 그녀의 수정 사항은 당신의 작업에 방해가 되지 않습니다."
+  },
+  "item-0237": {
+   "seq": "chat-en-ko-1",
+   "line": 24,
+   "kind": "real",
+   "a_text": "아, 알겠어요. 청구서 나왔나요? 화요일에 온다고 했잖아요.",
+   "b_text": "아, 알겠어요. 청구서 나왔어요? 화요일에 온다고 했잖아요."
+  },
+  "item-0238": {
+   "seq": "chat-en-ko-1",
+   "line": 26,
+   "kind": "real",
+   "a_text": "감사합니다. 그런데 Aoife가 금요일에 소파에서 잘 수 있을까요?",
+   "b_text": "고마워. 근데 Aoife가 금요일에 소파에서 자도 될까?"
+  },
+  "item-0239": {
+   "seq": "game-ja-en-1",
+   "line": 24,
+   "kind": "real",
+   "a_text": "That watch is also my mother's keepsake. ▼",
+   "b_text": "That watch is also my mother's keepsake."
+  },
+  "item-0240": {
+   "seq": "docs-en-ko-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "모든 프로젝트는 \"main\"이라고 불리는 하나의 브랜치로 시작합니다.",
+   "b_text": "모든 프로젝트는 \"main\"이라고 불리는 하나의 브랜치로 시작됩니다."
+  },
+  "item-0241": {
+   "seq": "docs-en-ko-1",
+   "line": 16,
+   "kind": "real",
+   "a_text": "Tomasz (토마시라고 발음)가 공유 서버를 관리합니다.",
+   "b_text": "토마시(TOH-mash라고 발음)가 공유 서버를 관리합니다."
+  },
+  "item-0242": {
+   "seq": "docs-en-ko-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "Tomasz가 동의하면, 당신의 브랜치를 main에 병합하세요.",
+   "b_text": "토마슈가 동의하면, 당신의 브랜치를 main에 병합하세요."
+  },
+  "item-0243": {
+   "seq": "subs-en-ko-1",
+   "line": 28,
+   "kind": "real",
+   "a_text": "메리골드는 더 나쁜 상황을 견뎌냈다. Gerald는 고집이 세다.",
+   "b_text": "메리골드는 더 심한 상황도 견뎌냈어. 제럴드는 고집이 세."
+  },
+  "item-0244": {
+   "seq": "docs-ko-en-1",
+   "line": 9,
+   "kind": "real",
+   "a_text": "The seat is next to the Dawn team, and Um Seo-jin will sit in the same row.",
+   "b_text": "The seats are next to the Dawn Team, and Eom Seo-jin will sit in the same row."
+  },
+  "item-0245": {
+   "seq": "game-zh-en-1",
+   "line": 22,
+   "kind": "real",
+   "a_text": "This is the array's eye. Only by guarding it can you say you have guarded your path.",
+   "b_text": "This is the formation eye token. Only by guarding it can you be said to have guarded your path."
+  },
+  "item-0246": {
+   "seq": "game-zh-en-1",
+   "line": 16,
+   "kind": "real",
+   "a_text": "The barrier is cracked, it's not safe to keep the spirit stones in your hands. I'll come back in three days.",
+   "b_text": "The ward is already cracked; the qi stones are not safe in your hands. I will come again in three days."
+  },
+  "item-0247": {
+   "seq": "docs-ko-en-1",
+   "line": 7,
+   "kind": "real",
+   "a_text": "When I go to work, I first get an access card at the 1st-floor reception desk.",
+   "b_text": "When you arrive, first get your access badge at the reception desk on the first floor."
+  },
+  "item-0248": {
+   "seq": "game-ja-ko-1",
+   "line": 31,
+   "kind": "real",
+   "a_text": "結界の石は洞窟の奥じゃ。それと、一人で先に行かせるなよ",
+   "b_text": "수호막의 돌은 동굴 깊은 곳에 있어. 그리고, 혼자 먼저 가게 하지 마."
+  },
+  "item-0249": {
+   "seq": "chat-ja-ko-2",
+   "line": 1,
+   "kind": "real",
+   "a_text": "日向さん、お疲れさま。明日の先方のご来訪、準備は進んでいますか?",
+   "b_text": "히우가 씨, 수고하셨습니다. 내일 상대방의 방문 준비는 진행되고 있나요?"
+  },
+  "item-0250": {
+   "seq": "subs-en-ko-1",
+   "line": 15,
+   "kind": "real",
+   "a_text": "그럼 그게 뭔데요? ■",
+   "b_text": "그럼 뭔데? ■"
+  },
+  "item-0251": {
+   "seq": "game-zh-en-1",
+   "line": 10,
+   "kind": "real",
+   "a_text": "Senior Sister Zeng, Elder Qin asked you to go to the barrier. I and Senior Brother Wanqi are here.",
+   "b_text": "Senior Sister Wanqi, Elder Qin asked you to go to the ward; I and Senior Brother Wanqi are here."
+  },
+  "item-0252": {
+   "seq": "game-ja-en-1",
+   "line": 23,
+   "kind": "real",
+   "a_text": "Kaoru removed his glasses and slowly pressed his eyes.",
+   "b_text": "Kaoru removed his glasses and slowly pressed his temples."
+  },
+  "item-0253": {
+   "seq": "chat-ja-ko-2",
+   "line": 21,
+   "kind": "real",
+   "a_text": "電話してみます。村田さんが出たら、稟議の期限も伝えておきますね。",
+   "b_text": "전화해 보겠습니다. 무라타 씨가 받으면 품의 기한도 말씀드리겠습니다."
+  },
+  "item-0254": {
+   "seq": "subs-en-ko-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "이것은 열 회수 풀입니다, Captain.",
+   "b_text": "이건 열 회복 풀이에요, 선장님."
+  },
+  "item-0255": {
+   "seq": "subs-ja-ko-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "ああ、頼む。…ん?誰か来たぞ。",
+   "b_text": "아, 부탁해. …응? 누가 왔네."
+  },
+  "item-0256": {
+   "seq": "chat-ja-ko-1",
+   "line": 28,
+   "kind": "real",
+   "a_text": "はい！楽しみです！",
+   "b_text": "네! 기대돼요!"
+  },
+  "item-0257": {
+   "seq": "chat-ja-ko-2",
+   "line": 29,
+   "kind": "real",
+   "a_text": "助かります。あ、ホタルのケースは傷をつけないでくださいね ◆",
+   "b_text": "도움이 됩니다. 아, 호타루 케이스는 흠집 내지 말아 주세요 ◆"
+  },
+  "item-0258": {
+   "seq": "subs-zh-ko-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "周姨,您说得对。",
+   "b_text": "저우 이모, 맞아요."
+  },
+  "item-0259": {
+   "seq": "chat-en-ko-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "언제든지. 어차피 재택근무잖아.",
+   "b_text": "언제든지. 어차피 집에서 일하잖아."
+  },
+  "item-0260": {
+   "seq": "chat-en-ko-1",
+   "line": 7,
+   "kind": "real",
+   "a_text": "알겠습니다, 선생님. 입금 영수증 보내주셔서 감사합니다!",
+   "b_text": "알겠습니다, 부장님. 보증금 영수증 보내주셔서 감사합니다!"
+  },
+  "item-0261": {
+   "seq": "game-zh-en-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "Before his words fell, Wanqi Jing rushed up from the mountain.",
+   "b_text": "Before he finished speaking, Wanqi Jing rushed up from the foot of the mountain."
+  },
+  "item-0262": {
+   "seq": "game-zh-en-1",
+   "line": 7,
+   "kind": "real",
+   "a_text": "Quickly lift him up. Ruoshui, go get the healing pills.",
+   "b_text": "Quick, lift her up. Ruoshui, go get the healing pills."
+  },
+  "item-0263": {
+   "seq": "chat-zh-ko-1",
+   "line": 32,
+   "kind": "real",
+   "a_text": "放心,都记着呢。婷姐,先给你发个红包,生日提前快乐!",
+   "b_text": "걱정 마세요, 다 기억하고 있어요. 팅 언니, 먼저 홍바오 보내 드릴게요. 생일 미리 축하해요!"
+  },
+  "item-0264": {
+   "seq": "chat-en-ko-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "Gareth는 모를 거야. 슈퍼는 어쨌든 월요일까지 자리를 비워.",
+   "b_text": "개러스는 모를 거야. 어차피 슈퍼는 월요일까지 안 와."
+  },
+  "item-0265": {
+   "seq": "game-ja-en-1",
+   "line": 14,
+   "kind": "real",
+   "a_text": "That's helpful. They can handle the phone calls and document organization too.",
+   "b_text": "That's a relief. She can handle taking calls and organizing documents."
+  },
+  "item-0266": {
+   "seq": "game-ja-en-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "The old innkeeper, Takanashi, stares at the floor while sitting in a chair.",
+   "b_text": "The owner, old Takanashi, is staring at the floor while sitting in a chair."
+  },
+  "item-0267": {
+   "seq": "subs-zh-ko-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "那就不是我们的茶了!爸会气坏",
+   "b_text": "그건 우리 차가 아니잖아요! 아버지가 화나실 거예요"
+  },
+  "item-0268": {
+   "seq": "chat-ko-en-1",
+   "line": 8,
+   "kind": "real",
+   "a_text": "No haha, semi-packing. I'm moving on Saturday, so I have to pack the stuff myself.",
+   "b_text": "No haha, semi-packing. I have to pack the stuff for the move on Saturday."
+  },
+  "item-0269": {
+   "seq": "chat-ja-ko-2",
+   "line": 7,
+   "kind": "real",
+   "a_text": "日向さんのせいではありませんよ。四半期報告は二日遅れると、部長に伝えておきます。",
+   "b_text": "히우가 씨 잘못이 아니에요. 분기 보고가 이틀 늦어지면 부장님께 말씀드리겠습니다."
+  },
+  "item-0270": {
+   "seq": "chat-zh-ko-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "三个人一晚九百左右，含早餐",
+   "b_text": "세 명 기준 하룻밤에 900위안 정도예요, 아침 식사 포함이에요."
+  },
+  "item-0271": {
+   "seq": "subs-en-ko-1",
+   "line": 14,
+   "kind": "real",
+   "a_text": "네, 선장님. 센서 문제가 아닙니다.",
+   "b_text": "예, 선장님. 센서가 아닙니다."
+  },
+  "item-0272": {
+   "seq": "chat-ja-ko-1",
+   "line": 21,
+   "kind": "real",
+   "a_text": "まあな。ミナの分は辛くしとくよ",
+   "b_text": "뭐. 미나 몫은 맵게 해둘게"
+  },
+  "item-0273": {
+   "seq": "subs-ja-ko-1",
+   "line": 22,
+   "kind": "real",
+   "a_text": "はい、突き当たりです。ごゆっくりどうぞ。",
+   "b_text": "네, 저쪽에 있습니다. 편히 이용하세요."
+  },
+  "item-0274": {
+   "seq": "subs-ja-ko-1",
+   "line": 21,
+   "kind": "real",
+   "a_text": "ちょっと、お手洗いをお借りするわね。 ◆",
+   "b_text": "잠깐, 화장실 좀 다녀올게. ◆"
+  },
+  "item-0275": {
+   "seq": "subs-en-ko-1",
+   "line": 10,
+   "kind": "real",
+   "a_text": "나한테 경례 그만해, Dex. 우리 나이 같아.",
+   "b_text": "나한테 경례 그만해, 덱스. 우리 나이 같아."
+  },
+  "item-0276": {
+   "seq": "chat-ko-en-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "After moving, let's rest on Sunday. I miss Bori too haha. Want to grab brunch?",
+   "b_text": "After the move, take Sunday off to rest. I miss Bori too haha. Want to grab brunch?"
+  },
+  "item-0277": {
+   "seq": "chat-ja-ko-1",
+   "line": 20,
+   "kind": "real",
+   "a_text": "先輩、カレー得意なんですか?",
+   "b_text": "선배, 카레 잘하세요?"
+  },
+  "item-0278": {
+   "seq": "docs-ko-en-1",
+   "line": 14,
+   "kind": "real",
+   "a_text": "I do not speak to an article that is currently being worked on first.",
+   "b_text": "We do not approach the drivers who are working."
+  },
+  "item-0279": {
+   "seq": "chat-ja-ko-1",
+   "line": 23,
+   "kind": "real",
+   "a_text": "そうだ、民宿の近くに温泉があるらしい。うちの姉も行ったことあるって",
+   "b_text": "맞아, 펜션 근처에 온천이 있대. 우리 언니도 가본 적 있다고"
+  },
+  "item-0280": {
+   "seq": "game-ja-ko-1",
+   "line": 32,
+   "kind": "real",
+   "a_text": "はい。必ず戻ります ▼",
+   "b_text": "네. 반드시 돌아올게요 ▼"
+  },
+  "item-0281": {
+   "seq": "chat-ja-ko-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "なるほど。じゃあ同期の湊(そう)も呼ぼうよ",
+   "b_text": "그렇구나. 그럼 동기인 미나토도 부르자"
+  },
+  "item-0282": {
+   "seq": "subs-zh-ko-1",
+   "line": 9,
+   "kind": "real",
+   "a_text": "周姨,所以我才不同意降价。",
+   "b_text": "저우 이모, 그래서 제가 가격 인하에 동의하지 않은 거예요."
+  },
+  "item-0283": {
+   "seq": "chat-ko-en-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "Too bad. Ah, what should I write for Chaeyul's English name? I need to send a calendar invite.",
+   "b_text": "That's a shame. Oh, how should I write the new hire Chaeyul's English name? I need to send a calendar invite."
+  },
+  "item-0284": {
+   "seq": "chat-ja-ko-1",
+   "line": 8,
+   "kind": "real",
+   "a_text": "ユウは初めての合宿だよね。緊張してる?",
+   "b_text": "유우는 처음 가는 엠티지? 긴장돼?"
+  },
+  "item-0285": {
+   "seq": "game-zh-en-1",
+   "line": 21,
+   "kind": "real",
+   "a_text": "Finally, he nodded and took out a jade talisman from his sleeve.",
+   "b_text": "Finally, he nodded and took a jade talisman from his sleeve."
+  },
+  "item-0286": {
+   "seq": "chat-zh-ko-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "没什么,在算费用。婷姐,公账里还剩一千二",
+   "b_text": "별거 없어, 비용 계산 중이야. 팅 언니, 공금에 천이백 남았어"
+  },
+  "item-0287": {
+   "seq": "chat-zh-ko-1",
+   "line": 16,
+   "kind": "real",
+   "a_text": "公账我来记吧,我有现成的表格",
+   "b_text": "공동 경비는 제가 기록할게요. 제가 이미 표가 있어요"
+  },
+  "item-0288": {
+   "seq": "docs-ja-en-1",
+   "line": 22,
+   "kind": "real",
+   "a_text": "Tips for organizing",
+   "b_text": "Tips for organization"
+  },
+  "item-0289": {
+   "seq": "subs-zh-ko-1",
+   "line": 8,
+   "kind": "real",
+   "a_text": "周姨和说话时要客气点，不要没分寸。",
+   "b_text": "저우 이모께 말씀드릴 때는 공손하게 하세요. 격식 없이 말하지 마세요."
+  },
+  "item-0290": {
+   "seq": "chat-ko-en-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "Yeah, I stamped it yesterday. It's finally over now.",
+   "b_text": "Yeah, I signed the papers yesterday. It's finally over."
+  },
+  "item-0291": {
+   "seq": "chat-ja-ko-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "아, 벌써 예약했어. 2박에 4만 엔",
+   "b_text": "응, 벌써 예약했어. 2박에 4만 엔이야"
+  },
+  "item-0292": {
+   "seq": "chat-ja-ko-2",
+   "line": 24,
+   "kind": "real",
+   "a_text": "まだです。台数が決まり次第、すぐ手配します。",
+   "b_text": "아직요. 대수가 정해지면 바로 준비하겠습니다."
+  },
+  "item-0293": {
+   "seq": "chat-ja-ko-1",
+   "line": 24,
+   "kind": "real",
+   "a_text": "え、本当？行きたい！",
+   "b_text": "어, 정말? 가고 싶어!"
+  },
+  "item-0294": {
+   "seq": "subs-en-ko-1",
+   "line": 22,
+   "kind": "real",
+   "a_text": "Dr. Pell도 그것을 사용합니다. 매일 밤, 두 시간 동안.",
+   "b_text": "펠 박사님도 그걸 사용해요. 매일 밤, 두 시간 동안요."
+  },
+  "item-0295": {
+   "seq": "game-ja-ko-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "北門では、雷蔵が剣を構え、黒い霧を睨んでいた。",
+   "b_text": "북문에서는 라이조가 검을 겨누고 검은 안개를 노려보고 있었다."
+  },
+  "item-0296": {
+   "seq": "docs-en-ko-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "클로닝은 전체 리포지토리를 노트북에 복사합니다.",
+   "b_text": "클론은 전체 저장소를 노트북에 복사합니다."
+  },
+  "item-0297": {
+   "seq": "docs-en-ko-1",
+   "line": 27,
+   "kind": "real",
+   "a_text": "모든 저장이 유지되므로, 아무것도 진정으로 잃지 않습니다",
+   "b_text": "모든 저장이 유지되므로 아무것도 진정으로 잃어버리지 않습니다."
+  },
+  "item-0298": {
+   "seq": "chat-ja-ko-2",
+   "line": 4,
+   "kind": "real",
+   "a_text": "それが、まだです。メーカーに催促したのですが、納期の回答待ちだと言われました。",
+   "b_text": "그게, 아직입니다. 제조사에 독촉했는데, 납품일 답변을 기다리고 있다고 합니다."
+  },
+  "item-0299": {
+   "seq": "chat-ja-ko-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "星いいね! 그럼 결정이 났네",
+   "b_text": "별 좋네! 그럼 결정이다ね"
+  },
+  "item-0300": {
+   "seq": "chat-en-ko-1",
+   "line": 10,
+   "kind": "real",
+   "a_text": "좋네. 그녀는 어디서 자고 있어?",
+   "b_text": "좋네. 어디서 자?"
+  },
+  "item-0301": {
+   "seq": "subs-ja-ko-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "ヒナタ、コーヒー二つ。…今日はヤマもなくて暇だな。",
+   "b_text": "히나타, 커피 두 잔. …오늘은 일이 없어서 한가하네."
+  },
+  "item-0302": {
+   "seq": "subs-zh-ko-1",
+   "line": 17,
+   "kind": "real",
+   "a_text": "夏夏,你小时候还尿过我一身呢,现在倒教训起你哥来了。",
+   "b_text": "샤샤, 너 어렸을 때 나한테 오줌까지 쌌었는데, 이제 와서 네 형한테 훈계하네."
+  },
+  "item-0303": {
+   "seq": "subs-en-ko-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "상태, Rook. 센서 때문이라고 말해줘.",
+   "b_text": "상태 보고해, 루크. 센서 문제인 거겠지."
+  },
+  "item-0304": {
+   "seq": "docs-en-ko-1",
+   "line": 21,
+   "kind": "real",
+   "a_text": "충돌 시, \"ours\"는 현재 있는 브랜치이고, \"theirs\"는 병합하려는 브랜치입니다.",
+   "b_text": "충돌 시, \"ours\"는 현재 작업 중인 브랜치이고, \"theirs\"는 병합하려는 브랜치입니다."
+  },
+  "item-0305": {
+   "seq": "chat-zh-ko-1",
+   "line": 29,
+   "kind": "real",
+   "a_text": "开完会了!你们聊什么呢?",
+   "b_text": "회의 끝났어! 뭐 얘기해?"
+  },
+  "item-0306": {
+   "seq": "docs-ko-en-1",
+   "line": 8,
+   "kind": "real",
+   "a_text": "Manager Byun Jun-ho will register the received access card.",
+   "b_text": "The access card you receive will be registered by Manager Byun Jun-ho."
+  },
+  "item-0307": {
+   "seq": "game-ja-ko-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "あなたが朔ね。王都から調査に来たの",
+   "b_text": "당신이 사쿠로군요. 왕도에서 조사하러 왔어요."
+  },
+  "item-0308": {
+   "seq": "subs-en-ko-1",
+   "line": 27,
+   "kind": "real",
+   "a_text": "마리골드가 정오까지 Ceres에 결혼 치즈를 운반하고 있습니다. Gerald가 죽게 두지 마세요.",
+   "b_text": "메리골드가 정오까지 세레스에 결혼 치즈를 싣고 가고 있어. 제럴드가 죽게 놔두지 마."
+  },
+  "item-0309": {
+   "seq": "chat-ja-ko-2",
+   "line": 25,
+   "kind": "real",
+   "a_text": "ああ、雨宮さんは電車で来るそうですよ。駐車場は要りません。",
+   "b_text": "아, 아마미야 씨는 전철로 오신대요. 주차장은 필요 없어요."
+  },
+  "item-0310": {
+   "seq": "chat-zh-ko-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "那你今晚抢,抢到了发群里",
+   "b_text": "그럼 오늘 밤에 잡고, 잡으면 단톡방에 알려줘"
+  },
+  "item-0311": {
+   "seq": "chat-ko-en-1",
+   "line": 33,
+   "kind": "real",
+   "a_text": "Yes, I just sent it. By the way, is it okay for Bori to take a car?",
+   "b_text": "Yeah, I just sent it. By the way, is it okay for Bori to ride in the car?"
+  },
+  "item-0312": {
+   "seq": "game-ja-en-1",
+   "line": 7,
+   "kind": "real",
+   "a_text": "Stop being a detective. Akira is fine. Especially in front of Takanashi-san.",
+   "b_text": "Stop calling me Inspector. Akira is fine. Especially in front of Takanashi-san."
+  },
+  "item-0313": {
+   "seq": "chat-zh-ko-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "婷姐太强了!鼓浪屿我一定要去打卡那个有名的猫咖",
+   "b_text": "팅 언니 너무 대단하다! 고랑위에는 꼭 그 유명한 고양이 카페에 인증샷 찍으러 가야겠어"
+  },
+  "item-0314": {
+   "seq": "game-zh-en-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "The barrier cracked again last night, Elder Qin didn't sleep all night.",
+   "b_text": "The ward cracked again last night, and Elder Qin hasn't slept all night."
+  },
+  "item-0315": {
+   "seq": "chat-en-ko-1",
+   "line": 16,
+   "kind": "real",
+   "a_text": "엄격하다고 했잖아, Siobhan.",
+   "b_text": "엄격하다고 했잖아, 시본."
+  },
+  "item-0316": {
+   "seq": "game-ja-en-1",
+   "line": 29,
+   "kind": "real",
+   "a_text": "Old man Kotori's hand trembled slightly.",
+   "b_text": "Old Takanashi's hand trembled slightly."
+  },
+  "item-0317": {
+   "seq": "chat-ja-ko-2",
+   "line": 32,
+   "kind": "real",
+   "a_text": "兄が引っ越すので、手伝いに行きたいんです。",
+   "b_text": "형이 이사해서, 가서 돕고 싶어요."
+  },
+  "item-0318": {
+   "seq": "game-ja-ko-1",
+   "line": 34,
+   "kind": "real",
+   "a_text": "行こう、朔。雷蔵が時間を稼いでくれてる",
+   "b_text": "가자, 사쿠. 라이조가 시간을 벌어주고 있어"
+  },
+  "item-0319": {
+   "seq": "subs-ja-ko-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "指示が矛盾してますよ、所長。お客さんも来ませんし。",
+   "b_text": "지시가 모순됩니다, 소장님. 손님도 안 오는데요."
+  },
+  "item-0320": {
+   "seq": "game-ja-en-1",
+   "line": 15,
+   "kind": "real",
+   "a_text": "Chatting can wait. Let's start the interrogation first.",
+   "b_text": "We'll chat later. First, I'll start the interrogation."
+  },
+  "item-0321": {
+   "seq": "docs-ja-en-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "Memotto is a note app that can combine text, tables, and images into one.",
+   "b_text": "Memotto is a note-taking app that can bring together text, tables, and images into one place."
+  },
+  "item-0322": {
+   "seq": "game-zh-en-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "Jie Xuan stood at the entrance of the hall, his sword unsheathed, but the lights flickered for a moment.",
+   "b_text": "Jie Xuan stood at the palace entrance, his sword unsheathed, but the lights flickered for a moment."
+  },
+  "item-0323": {
+   "seq": "game-zh-en-1",
+   "line": 8,
+   "kind": "real",
+   "a_text": "Wanqi Jing carried the unconscious woman into the main hall, the iron plaque at his waist was engraved with: Qiu (qiú) Shuang.",
+   "b_text": "Wanqi Jing carried the unconscious woman into the main hall, the iron plaque at his waist engraved with: Qiu Shuang."
+  },
+  "item-0324": {
+   "seq": "chat-ja-ko-1",
+   "line": 14,
+   "kind": "real",
+   "a_text": "バスは朝八時発だから、遅れる",
+   "b_text": "버스는 아침 8시 출발이니까, 늦을 거야"
+  },
+  "item-0325": {
+   "seq": "subs-en-ko-1",
+   "line": 32,
+   "kind": "real",
+   "a_text": "의사의 지시야. 아무도 욕조에 손대지 마.",
+   "b_text": "의사의 명령이야. 아무도 그 통을 건드리지 마."
+  },
+  "item-0326": {
+   "seq": "game-ja-ko-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "朔、客だ。ギルドの前で出迎えてやれ",
+   "b_text": "사쿠, 손님이다. 조합 앞에서 맞이해라"
+  },
+  "item-0327": {
+   "seq": "chat-zh-ko-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "婷姐,好的。我查了一下,十一的高铁票很紧,得今晚就抢",
+   "b_text": "주정 언니, 알겠어요. 제가 찾아봤는데, 국경절 고속열차표가 정말 부족해서 오늘 밤에 잡아야 해요"
+  },
+  "item-0328": {
+   "seq": "chat-ja-ko-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "숙소는 바다가 잡아주는 거지?",
+   "b_text": "숙소는 미나가 잡아주는 거지?"
+  },
+  "item-0329": {
+   "seq": "game-ja-ko-1",
+   "line": 17,
+   "kind": "real",
+   "a_text": "その魔石、見せてくれる?",
+   "b_text": "그 마정석, 보여줄 수 있나요?"
+  },
+  "item-0330": {
+   "seq": "subs-zh-ko-1",
+   "line": 18,
+   "kind": "real",
+   "a_text": "周姨,头采的鲜叶什么时候到?",
+   "b_text": "저우 이모, 첫 수확 신선 잎은 언제 도착해요?"
+  },
+  "item-0331": {
+   "seq": "chat-zh-ko-1",
+   "line": 18,
+   "kind": "real",
+   "a_text": "对了,我做了个攻略:第一天环岛路,第二天鼓浪屿,第三天吃吃吃",
+   "b_text": "맞다, 제가 여행 계획을 세웠어요: 첫째 날은 환도루, 둘째 날은 고랑위, 셋째 날은 먹방"
+  },
+  "item-0332": {
+   "seq": "chat-ja-ko-2",
+   "line": 15,
+   "kind": "real",
+   "a_text": "それと、今回納めるセンサーの社内名称は「ホタル」です。先方にもその名前で説明しますよ。",
+   "b_text": "그리고 이번에 납품할 센서의 사내 명칭은 '호타루'입니다. 상대방에게도 그 이름으로 설명하겠습니다."
+  },
+  "item-0333": {
+   "seq": "subs-en-ko-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "저는 그것을 Thorne에게 숨겼어요. 그녀는 계속 제 렌치를 빌려가요.",
+   "b_text": "쏜에게 숨겼어요. 그녀는 계속 제 렌치를 빌려 가요."
+  },
+  "item-0334": {
+   "seq": "docs-en-ko-1",
+   "line": 17,
+   "kind": "real",
+   "a_text": "Tomasz가 검토할 수 있도록 거기에 브랜치를 푸시하세요.",
+   "b_text": "토마시가 검토할 수 있도록 브랜치를 거기에 푸시하세요."
+  },
+  "item-0335": {
+   "seq": "game-zh-en-1",
+   "line": 26,
+   "kind": "real",
+   "a_text": "Dan Yunzhou nodded and put the array eye token close to his body.",
+   "b_text": "Shan Yunzhou nodded and tucked the formation eye token close to his chest."
+  },
+  "item-0336": {
+   "seq": "game-ja-en-1",
+   "line": 18,
+   "kind": "real",
+   "a_text": "My grandfather has been polishing that clock for many years.",
+   "b_text": "My grandfather has been polishing that watch for years"
+  },
+  "item-0337": {
+   "seq": "chat-ja-ko-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "えー、ひどい。じゃあ俺はカレー担当するわ",
+   "b_text": "에이, 너무하다. 그럼 난 카레 담당할게"
+  },
+  "item-0338": {
+   "seq": "chat-ja-ko-2",
+   "line": 8,
+   "kind": "real",
+   "a_text": "ありがとうございます。ご迷惑をおかけして、本当に申し訳ありませ",
+   "b_text": "감사합니다. 폐를 끼쳐서 정말 죄송합니다."
+  },
+  "item-0339": {
+   "seq": "chat-ja-ko-2",
+   "line": 27,
+   "kind": "real",
+   "a_text": "十時に雨宮さんが着いたら、私にすぐ知らせてください。",
+   "b_text": "아마미야 씨가 열 시에 도착하면 저에게 바로 알려주세요."
+  },
+  "item-0340": {
+   "seq": "subs-zh-ko-1",
+   "line": 20,
+   "kind": "real",
+   "a_text": "好的，这批我亲自盯。",
+   "b_text": "좋아요, 이 물량은 제가 직접 챙길게요."
+  },
+  "item-0341": {
+   "seq": "chat-en-ko-1",
+   "line": 18,
+   "kind": "real",
+   "a_text": "Aoife가 그 강아지를 데려오니? Gareth가 미쳐버릴 거야.",
+   "b_text": "아이파가 그 강아지를 데려오니? 개러스가 미쳐버릴 거야."
+  },
+  "item-0342": {
+   "seq": "chat-ja-ko-2",
+   "line": 22,
+   "kind": "real",
+   "a_text": "見積書が届き次第、ホタル分の稟議書を作成します。",
+   "b_text": "견적서가 도착하면 바로 호타루 몫의 품의서를 작성하겠습니다."
+  },
+  "item-0343": {
+   "seq": "docs-ko-en-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "The unloading work is observed while wearing safety shoes.",
+   "b_text": "We observe the unloading process while wearing safety shoes."
+  },
+  "item-0344": {
+   "seq": "subs-ja-ko-1",
+   "line": 18,
+   "kind": "real",
+   "a_text": "ああ。…あの人は、毎日あそこを歩いていたのかもしれない。",
+   "b_text": "아아. ...저분은 매일 저 길을 걸었을지도 모르겠네."
+  },
+  "item-0345": {
+   "seq": "chat-ja-ko-2",
+   "line": 17,
+   "kind": "real",
+   "a_text": "お願いします。雨宮さんには、ホタルの納期をどう伝えましょうか？",
+   "b_text": "부탁드립니다. 아마미야 씨에게 호타루 납품일을 어떻게 전달할까요?"
+  },
+  "item-0346": {
+   "seq": "game-ja-en-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "Hikaru, who did you ask to stay at the office?",
+   "b_text": "Hikaru, who did you ask to watch the bureau?"
+  },
+  "item-0347": {
+   "seq": "chat-ja-ko-2",
+   "line": 12,
+   "kind": "real",
+   "a_text": "失礼いたしました。雨宮様のお名前、覚えておきます。",
+   "b_text": "실례했습니다. 아메미야 님의 성함을 기억해 두겠습니다."
+  },
+  "item-0348": {
+   "seq": "docs-ko-en-1",
+   "line": 23,
+   "kind": "real",
+   "a_text": "We try to create a day's dispatch plan as a guide.",
+   "b_text": "You will create a day's worth of fleet allocation plan yourself using the Pathfinder."
+  },
+  "item-0349": {
+   "seq": "subs-en-ko-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "Rook, 냉동고가 또 소리를 내고 있어.",
+   "b_text": "루크, 냉동고에서 또 소리가 나."
+  },
+  "item-0350": {
+   "seq": "docs-ko-en-1",
+   "line": 25,
+   "kind": "real",
+   "a_text": "The report does not need to be written long.",
+   "b_text": "You don't have to write a long report."
+  },
+  "item-0351": {
+   "seq": "game-ja-ko-1",
+   "line": 23,
+   "kind": "real",
+   "a_text": "承知しました。夜までに終わらせます",
+   "b_text": "알겠습니다. 밤까지 끝내겠습니다"
+  },
+  "item-0352": {
+   "seq": "chat-ko-en-1",
+   "line": 32,
+   "kind": "real",
+   "a_text": "Thanks haha, Jiwoo. Did you send the Monday meeting invitation to Chaeyul too?",
+   "b_text": "Thanks haha, Jiu, did you send the Monday meeting invitation to Chaeyul too?"
+  },
+  "item-0353": {
+   "seq": "subs-ja-ko-1",
+   "line": 7,
+   "kind": "real",
+   "a_text": "히나타, 예의를 갖추도록 해.",
+   "b_text": "히나타, 예의를 지켜."
+  },
+  "item-0354": {
+   "seq": "chat-ja-ko-2",
+   "line": 20,
+   "kind": "real",
+   "a_text": "お願いします。十河課長だけが頼りです。",
+   "b_text": "부탁드립니다. 토고 과장님만 믿겠습니다."
+  },
+  "item-0355": {
+   "seq": "game-ja-ko-1",
+   "line": 24,
+   "kind": "real",
+   "a_text": "その夜。結界が、悲嗚のような音を立てて砕けた。",
+   "b_text": "그날 밤. 수호막이 비탄과 같은 소리를 내며 부서졌다."
+  },
+  "item-0356": {
+   "seq": "chat-ja-ko-2",
+   "line": 28,
+   "kind": "real",
+   "a_text": "かしこまりました。ホタルの試作機も会議室に運んでおきます。",
+   "b_text": "알겠습니다. 호타루 시제품도 회의실로 옮겨 놓겠습니다."
+  },
+  "item-0357": {
+   "seq": "docs-ko-en-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "Launchpad 1 is wiki login and joining the company messenger.",
+   "b_text": "Launchpad item 1 is logging into the wiki and joining the company messenger."
+  },
+  "item-0358": {
+   "seq": "docs-en-ko-1",
+   "line": 26,
+   "kind": "real",
+   "a_text": "태그는 놓은 곳에 그대로 있지만, 브랜치는 작업과 함께 이동합니다.",
+   "b_text": "태그는 지정한 위치에 그대로 있지만, 브랜치는 작업과 함께 이동합니다."
+  },
+  "item-0359": {
+   "seq": "chat-ja-ko-2",
+   "line": 3,
+   "kind": "real",
+   "a_text": "助かります。ところで、見積書はもう届きましたか?",
+   "b_text": "도움이 됩니다. 그런데, 견적서는 벌써 도착했나요?"
+  },
+  "item-0360": {
+   "seq": "game-ja-ko-1",
+   "line": 28,
+   "kind": "real",
+   "a_text": "私も行く。魔石を封じ直せるのは、王家の者だけよ",
+   "b_text": "저도 갈게요. 마정석을 다시 봉인할 수 있는 건 왕가 사람들뿐이에요"
+  },
+  "item-0361": {
+   "seq": "docs-ja-en-1",
+   "line": 16,
+   "kind": "real",
+   "a_text": "Member permissions can be changed for each plaza.",
+   "b_text": "Member permissions can also be changed per space."
+  },
+  "item-0362": {
+   "seq": "game-zh-en-1",
+   "line": 15,
+   "kind": "real",
+   "a_text": "Three-tenths? Spirit stones are painstakingly saved by the sect, when is it outsiders' turn to take them?",
+   "b_text": "Three parts? The qi stones are what the sect has worked hard to save up; when is it outsiders' turn to take them?"
+  },
+  "item-0363": {
+   "seq": "chat-ko-en-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "I just left. But did the contract finish well?",
+   "b_text": "I just left. But did the contract go well?"
+  },
+  "item-0364": {
+   "seq": "docs-ja-en-1",
+   "line": 17,
+   "kind": "real",
+   "a_text": "Synchronization and history",
+   "b_text": "Sync and Revisions"
+  },
+  "item-0365": {
+   "seq": "chat-zh-ko-1",
+   "line": 17,
+   "kind": "real",
+   "a_text": "行,但你别又忘了记。上次的账都对不上",
+   "b_text": "좋아요, 하지만 또 잊지 말고 기록하세요. 지난번 계산이 맞지 않았어요"
+  },
+  "item-0366": {
+   "seq": "chat-zh-ko-1",
+   "line": 26,
+   "kind": "real",
+   "a_text": "解辰说礼物他出两百,直接转公账里",
+   "b_text": "지천이 선물은 200달러 내겠다고 했으니, 바로 공금 계좌로 송금해"
+  },
+  "item-0367": {
+   "seq": "game-zh-en-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "He panted and said, a young woman was lying on the roadside at the foot of the mountain",
+   "b_text": "He panted and said, a young woman was lying on the roadside at the foot of the mountain."
+  },
+  "item-0368": {
+   "seq": "subs-en-ko-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "기침했나요? 기침은 나쁩니다. 기침은 매우 나쁩니다",
+   "b_text": "기침했다고? 기침은 나쁜 거야. 기침은 아주 나"
+  },
+  "item-0369": {
+   "seq": "chat-ko-en-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "Seoyun, are you still at the company?",
+   "b_text": "Seoyoon, are you still at the office?"
+  },
+  "item-0370": {
+   "seq": "docs-ko-en-1",
+   "line": 27,
+   "kind": "real",
+   "a_text": "The first practical work will be receiving a code review with 엄서진.",
+   "b_text": "The first practical task is to receive a code review with Eom Seo-jin."
+  },
+  "item-0371": {
+   "seq": "chat-en-ko-1",
+   "line": 28,
+   "kind": "real",
+   "a_text": "좋아. 엄마 비행기가 일찍 도착했어, 참고로!",
+   "b_text": "좋아. 그런데 엄마 비행기가 일찍 도착했어!"
+  },
+  "item-0372": {
+   "seq": "game-zh-en-1",
+   "line": 18,
+   "kind": "real",
+   "a_text": "Say three days is three days, never break a promise.",
+   "b_text": "I always keep my word."
+  },
+  "item-0373": {
+   "seq": "chat-ja-ko-2",
+   "line": 18,
+   "kind": "real",
+   "a_text": "はい。ホタルの分は、メーカーの村田さんの回答次第です。早ければ来週、遅ければ再来月とのことです。",
+   "b_text": "네. 호타루 건은 제조사 무라타 씨의 답변에 달려 있습니다. 빠르면 다음 주, 늦으면 다다음 달이라고 합니다."
+  },
+  "item-0374": {
+   "seq": "game-ja-ko-1",
+   "line": 7,
+   "kind": "real",
+   "a_text": "朔は頭をかいた。夏の日の記憶が、霧の向こうからよみがえる。",
+   "b_text": "사쿠는 머리를 긁적였다. 여름날의 기억이 안개 너머에서 되살아났다."
+  },
+  "item-0375": {
+   "seq": "subs-zh-ko-1",
+   "line": 15,
+   "kind": "real",
+   "a_text": "但他也说过，店不能倒。",
+   "b_text": "하지만 그는 가게가 망해서는 안 된다고도 말했어."
+  },
+  "item-0376": {
+   "seq": "game-zh-en-1",
+   "line": 11,
+   "kind": "calibration",
+   "a_text": "Okay. Miss Qiu has woken up, come call me immediately.",
+   "b_text": "Okay. Miss Qiu has woken up, come call me immediately."
+  },
+  "item-0377": {
+   "seq": "docs-ja-en-1",
+   "line": 8,
+   "kind": "real",
+   "a_text": "For use by the team",
+   "b_text": "For teams to use"
+  },
+  "item-0378": {
+   "seq": "subs-en-ko-1",
+   "line": 18,
+   "kind": "real",
+   "a_text": "Dex가 우리의 여분의 냉각수를 그의 온수 욕조에 쏟아부었다.",
+   "b_text": "덱스가 여분의 냉각수를 자기 온수 욕조에 쏟아부었어."
+  },
+  "item-0379": {
+   "seq": "game-ja-ko-1",
+   "line": 27,
+   "kind": "real",
+   "a_text": "強い人ですから。それより、姫様は宿へ避難を",
+   "b_text": "강한 분이시니까요. 그보다, 공주님께서는 숙소로 피신하세요"
+  },
+  "item-0380": {
+   "seq": "docs-en-ko-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "Pocket Git은 제외한 내용을 저장하지 않습니다.",
+   "b_text": "포켓 깃은 제외한 내용은 절대로 저장하지 않습니다."
+  },
+  "item-0381": {
+   "seq": "game-ja-en-1",
+   "line": 28,
+   "kind": "real",
+   "a_text": "Listen. ...Hmm. The culprit is inside the store.",
+   "b_text": "Let me hear it. ...Oh. The culprit is inside the shop."
+  },
+  "item-0382": {
+   "seq": "game-ja-ko-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "馬車から降りてきたのは、旅装の少女だった。",
+   "b_text": "마차에서 내린 것은 여행 복장의 소녀였다."
+  },
+  "item-0383": {
+   "seq": "game-ja-en-1",
+   "line": 16,
+   "kind": "real",
+   "a_text": "Akira-san, why don't we hear from Takanashi-san first?",
+   "b_text": "Akira-san, how about hearing from Takanashi-san first?"
+  },
+  "item-0384": {
+   "seq": "docs-ja-en-1",
+   "line": 24,
+   "kind": "real",
+   "a_text": "Pinned pages are listed at the top of the list.",
+   "b_text": "Pinned pages appear at the top of the list."
+  },
+  "item-0385": {
+   "seq": "subs-ja-ko-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "あら、思ったより若いのね。年寄り相手に畏まらないでちょうだい。",
+   "b_text": "어머, 생각보다 젊네. 노인 상대로 주눅 들지 말아요."
+  }
+ }
+}

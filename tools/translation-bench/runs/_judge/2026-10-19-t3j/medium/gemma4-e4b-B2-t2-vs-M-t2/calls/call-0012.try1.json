@@ -1,0 +1,27 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0103.1",
+  "item-0122.1",
+  "item-0173.1",
+  "item-0008.2",
+  "item-0104.1",
+  "item-0077.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0ef8638a-5968-4f24-8e1d-d5d94d4c7804",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"'Give' is more natural than 'feed' for medicine.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 wrongly replaces Kai with the speaker Mina.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Follows the established romanization 'Um' from the context.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly follows the specified terminology and character name.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly uses 반말 speech level for addressing Lin Xia.\"}\n]\n```\n",
+  "duration_seconds": 115.458638,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16125,
+   "output_tokens": 14205,
+   "thinking_tokens": 14024,
+   "cache_read_tokens": 0,
+   "total_tokens": 30330
+  }
+ }
+}

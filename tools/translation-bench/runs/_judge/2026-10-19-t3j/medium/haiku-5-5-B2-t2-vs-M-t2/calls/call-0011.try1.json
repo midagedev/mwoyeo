@@ -1,0 +1,27 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0366.2",
+  "item-0254.2",
+  "item-0097.2",
+  "item-0232.2",
+  "item-0290.2",
+  "item-0199.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ac91449f-d184-4641-b2e9-ebd610f5af0f",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Better conditional tense and captures '守住' accurately.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses term '수호막' and translates name to '텟사이'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Transliterates '텟사이' rather than leaving Japanese kanji.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated Japanese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'꼭 ~할 거야' captures '一定要' better than '~할래'.\"}\n]\n",
+  "duration_seconds": 42.898192,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16356,
+   "output_tokens": 5107,
+   "thinking_tokens": 4923,
+   "cache_read_tokens": 0,
+   "total_tokens": 21463
+  }
+ }
+}

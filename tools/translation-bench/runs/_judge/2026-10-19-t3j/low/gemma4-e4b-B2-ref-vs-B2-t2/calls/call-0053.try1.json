@@ -1,0 +1,31 @@
+{
+ "call": 53,
+ "try": 1,
+ "ids": [
+  "item-0231.2",
+  "item-0071.2",
+  "item-0186.1",
+  "item-0048.1",
+  "item-0304.2",
+  "item-0324.2",
+  "item-0145.1",
+  "item-0091.1",
+  "item-0024.2",
+  "item-0309.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d911c7ac-0be9-42c9-9608-65de19832e73",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly translates 'both' as '둘 다'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"기사 in delivery logistics refers to drivers, not general workers.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately; formatting differences are ignored.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Give' is more natural than 'feed' for administering medicinal pills.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly understands that Seoyoon is moving and should rest Sunday.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the text completely untranslated in Japanese.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate renderings of the onboarding document.\"}\n]\n```\n",
+  "duration_seconds": 5.330337,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17308,
+   "output_tokens": 316,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17624
+  }
+ }
+}

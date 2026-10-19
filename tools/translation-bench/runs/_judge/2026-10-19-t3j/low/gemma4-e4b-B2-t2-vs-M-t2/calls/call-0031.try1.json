@@ -1,0 +1,31 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0108.2",
+  "item-0195.2",
+  "item-0030.2",
+  "item-0099.1",
+  "item-0166.2",
+  "item-0034.2",
+  "item-0189.1",
+  "item-0205.1",
+  "item-0115.2",
+  "item-0049.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "bea861a1-9228-4883-8290-9d78d5036323",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Lin Yuan speaks banmal to Lin Xia and uses Zhou for 周.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Matches the designated term 事務所 = Bureau.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"湊 is Minato, not Mina.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"十河 (そごう) is pronounced Sogo (토고).\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both convey the meaning and polite register accurately.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are natural and faithfully convey the suggestion.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Japanese name 朔 (さく) is correctly transcribed as 사쿠.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Zhou Ting speaks banmal to friends Xu Nuo and Lu Ming.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are accurate and use the correct banmal speech level.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'Carrier' is the standard, natural English term for a pet carrier.\"}\n]\n```\n",
+  "duration_seconds": 4.87966,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17555,
+   "output_tokens": 311,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17866
+  }
+ }
+}

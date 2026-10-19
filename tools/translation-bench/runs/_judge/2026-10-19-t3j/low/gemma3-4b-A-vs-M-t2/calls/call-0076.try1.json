@@ -1,0 +1,28 @@
+{
+ "call": 76,
+ "try": 1,
+ "ids": [
+  "item-0049.1",
+  "item-0315.1",
+  "item-0323.1",
+  "item-0263.1",
+  "item-0095.2",
+  "item-0301.2",
+  "item-0261.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "14383e7b-908e-46bd-9a56-675a66b9ea3c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Rook uses 합쇼체 to Thorne, which Translation 1 correctly reflects.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Lu Ming speaks to Zhou Ting in 해요체 and has free time.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Follows the required term 稟議 = 품의.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both mistranslate: 1 mangles name/husband; 2 translates husband as wife.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the text in untranslated Japanese.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both use wrong sister term (언니 instead of 누나) and wrong register.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 reads more naturally in Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.944472,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16455,
+   "output_tokens": 235,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16690
+  }
+ }
+}

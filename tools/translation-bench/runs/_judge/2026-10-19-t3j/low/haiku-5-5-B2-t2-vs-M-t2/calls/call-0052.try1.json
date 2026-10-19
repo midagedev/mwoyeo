@@ -1,0 +1,31 @@
+{
+ "call": 52,
+ "try": 1,
+ "ids": [
+  "item-0224.1",
+  "item-0040.2",
+  "item-0243.1",
+  "item-0044.1",
+  "item-0181.1",
+  "item-0175.2",
+  "item-0067.1",
+  "item-0023.2",
+  "item-0189.1",
+  "item-0357.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "725603f7-eac0-48eb-bed3-64d903aad754",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates ギルド to 조합 per terms.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 without honorifics directed at the listener.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Mina speaks in 반말; Translation 1 uses the correct speech level.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"샤차면 is standard Korean transcription for shāchá miàn, flowing naturally.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 reads more naturally and idiomatically in English.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 sounds natural in Korean; '네 저우 이모' is unnatural.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Semi-packing' is standard terminology for 반포장 moving services.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are completely accurate and natural.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Uses standard romanization 'unnie' and captures '온대' accurately.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correct name transcription (키류) and appropriate politeness for niece to uncle.\"}\n]\n```\n",
+  "duration_seconds": 5.104992,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17604,
+   "output_tokens": 337,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17941
+  }
+ }
+}

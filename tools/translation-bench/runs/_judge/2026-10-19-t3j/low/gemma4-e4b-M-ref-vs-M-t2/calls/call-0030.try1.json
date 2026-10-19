@@ -1,0 +1,31 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0167.2",
+  "item-0255.2",
+  "item-0213.1",
+  "item-0145.1",
+  "item-0180.2",
+  "item-0277.1",
+  "item-0220.2",
+  "item-0228.2",
+  "item-0011.2",
+  "item-0072.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6ee175c2-347b-480d-9bad-df952090ca98",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"リーシア speaks to 朔 in 반말.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"The client (桐生) should be referred to with honorifics (-시-).\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both appropriately translate the line using 반말.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"The term 時計 is defined as watch.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"The speaker is 林远 speaking to his younger sister in 반말.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Rory is male speaking to Siobhan in 반말, so 누나 fits.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"十河 speaks to junior employee 日向 in 해요체.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"陆明 speaks in 해요체 and refers to an older sister figure.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and follow the specified terms.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate.\"}\n]\n```\n",
+  "duration_seconds": 4.136707,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5740,
+   "output_tokens": 312,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11818,
+   "total_tokens": 6052
+  }
+ }
+}

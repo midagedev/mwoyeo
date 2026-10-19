@@ -1,0 +1,31 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0044.1",
+  "item-0145.1",
+  "item-0052.2",
+  "item-0037.2",
+  "item-0078.1",
+  "item-0210.2",
+  "item-0240.2",
+  "item-0194.1",
+  "item-0125.1",
+  "item-0128.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2f62d559-5dce-45b0-8cef-5e67fafdf7ad",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Neither candidate translated the line into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Sister speaks to older brother in banmal, correctly using 우리/없어.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Thorne speaks to Rook using haeyo-che consistently.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Candidate 1 translates into Korean and uses correct term 수호막.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Reads much more naturally in English.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Candidate 2 captures 'quit saluting me' much better than nonsense translation.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Candidate 1 translated into Korean; Candidate 2 left it in Chinese.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Candidate 1 leaves Chinese characters untranslated.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Uses the specified term 납품일 for 納期.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Candidate 2 naturally translates the conditional 知ったら as '알면'.\"}\n]\n```\n",
+  "duration_seconds": 5.005148,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17515,
+   "output_tokens": 314,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17829
+  }
+ }
+}

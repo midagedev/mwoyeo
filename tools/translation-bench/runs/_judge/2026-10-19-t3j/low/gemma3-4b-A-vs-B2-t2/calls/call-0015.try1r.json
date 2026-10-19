@@ -1,0 +1,26 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0155.1",
+  "item-0208.2",
+  "item-0115.2",
+  "item-0123.2",
+  "item-0221.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "684d0567-ce09-4490-94be-b6bdeb9dd008",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates Japanese to English; Translation 2 is untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 and preserves the interrupted sentence ending.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates into English, whereas Translation 1 remains in Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 accurately translates the full line and uses correct 반말.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 is grammatically natural, whereas Translation 2 is broken nonsense.\"}\n]\n```\n",
+  "duration_seconds": 5.214807,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15897,
+   "output_tokens": 175,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16072
+  }
+ }
+}

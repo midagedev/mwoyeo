@@ -1,0 +1,31 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0118.2",
+  "item-0143.2",
+  "item-0096.2",
+  "item-0027.1",
+  "item-0028.1",
+  "item-0036.2",
+  "item-0189.2",
+  "item-0200.1",
+  "item-0079.2",
+  "item-0110.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "383abce6-df4c-4ae7-b5a7-e4d13f20dadc",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Princess speaks in banmal to Saku, but both used polite endings.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Follows the required glossary term '포켓 깃' and accurately translates the line.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Accurately translates '请我吃饭' (buy me a meal/dinner).\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly follows the established glossary term '先輩 = boss'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 'on' as turned on ('켜져 있는').\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'편히 이용하세요' is natural for a guest using the restroom.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Uses '사쿠' according to the pronunciation rule (さく) in facts.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately with appropriate captain-to-crew banmal.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Standard and natural heading phrasing for user documentation guides.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Follows the glossary term '结界 = ward'.\"}\n]\n```\n",
+  "duration_seconds": 4.781998,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17086,
+   "output_tokens": 340,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17426
+  }
+ }
+}

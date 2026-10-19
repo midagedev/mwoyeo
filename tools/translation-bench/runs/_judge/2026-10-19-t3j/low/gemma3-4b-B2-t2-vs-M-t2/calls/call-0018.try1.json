@@ -1,0 +1,31 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0045.1",
+  "item-0162.2",
+  "item-0141.1",
+  "item-0090.1",
+  "item-0172.1",
+  "item-0069.1",
+  "item-0239.2",
+  "item-0002.1",
+  "item-0023.2",
+  "item-0209.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9e0297ad-55c6-487f-9ba1-c4e1478677ee",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean entirely.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both failed to translate into Korean, leaving Chinese source text.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly romanizes 解玄 as Jié Xuán.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translates stash to 임시 저장 per specified terminology and reads naturally.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 gave an irrelevant title string instead of translating.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Maintains correct 반말 register to niece and translates name as 히나타.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both mistranslate conditional 'when she wakes' as already awake; equally flawed.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly follows the terminology rule translating Pocket Git to 포켓 깃.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correctly preserves the name Nagi rather than inventing Nagisa.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 uses standard Korean grammar and proper formal speech level.\"}\n]\n```\n",
+  "duration_seconds": 6.29768,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17369,
+   "output_tokens": 326,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17695
+  }
+ }
+}

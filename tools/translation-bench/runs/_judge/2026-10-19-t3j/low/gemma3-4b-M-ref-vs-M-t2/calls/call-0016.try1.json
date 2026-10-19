@@ -1,0 +1,31 @@
+{
+ "call": 16,
+ "try": 1,
+ "ids": [
+  "item-0176.2",
+  "item-0270.1",
+  "item-0350.1",
+  "item-0163.2",
+  "item-0162.2",
+  "item-0093.2",
+  "item-0317.1",
+  "item-0300.2",
+  "item-0202.1",
+  "item-0386.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d9a82f81-7a7c-48ea-aabb-5f02699ccb34",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates Korean laughter ㅋㅋ naturally to haha instead of leaving raw jamo.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Mina speaks 반말 to Kai and Yu; Translation 1 incorrectly uses 해요체.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 completely failed to translate the Japanese line into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the phrase '안개 속에서 떠오른다'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Siobhan speaks 반말 to Rory; Translation 1 uses incorrect 존댓말 and mistranslates.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean; Translation 2 correctly translates into 반말.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Rook speaks 반말 to Dex; Translation 2 uses the correct 반말 speech level.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 accurately translates the line describing the village barrier.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Lu Ming speaks 해요체 to Zhou Ting; Translation 2 corrupts names into French.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 captures the instructional wiki tone without adding unprompted 'please'.\"}\n]\n```\n",
+  "duration_seconds": 5.150837,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17428,
+   "output_tokens": 360,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17788
+  }
+ }
+}

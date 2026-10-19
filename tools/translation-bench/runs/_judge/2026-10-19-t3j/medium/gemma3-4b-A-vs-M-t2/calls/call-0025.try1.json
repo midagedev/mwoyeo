@@ -1,0 +1,23 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0119.1",
+  "item-0207.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "de6f612b-d9d7-40d5-8867-456693858b4b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 is translated into English, while Translation 2 is untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 has more faithful sentence structure and reads more naturally.\"}\n]\n```\n",
+  "duration_seconds": 39.048454,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14843,
+   "output_tokens": 4297,
+   "thinking_tokens": 4222,
+   "cache_read_tokens": 0,
+   "total_tokens": 19140
+  }
+ }
+}

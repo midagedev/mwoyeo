@@ -1,0 +1,27 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0111.2",
+  "item-0149.1",
+  "item-0258.2",
+  "item-0140.2",
+  "item-0396.1",
+  "item-0392.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7e5f7cd3-1303-4bd6-b270-cf97a8ea5614",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 flows much more naturally for instructional tutorial text.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in banmal, not haeyoche.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly uses subject honorifics for Professor Han.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Much more natural phrasing; Rory is not Siobhan's sibling.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"海 is the person's name Kai, not the sea.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both vocatives are equally natural and accurate in banmal.\"}\n]\n",
+  "duration_seconds": 50.600891,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15973,
+   "output_tokens": 5789,
+   "thinking_tokens": 5598,
+   "cache_read_tokens": 0,
+   "total_tokens": 21762
+  }
+ }
+}

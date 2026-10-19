@@ -1,0 +1,31 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0359.2",
+  "item-0333.1",
+  "item-0029.1",
+  "item-0127.2",
+  "item-0336.2",
+  "item-0281.1",
+  "item-0112.2",
+  "item-0239.2",
+  "item-0047.2",
+  "item-0346.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0df43442-7c62-4405-8beb-4e4d44d05dff",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Speaker is Rook to Thorne; both incorrectly use 반말/plain level.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the line.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translates Japanese names and characters into Korean properly.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"1 uses wrong honorific (해요체); 2 uses wrong term (형 for female speaker).\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Speaker is talking to client; both appropriately use honorifics and are natural.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Much more natural Korean conversational phrasing for spoken dialogue.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both left the Japanese line completely untranslated.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both accurately translate the technical tutorial sentence with equivalent natural phrasing.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both render the casual banmal tone accurately and naturally.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"\\\"What do you make of\\\" is more natural detective dialogue in English.\"}\n]\n```\n",
+  "duration_seconds": 4.66901,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17461,
+   "output_tokens": 320,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17781
+  }
+ }
+}

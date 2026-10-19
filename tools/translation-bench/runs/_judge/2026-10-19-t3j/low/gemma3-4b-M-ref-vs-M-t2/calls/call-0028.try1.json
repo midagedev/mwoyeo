@@ -1,0 +1,31 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0354.2",
+  "item-0050.1",
+  "item-0295.2",
+  "item-0245.2",
+  "item-0155.2",
+  "item-0359.1",
+  "item-0112.1",
+  "item-0257.2",
+  "item-0033.2",
+  "item-0166.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7750e8d0-e80c-40af-b6bd-2703544014c3",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both failed: 1 translated the wrong line; 2 left untranslated.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both misuse '형' for an older brother from a female sibling.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates into English, whereas Translation 1 left source Korean.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both wrongly use polite/honorific endings instead of 반말 between tenants.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"1 left Japanese untranslated; 2 used 해요체 instead of 반말.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 uses watch store; 1 mistakenly says clock shop.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are accurate and natural translations of the onboarding sentence.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly romanizes the name 小鳥遊 as 타카나시 instead of 타카하시.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translates 'catch' into Korean and correctly uses 해요체 to Rook.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Neither matches the 반말 speech level between Rook and Dex appropriately.\"}\n]\n```\n",
+  "duration_seconds": 5.456304,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17276,
+   "output_tokens": 341,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17617
+  }
+ }
+}

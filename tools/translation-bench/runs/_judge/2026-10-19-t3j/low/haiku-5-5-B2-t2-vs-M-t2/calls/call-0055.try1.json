@@ -1,0 +1,31 @@
+{
+ "call": 55,
+ "try": 1,
+ "ids": [
+  "item-0186.1",
+  "item-0048.1",
+  "item-0316.2",
+  "item-0272.2",
+  "item-0299.2",
+  "item-0145.1",
+  "item-0091.1",
+  "item-0024.2",
+  "item-0321.1",
+  "item-0293.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "42afa781-19b6-43b4-a814-f8d373fbb87a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both capture the meaning and casual name address accurately.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Captain is defined as 선장, not 함장.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are completely identical except for Korean spacing.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both correctly translate the meaning and brother referring to the sister.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Reads much more naturally in Korean documentation style.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 mistranslates the super as landlord (집주인) and uses incorrect honorifics.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말, and names match facts.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both failed the required 합쇼체 speech level towards Captain Thorne.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are completely natural and accurate translations of 管理者.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both mistranslate buying tickets (抢票) as snatching/stealing (뺏다).\"}\n]\n```\n",
+  "duration_seconds": 4.9132,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5589,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11813,
+   "total_tokens": 5914
+  }
+ }
+}

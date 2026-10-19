@@ -1,0 +1,31 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0006.1",
+  "item-0132.1",
+  "item-0162.1",
+  "item-0297.1",
+  "item-0157.1",
+  "item-0367.2",
+  "item-0207.2",
+  "item-0118.1",
+  "item-0099.2",
+  "item-0052.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fdc98ac7-9d4f-44ef-9114-6eeb241b3454",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates '모닥불' as 'Hearth' and uses imperative mood.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 gets '소장' right, though both fail the 반말 speech level.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both convey the meaning well with minor capitalization and article differences.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 uses the correct name '저우 이모' and accurate term '첫 수확'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 has correct names and conveys the meaning far more accurately.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly formats the possessive '토마시의' and natural phrasing.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 is much closer to soda bread than cookie bread, though both fail 반말.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both severely mistranslate '頭をかいた' (scratched head) and character names.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the 해요체 speech level to Zhou Ting.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 is completely corrupted output from earlier context.\"}\n]\n```\n",
+  "duration_seconds": 4.852395,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17453,
+   "output_tokens": 360,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17813
+  }
+ }
+}

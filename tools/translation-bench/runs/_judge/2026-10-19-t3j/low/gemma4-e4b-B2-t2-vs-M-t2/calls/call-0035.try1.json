@@ -1,0 +1,31 @@
+{
+ "call": 35,
+ "try": 1,
+ "ids": [
+  "item-0018.1",
+  "item-0099.2",
+  "item-0075.1",
+  "item-0173.2",
+  "item-0103.2",
+  "item-0028.2",
+  "item-0145.1",
+  "item-0018.2",
+  "item-0187.2",
+  "item-0074.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9366e8a0-a512-492f-b9c6-09d0a50a253e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Matches designated term '납품일' for 納期.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"十河 is read Sogo, transcribed closer to 토고 than 토가.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'내가 제럴드 처리할게' is natural; '제럴드랑' means 'with Gerald'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Uses established spelling 'Um' from context and correct present tense.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the line.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both misinterpret 'bridge' in sci-fi context, but Translation 2 mistranslates less absurdly.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations convey the meaning accurately and naturally.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Matches designated term '납품일' for 納期.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Speaker is unspecified; both polite and plain registers are plausible.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Gareth uses 해요체 when speaking to tenants.\"}\n]\n```\n",
+  "duration_seconds": 5.462118,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17228,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17560
+  }
+ }
+}

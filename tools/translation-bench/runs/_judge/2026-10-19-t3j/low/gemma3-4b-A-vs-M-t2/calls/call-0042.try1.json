@@ -1,0 +1,26 @@
+{
+ "call": 42,
+ "try": 1,
+ "ids": [
+  "item-0239.2",
+  "item-0371.1",
+  "item-0167.1",
+  "item-0080.1",
+  "item-0147.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7881f2fd-2a23-4619-a354-1367dea63495",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both fail speech level (반말) and specific terminology correctly.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly uses specified term 임시 저장 instead of transliterating stash.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 accurately translates the pronunciation guide context.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 leaves Japanese untranslated and severely mistranslates 주인.\"}\n]\n```\n",
+  "duration_seconds": 3.8110530000000002,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15700,
+   "output_tokens": 166,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15866
+  }
+ }
+}

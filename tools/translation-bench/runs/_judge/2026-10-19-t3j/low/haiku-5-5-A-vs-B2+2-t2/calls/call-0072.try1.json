@@ -1,0 +1,31 @@
+{
+ "call": 72,
+ "try": 1,
+ "ids": [
+  "item-0320.1",
+  "item-0081.2",
+  "item-0333.2",
+  "item-0316.1",
+  "item-0335.2",
+  "item-0370.2",
+  "item-0203.2",
+  "item-0305.2",
+  "item-0022.1",
+  "item-0325.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cf6e66f4-da95-4040-b67f-31f5559fd885",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both incorrectly use 'his' for female Akira; otherwise essentially identical.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the sentence naturally and accurately.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both capture the meaning accurately and naturally.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 sounds more natural in Korean technical tutorial register.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both '푸터' and '바닥글' are valid, accurate translations.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both word orders are natural and accurate in Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translates names into pinyin instead of leaving untranslated Chinese characters.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both convey the sentence accurately in appropriate informal speech (반말).\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Transliterates Japanese pronunciation into Hangul naturally instead of leaving kana.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 reads more concisely and naturally in English.\"}\n]\n```\n",
+  "duration_seconds": 4.675554,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17227,
+   "output_tokens": 313,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17540
+  }
+ }
+}

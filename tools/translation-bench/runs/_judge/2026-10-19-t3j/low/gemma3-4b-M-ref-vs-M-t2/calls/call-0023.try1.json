@@ -1,0 +1,31 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0076.1",
+  "item-0079.1",
+  "item-0380.1",
+  "item-0298.1",
+  "item-0114.1",
+  "item-0262.2",
+  "item-0268.2",
+  "item-0082.2",
+  "item-0379.2",
+  "item-0392.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d53a6f6f-8344-442e-999c-09c0a96c9102",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 uses correct natural grammar, though both miss male speaker/dresser.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly and naturally translates '아직 회사야?'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, adheres to 반말, and uses required terms.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 translates the Japanese sentence into Korean; Translation 2 kept Japanese.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both failed to translate the line into English.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 translates into English, whereas Translation 1 left Japanese untranslated.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both failed to translate the Chinese text into Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, whereas Translation 1 left Japanese untranslated.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 sounds much more natural for an onboarding guide instruction.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 translates into English, whereas Translation 2 left Korean untranslated.\"}\n]\n```\n",
+  "duration_seconds": 12.418569,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5516,
+   "output_tokens": 336,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11821,
+   "total_tokens": 5852
+  }
+ }
+}

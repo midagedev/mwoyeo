@@ -1,0 +1,31 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0182.1",
+  "item-0121.2",
+  "item-0139.2",
+  "item-0083.2",
+  "item-0015.1",
+  "item-0117.2",
+  "item-0198.1",
+  "item-0119.1",
+  "item-0012.1",
+  "item-0092.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a36b0721-1978-4c8d-ae38-5849713a3156",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the defined term 'Revisions' for 履歴.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified term '인증샷'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses the specified name '쉬눠' and natural phrasing.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"The speaker is referring to Nagi, not introducing herself.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate renderings.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both 'shop' and 'store' are accurate and natural translations.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are natural Korean translations using appropriate 반말 speech level.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 十河課長 as 토고 과장님.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 uses the established name '저우 이모'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Thorne speaks to Rook using 해요체.\"}\n]\n```\n",
+  "duration_seconds": 5.190013,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17447,
+   "output_tokens": 317,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17764
+  }
+ }
+}

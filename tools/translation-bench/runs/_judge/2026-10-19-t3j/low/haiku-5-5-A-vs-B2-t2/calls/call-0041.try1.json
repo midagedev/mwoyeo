@@ -1,0 +1,31 @@
+{
+ "call": 41,
+ "try": 1,
+ "ids": [
+  "item-0165.1",
+  "item-0312.1",
+  "item-0280.1",
+  "item-0167.1",
+  "item-0270.2",
+  "item-0326.2",
+  "item-0147.1",
+  "item-0275.1",
+  "item-0182.1",
+  "item-0237.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a7017ce4-183e-4462-b2d6-414f36b048ae",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both are natural Korean translations using informal 반말 register.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately convey the polite request.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Rook speaks to Captain Thorne in formal 합쇼체, not 반말.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'Book' is more natural and idiomatic than 'call for'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"The subject refers to the speaker's older brother, not oneself.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Matches the given name spelling '타카나시' and natural particle usage.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both convey the meaning and imperative instructional tone accurately and naturally.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"'Get off work' and 'leave work' are both accurate and natural.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Terms specify Marigold is 메리골드, but T1 mistranslates to 마리골드.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'What do you make of' is more idiomatic for interpreting clues.\"}\n]\n```\n",
+  "duration_seconds": 5.152217,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5483,
+   "output_tokens": 336,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11813,
+   "total_tokens": 5819
+  }
+ }
+}

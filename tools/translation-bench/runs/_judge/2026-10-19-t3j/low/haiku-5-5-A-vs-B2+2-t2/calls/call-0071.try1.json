@@ -1,0 +1,31 @@
+{
+ "call": 71,
+ "try": 1,
+ "ids": [
+  "item-0238.2",
+  "item-0016.1",
+  "item-0308.1",
+  "item-0124.2",
+  "item-0367.2",
+  "item-0019.1",
+  "item-0031.1",
+  "item-0033.1",
+  "item-0271.2",
+  "item-0008.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7b6d230d-fc04-4b01-8f1b-8d4421c1222d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both correctly use 해요체 and convey the message accurately and naturally.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates the name Gerald into Korean (제럴드) instead of leaving English.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both convey the meaning and correct speech level (반말) naturally.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both are accurate and natural Korean translations of the instructional text.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"雨宮 is Amamiya (아마미야); Sogou uses 해요체 to Hyuga.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both fail instruction register or term translation; neither accurately represents procedural instructions.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translate the sentence accurately and naturally in user guide style.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Pinyin romanization is preferred over leaving untranslated Chinese characters.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'발판' refers to onboarding Launchpad/foundation tasks, not literal scaffolding.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both accurately translate the detective's 반말 monologue/remark.\"}\n]\n```\n",
+  "duration_seconds": 5.368974,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17190,
+   "output_tokens": 335,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17525
+  }
+ }
+}

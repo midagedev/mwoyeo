@@ -1,0 +1,27 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0144.1",
+  "item-0230.1",
+  "item-0152.2",
+  "item-0307.2",
+  "item-0055.2",
+  "item-0347.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c8ddd1a9-1be5-4f3c-8a18-ce7b26dad64b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly conveys hearsay (~다고 해요) instead of realization (~군요).\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 translates '蓑衣' to 'raincoat', while 2 leaves it untranslated.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left untranslated Japanese text ('ですから').\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 accurately translates '叮嘱' and avoids the erroneous 'Luò' pronunciation.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly translates spaceship 'bridge' as '브리지' rather than '다리'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the sentence into Korean.\"}\n]\n```\n",
+  "duration_seconds": 37.422203,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16322,
+   "output_tokens": 4909,
+   "thinking_tokens": 4689,
+   "cache_read_tokens": 0,
+   "total_tokens": 21231
+  }
+ }
+}

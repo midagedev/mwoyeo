@@ -1,0 +1,31 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0219.2",
+  "item-0130.2",
+  "item-0175.1",
+  "item-0105.1",
+  "item-0235.2",
+  "item-0266.1",
+  "item-0284.1",
+  "item-0015.1",
+  "item-0008.1",
+  "item-0238.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "02a839fe-74ea-4664-bf66-5c2d47e57cae",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"The particle 'にも' conveys 'even for', captured well by Translation 2.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'상황도 견뎌냈어' is much more natural Korean than '것도 살아남았어'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both incorrectly use '형' for a female speaker talking to Rory.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Habitual present progressive matches '残しています' better than present perfect in guide.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"周姨 speaks to 林远 using 해요체 (보세요).\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'Appear at the top' avoids awkward repetition of 'listed... list'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Natural English phrasing using 'in' for departments and keeping honorific context.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate renderings of the line.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese; Translation 2 uses correct 해요체.\"}\n]\n```\n",
+  "duration_seconds": 5.096804,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16998,
+   "output_tokens": 343,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17341
+  }
+ }
+}

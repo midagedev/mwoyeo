@@ -1,0 +1,28 @@
+{
+ "call": 62,
+ "try": 1,
+ "ids": [
+  "item-0284.2",
+  "item-0368.1",
+  "item-0128.2",
+  "item-0117.2",
+  "item-0079.2",
+  "item-0094.2",
+  "item-0070.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6c52adc1-dec7-4fcb-9e51-41b7564b79e8",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Rook speaks 반말 to Dex and correctly preserves the interrupted ending.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses correct pinyin Xie Xuan per facts instead of Jie Xuan.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translates bridge to spaceship context (선교) instead of physical bridge.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly follows the defined terminology mapping 先輩 to boss.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses the specified name 쏜 and correct honorific speech level.\"}\n]\n```\n",
+  "duration_seconds": 4.914766,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16455,
+   "output_tokens": 228,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16683
+  }
+ }
+}

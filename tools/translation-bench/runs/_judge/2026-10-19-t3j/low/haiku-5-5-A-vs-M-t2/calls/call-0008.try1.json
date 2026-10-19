@@ -1,0 +1,31 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0141.1",
+  "item-0280.1",
+  "item-0093.2",
+  "item-0333.1",
+  "item-0047.2",
+  "item-0077.2",
+  "item-0158.2",
+  "item-0140.2",
+  "item-0242.2",
+  "item-0265.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "66a25ded-73f7-43ad-9f85-e983f1205051",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural phrasing without redundant pronouns.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses correct polite register (해요체) to Lin Yuan.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Follows the specified term '카운슬 택스'.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and accurate.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both are accurate and natural translations of urgent.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses 해요체 as required when Rory speaks to Gareth.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Accurately translates Tessai's name and honors specified speech level.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Natural 반말 between siblings/housemates; Translation 2 is overly literal.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Follows the specified term 수호막 for 結界.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Uses the specified term 'Space' for ワークスペース.\"}\n]\n```\n",
+  "duration_seconds": 4.223153,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17459,
+   "output_tokens": 308,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17767
+  }
+ }
+}

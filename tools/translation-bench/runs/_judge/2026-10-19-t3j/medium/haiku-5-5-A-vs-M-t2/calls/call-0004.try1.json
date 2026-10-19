@@ -1,0 +1,27 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0396.2",
+  "item-0161.1",
+  "item-0001.1",
+  "item-0208.2",
+  "item-0398.1",
+  "item-0231.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ea7d8d29-0c53-4ff2-922f-19257d6e500f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"海 refers to the person Kai, not the sea.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'Your cat' naturally clarifies ownership where Korean dropped the pronoun.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally accurate, faithful, and natural.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Uses the name 쏜 and natural Korean phrasing over translationese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Modakbul is the platform's proper name, not a campfire.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translates the character's name Rook to 루크 as specified.\"}\n]\n```\n",
+  "duration_seconds": 50.397356,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15936,
+   "output_tokens": 6261,
+   "thinking_tokens": 6068,
+   "cache_read_tokens": 0,
+   "total_tokens": 22197
+  }
+ }
+}

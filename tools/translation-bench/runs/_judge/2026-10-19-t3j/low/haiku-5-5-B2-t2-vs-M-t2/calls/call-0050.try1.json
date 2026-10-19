@@ -1,0 +1,31 @@
+{
+ "call": 50,
+ "try": 1,
+ "ids": [
+  "item-0164.2",
+  "item-0024.1",
+  "item-0021.2",
+  "item-0352.2",
+  "item-0311.2",
+  "item-0004.1",
+  "item-0150.1",
+  "item-0293.1",
+  "item-0317.1",
+  "item-0170.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1fcf8c6b-e7b4-441c-ae1f-d1a9344c3a88",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Neither uses the established term 'Commons', but both convey the meaning.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Rook speaks 합쇼체 to Thorne, but both incorrectly use 반말.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"More natural, formal instruction style for internal wiki documentation.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Refers to Qiu Shuang, who is female.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Incomplete sentence cut off from warning about being late.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both use correct 반말 register and convey identical meaning naturally.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Chinese source text.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both incorrectly translate '抢 (ticket rush/snag)' as '뺏다 (snatch/steal)'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Uses the specified term '엠티' for 合宿.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"}\n]\n```\n",
+  "duration_seconds": 5.698492,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17402,
+   "output_tokens": 317,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17719
+  }
+ }
+}

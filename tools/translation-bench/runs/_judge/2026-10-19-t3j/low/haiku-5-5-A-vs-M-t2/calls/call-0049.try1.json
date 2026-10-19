@@ -1,0 +1,31 @@
+{
+ "call": 49,
+ "try": 1,
+ "ids": [
+  "item-0211.1",
+  "item-0292.1",
+  "item-0017.1",
+  "item-0183.1",
+  "item-0337.2",
+  "item-0218.1",
+  "item-0345.1",
+  "item-0215.1",
+  "item-0305.1",
+  "item-0128.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "46c024b1-a472-43e6-9881-c1b8b8e44c4f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Matches the defined term 'Revisions' from the facts block.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Hinata speaks to Takanashi in banmal; Translation 1 uses 해요체.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translates 万俟 and Qiu姑娘 properly; Translation 2 leaves Chinese untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Earlier context establishes ひろば as Commons/plaza, not hiroba (space).\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translates Chinese characters into Korean hangeul instead of leaving hanzi.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Reads more naturally as a Korean morning greeting in chat.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Natural Korean for the month after next is 다다음 달, not 재내달.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'아직 안 왔어' naturally answers 'Did the bill come yet?'\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both convey the sentence equally well despite minor punctuation difference.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Preserves the bridge's proper name rather than translating the literal bird.\"}\n]\n```\n",
+  "duration_seconds": 4.949946,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17473,
+   "output_tokens": 343,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17816
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 50,
+ "try": 1,
+ "ids": [
+  "item-0124.1",
+  "item-0023.1",
+  "item-0154.2",
+  "item-0080.1",
+  "item-0307.1",
+  "item-0257.1",
+  "item-0337.2",
+  "item-0133.2",
+  "item-0366.1",
+  "item-0139.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5c5cf97e-18f3-47b9-b047-304935001f03",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 and accurately translates the complete sentence.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 mistranslates the subject and proper noun Thorne as 써니.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly captures the instructional tone rather than first-person 'I'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 sounds much more natural in Korean technical contexts.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into English.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Gareth speaks in 해요체 to tenants; Translation 2 uses polite 합쇼체.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 mistranslates '昏' (unconscious) as 'confused'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'그때까지' in Translation 1 is more natural than '그때 전에'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 completely failed to translate the line.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and convey the exact meaning.\"}\n]\n```\n",
+  "duration_seconds": 7.322086,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17358,
+   "output_tokens": 338,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17696
+  }
+ }
+}

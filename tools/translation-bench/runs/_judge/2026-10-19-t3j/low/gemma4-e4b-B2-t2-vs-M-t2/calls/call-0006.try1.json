@@ -1,0 +1,31 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0004.1",
+  "item-0126.2",
+  "item-0071.1",
+  "item-0065.1",
+  "item-0080.1",
+  "item-0026.1",
+  "item-0094.1",
+  "item-0157.1",
+  "item-0129.2",
+  "item-0101.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fa5b7b7a-7ee4-4191-9103-e56a02521c22",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Ship bridge is correctly translated as '조타실' rather than '다리'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses the specified term '메리골드' and appropriate 반말 register.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translates 'affects' accurately and reads more naturally in software context.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Follows the specified name spelling 'Seoyoon'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly follows the specified term '結界 = 수호막'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Uses the specified term '메리골드'.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both appropriately use 반말 with natural conversational phrasing.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Respects the specified 해요체 speech level toward 周婷.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly follows the specified term '結界 = 수호막'.\"}\n]\n```\n",
+  "duration_seconds": 4.879996,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17288,
+   "output_tokens": 319,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17607
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0008.2",
+  "item-0041.2",
+  "item-0017.2",
+  "item-0007.2",
+  "item-0038.1",
+  "item-0023.1",
+  "item-0022.2",
+  "item-0036.1",
+  "item-0045.1",
+  "item-0028.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cb32f7bc-974f-40b1-a44c-d39377fd4360",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 sounds more natural and idiomatic in Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"\\\"On site\\\" as an adverbial phrase is typically unhyphenated.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both failed to translate the Korean source into English.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both are identical except for an optional comma.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses the established term 'Commons' instead of untranslated 'Hiroba'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Preserves the original sentence-ending glyph symbol ◆.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 translates into English; Translation 1 left it untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Matches the source text more faithfully and naturally.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"\\\"Deliverables\\\" is much closer to onboarding steps than \\\"landing page\\\".\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Plural 'notes' and 'tags' read more naturally than singular 'memo'.\"}\n]\n```\n",
+  "duration_seconds": 5.334024,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16740,
+   "output_tokens": 321,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17061
+  }
+ }
+}

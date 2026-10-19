@@ -1,0 +1,27 @@
+{
+ "call": 7,
+ "try": 1,
+ "ids": [
+  "item-0029.2",
+  "item-0050.1",
+  "item-0063.1",
+  "item-0148.1",
+  "item-0038.1",
+  "item-0164.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1f401dc9-e043-4e08-a579-3fba644c1070",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'안 오는데요' is natural Korean, whereas '안 오고 있고요' is awkward.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly uses '우리다' for tea instead of '끓이다'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the name '개러스' from the facts.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both fail the required speech level and differ only in punctuation.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the particle '에게' for a person.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations completely misunderstand the context and mistranslate the sentence.\"}\n]\n",
+  "duration_seconds": 64.40132,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16211,
+   "output_tokens": 7948,
+   "thinking_tokens": 7746,
+   "cache_read_tokens": 0,
+   "total_tokens": 24159
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0343.2",
+  "item-0126.2",
+  "item-0309.1",
+  "item-0307.1",
+  "item-0099.1",
+  "item-0092.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "04cad512-27ba-4abd-853d-bcadc16a0952",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 reads much more naturally and idiomatically.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly preserves the code name Hotaru.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified name and polite speech level.\"}\n]\n",
+  "duration_seconds": 30.499333,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16183,
+   "output_tokens": 3799,
+   "thinking_tokens": 3625,
+   "cache_read_tokens": 0,
+   "total_tokens": 19982
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0004.1",
+  "item-0189.1",
+  "item-0096.2",
+  "item-0043.2",
+  "item-0312.2",
+  "item-0375.1",
+  "item-0260.2",
+  "item-0313.2",
+  "item-0313.1",
+  "item-0086.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "62cbd4c2-2f6e-46b8-add4-dff3a6b6d52f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Uses correct informal register (반말) and accurate monetary amount.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correct name 저우 이모 and proper 해요체 speech level.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"More natural and accurate translation of 'where you put it'.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left source text completely untranslated.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left source text completely untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Better modifier placement avoids ambiguity about trembling voice.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Better modifier placement avoids ambiguity about trembling voice.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correct context; 货/批 refers to goods/batch, not loan (대출).\"}\n]\n```\n",
+  "duration_seconds": 4.009428,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17297,
+   "output_tokens": 302,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17599
+  }
+ }
+}

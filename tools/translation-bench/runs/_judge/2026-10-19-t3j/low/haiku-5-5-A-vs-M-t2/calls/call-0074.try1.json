@@ -1,0 +1,31 @@
+{
+ "call": 74,
+ "try": 1,
+ "ids": [
+  "item-0385.2",
+  "item-0148.2",
+  "item-0263.2",
+  "item-0118.2",
+  "item-0162.1",
+  "item-0131.1",
+  "item-0363.1",
+  "item-0043.2",
+  "item-0283.1",
+  "item-0209.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4c2a33ba-1cef-4bf3-a3a7-66e3ac7cf9fc",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Uses established term 'Commons' instead of literal 'plaza'.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are natural and faithful translations of the Japanese request.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly uses honorifics toward an elder client.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Uses natural term '모차' without redundant explanatory glosses.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'여러분의 작업' fits tutorial register better than awkward '당신의'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'화장실 좀 빌릴게요' faithfully reflects the polite Japanese idiom お借りする.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both '알겠어' and '알았어' naturally translate informal casual 了解.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'독촉해 볼게요' accurately captures the meaning of 'chase'.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both incorrectly use female pronouns for Yuki, male client.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both capture casual chat tone and meaning accurately.\"}\n]\n```\n",
+  "duration_seconds": 5.275783,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17277,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17602
+  }
+ }
+}

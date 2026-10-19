@@ -1,0 +1,25 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0224.2",
+  "item-0358.2",
+  "item-0121.1",
+  "item-0137.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "997ddc8a-6133-45c5-a350-92130861bc7c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both misinterpret '부를까?' (shall I invite) as 'will come'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"More natural phrasing for posting notes to a space.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Neither translated the Chinese text into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 attempted Korean, while 2 remained in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 3.816675,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 3696,
+   "output_tokens": 130,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11807,
+   "total_tokens": 3826
+  }
+ }
+}

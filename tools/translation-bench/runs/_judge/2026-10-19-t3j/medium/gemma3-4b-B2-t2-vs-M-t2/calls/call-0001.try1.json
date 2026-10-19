@@ -1,0 +1,27 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0105.2",
+  "item-0204.2",
+  "item-0049.1",
+  "item-0258.1",
+  "item-0171.1",
+  "item-0004.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "be23cf80-0c21-4d11-8b99-a7d35117dc86",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified term 메리골드.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"1 followed the specified name; 2 followed the required speech level.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates Qiushuang without leaving untranslated Chinese characters.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, whereas Translation 1 remains in Japanese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly identifies Kaoru rather than mistranslating to Kazu.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 'that one' as a pronoun, not spot.\"}\n]\n```\n",
+  "duration_seconds": 113.82108,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16117,
+   "output_tokens": 14182,
+   "thinking_tokens": 13975,
+   "cache_read_tokens": 0,
+   "total_tokens": 30299
+  }
+ }
+}

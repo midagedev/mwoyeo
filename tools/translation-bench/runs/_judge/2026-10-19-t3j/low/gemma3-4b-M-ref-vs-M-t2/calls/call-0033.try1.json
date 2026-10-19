@@ -1,0 +1,31 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0134.2",
+  "item-0043.1",
+  "item-0144.2",
+  "item-0075.1",
+  "item-0298.2",
+  "item-0135.2",
+  "item-0113.1",
+  "item-0057.2",
+  "item-0277.1",
+  "item-0149.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c298742d-6a59-4087-9503-d5d5a7e1c225",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Pell is a doctor, not the captain, making Translation 1 wrong.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates the name 朔 to 삭 instead of leaving hanja.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 completely hallucinates unrelated content from earlier lines.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Chinese.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 appropriately uses honorific '-시-' for the elder building superintendent.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates Korean emoticons into natural English text.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 properly translates the two sentences, despite minor name spelling.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 more naturally renders 'Keep theirs for the footer'.\"}\n]\n```\n",
+  "duration_seconds": 4.596344,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17698,
+   "output_tokens": 322,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18020
+  }
+ }
+}

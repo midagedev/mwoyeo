@@ -1,0 +1,31 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0025.1",
+  "item-0203.1",
+  "item-0137.1",
+  "item-0127.2",
+  "item-0083.1",
+  "item-0224.2",
+  "item-0177.1",
+  "item-0231.1",
+  "item-0084.1",
+  "item-0040.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "96f57915-4908-4d95-b808-f933f66dbf68",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey meaning identically well, though both incorrectly use 'He' instead of 'She'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 uses natural imperative instruction style suitable for onboarding guides.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 'Status' and sounds much more natural.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly captures '醒了就好' (glad you're awake/it's fine).\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Translation 1 failed to translate to Korean; Translation 2 mistranslated husband as wife.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 accurately translated Japanese to Korean with correct speech level.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 is completely hallucinated; Translation 2 attempted the line.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translated into Korean, whereas Translation 1 left text in Chinese.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 uses the correct pronoun '너' instead of '네'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 translates the actual target line, while Translation 2 translates context.\"}\n]\n```\n",
+  "duration_seconds": 4.854976,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17582,
+   "output_tokens": 354,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17936
+  }
+ }
+}

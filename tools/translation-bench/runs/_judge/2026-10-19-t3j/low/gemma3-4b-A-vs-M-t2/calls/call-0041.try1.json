@@ -1,0 +1,27 @@
+{
+ "call": 41,
+ "try": 1,
+ "ids": [
+  "item-0353.1",
+  "item-0037.1",
+  "item-0197.2",
+  "item-0264.1",
+  "item-0049.2",
+  "item-0117.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3134dacf-9aa6-4a4c-a545-7e5988a1773b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 invents '형' for an inanimate/non-brother freezer.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 translates earlier context lines instead of the line.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 hallucinates red apples and eating.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 uses a more natural noun-phrase heading style.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Rook speaks to Captain Thorne in 합쇼체; Translation 1 uses 반말.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations completely mistranslate 十一 (National Day) and 厦门 (Xiamen).\"}\n]\n```\n",
+  "duration_seconds": 4.640992,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15847,
+   "output_tokens": 206,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16053
+  }
+ }
+}

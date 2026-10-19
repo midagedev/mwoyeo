@@ -1,0 +1,31 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0021.1",
+  "item-0304.2",
+  "item-0126.1",
+  "item-0053.2",
+  "item-0223.2",
+  "item-0370.1",
+  "item-0376.1",
+  "item-0234.2",
+  "item-0068.2",
+  "item-0358.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "63265947-1e71-4a18-8a64-7244c69a089f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates the name and keeps the reported statement accurate.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"1 left Chinese text uncompleted and mistranslated Xiamen into nonsense.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"More natural phrasing in Korean with '동안'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"1 hallucinated window/app metadata instead of translating the sentence.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"1 left the source Japanese sentence completely untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"1 translated the line, while 2 hallucinated window/app metadata.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"2 left the Chinese text completely untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"1 left the source sentence completely untranslated.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"2 hallucinated 'Otani' as part of the shopkeeper's name.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"1 contains severe spelling/encoding errors ('맡せて 줘').\"}\n]\n```\n",
+  "duration_seconds": 4.5972159999999995,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17583,
+   "output_tokens": 315,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17898
+  }
+ }
+}

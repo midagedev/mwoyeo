@@ -1,0 +1,31 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0297.1",
+  "item-0246.1",
+  "item-0245.1",
+  "item-0151.1",
+  "item-0141.1",
+  "item-0194.2",
+  "item-0063.1",
+  "item-0218.2",
+  "item-0164.1",
+  "item-0249.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "60f2888b-7f14-4891-867f-3e9aae1d6b19",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both capture the meaning accurately with natural phrasing.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the sentence into Korean.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Identical translations with negligible punctuation difference.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Zhou Ting speaks in banmal to Lu Ming.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Identical translations differing only by an optional comma.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both 'upfront' and 'beforehand' naturally convey '先に'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Properly transliterates 'Dex' into Korean as '덱스'.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both convey the casual tone accurately; punctuation difference is negligible.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"'Quite' and 'pretty' both translate '좀' naturally.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Gareth speaks in haeyo-che, matching '관리인이에요'.\"}\n]\n```\n",
+  "duration_seconds": 4.682753,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5713,
+   "output_tokens": 311,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11819,
+   "total_tokens": 6024
+  }
+ }
+}

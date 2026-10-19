@@ -1,0 +1,24 @@
+{
+ "call": 29,
+ "try": 1,
+ "ids": [
+  "item-0150.2",
+  "item-0344.1",
+  "item-0260.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9cef53a6-7d87-485c-813f-2da1d3af068c",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 translates the wrong line entirely.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 translates 構え as holding instead of swinging.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 is left untranslated in Japanese.\"}\n]\n",
+  "duration_seconds": 13.630062,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15287,
+   "output_tokens": 1250,
+   "thinking_tokens": 1159,
+   "cache_read_tokens": 0,
+   "total_tokens": 16537
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0077.1",
+  "item-0178.2",
+  "item-0217.1",
+  "item-0258.2",
+  "item-0060.2",
+  "item-0194.2",
+  "item-0223.1",
+  "item-0253.1",
+  "item-0039.2",
+  "item-0075.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "68aaeeb3-7b2d-437e-9a15-1742154898e7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"채율 is transcribed as Cha-eul, not Jae-yeol.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 leaves Chinese untranslated and uses awkward phrasing.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses the specified term 'fleet allocation' for 배차.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translates to Korean; Translation 2 leaves Japanese untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translates into Korean, whereas Translation 2 left Japanese untranslated.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Speaker is older brother talking to younger sister, so '형' is wrong.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 is unreadable romaji, while Translation 1 translates to English.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Follows the term fact 'メモット = Memotto'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both candidates failed to translate the Japanese text into Korean.\"}\n]\n```\n",
+  "duration_seconds": 9.051173,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17429,
+   "output_tokens": 326,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17755
+  }
+ }
+}

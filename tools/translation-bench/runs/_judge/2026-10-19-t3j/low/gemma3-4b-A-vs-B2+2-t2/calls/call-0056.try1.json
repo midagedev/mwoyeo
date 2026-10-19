@@ -1,0 +1,31 @@
+{
+ "call": 56,
+ "try": 1,
+ "ids": [
+  "item-0170.1",
+  "item-0231.2",
+  "item-0071.2",
+  "item-0186.1",
+  "item-0048.1",
+  "item-0323.2",
+  "item-0272.2",
+  "item-0306.2",
+  "item-0145.1",
+  "item-0091.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c8355d5b-72de-41b7-b6e3-226910991a57",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates Ceres to 세레스 and ship name to 마릴로호.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 at least attempts to explain the untranslated word 'raincoat'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates into English, whereas Translation 1 left Japanese untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Neither translates '부를까' accurately, but 1 preserves the terminal symbol ◆.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, whereas Translation 2 left Chinese untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Rory is male, but Translation 1 mistranslates dresser less egregiously than 앤틱 가구.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 translates into English, whereas Translation 1 left Korean untranslated.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 passive voice fits wiki guidebook tone better than personal 'we'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 translates the line, whereas Translation 2 outputs game title metadata.\"}\n]\n```\n",
+  "duration_seconds": 5.035294,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17566,
+   "output_tokens": 357,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17923
+  }
+ }
+}

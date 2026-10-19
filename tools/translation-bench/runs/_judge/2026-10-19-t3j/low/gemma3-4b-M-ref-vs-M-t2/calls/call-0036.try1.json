@@ -1,0 +1,31 @@
+{
+ "call": 36,
+ "try": 1,
+ "ids": [
+  "item-0113.2",
+  "item-0010.2",
+  "item-0383.1",
+  "item-0130.1",
+  "item-0090.1",
+  "item-0005.1",
+  "item-0291.1",
+  "item-0339.2",
+  "item-0346.1",
+  "item-0222.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8cac1180-967a-453e-87fe-3e14b970fe26",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"The super is not present, so honorific -시- is unnecessary.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Earlier context established 'Seojin Um', and row fits seating better.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Tutorial instructional style naturally uses polite imperative rather than plain form.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"アキラ responds to report with 聞こう ('Let's hear it').\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"两成 means 20%, not two times, and translated properly.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 is entirely untranslated Japanese.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"所長 corresponds to 소장, not 부장.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"多少钱一晚 asks the price per night, not per bed.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 translates at least part of the sentence into Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Unloading is the standard logistics term for 하차 작업.\"}\n]\n```\n",
+  "duration_seconds": 4.850475,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17448,
+   "output_tokens": 323,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17771
+  }
+ }
+}

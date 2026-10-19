@@ -1,0 +1,31 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0001.1",
+  "item-0044.2",
+  "item-0002.1",
+  "item-0056.2",
+  "item-0025.2",
+  "item-0019.2",
+  "item-0055.1",
+  "item-0026.2",
+  "item-0007.2",
+  "item-0050.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7e7ff155-c483-411f-b75e-52974a5d2fe7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"보증금 is the natural and accurate rental context term.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Niece calls her mother's brother 외삼촌, not 작은아버지.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"In logistics site unloading, 기사 refers to drivers, not engineers.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"ホタル is a project/product code name, so transliteration 호타루 fits.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"村田 (Murata) is standardly transcribed as 무라타, not 무라다.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Respectful honorific 하셨어 is appropriate when referring to professor's words.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both Eom and Um are standard English spellings for 엄.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"The character name Dex should be transliterated as 덱스.\"}\n]\n```\n",
+  "duration_seconds": 4.238963,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17178,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17510
+  }
+ }
+}

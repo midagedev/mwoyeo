@@ -1,0 +1,27 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0238.1",
+  "item-0070.2",
+  "item-0312.2",
+  "item-0173.2",
+  "item-0340.2",
+  "item-0343.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d4f40a0e-b377-4076-b9e0-5ee2a3edde69",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 translates into English, while Translation 2 is untranslated.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both candidates failed to translate the text into Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while Translation 1 is untranslated.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 translates into English, while Translation 1 is untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 'cleans up after' as 뒷정리를 하다.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 remains in Japanese.\"}\n]\n",
+  "duration_seconds": 42.410324,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16337,
+   "output_tokens": 5315,
+   "thinking_tokens": 5113,
+   "cache_read_tokens": 0,
+   "total_tokens": 21652
+  }
+ }
+}

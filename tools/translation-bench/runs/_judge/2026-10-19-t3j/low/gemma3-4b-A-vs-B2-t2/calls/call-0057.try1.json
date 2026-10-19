@@ -1,0 +1,25 @@
+{
+ "call": 57,
+ "try": 1,
+ "ids": [
+  "item-0294.1",
+  "item-0090.2",
+  "item-0267.1",
+  "item-0132.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1ce6faee-2253-4922-a310-5ef2260cf65c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Speaker addresses Zhou Yi using 해요체, unlike 2's 반말.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both miss terms and speech level (해요체 required for Gareth).\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the sentence into Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 is completely unrelated text, whereas 2 translates the line.\"}\n]\n```\n",
+  "duration_seconds": 4.351773,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15597,
+   "output_tokens": 137,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15734
+  }
+ }
+}

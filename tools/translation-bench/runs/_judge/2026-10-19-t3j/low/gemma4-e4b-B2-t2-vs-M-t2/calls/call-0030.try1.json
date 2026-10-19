@@ -1,0 +1,31 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0196.2",
+  "item-0159.1",
+  "item-0101.2",
+  "item-0201.1",
+  "item-0169.1",
+  "item-0006.1",
+  "item-0199.2",
+  "item-0164.1",
+  "item-0170.1",
+  "item-0055.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e4b1284c-f97c-45dc-b6c1-88976133d802",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Uses the specified term '엠티' for 合宿.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Pinyin given is Yuè Chuān and Shàn Yúnzhōu (Lechuan/Yunzhou).\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses the specified term '수호막' for 結界.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"십호 speaks to 일향 in 해요체 ('도착했나요?').\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly uses the established name '루크' for Rook.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both fail Gareth's 해요체 speech level and have term/meaning flaws.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Directly matches 'New hire onboarding' from facts; both are natural.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both mistranslate '替我道声谢' (asking him to say thanks for him).\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Kiryu speaks to Takanashi in 해요체 ('말아요').\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both fail speech level (Lu Ming speaks to Zhou Ting in 해요체).\"}\n]\n```\n",
+  "duration_seconds": 5.3697610000000005,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17405,
+   "output_tokens": 352,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17757
+  }
+ }
+}

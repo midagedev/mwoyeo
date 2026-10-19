@@ -1,0 +1,31 @@
+{
+ "call": 49,
+ "try": 1,
+ "ids": [
+  "item-0178.2",
+  "item-0260.1",
+  "item-0240.1",
+  "item-0100.1",
+  "item-0085.2",
+  "item-0187.1",
+  "item-0255.1",
+  "item-0226.1",
+  "item-0066.2",
+  "item-0030.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6f5e1356-6311-4c6e-8e75-ad192b09fd21",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Lu Ming speaks to Zhou Ting in 해요체; Translation 1 uses 반말.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"호타루 건 is natural Korean phrasing, avoiding awkward word-for-word translation.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Sogo speaks to Hyuga in 해요체, matching Translation 1.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"In a software pull request context, '승인하면' is more accurate than '동의하면'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Follows original sentence structure and emphasis much more naturally.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Refers to Seoyoon's day off moving/cleaning, so 'your' fits the context.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the line into English.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Transliterates Japanese app UI feature names properly instead of leaving kanji/kana.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Properly recognizes 海 as person name Kai, not the noun sea.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Strictly matches the given glossary term '履歴 = Revisions'.\"}\n]\n```\n",
+  "duration_seconds": 5.491749,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17162,
+   "output_tokens": 350,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17512
+  }
+ }
+}

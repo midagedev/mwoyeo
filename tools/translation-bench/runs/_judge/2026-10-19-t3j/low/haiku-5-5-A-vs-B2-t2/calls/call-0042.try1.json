@@ -1,0 +1,31 @@
+{
+ "call": 42,
+ "try": 1,
+ "ids": [
+  "item-0361.1",
+  "item-0318.2",
+  "item-0072.1",
+  "item-0298.2",
+  "item-0020.1",
+  "item-0083.1",
+  "item-0116.2",
+  "item-0279.1",
+  "item-0273.1",
+  "item-0362.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c701c6d7-39fd-42ec-b2ff-9dba71061955",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 incorrectly translated the internal tool name 모닥불 as 'campfire'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 faithfully preserves the truncated sentence from the source text.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly reflects the incomplete conditional '遅れる(と/ば)'.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Neither gender is indicated in the text or facts; both are plausible.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 translates and romanizes the Korean name properly.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"십하 is male, so his older sister is 누나, not 언니.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Uses the specified name 저우 이모 and natural tea-harvesting terminology.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally convey the inspector's blunt tone.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 properly transcribes the name phonetically in Korean.\"}\n]\n```\n",
+  "duration_seconds": 5.130764,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17321,
+   "output_tokens": 333,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17654
+  }
+ }
+}

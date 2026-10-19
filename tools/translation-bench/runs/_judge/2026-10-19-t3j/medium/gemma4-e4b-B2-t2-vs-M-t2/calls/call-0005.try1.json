@@ -1,0 +1,27 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0018.1",
+  "item-0067.2",
+  "item-0060.1",
+  "item-0199.1",
+  "item-0049.2",
+  "item-0135.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c6df6e34-2c01-471d-bd51-b7e0d901b4fa",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Follows the specified term 납품일 for 納期.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"괜찮은 거야 naturally captures the nuance of なの.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Accurately follows the specified terms 블렌딩 and 모차.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Matches the documented term New hire onboarding from the facts.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Carrier is natural English for a pet carrier, unlike carrier cage.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"다 accurately conveys the complete emptying implied by drained.\"}\n]\n```\n",
+  "duration_seconds": 42.535514,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16088,
+   "output_tokens": 5250,
+   "thinking_tokens": 5061,
+   "cache_read_tokens": 0,
+   "total_tokens": 21338
+  }
+ }
+}

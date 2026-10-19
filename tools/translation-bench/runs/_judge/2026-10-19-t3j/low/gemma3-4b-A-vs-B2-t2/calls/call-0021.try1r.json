@@ -1,0 +1,23 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0276.1",
+  "item-0353.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7d9c950e-25f6-4a70-88c6-c306ce274422",
+  "status": "SUCCESS",
+  "response": "[{\"case\": 1, \"better\": \"2\", \"why\": \"Thorne uses 해요체 to Rook; Translation 2 adheres to polite register.\"}, {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 uses correct spacing and natural phrasing ('그걸').\"}]\n",
+  "duration_seconds": 3.809076,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14771,
+   "output_tokens": 64,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 14835
+  }
+ }
+}

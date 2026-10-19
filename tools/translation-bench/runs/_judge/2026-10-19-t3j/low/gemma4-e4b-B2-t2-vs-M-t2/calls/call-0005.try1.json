@@ -1,0 +1,31 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0061.1",
+  "item-0178.1",
+  "item-0007.1",
+  "item-0184.1",
+  "item-0037.2",
+  "item-0078.1",
+  "item-0039.1",
+  "item-0120.2",
+  "item-0130.2",
+  "item-0056.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d5d63054-6371-492d-ac5c-86e2646ca552",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"More natural Korean without unnecessary and unnatural repetitive pronouns.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"The source sentence is cut off mid-word without trailing punctuation.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Accurately follows the specified terminology for 毛茶 (모차).\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"공주님 is far more natural in Korean than the literal 왕녀님.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Reads much more naturally in Korean than translation 1's literal phrasing.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates the detective jargon ヤマ naturally instead of leaving raw transliteration.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses proper Korean phonology/particles and natural phrasing for informal speech.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Follows the specified name spelling Jiu rather than Jiwoo.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and faithful to the source.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Contraction difference only; both accurately convey the meaning and register.\"}\n]\n```\n",
+  "duration_seconds": 4.793823,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17146,
+   "output_tokens": 326,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17472
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0237.2",
+  "item-0130.1",
+  "item-0090.1",
+  "item-0005.1",
+  "item-0272.1",
+  "item-0194.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ccd8ad86-b021-459d-b00d-6b46acfaf131",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both use wrong pronouns, speech level, and misinterpret the sentence.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 leaves kanji untranslated and uses the wrong register.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both use wrong terms (보증금 for rent) and wrong speech levels.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated Chinese text.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated Chinese text.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the formal affirmative '네' for 합쇼체.\"}\n]\n```\n",
+  "duration_seconds": 3.870699,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16216,
+   "output_tokens": 200,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16416
+  }
+ }
+}

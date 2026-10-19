@@ -1,0 +1,27 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0232.1",
+  "item-0119.1",
+  "item-0200.2",
+  "item-0319.1",
+  "item-0313.1",
+  "item-0208.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1e99aa56-8566-4769-ab45-29866b3a188b",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"1 uses correct name, proper business register, and natural honorifics.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"1 correctly uses informal speech (반말) between siblings.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"1 translates the descriptive clause more naturally and fluently.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"2 perfectly captures the elderly guild master's tone and register.\"}\n]\n",
+  "duration_seconds": 116.036969,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16233,
+   "output_tokens": 14636,
+   "thinking_tokens": 14458,
+   "cache_read_tokens": 0,
+   "total_tokens": 30869
+  }
+ }
+}

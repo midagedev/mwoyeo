@@ -1,0 +1,31 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0299.2",
+  "item-0322.2",
+  "item-0327.1",
+  "item-0037.2",
+  "item-0052.2",
+  "item-0045.1",
+  "item-0099.1",
+  "item-0189.2",
+  "item-0034.2",
+  "item-0300.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "03bdcf1e-35e1-4c1a-b1be-89d3942c5314",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 'looking for' instead of 'doing'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly renders 'Tomasz' as '토마슈' according to pronunciation.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly identifies Thorne and the meaning of hiding it.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations accurately convey the meaning naturally in English.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 'freezer' as 냉동고 and 'that noise'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 contains severe untranslated and corrupted name text.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Korean sentence into English.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Hinata speaks 반말 to her uncle; 2 uses inappropriate formal speech.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 leaves the Japanese text untranslated.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"}\n]\n```\n",
+  "duration_seconds": 4.863778,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17143,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17467
+  }
+ }
+}

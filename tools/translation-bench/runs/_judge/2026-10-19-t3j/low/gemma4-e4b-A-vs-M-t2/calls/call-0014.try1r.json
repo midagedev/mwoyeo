@@ -1,0 +1,25 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0301.1",
+  "item-0048.2",
+  "item-0123.2",
+  "item-0384.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b5e3a751-ad84-4cd7-a491-d952d6dcce23",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in banmal, not polite honorifics.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Refers to a one-time upcoming Saturday, not habitual Saturdays.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 sounds more natural without repeating 'listed... list'.\"}\n]\n```\n",
+  "duration_seconds": 3.280174,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15442,
+   "output_tokens": 137,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15579
+  }
+ }
+}

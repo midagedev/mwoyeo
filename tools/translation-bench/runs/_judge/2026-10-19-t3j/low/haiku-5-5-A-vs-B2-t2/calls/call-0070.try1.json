@@ -1,0 +1,31 @@
+{
+ "call": 70,
+ "try": 1,
+ "ids": [
+  "item-0263.2",
+  "item-0118.2",
+  "item-0162.1",
+  "item-0131.1",
+  "item-0043.2",
+  "item-0283.1",
+  "item-0209.1",
+  "item-0143.1",
+  "item-0336.1",
+  "item-0235.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ab96fbf1-942b-4b68-b70d-750f7c46962d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"As a section heading in a tutorial, the verbal noun form is natural.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the meaning well, though both missed Thorne's 해요체 and name.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Invited people naturally translates the plural/general sense of 招待された人.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both incorrectly use polite language when Rory speaks to Siobhan in 반말.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Lin Xia speaks to Lin Yuan in 반말, correctly reflected in 2.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Honorific 도착하시면 appropriately respects the client Amemiya.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Dex speaks to Rook in 반말 and Gerald is transcribed into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"A pocket watch is an inanimate object, so 유품이네요 is grammatically correct.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both use 해요체 instead of the specified 합쇼체 to Gareth.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Lin Yuan uses 반말 to Lin Xia, matching translation 1's speech level.\"}\n]\n```\n",
+  "duration_seconds": 5.090265,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17112,
+   "output_tokens": 346,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17458
+  }
+ }
+}

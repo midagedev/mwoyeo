@@ -1,0 +1,27 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0231.1",
+  "item-0118.1",
+  "item-0199.2",
+  "item-0279.2",
+  "item-0206.1",
+  "item-0328.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "21c66588-53c5-4dec-a86b-580a167d7ed0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both '엷은' and '옅은' are equally natural and accurate synonyms for light.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified 해요체 speech level.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'꼭 ~할 거야' captures '一定要' more faithfully and avoids repeating '가다'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 romanizes '모닥불' instead of leaving untranslated Korean text.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Chinese text into Korean.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both correctly translate the heading; capitalization difference is purely formatting.\"}\n]\n```\n",
+  "duration_seconds": 61.266039,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16229,
+   "output_tokens": 7331,
+   "thinking_tokens": 7121,
+   "cache_read_tokens": 0,
+   "total_tokens": 23560
+  }
+ }
+}

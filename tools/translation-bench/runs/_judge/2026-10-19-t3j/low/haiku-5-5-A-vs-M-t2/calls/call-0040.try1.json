@@ -1,0 +1,31 @@
+{
+ "call": 40,
+ "try": 1,
+ "ids": [
+  "item-0180.1",
+  "item-0393.1",
+  "item-0041.2",
+  "item-0194.2",
+  "item-0158.1",
+  "item-0129.1",
+  "item-0251.2",
+  "item-0179.2",
+  "item-0339.1",
+  "item-0089.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f81286e0-61b5-4cc1-9840-44bc8502da58",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Day 2 matches the preceding '첫날' standard heading format.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Matches the context where 许诺 uses 해요체 and natural phrasing.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translates the Japanese verb phrase 'チームで使う' naturally as an action/heading.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Lu Ming speaks to Zhou Ting in 해요체, not 반말.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses correct name '텟사이' and addressing '저기/공' in 반말.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"확인하시면 refers to the team leader reviewing the report submitted.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Kai speaks in 반말 to junior club members.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Kai speaks in 반말 to other club members.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'자도 돼?' correctly conveys asking for permission.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Respects the defined term 納期 = 납품일 and 합쇼체 register.\"}\n]\n```\n",
+  "duration_seconds": 5.275559,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17314,
+   "output_tokens": 329,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17643
+  }
+ }
+}

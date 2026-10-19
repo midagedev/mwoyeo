@@ -1,0 +1,31 @@
+{
+ "call": 49,
+ "try": 1,
+ "ids": [
+  "item-0332.2",
+  "item-0218.1",
+  "item-0368.1",
+  "item-0215.1",
+  "item-0302.1",
+  "item-0128.1",
+  "item-0282.2",
+  "item-0035.2",
+  "item-0054.2",
+  "item-0312.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "322c0142-bc3b-4247-93d8-aaf8757bfcde",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 naturally translates '발판을 모두 끝내면' with an active subject.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both failed to translate the line into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly keeps the surname pronounciation '해(xiè)'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 is more natural and correctly conveys the meaning.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the text in Japanese; 2 attempted Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 hallucinated completely unrelated text for the greeting.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly uses '오빠' instead of '형' for younger sister speaking.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 translates 环岛路 naturally as 해안도로.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both mispronounce the compound surname 万俟 (Mòqí).\"}\n]\n```\n",
+  "duration_seconds": 4.872676,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17594,
+   "output_tokens": 333,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17927
+  }
+ }
+}

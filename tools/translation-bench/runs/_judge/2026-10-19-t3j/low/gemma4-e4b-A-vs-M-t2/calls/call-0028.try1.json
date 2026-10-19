@@ -1,0 +1,31 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0212.2",
+  "item-0327.1",
+  "item-0019.1",
+  "item-0338.2",
+  "item-0204.2",
+  "item-0003.1",
+  "item-0367.2",
+  "item-0049.1",
+  "item-0350.2",
+  "item-0385.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b7acf044-46c2-4638-9123-c075bc264c0e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 left Japanese untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean with correct names and speech levels.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 omits the unnatural pronoun and sounds more natural in Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 left it untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 is in Japanese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 transliterates Rory correctly per the facts block.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both convey the same meaning accurately, ignoring trailing punctuation.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean with the proper name and speech level.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 reads much more naturally in instructional English guide style.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean; Translation 1 is untranslated Japanese.\"}\n]\n```\n",
+  "duration_seconds": 5.255078,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17408,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17740
+  }
+ }
+}

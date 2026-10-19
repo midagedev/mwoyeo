@@ -1,0 +1,25 @@
+{
+ "call": 35,
+ "try": 1,
+ "ids": [
+  "item-0031.1",
+  "item-0248.1",
+  "item-0073.1",
+  "item-0003.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "095a30da-fa69-439f-a545-1e92e349ca08",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both fail completely to translate the line into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'A place' reads more naturally than 'a location' in software.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly refers to Bori and the brother; 2 hallucinates entirely.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'Access card' accurately translates 출입증, unlike 'ID card'.\"}\n]\n",
+  "duration_seconds": 48.891542,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15470,
+   "output_tokens": 5572,
+   "thinking_tokens": 5442,
+   "cache_read_tokens": 0,
+   "total_tokens": 21042
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 61,
+ "try": 1,
+ "ids": [
+  "item-0360.2",
+  "item-0125.1",
+  "item-0299.1",
+  "item-0107.2",
+  "item-0362.1",
+  "item-0039.1",
+  "item-0038.2",
+  "item-0358.1",
+  "item-0152.2",
+  "item-0169.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a9e3fb3d-c630-40a0-8332-775c6201f578",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both 'internal messenger' and 'company messenger' accurately translate 사내 메신저.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly uses the defined term 'Commons' rather than translating as 'plaza'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"모닥불 is the internal platform/channel name, not an actual campfire.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both 'earlier version' and 'previous version' are accurate and natural.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both '줄에' and '줄마다' capture the meaning well.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated into Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese source text completely untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Lu Ming speaks to Zhou Ting in 해요체, not 반말.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Uses consistent 해요체 as specified for Gareth speaking in the group.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Mina speaks in 반말 without honorific '씨' to a classmate/peer.\"}\n]\n```\n",
+  "duration_seconds": 5.480851,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17207,
+   "output_tokens": 343,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17550
+  }
+ }
+}

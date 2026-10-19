@@ -1,0 +1,31 @@
+{
+ "call": 48,
+ "try": 1,
+ "ids": [
+  "item-0344.1",
+  "item-0106.2",
+  "item-0213.2",
+  "item-0347.1",
+  "item-0268.2",
+  "item-0071.1",
+  "item-0121.2",
+  "item-0116.1",
+  "item-0029.2",
+  "item-0278.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "92856433-3561-4b02-a524-dce7cf02f27a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"더 자연스럽고 문맥에 맞는 '결혼식용 치즈' 번역.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"두 번역 모두 의미와 어조가 자연스럽고 대등함.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'any line'의 뉘앙스를 '줄마다'로 더 잘 살림.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"원문의 간접화법 의미('직접 넣겠다고 함')를 정확히 반영함.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the source line.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 leaves Chinese characters untranslated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"주정의 발화이므로 반말 설정 및 맥락에 맞는 구어체가 적절함.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"상사가 부하 직원에게 '씨'라고 칭하는 것이 자연스러움.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'助かります'의 현재 도움/다행 의미를 '도움이 됩니다'로 더 잘 살림.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"원문의 대비를 나타내는 주어 '私は'를 잘 살렸음.\"}\n]\n```\n",
+  "duration_seconds": 5.565727,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17803,
+   "output_tokens": 366,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18169
+  }
+ }
+}

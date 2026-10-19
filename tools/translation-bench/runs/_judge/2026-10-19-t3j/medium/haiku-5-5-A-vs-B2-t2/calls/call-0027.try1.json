@@ -1,0 +1,27 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0144.1",
+  "item-0244.2",
+  "item-0132.2",
+  "item-0337.1",
+  "item-0370.2",
+  "item-0102.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b7daa932-2a29-414f-b4b2-60e8ac502784",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and use the correct speech level.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly uses banmal appropriate for speaking to his sister.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses haeyo-che as specified in the facts.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly conveys that the speaker is receiving the help.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly uses haeyo-che when speaking to the tenants.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 殿门口 as hall doorway, not palace gate.\"}\n]\n",
+  "duration_seconds": 240.559796,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16242,
+   "output_tokens": 28546,
+   "thinking_tokens": 28345,
+   "cache_read_tokens": 0,
+   "total_tokens": 44788
+  }
+ }
+}

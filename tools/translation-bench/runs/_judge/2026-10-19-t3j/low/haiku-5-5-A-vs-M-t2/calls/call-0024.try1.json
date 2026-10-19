@@ -1,0 +1,31 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0153.2",
+  "item-0082.2",
+  "item-0217.2",
+  "item-0233.2",
+  "item-0111.2",
+  "item-0027.1",
+  "item-0371.1",
+  "item-0021.1",
+  "item-0319.1",
+  "item-0257.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c207066c-8317-406d-a364-6244198bfd1e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Rory speaks 반말 to Siobhan, and '어머니' naturally translates 'your mom'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Aoife is transliterated rather than left in Latin script.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"More natural phrasing for '그러게ㅠㅠ'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"타카나시 speaks 반말 to 히나타; '저 사람' correctly reflects 'あの人'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Reads more naturally and smoothly as software tutorial instruction.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 leaves the Japanese name in katakana.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately in 해요체 with minimal natural variation.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into English.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Matches given name 저우 이모 and uses proper 해요체.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"十河 speaks 해요체 to 日向; Translation 2 uses 합쇼체.\"}\n]\n```\n",
+  "duration_seconds": 5.173768,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17445,
+   "output_tokens": 331,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17776
+  }
+ }
+}

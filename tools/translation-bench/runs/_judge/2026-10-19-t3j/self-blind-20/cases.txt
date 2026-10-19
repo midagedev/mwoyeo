@@ -1,0 +1,578 @@
+### Case 1
+Source language: Korean. Target language: English.
+
+Facts known to be true (from the user; not part of the text):
+Window: 이삿날 D-3 | app: KakaoTalk | category: Social Networking
+People:
+- 서윤 (Seoyoon); female; coworker
+- 지우 = Jiu; male; coworker
+- 혜진 = Hyejin; female; senior colleague
+- 민재 = Minjae; male; Seoyoon's older brother
+- 수빈 = Subin; male; coworker
+Terms: 당근 = Karrot
+
+Earlier lines (source language, context only):
+[지우] 서윤아, 아직 회사야?
+[서윤] 응ㅠㅠ 회의가 안 끝나. 지우야, 너는 퇴근했어?
+[지우] 방금 나왔어. 근데 계약은 잘 끝났어?
+[서윤] 응, 어제 도장 찍었어. 이제 진짜 끝이야
+[지우] 헐 사흘밖에 안 남았내
+[서윤] 그러게ㅠㅠ 할 게 너무 많아
+
+Line to translate:
+[지우] 포장이사는 불렀어?
+
+Translation 1:
+Did you call a packing service?
+
+Translation 2:
+Did you call a packing moving service?
+
+
+### Case 2
+Source language: Japanese. Target language: English.
+
+Facts known to be true (from the user; not part of the text):
+Window: はじめに - メモット ヘルプ | app: Safari | category: Utilities
+Document: Memotto User Guide; note-taking app; manual for a team note app, with examples
+Terms: メモット = Memotto; ワークスペース = Space; 履歴 = Revisions; 付箋 = Sticky
+
+Earlier lines (source language, context only):
+メモットで始める
+メモットは、文章も表も画像も、ひとつにまとめられるノートアプリです。
+このガイドでは、広報の月見里(やまなし)さんと営業の小鳥遊(たかなし)さんの例で説明します。
+ページに添える短いメモを『ひとこと』(Quick Note)と呼びます。
+
+Line to translate:
+月見里さんは、会議の決定事項をひとことに残しています。
+
+Translation 1:
+Yamashiri-san leaves the decisions of the meeting in one Quick Note.
+
+Translation 2:
+Tsukimiya-san leaves the decisions of the meeting in one quick note.
+
+
+### Case 3
+Source language: Japanese. Target language: Korean.
+
+Facts known to be true (from the user; not part of the text):
+Window: ルーンベルの灯 | app: ルーンベルの灯 | category: Games
+Document: ルーンベルの灯; JRPG; a young guild hand and a princess save a village barrier
+People:
+- 朔 (さく); male; young hero; speaks to リーシア: 해요체, 鉄斎: 합쇼체
+- リーシア; female; princess; speaks to 朔: 반말, 鉄斎: 해요체
+- 鉄斎 (てっさい) = 텟사이; male; guild master; speaks to リーシア: 합쇼체, 朔: 반말
+Terms: 魔石 = 마정석; 結界 = 수호막; ギルド = 조합
+
+Earlier lines (source language, context only):
+[朔] はい。三十年、この村を守ってきました
+[リーシア] その魔石、見せてくれる?
+朔は懐から、青く脈打つ石を取り出した。澪が毎日磨いている石だ。
+[リーシア] きれい。でも、ひびが入ってるわ
+[朔] ええ。澪も毎日、石の世話を手伝ってくれるんです
+戻ってきた鉄斎が、朔の肩を叩いた。
+
+Line to translate:
+[鉄斎] 朔、澪に薬草を分けてもらえ。補強に使う
+
+Translation 1:
+사쿠, 미오에게 약초를 좀 받아. 보강에 쓸 거야.
+
+Translation 2:
+사쿠, 미오에게 약초를 좀 받아와. 보강에 쓸 거야.
+
+
+### Case 4
+Source language: Japanese. Target language: Korean.
+
+Facts known to be true (from the user; not part of the text):
+Window: 営業二課 チャット | app: Microsoft Teams | category: Business
+People:
+- 十河 (そごう); male; section chief; speaks to 日向: 해요체
+- 日向 (ひゅうが); female; junior employee; speaks to 十河: 합쇼체
+Terms: 稟議 = 품의; 納期 = 납품일
+
+Earlier lines (source language, context only):
+[日向] はい。ホタルの分は、メーカーの村田さんの回答次第です。早ければ来週、遅ければ再来月とのことです。
+[十河] 再来月だと困ります。私から村田さんに電話してみましょうか。
+[日向] お願いいたします。十河課長だけが頼りです。
+[十河] 電話してみます。村田さんが出たら、稟議の期限も伝えておきますね。
+[日向] 私は、見積書が届いたらすぐホタル分の稟議書を作ります。
+[十河] ええ。ところで、お客様用の駐車場は押さえましたか?
+
+Line to translate:
+[日向] まだです。台数が決まれば、すぐ手配します。
+
+Translation 1:
+まだです。台数が決まり次第、すぐ手配します。
+
+Translation 2:
+아직요. 대수가 정해지면 바로 준비하겠습니다.
+
+
+### Case 5
+Source language: Japanese. Target language: English.
+
+Facts known to be true (from the user; not part of the text):
+Window: 雨音探偵録 | app: 雨音探偵録 | category: Games
+Document: 雨音探偵録; detective visual novel; a stolen pocket watch in a rainy harbor town
+People:
+- ヒカル; female; apprentice detective
+- 薫 (かおる); male; senior detective
+- アキラ; female; police inspector
+- ユキ; male; client, shop heir
+Terms: 先輩 = boss; 事務所 = Bureau; 時計 = watch
+
+Earlier lines (source language, context only):
+[ヒカル] ナギです。まだ十八の少女ですが、しっかり者ですよ。アキラさんもご安心を
+[薫] 助かる。電話番も書類整理もこなしてくれるしな
+[アキラ] 雑談はあとだ。まず聴取を始めるぞ
+[薫] アキラさん、先に小鳥遊さんから話を聞いても?
+老人は震える声で、昨夜は九時に店を閉めたと答えた。
+[ユキ] 祖父はもう何年も、あの時計だけを磨いてきたんです
+
+Line to translate:
+ユキは昨夜から眠れていないらしい。ずっと指先が震えている。
+
+Translation 1:
+Yuki hasn't been able to sleep since last night. His fingertips have been trembling constantly.
+
+Translation 2:
+Yuki hasn't been able to sleep since last night. Her fingertips have been trembling constantly.
+
+
+### Case 6
+Source language: Korean. Target language: English.
+
+Facts known to be true (from the user; not part of the text):
+Window: 온보딩 가이드 - 모아 위키 | app: Chrome | category: Utilities
+Document: New hire onboarding; delivery logistics startup, internal wiki; first two weeks for ops and engineering hires
+Terms: 모아로지스 = MoaLogis; 길잡이 = Pathfinder; 배차 = fleet allocation; 새벽팀 = Dawn Team
+
+Earlier lines (source language, context only):
+신규 입사자 온보딩 가이드
+모아로지스에 오신 것을 환영합니다.
+이 문서는 첫 2주 동안 할 일을 순서대로 안내합니다 ▶
+문의는 인사팀 변준호(Joonho Byun) 매니저에게 하면 됩니다.
+개발 환경 설정은 엄서진(Seojin Um) 님이 도와 드립니다.
+첫날
+
+Line to translate:
+출근하면 먼저 1층 안내 데스크에서 출입증을 받습니다.
+
+Translation 1:
+Once you arrive, please first pick up your ID card at the 1st floor information desk.
+
+Translation 2:
+When I go to work, I first get my access card at the 1st floor information desk.
+
+
+### Case 7
+Source language: Chinese (Simplified). Target language: Korean.
+
+Facts known to be true (from the user; not part of the text):
+Window: 十一厦门行 (3) | app: WeChat | category: Social Networking
+People:
+- 周婷 (Zhōu Tíng) = 주정; female; friend, organizer; speaks to 许诺: 반말, 陆明: 반말
+- 陆明 (Lù Míng) = 루밍; male; friend; speaks to 周婷: 해요체, 许诺: 반말
+- 许诺 (Xǔ Nuò) = 쉬눠; female; friend; speaks to 周婷: 해요체, 陆明: 반말
+Terms: 打卡 = 인증샷
+
+Earlier lines (source language, context only):
+[陆明] 解辰说礼物他出两百,直接转公账里
+[许诺] 可以。她上次盯着那个拍立得看了好久
+[陆明] 对,我也看到了。礼物就买那个吧 ◆
+[周婷] 开完会了!你们聊什么呢?
+[陆明] 没什么,在算费用。婷姐,公账里还剩一千二
+[周婷] 好,解辰那份也别忘了算
+
+Line to translate:
+[许诺] 放心,都记着呢。婷姐,先给你发个红包,生日提前快乐!
+
+Translation 1:
+괜찮아요, 다 기억하고 있어요. 팅, 먼저 생일 미리 축하하는 홍배수를 보내드릴게요!
+
+Translation 2:
+放心,都记着呢。婷姐,先给你发个红包,生日提前快乐!
+
+
+### Case 8
+Source language: Japanese. Target language: Korean.
+
+Facts known to be true (from the user; not part of the text):
+Window: テニス部 合宿どうする? | app: LINE | category: Social Networking
+People:
+- ミナ (みな); female; club 2nd-year; speaks to ユウ: 반말, 海: 반말
+- 海 (かい); male; club senior; speaks to ミナ: 반말, ユウ: 반말
+- ユウ (ゆう); female; club 1st-year; speaks to ミナ: 해요체, 海: 해요체
+Terms: 合宿 = 엠티; 民宿 = 펜션
+
+Earlier lines (source language, context only):
+[海] ああ、もう押さえた。二泊で四万円
+[ユウ] 安いですね!ありがとうございます!
+[ミナ] ユウは初めての合宿だよね。緊張してる?
+[ユウ] はい、ちょっとだけ。でも楽しみです
+[海] 大丈夫、俺たちがついてるから
+[ミナ] そうだ、ハン教授も誘ってみる?
+
+Line to translate:
+[海] 昨日、研究室で会ったよ。来週は学会だって言ってた
+
+Translation 1:
+昨日、研究室で会ったよ。来週は学会だって言ってた
+
+Translation 2:
+어제 연구실에서 봤어. 다음 주에 학회라고 하더라
+
+
+### Case 9
+Source language: Japanese. Target language: English.
+
+Facts known to be true (from the user; not part of the text):
+Window: 雨音探偵録 | app: 雨音探偵録 | category: Games
+Document: 雨音探偵録; detective visual novel; a stolen pocket watch in a rainy harbor town
+People:
+- ヒカル; female; apprentice detective
+- 薫 (かおる); male; senior detective
+- アキラ; female; police inspector
+- ユキ; male; client, shop heir
+Terms: 先輩 = boss; 事務所 = Bureau; 時計 = watch
+
+Line to translate:
+雨の港町。古い時計店の前に、パトカーが止まっている。
+
+Translation 1:
+A rainy port town. A police car is parked in front of an old clock shop.
+
+Translation 2:
+A rainy harbor town. A police car is parked in front of an old watch shop.
+
+
+### Case 10
+Source language: English. Target language: Korean.
+
+Facts known to be true (from the user; not part of the text):
+Window: 14 Maple St | app: WhatsApp | category: Social Networking
+People:
+- Gareth (GAIR-eth) = 개러스; male; landlord; speaks to Rory: 해요체, Siobhan: 해요체
+- Siobhan (shi-VAWN) = 시본; female; tenant; speaks to Gareth: 합쇼체, Rory: 반말
+- Rory (ROH-ree) = 로리; male; tenant; speaks to Gareth: 해요체, Siobhan: 반말
+Terms: council tax = 카운슬 택스
+
+Earlier lines (source language, context only):
+[Rory] Is your mom still coming Saturday?
+[Siobhan] Yeah. Lands at 4, says she's bringing soda bread.
+[Rory] Nice. Where's she sleeping?
+[Siobhan] At my older brother's place. He's lending her his bed.
+[Rory] Same here. My older sister's coming to help me move the dresser.
+[Gareth] FYI, Mr. Bell is the building super. He lives in 1A. Call him if the hall light dies.
+
+Line to translate:
+[Siobhan] Will do, sir. Is the super around on weekends?
+
+Translation 1:
+알겠습니다, 팀장님. 관리인이 주말에 혹시 근처에 계십니까?
+
+Translation 2:
+알겠습니다, 선생님. 관리인이 주말에 혹시 돌아다니시나요?
+
+
+### Case 11
+Source language: Chinese (Simplified). Target language: Korean.
+
+Facts known to be true (from the user; not part of the text):
+Window: 十一厦门行 (3) | app: WeChat | category: Social Networking
+People:
+- 周婷 (Zhōu Tíng) = 주정; female; friend, organizer; speaks to 许诺: 반말, 陆明: 반말
+- 陆明 (Lù Míng) = 루밍; male; friend; speaks to 周婷: 해요체, 许诺: 반말
+- 许诺 (Xǔ Nuò) = 쉬눠; female; friend; speaks to 周婷: 해요체, 陆明: 반말
+Terms: 打卡 = 인증샷
+
+Earlier lines (source language, context only):
+[周婷] 沙茶面第二天中午吃,我都安排好了。我先去开个会,你们聊
+[陆明] 婷姐开会去了,正好商量下蛋糕
+[许诺] 她不是爱吃芒果吗?去年她自己点了芒果千层
+[陆明] 对,订小城路那家的吧
+[许诺] 好,我下午去订。她一直想试试他们家的
+[陆明] 解辰说礼物他出两百,直接转公账里
+
+Line to translate:
+[许诺] 可以。她上次盯着那个拍立得看了好久
+
+Translation 1:
+좋아요. 그녀가 지난번에 그 폴라로이드 카메라를 아주 오래 쳐다봤었죠.
+
+Translation 2:
+네. 그녀는 지난번에 그 폴라로이드 카메라를 아주 오래 쳐다봤어요.
+
+
+### Case 12
+Source language: Chinese (Simplified). Target language: English.
+
+Facts known to be true (from the user; not part of the text):
+Window: 云岭仙途 | app: 云岭仙途 | category: Games
+Document: 云岭仙途; xianxia RPG; disciples try to keep their mountain sect's ward from failing
+People:
+- 单云舟 (Shàn Yúnzhōu); junior disciple
+- 曾若水 (Zēng Ruòshuǐ); ward keeper
+- 覃长老 (Qín); elder
+- 乐川 (Yuè Chuān); alchemist
+- 解玄 (Xiè Xuán); female; envoy of a rival pavilion
+Terms: 师姐 = Shijie; 灵石 = qi stone; 结界 = ward
+
+Earlier lines (source language, context only):
+解玄冷笑一声,转身便走,头也不囬。
+[曾若水] 说三日就是三日,从不食言。
+覃长老捋着胡须,望了望榻上昏睡的仇霜。
+[单云舟] 长老,让我去守结界吧。仇姑娘有乐川照看,我走得开。
+终于,点了点头,从袖中取出一枚玉符。
+[覃长老] 这是阵眼令。守住了它,才算守住你的道。
+
+Line to translate:
+乐川把药囊塞进云舟怀里,又低声叮嘱了几句。
+
+Translation 1:
+Lechuan tucked the medicine pouch into Yunzhou's embrace and whispered a few more instructions.
+
+Translation 2:
+Le Chuan tucked the medicine pouch into Yun Zhou's embrace and whispered a few more instructions.
+
+
+### Case 13
+Source language: Chinese (Simplified). Target language: Korean.
+
+Facts known to be true (from the user; not part of the text):
+Window: 林记茶庄 第12集 | app: VLC | category: Entertainment
+Document: 林记茶庄; family tea business drama; siblings clash over a cheap blend order
+People:
+- 林远 = 린위안; male; general manager; speaks to 周姨: 해요체, 林夏: 반말
+- 林夏 = 린시아; female; his younger sister, tea blender; speaks to 周姨: 해요체, 林远: 반말
+- 周姨 = 저우 이모; female; family friend, accountant; speaks to 林夏: 반말, 林远: 해요체
+Terms: 毛茶 = 모차; 拼配 = 블렌딩
+
+Earlier lines (source language, context only):
+周姨,头采的鲜叶什么时候到?
+后天到。我已经约好两位老师傅了。
+好,这批贷我亲自盯。
+对方采购叫曾岚,Zēng Lán,别念错了。
+曾岚来了,我们泡什么?
+拿三红给她尝。头采的留着。
+
+Line to translate:
+周姨,三红的库存还有多少?
+
+Translation 1:
+주이, 3홍의 재고가 남아있는 것은 얼마나 있나요?
+
+Translation 2:
+저우 이모, 삼홍의 재고가 남아 있는가?
+
+
+### Case 14
+Source language: Chinese (Simplified). Target language: English.
+
+Facts known to be true (from the user; not part of the text):
+Window: 云岭仙途 | app: 云岭仙途 | category: Games
+Document: 云岭仙途; xianxia RPG; disciples try to keep their mountain sect's ward from failing
+People:
+- 单云舟 (Shàn Yúnzhōu); junior disciple
+- 曾若水 (Zēng Ruòshuǐ); ward keeper
+- 覃长老 (Qín); elder
+- 乐川 (Yuè Chuān); alchemist
+- 解玄 (Xiè Xuán); female; envoy of a rival pavilion
+Terms: 师姐 = Shijie; 灵石 = qi stone; 结界 = ward
+
+Earlier lines (source language, context only):
+乐川把药囊塞进云舟怀里,又低声叮嘱了几句。
+山门口,万俟靖递来一件蓑衣。
+[单云舟] 多谢万俟师兄。仇姑娘醒了,替我道声谢。
+单云舟点点头,把阵眼令贴身收好。
+殿里,仇霜缓缓睁开了眼睛。
+[乐川] 醒了就好。你昏了一整天,别乱动 ▼
+
+Line to translate:
+仇霜挣扎着坐起身,望向窗外裂开的天幕。
+
+Translation 1:
+仇霜 struggled to sit up and looked out at the torn curtain of sky.
+
+Translation 2:
+Chou Shuang struggled to sit up, looking out at the torn curtain of sky.
+
+
+### Case 15
+Source language: Japanese. Target language: Korean.
+
+Facts known to be true (from the user; not part of the text):
+Window: 営業二課 チャット | app: Microsoft Teams | category: Business
+People:
+- 十河 (そごう); male; section chief; speaks to 日向: 해요체
+- 日向 (ひゅうが); female; junior employee; speaks to 十河: 합쇼체
+Terms: 稟議 = 품의; 納期 = 납품일
+
+Earlier lines (source language, context only):
+[日向] 承知しました。では、お茶だけにいたします。
+[十河] それと、今回納めるセンサーの社内名称は「ホタル」です。先方にもその名前で説明しますよ。
+[日向] ホタルの仕様書は、十部印刷しておきます。
+[十河] お願いします。雨宮さんには、ホタルの納期をどう伝えましょうか?
+[日向] はい。ホタルの分は、メーカーの村田さんの回答次第です。早ければ来週、遅ければ再来月とのことです。
+[十河] 再来月だと困ります。私から村田さんに電話してみましょうか。
+
+Line to translate:
+[日向] お願いいたします。十河課長だけが頼りです。
+
+Translation 1:
+요청드립니다. 十河 과장님만이 의지할 수 있습니다.
+
+Translation 2:
+부탁드립니다. 十河課長님만이 의지할 수 있습니다.
+
+
+### Case 16
+Source language: Korean. Target language: English.
+
+Facts known to be true (from the user; not part of the text):
+Window: 이삿날 D-3 | app: KakaoTalk | category: Social Networking
+People:
+- 서윤 (Seoyoon); female; coworker
+- 지우 = Jiu; male; coworker
+- 혜진 = Hyejin; female; senior colleague
+- 민재 = Minjae; male; Seoyoon's older brother
+- 수빈 = Subin; male; coworker
+Terms: 당근 = Karrot
+
+Earlier lines (source language, context only):
+[서윤] 그러게ㅠㅠ 할 게 너무 많아
+[지우] 포장이사는 불렀어?
+[서윤] 아니ㅋㅋ 반포장. 토요일에 이사하는데 짐은 내가 싸야 해
+[지우] 고양이는 어떡해? 이사 날 난리 나겠다
+[서윤] 토요일엔 보리를 펫호텔에 맡겨. 예약 폼에 영어 이름 쓰라길래 Barley로 썼어ㅋㅋ
+[지우] ㅋㅋㅋㅋ 보리 수컷이었나 암컷이었나 맨날 헷갈려
+
+Line to translate:
+[서윤] 암컷이야. 세 살인데 아직도 낯가려
+
+Translation 1:
+It's a female. She's three years old and still shy around new people
+
+Translation 2:
+암컷이야. 세 살인데 아직도 낯가려
+
+
+### Case 17
+Source language: Korean. Target language: English.
+
+Facts known to be true (from the user; not part of the text):
+Window: 이삿날 D-3 | app: KakaoTalk | category: Social Networking
+People:
+- 서윤 (Seoyoon); female; coworker
+- 지우 = Jiu; male; coworker
+- 혜진 = Hyejin; female; senior colleague
+- 민재 = Minjae; male; Seoyoon's older brother
+- 수빈 = Subin; male; coworker
+Terms: 당근 = Karrot
+
+Earlier lines (source language, context only):
+[지우] 헐 사흘밖에 안 남았내
+[서윤] 그러게ㅠㅠ 할 게 너무 많아
+[지우] 포장이사는 불렀어?
+[서윤] 아니ㅋㅋ 반포장. 토요일에 이사하는데 짐은 내가 싸야 해
+[지우] 고양이는 어떡해? 이사 날 난리 나겠다
+[서윤] 토요일엔 보리를 펫호텔에 맡겨. 예약 폼에 영어 이름 쓰라길래 Barley로 썼어ㅋㅋ
+
+Line to translate:
+[지우] ㅋㅋㅋㅋ 보리 수컷이었나 암컷이었나 맨날 헷갈려
+
+Translation 1:
+ㅋㅋㅋㅋ I always get confused whether Barley is male or female
+
+Translation 2:
+Hahaha, I always get confused whether Bori is male or female
+
+
+### Case 18
+Source language: Chinese (Simplified). Target language: English.
+
+Facts known to be true (from the user; not part of the text):
+Window: 云岭仙途 | app: 云岭仙途 | category: Games
+Document: 云岭仙途; xianxia RPG; disciples try to keep their mountain sect's ward from failing
+People:
+- 单云舟 (Shàn Yúnzhōu); junior disciple
+- 曾若水 (Zēng Ruòshuǐ); ward keeper
+- 覃长老 (Qín); elder
+- 乐川 (Yuè Chuān); alchemist
+- 解玄 (Xiè Xuán); female; envoy of a rival pavilion
+Terms: 师姐 = Shijie; 灵石 = qi stone; 结界 = ward
+
+Earlier lines (source language, context only):
+[曾若水] 好。仇姑娘醒了,立刻来叫我。
+万俟靖挠了挠头,又转身跑向山脚。
+解玄立在殿门口,剑未出鞘,灯火却暗了一瞬。
+[解玄] 覃长老,别来无恙。我奉阁主之命,来取三成灵石。
+[覃长老] 三成?灵石是宗门辛苦攒下的,几时轮到外人来取?
+[解玄] 结界都裂了,灵石放在你们手里不安全。三日后,我再来。
+
+Line to translate:
+解玄冷笑一声,转身便走,头也不囬。
+
+Translation 1:
+Jie Xuan sneered, turned and left without looking back.
+
+Translation 2:
+Jie Xuan sneered, turned and left, without looking back.
+
+
+### Case 19
+Source language: English. Target language: Korean.
+
+Facts known to be true (from the user; not part of the text):
+Window: Low Orbit Blues S2E4 | app: VLC | category: Entertainment
+Document: Low Orbit Blues; sci-fi comedy, cargo ship crew; a dying freezer full of wedding cheese
+People:
+- Thorne = 쏜; female; ship's captain; speaks to Dex: 반말, Rook: 해요체
+- Rook = 루크; female; engineer; speaks to Dex: 반말, Thorne: 합쇼체
+- Dex; male; cargo hand; speaks to Rook: 반말, Thorne: 합쇼체
+- Pell; male; ship's doctor
+Terms: Captain = 선장; Marigold = 메리골드
+
+Earlier lines (source language, context only):
+Why's it on the bridge?
+I hid it from Thorne. She keeps borrowing my wrenches.
+She borrowed my boots last week and never gave them back.
+Just bring it. I'll deal with Gerald.
+Yes, ma'am!
+Quit saluting me, Dex. We're the same age.
+
+Line to translate:
+Okay, okay. Rook, Gerald just coughed.
+
+Translation 1:
+좋아요, 좋아요. 룩, 제럴드가 기침했어요.
+
+Translation 2:
+알았어, 알았어. 록, 제럴드 기침했어.
+
+
+### Case 20
+Source language: Chinese (Simplified). Target language: Korean.
+
+Facts known to be true (from the user; not part of the text):
+Window: 林记茶庄 第12集 | app: VLC | category: Entertainment
+Document: 林记茶庄; family tea business drama; siblings clash over a cheap blend order
+People:
+- 林远 = 린위안; male; general manager; speaks to 周姨: 해요체, 林夏: 반말
+- 林夏 = 린시아; female; his younger sister, tea blender; speaks to 周姨: 해요체, 林远: 반말
+- 周姨 = 저우 이모; female; family friend, accountant; speaks to 林夏: 반말, 林远: 해요체
+Terms: 毛茶 = 모차; 拼配 = 블렌딩
+
+Line to translate:
+叶子一到就得炒,一天都不能放。
+
+Translation 1:
+叶子一到就得炒,一天都不能放。
+
+Translation 2:
+叶子一到就得炒，一天都不能放。
+
+

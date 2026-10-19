@@ -1,0 +1,31 @@
+{
+ "call": 70,
+ "try": 1,
+ "ids": [
+  "item-0001.1",
+  "item-0009.2",
+  "item-0035.1",
+  "item-0198.2",
+  "item-0149.2",
+  "item-0349.2",
+  "item-0206.1",
+  "item-0056.1",
+  "item-0289.1",
+  "item-0036.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "75795d27-40fe-4fc8-90e1-396357cbe8d7",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Omits unnatural pronoun '그녀는' and connects clauses more naturally.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese text untranslated.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly reads the name as Yamanashi according to ruby text.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 includes the terminating punctuation.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Rook speaks 반말 to Dex and faithfully preserves the trailing cutoff.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Mina speaks 반말; Translation 2 incorrectly uses 해요체.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 mispronounces Aoife (EE-fa) as 아이파 and Gareth as 개럿.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Subject refers to Jiu's older brother ('he'), not Jiu ('I').\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese source text untranslated.\"}\n]\n",
+  "duration_seconds": 5.295471,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17400,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17724
+  }
+ }
+}

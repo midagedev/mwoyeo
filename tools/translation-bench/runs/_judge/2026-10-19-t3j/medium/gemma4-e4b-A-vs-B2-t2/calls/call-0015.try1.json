@@ -1,0 +1,27 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0293.2",
+  "item-0022.2",
+  "item-0120.1",
+  "item-0331.2",
+  "item-0081.2",
+  "item-0311.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3ef3b5e1-979d-48ab-9da5-da3e67bb50c8",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"골치 아픈 이야기 is much more natural than 힘든 이야기.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Sync is much more natural and standard than Synchronization.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"제외한 correctly reflects the active voice of you leave out.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"}\n]\n```\n",
+  "duration_seconds": 103.085287,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15979,
+   "output_tokens": 11855,
+   "thinking_tokens": 11670,
+   "cache_read_tokens": 0,
+   "total_tokens": 27834
+  }
+ }
+}

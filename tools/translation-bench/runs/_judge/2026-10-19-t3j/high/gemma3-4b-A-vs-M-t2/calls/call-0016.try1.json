@@ -1,0 +1,27 @@
+{
+ "call": 16,
+ "try": 1,
+ "ids": [
+  "item-0379.1",
+  "item-0349.1",
+  "item-0109.2",
+  "item-0382.2",
+  "item-0369.2",
+  "item-0216.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6fedd387-8288-41cf-b373-aaca9b406f60",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"1 gets the name right; 2 gets the pronoun right.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"1 correctly translates 'こりゃあ' as '이건' rather than '정말'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"1 uses standard Git term '브랜치' instead of '가지 분기'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"2 correctly captures stammering and avoids mistranslating the clause.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"2 translates 'Morning both' naturally instead of nonsensical '오전 모두에게'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"1 uses defined term 'fleet allocation'; 2 mistranslates terms and grammar.\"}\n]\n",
+  "duration_seconds": 211.83233,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15888,
+   "output_tokens": 26431,
+   "thinking_tokens": 26216,
+   "cache_read_tokens": 0,
+   "total_tokens": 42319
+  }
+ }
+}

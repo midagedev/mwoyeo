@@ -1,0 +1,31 @@
+{
+ "call": 52,
+ "try": 1,
+ "ids": [
+  "item-0222.1",
+  "item-0339.1",
+  "item-0214.2",
+  "item-0040.2",
+  "item-0243.1",
+  "item-0044.1",
+  "item-0181.1",
+  "item-0175.2",
+  "item-0067.1",
+  "item-0023.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "67faf224-0d39-4ed2-8b4d-87872b547133",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the source line.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both use polite 해요체 asking if anything happened.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"More natural phrasing in Korean without awkward parenthetical gloss.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the source Chinese line completely untranslated.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"More natural casual phrasing for KakaoTalk chat between coworkers.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translates and romanizes the Korean name 채율 properly into English.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Siobhan is replying directly to Rory, speaking in 반말.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally in polite 해요체.\"}\n]\n```\n",
+  "duration_seconds": 4.256712,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17471,
+   "output_tokens": 298,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17769
+  }
+ }
+}

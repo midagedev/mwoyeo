@@ -1,0 +1,31 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0389.1",
+  "item-0296.2",
+  "item-0126.2",
+  "item-0032.1",
+  "item-0222.2",
+  "item-0159.1",
+  "item-0103.2",
+  "item-0298.2",
+  "item-0264.2",
+  "item-0326.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "021e2379-6334-4d4e-a49b-70cb3c233c06",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Matches the defined term 'fleet allocation' and 'Pathfinder'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses the defined term '포켓 깃' instead of English.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are completely natural, accurate, and equivalent in meaning.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 mistranslates condition/stipulation as present continuous tense.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Subin is male; Translation 1 uses the incorrect pronoun 'she'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly romanizes 烏丸 (からすま) as 가라스마.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Uses polite first-person pronoun '저', appropriate for junior speaking to seniors.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Identical except for title capitalization; prompt instructs to ignore formatting.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Faithfully reflects '〜という' (named/called) from the source line.\"}\n]\n```\n",
+  "duration_seconds": 4.934756,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17030,
+   "output_tokens": 335,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17365
+  }
+ }
+}

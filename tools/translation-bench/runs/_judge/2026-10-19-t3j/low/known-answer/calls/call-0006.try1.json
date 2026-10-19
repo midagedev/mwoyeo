@@ -1,0 +1,31 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0048.1",
+  "item-0043.1",
+  "item-0049.1",
+  "item-0080.2",
+  "item-0010.2",
+  "item-0053.2",
+  "item-0080.1",
+  "item-0028.2",
+  "item-0040.1",
+  "item-0051.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "73be30bf-4e7d-4bdd-82b2-aba0c4af497a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 adheres to the specified term 납품일 for 納期.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified term 품의 for 稟議.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"홍차 accurately reflects black tea, unlike 붉은 차.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Irish name Aoife is correctly transcribed as 이파, not 아오이페.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'Pin' is the natural UI term for fixing note pages.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 actually translates the text into Korean with correct honorifics.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Aoife is accurately transcribed as 이파 rather than letter-by-letter 아오이페.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean with the correct character name and register.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"懐中時計 means pocket watch (회중시계), not wristwatch (손목시계).\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"The internal project code name 'ホタル' should be kept as '호타루'.\"}\n]\n```\n",
+  "duration_seconds": 5.218259,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17380,
+   "output_tokens": 350,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17730
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0297.1",
+  "item-0098.1",
+  "item-0343.2",
+  "item-0134.2",
+  "item-0200.1",
+  "item-0141.2",
+  "item-0102.2",
+  "item-0129.2",
+  "item-0175.1",
+  "item-0302.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "67786cdb-f7e8-44b5-a6e3-f0941e071a1e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 invents 'Nagisa', while Translation 2 correctly renders 'Nagi'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Licia speaks to Saku in banmal, correctly matched in 1.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Standard punctuation with a period matches the source sentence.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the causative and aspect more naturally.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 keeps the source form '婷姐' instead of an awkward phonetic spelling.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'Elder Qin' and 'mat/couch' (榻) are accurate, unlike 'Qin Elder' and 'table'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"General statements in software documentation sound more natural without the definite article.\"}\n]\n```\n",
+  "duration_seconds": 4.9926639999999995,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17507,
+   "output_tokens": 331,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17838
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0053.1",
+  "item-0223.1",
+  "item-0119.2",
+  "item-0225.2",
+  "item-0129.2",
+  "item-0350.2",
+  "item-0146.2",
+  "item-0141.2",
+  "item-0319.2",
+  "item-0002.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a06cbf84-eff8-43f0-886f-86bdb4f73e07",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 as established in the facts.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Thorne speaks to Rook using 해요체; Translation 1 respects this register.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and use the correct speech level.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 left text untranslated.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 悲鳴 (screaming/shrieking) as 비명.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 preserves the honorific suffix -san corresponding to さん.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly renders '그러게' agreeing with the other speaker.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate in 반말.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 translates into English and uses natural onboarding guide perspective.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally in English.\"}\n]\n```\n",
+  "duration_seconds": 4.6992329999999995,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17515,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17847
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0274.2",
+  "item-0334.1",
+  "item-0319.1",
+  "item-0264.2",
+  "item-0097.1",
+  "item-0228.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7f29f877-3ede-4114-9de8-289e54aad10c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"사건 captures the detective jargon ヤマ accurately.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translates the character name Rook into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Follows specified term council tax and 해요체 register.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translates the name and uses specified term 수호막.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Follows the specified term 納期 = 납품일.\"}\n]\n```\n",
+  "duration_seconds": 32.649845,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16119,
+   "output_tokens": 4095,
+   "thinking_tokens": 3916,
+   "cache_read_tokens": 0,
+   "total_tokens": 20214
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 59,
+ "try": 1,
+ "ids": [
+  "item-0321.1",
+  "item-0132.2",
+  "item-0201.2",
+  "item-0123.1",
+  "item-0131.2",
+  "item-0372.2",
+  "item-0020.2",
+  "item-0056.2",
+  "item-0054.1",
+  "item-0025.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "01c41bfb-766f-4516-bd47-d517459742a0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Faithfully renders both clauses of the original Korean sentence.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Korean text.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese text.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Receipts means 증서/영수증, not check (수표).\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translates the Japanese demonstrative and natural idiom accurately into Korean.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both failed to translate into the target language Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correct imperative/instructional tone for onboarding steps.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the text in Japanese.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the text in Japanese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"More concise and natural English phrasing in dialogue.\"}\n]\n```\n",
+  "duration_seconds": 6.402989,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17349,
+   "output_tokens": 298,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17647
+  }
+ }
+}

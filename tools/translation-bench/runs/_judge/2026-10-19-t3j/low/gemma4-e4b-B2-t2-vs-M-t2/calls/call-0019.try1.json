@@ -1,0 +1,31 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0171.1",
+  "item-0176.1",
+  "item-0138.1",
+  "item-0111.1",
+  "item-0188.2",
+  "item-0010.2",
+  "item-0082.1",
+  "item-0077.2",
+  "item-0193.2",
+  "item-0098.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "249c61d8-855e-40cd-bcb9-1dabaf246132",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates the person's name Kai correctly instead of sea.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses '그' for an absent person referred to with 'あの'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"홍차 uses the counter 가지 rather than 개.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Sounds much more natural in Korean chat than literal '아아'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses the specified name romanization 시본 instead of 시오반.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates the Japanese line into Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Omits the Japanese honorific -san and uses the defined term.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Matches the required 해요체 speech level toward 周姨.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Adheres to the glossary translating 時計 as watch.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Follows the glossary mapping ワークスペース to Space.\"}\n]\n```\n",
+  "duration_seconds": 4.468195,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17313,
+   "output_tokens": 310,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17623
+  }
+ }
+}

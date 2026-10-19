@@ -1,0 +1,31 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0056.1",
+  "item-0071.2",
+  "item-0027.2",
+  "item-0068.1",
+  "item-0062.1",
+  "item-0071.1",
+  "item-0031.1",
+  "item-0004.1",
+  "item-0014.1",
+  "item-0014.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7ffad1a7-ee5a-46fb-8145-faa4bfc7a658",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"In logistics context, '기사' correctly means driver, not engineer.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'海' is the person Kai, not '바다' (the sea).\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 is untranslated English text.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'鵲橋' is a proper place name (Kasasagibashi), not literal 까치다리.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Akira explicitly asked to drop titles earlier; first name alone fits.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'海' refers to Kai, not '바다' (the ocean).\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'見積書' correctly translates to '견적서' in business Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Korean text.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 is untranslated English text.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 is untranslated English text.\"}\n]\n```\n",
+  "duration_seconds": 5.227953,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17196,
+   "output_tokens": 329,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17525
+  }
+ }
+}

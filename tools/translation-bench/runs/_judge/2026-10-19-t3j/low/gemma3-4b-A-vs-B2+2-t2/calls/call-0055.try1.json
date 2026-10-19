@@ -1,0 +1,31 @@
+{
+ "call": 55,
+ "try": 1,
+ "ids": [
+  "item-0309.2",
+  "item-0011.2",
+  "item-0018.1",
+  "item-0160.2",
+  "item-0184.1",
+  "item-0244.1",
+  "item-0010.1",
+  "item-0018.2",
+  "item-0072.2",
+  "item-0268.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e7784348-bf5f-47f5-aa07-1f657752b454",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"The watch wasn't Kaoru's; 'my' in 2 is completely unfaithful.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"1 mistranslates '발판' (onboarding steps) as 'landing page'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Lysia speaks banmal to Saku; 1 uses banmal (-네), 2 uses 해요체.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"2 mistranslates 澪 (Mio) as 료 and distorts meaning.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"2 incorrectly attributes '아직' and the subject to 'You'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Korean source into English.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"1 correctly matches the confirming question marker だよね (-잖아/지).\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Lysia speaks banmal to Saku; 2 uses banmal (-네).\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"2 captures the rhetorical question structure and meaning more naturally.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the text into English.\"}\n]\n```\n",
+  "duration_seconds": 5.72649,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17321,
+   "output_tokens": 355,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17676
+  }
+ }
+}

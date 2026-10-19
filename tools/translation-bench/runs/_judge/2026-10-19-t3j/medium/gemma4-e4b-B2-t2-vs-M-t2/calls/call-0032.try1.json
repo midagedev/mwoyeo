@@ -1,0 +1,27 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0145.2",
+  "item-0198.2",
+  "item-0144.2",
+  "item-0131.2",
+  "item-0168.1",
+  "item-0181.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e98a95a0-1875-44c6-a9ae-b8c55e77d5d7",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 is more faithful; Translation 2 adds unmentioned '흐름'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'받아와' is far more natural when fetching items from another person.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'When you arrive' reads much more naturally for an onboarding guide.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 follows the specified fact for 周姨 (저우 이모).\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 as required by the facts.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 was left completely untranslated in Japanese.\"}\n]\n",
+  "duration_seconds": 29.539474,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16056,
+   "output_tokens": 3725,
+   "thinking_tokens": 3525,
+   "cache_read_tokens": 0,
+   "total_tokens": 19781
+  }
+ }
+}

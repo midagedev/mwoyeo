@@ -1,0 +1,26 @@
+{
+ "call": 57,
+ "try": 1,
+ "ids": [
+  "item-0231.2",
+  "item-0071.2",
+  "item-0186.1",
+  "item-0272.2",
+  "item-0091.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c3dd034b-e4db-4c21-ab53-b980be5bc6ae",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'stage' as a verb is more accurately translated as '스테이지하는'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Hinata speaks 반말 to Takanashi; 2 uses incorrect speech level and reading.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly transcribes the name Dex as 덱스 instead of 덱.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Rook speaks 반말 to Dex; 2 uses incorrect honorifics and unlocalized name.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Omitting unnatural pronouns makes the Korean sentence sound much more natural.\"}\n]\n```\n",
+  "duration_seconds": 3.795286,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15715,
+   "output_tokens": 183,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15898
+  }
+ }
+}

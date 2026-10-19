@@ -1,0 +1,31 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0051.1",
+  "item-0177.2",
+  "item-0329.2",
+  "item-0245.2",
+  "item-0227.2",
+  "item-0106.1",
+  "item-0219.2",
+  "item-0058.1",
+  "item-0282.1",
+  "item-0041.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "944c22be-7474-47a3-932d-f1630dfb41bc",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the text in Japanese.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the text in Chinese.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Natural translation; Gareth is a landlord, not a company boss.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately convey the meaning.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말, not 해요체.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translates the character name Dex into Korean (덱스).\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the text in Japanese.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left the text in Chinese.\"}\n]\n```\n",
+  "duration_seconds": 6.990881,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17282,
+   "output_tokens": 295,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17577
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0354.1",
+  "item-0202.1",
+  "item-0105.2",
+  "item-0172.1",
+  "item-0102.1",
+  "item-0324.2",
+  "item-0109.1",
+  "item-0166.2",
+  "item-0361.1",
+  "item-0141.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9010ee75-918e-4e22-829d-40b3e8a1e68a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates Japanese text into Korean.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural English equivalents.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'헐' expresses exclamation, not a question.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 translates the Chinese character name into English pinyin.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Gareth speaks to tenants using 해요체.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both incorrectly use male pronouns for female character Xie Xuan.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Lin Yuan speaks to his younger sister using 반말.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translates the text into Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 correctly uses standard noun-phrase heading style.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both are natural and accurate 반말 translations.\"}\n]\n```\n",
+  "duration_seconds": 4.701616,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17345,
+   "output_tokens": 292,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17637
+  }
+ }
+}

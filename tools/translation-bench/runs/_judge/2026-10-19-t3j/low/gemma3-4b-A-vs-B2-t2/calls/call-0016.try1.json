@@ -1,0 +1,31 @@
+{
+ "call": 16,
+ "try": 1,
+ "ids": [
+  "item-0361.1",
+  "item-0207.1",
+  "item-0081.2",
+  "item-0222.1",
+  "item-0259.2",
+  "item-0219.2",
+  "item-0049.2",
+  "item-0162.2",
+  "item-0366.2",
+  "item-0314.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7d178b0a-842d-4f12-a422-b6466c0d4470",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly translates '아직' and who told whom to clean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 sounds more natural with the informal ending '~야'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the line into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'Day 2' parallels '첫날' (Day 1) much more naturally in documentation.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Uses the correct polite speech level (해요체) instead of formal/blunt style.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are grammatically correct and convey the exact meaning accurately.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'별거 없어' correctly translates 没什么 in this context, unlike '별로야'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 leaves Japanese untranslated and mistranslates 宿 as 숙하.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Accurately captures the sarcastic meaning of 'volunteering me'.\"}\n]\n```\n",
+  "duration_seconds": 5.792921,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17345,
+   "output_tokens": 345,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17690
+  }
+ }
+}

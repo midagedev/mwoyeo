@@ -1,0 +1,31 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0250.2",
+  "item-0149.1",
+  "item-0234.2",
+  "item-0177.1",
+  "item-0133.2",
+  "item-0331.2",
+  "item-0286.1",
+  "item-0121.1",
+  "item-0365.2",
+  "item-0086.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d0c02076-ca3f-40ec-8dd7-0c7db41f3a22",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates Korean name properly into Latin script instead of leaving Hangul.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말 as specified in facts.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Standard pinyin without tone marks matches standard English transliteration conventions.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Lin Yuan speaks in 반말 to Lin Xia and gives directions.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and equally accurate.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Captures the older male speaker's authoritative, friendly plain speech (반말) naturally.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Zhou Ting speaks in 반말 to friends and uses natural terms.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Uses proper 반말 speech level between siblings.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'Even heavier' accurately captures 'ひときわ強くなった' in ongoing rainy context.\"}\n]\n```\n",
+  "duration_seconds": 4.612767,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17718,
+   "output_tokens": 323,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18041
+  }
+ }
+}

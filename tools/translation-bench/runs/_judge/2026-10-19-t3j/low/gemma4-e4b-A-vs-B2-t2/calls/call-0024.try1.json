@@ -1,0 +1,30 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0319.2",
+  "item-0016.2",
+  "item-0368.1",
+  "item-0307.1",
+  "item-0208.1",
+  "item-0014.1",
+  "item-0064.2",
+  "item-0170.2",
+  "item-0140.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a75acb87-37b0-40c8-803f-51e9aaa06554",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 sounds natural; '참고로' tacked at the end is awkward.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both have errors: 1 uses wrong honorific; 2 mistranslates pronoun.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 'we will deposit' into a request to deposit.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'Signed the papers' naturally captures closing a lease contract.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 preserves the in-game text advance prompt marker.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correctly transliterates Tomasz according to the given pronunciation.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Concise heading style matches the preceding '첫날' section header.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the line in untranslated Japanese.\"}\n]\n```\n",
+  "duration_seconds": 5.199528,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17009,
+   "output_tokens": 299,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17308
+  }
+ }
+}

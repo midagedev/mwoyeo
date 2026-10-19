@@ -1,0 +1,29 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0235.1",
+  "item-0048.2",
+  "item-0332.1",
+  "item-0021.1",
+  "item-0057.1",
+  "item-0103.2",
+  "item-0122.1",
+  "item-0010.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2606a76a-4209-4d9f-b906-e211c437320a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly conveys the change in state implied by なった.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly renders habitual present tense instead of continuous aspect.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 leaves untranslated Chinese text and introduces hallucinations.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses natural, idiomatic English phrasing for channel activity.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 uses the correct 반말 speech level and captures informal register.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 completely failed to translate from Chinese to Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly includes both kanji and reading glosses from source.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 mistranslates the negative adverb あまり as 아무리.\"}\n]\n```\n",
+  "duration_seconds": 4.70071,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16670,
+   "output_tokens": 265,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16935
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 56,
+ "try": 2,
+ "ids": [
+  "item-0170.1",
+  "item-0231.2",
+  "item-0071.2",
+  "item-0186.1",
+  "item-0048.1",
+  "item-0323.2",
+  "item-0272.2",
+  "item-0306.2",
+  "item-0145.1",
+  "item-0091.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "900f3edb-a9af-45aa-8214-fd7fbbb51971",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Thorne speaks to Dex in banmal.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"More natural phrasing and preserves designated term '풀'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are virtually identical and accurate.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Punctuation creates a much clearer and more natural sentence boundary.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'Search scope' is the standard software documentation terminology.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both correctly use hapsyoche and translate the content accurately.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Bridge' in a spaceship context is 브릿지, not 다리.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"More natural English phrasing for an onboarding guide instruction.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Complete punctuation makes the sentence properly finished.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Clearer structure matching the instructional tone of the onboarding wiki.\"}\n]\n```\n",
+  "duration_seconds": 5.934958,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17221,
+   "output_tokens": 299,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17520
+  }
+ }
+}

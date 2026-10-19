@@ -1,0 +1,31 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0373.2",
+  "item-0176.2",
+  "item-0112.2",
+  "item-0349.1",
+  "item-0026.2",
+  "item-0234.1",
+  "item-0334.2",
+  "item-0391.1",
+  "item-0265.1",
+  "item-0123.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4f1f0bc7-de9a-4bd8-9222-b5e4953c1b74",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Jiu is referring to his older brother, not himself.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"The facts state Kaoru is male, so 'his' is correct.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Follows the specified term Pocket Git = 포켓 깃.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are completely natural and accurate.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Kiryu speaks in 해요체 to Takanashi; Translation 2 uses 반말.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Consistently uses tone marks matching the character name convention.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Hiroba is a feature/space name in the app, not a literal plaza.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the source text into English.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Follows the term ワークスペース = Space without assuming gender.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly uses the defined channel term Hearth instead of literal campfire.\"}\n]\n```\n",
+  "duration_seconds": 6.996607,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17232,
+   "output_tokens": 322,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17554
+  }
+ }
+}

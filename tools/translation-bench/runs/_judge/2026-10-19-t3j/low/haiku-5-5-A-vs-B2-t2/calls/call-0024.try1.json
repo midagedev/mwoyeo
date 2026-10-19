@@ -1,0 +1,31 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0306.1",
+  "item-0264.2",
+  "item-0292.1",
+  "item-0256.1",
+  "item-0166.2",
+  "item-0221.1",
+  "item-0132.1",
+  "item-0177.1",
+  "item-0251.2",
+  "item-0004.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "18221feb-8d9b-42ef-acc0-534faa19aa73",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"출근하면 specifically means arriving at work.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural phrasing for completing foundation tasks and timeline.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"The person found is a young woman, so 'her' is accurate.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Matches context of directing someone to the restroom naturally.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both present and past reporting verbs convey the meaning well.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both 관리합니다 and 담당합니다 are natural and accurate translations.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Speaks in 해요체 to seniors as specified in the facts.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Properly translates the feature name to English per document conventions.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translates the Japanese interjection naturally instead of leaving romaji.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Lin Yuan speaks in 해요체 to Zhou Yi, using proper honorifics.\"}\n]\n```\n",
+  "duration_seconds": 4.829418,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17297,
+   "output_tokens": 311,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17608
+  }
+ }
+}

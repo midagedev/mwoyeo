@@ -1,0 +1,31 @@
+{
+ "call": 74,
+ "try": 1,
+ "ids": [
+  "item-0022.1",
+  "item-0325.2",
+  "item-0356.1",
+  "item-0276.2",
+  "item-0047.1",
+  "item-0073.2",
+  "item-0156.1",
+  "item-0229.2",
+  "item-0049.1",
+  "item-0096.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9b571beb-137e-495b-9f58-edeb4be8da5b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"三成 means thirty percent (three shares), not three hundred.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Thorne speaks to Rook in 해요체; Translation 2 correctly captures the meaning.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 omits the clause explaining spiritual power was exhausted.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Rook speaks to Dex in 반말, making Translation 1 correct.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 contains garbled grammar and unnatural phrasing.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 mistranslates the meaning and has garbled transliteration.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both incorrectly use 해요체 instead of 반말 to Rory.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.782432,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17729,
+   "output_tokens": 314,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18043
+  }
+ }
+}

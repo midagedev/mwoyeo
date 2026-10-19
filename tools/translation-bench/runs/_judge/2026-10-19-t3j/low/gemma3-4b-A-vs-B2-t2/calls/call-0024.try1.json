@@ -1,0 +1,31 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0334.1",
+  "item-0111.1",
+  "item-0367.2",
+  "item-0323.2",
+  "item-0055.1",
+  "item-0086.2",
+  "item-0242.1",
+  "item-0209.1",
+  "item-0241.2",
+  "item-0092.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "910eb255-c124-47da-a8f0-f574d062a25b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the question, whereas 2 turns it into a request.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 leaves untranslated Chinese characters, while 1 is fully translated.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 was not translated into English.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 naturally uses 'My grandfather' for the speaker's own grandfather.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 leaves the name untranslated in Chinese characters.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 uses the required 합쇼체 speech level toward the section chief.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 was not translated into English.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 is grammatically natural and uses consistent speech levels.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Speaker Thorne uses 해요체 with Rook, matching Translation 2's honorific register.\"}\n]\n```\n",
+  "duration_seconds": 5.691831,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17455,
+   "output_tokens": 328,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17783
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0377.2",
+  "item-0244.1",
+  "item-0005.2",
+  "item-0351.1",
+  "item-0100.2",
+  "item-0041.2",
+  "item-0021.2",
+  "item-0382.1",
+  "item-0349.2",
+  "item-0112.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d3b1c8c0-4ee3-4f78-89a6-c9b685bbd783",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural phrasing for UI / manual sections.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses romanization 'Um' from context and singular 'seat'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated; 2 uses correct speech level.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into the target language Korean.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both misunderstand the conditional 'when she wakes up, thank her for me'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the text in Japanese instead of translating.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translates name to Korean 루크 and sounds much more natural.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both are accurate, natural, and use the established name spelling.\"}\n]\n```\n",
+  "duration_seconds": 4.826643,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17199,
+   "output_tokens": 317,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17516
+  }
+ }
+}

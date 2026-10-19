@@ -1,0 +1,27 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0011.1",
+  "item-0140.2",
+  "item-0181.1",
+  "item-0107.1",
+  "item-0123.1",
+  "item-0120.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b8e38830-706c-46d6-b2ef-b4205909a037",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Uses the correct name '루크' specified in the facts.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Subject particle '그녀가' is more natural than topic particle '그녀는'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the text into Korean.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and use the correct register.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Accurately translates '只' as '만' and reads more naturally.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses the correct name 'Jiu' specified in the facts.\"}\n]\n```\n",
+  "duration_seconds": 99.518264,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16093,
+   "output_tokens": 11779,
+   "thinking_tokens": 11577,
+   "cache_read_tokens": 0,
+   "total_tokens": 27872
+  }
+ }
+}

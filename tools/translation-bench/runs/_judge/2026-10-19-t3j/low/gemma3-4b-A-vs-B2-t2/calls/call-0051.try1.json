@@ -1,0 +1,24 @@
+{
+ "call": 51,
+ "try": 1,
+ "ids": [
+  "item-0147.2",
+  "item-0275.2",
+  "item-0220.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7eea0218-8111-4394-99c8-e61ee2d8b6e4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly translates 'The rest' and uses the specified term '작업 트리'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"More natural honorific '연락드리겠습니다' when speaking to a section chief.\"}\n]\n```\n",
+  "duration_seconds": 4.1297,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15014,
+   "output_tokens": 107,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15121
+  }
+ }
+}

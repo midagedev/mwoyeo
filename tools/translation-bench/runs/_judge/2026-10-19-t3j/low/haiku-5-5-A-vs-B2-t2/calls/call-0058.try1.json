@@ -1,0 +1,31 @@
+{
+ "call": 58,
+ "try": 1,
+ "ids": [
+  "item-0144.1",
+  "item-0310.1",
+  "item-0246.1",
+  "item-0300.2",
+  "item-0065.2",
+  "item-0036.1",
+  "item-0090.2",
+  "item-0267.1",
+  "item-0151.1",
+  "item-0252.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b86fd5ec-77d3-4566-b346-328f22d04acd",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Takanashi speaks to Hinata in banmal after Kiryu leaves.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 sounds much more natural for greeting an ongoing task.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses the natural Korean business expression '감사합니다'.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both mistranslate the tool/system name '길잡이' as a human guide.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 flows more naturally as a spoken drama line.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Lin Yuan speaks to his younger sister Lin Xia in banmal.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Japanese.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 mistranslates tea leaves as leafy vegetables (잎채소).\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 'deposit' as rental deposit (보증금).\"}\n]\n```\n",
+  "duration_seconds": 4.382469,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17264,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17596
+  }
+ }
+}

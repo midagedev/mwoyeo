@@ -1,0 +1,31 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0030.1",
+  "item-0171.2",
+  "item-0181.2",
+  "item-0211.1",
+  "item-0176.2",
+  "item-0135.1",
+  "item-0188.2",
+  "item-0078.2",
+  "item-0288.2",
+  "item-0204.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c38cefe0-e4c0-424a-be89-c2e4f43f6ff4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately with correct banmal tone.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both use haeyo-che appropriately, though Xu Nuo speaks banmal to Lu Ming.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly translates 昏 (unconscious), whereas 2 mistranslates it as confused.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 hallucinates metadata instead of translating the dialogue.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Transliterates the name Chae-yul much better than Jae-yeol.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both are equally flawed in grammar and meaning.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Captures the original question format and intent more naturally.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Sogou speaks to Hyuga using haeyo-che; 2 uses hapsyo-che.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Kai speaks banmal, which 1 uses; 2 incorrectly uses polite language.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"1 contains severe typos ('어이미') despite Rory speaking banmal to Siobhan.\"}\n]\n```\n",
+  "duration_seconds": 5.71138,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17437,
+   "output_tokens": 349,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17786
+  }
+ }
+}

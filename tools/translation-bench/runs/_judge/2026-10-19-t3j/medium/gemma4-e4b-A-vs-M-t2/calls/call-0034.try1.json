@@ -1,0 +1,27 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0097.2",
+  "item-0326.2",
+  "item-0173.1",
+  "item-0056.1",
+  "item-0354.2",
+  "item-0290.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b20b829d-2030-4b89-8f89-a5055a534589",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both are accurate and natural; comma is a stylistic choice.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'저장하기' correctly fits a tutorial heading, unlike '저장 중'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 transcribes the name into Korean instead of raw Hanzi.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'Signed the papers' naturally translates the contract idiom '도장 찍었어'.\"}\n]\n",
+  "duration_seconds": 35.628315,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16015,
+   "output_tokens": 4239,
+   "thinking_tokens": 4049,
+   "cache_read_tokens": 0,
+   "total_tokens": 20254
+  }
+ }
+}

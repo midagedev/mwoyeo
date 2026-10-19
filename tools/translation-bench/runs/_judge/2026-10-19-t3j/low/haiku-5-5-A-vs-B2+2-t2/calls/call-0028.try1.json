@@ -1,0 +1,31 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0002.1",
+  "item-0246.2",
+  "item-0030.1",
+  "item-0174.1",
+  "item-0331.1",
+  "item-0213.2",
+  "item-0179.1",
+  "item-0135.1",
+  "item-0300.1",
+  "item-0078.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c6350f77-5ad0-4635-ad73-d284838a1ad4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translate the line accurately; 'clock' appears in both, meaning is identical.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both capture the meaning and terms accurately and read naturally.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses the specified term 'Commons' from earlier context.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both use correct 반말 speech level and translate accurately.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translates the pinyin-annotated name 万俟靖 to Moqi Jing properly.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both use appropriate 반말/하게체 elder phrasing for Tessai to Saku.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Old Mr. Takanashi' is more polite and natural for 小鳥遊老人.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both miss 'qi stone' term, translating 灵石 as spirit stones equally.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'아직 안 왔어' correctly answers whether the bill came yet.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both miss the specified term 'ward' for 结界 and are otherwise equal.\"}\n]\n```\n",
+  "duration_seconds": 4.962605,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17618,
+   "output_tokens": 341,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17959
+  }
+ }
+}

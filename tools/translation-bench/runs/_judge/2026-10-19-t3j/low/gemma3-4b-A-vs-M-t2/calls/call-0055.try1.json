@@ -1,0 +1,25 @@
+{
+ "call": 55,
+ "try": 1,
+ "ids": [
+  "item-0039.2",
+  "item-0342.1",
+  "item-0306.1",
+  "item-0377.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "bb9689fc-cfd8-4bd2-a38e-50197c2b2964",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Instructional tone fits the tutorial context better than casual 반말.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese text untranslated.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both failed to use the required 해요체 speech level to 周婷.\"}\n]\n",
+  "duration_seconds": 4.5182269999999995,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15459,
+   "output_tokens": 126,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15585
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0031.2",
+  "item-0163.2",
+  "item-0327.2",
+  "item-0003.1",
+  "item-0186.1",
+  "item-0392.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dc36a623-b5e2-464e-8cdb-6e20ca01b099",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Rory is male, requiring 누나 rather than 큰언니.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Lin Xia speaks to her brother in 반말.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"One-line notes accurately reflects note feature over comments.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"얘야 correctly captures the vocative address for Kid.\"}\n]\n",
+  "duration_seconds": 175.293734,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15989,
+   "output_tokens": 21089,
+   "thinking_tokens": 20916,
+   "cache_read_tokens": 0,
+   "total_tokens": 37078
+  }
+ }
+}

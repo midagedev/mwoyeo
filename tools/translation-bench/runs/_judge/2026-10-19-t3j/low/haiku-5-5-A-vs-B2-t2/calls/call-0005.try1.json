@@ -1,0 +1,31 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0207.2",
+  "item-0123.2",
+  "item-0034.2",
+  "item-0241.1",
+  "item-0228.2",
+  "item-0346.1",
+  "item-0285.2",
+  "item-0154.1",
+  "item-0313.1",
+  "item-0158.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "45122875-1137-485d-946e-7b18ee6a3946",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"The source sentence is cut off mid-thought, matching Translation 1.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말, and names are transliterated.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Zhou Ting speaks to Xu Nuo and Lu Ming in 반말.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Rory speaks to Gareth in 해요체, not 합쇼체.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 properly transliterates the character name 雷蔵 into Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 actually translates into Korean, while 2 remains in Chinese.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and use correct 해요체 honorific register.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Context established the cat's official English name as Barley.\"}\n]\n```\n",
+  "duration_seconds": 5.41837,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17668,
+   "output_tokens": 327,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17995
+  }
+ }
+}

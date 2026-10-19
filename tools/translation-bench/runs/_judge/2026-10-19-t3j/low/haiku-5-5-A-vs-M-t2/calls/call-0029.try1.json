@@ -1,0 +1,31 @@
+{
+ "call": 29,
+ "try": 1,
+ "ids": [
+  "item-0033.2",
+  "item-0223.2",
+  "item-0122.1",
+  "item-0064.1",
+  "item-0350.1",
+  "item-0104.1",
+  "item-0314.1",
+  "item-0118.1",
+  "item-0150.2",
+  "item-0017.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "86ff95fb-4e4a-498a-bf0e-4760cbbaa3a9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Gareth speaks to his tenants in 해요체.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Boli is a female dog being dropped off.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translates the Japanese names into Korean and keeps established speech style.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Preserves standard English sentence-ending punctuation before the marker.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and convey the same meaning.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Properly translates names, titles, and established terms into English.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translates Japanese name kanji into Korean hangul pronunciation.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Uses the specified term '모차' directly without unnecessary parenthetical glossing.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Keeping Aoife avoids the incorrect phonetic guess '아오이프'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both misinterpret the conditional '醒了' (when she wakes up).\"}\n]\n```\n",
+  "duration_seconds": 4.67021,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17785,
+   "output_tokens": 319,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18104
+  }
+ }
+}

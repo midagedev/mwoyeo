@@ -1,0 +1,30 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0190.1",
+  "item-0374.2",
+  "item-0188.2",
+  "item-0092.1",
+  "item-0358.1",
+  "item-0126.1",
+  "item-0254.2",
+  "item-0026.2",
+  "item-0199.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b4ce614a-f7c3-4598-9922-70cdb8478f34",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the source Japanese text untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Addresses the user naturally without unnecessary humble pronouns like 저희.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both mistranslate spaceship 'bridge' as bridge and share speech level.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated in Chinese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese text untranslated.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese source text untranslated.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both miss the established term Commons and use plaza identically.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Mountain gate is more accurate and conventional for 山门.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Maintains the required hapsyo-che register toward Gareth consistently.\"}\n]\n```\n",
+  "duration_seconds": 5.399322,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17107,
+   "output_tokens": 280,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17387
+  }
+ }
+}

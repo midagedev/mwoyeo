@@ -1,0 +1,31 @@
+{
+ "call": 44,
+ "try": 1,
+ "ids": [
+  "item-0037.1",
+  "item-0200.1",
+  "item-0061.2",
+  "item-0069.1",
+  "item-0391.2",
+  "item-0197.2",
+  "item-0274.1",
+  "item-0049.2",
+  "item-0117.1",
+  "item-0257.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3f171200-c90b-48ed-8958-6242704e357d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally convey the meaning in software guide documentation.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both correctly use informal speech (반말) and convey the intended meaning naturally.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Follows the specified term mapping '時計 = watch'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translates proper nouns into Korean characters matching the facts block.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the source Korean text into English.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Accurately translates Akira's role as police inspector rather than leaving untranslated honorific.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly transcribes 'あめみや' as 아메미야 and maintains proper speech register.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both accurately translate the sentence with identical meaning, register, and naturalness.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correctly uses the specified glossary term '魔石 = 마정석'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Matches the specified speech level (해요체) that 十河 uses with 日向.\"}\n]\n```\n",
+  "duration_seconds": 5.763356,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17350,
+   "output_tokens": 345,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17695
+  }
+ }
+}

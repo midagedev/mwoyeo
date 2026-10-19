@@ -1,0 +1,31 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0223.2",
+  "item-0185.2",
+  "item-0143.2",
+  "item-0331.2",
+  "item-0280.1",
+  "item-0214.1",
+  "item-0040.1",
+  "item-0179.1",
+  "item-0172.2",
+  "item-0154.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "98b3c7fc-20b7-48ae-ac65-ad422528ee4f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately, with or without explicit subject pronoun.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses the specified romanization 'Jiu' from the facts.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses the specified name '저우 이모' and proper polite register.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translates the proper name into Korean rather than leaving kanji untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly retains the source nuance '이라는' and uses 타카나시/계신가요.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly follows the given terms 'qi stone' and 'ward'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Natural 해요체 phrasing with appropriate honorific addressing of the listener.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly adheres to the given terms '다방' and '부엉이'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translates Japanese into Korean; Translation 2 left text completely in Japanese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Includes the necessary subject particle '가' after the name for naturalness.\"}\n]\n```\n",
+  "duration_seconds": 4.624821,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5897,
+   "output_tokens": 344,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11821,
+   "total_tokens": 6241
+  }
+ }
+}

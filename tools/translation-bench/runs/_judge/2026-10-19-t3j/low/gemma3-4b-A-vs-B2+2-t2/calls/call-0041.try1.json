@@ -1,0 +1,31 @@
+{
+ "call": 41,
+ "try": 1,
+ "ids": [
+  "item-0165.1",
+  "item-0312.1",
+  "item-0280.1",
+  "item-0167.1",
+  "item-0270.2",
+  "item-0326.2",
+  "item-0147.1",
+  "item-0275.1",
+  "item-0182.1",
+  "item-0237.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "16e6da17-51f5-4af8-924c-5131d03003fa",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'A previous state' is more natural than 'the previous state'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 translates literal words unnaturally and mixes speech levels.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'How do you interpret' accurately translates 'どう見る?'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 leaves Chinese characters and pinyin untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese sentence untranslated.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 uses appropriate honorifics and naturally phrased 반말.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the simple present tense for habitual action.\"}\n]\n```\n",
+  "duration_seconds": 5.48405,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5530,
+   "output_tokens": 310,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11818,
+   "total_tokens": 5840
+  }
+ }
+}

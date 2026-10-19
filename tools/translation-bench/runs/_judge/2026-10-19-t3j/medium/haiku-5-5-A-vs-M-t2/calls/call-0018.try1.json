@@ -1,0 +1,27 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0102.1",
+  "item-0342.1",
+  "item-0047.1",
+  "item-0228.2",
+  "item-0291.2",
+  "item-0350.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "76de5ce0-9ed3-4dd1-9e7d-b947e57a3b59",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly avoids honorific '소장님', matching '존댓말은 쓰지 마'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"오작교 is the natural Korean term for 鵲橋; 작교 is unnatural.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both '긴급한' and '급한' translate 'urgent' accurately and naturally.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 translates the name properly instead of leaving Chinese characters.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly follows the provided glossary term 마정석 for 魔石.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both 'Good to hear' and 'That's a relief' fit '다행이다' well.\"}\n]\n```\n",
+  "duration_seconds": 93.002803,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16159,
+   "output_tokens": 11065,
+   "thinking_tokens": 10837,
+   "cache_read_tokens": 0,
+   "total_tokens": 27224
+  }
+ }
+}

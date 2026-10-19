@@ -1,0 +1,31 @@
+{
+ "call": 9,
+ "try": 1,
+ "ids": [
+  "item-0214.1",
+  "item-0158.2",
+  "item-0305.1",
+  "item-0084.1",
+  "item-0212.2",
+  "item-0241.1",
+  "item-0269.1",
+  "item-0087.1",
+  "item-0308.2",
+  "item-0262.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f8d06f5b-8ce1-49e5-a89a-9ea4408bff26",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Fact establishes the term 毛茶 = 모차.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translates Japanese Kanji name 澪 into Korean 미오.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally in 반말.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Matches the document title pronunciation '룬벨' over '루네벨'.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both incorrectly mistranslate name 린위안 as 임원 (executive).\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Thorne speaks to Rook in 해요체; phrasing reads more naturally.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both incorrectly translate female speaker's older brother as '형' instead of '오빠'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Term Pocket Git = 포켓 깃 was missed in both; 1 is natural.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Thorne speaks to Rook in 해요체, but 1 fits context better.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"桐生 speaks in 해요체, whereas 2 uses inappropriate 반말/해라체.\"}\n]\n```\n",
+  "duration_seconds": 5.216407,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17420,
+   "output_tokens": 341,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17761
+  }
+ }
+}

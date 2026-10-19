@@ -1,0 +1,26 @@
+{
+ "call": 46,
+ "try": 1,
+ "ids": [
+  "item-0281.2",
+  "item-0017.1",
+  "item-0183.1",
+  "item-0215.1",
+  "item-0274.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b6ea0c88-8be7-4d0d-9134-0af6f9667d8f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"The bridge on a ship is the command deck, not a bridge.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 failed to translate most of the sentence into English.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 uses the correct name reading 타카나시 and appropriate 해요체 honorifics.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 馬車 to 마차 with appropriate narrative ending.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both failed to translate the line into Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.035716,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15808,
+   "output_tokens": 170,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15978
+  }
+ }
+}

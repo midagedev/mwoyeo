@@ -1,0 +1,25 @@
+{
+ "call": 35,
+ "try": 1,
+ "ids": [
+  "item-0329.1",
+  "item-0064.2",
+  "item-0103.2",
+  "item-0220.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "46da577c-9641-4eac-9b4a-b7d575009f25",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Uses natural vocative '삭아' and honors the guest.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"}\n]\n",
+  "duration_seconds": 13.812942,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15370,
+   "output_tokens": 1407,
+   "thinking_tokens": 1298,
+   "cache_read_tokens": 0,
+   "total_tokens": 16777
+  }
+ }
+}

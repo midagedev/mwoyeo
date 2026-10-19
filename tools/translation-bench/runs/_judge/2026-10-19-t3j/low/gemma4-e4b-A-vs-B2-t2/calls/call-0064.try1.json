@@ -1,0 +1,29 @@
+{
+ "call": 64,
+ "try": 1,
+ "ids": [
+  "item-0169.1",
+  "item-0313.1",
+  "item-0005.2",
+  "item-0133.1",
+  "item-0227.1",
+  "item-0345.2",
+  "item-0075.2",
+  "item-0022.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "486fbde7-7070-48a1-8e75-9f3fc7fb508e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both capture the meaning and function well as a section heading.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 left text in Japanese; 2 translates into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Natural Korean phrasing, translates Rook to 룩, and uses correct 반말.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both make the same error using 'he' for female Hikaru.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left Japanese untranslated; 2 is Korean despite minor term inaccuracies.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Natural standard phrasing for a software documentation heading.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Transliterates Dex into Korean (덱스) in Korean target text.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both fail to use the required term 'Revisions' for 履歴.\"}\n]\n```\n",
+  "duration_seconds": 4.458896,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16393,
+   "output_tokens": 266,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16659
+  }
+ }
+}

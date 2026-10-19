@@ -1,0 +1,31 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0310.1",
+  "item-0361.1",
+  "item-0051.1",
+  "item-0033.1",
+  "item-0093.1",
+  "item-0382.2",
+  "item-0064.2",
+  "item-0151.1",
+  "item-0383.2",
+  "item-0379.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9f4f0718-a9d2-4736-8775-13ffcad0de52",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 'ひろば' as 'space' instead of 'plaza/Commons'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Thorne speaks in 반말; Translation 1 uses wrong speech level and grammar.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 uses natural phrasing 'return the deposit' instead of repeating 'deposit'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly translates '오빠' as 'my brother' and pronoun for Boli as 'her'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated into Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated into Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated into Korean.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both convey the polite suggestion accurately and naturally in English.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated into Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.602667,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17538,
+   "output_tokens": 345,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17883
+  }
+ }
+}

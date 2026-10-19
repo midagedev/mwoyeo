@@ -1,0 +1,31 @@
+{
+ "call": 50,
+ "try": 1,
+ "ids": [
+  "item-0304.1",
+  "item-0100.1",
+  "item-0244.1",
+  "item-0176.2",
+  "item-0051.1",
+  "item-0142.2",
+  "item-0320.1",
+  "item-0296.2",
+  "item-0190.1",
+  "item-0041.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "bc03f719-1285-4df2-9b29-010980cc883c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correct name reading: earlier context establishes 雨宮 is read あめみや (아메미야).\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"More natural heading style without the unnecessary definite article.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Nagi is a third person, and Akira asked not to be called Inspector.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Uses correct established name 주정 and appropriate polite register for 周婷.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Faithfully captures '먼저 말을 걸지 않습니다' (do not speak first).\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Matches the specified pinyin reading Yuè Chuān for 乐川.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both mistranslate conditional '醒了' as already woken; equally flawed.\"}\n]\n```\n",
+  "duration_seconds": 5.349327,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17517,
+   "output_tokens": 322,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17839
+  }
+ }
+}

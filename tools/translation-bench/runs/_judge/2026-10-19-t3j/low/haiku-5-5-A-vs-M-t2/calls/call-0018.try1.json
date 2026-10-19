@@ -1,0 +1,31 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0358.2",
+  "item-0222.1",
+  "item-0161.2",
+  "item-0014.2",
+  "item-0062.2",
+  "item-0212.2",
+  "item-0312.1",
+  "item-0336.2",
+  "item-0255.1",
+  "item-0372.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "34073e0f-cc11-45ec-ba5f-a987301c2eb9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly captures the future condition/obligation rather than continuous present.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate in context.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Scope is more natural and precise than range for search settings.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 adheres to the designated term 'boss' for 先輩.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly transliterates 澪 as 미오 instead of leaving raw Kanji.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both convey the meaning and polite register appropriately.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified term 'ward' for 结界.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 accurately uses the required 해요체 speech level for 周姨.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 is a more natural translation of 盯着看了好久.\"}\n]\n```\n",
+  "duration_seconds": 5.191566,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17317,
+   "output_tokens": 319,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17636
+  }
+ }
+}

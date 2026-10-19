@@ -1,0 +1,31 @@
+{
+ "call": 16,
+ "try": 1,
+ "ids": [
+  "item-0193.1",
+  "item-0116.1",
+  "item-0123.2",
+  "item-0015.2",
+  "item-0104.2",
+  "item-0011.1",
+  "item-0112.1",
+  "item-0149.1",
+  "item-0082.2",
+  "item-0188.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "bfe6fd29-d413-4e10-b4e2-9577f2340d57",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"The specified term for 時計 is watch, not clock.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly uses first-person intention rather than an imperative request.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Faithfully translates 'only want to eat' and names the dish 사차면.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the onboarding sentence.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly spells Rook as 루크 and captures 'that noise' (그 소리).\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly uses the defined name 텟사이 instead of Sino-Korean reading 철재.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"In context of the coolant/cheese vat, 통 is more accurate than 욕조.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Drops unnecessary Japanese honorific -san and uses standard English documentation register.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Uses the specified name spelling 시본 instead of incorrect 시오반.\"}\n]\n```\n",
+  "duration_seconds": 5.061788,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17320,
+   "output_tokens": 334,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17654
+  }
+ }
+}

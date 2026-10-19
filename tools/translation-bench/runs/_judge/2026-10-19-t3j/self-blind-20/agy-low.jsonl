@@ -1,0 +1,20 @@
+{"id": "case05.2", "better": "1", "why": "Facts state Yuki is male, so 'His' is correct.", "call": 1}
+{"id": "case16.1", "better": "1", "why": "Translation 2 left the line completely untranslated in Korean.", "call": 1}
+{"id": "case06.2", "better": "1", "why": "Onboarding guides instruct the reader, not the author's own actions.", "call": 1}
+{"id": "case01.2", "better": "2", "why": "'Packing moving service' accurately captures the concept of '포장이사'.", "call": 1}
+{"id": "case12.2", "better": "1", "why": "Facts romanize Chinese names as single words without spaces.", "call": 1}
+{"id": "case14.2", "better": "2", "why": "Translation 1 left the character name untranslated in Chinese characters.", "call": 1}
+{"id": "case04.1", "better": "2", "why": "Target language is Korean; Translation 1 stayed in Japanese.", "call": 1}
+{"id": "case02.2", "better": "1", "why": "Capitalizes term Quick Note and correctly romanizes 月見里 as Yamanashi-derived name.", "call": 1}
+{"id": "case17.1", "better": "1", "why": "The cat's English name Barley was explicitly established in context.", "call": 1}
+{"id": "case10.1", "better": "2", "why": "Gareth is a landlord, so '팀장님' (team leader) is incorrect.", "call": 1}
+{"id": "case11.2", "better": "tie", "why": "Both correctly use 해요체 to 陆明 and natural Korean phrasing.", "call": 2}
+{"id": "case08.2", "better": "2", "why": "Translation 1 failed to translate the Japanese source text into Korean.", "call": 2}
+{"id": "case09.1", "better": "2", "why": "Uses the specified term 'watch' and matches document terms accurately.", "call": 2}
+{"id": "case13.1", "better": "1", "why": "Lin Yuan speaks to Zhou Yi in 해요체, not 반말/해라체.", "call": 2}
+{"id": "case03.1", "better": "2", "why": "'받아와' is more natural in Korean when asking someone to fetch something.", "call": 2}
+{"id": "case07.1", "better": "1", "why": "Translation 2 did not translate the Chinese text into Korean at all.", "call": 2}
+{"id": "case19.1", "better": "2", "why": "Dex speaks to Rook in 반말; translation 1 inappropriately uses 존댓말.", "call": 2}
+{"id": "case20.2", "better": "tie", "why": "Both failed to translate the Chinese text into the target language Korean.", "call": 2}
+{"id": "case18.2", "better": "1", "why": "More natural punctuation without an unnecessary extra comma.", "call": 2}
+{"id": "case15.2", "better": "1", "why": "Uses natural Korean '과장님' instead of leaving the title as '課長님'.", "call": 2}

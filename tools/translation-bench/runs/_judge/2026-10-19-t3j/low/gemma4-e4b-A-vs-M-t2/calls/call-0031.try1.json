@@ -1,0 +1,31 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0103.2",
+  "item-0361.2",
+  "item-0320.1",
+  "item-0271.1",
+  "item-0346.2",
+  "item-0292.2",
+  "item-0292.1",
+  "item-0063.1",
+  "item-0253.1",
+  "item-0060.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e30ddf54-feeb-42a5-93d4-b9ec7b839a95",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 leaves Japanese untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Matches context where 'ひろば' refers to the shared area, not space.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"More natural phrasing and captures the inclusive collaborative nuance of '始めるぞ'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"More natural and contextually accurate for diagnosing a mechanical malfunction.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly follows the specified term mapping '事務所 = Bureau'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 remains in Japanese.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean; Translation 1 remains in Japanese.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean; Translation 1 remains in Chinese.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean using the required term '품의'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Modakbul is the proper name of the internal communication platform.\"}\n]\n",
+  "duration_seconds": 4.980457,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17317,
+   "output_tokens": 328,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17645
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 29,
+ "try": 1,
+ "ids": [
+  "item-0135.1",
+  "item-0140.1",
+  "item-0260.2",
+  "item-0078.2",
+  "item-0355.2",
+  "item-0213.1",
+  "item-0080.2",
+  "item-0188.2",
+  "item-0148.1",
+  "item-0319.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4577bcf1-ea22-4b28-978a-d2a4f00d087e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly translates 'freezer' as 냉동고 rather than 냉장고.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Preserves git term 'branch' as 브랜치 instead of 가지.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 translated the wrong sentence entirely.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations convey the meaning well with minor wording differences.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"More natural and accurate translation of the transitive verb 'stage'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Both mistranslate internal tool 모닥불, but 1 is slightly more natural.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"이렇게 한다 is more natural Korean for 'does this'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left the text entirely untranslated.\"}\n]\n```\n",
+  "duration_seconds": 4.652511,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17160,
+   "output_tokens": 318,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17478
+  }
+ }
+}

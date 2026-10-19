@@ -1,0 +1,23 @@
+{
+ "call": 61,
+ "try": 1,
+ "ids": [
+  "item-0025.1",
+  "item-0248.1"
+ ],
+ "problem": "1 of 2 cases missing or malformed",
+ "event": {
+  "conversation_id": "4563031e-6006-48b8-b913-8698e6b6dec3",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Candidate 1 left the text untranslated in Chinese.\"},\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Candidate 1 left the text untranslated in Japanese.\"}\n]\n",
+  "duration_seconds": 2.800494,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14992,
+   "output_tokens": 64,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15056
+  }
+ }
+}

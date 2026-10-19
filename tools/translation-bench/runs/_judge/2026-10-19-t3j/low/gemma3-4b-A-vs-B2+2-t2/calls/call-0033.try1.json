@@ -1,0 +1,31 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0364.1",
+  "item-0010.2",
+  "item-0327.1",
+  "item-0130.1",
+  "item-0090.1",
+  "item-0005.1",
+  "item-0278.2",
+  "item-0208.2",
+  "item-0249.1",
+  "item-0321.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "25f9562e-44e4-47ea-a98f-1c96fb69013e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 bizarrely translates sensor name 'ホタル' as merry-go-round.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both capture the informal tone, though neither uses the term 엠티.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 構え as holding rather than swinging.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly includes 'The rest' (나머지는) which Translation 1 omitted.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'Row' is the standard, natural English term for seating arrangements.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly reads 月見里 as Yamanashi and uses Quick Notes.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 leaves untranslated Japanese katakana (호タル).\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 mistranslates the person's name 若水 as literal 'If water'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 accurately captures the reported speech ending '하더라' (He said).\"}\n]\n```\n",
+  "duration_seconds": 5.864354,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17517,
+   "output_tokens": 352,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17869
+  }
+ }
+}

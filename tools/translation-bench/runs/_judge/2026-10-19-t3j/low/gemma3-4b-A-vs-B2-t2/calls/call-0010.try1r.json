@@ -1,0 +1,25 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0249.2",
+  "item-0262.2",
+  "item-0174.1",
+  "item-0059.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "db69a5e5-c439-4e1d-9311-778e23ca7665",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the name 日向 as 히나타.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly identifies Hearth as the channel name.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both appropriately translate Thorne speaking to Rook with matching speech levels.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese text completely untranslated.\"}\n]\n",
+  "duration_seconds": 3.708632,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15416,
+   "output_tokens": 125,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15541
+  }
+ }
+}

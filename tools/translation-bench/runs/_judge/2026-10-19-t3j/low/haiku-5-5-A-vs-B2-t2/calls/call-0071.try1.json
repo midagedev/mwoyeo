@@ -1,0 +1,31 @@
+{
+ "call": 71,
+ "try": 1,
+ "ids": [
+  "item-0044.2",
+  "item-0340.1",
+  "item-0003.1",
+  "item-0256.2",
+  "item-0151.2",
+  "item-0328.2",
+  "item-0120.2",
+  "item-0266.2",
+  "item-0101.1",
+  "item-0303.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "20f1ecd9-a2e8-4990-a6db-759c89b9e3ea",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural and preserve meaning and speech level.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Context indicates Qiu Shuang (female) is waking up; 'her' is correct.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly responds to someone asking to use the restroom.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Context is a tea business, not leafy vegetables (잎채소).\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Gender is unspecified in the prompt/facts for Takanashi.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both 'Day Two' and 'Day 2' are standard headings.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both capture the action and meaning accurately and naturally.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Zhou Ting speaks in 반말, which Translation 2 correctly reflects.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both '항목' and '내용' translate the line accurately and naturally.\"}\n]\n```\n",
+  "duration_seconds": 4.540908,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17266,
+   "output_tokens": 323,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17589
+  }
+ }
+}

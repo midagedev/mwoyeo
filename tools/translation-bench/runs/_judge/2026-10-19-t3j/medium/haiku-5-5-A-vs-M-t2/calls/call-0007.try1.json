@@ -1,0 +1,27 @@
+{
+ "call": 7,
+ "try": 1,
+ "ids": [
+  "item-0303.2",
+  "item-0125.2",
+  "item-0325.2",
+  "item-0008.1",
+  "item-0265.2",
+  "item-0278.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "310d88ee-d114-4e1d-b0f3-228c0d0baed7",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Uses appropriate honorifics for the professor.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates 'still' naturally without awkward literal phrasing.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly uses past tense 'said' for reported speech.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly transliterates names and avoids unnatural pronouns like '당신'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly follows the defined term mapping 'Space'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses natural Korean phrasing instead of literal Japanese translationese.\"}\n]\n",
+  "duration_seconds": 114.420285,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16130,
+   "output_tokens": 13598,
+   "thinking_tokens": 13416,
+   "cache_read_tokens": 0,
+   "total_tokens": 29728
+  }
+ }
+}

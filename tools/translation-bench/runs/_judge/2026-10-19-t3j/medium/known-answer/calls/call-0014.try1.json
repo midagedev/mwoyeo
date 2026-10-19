@@ -1,0 +1,27 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0009.2",
+  "item-0072.1",
+  "item-0063.1",
+  "item-0065.2",
+  "item-0022.1",
+  "item-0020.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0765f0b7-0f7c-4b3c-aa57-cf43ec277cde",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Uses the specified term 모차 instead of 마오차.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly transcribes the Chinese name 解辰 as 셰천.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly translates spaceship bridge as 조종실 instead of 다리.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translates into English rather than leaving Korean untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Follows the specified term Shijie instead of Senior Sister.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Follows the specified term 포켓 깃.\"}\n]\n",
+  "duration_seconds": 18.766072,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15942,
+   "output_tokens": 2189,
+   "thinking_tokens": 2002,
+   "cache_read_tokens": 0,
+   "total_tokens": 18131
+  }
+ }
+}

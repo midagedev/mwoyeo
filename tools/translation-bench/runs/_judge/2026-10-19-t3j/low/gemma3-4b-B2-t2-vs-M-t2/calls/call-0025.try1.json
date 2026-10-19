@@ -1,0 +1,31 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0015.1",
+  "item-0157.2",
+  "item-0180.1",
+  "item-0248.1",
+  "item-0168.2",
+  "item-0009.1",
+  "item-0092.1",
+  "item-0166.2",
+  "item-0109.2",
+  "item-0236.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d932487c-91ae-43fe-8de4-318e90f05506",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correct grammar, speaker register, and captures the meaning of the original sentence.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Accurately conveys that the heirloom was from the mother.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left Japanese untranslated into Korean.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both 'place' and 'location' are equally valid translations here.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left Japanese untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Natural English without repeating the Korean name in Hangul.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses 해요체 as specified by the speaker facts.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Both missed the person name '카이', but 1 is marginally closer.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Uses correct title 'Inspector' matching Akira's role.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in 반말, matching Translation 1.\"}\n]\n```\n",
+  "duration_seconds": 6.203262,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17282,
+   "output_tokens": 315,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17597
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0140.1",
+  "item-0275.1",
+  "item-0078.2",
+  "item-0374.2",
+  "item-0157.1",
+  "item-0234.2",
+  "item-0080.2",
+  "item-0205.2",
+  "item-0372.1",
+  "item-0269.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6ec31cc8-110d-4e3e-9648-3d767be23ddc",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly parses names and keeps -san without hallucinating managers.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 sounds much more natural in Korean.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both incorrectly use honorifics instead of banmal for Siobhan.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 transliterates the name correctly without leaving untranslated Korean honorific.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 is more natural and accurately conveys 'must never move'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 completely hallucinates meanings, subjects, and names.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 Romanizes the name accurately without assuming gender.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 包み as parcel/wrapping; 2 has severe typos.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 translates the text faithfully; 2 hallucinates 'freezer' and banmal.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 properly translates '三成' as three-tenths instead of leaving Chinese characters.\"}\n]\n```\n",
+  "duration_seconds": 5.481615,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17404,
+   "output_tokens": 345,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17749
+  }
+ }
+}

@@ -1,0 +1,26 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0275.2",
+  "item-0337.2",
+  "item-0287.1",
+  "item-0265.2",
+  "item-0070.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "70f1b025-95a5-4a5c-9ee3-02d71f5c6ea9",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into the target language English.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates pickup, whereas Translation 2 reverses it.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates the title 課長 to 과장.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly renders the platform as campfire rather than bonfire.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 translates the name and preserves the correct subject.\"}\n]\n",
+  "duration_seconds": 130.10754,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15882,
+   "output_tokens": 14593,
+   "thinking_tokens": 14435,
+   "cache_read_tokens": 0,
+   "total_tokens": 30475
+  }
+ }
+}

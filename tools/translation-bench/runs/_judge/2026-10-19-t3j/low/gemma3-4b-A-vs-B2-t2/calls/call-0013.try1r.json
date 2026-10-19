@@ -1,0 +1,25 @@
+{
+ "call": 13,
+ "try": 1,
+ "ids": [
+  "item-0089.1",
+  "item-0093.1",
+  "item-0191.2",
+  "item-0198.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9cf01a12-7357-40bc-9ff7-e73a34f19e73",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both miss Siobhan's 반말 to Rory and mistranslate the permission question.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Better captures Gareth's 해요체 and faithful meaning than Translation 2.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Gerund heading translated naturally as a noun phrase rather than declarative verb.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Chinese text.\"}\n]\n```\n",
+  "duration_seconds": 4.279081,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15493,
+   "output_tokens": 139,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15632
+  }
+ }
+}

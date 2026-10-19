@@ -1,0 +1,27 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0123.2",
+  "item-0014.2",
+  "item-0157.1",
+  "item-0146.2",
+  "item-0004.2",
+  "item-0173.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f96b81db-1d9d-4aac-a515-0ec9437e265b",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"1 accurately translates '只想吃' instead of mistranslating it as going.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"2 captures 'なし' more concisely and naturally without adding an extra verb.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and use the correct speech level.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"1 correctly follows the specified term '납품일' and translates 'それが'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"1 correctly translates spaceship 'bridge' as 조타실 instead of 다리.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"2 correctly uses the established name spelling 'Um' and captures '도' (also).\"}\n]\n",
+  "duration_seconds": 30.698215,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16171,
+   "output_tokens": 3537,
+   "thinking_tokens": 3328,
+   "cache_read_tokens": 0,
+   "total_tokens": 19708
+  }
+ }
+}

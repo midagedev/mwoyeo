@@ -1,0 +1,31 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0074.2",
+  "item-0295.2",
+  "item-0110.2",
+  "item-0273.1",
+  "item-0296.1",
+  "item-0135.1",
+  "item-0302.2",
+  "item-0257.1",
+  "item-0087.1",
+  "item-0200.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8b991a20-a7f7-496b-890a-87d1e1e0aba8",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"许诺 refers to 周婷 respectfully, so '그 사람' fits better than '걔'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"林远 speaks to his younger sister 林夏 in 반말.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the imperative '확인해 보세요' for 去仓库点一下.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"再来月 means 'month after next' (재다음 달), not end of next month.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly preserves the meaning of '먼저 말을 걸지 않습니다'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'there's a catch' means a catch/problem, naturally translated as '문제가 하나 있어요'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"The speaker speaks to his sister in 반말; '三红' is three black teas.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'For team use' is much more natural and concise as a heading.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Facts state 解玄 is romanized as Xiè Xuán with tones preserved.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Dex is defending his own hot tub, so '이건' (this) fits best.\"}\n]\n```\n",
+  "duration_seconds": 5.718196,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17488,
+   "output_tokens": 369,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17857
+  }
+ }
+}

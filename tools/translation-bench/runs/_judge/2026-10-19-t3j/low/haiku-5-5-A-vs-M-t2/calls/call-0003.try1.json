@@ -1,0 +1,31 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0302.1",
+  "item-0195.2",
+  "item-0124.1",
+  "item-0221.1",
+  "item-0240.2",
+  "item-0208.2",
+  "item-0077.1",
+  "item-0383.2",
+  "item-0143.2",
+  "item-0273.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a3b58842-2aec-4488-899c-e7c6f4283760",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Wanqi is a compound surname, and 'young woman' captures 年轻女子 context.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates 三百盒 naturally as 삼백 상자 instead of awkward 상자 300개.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Accurately translates 'Did the bill come yet?' without adding unprompted '벌써'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Properly translates 湊 as Korean name 미나토 instead of raw romaji.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly uses third-person 'She's' for Nagi rather than mistaken 'I'm'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Follows the specified name 쏜 and uses natural Korean phrasing.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Rory speaks to Gareth in 해요체 ('알겠어요'), not 합쇼체.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally and use appropriate informal speech (반말).\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Dex speaks to Rook in 반말 and Gerald is transliterated naturally.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Uses the standard Korean business expression '품의를 올리다'.\"}\n]\n```\n",
+  "duration_seconds": 5.282496,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17558,
+   "output_tokens": 366,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17924
+  }
+ }
+}

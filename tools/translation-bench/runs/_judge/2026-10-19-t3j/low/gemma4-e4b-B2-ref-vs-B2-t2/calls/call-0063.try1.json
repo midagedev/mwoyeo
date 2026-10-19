@@ -1,0 +1,31 @@
+{
+ "call": 63,
+ "try": 1,
+ "ids": [
+  "item-0069.2",
+  "item-0061.1",
+  "item-0210.2",
+  "item-0341.1",
+  "item-0171.1",
+  "item-0160.1",
+  "item-0045.2",
+  "item-0173.1",
+  "item-0139.1",
+  "item-0102.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5aeb4d62-1cd7-4909-b596-561dbb1cb742",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in 반말, matching Translation 1.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the line in Japanese.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 is in Japanese; Translation 2 translates into Korean.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and faithful.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 remained untranslated in Japanese.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translates Dex to 덱스 and uses natural pronoun and register.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 4.3323,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17349,
+   "output_tokens": 299,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17648
+  }
+ }
+}

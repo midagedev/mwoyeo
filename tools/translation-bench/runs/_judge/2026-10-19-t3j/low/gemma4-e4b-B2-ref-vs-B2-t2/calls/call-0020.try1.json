@@ -1,0 +1,31 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0042.1",
+  "item-0175.1",
+  "item-0330.1",
+  "item-0155.2",
+  "item-0030.1",
+  "item-0208.1",
+  "item-0104.1",
+  "item-0217.2",
+  "item-0166.2",
+  "item-0149.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8cf43fa6-7055-48da-a32a-aa0df26c44a8",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"1 accurately translates '没问题' contextually, whereas 2 mistranslates 意外 as accident/coincidence.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while Translation 1 left Japanese untranslated.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while Translation 1 left Japanese untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"1 uses correct terms, natural phrasing, and appropriate speech level.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while Translation 1 left Japanese untranslated.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"2 uses the correct 반말 register and translates names properly.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'Let me hear it' correctly translates 聞こう ('I'm listening'), unlike 'Listen'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 left Japanese untranslated.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 left Japanese untranslated.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while Translation 1 left Japanese untranslated.\"}\n]\n```\n",
+  "duration_seconds": 5.992599,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17652,
+   "output_tokens": 362,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18014
+  }
+ }
+}

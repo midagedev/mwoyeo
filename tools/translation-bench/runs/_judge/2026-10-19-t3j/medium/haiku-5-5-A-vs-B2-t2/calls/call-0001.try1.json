@@ -1,0 +1,27 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0279.2",
+  "item-0339.2",
+  "item-0056.2",
+  "item-0290.1",
+  "item-0266.2",
+  "item-0070.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "73dd06c3-d558-480a-bf6c-3b942438c4d6",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly follows the specified character name 저우 이모.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 오빠 and informal speech level (반말).\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly identifies the injured character's gender as female.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural with minor punctuation differences.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are faithful, fluent, and equally valid.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified speech level (반말).\"}\n]\n```\n",
+  "duration_seconds": 15.113198,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16212,
+   "output_tokens": 1536,
+   "thinking_tokens": 1339,
+   "cache_read_tokens": 0,
+   "total_tokens": 17748
+  }
+ }
+}

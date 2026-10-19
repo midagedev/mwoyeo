@@ -1,0 +1,31 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0061.2",
+  "item-0319.1",
+  "item-0064.1",
+  "item-0145.2",
+  "item-0369.1",
+  "item-0304.1",
+  "item-0309.1",
+  "item-0152.1",
+  "item-0362.2",
+  "item-0046.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8b7e33fe-b7fb-4420-b7a5-b1e33168fd9c",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Rory speaks 반말 to Siobhan.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Tomasz is correctly transliterated as 토마슈 based on pronunciation.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 was left untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated in Japanese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 remained in Chinese rather than Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Jiwoo is directly addressed in Korean facts; Translation 2 punctuates naturally.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'some know-how' is much more natural in English than 'his know-how'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 was left untranslated in Japanese.\"}\n]\n",
+  "duration_seconds": 5.045272,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17427,
+   "output_tokens": 306,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17733
+  }
+ }
+}

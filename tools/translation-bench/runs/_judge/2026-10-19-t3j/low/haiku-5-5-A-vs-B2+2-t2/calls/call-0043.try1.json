@@ -1,0 +1,31 @@
+{
+ "call": 43,
+ "try": 1,
+ "ids": [
+  "item-0355.1",
+  "item-0017.1",
+  "item-0183.1",
+  "item-0312.1",
+  "item-0283.2",
+  "item-0234.1",
+  "item-0264.2",
+  "item-0035.2",
+  "item-0054.2",
+  "item-0293.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f9a56a30-a885-4aa3-a489-c91a240c86d9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates names into natural English phonetics instead of leaving raw kanji/furigana.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly preserves the company name MoaLogis better than Moaroji.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Lin Yuan speaks to his sister in 반말/해요체 context, and 1 is more natural.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Gender of Takanashi is unspecified here; 2 avoids assuming Ms.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translates name 夏夏 into Korean 샤샤 and uses natural Korean phrasing.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Uses correct name '키류' matching facts instead of '키리유'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Preserves the cat's actual Korean name Boree before explaining Barley.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Neither translated 甘えて, but 1 recovers with natural Korean dialogue.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Clarifies '상자' (boxes) and '생산 라인' accurately according to context.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'You've arrived' and 'don't touch anything' reads much more naturally.\"}\n]\n```\n",
+  "duration_seconds": 5.380047,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17406,
+   "output_tokens": 363,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17769
+  }
+ }
+}

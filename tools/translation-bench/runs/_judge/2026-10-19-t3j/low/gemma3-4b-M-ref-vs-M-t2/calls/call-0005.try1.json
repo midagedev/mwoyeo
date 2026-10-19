@@ -1,0 +1,31 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0028.1",
+  "item-0040.1",
+  "item-0157.2",
+  "item-0225.2",
+  "item-0130.2",
+  "item-0212.1",
+  "item-0238.1",
+  "item-0373.2",
+  "item-0334.2",
+  "item-0209.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8a63d106-8815-40fc-898a-aca626707dad",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correctly translates '你周姨' and uses natural 반말.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 押さえた and uses the required 반말.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"More natural phrasing and accurate translation of 'must never move'.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both poorly translate military/workplace 'ma'am' to older woman honorifics.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translates the full line; translation 2 mistranslates 聞こう.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'Company-wide announcements' accurately captures 전사 공지.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 completely drops the second half of the sentence.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Onboarding task instruction is properly rendered as an imperative/suggestion.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 has severe grammatical errors ('행운해요') and awkward tone.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both leave Japanese text untranslated and mistranslate 主人 and 懐中時計.\"}\n]\n```\n",
+  "duration_seconds": 5.937682,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5390,
+   "output_tokens": 342,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11816,
+   "total_tokens": 5732
+  }
+ }
+}

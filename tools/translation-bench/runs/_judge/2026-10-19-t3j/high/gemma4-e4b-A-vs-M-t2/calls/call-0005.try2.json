@@ -1,0 +1,36 @@
+{
+ "call": 5,
+ "try": 2,
+ "ids": [
+  "item-0364.1",
+  "item-0004.2",
+  "item-0292.1",
+  "item-0269.2",
+  "item-0175.1",
+  "item-0062.1",
+  "item-0254.2",
+  "item-0346.2",
+  "item-0159.1",
+  "item-0153.2",
+  "item-0228.1",
+  "item-0130.2",
+  "item-0367.2",
+  "item-0187.2",
+  "item-0304.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "371cef7e-59e8-416e-8155-1aeb6e2dda34",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 adheres to the glossary term Revisions for 履歴.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Chinese instead of Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese instead of Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese instead of Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the glossary term Revisions for 履歴.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese instead of Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translates the term Captain instead of leaving it untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified term Bureau for 事務所.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 correctly translates proper names into Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese instead of Korean.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese instead of Korean.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Chinese instead of Korean.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are identical except for ending punctuation.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 includes the moving aspect of 포장이사, which 1 omits.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 uses more natural and standard Git terminology in Korean.\"}\n]\n```\n",
+  "duration_seconds": 95.494552,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 18949,
+   "output_tokens": 12507,
+   "thinking_tokens": 12032,
+   "cache_read_tokens": 0,
+   "total_tokens": 31456
+  }
+ }
+}

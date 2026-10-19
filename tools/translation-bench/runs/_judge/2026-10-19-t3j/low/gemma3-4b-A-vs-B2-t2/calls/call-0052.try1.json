@@ -1,0 +1,25 @@
+{
+ "call": 52,
+ "try": 1,
+ "ids": [
+  "item-0224.1",
+  "item-0040.2",
+  "item-0181.1",
+  "item-0023.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ae91e783-5c77-4454-bfce-2a14ce978feb",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translate 부를까 (shall we invite) naturally as will he come.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Matches 해요체 register (-니까요) and meaning of 宿 (lodging/shelter) better.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"醒了就好 correctly means 'glad you're awake', not an imperative 'wake up'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly transliterates the project name ホタル (Hotaru) instead of mistranslating it.\"}\n]\n```\n",
+  "duration_seconds": 4.140039,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15605,
+   "output_tokens": 161,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15766
+  }
+ }
+}

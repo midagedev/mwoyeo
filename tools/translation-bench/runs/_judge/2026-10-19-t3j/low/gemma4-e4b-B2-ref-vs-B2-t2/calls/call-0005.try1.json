@@ -1,0 +1,31 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0346.1",
+  "item-0270.1",
+  "item-0319.1",
+  "item-0158.2",
+  "item-0047.2",
+  "item-0206.2",
+  "item-0314.1",
+  "item-0224.2",
+  "item-0178.1",
+  "item-0285.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "626eb56a-7be3-4079-b618-ad03b53390e3",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese source text into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly retains the second-person reference to the listener's father.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 translates the name to Korean script matching tutorial context.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 accurately addresses the new hire with 'you' and natural terminology.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both 'Day one' and 'Day 1' are standard headings.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left the text in Japanese without translating into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 translates the wrong line entirely.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally in Korean casual speech.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 captures the idiomatic nuance of 骨の折れる more naturally.\"}\n]\n```\n",
+  "duration_seconds": 4.731147,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17358,
+   "output_tokens": 322,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17680
+  }
+ }
+}

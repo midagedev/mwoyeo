@@ -1,0 +1,31 @@
+{
+ "call": 39,
+ "try": 1,
+ "ids": [
+  "item-0037.1",
+  "item-0061.2",
+  "item-0069.1",
+  "item-0007.1",
+  "item-0049.2",
+  "item-0117.1",
+  "item-0222.2",
+  "item-0257.1",
+  "item-0165.1",
+  "item-0306.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cd68c466-c4df-45fc-83eb-2bd283d3139b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Seoyoon is moving, so Sunday is her day off cleaning.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally convey the technical instructions.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"More natural phrasing when referring to someone's father in Korean dialogue.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Properly translates and transliterates Zhou Yi rather than leaving raw hanzi.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Rook speaks to Dex in informal speech (반말).\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'공유 서버' is the standard Korean computing term for shared server.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both accurately translate the sentence with natural, equivalent phrasing.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translates character names into Korean phonetics rather than leaving Japanese kanji.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Matches the archaic/authoritative tone of '〜じゃ' better.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both incorrectly use male pronouns for female apprentice Hikaru.\"}\n]\n```\n",
+  "duration_seconds": 5.492562,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17338,
+   "output_tokens": 322,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17660
+  }
+ }
+}

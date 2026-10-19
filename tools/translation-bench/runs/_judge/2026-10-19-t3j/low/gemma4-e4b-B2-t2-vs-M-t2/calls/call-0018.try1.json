@@ -1,0 +1,31 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0146.1",
+  "item-0156.2",
+  "item-0044.2",
+  "item-0179.1",
+  "item-0196.1",
+  "item-0106.2",
+  "item-0070.2",
+  "item-0103.1",
+  "item-0093.2",
+  "item-0144.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7661cab3-3f22-4f76-8e77-2304d1afc6b5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly follows the designated term '납품일' for 納期.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified term '펜션' instead of untranslated Japanese.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 adheres to the designated term '마정석' for 魔石.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Kaoru is male in facts, but Translation 2 mistranslates 目頭 as temples.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 follows the specified glossary term '엠티' for 合宿.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Lin Yuan speaks to Lin Xia in 반말 and uses '린시아'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 left Japanese untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 flows more naturally in English with 'Give her'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 appropriately uses honorific '-시-' when referring to Dr. Pell.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and faithful to the source.\"}\n]\n```\n",
+  "duration_seconds": 5.425772,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5686,
+   "output_tokens": 356,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11816,
+   "total_tokens": 6042
+  }
+ }
+}

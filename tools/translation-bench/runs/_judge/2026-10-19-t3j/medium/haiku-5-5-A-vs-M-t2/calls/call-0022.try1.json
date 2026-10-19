@@ -1,0 +1,27 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0273.1",
+  "item-0378.2",
+  "item-0043.2",
+  "item-0395.2",
+  "item-0082.2",
+  "item-0240.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "74a83e32-9cf1-4076-b0c0-a400ee7b15d5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"품의를 올리다 is the idiomatic Korean expression for 稟議を回す.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Dex speaks to Captain Thorne in 합쇼체, not 반말.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"독촉하다 faithfully captures chase, whereas 연락하다 is too weak.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"도착했어 accurately reflects a direct statement without hearsay.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 ignores context stating Aoife is pronounced EE-fa.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly identifies Nagi as she instead of mistranslating as I.\"}\n]\n```\n",
+  "duration_seconds": 74.036032,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16241,
+   "output_tokens": 9407,
+   "thinking_tokens": 9200,
+   "cache_read_tokens": 0,
+   "total_tokens": 25648
+  }
+ }
+}

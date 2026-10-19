@@ -1,0 +1,208 @@
+{"id": "item-0279.2", "better": "2", "why": "Translation 2 correctly follows the specified character name 저우 이모.", "call": 1}
+{"id": "item-0339.2", "better": "1", "why": "Translation 1 correctly uses 오빠 and informal speech level (반말).", "call": 1}
+{"id": "item-0056.2", "better": "1", "why": "Translation 1 correctly identifies the injured character's gender as female.", "call": 1}
+{"id": "item-0290.1", "better": "tie", "why": "Both translations are equally accurate and natural with minor punctuation differences.", "call": 1}
+{"id": "item-0266.2", "better": "tie", "why": "Both translations are faithful, fluent, and equally valid.", "call": 1}
+{"id": "item-0070.2", "better": "1", "why": "Translation 1 correctly uses the specified speech level (반말).", "call": 1}
+{"id": "item-0319.2", "better": "2", "why": "Translation 2 reads much more naturally and flows better.", "call": 3}
+{"id": "item-0304.1", "better": "1", "why": "Translation 2 was left untranslated in Japanese.", "call": 3}
+{"id": "item-0229.1", "better": "2", "why": "Translation 2 translates 'そうだ' into natural conversational Korean.", "call": 3}
+{"id": "item-0157.1", "better": "1", "why": "Translation 2 introduces the wrong gender pronoun for Zeng Ruoshui.", "call": 3}
+{"id": "item-0311.1", "better": "2", "why": "Translation 2 correctly identifies the dog as being dropped off.", "call": 3}
+{"id": "item-0140.1", "better": "1", "why": "Translation 1 correctly transliterates Gerald into Hangul.", "call": 3}
+{"id": "item-0286.1", "better": "1", "why": "Translation 1 translates 'both' and avoids inaccurate hearsay phrasing.", "call": 4}
+{"id": "item-0347.1", "better": "2", "why": "'Notes' correctly reflects the defined term, unlike 'comments'.", "call": 4}
+{"id": "item-0031.2", "better": "1", "why": "Translation 1 correctly renders 'ほう' as an observation, not a question.", "call": 4}
+{"id": "item-0368.2", "better": "1", "why": "'Signed it' correctly translates the Korean idiom for executing a contract.", "call": 4}
+{"id": "item-0049.1", "better": "tie", "why": "Both translations are natural, accurate, and faithful to the Korean original.", "call": 4}
+{"id": "item-0339.1", "better": "2", "why": "Siobhan is female and uses informal speech with Rory.", "call": 4}
+{"id": "item-0043.2", "better": "2", "why": "Uses correct informal speech level (반말) between siblings.", "call": 5}
+{"id": "item-0043.1", "better": "1", "why": "Uses correct informal speech level (반말) between siblings.", "call": 5}
+{"id": "item-0044.1", "better": "tie", "why": "Both translations are accurate, natural, and equally good.", "call": 5}
+{"id": "item-0292.1", "better": "2", "why": "Correctly uses the female pronoun for the victim.", "call": 5}
+{"id": "item-0242.2", "better": "1", "why": "Reads much more naturally without awkward literal translation.", "call": 5}
+{"id": "item-0163.1", "better": "1", "why": "Correctly transliterates the character name Raizou as 라이조.", "call": 5}
+{"id": "item-0269.1", "better": "1", "why": "Translation 1 translates the name into Korean instead of untranslated Hanzi.", "call": 2}
+{"id": "item-0313.2", "better": "tie", "why": "Both translations are identical.", "call": 2}
+{"id": "item-0128.1", "better": "tie", "why": "Both translations accurately convey the meaning with appropriate honorifics.", "call": 2}
+{"id": "item-0061.1", "better": "tie", "why": "Both translations are natural, polite, and equally accurate.", "call": 2}
+{"id": "item-0035.2", "better": "2", "why": "Translation 2 completes the truncated sentence naturally instead of leaving 'lo'.", "call": 2}
+{"id": "item-0187.1", "better": "tie", "why": "Both translations are identical.", "call": 2}
+{"id": "item-0027.2", "better": "1", "why": "Translation 1 correctly uses conversational 반말 instead of written style.", "call": 6}
+{"id": "item-0016.1", "better": "2", "why": "Translation 2 correctly uses third-person pronouns for Nagi.", "call": 6}
+{"id": "item-0206.1", "better": "2", "why": "Translation 2 uses the correct intention ending and natural phrasing.", "call": 6}
+{"id": "item-0212.2", "better": "1", "why": "Translation 2 leaves the name Bori untranslated in Hangul.", "call": 6}
+{"id": "item-0337.2", "better": "2", "why": "Translation 1 reverses who receives help with an incorrect ending.", "call": 6}
+{"id": "item-0038.2", "better": "1", "why": "Translation 1 accurately translates 守住 as guard rather than hold.", "call": 6}
+{"id": "item-0327.2", "better": "1", "why": "Properly uses subject honorifics for mother and natural conversational phrasing.", "call": 7}
+{"id": "item-0314.2", "better": "1", "why": "Translation 2 has broken, ungrammatical phrasing; translation 1 is natural.", "call": 7}
+{"id": "item-0099.2", "better": "1", "why": "“My brother” is much more natural in English than “older brother”.", "call": 7}
+{"id": "item-0211.1", "better": "1", "why": "Translation 2 is left untranslated in Japanese instead of Korean.", "call": 7}
+{"id": "item-0259.2", "better": "1", "why": "Correctly uses the established term “Commons” instead of “plaza”.", "call": 7}
+{"id": "item-0264.1", "better": "1", "why": "Correctly translates onboarding “발판” as foundation tasks rather than literal scaffolding.", "call": 7}
+{"id": "item-0149.1", "better": "2", "why": "'장인' fits traditional tea masters much better than '기술자'.", "call": 8}
+{"id": "item-0008.1", "better": "1", "why": "Properly transliterates the name 湊 into Korean as 미나토.", "call": 8}
+{"id": "item-0125.2", "better": "2", "why": "Transcribes the character name into Korean and sounds more natural.", "call": 8}
+{"id": "item-0208.2", "better": "1", "why": "Captures the elderly guild master's speech style much better.", "call": 8}
+{"id": "item-0233.2", "better": "2", "why": "Correctly uses 반말 speech level between Rook and Dex.", "call": 8}
+{"id": "item-0279.1", "better": "1", "why": "Follows the specified name 저우 이모 and reads more naturally.", "call": 8}
+{"id": "item-0070.1", "better": "2", "why": "Translation 2 correctly uses 반말 matching the speaker's speech level.", "call": 9}
+{"id": "item-0033.1", "better": "1", "why": "Translation 1 uses more natural phrasing for 'whole repository'.", "call": 9}
+{"id": "item-0229.2", "better": "1", "why": "Translation 1 translates 'そうだ' naturally as '아, 맞다' in dialogue.", "call": 9}
+{"id": "item-0327.1", "better": "2", "why": "Translation 2 appropriately honors the mother and uses natural reported speech.", "call": 9}
+{"id": "item-0163.2", "better": "2", "why": "Translation 2 correctly transliterates the character name 雷蔵 as 라이조.", "call": 9}
+{"id": "item-0169.2", "better": "1", "why": "Translation 1 reads much more naturally as a spoken Korean request.", "call": 9}
+{"id": "item-0274.1", "better": "1", "why": "Translation 2 leaves Chinese names untranslated.", "call": 10}
+{"id": "item-0019.1", "better": "tie", "why": "Both translations are accurate and natural.", "call": 10}
+{"id": "item-0373.2", "better": "2", "why": "Translation 1 leaves Gerald untranslated.", "call": 10}
+{"id": "item-0320.1", "better": "1", "why": "Using 'but' connects the clauses more naturally than 'and'.", "call": 10}
+{"id": "item-0074.2", "better": "1", "why": "Translation 1 is much more natural and idiomatic Korean dialogue.", "call": 10}
+{"id": "item-0373.1", "better": "1", "why": "Translation 2 leaves Gerald untranslated.", "call": 10}
+{"id": "item-0242.1", "better": "2", "why": "Translation 2 sounds natural, avoiding awkward translationese like '너의'.", "call": 11}
+{"id": "item-0150.1", "better": "1", "why": "Translation 2 leaves Korean characters untranslated.", "call": 11}
+{"id": "item-0098.2", "better": "tie", "why": "Both translations are accurate and natural text message English.", "call": 11}
+{"id": "item-0161.1", "better": "tie", "why": "Both convey the onboarding guide's instructions accurately and naturally.", "call": 11}
+{"id": "item-0092.2", "better": "2", "why": "Translation 2 preserves the honorific '-san', reflecting the speaker's deference.", "call": 11}
+{"id": "item-0036.1", "better": "2", "why": "Translation 2 reads much more naturally as spoken Korean dialogue.", "call": 11}
+{"id": "item-0019.2", "better": "1", "why": "'잘못된' and '우리 버전' are more accurate in software contexts.", "call": 12}
+{"id": "item-0342.1", "better": "1", "why": "Translation 1 correctly transliterates the Japanese name into Korean Hangul.", "call": 12}
+{"id": "item-0195.1", "better": "1", "why": "'as soon as' is more idiomatic and natural for software documentation.", "call": 12}
+{"id": "item-0125.1", "better": "1", "why": "Translation 1 transliterates the name into Korean and sounds more natural.", "call": 12}
+{"id": "item-0259.1", "better": "2", "why": "'Commons' matches the established terminology defined in the preceding context.", "call": 12}
+{"id": "item-0061.2", "better": "tie", "why": "Both translations are equally natural, accurate, and polite Korean expressions.", "call": 12}
+{"id": "item-0253.2", "better": "1", "why": "Translation 1 completes the sentence naturally; Translation 2 leaves untranslated text.", "call": 13}
+{"id": "item-0174.2", "better": "tie", "why": "Both are accurate and natural translations of the line.", "call": 13}
+{"id": "item-0099.1", "better": "tie", "why": "Both older brother and brother are accurate and natural here.", "call": 13}
+{"id": "item-0304.2", "better": "2", "why": "Translation 2 correctly translates into Korean; Translation 1 is untranslated.", "call": 13}
+{"id": "item-0187.2", "better": "tie", "why": "Both translations are completely identical.", "call": 13}
+{"id": "item-0352.1", "better": "1", "why": "Translation 1 translates the name properly without meta-commentary.", "call": 13}
+{"id": "item-0320.2", "better": "2", "why": "Translation 2 uses 'but' and translates '선약' more accurately.", "call": 14}
+{"id": "item-0098.1", "better": "tie", "why": "Both translations are natural and accurately convey the casual chat message.", "call": 14}
+{"id": "item-0157.2", "better": "2", "why": "Translation 2 avoids assuming an unsupported gender pronoun for the speaker.", "call": 14}
+{"id": "item-0247.2", "better": "1", "why": "Translation 2 leaves Japanese words untranslated.", "call": 14}
+{"id": "item-0217.2", "better": "1", "why": "Translation 1 correctly uses natural spoken dialogue register instead of written.", "call": 14}
+{"id": "item-0016.2", "better": "1", "why": "Translation 2 mistranslates the third-person answer as a first-person self-introduction.", "call": 14}
+{"id": "item-0006.2", "better": "2", "why": "Translation 2 correctly uses '-거든' to convey the explanatory reason.", "call": 16}
+{"id": "item-0172.1", "better": "1", "why": "Translation 1 faithfully translates 'while' without adding unprompted nuance like '-도'.", "call": 16}
+{"id": "item-0003.2", "better": "2", "why": "Translation 2 correctly identifies Chou Shuang as female, using 'her sleeve'.", "call": 16}
+{"id": "item-0206.2", "better": "1", "why": "Translation 1 uses the natural business term '고객사' rather than '상대 측'.", "call": 16}
+{"id": "item-0128.2", "better": "1", "why": "Translation 1 uses '무라타 님', properly observing Korean business honorific etiquette.", "call": 16}
+{"id": "item-0001.1", "better": "1", "why": "Translation 1 correctly uses informal speech (반말) toward Rory.", "call": 16}
+{"id": "item-0293.2", "better": "1", "why": "More natural phrasing without redundant expressions like '따라 함께'.", "call": 15}
+{"id": "item-0022.2", "better": "1", "why": "Correctly translates the imperative verb 'stash' as a Git action.", "call": 15}
+{"id": "item-0121.1", "better": "1", "why": "Translation 2 leaves the Japanese name untranslated in kanji.", "call": 15}
+{"id": "item-0329.2", "better": "1", "why": "Natural vocative particle '삭아' and appropriate honorific for the guest.", "call": 15}
+{"id": "item-0082.2", "better": "2", "why": "Translation 1 is completely untranslated Chinese text.", "call": 15}
+{"id": "item-0311.2", "better": "1", "why": "Correctly identifies dropping off the dog rather than driving Seoyoon.", "call": 15}
+{"id": "item-0121.2", "better": "2", "why": "Translation 1 leaves Japanese characters untranslated.", "call": 18}
+{"id": "item-0047.1", "better": "2", "why": "Translation 1 mistranslates the ship's bridge as a physical bridge.", "call": 18}
+{"id": "item-0238.1", "better": "tie", "why": "Both translations are accurate, natural, and faithful to the context.", "call": 18}
+{"id": "item-0352.2", "better": "2", "why": "Translation 1 includes meta-commentary and leaves Gareth untranslated.", "call": 18}
+{"id": "item-0031.1", "better": "2", "why": "Translation 2 captures the inspector's tone and reaction more naturally.", "call": 18}
+{"id": "item-0344.2", "better": "1", "why": "Translation 1 correctly translates the section heading as a noun phrase.", "call": 18}
+{"id": "item-0103.1", "better": "2", "why": "Translation 1 was left untranslated in Chinese.", "call": 17}
+{"id": "item-0022.1", "better": "1", "why": "'수정 사항' and storing in stash are more accurate for Git.", "call": 17}
+{"id": "item-0111.1", "better": "tie", "why": "Both translations are equally accurate and natural in 반말.", "call": 17}
+{"id": "item-0314.1", "better": "2", "why": "Translation 2 is natural Korean; Translation 1 has broken phrasing.", "call": 17}
+{"id": "item-0306.2", "better": "1", "why": "'Front desk' is more natural than 'information desk' for offices.", "call": 17}
+{"id": "item-0102.2", "better": "1", "why": "'Hall doorway' correctly translates 殿门口; 'palace gate' is incorrect.", "call": 17}
+{"id": "item-0045.1", "better": "1", "why": "Translates the name into English instead of leaving Japanese characters.", "call": 20}
+{"id": "item-0376.2", "better": "1", "why": "Uses the established term Commons instead of plaza.", "call": 20}
+{"id": "item-0266.1", "better": "tie", "why": "Both translations are natural and convey the meaning accurately.", "call": 20}
+{"id": "item-0376.1", "better": "2", "why": "Uses the established term Commons instead of plaza.", "call": 20}
+{"id": "item-0109.1", "better": "2", "why": "Correctly interprets goods in context and uses the appropriate 해요체.", "call": 20}
+{"id": "item-0274.2", "better": "2", "why": "Translates names into English instead of leaving Chinese characters.", "call": 20}
+{"id": "item-0038.1", "better": "2", "why": "Translates '守住' accurately as 'guard' rather than 'hold'.", "call": 19}
+{"id": "item-0132.1", "better": "2", "why": "Correctly uses the required 해요체 speech level.", "call": 19}
+{"id": "item-0205.1", "better": "1", "why": "Maintains consistent honorific polite tone matching '마세요'.", "call": 19}
+{"id": "item-0074.1", "better": "2", "why": "More faithful to 'ちょうだい' and avoids awkward Japanese translationese.", "call": 19}
+{"id": "item-0342.2", "better": "2", "why": "Transcribes the name into Korean instead of leaving Japanese text.", "call": 19}
+{"id": "item-0052.2", "better": "2", "why": "Correctly uses the required 해요체 speech level.", "call": 19}
+{"id": "item-0140.2", "better": "2", "why": "Translation 2 correctly transliterates Gerald into Korean.", "call": 21}
+{"id": "item-0232.2", "better": "1", "why": "Translation 1 correctly uses the required 해요체 speech level.", "call": 21}
+{"id": "item-0161.2", "better": "tie", "why": "Both translations are equally accurate, natural, and well phrased.", "call": 21}
+{"id": "item-0200.1", "better": "2", "why": "Translation 2 correctly uses 반말 between the siblings.", "call": 21}
+{"id": "item-0049.2", "better": "tie", "why": "Both translations are equally natural, accurate, and properly casual.", "call": 21}
+{"id": "item-0119.2", "better": "2", "why": "Translation 1 left the Japanese source text completely untranslated.", "call": 21}
+{"id": "item-0286.2", "better": "2", "why": "Translation 1 drops 'both' and incorrectly uses hearsay phrasing.", "call": 22}
+{"id": "item-0238.2", "better": "tie", "why": "Both are natural and accurate translations.", "call": 22}
+{"id": "item-0097.1", "better": "1", "why": "Translation 2 is completely untranslated.", "call": 22}
+{"id": "item-0292.2", "better": "1", "why": "Translation 1 uses the correct female pronoun for the woman.", "call": 22}
+{"id": "item-0233.1", "better": "1", "why": "Correctly uses informal speech (반말) from Rook to Dex.", "call": 22}
+{"id": "item-0269.2", "better": "2", "why": "Translation 1 leaves the name untranslated in Chinese characters.", "call": 22}
+{"id": "item-0241.1", "better": "2", "why": "Translation 2 translates 'still' much more naturally than Translation 1.", "call": 23}
+{"id": "item-0052.1", "better": "1", "why": "Translation 1 correctly uses 해요체 matching the speaker's speech level.", "call": 23}
+{"id": "item-0372.2", "better": "1", "why": "Translation 1 correctly uses 해요체 and avoids the incorrect reading 철재.", "call": 23}
+{"id": "item-0047.2", "better": "1", "why": "Translation 1 correctly renders spaceship bridge and uses appropriate informal register.", "call": 23}
+{"id": "item-0149.2", "better": "1", "why": "장인 fits the traditional tea craft context much better than 기술자.", "call": 23}
+{"id": "item-0372.1", "better": "2", "why": "Translation 2 correctly uses 해요체 and avoids the incorrect reading 철재.", "call": 23}
+{"id": "item-0064.1", "better": "tie", "why": "Both candidate translations are identical.", "call": 24}
+{"id": "item-0009.1", "better": "2", "why": "Kaoru is not a police officer; 2 avoids mislabeling him.", "call": 24}
+{"id": "item-0205.2", "better": "2", "why": "Consistently maintains polite honorific register with 보시죠.", "call": 24}
+{"id": "item-0027.1", "better": "2", "why": "Uses natural spoken informal 반말 matching Dex's speech style.", "call": 24}
+{"id": "item-0096.2", "better": "2", "why": "Properly transliterates character names into Korean Hangul.", "call": 24}
+{"id": "item-0008.2", "better": "2", "why": "Translates the kanji name 湊 to Hangul 미나토.", "call": 24}
+{"id": "item-0370.1", "better": "2", "why": "Translation 2 correctly uses 해요체 throughout.", "call": 26}
+{"id": "item-0033.2", "better": "tie", "why": "Both translations are equally accurate and natural.", "call": 26}
+{"id": "item-0235.2", "better": "2", "why": "Translation 2 correctly uses 반말 when addressing Lin Xia.", "call": 26}
+{"id": "item-0152.2", "better": "1", "why": "Translation 1 transcribes the reading and avoids honorific errors.", "call": 26}
+{"id": "item-0006.1", "better": "1", "why": "Translation 1 accurately renders 寒かったし using -거든 instead of -잖아.", "call": 26}
+{"id": "item-0109.2", "better": "1", "why": "Context refers to tea goods and correctly uses 해요체.", "call": 26}
+{"id": "item-0232.1", "better": "1", "why": "1 uses correct name, proper business register, and natural honorifics.", "call": 25}
+{"id": "item-0119.1", "better": "1", "why": "Translation 2 is completely untranslated.", "call": 25}
+{"id": "item-0200.2", "better": "1", "why": "1 correctly uses informal speech (반말) between siblings.", "call": 25}
+{"id": "item-0319.1", "better": "1", "why": "1 translates the descriptive clause more naturally and fluently.", "call": 25}
+{"id": "item-0313.1", "better": "tie", "why": "Both candidate translations are identical.", "call": 25}
+{"id": "item-0208.1", "better": "2", "why": "2 perfectly captures the elderly guild master's tone and register.", "call": 25}
+{"id": "item-0096.1", "better": "1", "why": "Translation 1 transliterates names properly and translates 固めさせろ idiomatically.", "call": 28}
+{"id": "item-0044.2", "better": "tie", "why": "Both translations are accurate, natural, and convey the same meaning.", "call": 28}
+{"id": "item-0306.1", "better": "tie", "why": "Both translations are fluent, accurate, and fit the onboarding context.", "call": 28}
+{"id": "item-0036.2", "better": "1", "why": "Translation 1 is much more natural; '상자 300개' is awkward translationese.", "call": 28}
+{"id": "item-0092.1", "better": "1", "why": "Translation 1 preserves Hikaru's polite register and intended honorific address.", "call": 28}
+{"id": "item-0308.1", "better": "1", "why": "Translation 1 accurately translates 'only that clock' without exaggerating the action.", "call": 28}
+{"id": "item-0144.2", "better": "tie", "why": "Both convey the meaning naturally in appropriate informal Korean.", "call": 29}
+{"id": "item-0217.1", "better": "2", "why": "Translation 2 uses natural spoken speech instead of written literary form.", "call": 29}
+{"id": "item-0150.2", "better": "2", "why": "Translation 2 translates the name instead of leaving untranslated Korean text.", "call": 29}
+{"id": "item-0344.1", "better": "2", "why": "Translation 2 correctly formats the section heading as a noun phrase.", "call": 29}
+{"id": "item-0308.2", "better": "2", "why": "Translation 2 accurately captures 'only that clock' without distorting the meaning.", "call": 29}
+{"id": "item-0264.2", "better": "2", "why": "Translation 2 correctly translates onboarding milestones instead of literal scaffolding.", "call": 29}
+{"id": "item-0253.1", "better": "2", "why": "Translation 2 completes the cut-off text naturally and uses proper speech.", "call": 30}
+{"id": "item-0169.1", "better": "2", "why": "Translation 2 reads more naturally with '좀' for a casual request.", "call": 30}
+{"id": "item-0001.2", "better": "2", "why": "Translation 2 correctly uses informal speech (반말) appropriate for Rory.", "call": 30}
+{"id": "item-0293.1", "better": "1", "why": "Translation 1 translates 'put' and 'moves along with' much more naturally.", "call": 30}
+{"id": "item-0082.1", "better": "1", "why": "Translation 2 failed to translate and left the source Chinese text.", "call": 30}
+{"id": "item-0212.1", "better": "2", "why": "Translation 2 translates the name '보리' into English instead of Hangul.", "call": 30}
+{"id": "item-0144.1", "better": "tie", "why": "Both translations are natural, faithful, and use the correct speech level.", "call": 27}
+{"id": "item-0244.2", "better": "2", "why": "Translation 2 correctly uses banmal appropriate for speaking to his sister.", "call": 27}
+{"id": "item-0132.2", "better": "1", "why": "Translation 1 correctly uses haeyo-che as specified in the facts.", "call": 27}
+{"id": "item-0337.1", "better": "1", "why": "Translation 1 correctly conveys that the speaker is receiving the help.", "call": 27}
+{"id": "item-0370.2", "better": "1", "why": "Translation 1 correctly uses haeyo-che when speaking to the tenants.", "call": 27}
+{"id": "item-0102.1", "better": "2", "why": "Translation 2 correctly translates 殿门口 as hall doorway, not palace gate.", "call": 27}
+{"id": "item-0324.1", "better": "tie", "why": "Both translations convey the meaning naturally and accurately.", "call": 33}
+{"id": "item-0247.1", "better": "2", "why": "Translation 1 leaves Japanese text untranslated.", "call": 33}
+{"id": "item-0152.1", "better": "2", "why": "Translation 2 correctly transcribes the name into Korean.", "call": 33}
+{"id": "item-0111.2", "better": "tie", "why": "Both are natural and faithful informal Korean translations.", "call": 33}
+{"id": "item-0097.2", "better": "2", "why": "Translation 1 is completely untranslated Chinese text.", "call": 33}
+{"id": "item-0374.2", "better": "1", "why": "Translation 1 avoids awkward translationese and fits software terminology.", "call": 33}
+{"id": "item-0324.2", "better": "tie", "why": "Both translations are accurate, natural, and convey the same meaning.", "call": 32}
+{"id": "item-0174.1", "better": "tie", "why": "Both translations are completely natural and accurate renderings of the text.", "call": 32}
+{"id": "item-0056.1", "better": "2", "why": "Translation 2 correctly uses the female pronoun for the injured woman.", "call": 32}
+{"id": "item-0290.2", "better": "tie", "why": "Identical translations aside from minor punctuation formatting.", "call": 32}
+{"id": "item-0235.1", "better": "1", "why": "Translation 1 correctly uses informal speech level (반말) between siblings.", "call": 32}
+{"id": "item-0241.2", "better": "1", "why": "Translation 1 reads naturally, whereas Translation 2 uses awkward translationese.", "call": 32}
+{"id": "item-0211.2", "better": "2", "why": "Translation 1 failed to translate the line into Korean.", "call": 31}
+{"id": "item-0045.2", "better": "2", "why": "Translation 2 correctly transliterates the Japanese name into English.", "call": 31}
+{"id": "item-0172.2", "better": "1", "why": "Translation 1 reads much more naturally and avoids translationese pronouns.", "call": 31}
+{"id": "item-0195.2", "better": "tie", "why": "Both translations are accurate, natural, and convey the meaning well.", "call": 31}
+{"id": "item-0035.1", "better": "1", "why": "Translation 2 leaves an untranslated fragment from the truncated source.", "call": 31}
+{"id": "item-0368.1", "better": "2", "why": "Translation 2 correctly translates the idiom instead of translating literally.", "call": 31}
+{"id": "item-0329.1", "better": "2", "why": "Uses natural vocative '삭아' and honors the guest.", "call": 35}
+{"id": "item-0064.2", "better": "tie", "why": "Both candidate translations are identical.", "call": 35}
+{"id": "item-0103.2", "better": "1", "why": "Translation 2 is completely untranslated.", "call": 35}
+{"id": "item-0220.2", "better": "tie", "why": "Both candidate translations are identical.", "call": 35}
+{"id": "item-0009.2", "better": "1", "why": "Kaoru is a detective, not a senior officer; senpai is better.", "call": 34}
+{"id": "item-0374.1", "better": "2", "why": "Translation 2 reads naturally and avoids awkward pronoun translationese.", "call": 34}
+{"id": "item-0244.1", "better": "1", "why": "Correctly uses informal speech (반말) for Lin Yuan speaking to his sister.", "call": 34}
+{"id": "item-0220.1", "better": "tie", "why": "Both candidate translations are identical.", "call": 34}
+{"id": "item-0347.2", "better": "1", "why": "Correctly translates ひとこと as notes rather than comments.", "call": 34}
+{"id": "item-0003.1", "better": "1", "why": "Correctly identifies Qiu Shuang's female gender with 'her'.", "call": 34}

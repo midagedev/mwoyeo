@@ -1,0 +1,31 @@
+{
+ "call": 69,
+ "try": 1,
+ "ids": [
+  "item-0287.1",
+  "item-0091.2",
+  "item-0250.1",
+  "item-0392.2",
+  "item-0031.2",
+  "item-0006.2",
+  "item-0052.2",
+  "item-0127.1",
+  "item-0069.2",
+  "item-0061.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6c49da0b-97cb-4676-ad9d-8d2d3b064b32",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"More natural English dialogue avoiding untranslated honorific suffix.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translate the sentence accurately with natural Korean phrasing.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Follows the specified term 납품일 for 納期.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Accurately conveys identity and purpose to the client.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both completely mistranslate giving directions to the restroom.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both accurately translate the line with correct terminology.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Accurately captures that only one pocket watch was stolen.\"}\n]\n```\n",
+  "duration_seconds": 5.58775,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17077,
+   "output_tokens": 297,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17374
+  }
+ }
+}

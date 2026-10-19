@@ -1,0 +1,31 @@
+{
+ "call": 65,
+ "try": 1,
+ "ids": [
+  "item-0250.1",
+  "item-0369.2",
+  "item-0031.2",
+  "item-0006.2",
+  "item-0052.2",
+  "item-0127.1",
+  "item-0069.2",
+  "item-0061.1",
+  "item-0210.2",
+  "item-0355.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ad1b3ae0-aeb2-409c-b49b-6c71256332a0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both missed 텟사이 as specified in the facts block.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural contextually than an unnatural first-person singular 'I'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are completely natural and accurate renderings.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translating 署 as 경찰서 is much clearer and more natural in Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 leaves 'eh' untranslated in English alphabet.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"1 uses 형 instead of 오빠; 2 uses 해요체 instead of 반말.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"그 사람이 is much more natural Korean than unnatural pronoun 그는.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural Korean expressions.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly preserves the established channel name Hearth.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 romanizes Japanese names rather than leaving raw kanji/furigana.\"}\n]\n```\n",
+  "duration_seconds": 5.299754,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17111,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17435
+  }
+ }
+}

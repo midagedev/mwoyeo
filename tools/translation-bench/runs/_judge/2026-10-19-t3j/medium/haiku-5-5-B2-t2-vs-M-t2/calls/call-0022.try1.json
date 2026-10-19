@@ -1,0 +1,27 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0264.1",
+  "item-0009.1",
+  "item-0204.2",
+  "item-0027.1",
+  "item-0095.2",
+  "item-0008.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "61987ecf-5698-4f9a-9a1e-ff6a032a594e",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 uses the required speech level and specified term.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 left the text entirely untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 smoothly translates the cut-off text; Translation 2 leaves English.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 properly uses the subject honorific for the client.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 uses the standard imperative mood for onboarding instructions.\"}\n]\n",
+  "duration_seconds": 20.926584,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16285,
+   "output_tokens": 2272,
+   "thinking_tokens": 2087,
+   "cache_read_tokens": 0,
+   "total_tokens": 18557
+  }
+ }
+}

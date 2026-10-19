@@ -1,0 +1,31 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0346.1",
+  "item-0093.1",
+  "item-0227.2",
+  "item-0026.2",
+  "item-0255.1",
+  "item-0178.1",
+  "item-0352.2",
+  "item-0339.2",
+  "item-0148.1",
+  "item-0050.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "854cc43a-e66c-42b8-840c-e37509f95bf7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"\\\"What do you make of\\\" is more natural for interpreting clues.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally in Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"More natural phrasing for introducing a defined feature in documentation.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"\\\"We\\\" correctly reflects inviting someone to their shared hangout plans.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are completely accurate, faithful, and natural.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both \\\"Let me hear it\\\" and \\\"Go on\\\" fit the context well.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses the specified pinyin \\\"Yuechuan\\\" according to the facts block.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly uses 해요체 as specified in the facts block.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are accurate and natural translations of the tutorial sentence.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly refers to Nagi as \\\"she\\\" rather than \\\"I\\\".\"}\n]\n```\n",
+  "duration_seconds": 4.813792,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17246,
+   "output_tokens": 320,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17566
+  }
+ }
+}

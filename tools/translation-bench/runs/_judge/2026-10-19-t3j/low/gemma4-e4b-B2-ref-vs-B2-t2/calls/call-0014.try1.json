@@ -1,0 +1,31 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0291.1",
+  "item-0235.2",
+  "item-0196.1",
+  "item-0142.2",
+  "item-0331.2",
+  "item-0162.2",
+  "item-0219.1",
+  "item-0319.2",
+  "item-0228.2",
+  "item-0155.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "207e705b-4dc9-45bb-aa7d-fc88afd1e115",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 uses natural phrasing instead of awkward repetition like 'deposit the deposit'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are faithful, accurate, and equally natural.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 properly transliterates the Korean name into English.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Yunzhou should be written as a single word per pinyin conventions.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 capitalizes 'Commons' according to the established term in context.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 correctly transliterates the character name Dex into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 uses the polite register appropriate for the speaker.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 uses correct banmal speech level and transliterates proper nouns.\"}\n]\n```\n",
+  "duration_seconds": 4.355971,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17372,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17697
+  }
+ }
+}

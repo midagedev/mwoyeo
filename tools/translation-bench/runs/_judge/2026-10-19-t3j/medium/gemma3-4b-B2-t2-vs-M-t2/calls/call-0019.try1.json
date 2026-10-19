@@ -1,0 +1,27 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0227.1",
+  "item-0078.2",
+  "item-0055.1",
+  "item-0115.2",
+  "item-0177.2",
+  "item-0221.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "974b8415-3a52-4494-a463-c619df258f7a",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Follows the specified term 메리골드 instead of mistranslating it.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Phrased much more naturally and idiomatically in English.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Candidate 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly uses the required 합쇼체 speech level.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Candidate 2 is a complete hallucination unrelated to the text.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly translates the character name and uses 반말 speech level.\"}\n]\n",
+  "duration_seconds": 18.473194,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16124,
+   "output_tokens": 2209,
+   "thinking_tokens": 2019,
+   "cache_read_tokens": 0,
+   "total_tokens": 18333
+  }
+ }
+}

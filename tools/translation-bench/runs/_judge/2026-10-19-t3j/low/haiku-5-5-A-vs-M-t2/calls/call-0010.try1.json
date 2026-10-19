@@ -1,0 +1,31 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0165.2",
+  "item-0170.2",
+  "item-0139.2",
+  "item-0115.2",
+  "item-0014.1",
+  "item-0084.1",
+  "item-0012.2",
+  "item-0169.2",
+  "item-0231.1",
+  "item-0114.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dfa82996-eed0-44bd-b786-a62ca35dc529",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are completely natural, accurate, and use appropriate 해요체 register.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 leaves 万俟靖 in untranslated Chinese characters and mistranslates perspective.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly follows the term fact 先輩 = boss.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 translates そうだ naturally and uses natural Korean 반말 phrasing.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 uses standard software terminology ('search scope') and reads more naturally.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 adheres to the term Captain = 선장 and sounds conversational.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are fluent, accurate, and have identical meaning and register.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"The condition is future/conditional ('When... wakes up'), not completed past tense.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 transliterates Rook to 루크 as specified in the character facts.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 follows the established character name mapping 周姨 = 저우 이모.\"}\n]\n```\n",
+  "duration_seconds": 5.627844,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17274,
+   "output_tokens": 349,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17623
+  }
+ }
+}

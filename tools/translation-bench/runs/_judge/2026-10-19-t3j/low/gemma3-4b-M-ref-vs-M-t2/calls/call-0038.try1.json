@@ -1,0 +1,31 @@
+{
+ "call": 38,
+ "try": 1,
+ "ids": [
+  "item-0119.2",
+  "item-0088.2",
+  "item-0129.2",
+  "item-0373.1",
+  "item-0146.2",
+  "item-0141.2",
+  "item-0340.2",
+  "item-0002.2",
+  "item-0234.1",
+  "item-0051.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ad841a12-a3d1-4250-a5a7-4b582fb5c6e7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese source into Korean.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both incorrectly use 존댓말 instead of 반말 and have minor flaws.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 hallucinates 'backed up' and mistranslates the surname Wanqi.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly captures the instructional onboarding guide tone without hallucinating 'I'.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are virtually identical and accurate, differing only by a comma.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 uses wrong pronoun 'I' instead of 'my brother'.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are clear and natural, differing only between 복제 and 복사.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly translates clean up after, while 2 translates it nonsensically.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 completely hallucinates and mistranslates the meaning and names.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both reasonably convey the pronunciation guide and meaning.\"}\n]\n```\n",
+  "duration_seconds": 5.251309,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17319,
+   "output_tokens": 342,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17661
+  }
+ }
+}

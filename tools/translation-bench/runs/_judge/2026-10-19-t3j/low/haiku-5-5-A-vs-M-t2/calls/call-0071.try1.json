@@ -1,0 +1,31 @@
+{
+ "call": 71,
+ "try": 1,
+ "ids": [
+  "item-0210.2",
+  "item-0383.1",
+  "item-0171.1",
+  "item-0160.1",
+  "item-0045.2",
+  "item-0173.1",
+  "item-0139.1",
+  "item-0346.2",
+  "item-0102.2",
+  "item-0393.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f9fa80fc-7753-4f30-80d8-10041baaa33a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in 반말; 2 mistranslates 'volunteering me' literally.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey meaning and register equally well; ignore formatting/punctuation differences.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"1 matches the instructional onboarding guide style better than 2.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Zhou Yi is an elder family friend speaking to Lin Xia; 너희 아버지 is correct.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"仇 is pronounced Qiú as a surname; Chou is incorrect pinyin.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Identical translations; instructions state to ignore formatting and punctuation differences.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Follows the specified term mapping 先輩 = boss.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"2 failed to translate the line from Chinese into Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Speaker tells niece not to use honorifics; 소장 matches better than 소장님.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Xu Nuo responds to Zhou Ting in 해요체; 1 is more natural and polite.\"}\n]\n```\n",
+  "duration_seconds": 6.250101,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17411,
+   "output_tokens": 346,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17757
+  }
+ }
+}

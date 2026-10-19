@@ -1,0 +1,31 @@
+{
+ "call": 76,
+ "try": 1,
+ "ids": [
+  "item-0266.2",
+  "item-0101.1",
+  "item-0303.2",
+  "item-0226.2",
+  "item-0168.1",
+  "item-0238.2",
+  "item-0016.1",
+  "item-0308.1",
+  "item-0124.2",
+  "item-0395.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "715ce214-07d3-49c5-a5fb-2353d2118bfa",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates '모닥불의 팀 채널' as Modakbul's team channel.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Rook speaks 반말 to Dex; Translation 1 incorrectly uses 해요체.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses honorific '오실 수' referring to professor Han.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Lin Yuan speaks 반말 to his younger sister Lin Xia.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are completely accurate and natural.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'The super' refers to the building superintendent (관리인), not landlord (집주인).\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are natural and maintain the appropriate speech level.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Transliterates Japanese reading into Korean and uses natural phrasing.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both convey the meaning, tone, and 반말 register accurately.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'Got in early' is direct past statement; Translation 1 adds hearsay '대'.\"}\n]\n```\n",
+  "duration_seconds": 5.355609,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17408,
+   "output_tokens": 335,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17743
+  }
+ }
+}

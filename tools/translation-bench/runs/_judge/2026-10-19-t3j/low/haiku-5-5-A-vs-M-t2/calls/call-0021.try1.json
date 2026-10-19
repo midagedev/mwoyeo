@@ -1,0 +1,31 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0300.2",
+  "item-0199.1",
+  "item-0241.1",
+  "item-0321.2",
+  "item-0094.1",
+  "item-0145.2",
+  "item-0297.1",
+  "item-0366.2",
+  "item-0394.1",
+  "item-0107.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d02b28ab-407f-4f90-9ff1-f05d05d0d007",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Reads much more natural in Korean without literal translation '너의' and '업무 라인'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses the specified term '조합' for ギルド instead of '길드'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"조사해 달라고 하자 is unnatural for checking lost property at a station.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Captures '모두 끝내면' (all) and reads more naturally.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are virtually identical and accurate.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Spells 'Jiu' correctly according to the facts block.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Instructional tone in a guide is better translated with imperative voice.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and handle the pronunciation note accurately.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"English translations do not need to retain the Japanese source characters.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly follows the defined terms 'Pathfinder' and 'fleet allocation'.\"}\n]\n```\n",
+  "duration_seconds": 5.366905,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17069,
+   "output_tokens": 338,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17407
+  }
+ }
+}

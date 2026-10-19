@@ -1,0 +1,31 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0087.1",
+  "item-0086.1",
+  "item-0172.2",
+  "item-0252.2",
+  "item-0242.2",
+  "item-0188.2",
+  "item-0027.1",
+  "item-0112.2",
+  "item-0021.1",
+  "item-0285.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "590d8b80-4f2f-4176-a9ea-7ce230adc02f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the source Japanese text untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translates 'Rook' and 'making that noise' much more naturally in Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both incorrectly use 반말 when Gareth speaks in 해요체.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Once confirmed' accurately reflects procedural sequencing over hypothetical 'if'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese line completely untranslated.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly reads the kanji surname 小鳥遊 as Takanashi.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 left the Chinese source line untranslated.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both natural Korean renderings capturing 骨の折れる话 well in context.\"}\n]\n```\n",
+  "duration_seconds": 6.227057,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17354,
+   "output_tokens": 323,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17677
+  }
+ }
+}

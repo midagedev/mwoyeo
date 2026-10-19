@@ -1,0 +1,31 @@
+{
+ "call": 48,
+ "try": 1,
+ "ids": [
+  "item-0126.2",
+  "item-0153.2",
+  "item-0310.1",
+  "item-0211.2",
+  "item-0247.1",
+  "item-0066.2",
+  "item-0303.1",
+  "item-0181.1",
+  "item-0277.2",
+  "item-0062.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "697e11ad-aa3d-4d59-b9e8-0ed93587d6ac",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Includes 'new hire' (신입) which Translation 2 completely omitted.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Terms state 길잡이 = Pathfinder, which should not have an article.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both incorrectly use literal '부인' for ma'am in a military/captain context.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"‘이사하시는군요’ is grammatically correct and natural Korean honorific phrasing.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 was left entirely untranslated in Japanese.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both actively and passively convey the condition accurately and naturally.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"老师傅 means master craftsmen/veterans, not 'father-in-law' (장인어른).\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Speaks to client Kiryu in 해요체; completes the sentence naturally.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Rory is male and speaks 반말 to Siobhan (누나, not 언니/존댓말).\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translates the tagged name 周婷 to Korean 주정 instead of Chinese.\"}\n]\n```\n",
+  "duration_seconds": 5.272086,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17413,
+   "output_tokens": 358,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17771
+  }
+ }
+}

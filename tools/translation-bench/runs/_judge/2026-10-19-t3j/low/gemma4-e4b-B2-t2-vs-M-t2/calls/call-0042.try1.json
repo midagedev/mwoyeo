@@ -1,0 +1,25 @@
+{
+ "call": 42,
+ "try": 1,
+ "ids": [
+  "item-0120.1",
+  "item-0200.2",
+  "item-0144.1",
+  "item-0116.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c7251da7-8bef-478a-ab5e-914d93938feb",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Matches the specified spelling 'Jiu' from the facts block.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately in 반말; bay as 격실 or 구역.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural English for onboarding instructions.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly translates the speaker's statement of intention rather than an imperative request.\"}\n]\n```\n",
+  "duration_seconds": 3.713288,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15438,
+   "output_tokens": 138,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15576
+  }
+ }
+}

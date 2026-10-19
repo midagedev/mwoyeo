@@ -1,0 +1,31 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0026.2",
+  "item-0172.1",
+  "item-0293.1",
+  "item-0259.1",
+  "item-0245.1",
+  "item-0366.2",
+  "item-0103.1",
+  "item-0361.2",
+  "item-0190.1",
+  "item-0165.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0b44bc9c-9e4b-4dc4-87dc-d77291f58e91",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"In Japanese context, Yuki refers to his own grandfather ('my grandfather').\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Addresses the captain naturally with '선장님' rather than literal machine-like phrasing.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translates '할 게 너무 많아' accurately, whereas translation 1 omits it.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 'quit saluting' ('그만 인사해'); 2 is nonsensical.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in banmal, but both failed; 1 is more accurate.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 misspelled Akira as Akeira.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Target language is English; translation 2 left Korean untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 misreads 十河課長 as 도호쿠카죠님.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"The character's name is Nagi, not Nagisa.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both incorrectly used honorifics (해요체) instead of banmal to Rory.\"}\n]\n```\n",
+  "duration_seconds": 4.975522,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17485,
+   "output_tokens": 356,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17841
+  }
+ }
+}

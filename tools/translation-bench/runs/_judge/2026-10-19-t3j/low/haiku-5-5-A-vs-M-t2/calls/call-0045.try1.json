@@ -1,0 +1,31 @@
+{
+ "call": 45,
+ "try": 1,
+ "ids": [
+  "item-0246.2",
+  "item-0165.1",
+  "item-0331.1",
+  "item-0295.2",
+  "item-0387.1",
+  "item-0167.1",
+  "item-0080.1",
+  "item-0354.2",
+  "item-0147.1",
+  "item-0290.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "aa012a5f-da10-4a99-ba52-b24ffb63a777",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Lin Yuan speaks to Lin Xia using 반말, matching 했어 over 했다.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are completely natural, accurate, and use appropriate 해요체 register.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the message.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally render the sentence in Korean.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and observe the correct speech level.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly identifies Xie Xuan as female ('her' vs 'his').\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 adheres to the specified terminology '履歴 = Revisions'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 translates/romanizes the name Eom Seo-jin instead of leaving Hangul.\"}\n]\n```\n",
+  "duration_seconds": 5.239116,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17382,
+   "output_tokens": 328,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17710
+  }
+ }
+}

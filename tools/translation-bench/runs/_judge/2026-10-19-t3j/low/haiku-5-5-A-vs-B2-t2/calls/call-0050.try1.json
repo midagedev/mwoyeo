@@ -1,0 +1,31 @@
+{
+ "call": 50,
+ "try": 1,
+ "ids": [
+  "item-0124.1",
+  "item-0023.1",
+  "item-0154.2",
+  "item-0080.1",
+  "item-0307.1",
+  "item-0257.1",
+  "item-0337.2",
+  "item-0133.2",
+  "item-0366.1",
+  "item-0139.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "09d69228-7cd8-477f-9597-c4e179923b8d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both incorrectly translate ticket grabbing 抢 as stealing 뺏다.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translates Japanese reading into Korean and uses correct demonstrative 그.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"고객용 is more natural and standard in a business context.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 reads much more naturally in Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Speaker is female, so 언니 is correct; 누나 is wrong.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses proper Korean phonology 삭 instead of unlocalized kanji 朔.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"도움이 됩니다 correctly translates present state 助かります, unlike future tense.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Properly uses honorific suffix 하시더라 when referring to professor's words.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the source Japanese sentence completely untranslated.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 flows much more naturally without passive awkwardness.\"}\n]\n```\n",
+  "duration_seconds": 5.398406,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17392,
+   "output_tokens": 327,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17719
+  }
+ }
+}

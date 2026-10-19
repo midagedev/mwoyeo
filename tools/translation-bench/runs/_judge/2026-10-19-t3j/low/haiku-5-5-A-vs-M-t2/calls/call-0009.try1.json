@@ -1,0 +1,31 @@
+{
+ "call": 9,
+ "try": 1,
+ "ids": [
+  "item-0317.2",
+  "item-0092.1",
+  "item-0087.1",
+  "item-0188.2",
+  "item-0342.1",
+  "item-0281.2",
+  "item-0001.2",
+  "item-0219.1",
+  "item-0381.2",
+  "item-0288.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "856c1f6d-7c5e-4edb-96ac-9240469500a8",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'Hearth' matches the channel name defined in the onboarding guide.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally and accurately in context.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'at home' sounds much more natural in English than 'at the house'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in banmal, matching translation 1.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"鵲橋 (かささぎばし) refers to the Magpie Bridge, translated as 오작교 in Korean.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately render the Git explanation.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both capture the meaning and nuances equally well.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are clear, professional, and faithful to the source.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Matches the given name spelling '타카나시' and polite speech register.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly transcribes the compound surname 万俟 as 'Moqi' instead of 'Wan Qi'.\"}\n]\n```\n",
+  "duration_seconds": 4.206216,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17407,
+   "output_tokens": 339,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17746
+  }
+ }
+}

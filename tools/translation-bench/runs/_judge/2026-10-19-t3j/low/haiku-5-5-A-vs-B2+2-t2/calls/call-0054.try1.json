@@ -1,0 +1,31 @@
+{
+ "call": 54,
+ "try": 1,
+ "ids": [
+  "item-0011.2",
+  "item-0018.1",
+  "item-0160.2",
+  "item-0184.1",
+  "item-0244.1",
+  "item-0010.1",
+  "item-0018.2",
+  "item-0072.2",
+  "item-0268.1",
+  "item-0170.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "30009869-564d-4f46-8ac6-0bef2b9d19a6",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 is grammatically correct and natural English.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Zhou Ting speaks to group members using banmal.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 leaves untranslated source fragment at the end.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 leaves the name in untranslated Chinese characters.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Matches the designated name 저우 이모 in facts.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Zhou Ting speaks using banmal per facts.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both convey the meaning with minor stylistic difference in particle.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 leaves Japanese text completely untranslated.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"}\n]\n```\n",
+  "duration_seconds": 4.618538,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17365,
+   "output_tokens": 293,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17658
+  }
+ }
+}

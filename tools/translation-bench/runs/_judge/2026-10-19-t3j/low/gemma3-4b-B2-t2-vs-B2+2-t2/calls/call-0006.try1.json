@@ -1,0 +1,31 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0023.2",
+  "item-0039.2",
+  "item-0018.2",
+  "item-0014.1",
+  "item-0009.2",
+  "item-0034.1",
+  "item-0032.2",
+  "item-0045.2",
+  "item-0022.1",
+  "item-0001.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "75e138f3-0a67-4788-b821-c67465cc7bbf",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural phrasing matching the original text's tone and symbol.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Announcements and conversations 'happen' in a channel naturally.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the sentence into English.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Rory speaks 해요체 to landlord Gareth; 그분 is more polite than 그.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into English.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are identical, accurate, and concise.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Practical work' fits '실무' much better than 'practical session'.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both incorrectly translate the internal onboarding program '발판' (Launchpad).\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 did not translate the text into English.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Uses 해요체 for 周婷 and correctly translates 民宿 and 酒店.\"}\n]\n```\n",
+  "duration_seconds": 4.665963,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16708,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17032
+  }
+ }
+}

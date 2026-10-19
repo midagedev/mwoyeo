@@ -1,0 +1,31 @@
+{
+ "call": 58,
+ "try": 1,
+ "ids": [
+  "item-0328.1",
+  "item-0011.2",
+  "item-0018.1",
+  "item-0160.2",
+  "item-0184.1",
+  "item-0244.1",
+  "item-0010.1",
+  "item-0018.2",
+  "item-0072.2",
+  "item-0268.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a97f3165-f3a1-4481-83b3-94cadafcddb5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Lin Xia is female, so she addresses her brother as 오빠.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Smooth, natural English identifying Elder Qin as the subject.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translates Korean name and laughter into natural English.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Aunt Zhou is speaking to the siblings, so 너희 아버지가 is appropriate.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Gareth speaks to tenants in 해요체.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Transliterates Japanese kanji name 小鳥遊 to Takanashi.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Capitalizes title Manager before the name.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translates Chaeyul and laughter into natural English.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Fully translated into English using the established cat name Barley.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"More natural phrasing for 'at the foot of the mountain'.\"}\n]\n```\n",
+  "duration_seconds": 4.722764,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17545,
+   "output_tokens": 309,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17854
+  }
+ }
+}

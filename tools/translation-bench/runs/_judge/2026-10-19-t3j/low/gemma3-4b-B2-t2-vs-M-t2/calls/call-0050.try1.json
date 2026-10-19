@@ -1,0 +1,31 @@
+{
+ "call": 50,
+ "try": 1,
+ "ids": [
+  "item-0080.2",
+  "item-0023.1",
+  "item-0087.1",
+  "item-0070.1",
+  "item-0173.2",
+  "item-0200.1",
+  "item-0051.2",
+  "item-0262.2",
+  "item-0145.2",
+  "item-0019.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d4972d29-d135-4fba-925e-89269acae649",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the sentence and Thorne's name.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly renders the name ナギ as Nagi, not Nagisa.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both are acceptable translations of the UI heading.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both candidates failed to translate the Japanese text into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 has fewer hallucinations than Translation 2.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into English.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translated the second clause into Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Lin Xia speaks to her brother in 반말.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the text into Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.703995,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17513,
+   "output_tokens": 300,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17813
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0356.2",
+  "item-0352.1",
+  "item-0064.2",
+  "item-0317.1",
+  "item-0300.2",
+  "item-0239.2",
+  "item-0024.1",
+  "item-0296.1",
+  "item-0309.1",
+  "item-0308.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1f6b067f-ad39-4182-9e73-3433eba446f0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 actually attempts to translate the source sentence.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translates the instructional onboarding guide as an imperative using the term Hearth.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 構え as 들고 instead of 휘두르며.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are identical in register and accuracy.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 mistranslates the name 朔 as bird (새).\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 is more natural and direct for '~은 ~입니다'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates the past action 取り戻しました more faithfully than potential was able.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the text entirely untranslated in Japanese.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"万俟 is pronounced Mòqí/Wànqí; Translation 2 garbles it as Wan Sita.\"}\n]\n```\n",
+  "duration_seconds": 5.061018,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17424,
+   "output_tokens": 334,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17758
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 79,
+ "try": 1,
+ "ids": [
+  "item-0301.2",
+  "item-0261.1",
+  "item-0232.1",
+  "item-0239.1",
+  "item-0287.2",
+  "item-0232.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6c33e5d5-def0-4e10-bad4-a756ad1e08db",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates 둘째 날 naturally without switching to 'Day 2'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly translates 所長 as 소장, whereas 2 mistranslates it as 선장님.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 leaves a Chinese character untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"More faithful to '目が違うな' than the added '보이는 거야'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into the target language.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 leaves an untranslated Chinese character.\"}\n]\n```\n",
+  "duration_seconds": 4.355517,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15979,
+   "output_tokens": 204,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16183
+  }
+ }
+}

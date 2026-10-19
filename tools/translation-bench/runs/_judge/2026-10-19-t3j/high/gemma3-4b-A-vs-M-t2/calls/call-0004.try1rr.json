@@ -1,0 +1,27 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0293.1",
+  "item-0280.2",
+  "item-0311.2",
+  "item-0220.1",
+  "item-0046.1",
+  "item-0268.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2342afe7-24ef-4eb4-8bae-abde10dd5eff",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly spells Seoyoon and omits the Korean vocative particle.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 uses the correct name '쏜' and avoids hallucinating words.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 naturally translates conversational agreement instead of 'Yeah, it is'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 'that one' as an object, not '그곳'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 is in Korean, while Translation 2 left untranslated Chinese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 preserves the question and meaning; Translation 1 is ungrammatical.\"}\n]\n",
+  "duration_seconds": 249.102711,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16163,
+   "output_tokens": 36250,
+   "thinking_tokens": 36036,
+   "cache_read_tokens": 0,
+   "total_tokens": 52413
+  }
+ }
+}

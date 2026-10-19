@@ -1,0 +1,27 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0009.2",
+  "item-0242.1",
+  "item-0213.1",
+  "item-0003.1",
+  "item-0329.1",
+  "item-0062.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d75db9f1-9d49-49d5-88ac-0ddf357d5465",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 mistranslates his bed as my bed.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the required 합쇼체 speech level.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 bizarrely mistranslates 海 as seafood.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 outputs UI metadata instead of the dialogue.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly interprets なし as dropping formality.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 changes Saturday to weekend and omits still.\"}\n]\n```\n",
+  "duration_seconds": 27.386221,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16173,
+   "output_tokens": 3248,
+   "thinking_tokens": 3058,
+   "cache_read_tokens": 0,
+   "total_tokens": 19421
+  }
+ }
+}

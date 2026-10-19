@@ -1,0 +1,31 @@
+{
+ "call": 13,
+ "try": 1,
+ "ids": [
+  "item-0327.1",
+  "item-0192.1",
+  "item-0073.1",
+  "item-0249.1",
+  "item-0186.2",
+  "item-0193.2",
+  "item-0154.2",
+  "item-0258.1",
+  "item-0273.1",
+  "item-0086.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "558c2899-0072-4aa6-ae9f-e6aaad38e534",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Natural phrasing in English tutorial/onboarding context.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correct name transcription (시본) and natural banmal phrasing.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Noun form (-기) fits UI/tutorial section headers naturally.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Source is an incomplete sentence conditional ('遅れる[と/なら...]').\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Matches friendly banmal tone requested in the previous context.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correct speech level (해요체) specified for speaking to 周姨.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly uses honorific suffix (-시-) referring to Professor Han.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Maintains the prescribed 해요체 speech level consistently.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'ひときわ' means notably/distinctly/even more, not suddenly.\"}\n]\n```\n",
+  "duration_seconds": 5.332054,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17131,
+   "output_tokens": 312,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17443
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 46,
+ "try": 1,
+ "ids": [
+  "item-0371.1",
+  "item-0194.1",
+  "item-0207.1",
+  "item-0206.2",
+  "item-0111.1",
+  "item-0163.1",
+  "item-0051.2",
+  "item-0065.1",
+  "item-0332.1",
+  "item-0104.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "724686b0-4cfc-4a70-b96a-d001f223b8d7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"留守番は誰に頼んだ is asking who was asked, not a command.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates 雨の港町 accurately; Translation 2 mistranslates it as rain sounds.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 has severe grammatical errors and unnatural phrasing.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Rory speaks 반말 to Siobhan and pillow means 베개, not 침구.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 bizarrely mistranslates 'hot' as 야수 (beast/wild).\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"叔父 means uncle (숙부), not aunt (고모), despite unlocalized characters.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Takanashi speaks 반말 to Hinata; Translation 2 incorrectly uses honorifics.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"알 경우 is more natural than the awkward past conditional 알았을 때.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 leaves the text in Japanese.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Dex speaks 합쇼체 to Captain Thorne; 그래 is 반말.\"}\n]\n```\n",
+  "duration_seconds": 10.706291,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5428,
+   "output_tokens": 363,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11825,
+   "total_tokens": 5791
+  }
+ }
+}

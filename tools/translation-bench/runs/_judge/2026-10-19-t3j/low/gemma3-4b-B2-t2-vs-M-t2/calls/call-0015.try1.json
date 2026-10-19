@@ -1,0 +1,31 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0280.1",
+  "item-0129.1",
+  "item-0161.1",
+  "item-0032.1",
+  "item-0262.1",
+  "item-0016.2",
+  "item-0013.2",
+  "item-0027.1",
+  "item-0042.2",
+  "item-0060.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "12fdff3f-7597-4bf3-8a74-4f0673965ce9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 周姨 into 저우 이모.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the source.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 雨の港町 as rainy harbor town.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 is in Chinese; Translation 2 is in target language Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 is translated into Korean, while Translation 2 remains in Chinese.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 uses proper Korean characters instead of untranslated Hanzi.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, whereas Translation 1 is Japanese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, whereas Translation 1 is untranslated Japanese.\"}\n]\n```\n",
+  "duration_seconds": 4.819612,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17359,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17683
+  }
+ }
+}

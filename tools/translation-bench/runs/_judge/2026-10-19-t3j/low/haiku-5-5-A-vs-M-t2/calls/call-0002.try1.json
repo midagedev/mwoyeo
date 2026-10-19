@@ -1,0 +1,31 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0200.2",
+  "item-0270.1",
+  "item-0083.2",
+  "item-0225.2",
+  "item-0004.2",
+  "item-0162.2",
+  "item-0201.1",
+  "item-0119.1",
+  "item-0028.1",
+  "item-0154.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2bd207d2-77b7-4888-8749-420db9f7b324",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Captures the casual nuance of もう押さえた more naturally in 반말.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Accurately capitalizes defined term 'Sticky'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translates cut-off sentence naturally while respecting detective's polite customer register.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly uses 해요체 required for speaking to 周婷.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Reads more naturally for tutorial instructions addressing the audience.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Section chief uses 해요체 without over-honorific subject particle to subordinate.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translates 堅苦しいのはなし more naturally into conversational Korean.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both fail the speaker's required 해요체 to Rook.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly uses 해요체 as specified in facts.\"}\n]\n```\n",
+  "duration_seconds": 4.533004,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17296,
+   "output_tokens": 315,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17611
+  }
+ }
+}

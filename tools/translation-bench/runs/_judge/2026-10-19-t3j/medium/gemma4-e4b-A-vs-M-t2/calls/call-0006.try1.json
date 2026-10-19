@@ -1,0 +1,27 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0008.1",
+  "item-0099.2",
+  "item-0242.2",
+  "item-0033.1",
+  "item-0200.1",
+  "item-0292.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5590e426-ff71-4e44-a1d8-f484a83610ad",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese; Translation 2 is in Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 transliterates proper nouns Rook and Ceres into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 transliterates Tomasz according to the pronunciation guide.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 uses natural phrasing instead of 'deposit the deposit'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 and translates 'both'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese; Translation 1 is in Korean.\"}\n]\n",
+  "duration_seconds": 22.149432,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15948,
+   "output_tokens": 2377,
+   "thinking_tokens": 2179,
+   "cache_read_tokens": 0,
+   "total_tokens": 18325
+  }
+ }
+}

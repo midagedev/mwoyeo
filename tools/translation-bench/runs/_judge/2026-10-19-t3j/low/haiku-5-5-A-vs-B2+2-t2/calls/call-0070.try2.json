@@ -1,0 +1,31 @@
+{
+ "call": 70,
+ "try": 2,
+ "ids": [
+  "item-0003.1",
+  "item-0256.2",
+  "item-0151.2",
+  "item-0328.2",
+  "item-0120.2",
+  "item-0266.2",
+  "item-0101.1",
+  "item-0303.2",
+  "item-0226.2",
+  "item-0168.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3198662a-6076-49ff-bb3d-3940cd9bf444",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the line.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in banmal and transliterates Gareth as 개러스.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly translates nothing without adding unprompted parenthetical english terms.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Punctuation in translation 1 cleanly separates the laughter from the vocative.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Takanashi speaks to client Kiryu in haeyo-che, matching 부탁할게요.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 sounds much more natural in Korean dialogue.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 actually translates the text into Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"The established context and term specify pocket watch, not clock.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 周姨 into Korean as 저우 이모.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 translates Rook to 룩 and tub to 욕조 properly.\"}\n]\n```\n",
+  "duration_seconds": 12.684217,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17583,
+   "output_tokens": 335,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17918
+  }
+ }
+}

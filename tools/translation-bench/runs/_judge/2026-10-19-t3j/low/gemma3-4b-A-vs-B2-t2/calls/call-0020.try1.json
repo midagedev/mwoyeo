@@ -1,0 +1,31 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0219.1",
+  "item-0362.1",
+  "item-0175.2",
+  "item-0052.1",
+  "item-0291.2",
+  "item-0116.1",
+  "item-0254.1",
+  "item-0144.2",
+  "item-0183.2",
+  "item-0338.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2b1bd9dd-196e-4888-813b-d00a8316e5d2",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 to 周姨, unlike 2's 합쇼체.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both incorrectly use 존댓말 (-요) when Siobhan speaks to Rory in 반말.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 uses standard English title order 'Elder Qin'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Faithfully translates 'freezer' as 냉동고 rather than 냉장고.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Korean text.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both severely botch the names, terms, and meaning.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both misgender male client Yuki as 'her'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Korean text.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Korean text.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Japanese text.\"}\n]\n```\n",
+  "duration_seconds": 5.158288,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5743,
+   "output_tokens": 326,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11820,
+   "total_tokens": 6069
+  }
+ }
+}

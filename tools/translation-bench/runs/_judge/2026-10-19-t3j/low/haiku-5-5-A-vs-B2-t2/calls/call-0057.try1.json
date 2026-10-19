@@ -1,0 +1,31 @@
+{
+ "call": 57,
+ "try": 1,
+ "ids": [
+  "item-0024.2",
+  "item-0328.1",
+  "item-0300.1",
+  "item-0229.1",
+  "item-0211.2",
+  "item-0138.2",
+  "item-0288.2",
+  "item-0009.1",
+  "item-0105.1",
+  "item-0320.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1a5bbd5f-831a-4bae-a8ef-fb059446fab8",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly translates 기사 as driver instead of reporter in logistics context.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are grammatically valid translations as Takanashi's gender is unspecified.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Reflects the section chief's casual-polite 해요체 tone accurately.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'아, 맞다' is a natural conversational rendering of 'そうだ'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the sentence into Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'말로만 듣기 좋은 소리 하지 말고' is more natural Korean idiom.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 completely failed to translate into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the meaning rather than leaving raw romaji.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and correctly preserve terms.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both mistakenly use female pronoun 'she' for male coworker Subin.\"}\n]\n```\n",
+  "duration_seconds": 4.84851,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17483,
+   "output_tokens": 329,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17812
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0042.2",
+  "item-0345.2",
+  "item-0166.2",
+  "item-0144.2",
+  "item-0149.1",
+  "item-0015.1",
+  "item-0199.1",
+  "item-0308.2",
+  "item-0085.1",
+  "item-0114.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8fb0fa55-0905-4f45-9c51-f76430a1b9a0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"'What do you make of' is more natural than 'read'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translates 'hot tub' accurately rather than using Jacuzzi.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'One-line notes' is closer to ひとこと than generic 'notes'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese text untranslated.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately with appropriate grammar and tone.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"The client stepped away to the restroom, so '그 사람' fits best.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both fail to use 해요체 and leave '婷姐' untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'먹고 먹고 또 먹기' translates '吃吃吃' more naturally.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'여러분이' is more natural in Korean technical documentation than '당신이'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'決まりだね' is passive/intransitive ('정해졌네'), not active ('정했네').\"}\n]\n```\n",
+  "duration_seconds": 6.17409,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17418,
+   "output_tokens": 346,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17764
+  }
+ }
+}

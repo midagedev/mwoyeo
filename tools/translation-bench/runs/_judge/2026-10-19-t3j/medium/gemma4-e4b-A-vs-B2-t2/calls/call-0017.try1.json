@@ -1,0 +1,27 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0103.1",
+  "item-0022.1",
+  "item-0110.1",
+  "item-0318.1",
+  "item-0306.2",
+  "item-0100.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "73fb95fe-b91c-4e9d-840f-05cee734f7a2",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Sync is more natural in app documentation.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 uses the specified term 저장소 for repository.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 was left untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 was left untranslated.\"}\n]\n",
+  "duration_seconds": 22.993867,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16069,
+   "output_tokens": 2810,
+   "thinking_tokens": 2642,
+   "cache_read_tokens": 0,
+   "total_tokens": 18879
+  }
+ }
+}

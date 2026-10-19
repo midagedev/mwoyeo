@@ -1,0 +1,27 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0162.1",
+  "item-0304.2",
+  "item-0308.2",
+  "item-0243.2",
+  "item-0365.1",
+  "item-0038.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c88ed22b-558c-4c9f-9bd9-41745e212c3e",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates dresser accurately as 서랍장 instead of 장롱.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates Mr. Bell into Korean and uses natural polite honorifics.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translates 吃吃吃 naturally without adding an unwarranted 도 to the plan.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly uses 반말 speech level as specified in the speaker facts.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly uses 반말 when addressing Siobhan according to the facts.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Adheres to terms by translating Marigold as 메리골드 instead of English.\"}\n]\n",
+  "duration_seconds": 46.170259,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16373,
+   "output_tokens": 5822,
+   "thinking_tokens": 5621,
+   "cache_read_tokens": 0,
+   "total_tokens": 22195
+  }
+ }
+}

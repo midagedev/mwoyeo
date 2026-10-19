@@ -1,0 +1,36 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0351.2",
+  "item-0123.2",
+  "item-0319.1",
+  "item-0384.1",
+  "item-0331.2",
+  "item-0182.2",
+  "item-0042.2",
+  "item-0074.2",
+  "item-0256.1",
+  "item-0264.2",
+  "item-0307.1",
+  "item-0246.2",
+  "item-0089.1",
+  "item-0254.1",
+  "item-0163.2"
+ ],
+ "problem": "no JSON list in the answer",
+ "event": {
+  "conversation_id": "93b79945-2fdd-420f-89cc-03e3995cf458",
+  "status": "SUCCESS",
+  "response": "",
+  "duration_seconds": 0,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 0
+  }
+ }
+}

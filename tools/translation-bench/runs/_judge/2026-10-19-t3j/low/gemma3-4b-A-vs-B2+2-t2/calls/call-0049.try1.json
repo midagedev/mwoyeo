@@ -1,0 +1,31 @@
+{
+ "call": 49,
+ "try": 1,
+ "ids": [
+  "item-0307.2",
+  "item-0236.2",
+  "item-0169.2",
+  "item-0158.1",
+  "item-0200.2",
+  "item-0128.1",
+  "item-0029.2",
+  "item-0179.2",
+  "item-0059.2",
+  "item-0353.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8773ed93-f56c-41d9-a41c-440aa1b768c0",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Korean source into English.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Simple past is more direct and natural for narrative user guide examples.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Korean source into English.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 keeps natural banmal and preserves pronunciation guide clearly.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly reads 鵲橋 and matches Hinata's banmal to Takanashi.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Uses the required haeyo-che polite speech level.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Accurately translates 'notes on any line he wants changed'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly renders the possessive Tomasz's as 토마시의 instead of 토마시스.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Includes the subject '아무것도' to translate 'nothing is truly lost'.\"}\n]\n",
+  "duration_seconds": 6.109542,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17251,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17576
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0083.2",
+  "item-0086.1",
+  "item-0352.1",
+  "item-0094.1",
+  "item-0338.1",
+  "item-0026.2",
+  "item-0269.2",
+  "item-0140.2",
+  "item-0186.2",
+  "item-0200.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "47e3eb14-f031-42d2-8959-b1ff5b28e45f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 romanizes the Korean name rather than leaving Hangul untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Saku speaks to Princess Licia in haeyo-che, matching the prompt's ellipsis naturally.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 includes meta-explanation and untranslated English text.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly translates the specific channel name 'Hearth' per onboarding context.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both appropriately translate the UI heading context naturally into English.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Uses the specified pinyin Yuechuan/Yue Chuan for 乐川.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 leaves the Chinese name untranslated in Hanzi.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Transliterates Gerald into Korean rather than leaving it in English.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly spells the name Jiu/Jiwoo with proper punctuation.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Siblings speak in banmal to each other, correctly using 너/잖아.\"}\n]\n```\n",
+  "duration_seconds": 5.866627,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17467,
+   "output_tokens": 345,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17812
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0089.1",
+  "item-0094.2",
+  "item-0143.1",
+  "item-0043.1",
+  "item-0058.2",
+  "item-0174.2",
+  "item-0047.1",
+  "item-0012.2",
+  "item-0017.2",
+  "item-0074.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "73ce6a49-ec95-4639-b8f3-33ce00fbd295",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly follows the glossary term '조합' for ギルド.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 uses the established term '포켓 깃' from facts.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly conveys the condition '대신' rather than simple future.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Brief note' accurately translates ひとこと in the context of note apps.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Rook speaks to Thorne in 합쇼체, but both use 해요체 equally.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 correctly romanizes 单 as 'Shan' as specified in facts.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 adheres to the established name '저우 이모'.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful renderings of 老人.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체, matching Gareth's specified speech level.\"}\n]\n```\n",
+  "duration_seconds": 5.373384,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17233,
+   "output_tokens": 335,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17568
+  }
+ }
+}

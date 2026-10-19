@@ -1,0 +1,31 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0364.1",
+  "item-0010.2",
+  "item-0327.1",
+  "item-0130.1",
+  "item-0090.1",
+  "item-0005.1",
+  "item-0278.2",
+  "item-0208.2",
+  "item-0249.1",
+  "item-0321.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c29b6ac9-916d-4cb5-89fe-fce4eb52eb34",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Earlier line explicitly defined \\\"theirs\\\" in quotation marks.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Lu Ming speaks to Xu Nuo in informal speech (반말).\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Siobhan speaks to Rory in 반말, not honorific 해요체.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Avoids awkward 'Mr./Ms.' translation for Korean honorific 님.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Lin Yuan speaks to his sister Lin Xia in 반말.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Reads more naturally as a full sentence with 'In the'.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both incorrectly identify the speaker/subject (Xie Xuan is female).\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Tesshai's grandfatherly tone (わし, やっとる) suits 해라체/하게체 better.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Neither uses the required speech level (Rook speaks 합쇼체 to Thorne).\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Clear and natural Korean translation without unnecessary parenthetical English gloss.\"}\n]\n```\n",
+  "duration_seconds": 5.731553,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17345,
+   "output_tokens": 343,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17688
+  }
+ }
+}

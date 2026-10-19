@@ -1,0 +1,31 @@
+{
+ "call": 63,
+ "try": 1,
+ "ids": [
+  "item-0305.2",
+  "item-0022.1",
+  "item-0276.2",
+  "item-0047.1",
+  "item-0073.2",
+  "item-0156.1",
+  "item-0229.2",
+  "item-0049.1",
+  "item-0096.1",
+  "item-0315.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "35bb34e7-2399-4315-9263-624cafd70fcd",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Accurately conveys '남기면 끝입니다' as 'and you're done'.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both '곳' and '위치' naturally and accurately translate 'where you put it'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both '-다고 해' and '-다고' correctly convey hearsay in informal 반말.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the sentence into Korean.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both singular and plural formulations accurately and naturally convey '伤不重'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"More natural phrasing for 'due at Ceres by noon'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Past perfect 'had not yet' fits standard narrative past tense better.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both styles appropriately translate the polite proposal into English.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Transliterates the name 'Dex' into Korean '덱스'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'맨 끝' accurately translates '突き当たり' (end of the hall/passage).\"}\n]\n```\n",
+  "duration_seconds": 5.443686,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17388,
+   "output_tokens": 341,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17729
+  }
+ }
+}

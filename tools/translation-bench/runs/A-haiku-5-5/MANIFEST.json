@@ -1,0 +1,298 @@
+{
+ "manifest_version": 1,
+ "run": "A-haiku-5-5",
+ "kind": "model",
+ "note": "t3j cloud check: claude-haiku-5-5 over the Anthropic API from this Mac, product layout (--layout t2), jobs 1; round t3j-judge. Cloud latency is network plus service load, not comparable across hours; the agy judge pass ran at the same time on the same network. load avg (1m 5m 15m) start: 10.28 7.82 6.08 end: 5.60 6.55 5.96",
+ "date": "2026-10-19T12:42:58Z",
+ "seconds": 317.875194625,
+ "preserved": "2026-10-19T12:48:16Z",
+ "condition": "A",
+ "layout": "t2",
+ "jobs": 1,
+ "batch_size": 3,
+ "sequences": [
+  "chat-en-ko-1",
+  "chat-ja-ko-1",
+  "chat-ja-ko-2",
+  "chat-ko-en-1",
+  "chat-zh-ko-1",
+  "docs-en-ko-1",
+  "docs-ja-en-1",
+  "docs-ko-en-1",
+  "game-ja-en-1",
+  "game-ja-ko-1",
+  "game-zh-en-1",
+  "subs-en-ko-1",
+  "subs-ja-ko-1",
+  "subs-zh-ko-1"
+ ],
+ "command": "MWOYEO_MEMORY_SECRETS=1 /tmp/t3j/build-rel/release/bench-run run --engine engines/anthropic-haiku-5-5.json --condition A --layout t2 --out /tmp/t3j/cloud/A-haiku-5-5 --root .",
+ "command_cwd": "tools/translation-bench",
+ "env": {
+  "MWOYEO_MEMORY_SECRETS": "1"
+ },
+ "engine": {
+  "config_file": "engines/anthropic-haiku-5-5.json",
+  "config": {
+   "name": "anthropic-haiku-5-5",
+   "kind": "anthropic",
+   "model": "claude-haiku-5-5",
+   "thinking": "off",
+   "keyEnv": "ANTHROPIC_API_KEY",
+   "price": "claude-haiku-5-5",
+   "timeoutSeconds": 60
+  },
+  "name": "anthropic-haiku-5-5",
+  "kind": "anthropic"
+ },
+ "model": {
+  "name": "claude-haiku-5-5",
+  "source": "not a local Ollama engine; digest not recorded"
+ },
+ "machine": {
+  "chip": "Apple M1 Pro",
+  "memory_bytes": 34359738368,
+  "macos": "27.0",
+  "kernel": "27.0.0",
+  "ollama": "0.34.2"
+ },
+ "source": {
+  "git_head": "4b90f1cf2c03ab709a3cc0fcf0f7f7382f48610a",
+  "tree": "uncommitted tools/translation-bench tree",
+  "runner_sha256": "7ffe11b66a656050acedbc789398d28e2abfcc6b649eefbab306426405a0ff7c",
+  "runner_files": {
+   "runner/Package.swift": "a82bbcaa2d9934dddaf4ac45762123f81f2b24a230c50b57c8464c0b0694e2d6",
+   "runner/Sources/BenchKit/AppleFM.swift": "de33c0f1c71a93c519e168e94b14fb087f33ed4ac5801630489c2e943302bcc7",
+   "runner/Sources/BenchKit/Conditions.swift": "2d888d77863925efbcd496b438c309f440c8ab8efcda01ed5a53988ce56113c6",
+   "runner/Sources/BenchKit/Engines.swift": "62e2cc2a26a74247b4672ccaa549be13091db7a0f94405625c067d01fbcd3d26",
+   "runner/Sources/BenchKit/Models.swift": "65df04afdd6a966d8c34516926da39e6c67b3fd3c194e1de4d2be2b55f912a84",
+   "runner/Sources/BenchKit/Replay.swift": "df4f69e32e3599bb97f50dab2d6c95fd79a5aaa01aa12764d756c7cd29dd1757",
+   "runner/Sources/BenchKit/Run.swift": "cca2dd8547e79a39f5958e3f4b0aeab16648a992f3b61ec94f9dabef051616ec",
+   "runner/Sources/BenchKit/Tokens.swift": "47e42221ff5d864969aaec67481bd28df855072b6404148a747808463674765c",
+   "runner/Sources/bench-run/main.swift": "af0489baed70c96ddaac6ad09d20f42e15108726f733440007090af4d9a4c960"
+  },
+  "runner_files_modified_after_run_start": [],
+  "binary": {
+   "path": "/tmp/t3j/build-rel/release/bench-run",
+   "sha256": "3067a270a44df2ea465239b000b175feb6123cbcd5c71f2ee735c13b33ccc38e",
+   "mtime": "2026-10-19T12:41:52Z",
+   "note": "hash of the binary at preservation time"
+  }
+ },
+ "corpus": {
+  "sequences": 14,
+  "sha256": "847a7533bd39c68dc0ce00d820d681623ae5fe07f60fcc5e2f23ad0fd05e797e",
+  "files": {
+   "sequences/chat-en-ko-1.json": "ab2522d85a9284fed420b7119cf79a1226642a40767da2404af84ddf1f5f22af",
+   "sequences/chat-ja-ko-1.json": "b74884821f398ba7e3e026775a9a24769cc19fea185b6b4ded3b36384be784bb",
+   "sequences/chat-ja-ko-2.json": "aa48e5aca75ef20b2b4a35fb960e5d6a4f6e0f7ea9dba47230e8fc74ed9eaeac",
+   "sequences/chat-ko-en-1.json": "f27cd057e207469171daea3bc5913a8b4c1f0c1de0041c7dccf13a6d29a93a03",
+   "sequences/chat-zh-ko-1.json": "520efa62f044f69fd91f76fb9b5f08d2dc3fe227396601516c1a796402da2ece",
+   "sequences/docs-en-ko-1.json": "ec358a53efe04a4c6d6a49aa046304644252baaf790aa38948b09af6f5cb8b39",
+   "sequences/docs-ja-en-1.json": "7187571247fbe808e9847b84fe9e6834254799ce0df77f3d9fe3abdb09b7a94c",
+   "sequences/docs-ko-en-1.json": "6c57a34fdb7c6bd53126e91b2bfff9f685fd2e287e6b8642a0a59318e407bcfa",
+   "sequences/game-ja-en-1.json": "7d613a1d3b3a91e80dfd13ef58e95d15980c5b4195a8da9756ba06f77ab1014d",
+   "sequences/game-ja-ko-1.json": "b366ef17a1469ef4b909e80433a110158bbd154d9257fda408b8a3f410e2b045",
+   "sequences/game-zh-en-1.json": "58a535be9cfe908a746e069da4ed2c39dacb8a6b2f2bd14d026b628343019e3c",
+   "sequences/subs-en-ko-1.json": "7b78d9972ab5457b243ac265f703100271d9065cda7c121eb90c0e8b1a169455",
+   "sequences/subs-ja-ko-1.json": "da693acbfeb29e0bdd24ab706acafa05943cd9028d815ad4617dedeae9ee3b70",
+   "sequences/subs-zh-ko-1.json": "8b34d6b9c79bf01452849f32cb06736245dc7d19776f9b46e43d8e13b37fda0d",
+   "memory/chat-en-ko-1.json": "322827e31b64e8d5c581353c4a588036dc025688f2f20b18657f08da042b13a8",
+   "memory/chat-ja-ko-1.json": "abcebe2b0decec51bbd5d879afdae59a276a5df93179d53276ed60e3ff79d37b",
+   "memory/chat-ja-ko-2.json": "8d50017af5e0dceae10086d289c846859e67c04d9093599df496d2a74da3d457",
+   "memory/chat-ko-en-1.json": "4d6feb7de587d0d64ebf68f363da8326abe21635e53dff3a69548d4bb2c06328",
+   "memory/chat-zh-ko-1.json": "0ff748323d17cd8406696a839d5f12f8a0dfaf03ab324c6dc2d0d182658fc827",
+   "memory/docs-en-ko-1.json": "63833d5430f264a93ed03987578cc456d2ec3f27cc55bef1a8a01b08816dee0e",
+   "memory/docs-ja-en-1.json": "17eaa7aa97e3b4c55098c01f469e6e94a3ebcf761e934da96583904212c5494f",
+   "memory/docs-ko-en-1.json": "51f4027da3c1ed58f82c729f3e3ef66cac8b39bee02d6d8d4d31571f6de75605",
+   "memory/game-ja-en-1.json": "e65de61cdbee29bdd2e2f35766cc4078bce79f8999b7953f68f7dd56d75962f4",
+   "memory/game-ja-ko-1.json": "87aae7b2243710256d82cf8d7c4480340a91143e93b583cb658418ca880e87f3",
+   "memory/game-zh-en-1.json": "4923e1695087c88fe14800d2aa6cb63efe8f7c042b924372dd7d5b5d2af36630",
+   "memory/subs-en-ko-1.json": "c7d32fb1da465200eff0b8ec86b387989a0c67007d27e27a253cd8e0d4721b93",
+   "memory/subs-ja-ko-1.json": "d8ab961cdae446aa9f23a0fd1fc150d88e6dd1194cb8664337a15a85fa1cf6d6",
+   "memory/subs-zh-ko-1.json": "1027c30cb867a9af6f1b4b76edc139b0f493b7b7616a1d4f88eb28276b5112d0",
+   "prices.json": "e82b780c604b5296a69c8962e67b9626d0b9610ff57193960a0442389dcd7add"
+  },
+  "snapshot": "_corpus/847a7533bd39c68d",
+  "files_modified_after_run_start": [],
+  "probes": 312
+ },
+ "score_summary": [
+  "== run A | anthropic-haiku-5-5 claude-haiku-5-5 | jobs=1 | 14 sequences, 252 requests",
+  "probes 312: 136 correct = 43.6%",
+  "  by evidence: memory 40/126 31.7%  lines 48/133 36.1%  none 48/53 90.6%",
+  "  by type:     name 39/107 36.4%  pronoun 15/53 28.3%  register 13/25 52.0%  speech_level 11/22 50.0%  term 58/105 55.2%",
+  "  by distance: 1-2 9/32 28.1%  3-4 8/28 28.6%  5-8 11/26 42.3%  9-16 13/30 43.3%  17+ 7/17 41.2%",
+  "  by pair:     en>ko 44.1%  ja>en 45.5%  ja>ko 49.4%  ko>en 38.6%  zh>en 43.5%  zh>ko 34.8%",
+  "speech level: 234 lines judged, 133 match the speaker's level = 56.8%, 44 mixed, 29 of 38 speaker-level groups inconsistent",
+  "carry-over: 25 repeated wrong forms after 30 probes that followed a wrong form; 42 fail streaks in 82 chances",
+  "failed attempts 9, fallback lines 6, empty lines 9",
+  "latency ms: p50 1046 p95 2381",
+  "tokens: in 34783 (mean 138.0: stable 81.5 + history 0.0 + volatile 56.5; shared prefix with the previous request 83.9; user memory 0.0) out 22946 (mean 91.1) cached 0",
+  "cost estimate: $0.0150"
+ ],
+ "score": {
+  "condition": "A",
+  "engine": "anthropic-haiku-5-5",
+  "model": "claude-haiku-5-5",
+  "jobs": 1,
+  "sequences": 14,
+  "requests": 252,
+  "probes": {
+   "n": 312,
+   "ok": 136,
+   "by": {
+    "memory": [
+     40,
+     126
+    ],
+    "lines": [
+     48,
+     133
+    ],
+    "none": [
+     48,
+     53
+    ]
+   },
+   "type": {
+    "name": [
+     39,
+     107
+    ],
+    "pronoun": [
+     15,
+     53
+    ],
+    "register": [
+     13,
+     25
+    ],
+    "speech_level": [
+     11,
+     22
+    ],
+    "term": [
+     58,
+     105
+    ]
+   },
+   "pair": {
+    "en>ko": [
+     30,
+     68
+    ],
+    "ja>en": [
+     20,
+     44
+    ],
+    "ja>ko": [
+     43,
+     87
+    ],
+    "ko>en": [
+     17,
+     44
+    ],
+    "zh>en": [
+     10,
+     23
+    ],
+    "zh>ko": [
+     16,
+     46
+    ]
+   },
+   "kind": {
+    "chat": [
+     52,
+     110
+    ],
+    "docs": [
+     27,
+     66
+    ],
+    "game": [
+     31,
+     67
+    ],
+    "subtitles": [
+     26,
+     69
+    ]
+   },
+   "distance": {
+    "1-2": [
+     9,
+     32
+    ],
+    "3-4": [
+     8,
+     28
+    ],
+    "5-8": [
+     11,
+     26
+    ],
+    "9-16": [
+     13,
+     30
+    ],
+    "17+": [
+     7,
+     17
+    ]
+   }
+  },
+  "speech": {
+   "scored": 234,
+   "match": 133,
+   "mixed": 44,
+   "speakers": 38,
+   "inconsistent_speakers": 29
+  },
+  "carry": {
+   "repeat_same": 25,
+   "after_wrong": 30,
+   "fail_streak": 42,
+   "streak_chances": 82
+  },
+  "attempts_failed": 9,
+  "fallback_lines": 6,
+  "failed_lines": 9,
+  "latency": {
+   "p50": 1046.0,
+   "p95": 2381.4999999999995
+  },
+  "tokens": {
+   "in": 34783,
+   "out": 22946,
+   "cached": 0,
+   "mean_in": 138.02777777777777,
+   "mean_out": 91.05555555555556,
+   "stable": 81.54475950877196,
+   "history": 0.0,
+   "volatile": 56.48301826900581,
+   "lcp": 83.8806889310579,
+   "memory": 0.0
+  },
+  "cost_usd": 0.014951299999999995
+ },
+ "files": {
+  "chat-en-ko-1.json": "27a44315e4d7db481459a5651bf73dbccfbf7020df01996968e388d2c7bd5df4",
+  "chat-ja-ko-1.json": "388b82e67c3e196291633e40b81628ac97f1b7d70baa8b299db3bc102207633e",
+  "chat-ja-ko-2.json": "3efff58d4dad46fcbda4aa2f9de36eccac7b54405b3f5b3d42a71724c56d9b77",
+  "chat-ko-en-1.json": "4446b9f7fe35f70a5a989dd37cdc323ddffb102ada62da3ed4e1e2c35e78a777",
+  "chat-zh-ko-1.json": "f1da415481c9479c7263ff9ffa24f7d30c97d7b0478eb1b98feadd76825bc826",
+  "docs-en-ko-1.json": "72d6cdfa066f81cf9713344922e9bdacbdbbb97cbd475999aeed70a89c8f06f8",
+  "docs-ja-en-1.json": "72cfacf84e040e9b32a505aca7bc3df292a4da03592c71d221330cf28ed89c99",
+  "docs-ko-en-1.json": "47d354aea934590e7e0b5be588ecff7563991a013a9055c1229486cb475a505a",
+  "game-ja-en-1.json": "1f65977e4d0a0960406190b92fbb51ab91074044c2cf374ee22060fc2d703a86",
+  "game-ja-ko-1.json": "fc2769da011e4300e4b9c1129ae305cc8b5a7aaecd3bcf86a73ce3ecf003299c",
+  "game-zh-en-1.json": "4fc83c7bee544ecc7aac8b34439c71418f6af2b8065a885183043e6acba81e4f",
+  "meta.json": "843c720b1da76cdf043a251d42569b56516bf90af6fcd19c21ef6ae703b789c5",
+  "subs-en-ko-1.json": "e5c8a5a520461bf42d33bbbabd66fb4e6eea6173a8873a7c5cf57f21cea9e8cc",
+  "subs-ja-ko-1.json": "6ad4f6caca13700556777e6841c50473fbee3f8fdb03263b15b720f9fe70dcdb",
+  "subs-zh-ko-1.json": "a62b323b90354a7fc904a8f3ba5b34583d57b3df314038e9a09354ebfed9480a"
+ }
+}

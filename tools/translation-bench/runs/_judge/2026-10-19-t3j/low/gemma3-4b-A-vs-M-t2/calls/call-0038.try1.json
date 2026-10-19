@@ -1,0 +1,29 @@
+{
+ "call": 38,
+ "try": 1,
+ "ids": [
+  "item-0295.2",
+  "item-0129.1",
+  "item-0254.1",
+  "item-0372.2",
+  "item-0089.2",
+  "item-0273.1",
+  "item-0058.2",
+  "item-0278.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3652f25c-f0a6-478e-9f8a-d895b19e4918",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 speech level between tenants.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 uses correct name 루크 and natural phrasing.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses informal speech level 반말.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 translates terms accurately into Korean without raw Japanese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 avoids raw hanja characters in 소장님.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 translates the Korean text into English.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 uses the specified name 저우 이모 and 삼홍.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both incorrectly use 존댓말 instead of required 반말.\"}\n]\n```\n",
+  "duration_seconds": 6.065985,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16755,
+   "output_tokens": 250,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17005
+  }
+ }
+}

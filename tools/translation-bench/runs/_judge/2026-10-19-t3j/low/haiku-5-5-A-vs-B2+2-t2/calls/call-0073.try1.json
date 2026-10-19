@@ -1,0 +1,31 @@
+{
+ "call": 73,
+ "try": 1,
+ "ids": [
+  "item-0356.1",
+  "item-0276.2",
+  "item-0047.1",
+  "item-0073.2",
+  "item-0156.1",
+  "item-0229.2",
+  "item-0049.1",
+  "item-0096.1",
+  "item-0315.1",
+  "item-0323.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a5d97066-30a2-4167-885b-ebcd24cb7800",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Aoife's pronunciation guide in context makes '아오이프' inaccurate; 2 is better.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both correctly use 반말 and convey the meaning naturally.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 awkwardly repeats the name in parentheses.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 uses incorrect literal translation '형견' instead of '유품'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly shows respect toward the professor with honorifics.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Speaker Thorne uses 반말 to Dex; bridge is 함교, but 2's register fits.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both are natural Korean translations using 반말.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Kiryu speaks in 해요체 to Takanashi according to facts.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Mina speaks to group/peers in 반말, not 해요체.\"}\n]\n```\n",
+  "duration_seconds": 6.303532,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17382,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17714
+  }
+ }
+}

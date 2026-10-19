@@ -1,0 +1,31 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0021.1",
+  "item-0304.2",
+  "item-0126.1",
+  "item-0053.2",
+  "item-0223.2",
+  "item-0370.1",
+  "item-0376.1",
+  "item-0234.2",
+  "item-0068.2",
+  "item-0358.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3883700b-d64a-4013-a9c1-b85059158587",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches the term 'Memotto' specified in the facts.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses '선장' matching the specified term 'Captain = 선장'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both accurately translate the sentence in natural 반말.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Gareth speaks to tenants in 해요체.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Reflects the established term 'Commons' from context.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Lu Ming speaks to Xu Nuo in 반말 and fits context.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 reads much more naturally in English.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"}\n]\n```\n",
+  "duration_seconds": 4.259908,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17312,
+   "output_tokens": 304,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17616
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 40,
+ "try": 1,
+ "ids": [
+  "item-0013.1",
+  "item-0037.1",
+  "item-0061.2",
+  "item-0069.1",
+  "item-0197.2",
+  "item-0259.2",
+  "item-0049.2",
+  "item-0117.1",
+  "item-0230.2",
+  "item-0222.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2dff08e9-3cbd-4ff8-be65-92e2d4960219",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Chou is the surname 仇; 殿 is hall.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly translates the imperative guideline and uses the defined term Hearth.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correct character name 삭 (朔) and closer translation than 숙.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both fail: 1 is untranslated, 2 has severe Hanja/typo errors.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Both hallucinated badly, but 1 preserves Takanashi reading miss slightly better.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Both erroneously use polite endings to Rory, but 1 sounds more natural.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 hallucinates context lines; 1 translates only the target line.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Correct name Nagi rather than Nagisa.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly transliterates ホタル as 호타루; 2 mistranslates as carousel.\"}\n]\n```\n",
+  "duration_seconds": 4.701649,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17482,
+   "output_tokens": 340,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17822
+  }
+ }
+}

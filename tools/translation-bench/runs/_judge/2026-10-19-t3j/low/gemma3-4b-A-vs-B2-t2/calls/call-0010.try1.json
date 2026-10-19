@@ -1,0 +1,31 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0158.2",
+  "item-0269.2",
+  "item-0189.1",
+  "item-0238.2",
+  "item-0021.2",
+  "item-0336.2",
+  "item-0068.2",
+  "item-0341.1",
+  "item-0001.2",
+  "item-0039.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2d70825a-42f5-4962-b57e-264c05ce9274",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"1 is completely untranslated romaji gibberish.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"1 is in Chinese; 2 is translated into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"1 translates uncle properly; 2 mistakes uncle for aunt (고모).\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"1 is completely untranslated Korean text.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"2 uses more natural phrasing with 'happen'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"1 is more concise and natural than 2's redundancy.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"1 maintains consistent 반말 speech level used by Tessai.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"2 leaves the character's name untranslated in Chinese characters.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both miss Pathfinder and fleet allocation; equally flawed.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"2 translates the full sentence structure properly.\"}\n]\n```\n",
+  "duration_seconds": 5.060165,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17429,
+   "output_tokens": 307,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17736
+  }
+ }
+}

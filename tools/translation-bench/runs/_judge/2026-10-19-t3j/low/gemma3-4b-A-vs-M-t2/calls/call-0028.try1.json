@@ -1,0 +1,31 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0003.1",
+  "item-0352.1",
+  "item-0048.1",
+  "item-0367.1",
+  "item-0096.1",
+  "item-0269.1",
+  "item-0376.1",
+  "item-0291.1",
+  "item-0302.1",
+  "item-0061.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "745cfcbc-7f9f-4daa-8e05-1eace6a0e1f4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"1 mistranslates a question as a statement and misses the subject.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"2 uses the required term '작업 디렉터리' and translates 'the rest'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"1 correctly identifies 叔父 as an uncle, while 2 translates aunt.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"1 translates Tomasz's naturally instead of the phonetic transliteration '토마시스'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"2 translates 'stays where you put it' much more accurately and naturally.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"1 leaves out 인사팀 and garbles the person's name and title.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"2 correctly translates 警部 as Inspector, matching Akira's role.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"2 failed to translate into English at all.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are deeply flawed and fail Siobhan's informal speech register.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Both misromanize the surname 单 (Shàn), but 1 is closer.\"}\n]\n```\n",
+  "duration_seconds": 6.225892,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17105,
+   "output_tokens": 348,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17453
+  }
+ }
+}

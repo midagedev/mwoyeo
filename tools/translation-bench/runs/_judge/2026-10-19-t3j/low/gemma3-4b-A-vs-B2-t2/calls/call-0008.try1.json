@@ -1,0 +1,31 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0253.2",
+  "item-0028.2",
+  "item-0340.2",
+  "item-0036.2",
+  "item-0101.1",
+  "item-0266.2",
+  "item-0292.2",
+  "item-0334.2",
+  "item-0212.2",
+  "item-0159.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c6e24b04-ba49-4f26-87b2-36b161f3605b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 'bringing that dog' as 데려와 rather than 가져온다.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly conveys changing permissions for each space/group.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 naturally translates 'cleans up after that dog' and uses Korean script.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 captures fleet allocation/dispatch and the guide training structure better.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 retains the character name Jiě Xuán rather than an incorrect pronoun.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 recognizes 哥 as an address term, though speaker is female.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 uses the required formal register (합쇼체).\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly translates the question asking who was asked to watch/stay.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 provides a natural greeting instead of literal '오전 모두께'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 is in Korean, whereas Translation 2 remains in Chinese.\"}\n]\n```\n",
+  "duration_seconds": 5.285883,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17333,
+   "output_tokens": 351,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17684
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0006.1",
+  "item-0190.2",
+  "item-0048.2",
+  "item-0335.1",
+  "item-0363.2",
+  "item-0046.1",
+  "item-0085.1",
+  "item-0223.1",
+  "item-0341.2",
+  "item-0191.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a9ceb489-43d3-407e-9838-ff243fd81e61",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both capture the meaning and register accurately.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are clear and acceptable; neither matches the romanization exactly.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly reflects spicy food and applies the defined term '엠티'.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and use appropriate casual speech.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated in Japanese.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 uses the prescribed 해요체 speech level.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly interprets bringing the pet (Bori/her) rather than 'me'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Uses the specified term 'Space' for ワークスペース.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both preserve the technical term 'theirs' clearly and naturally.\"}\n]\n```\n",
+  "duration_seconds": 4.6834050000000005,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17167,
+   "output_tokens": 311,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17478
+  }
+ }
+}

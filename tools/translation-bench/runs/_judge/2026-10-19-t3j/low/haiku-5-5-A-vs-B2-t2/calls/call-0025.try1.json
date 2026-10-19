@@ -1,0 +1,31 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0165.2",
+  "item-0223.1",
+  "item-0025.2",
+  "item-0014.2",
+  "item-0180.1",
+  "item-0269.1",
+  "item-0322.2",
+  "item-0346.2",
+  "item-0152.1",
+  "item-0354.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "59ea064f-10cd-477e-9263-81f107fd9a6e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"용서해 주다 sounds much more natural in Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Takanashi speaks in banmal to Hinata.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translates the Japanese name kanji into Korean hangul.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"More natural phrasing for acknowledging instructions and asking for half-day leave.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'at home' or 'be home' is more natural than 'at the house'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correct pinyin reading, banmal register between siblings, and translated name.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Gareth speaks in 해요체 and honors the super naturally.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translates Japanese kanji name Raizo into Korean hangul.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Transliterates the Japanese pronunciation into Korean hangul.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in banmal, not honorifics.\"}\n]\n```\n",
+  "duration_seconds": 4.377434,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17739,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18063
+  }
+ }
+}

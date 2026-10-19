@@ -1,0 +1,31 @@
+{
+ "call": 9,
+ "try": 1,
+ "ids": [
+  "item-0009.1",
+  "item-0097.1",
+  "item-0081.1",
+  "item-0324.2",
+  "item-0323.1",
+  "item-0019.2",
+  "item-0061.2",
+  "item-0133.2",
+  "item-0133.1",
+  "item-0150.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f1a8fcc6-d400-4215-bc85-70f0c0398cf2",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 incorrectly translates 'his bed' as 'my bed' (제 침대).\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Closer to the company name MoaLogis than 'Moores Logistics'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Preserves the pronunciation guide EE-fa and natural conversational tone.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese sentence into Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into English.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Both miss the proper term 메리골드, but 2 handles register better.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are equally accurate translations of the line.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both completely failed to translate into the target language Korean.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both completely failed to translate into the target language Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into the target language Korean entirely.\"}\n]\n```\n",
+  "duration_seconds": 4.803121,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17599,
+   "output_tokens": 322,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17921
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 40,
+ "try": 1,
+ "ids": [
+  "item-0153.1",
+  "item-0011.2",
+  "item-0163.1",
+  "item-0178.2",
+  "item-0138.2",
+  "item-0024.1",
+  "item-0037.1",
+  "item-0078.2",
+  "item-0115.1",
+  "item-0025.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "12a5dfb4-9608-45b6-80cd-ff873e276edb",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the established term 'ward' for 结界.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified name '루크'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 uses the correct name '루크' instead of '룩'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly finishes the sentence with proper terminal punctuation.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"세 가지 is more natural than 세 개 for classifying tea varieties.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'Mountain gate' is the standard translation for 山门.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 reads much more naturally in Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 naturally translates the slang/jargon ヤマ as work/case.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"샤차면 is the standard, widely accepted Korean transcription for shāchámiàn.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both convey the meaning and polite speech level equally well.\"}\n]\n```\n",
+  "duration_seconds": 5.159797,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17629,
+   "output_tokens": 329,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17958
+  }
+ }
+}

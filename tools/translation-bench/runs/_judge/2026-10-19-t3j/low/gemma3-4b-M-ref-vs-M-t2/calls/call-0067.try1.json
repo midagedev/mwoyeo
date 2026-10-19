@@ -1,0 +1,31 @@
+{
+ "call": 67,
+ "try": 1,
+ "ids": [
+  "item-0202.2",
+  "item-0096.2",
+  "item-0108.2",
+  "item-0011.1",
+  "item-0156.2",
+  "item-0304.1",
+  "item-0349.1",
+  "item-0355.2",
+  "item-0109.2",
+  "item-0216.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f509d383-ee87-4b61-8731-9b9b0cbb881f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 to Zhou Ting; Translation 1 mixes French.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 and Korean polite title '씨'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 uses standard noun-phrase heading style.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 between siblings.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 leaves Japanese and Chinese characters untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left Japanese completely untranslated.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 translates 试试 naturally as 먹어보고 싶어했거든요.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 forms a complete noun phrase suitable for a heading.\"}\n]\n```\n",
+  "duration_seconds": 5.459897,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17436,
+   "output_tokens": 316,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17752
+  }
+ }
+}

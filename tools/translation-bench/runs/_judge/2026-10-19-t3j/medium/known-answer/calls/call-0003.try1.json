@@ -1,0 +1,27 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0073.1",
+  "item-0048.2",
+  "item-0082.1",
+  "item-0038.1",
+  "item-0023.1",
+  "item-0011.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4a09f439-a038-429b-a00e-bc6f912ebee3",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 오빠 for a younger sister's brother.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly follows the term fact 납품일 for 納期.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly transliterates the character name as 라이조.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, whereas Translation 2 remains English.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly renders the name 烏丸 as 카라스마.\"}\n]\n",
+  "duration_seconds": 13.509363,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16220,
+   "output_tokens": 1620,
+   "thinking_tokens": 1428,
+   "cache_read_tokens": 0,
+   "total_tokens": 17840
+  }
+ }
+}

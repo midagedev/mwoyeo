@@ -1,0 +1,31 @@
+{
+ "call": 43,
+ "try": 1,
+ "ids": [
+  "item-0254.2",
+  "item-0180.1",
+  "item-0092.2",
+  "item-0122.2",
+  "item-0264.2",
+  "item-0290.1",
+  "item-0152.1",
+  "item-0294.1",
+  "item-0150.2",
+  "item-0134.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4f0115a4-c37e-42e9-9c33-63a304aeb4cd",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"소고 matches Japanese name pronunciation そごう better than 토고.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Lin Yuan or Zhou Yi speaks in 반말 to younger sister.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses correct 반말 register and natural conversational phrasing.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 mistranslates 'on' as turned on (켜져).\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 accidentally leaves untranslated Japanese character ね at the end.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"More natural phrasing for an onboarding wiki guide.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correctly identifies first-person subject 'I'll leave' instead of imperative.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 reads more naturally and complete.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Standard pinyin romanization writes given names together as 'Yunzhou'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the sentence into Korean.\"}\n]\n```\n",
+  "duration_seconds": 5.800305,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17247,
+   "output_tokens": 321,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17568
+  }
+ }
+}

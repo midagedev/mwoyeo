@@ -1,0 +1,25 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0050.1",
+  "item-0202.1",
+  "item-0366.1",
+  "item-0087.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7ab3e34f-f8e5-423a-b798-f822d783ab8e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 mistranslates name Sou (湊) as Mina (미나).\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 transliterates Gerald and translates 'catch' more naturally.\"}\n]\n```\n",
+  "duration_seconds": 3.298159,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15574,
+   "output_tokens": 133,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15707
+  }
+ }
+}

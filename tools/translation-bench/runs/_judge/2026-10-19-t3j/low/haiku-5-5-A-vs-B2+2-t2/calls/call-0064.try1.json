@@ -1,0 +1,31 @@
+{
+ "call": 64,
+ "try": 1,
+ "ids": [
+  "item-0060.2",
+  "item-0197.1",
+  "item-0330.2",
+  "item-0068.1",
+  "item-0098.2",
+  "item-0261.2",
+  "item-0230.1",
+  "item-0097.1",
+  "item-0287.1",
+  "item-0091.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "19af5a71-572b-46bd-a418-7b0a085248bf",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"'all the best' is more natural English than 'all of the best'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Keeps characters in Hangul and fits Tessai speaking to Saku in banmal.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in banmal, not haeyo-che.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Without speaker context, both polite styles are acceptable natural translations.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Ricia speaks to Saku in banmal, and 魔石 is 마정석 (or banmal fits).\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately convey the informal conversational tone.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both convey the meaning well, though 结界 term was ward.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Xu Nuo speaks to Lu Ming in banmal, not haeyo-che.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'작업을 따라 함께 움직입니다' translates 'moves along with your work' more naturally.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Sogo speaks to Hyuga in haeyo-che, matching '~설명드릴게요'.\"}\n]\n",
+  "duration_seconds": 6.078758,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17424,
+   "output_tokens": 356,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17780
+  }
+ }
+}

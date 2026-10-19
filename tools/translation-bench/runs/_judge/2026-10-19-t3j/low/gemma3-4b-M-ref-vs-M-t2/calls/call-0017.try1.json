@@ -1,0 +1,31 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0382.2",
+  "item-0145.2",
+  "item-0092.1",
+  "item-0019.2",
+  "item-0087.1",
+  "item-0124.1",
+  "item-0264.2",
+  "item-0143.2",
+  "item-0239.2",
+  "item-0220.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "64c0bb0c-4944-4349-8be7-4eecf9a96502",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left most of the sentence in Chinese untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Matches specified name '메리골드' and Thorne's 반말 speech style.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left text in Japanese instead of translating into English.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'브랜치' is the standard Git terminology in Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Yuu uses 해요체, and 兄 means older brother (오빠), not 남동생.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated in Japanese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Siobhan uses 반말 with Rory, but 1 closer reflects soda bread.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Takanashi speaks to Hinata in 반말, and 2 is natural.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both failed: 1 misread ひろば as hibi, 2 translated it as Space.\"}\n]\n```\n",
+  "duration_seconds": 5.368666,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17345,
+   "output_tokens": 347,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17692
+  }
+ }
+}

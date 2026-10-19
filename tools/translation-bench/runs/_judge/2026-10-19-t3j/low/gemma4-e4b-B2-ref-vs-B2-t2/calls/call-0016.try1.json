@@ -1,0 +1,31 @@
+{
+ "call": 16,
+ "try": 1,
+ "ids": [
+  "item-0201.1",
+  "item-0077.1",
+  "item-0280.2",
+  "item-0318.2",
+  "item-0237.1",
+  "item-0173.2",
+  "item-0254.1",
+  "item-0076.1",
+  "item-0079.1",
+  "item-0286.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a256b9b6-5a9c-4009-9e39-597ba16d06e7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Matches the designated character name '쏜'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural concise Korean phrasing for a section title.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses 해요체 (-나요) as specified in the facts.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'Old place' is more natural than 'old house' for an apartment/rental.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Faithfully preserves 'one branch' (하나의 브랜치).\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese source untranslated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Uses the specified term '모차' for 毛茶.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese source untranslated.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese source untranslated.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 is in Japanese, not Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.584999,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17285,
+   "output_tokens": 308,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17593
+  }
+ }
+}

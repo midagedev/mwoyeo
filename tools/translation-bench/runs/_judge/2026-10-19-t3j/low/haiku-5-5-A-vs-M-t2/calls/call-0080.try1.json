@@ -1,0 +1,27 @@
+{
+ "call": 80,
+ "try": 1,
+ "ids": [
+  "item-0301.2",
+  "item-0261.1",
+  "item-0232.1",
+  "item-0239.1",
+  "item-0287.2",
+  "item-0232.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d831ae21-ec10-41ca-b514-eaa020e50ab8",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates Siobhan to Korean 시본 while Translation 2 left it in English.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"More natural phrasing for an onboarding procedure document.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Reads more naturally in Korean technical documentation than 클로닝.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into English.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both capture the original meaning and nuances accurately and naturally.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Reads more naturally in Korean technical documentation than 클로닝.\"}\n]\n",
+  "duration_seconds": 3.550357,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15846,
+   "output_tokens": 182,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16028
+  }
+ }
+}

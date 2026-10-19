@@ -1,0 +1,28 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0177.2",
+  "item-0190.2",
+  "item-0029.1",
+  "item-0007.2",
+  "item-0209.2",
+  "item-0139.2",
+  "item-0260.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2be89f29-f114-4219-86b2-cb6c0e5f7d61",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches the designated term '카운슬 택스'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural interpretation of 'お言葉に甘えて' than literal '감사해서'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Context is moving into a new place, so 'unpacking' fits best.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'Get the deposit back from the old place' is more natural.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural representations.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Gareth is a landlord, so '부장님' in Translation 2 is incorrect.\"}\n]\n```\n",
+  "duration_seconds": 4.921638,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16605,
+   "output_tokens": 235,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16840
+  }
+ }
+}

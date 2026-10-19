@@ -1,0 +1,27 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0099.1",
+  "item-0234.2",
+  "item-0305.1",
+  "item-0325.1",
+  "item-0157.1",
+  "item-0016.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b37f40ed-e798-4fc2-8988-792d623c972b",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 translates Japanese characters and correctly uses informal speech.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"English translations omit pinyin tone marks, reading much more naturally.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Identical except for punctuation; formatting differences are ignored.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'She said' accurately conveys the past reported speech of '하래서'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 sounds more natural by omitting translationese pronoun '그게'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'저' is appropriate polite hesitation when addressing a superior at work.\"}\n]\n",
+  "duration_seconds": 88.318167,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16225,
+   "output_tokens": 11994,
+   "thinking_tokens": 11801,
+   "cache_read_tokens": 0,
+   "total_tokens": 28219
+  }
+ }
+}

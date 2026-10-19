@@ -1,0 +1,31 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0395.1",
+  "item-0271.1",
+  "item-0302.2",
+  "item-0172.2",
+  "item-0076.1",
+  "item-0079.1",
+  "item-0320.2",
+  "item-0301.1",
+  "item-0192.2",
+  "item-0375.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dba7de13-f80e-4a8f-b947-0cabaffb0682",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Speaker directly states the flight arrived, not hearsay ('-대').\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Facts state Hikaru is female, so 'she' is correct.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Wanqi is a compound surname; 'great hall' fits context well.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Follows the specified term 'MoaLogis' instead of 'Moaro Logis'.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Natural conversational register for siblings; translation 1 is narrative/stiff.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations convey the meaning accurately and naturally in Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Rory speaks banmal to Siobhan, making honorific '-시-' unfitting.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Uses the specified name '시본' and sounds much more natural.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Thorne speaks 해요체 to Rook; '말해 봐' fits better than '계속해'.\"}\n]\n```\n",
+  "duration_seconds": 5.469122,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17362,
+   "output_tokens": 341,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17703
+  }
+ }
+}

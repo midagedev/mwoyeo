@@ -1,0 +1,31 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0134.2",
+  "item-0043.1",
+  "item-0144.2",
+  "item-0075.1",
+  "item-0286.1",
+  "item-0135.2",
+  "item-0113.1",
+  "item-0057.2",
+  "item-0166.1",
+  "item-0149.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cb3e51a7-97a8-477a-82d8-0ad0b0c3dba5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural phrasing for '尿过我一身' and '教训'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Siobhan addresses Gareth with 합쇼체 in the shared thread context.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Accurately uses standard Git terminology '브랜치' instead of literal '가지'.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both 'conversations' and 'conversation' are accurate and natural here.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translates the name 薫 correctly as Kaoru instead of Kaon.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the source sentence entirely untranslated.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 incorrectly introduces '제 침대' (my bed) instead of his.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Follows the specified speech level 해요체 and translates 稟議 closer to context.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Uses the required 해요체 speech level to 周姨; 2 uses 반말.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"More natural Korean rendering for names ('벨 씨') and '복도등'.\"}\n]\n```\n",
+  "duration_seconds": 5.195757,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17258,
+   "output_tokens": 350,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17608
+  }
+ }
+}

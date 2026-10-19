@@ -1,0 +1,31 @@
+{
+ "call": 50,
+ "try": 1,
+ "ids": [
+  "item-0285.1",
+  "item-0035.2",
+  "item-0054.2",
+  "item-0385.1",
+  "item-0236.2",
+  "item-0150.1",
+  "item-0057.1",
+  "item-0099.1",
+  "item-0055.2",
+  "item-0226.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6e439b9b-02ac-40f3-b8a0-41a76c8547ff",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both are accurate and natural with correct honorifics and spacing variations.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 translates '川遊び' and the ending '-し' more accurately.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses specified terms and names (조합, 텟사이).\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly adheres to the established term 'Commons'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 uses the specified spelling 'Seoyoon'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 uses correct 반말 speech level addressed to Rory.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translates '先に言っておくが' much more naturally in English.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates the name and uses correct 반말 register.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 sounds more natural with '용서해 줄'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Speaker speaks to younger sister in 반말, correctly used in Translation 2.\"}\n]\n```\n",
+  "duration_seconds": 4.567992,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17222,
+   "output_tokens": 338,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17560
+  }
+ }
+}

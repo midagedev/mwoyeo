@@ -1,0 +1,31 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0125.1",
+  "item-0167.2",
+  "item-0069.1",
+  "item-0187.1",
+  "item-0184.2",
+  "item-0053.1",
+  "item-0092.2",
+  "item-0180.1",
+  "item-0130.1",
+  "item-0165.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a51c06b4-f2a4-4917-a82b-f8f19f87d60a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates '说三日就是三日' which Translation 2 omitted.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly follows the established glossary for 길잡이 and 배차.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses the specified term 'qi stone' for 灵石.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Speaker/addressee is ambiguous without speaker attribution in context.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate in this context.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Reads much more naturally for spoken conversational Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Thorne speaks to Rook using 해요체.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both mistakenly translate '알려줄 거야' (my brother will give) as 'I'll give'.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are accurate and natural translations.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Uses the correct name reading '타카나시' specified in the facts.\"}\n]\n```\n",
+  "duration_seconds": 4.740361,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17424,
+   "output_tokens": 323,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17747
+  }
+ }
+}

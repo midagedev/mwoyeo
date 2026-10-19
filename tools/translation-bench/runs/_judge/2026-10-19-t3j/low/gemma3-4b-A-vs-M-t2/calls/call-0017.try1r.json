@@ -1,0 +1,28 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0014.2",
+  "item-0240.2",
+  "item-0190.2",
+  "item-0357.1",
+  "item-0161.2",
+  "item-0015.2",
+  "item-0262.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2fa0d63f-92a2-4f56-ab25-201196b8cddf",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"고객용 주차장은 is more natural than 고객님을 위한 주차장은.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly translates 周姨 as 저우 이모 without leaving Chinese characters.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Treats 모닥불 as a platform/tool name rather than literally translating bonfire.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the source Japanese text untranslated.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the source Japanese text untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Better translation of the conditional waking and request to say thanks.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Happen in the channel reads much more naturally in English.\"}\n]\n```\n",
+  "duration_seconds": 4.702523,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16566,
+   "output_tokens": 233,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16799
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0054.1",
+  "item-0055.2",
+  "item-0045.1",
+  "item-0008.1",
+  "item-0053.1",
+  "item-0047.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5b5c5c02-125b-4c94-a558-a397e7c3665d",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"삼홍 is more natural and standard than 3홍.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses the honorific 하셨어 when referring to what the professor said.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses the established feature name Quick Notes from context.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Follows the specified term Sticky instead of generic sticky notes.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translates the text into Korean using the correct speech level.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly translates パトカー as patrol car instead of ambulance.\"}\n]\n",
+  "duration_seconds": 14.298221,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15847,
+   "output_tokens": 1611,
+   "thinking_tokens": 1425,
+   "cache_read_tokens": 0,
+   "total_tokens": 17458
+  }
+ }
+}

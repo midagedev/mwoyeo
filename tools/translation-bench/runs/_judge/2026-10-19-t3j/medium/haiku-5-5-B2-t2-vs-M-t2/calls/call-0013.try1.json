@@ -1,0 +1,27 @@
+{
+ "call": 13,
+ "try": 1,
+ "ids": [
+  "item-0003.2",
+  "item-0290.1",
+  "item-0001.1",
+  "item-0102.1",
+  "item-0022.1",
+  "item-0231.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "24c01958-3f48-47e2-82e0-e9590ca98d72",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"갈게요 faithfully translates 去 without adding unnecessary nuance.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Japanese.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both 올리다 and 진행하다 are equally natural and accurate for 품의.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the term 포켓 깃.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly spells Seoyoon as specified in the facts.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"옅은 is the correct word for light rather than 엷은.\"}\n]\n",
+  "duration_seconds": 147.203513,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15952,
+   "output_tokens": 16218,
+   "thinking_tokens": 16030,
+   "cache_read_tokens": 0,
+   "total_tokens": 32170
+  }
+ }
+}

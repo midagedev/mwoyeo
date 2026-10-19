@@ -1,0 +1,31 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0136.2",
+  "item-0161.2",
+  "item-0257.2",
+  "item-0089.1",
+  "item-0297.1",
+  "item-0099.2",
+  "item-0365.2",
+  "item-0355.1",
+  "item-0224.1",
+  "item-0177.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d18fb713-4cc8-4d4f-bb63-34493332de52",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese source text.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Matches section heading style much better than a finite verb phrase.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Follows Gareth's speech level to tenants and translates naturally.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into English.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates the actual sentence rather than giving an unrelated window title.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan; '퇴사합니다' (resigns from work) is completely wrong.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Accurately translates the narrative sentence rather than repeating preceding dialogue.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Standard onboarding schedule heading matching '첫날' (Day 1).\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'You' correctly addresses the new hire reading an onboarding guide.\"}\n]\n```\n",
+  "duration_seconds": 5.001739,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17431,
+   "output_tokens": 320,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17751
+  }
+ }
+}

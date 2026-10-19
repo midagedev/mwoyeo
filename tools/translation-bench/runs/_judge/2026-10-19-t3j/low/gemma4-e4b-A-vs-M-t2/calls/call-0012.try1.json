@@ -1,0 +1,31 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0082.1",
+  "item-0195.1",
+  "item-0376.2",
+  "item-0341.2",
+  "item-0019.2",
+  "item-0020.2",
+  "item-0101.1",
+  "item-0217.2",
+  "item-0074.2",
+  "item-0266.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f6b51b1e-cb9e-4072-a3c5-d3d3a4f7d045",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Transliterates the names into Korean rather than keeping Latin script.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Sounds much more natural by omitting the unnecessary pronoun '그녀는'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Matches the established English name Barley from the previous line.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses correct informal register (반말) and transliterates Gerald to Korean.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are completely equivalent.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"The shop is a watch shop, not an inn.\"}\n]\n```\n",
+  "duration_seconds": 4.417587,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17304,
+   "output_tokens": 295,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17599
+  }
+ }
+}

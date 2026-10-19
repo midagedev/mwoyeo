@@ -1,0 +1,31 @@
+{
+ "call": 56,
+ "try": 1,
+ "ids": [
+  "item-0374.1",
+  "item-0366.1",
+  "item-0214.2",
+  "item-0040.2",
+  "item-0243.1",
+  "item-0044.1",
+  "item-0181.1",
+  "item-0175.2",
+  "item-0067.1",
+  "item-0023.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ec7c5974-34a5-4254-8b68-47587379a771",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"泡茶 refers to brewing tea, not drinking, and fits tea business context.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate with minor punctuation style differences.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Speaker was just told not to use keigo; Translation 1 fits context better.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both are identical except for ending punctuation.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'Stamped it' correctly translates signing the contract via stamp.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"The source is an exclamation ('헐... 안 남았내'), not a question.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both 'bags' and 'pouches' accurately capture the informal dialogue.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both '깊은 곳' and '깊숙한 곳' accurately convey 洞窟の奥.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"As a section heading, '변경 사항 저장하기' is much more natural.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Police questioning/interrogation fits police inspector's formal investigation better.\"}\n]\n```\n",
+  "duration_seconds": 5.684886,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17127,
+   "output_tokens": 337,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17464
+  }
+ }
+}

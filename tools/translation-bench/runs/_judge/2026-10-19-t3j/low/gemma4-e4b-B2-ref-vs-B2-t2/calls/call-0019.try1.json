@@ -1,0 +1,31 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0214.1",
+  "item-0115.2",
+  "item-0297.2",
+  "item-0352.1",
+  "item-0014.1",
+  "item-0134.2",
+  "item-0308.2",
+  "item-0032.1",
+  "item-0046.1",
+  "item-0093.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8f1e1b6d-9119-4fa7-b092-9cb211f6c973",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese source untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Siobhan is female, so older brother is '오빠', not '형'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both have grammatical/phrasing errors with particle and collocations.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 uses standard English punctuation between sentences.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Rory is male, so older sister is '누나', not '언니'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Kaoru is male; Translation 1 incorrectly uses 'her'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese source untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Sogo speaks in 해요체 to Hinata, not 합쇼체.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 is in Chinese; Translation 2 translates into Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese source untranslated.\"}\n]\n```\n",
+  "duration_seconds": 7.017465,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17548,
+   "output_tokens": 328,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17876
+  }
+ }
+}

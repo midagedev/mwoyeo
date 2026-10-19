@@ -1,0 +1,31 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0040.2",
+  "item-0090.2",
+  "item-0046.2",
+  "item-0061.2",
+  "item-0111.2",
+  "item-0181.2",
+  "item-0142.2",
+  "item-0173.1",
+  "item-0075.2",
+  "item-0157.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "920ac425-1f47-43c2-854b-a7db911a8e0a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches designated terms 'Pathfinder' and 'fleet allocation'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly transliterates the name 日向 (ひゅうが) as 히우가.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Sounds much more natural in Korean without redundant pronouns.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Sounds more natural as casual text message Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Neither used 'Commons'; both are flawed or alternative interpretations.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Uses 'Um' as established in context, matching present tense.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'deal with Gerald' means handling Gerald, not working with him.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both '너무하다' and '너무하네' are natural and accurate translations.\"}\n]\n```\n",
+  "duration_seconds": 4.647298,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17277,
+   "output_tokens": 313,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17590
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 40,
+ "try": 1,
+ "ids": [
+  "item-0041.2",
+  "item-0194.2",
+  "item-0158.1",
+  "item-0129.1",
+  "item-0233.2",
+  "item-0179.2",
+  "item-0334.1",
+  "item-0089.2",
+  "item-0281.1",
+  "item-0262.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4d1646b6-5305-4b8d-a567-908edb99a496",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both mis-transliterate ルーンベル (루른벨 vs 루엔벨); equally flawed.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly respects the established term ワークスペース = Space.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Context confirms '오빠' refers to her older brother.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 bizarrely mistranslates 背着 (carrying on back) as 'backed up'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"모닥불 refers to the internal tool/app, not MoaLogis.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Thorne speaks to Rook in 해요체, which Translation 1 uses.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both fail to use 반말, which Lin Yuan uses with his sister.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 completely failed to translate into Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the line into English.\"}\n]\n```\n",
+  "duration_seconds": 4.552342,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17375,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17707
+  }
+ }
+}

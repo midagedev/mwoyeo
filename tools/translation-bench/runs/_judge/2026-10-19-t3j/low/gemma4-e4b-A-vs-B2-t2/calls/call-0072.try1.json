@@ -1,0 +1,31 @@
+{
+ "call": 72,
+ "try": 1,
+ "ids": [
+  "item-0336.1",
+  "item-0235.1",
+  "item-0044.2",
+  "item-0340.1",
+  "item-0003.1",
+  "item-0256.2",
+  "item-0151.2",
+  "item-0328.2",
+  "item-0120.2",
+  "item-0266.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "32153e9c-b210-48f1-bc65-3f2b614d4884",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"포장이사 specifically refers to full-service packing and moving.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Nagi was established as an 18-year-old girl; 'she' is accurate.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately convey the meaning.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"The difference between contracted and uncontracted forms is negligible here.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the line in Japanese instead of translating.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 is entirely untranslated Japanese.\"}\n]\n```\n",
+  "duration_seconds": 4.894304,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17271,
+   "output_tokens": 311,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17582
+  }
+ }
+}

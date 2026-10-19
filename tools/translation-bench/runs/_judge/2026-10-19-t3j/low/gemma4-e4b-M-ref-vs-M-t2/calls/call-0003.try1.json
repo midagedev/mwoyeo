@@ -1,0 +1,31 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0168.2",
+  "item-0307.2",
+  "item-0215.1",
+  "item-0048.2",
+  "item-0240.2",
+  "item-0135.2",
+  "item-0142.1",
+  "item-0131.2",
+  "item-0258.2",
+  "item-0030.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4082f419-847b-44ae-a9ac-ec8e93f7afc5",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Korean punctuation is more natural without the comma after '지난달에도'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 keeps 'Aoife' matching the pronunciation hint 'EE-fa'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses the specified term '포켓 깃' and reads more naturally.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both fail to use 해요체 as Thorne speaks to Rook.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Accurately translates '话音未落' and '从山下' ('foot of the mountain').\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'there's a catch' is naturally translated as '문제가 하나 있어요'.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the line untranslated in Japanese.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 is in Japanese instead of target language Korean.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are faithful, accurate, and natural.\"}\n]\n",
+  "duration_seconds": 4.320304,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17475,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17799
+  }
+ }
+}

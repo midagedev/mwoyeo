@@ -1,0 +1,36 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0007.2",
+  "item-0055.1",
+  "item-0063.2",
+  "item-0257.2",
+  "item-0187.1",
+  "item-0158.2",
+  "item-0111.2",
+  "item-0172.1",
+  "item-0224.2",
+  "item-0120.1",
+  "item-0181.2",
+  "item-0343.1",
+  "item-0083.2",
+  "item-0142.1",
+  "item-0351.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2a51a51b-f7a2-422d-adfc-c334ad9b0677",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly names Gareth and has no untranslated English.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly translates spaceship bridge as 브리지 instead of 다리.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 uses natural Korean instead of awkward 그때 전에.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses proper Korean without untranslated Japanese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 properly translates the Japanese title -san to 씨.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 uses the correct name 메리골드 instead of 마릴로드.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 translates into English, whereas Translation 1 remains Japanese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, whereas Translation 2 remains Japanese.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 translates completely without leaving untranslated English words.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 avoids the incorrect pronoun you.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 uses 처리하다, which fits dealing with a freezer better.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 translates the name without leaving untranslated Korean characters.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 correctly translates bay four instead of gibberish.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 寿星 as 생일 주인공 instead of 수하.\"}\n]\n",
+  "duration_seconds": 161.657832,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 19151,
+   "output_tokens": 19836,
+   "thinking_tokens": 19357,
+   "cache_read_tokens": 0,
+   "total_tokens": 38987
+  }
+ }
+}

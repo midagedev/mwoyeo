@@ -1,0 +1,31 @@
+{
+ "call": 43,
+ "try": 1,
+ "ids": [
+  "item-0363.1",
+  "item-0329.2",
+  "item-0134.1",
+  "item-0161.1",
+  "item-0324.1",
+  "item-0106.2",
+  "item-0213.2",
+  "item-0225.2",
+  "item-0071.1",
+  "item-0121.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "49be8b32-74b3-483c-9d86-2eb172da1c13",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Siobhan speaks to Rory in 반말, and '원하셔' is unnatural.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Korean vocative particle '삭아' is natural; both missed guild term.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'그는' is an unnatural written translation pronoun in spoken dialogue.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the source line.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations accurately capture the meaning, tone, and register.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly translates the established term '모닥불' as 'Hearth'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Siobhan addresses the group including landlord Gareth using 해요체.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Sogo speaks to Hyuga in 해요체, so '하셨어요' matches required register.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are identical in meaning and register, differing only by a comma.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 untranslated the Japanese name '烏丸さん'.\"}\n]\n```\n",
+  "duration_seconds": 4.278341,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17341,
+   "output_tokens": 340,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17681
+  }
+ }
+}

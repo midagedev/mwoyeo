@@ -1,0 +1,22 @@
+{
+ "call": 50,
+ "try": 1,
+ "ids": [
+  "item-0293.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f8c22a2c-4327-4645-8040-2b0875cc0a8b",
+  "status": "SUCCESS",
+  "response": "[{\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 sounds natural, whereas Translation 1 uses unnatural phrasing.\"}]\n",
+  "duration_seconds": 3.323116,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14449,
+   "output_tokens": 32,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 14481
+  }
+ }
+}

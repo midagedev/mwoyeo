@@ -1,0 +1,31 @@
+{
+ "call": 71,
+ "try": 1,
+ "ids": [
+  "item-0308.1",
+  "item-0124.2",
+  "item-0366.2",
+  "item-0019.1",
+  "item-0031.1",
+  "item-0033.1",
+  "item-0271.2",
+  "item-0008.2",
+  "item-0320.1",
+  "item-0081.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ee5a4d2d-4726-48dc-bd7e-de54bf0ef060",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey the meaning, tone, and informal register equally well.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Follows the specified term 부엉이 and the niece's 반말 speech level.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"More natural phrasing and accurately conveys the conditional completion aspect.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly uses the standard term 냉각수 (coolant) and appropriate 반말 register.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural and convey the intended meaning accurately.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates the Japanese name into Korean Hangul instead of leaving untranslated kanji.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both natural Korean endings correctly match the 반말 speech level and nuance.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Imperative instruction is standard and natural for company onboarding guide wikis.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correctly follows the specified term 魔石 = 마정석.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Adheres to the glossary requirement 魔石 = 마정석 and correct honorifics.\"}\n]\n```\n",
+  "duration_seconds": 5.328611,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17673,
+   "output_tokens": 339,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18012
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 46,
+ "try": 1,
+ "ids": [
+  "item-0322.2",
+  "item-0178.2",
+  "item-0189.1",
+  "item-0100.1",
+  "item-0085.2",
+  "item-0187.1",
+  "item-0239.2",
+  "item-0226.1",
+  "item-0066.2",
+  "item-0030.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "46fee79f-4cdd-4632-a63a-01de522a70eb",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches the designated name '저우 이모' from facts.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates '民宿' accurately as '민박집'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both failed to translate Japanese into Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly preserves the name Bori instead of Bora.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both failed to translate Japanese into Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 actually translated Japanese into Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translated into Korean, unlike Translation 2.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translated the Chinese name and text into Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"More natural phrasing and preserves '직접' as 'yourself'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 translated into Korean; Translation 2 left Japanese untranslated.\"}\n]\n```\n",
+  "duration_seconds": 4.99042,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17655,
+   "output_tokens": 306,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17961
+  }
+ }
+}

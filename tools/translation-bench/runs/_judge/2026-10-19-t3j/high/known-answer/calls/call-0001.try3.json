@@ -1,0 +1,36 @@
+{
+ "call": 1,
+ "try": 3,
+ "ids": [
+  "item-0047.2",
+  "item-0030.1",
+  "item-0035.1",
+  "item-0016.1",
+  "item-0024.1",
+  "item-0036.2",
+  "item-0033.1",
+  "item-0061.1",
+  "item-0052.2",
+  "item-0023.2",
+  "item-0070.2",
+  "item-0050.2",
+  "item-0073.1",
+  "item-0048.2",
+  "item-0082.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b1ff2bd8-e2b1-47f2-8117-e585d4af70e2",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"パトカー means patrol car, not ambulance.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 was left untranslated.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Rory is male, so his older sister is 누나.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Facts establish Seoyoon has an older brother, not boyfriend.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Boli was established as female in the context.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Follows the specified term mapping ワークスペース = Space.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Zēng Lán is correctly transcribed as 쩡란, not 청란.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Uses the specified character name 루크 instead of 룩.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Transcribes さく phonetically as 사쿠 rather than Sino-Korean 삭.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translates Dex correctly as 덱스, not 덱서.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Lin Xia is female, so her older brother is 오빠.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Follows the specified term mapping 納期 = 납품일.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations are identical and accurate.\"}\n]\n",
+  "duration_seconds": 45.977208,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 18947,
+   "output_tokens": 6537,
+   "thinking_tokens": 6080,
+   "cache_read_tokens": 0,
+   "total_tokens": 25484
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0334.2",
+  "item-0002.2",
+  "item-0223.2",
+  "item-0034.1",
+  "item-0106.1",
+  "item-0023.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4e0d537b-75a4-4625-9854-391318b8c451",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates pronunciation-annotated name into Korean Hangul naturally.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses the specified term 'qi stone' from the facts.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses correct furigana reading 'Yamanashi' explicitly given in context.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Uses appropriate polite honorifics and speech level for landlord conversation.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translates idiomatically in casual speech (반말) rather than literal translation.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly reads the name 小鳥遊 as Takanashi, matching earlier furigana.\"}\n]\n",
+  "duration_seconds": 4.902035,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15936,
+   "output_tokens": 201,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16137
+  }
+ }
+}

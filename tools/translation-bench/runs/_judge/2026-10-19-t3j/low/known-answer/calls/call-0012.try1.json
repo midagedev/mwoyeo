@@ -1,0 +1,31 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0037.1",
+  "item-0005.1",
+  "item-0073.2",
+  "item-0077.1",
+  "item-0033.2",
+  "item-0015.2",
+  "item-0049.2",
+  "item-0074.1",
+  "item-0017.1",
+  "item-0046.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "22c301ca-0928-48db-8ebc-0ee339b6b568",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"The surname 仇 is pronounced Qiú in pinyin.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Lin Xia is female, so Lin Yuan is her 오빠, not 형.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"馬車 means carriage/wagon (마차), not car (자동차).\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"曾岚 (Zēng Lán) is correctly transliterated as 쩡란.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Aoife is an Irish name pronounced EE-fa (이파).\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"红茶 means black tea (홍차), not 붉은 차.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Facts establish the surname 单 is read Shàn, not Dan.\"}\n]\n```\n",
+  "duration_seconds": 5.391875,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17620,
+   "output_tokens": 326,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17946
+  }
+ }
+}

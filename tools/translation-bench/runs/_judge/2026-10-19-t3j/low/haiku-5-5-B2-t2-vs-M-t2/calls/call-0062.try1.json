@@ -1,0 +1,31 @@
+{
+ "call": 62,
+ "try": 1,
+ "ids": [
+  "item-0227.1",
+  "item-0332.2",
+  "item-0075.2",
+  "item-0022.2",
+  "item-0052.1",
+  "item-0296.1",
+  "item-0309.1",
+  "item-0202.2",
+  "item-0096.2",
+  "item-0108.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "891e8355-2a97-406e-a2ef-79363aed1610",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"지키게 하거라 is much more natural than 굳히게 하거라 for 固めさせろ.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly finishes the incomplete polite sentence naturally.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Facts state 日向 is read ひゅうが, not 히나타.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Facts explicitly spell her name as Seoyoon.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"鵲橋 is a proper bridge name, better rendered as 작교.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Speaker is 周姨 speaking to 林夏, which requires 반말 per facts.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both make identical errors leaving names untranslated and mistranslating the condition.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally in the correct register.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 sounds more natural and accurately transliterates 沙茶面 to 샤차면.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"조심하겠습니다 is more natural in response to avoiding scratches on equipment.\"}\n]\n```\n",
+  "duration_seconds": 5.141524,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17530,
+   "output_tokens": 343,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17873
+  }
+ }
+}

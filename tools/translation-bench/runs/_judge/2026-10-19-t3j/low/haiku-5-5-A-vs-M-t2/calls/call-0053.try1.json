@@ -1,0 +1,31 @@
+{
+ "call": 53,
+ "try": 1,
+ "ids": [
+  "item-0281.1",
+  "item-0348.2",
+  "item-0309.2",
+  "item-0249.2",
+  "item-0255.2",
+  "item-0058.2",
+  "item-0367.2",
+  "item-0012.1",
+  "item-0247.1",
+  "item-0353.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "54c02123-1af9-4919-aca6-c78988992d3a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'붙여 둔' captures Git tag metaphor better than '지정한'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"More natural phrasing and respectful honorific form for a parent.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Incomplete source line ending in 'され'; 'changes' fits Memotto context better.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Incomplete sentence '遅れる...' expresses conditional concern ('늦으면'), not a declarative assertion.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Speaks to manager in 해요체; avoids untranslated Chinese characters in pinyin.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Refers respectfully to dad using honorific '그분이' and '-셨어'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 leaves Japanese filler 'eh' untranslated.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are completely accurate and natural variations of word order.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both convey the meaning, tone (해요체), and male speaker's '누나' equally well.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both correctly use 합쇼체 and differ only in minor spacing/polite nuances.\"}\n]\n```\n",
+  "duration_seconds": 6.60999,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17197,
+   "output_tokens": 355,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17552
+  }
+ }
+}

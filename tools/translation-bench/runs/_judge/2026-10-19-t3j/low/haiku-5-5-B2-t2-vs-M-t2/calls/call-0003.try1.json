@@ -1,0 +1,31 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0029.1",
+  "item-0086.1",
+  "item-0177.1",
+  "item-0102.1",
+  "item-0162.2",
+  "item-0092.1",
+  "item-0158.2",
+  "item-0153.2",
+  "item-0313.1",
+  "item-0159.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b9b30385-d429-47b6-a010-4f4312efffe4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"In English, posting content 'to' a forum or commons is more natural.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Sogo speaks in 해요체 to Hyuga, so 아니에요 is correct.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Dex speaks to Rook in 반말, and names Rook as 루크.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 uses the established term '포켓 깃' and sounds natural.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Rory is male, but Korean '큰누나' is missing; 1 correctly translates dresser as 서랍장.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Direct second-person instruction fits onboarding guides better than passive voice.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translates Siobhan's name into Korean and maintains 해요체 appropriately.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translating 'sir' to landlord as '선생님' in Translation 1 is awkward.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translates the name/honorific into Korean rather than leaving raw Chinese characters.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are virtually identical 반말 renderings with minor spacing differences.\"}\n]\n```\n",
+  "duration_seconds": 4.5468720000000005,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17212,
+   "output_tokens": 357,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17569
+  }
+ }
+}

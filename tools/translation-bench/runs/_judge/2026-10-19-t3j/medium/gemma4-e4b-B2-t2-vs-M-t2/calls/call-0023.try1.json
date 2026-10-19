@@ -1,0 +1,27 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0017.1",
+  "item-0166.1",
+  "item-0150.1",
+  "item-0130.2",
+  "item-0131.1",
+  "item-0156.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "17695379-40d4-41b1-be4c-3592b6468469",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and accurate.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 connects the two clauses much more naturally.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 addresses the wrong person by confusing the name.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are natural and convey the meaning accurately.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the specified name 저우 이모.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 adheres to the specified term 펜션.\"}\n]\n```\n",
+  "duration_seconds": 32.270416,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16200,
+   "output_tokens": 3584,
+   "thinking_tokens": 3399,
+   "cache_read_tokens": 0,
+   "total_tokens": 19784
+  }
+ }
+}

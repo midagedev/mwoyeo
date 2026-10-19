@@ -1,0 +1,31 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0170.2",
+  "item-0086.1",
+  "item-0219.2",
+  "item-0339.1",
+  "item-0196.1",
+  "item-0305.1",
+  "item-0212.2",
+  "item-0008.2",
+  "item-0031.1",
+  "item-0101.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "527f759c-7508-4e50-83fa-6efc25c8d27f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into English.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly understands the tea context (batch/lot) rather than bank loan.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 is more natural and uses appropriate instructional phrasing.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 uses correct proper nouns (메리골드, 세레스) and accurate phrasing.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese, while Translation 1 translates to Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Casual 'Yeah, I stamped it' fits the friendly KakaoTalk chat tone perfectly.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both incorrectly romanize Takanashi and fail to use the term 'Space'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'저렴하네요' naturally conveys the reactive nuance of '~ですね' in Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 retains 'there' (그곳에) translating the full meaning of the sentence.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both mistranslate the name 薫 and mistranslate '鍵はかかったまま' as unlocked.\"}\n]\n```\n",
+  "duration_seconds": 5.564329,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17096,
+   "output_tokens": 363,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17459
+  }
+ }
+}

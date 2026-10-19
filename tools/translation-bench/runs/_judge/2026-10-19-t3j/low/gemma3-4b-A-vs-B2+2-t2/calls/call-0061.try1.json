@@ -1,0 +1,31 @@
+{
+ "call": 61,
+ "try": 1,
+ "ids": [
+  "item-0332.2",
+  "item-0079.2",
+  "item-0094.2",
+  "item-0310.2",
+  "item-0070.1",
+  "item-0295.1",
+  "item-0248.2",
+  "item-0374.1",
+  "item-0066.1",
+  "item-0233.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1ef38b8a-89d3-4b11-bcf2-4bc7248f1a06",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 was left entirely in Japanese.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 was left in Japanese; 2 translated into Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 was left in Japanese instead of Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses correct 합쇼체 honorific speech level required for speaking to the manager.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 hallucinated metadata instead of translating the dialogue.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 remained in Chinese instead of translating into English.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 contains garbled typos like '어이미'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 was not translated into Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.687074,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17530,
+   "output_tokens": 304,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17834
+  }
+ }
+}

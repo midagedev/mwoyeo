@@ -1,0 +1,27 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0019.2",
+  "item-0343.1",
+  "item-0195.1",
+  "item-0122.1",
+  "item-0259.1",
+  "item-0057.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e7b2f801-267c-4d35-846b-c8520653b70b",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated Japanese.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 translates the name and sounds much more natural.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Chatting can wait accurately reflects dismissing others' small talk.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly uses the surname Takanashi instead of misreading it as Kotori.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"The definite article correctly refers back to the workspace in context.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Posted it and someone contacted me read much more naturally.\"}\n]\n",
+  "duration_seconds": 34.550489,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16110,
+   "output_tokens": 4349,
+   "thinking_tokens": 4163,
+   "cache_read_tokens": 0,
+   "total_tokens": 20459
+  }
+ }
+}

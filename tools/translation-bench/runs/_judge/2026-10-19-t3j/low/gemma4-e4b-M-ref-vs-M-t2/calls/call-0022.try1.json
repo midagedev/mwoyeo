@@ -1,0 +1,31 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0175.2",
+  "item-0121.1",
+  "item-0298.2",
+  "item-0149.1",
+  "item-0166.1",
+  "item-0065.2",
+  "item-0234.2",
+  "item-0300.2",
+  "item-0115.2",
+  "item-0220.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c94f6fd0-f9da-4f46-9ec9-560aedb13a27",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Siobhan speaks 반말 to Rory; also female speaker uses 오빠, not 형.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both appropriately use 해요체 to 周姨 with equally natural phrasing.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both are faithful and natural translations.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"十一 refers to China's National Day (국경절), not November (11월).\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 accurately translates the source line about the deposit inspection.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both use correct 합쇼체 honorifics to Captain Thorne naturally.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Neither translates ひろば (Commons) correctly; both incorrectly use space/Space.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both are acceptable translations of the tutorial instruction.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are fluent, faithful translations with equivalent terminology.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"十河 speaks to 日向 using 해요체 (아니요).\"}\n]\n```\n",
+  "duration_seconds": 5.2735520000000005,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17213,
+   "output_tokens": 327,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17540
+  }
+ }
+}

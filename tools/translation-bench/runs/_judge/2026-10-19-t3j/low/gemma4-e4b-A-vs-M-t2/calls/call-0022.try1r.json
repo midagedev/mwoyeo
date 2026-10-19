@@ -1,0 +1,25 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0300.2",
+  "item-0240.1",
+  "item-0221.2",
+  "item-0136.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4931c559-19ec-4d38-a7a1-85cba1653546",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Natural casual Korean omits unnecessary '그녀는' and fits future arrangement context.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and equally acceptable in Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly uses the pronoun 'he' referring to older brother.\"}\n]\n",
+  "duration_seconds": 3.613123,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 3667,
+   "output_tokens": 132,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11814,
+   "total_tokens": 3799
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0068.2",
+  "item-0363.2",
+  "item-0347.1",
+  "item-0111.1",
+  "item-0348.2",
+  "item-0010.2",
+  "item-0378.1",
+  "item-0238.2",
+  "item-0211.2",
+  "item-0323.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dbfdc237-8ca7-43a7-a1f0-de1f7d44dee1",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly translates the channel name '모닥불' as 'Hearth'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'Did the contract go well?' is much more natural English.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Accurately translates '길잡이' as Pathfinder and '배차' as fleet allocation.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly identifies the subject as the older brother ('he').\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Neither uses the required 합쇼체 speech level toward Captain Thorne.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in 반말.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Uses correct 반말 and terms for siblings talking to each other.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 awkwardly retains the pinyin pronunciation guide in the text.\"}\n]\n```\n",
+  "duration_seconds": 5.026179,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17412,
+   "output_tokens": 319,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17731
+  }
+ }
+}

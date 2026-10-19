@@ -1,0 +1,27 @@
+{
+ "call": 29,
+ "try": 1,
+ "ids": [
+  "item-0141.2",
+  "item-0216.1",
+  "item-0150.2",
+  "item-0348.1",
+  "item-0308.2",
+  "item-0264.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "72b1262f-b078-422d-9f29-a4a6879f2cb7",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 is untranslated source text.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 is untranslated source text.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 is untranslated source text.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified 해요체 speech level.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 is untranslated source text.\"}\n]\n",
+  "duration_seconds": 15.389671,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16074,
+   "output_tokens": 1779,
+   "thinking_tokens": 1608,
+   "cache_read_tokens": 0,
+   "total_tokens": 17853
+  }
+ }
+}

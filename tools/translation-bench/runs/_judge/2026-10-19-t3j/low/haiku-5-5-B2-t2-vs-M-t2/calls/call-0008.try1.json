@@ -1,0 +1,31 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0291.1",
+  "item-0076.2",
+  "item-0073.1",
+  "item-0238.1",
+  "item-0364.1",
+  "item-0112.1",
+  "item-0357.1",
+  "item-0323.2",
+  "item-0348.1",
+  "item-0241.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3bc91a9e-5c15-42f8-b23d-652107fc4118",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates the name into Korean phonetics and sounds natural.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Keeps the period corresponding to the Japanese full stop/sentence structure.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both use valid translation choices and appropriate speech level.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both are equally natural and accurate Korean translations.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Accurately follows designated terms 'Space' and 'Commons'.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are virtually identical and have the same flaws.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses correct name '키류' instead of '키리유'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"The speaker wasn't male; 'his mouth' makes an unsupported gender assumption.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'Signed' is the natural English equivalent for completing a contract.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both are completely natural and accurate translations.\"}\n]\n```\n",
+  "duration_seconds": 5.094634,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17291,
+   "output_tokens": 312,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17603
+  }
+ }
+}

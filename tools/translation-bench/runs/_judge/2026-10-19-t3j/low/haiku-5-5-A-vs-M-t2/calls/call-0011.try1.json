@@ -1,0 +1,31 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0303.1",
+  "item-0260.1",
+  "item-0172.1",
+  "item-0292.2",
+  "item-0278.1",
+  "item-0275.1",
+  "item-0130.2",
+  "item-0228.2",
+  "item-0307.1",
+  "item-0289.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "eb6a26fb-3204-464d-b908-a4a69d6c7942",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Kai asks about Professor Han; honorifics fit the professor context better.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 leaves Japanese untranslated.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 uses the correct company name MoaLogis.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Hinata speaks to her uncle Takanashi in banmal.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"More natural Korean without redundant subject pronoun and literal '분'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses first-person singular 'I'm moving' and natural phrasing.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 transcribes the Japanese name phonetically instead of leaving kanji.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 mistranslates a birthday red packet as New Year's money.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Siobhan speaks in hapsyoche and refers to Mr. Bell respectfully.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both particles '에' and '로' are natural and valid.\"}\n]\n```\n",
+  "duration_seconds": 4.814631,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17522,
+   "output_tokens": 337,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17859
+  }
+ }
+}

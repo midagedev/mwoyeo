@@ -1,0 +1,29 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0113.1",
+  "item-0057.2",
+  "item-0222.1",
+  "item-0149.1",
+  "item-0222.2",
+  "item-0249.1",
+  "item-0278.1",
+  "item-0121.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7bb5ed3a-6f27-4c2c-9d1d-912577880c68",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left Chinese characters untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 did not translate into Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 did not translate into Korean and misread meaning.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Neither candidate translated into Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 did not translate into Korean and misread meaning.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 did not translate into Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 mistranslated 기사 (driver) as article.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 did not translate into Korean.\"}\n]\n```\n",
+  "duration_seconds": 3.653677,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16816,
+   "output_tokens": 236,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17052
+  }
+ }
+}

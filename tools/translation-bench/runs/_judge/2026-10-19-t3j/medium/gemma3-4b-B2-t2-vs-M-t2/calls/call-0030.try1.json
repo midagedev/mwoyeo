@@ -1,0 +1,27 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0115.1",
+  "item-0067.1",
+  "item-0265.2",
+  "item-0127.1",
+  "item-0224.1",
+  "item-0064.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5f6983ee-c212-47a8-9eed-fd296c251386",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the required 합쇼체 speech level.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"A hot tub is a tub (탕), not a hot spring (온천).\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translates '메신저' accurately as 'messenger' rather than 'messaging'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 includes '就好' (it's fine) instead of omitting it.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Korean.\"}\n]\n```\n",
+  "duration_seconds": 30.254234,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15993,
+   "output_tokens": 3480,
+   "thinking_tokens": 3272,
+   "cache_read_tokens": 0,
+   "total_tokens": 19473
+  }
+ }
+}

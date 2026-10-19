@@ -1,0 +1,28 @@
+{
+ "call": 54,
+ "try": 1,
+ "ids": [
+  "item-0160.2",
+  "item-0184.1",
+  "item-0018.2",
+  "item-0072.2",
+  "item-0268.1",
+  "item-0231.2",
+  "item-0071.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c2468f9e-043f-4f91-8d8a-cbbbfc4969be",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches defined term 'Sticky', while Translation 2 misreads the name.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translates '모닥불에' as the destination/location rather than 'about the bonfire'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while Translation 1 left Japanese untranslated.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Neither translated into Korean; both failed to translate into the target language.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, whereas Translation 2 left Japanese untranslated.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Speaker uses 해요체 with 周姨, matching facts better than Translation 1.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are completely mistranslated and hallucinated.\"}\n]\n```\n",
+  "duration_seconds": 4.387701,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16389,
+   "output_tokens": 246,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16635
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 8,
+ "try": 2,
+ "ids": [
+  "item-0078.2",
+  "item-0012.1",
+  "item-0032.1",
+  "item-0067.2",
+  "item-0070.1",
+  "item-0041.2",
+  "item-0007.1",
+  "item-0016.2",
+  "item-0009.2",
+  "item-0072.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b06677b0-e7e8-443c-becd-2cac4bd06754",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Pronunciation specifies 'TOH-mash', making 토마시 the more faithful transliteration.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"同期 means 'Sync' and matches the glossary term for 履歴.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the line untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"月見里 is read Tsukimisato (or Yamanashi), but standard surname reading matches 1.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Revised Romanization of 채율 is Chaeyul, which is standard.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both Um and Eom are standard romanizations of 엄.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Facts establish Seoyoon has an older brother (민재), not boyfriend.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Uses the specified glossary term 모차 instead of 마오차.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"解 as a Chinese surname is pronounced Xiè (셰천).\"}\n]\n```\n",
+  "duration_seconds": 5.639019,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17281,
+   "output_tokens": 338,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17619
+  }
+ }
+}

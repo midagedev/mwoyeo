@@ -1,0 +1,31 @@
+{
+ "call": 35,
+ "try": 1,
+ "ids": [
+  "item-0219.2",
+  "item-0051.1",
+  "item-0265.1",
+  "item-0209.2",
+  "item-0034.1",
+  "item-0245.2",
+  "item-0106.1",
+  "item-0237.1",
+  "item-0058.1",
+  "item-0292.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d17e9a66-8780-47bc-9695-ec5073ca4824",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Context is curry spiciness (辛い), not hard/tough (힘든).\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Japanese line into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 leaves Japanese Kanji and name untranslated.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left the source Japanese untranslated.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses correct name '저우 이모' and natural 해요체 tone.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 transliterates the character name 雷蔵 as 라이조.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 leaves the app name in Japanese katakana.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"More natural everyday 반말 dialogue between close uncle and niece.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Line is a cut-off warning condition (늦으면…); 2 mistranslates as 'likely late'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Preserves the pronoun referent 'she' (걔) referring to Aoife.\"}\n]\n```\n",
+  "duration_seconds": 5.035148,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17393,
+   "output_tokens": 339,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17732
+  }
+ }
+}

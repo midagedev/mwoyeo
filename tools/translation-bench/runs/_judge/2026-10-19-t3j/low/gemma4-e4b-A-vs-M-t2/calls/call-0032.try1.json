@@ -1,0 +1,31 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0170.2",
+  "item-0302.1",
+  "item-0074.1",
+  "item-0011.2",
+  "item-0229.2",
+  "item-0027.1",
+  "item-0102.2",
+  "item-0010.1",
+  "item-0269.2",
+  "item-0144.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3d5e5421-c6df-4cd9-979d-256338c28b7b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 is untranslated; though 2 misused '형', it translated the text.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both candidates left the text untranslated into Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses established terms 'Pathfinder' and 'fleet allocation'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the line untranslated in Japanese.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Preserves the impersonal wiki guide tone without adding 'We will'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly refers to coworker's older brother as 'he'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 is untranslated, making Translation 2 better despite minor errors.\"}\n]\n```\n",
+  "duration_seconds": 4.862979,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17310,
+   "output_tokens": 323,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17633
+  }
+ }
+}

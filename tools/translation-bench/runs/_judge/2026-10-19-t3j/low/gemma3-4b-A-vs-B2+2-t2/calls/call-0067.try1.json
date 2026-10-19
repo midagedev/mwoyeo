@@ -1,0 +1,31 @@
+{
+ "call": 67,
+ "try": 1,
+ "ids": [
+  "item-0210.2",
+  "item-0361.2",
+  "item-0171.1",
+  "item-0160.1",
+  "item-0045.2",
+  "item-0173.1",
+  "item-0139.1",
+  "item-0102.2",
+  "item-0371.2",
+  "item-0290.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "84cd3d6d-0edb-49ff-a4ff-76984160f0a7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 sounds more natural and keeps the proper name order.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 did not translate into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly renders the imperative nuance and speaker's 반말 register.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 invents an incorrect surname (Bae) and wrong tense.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both miss the app feature meaning of ひとこと (short comment/status).\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and express the same meaning well.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 translates the wrong line entirely.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 correctly translates the question asking who was asked to watch/stay.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both completely mistranslate 기사 (driver/technician) as equipment or articles.\"}\n]\n```\n",
+  "duration_seconds": 4.1890979999999995,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17235,
+   "output_tokens": 327,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17562
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0180.2",
+  "item-0097.2",
+  "item-0002.1",
+  "item-0172.1",
+  "item-0030.1",
+  "item-0192.2",
+  "item-0178.1",
+  "item-0279.2",
+  "item-0221.2",
+  "item-0185.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5a76c61d-c14a-4d4e-85b5-a867bdbb4bd7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both are accurate and use the correct polite register (합쇼체).\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the text in Chinese without translating it.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 to Princess Lysia.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the name 채율.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 電話番 as phone duty/watch.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are virtually identical and equally flawed in speech level.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 accurately translates 체험 보고서 as experience report.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 is much more natural and accurate in meaning.\"}\n]\n```\n",
+  "duration_seconds": 4.877132,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17564,
+   "output_tokens": 306,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17870
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0277.1",
+  "item-0293.1",
+  "item-0040.1",
+  "item-0074.2",
+  "item-0175.1",
+  "item-0140.2",
+  "item-0196.1",
+  "item-0077.1",
+  "item-0171.2",
+  "item-0210.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e1737c5d-1968-461e-a854-fd4e7a6fb99a",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Faithfully reflects the cut-off source sentence ending.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Reads much more naturally for police dialogue.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"More natural phrasing and clearer rendering of 'resolve each conflict'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translates Korean name 채율 to Latin Chaeyul properly.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Uses correct speech level (반말) and Korean transliteration for Siobhan.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Chinese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Natural Korean localization without leaving Japanese furigana.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are accurate and natural translations of the question.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly uses established term 'Hearth' and natural instructional register.\"}\n]\n",
+  "duration_seconds": 5.808398,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17487,
+   "output_tokens": 298,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17785
+  }
+ }
+}

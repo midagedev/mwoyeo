@@ -1,0 +1,31 @@
+{
+ "call": 48,
+ "try": 1,
+ "ids": [
+  "item-0249.2",
+  "item-0329.1",
+  "item-0157.2",
+  "item-0174.2",
+  "item-0259.1",
+  "item-0078.1",
+  "item-0095.1",
+  "item-0003.2",
+  "item-0325.1",
+  "item-0305.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "eb827fee-8f6b-431f-a1c2-981e5baf0b1d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Rook speaks 반말 to Dex and reports in dialogue.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Korean vocative particle '아' after consonant '삭' is natural.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Zeng Ruoshui was speaking; Translation 1 incorrectly assumes 'his mouth'.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate renderings.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses established term 'Commons' from context instead of 'plaza'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Thorne speaks 해요체 to Rook; but both are 반말 here, 2 is more natural.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Zhou Yi speaks 해요체 to Lin Yuan.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Refers to Qiu Shuang (female) waking up in the hall.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Passive voice fits documentation tone better than first-person plural 'We'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Siobhan replies to Rory, so she must use 반말.\"}\n]\n```\n",
+  "duration_seconds": 4.576261,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17293,
+   "output_tokens": 330,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17623
+  }
+ }
+}

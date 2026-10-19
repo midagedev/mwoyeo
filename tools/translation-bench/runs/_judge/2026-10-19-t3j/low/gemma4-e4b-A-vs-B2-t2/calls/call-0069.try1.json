@@ -1,0 +1,31 @@
+{
+ "call": 69,
+ "try": 1,
+ "ids": [
+  "item-0377.2",
+  "item-0290.2",
+  "item-0038.1",
+  "item-0215.2",
+  "item-0204.1",
+  "item-0193.1",
+  "item-0241.2",
+  "item-0027.2",
+  "item-0108.1",
+  "item-0110.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b851d232-b27a-49dd-8c8f-847a81994178",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"\\\"현재 작업 중인\\\" is more natural for Git branch context.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Mina speaks 반말 to Kai and Yu, though both mistranslated name.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Instructional onboarding guide addresses the reader as \\\"you\\\", not \\\"I\\\".\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correct pinyin transcription for 解玄 is Xie Xuan.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Removes unnecessary phonetic pinyin gloss from in-universe text.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly uses the channel name 'Hearth' instead of literal bonfire.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Transcribes pronunciation guide into Korean rather than leaving raw English.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both failed to translate the Japanese source line into Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 actually translated into Korean; 1 remained in Japanese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 translated into Korean; 1 remained in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 4.58095,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17456,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17781
+  }
+ }
+}

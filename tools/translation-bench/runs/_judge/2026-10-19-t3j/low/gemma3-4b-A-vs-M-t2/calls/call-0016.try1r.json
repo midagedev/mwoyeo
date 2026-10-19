@@ -1,0 +1,26 @@
+{
+ "call": 16,
+ "try": 1,
+ "ids": [
+  "item-0085.1",
+  "item-0191.2",
+  "item-0105.2",
+  "item-0234.1",
+  "item-0250.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d83b21ac-b0a7-42ac-8903-1963efb8dd71",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Thorne speaks to Rook using 해요체; Translation 1 incorrectly uses 반말.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Generic statements about notes in manuals are more natural without 'The'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both incorrectly use 존댓말; 쉬눠 speaks to 陆明 in 반말.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'스테이지에 추가하세요' is standard Korean Git terminology, unlike '스테이지하세요'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"This is an instructional onboarding guide addressed to the reader, not 'I'.\"}\n]\n```\n",
+  "duration_seconds": 3.678669,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15617,
+   "output_tokens": 182,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15799
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 38,
+ "try": 1,
+ "ids": [
+  "item-0113.2",
+  "item-0084.2",
+  "item-0119.2",
+  "item-0008.2",
+  "item-0154.2",
+  "item-0062.2",
+  "item-0204.1",
+  "item-0010.1",
+  "item-0016.1",
+  "item-0017.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ec64f80f-1dcc-428c-8c9b-ca0f61a54f59",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"More natural onboarding documentation tone and concise phrasing.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly adheres to the specified term 魔石 = 마정석.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly romanizes Sogo (토고) and section chief title (과장).\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly follows specified terms/names (공주님, 조합장, 텟사이).\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses correct particle and natural phrasing (시간에 엄격한 분).\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese text.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese text.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese text.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Accurately conveys '詰まってる' as '가득 담겨' matching speaker context.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and equally accurate.\"}\n]\n",
+  "duration_seconds": 4.489433,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5636,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11818,
+   "total_tokens": 5961
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0194.1",
+  "item-0098.2",
+  "item-0366.1",
+  "item-0328.2",
+  "item-0252.2",
+  "item-0323.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ba66ac1a-574c-4493-8546-f37a2288b11c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Uses the correct term 'Memotto' specified in the facts.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses the standard and natural Korean parenthetical format for pronunciation.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'will have guarded' is grammatically correct for future conditional results.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Identical except for capitalization, which is ignored as formatting.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and use appropriate 반말.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Avoids the incorrect gendered pronoun 'his' for the speaker.\"}\n]\n```\n",
+  "duration_seconds": 73.940674,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15963,
+   "output_tokens": 8429,
+   "thinking_tokens": 8235,
+   "cache_read_tokens": 0,
+   "total_tokens": 24392
+  }
+ }
+}

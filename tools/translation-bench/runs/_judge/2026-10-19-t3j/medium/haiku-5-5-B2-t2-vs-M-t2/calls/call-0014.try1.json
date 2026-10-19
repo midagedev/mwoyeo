@@ -1,0 +1,27 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0274.1",
+  "item-0269.2",
+  "item-0286.1",
+  "item-0120.2",
+  "item-0047.1",
+  "item-0174.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4b8fe631-d122-4dea-8a21-8662a8b4a8f2",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"사건 correctly captures the detective slang ヤマ.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both 'at home' and 'home' are equally natural and accurate.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'Hearth channel' is clearer and reads more naturally in English.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Follows the specified term mapping 先輩 to boss.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses the correct pinyin and tone marks from the facts.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Preserves the contrast between mountain and river (강).\"}\n]\n```\n",
+  "duration_seconds": 67.316356,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16012,
+   "output_tokens": 8183,
+   "thinking_tokens": 7994,
+   "cache_read_tokens": 0,
+   "total_tokens": 24195
+  }
+ }
+}

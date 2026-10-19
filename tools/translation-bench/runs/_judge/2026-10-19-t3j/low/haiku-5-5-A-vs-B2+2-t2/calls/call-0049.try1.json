@@ -1,0 +1,31 @@
+{
+ "call": 49,
+ "try": 1,
+ "ids": [
+  "item-0139.2",
+  "item-0317.1",
+  "item-0119.1",
+  "item-0113.2",
+  "item-0118.1",
+  "item-0344.1",
+  "item-0178.2",
+  "item-0368.2",
+  "item-0240.1",
+  "item-0100.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b01d58ff-4f90-404c-ab2c-5380cbc9e637",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Siobhan addresses her landlord; '네, 알겠습니다' fits much better than '선생님'.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both incorrectly use feminine pronouns for Yuki, a male client.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and use proper 합쇼체 honorifics.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Uses the established name 개러스 and uses natural Korean phrasing.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Hiroba is an app feature/section name, not a generic plaza.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both capture the meaning and tone accurately and naturally.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both accurately translate the detective inspector's terse line.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"鵲橋 refers to Kasasagi bridge (작교), not the legendary 오작교.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말, not 해요체.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both use correct 반말 to Dex; hot tub translations are acceptable.\"}\n]\n```\n",
+  "duration_seconds": 4.707308,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17400,
+   "output_tokens": 338,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17738
+  }
+ }
+}

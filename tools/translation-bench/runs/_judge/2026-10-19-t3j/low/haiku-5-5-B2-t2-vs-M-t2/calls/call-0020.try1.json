@@ -1,0 +1,31 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0230.2",
+  "item-0271.1",
+  "item-0082.2",
+  "item-0273.1",
+  "item-0202.1",
+  "item-0027.1",
+  "item-0328.1",
+  "item-0021.1",
+  "item-0297.1",
+  "item-0142.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "629f9ba7-c2c7-4b1c-ab15-3bfa7e5d9e4f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both '열 부' and '10부' are natural, valid Korean renderings.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both '~하거든' and '~하니까' naturally convey the informal casual ending.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both 'casual chat' and 'chitchat' accurately translate 잡담.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both '난' and '나는' are natural informal pronouns in Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 captures conversational chat tone and natural colloquial phrasing better.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 naturally completes the truncated word instead of leaving raw English.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both title-case and sentence-case day labels are standard and acceptable.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both 'Do not' and 'Don't' are accurate translations of documentation instructions.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 romanizes the Japanese surname using the provided reading Yamanashi.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Spacing for '재택근무 하다' is acceptable both closed and spaced.\"}\n]\n```\n",
+  "duration_seconds": 5.196505,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5430,
+   "output_tokens": 347,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11811,
+   "total_tokens": 5777
+  }
+ }
+}

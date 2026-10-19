@@ -1,0 +1,31 @@
+{
+ "call": 44,
+ "try": 1,
+ "ids": [
+  "item-0285.1",
+  "item-0057.1",
+  "item-0099.1",
+  "item-0055.2",
+  "item-0310.1",
+  "item-0194.1",
+  "item-0207.1",
+  "item-0206.2",
+  "item-0111.1",
+  "item-0163.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7a011305-6ffd-4b6b-b94f-8c57a8d4888b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correct subject pronoun ('he' referring to older brother, not 'I').\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Arabic numeral '10부' is much more natural in business contexts.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both convey the meaning, tone, and truncated ending naturally.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Referring to an established distal location as '거기' is more natural.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Maintains consistent 해요체 speech level to both listeners.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both 'Day 2' and 'Day Two' are standard, accurate translations.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translates the Japanese brand name according to the specified English term.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly uses the female pronoun 'she' for the unconscious woman.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correct 반말 speech level between peers and transliterates Gerald to Korean.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both accurately translate the sentence using the required terms and 합쇼체.\"}\n]\n```\n",
+  "duration_seconds": 4.449288,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17349,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17681
+  }
+ }
+}

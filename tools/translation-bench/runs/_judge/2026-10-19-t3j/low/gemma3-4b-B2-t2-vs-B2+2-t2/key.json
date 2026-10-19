@@ -1,0 +1,357 @@
+{
+ "a": "B2",
+ "b": "B2+2",
+ "identical": 399,
+ "items": {
+  "item-0001": {
+   "seq": "chat-zh-ko-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "저도 시간 있어요! @주팅 님 숙소는 어떠세요, 호텔은 어떠세요?",
+   "b_text": "저도 있어요!@周婷 숙소는 바베큐 하는 곳으로 할까요, 아니면 호텔?"
+  },
+  "item-0002": {
+   "seq": "docs-en-ko-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "동료인 Aoife (EE-fa라고 발음됩니다)가 푸터의 오타를 수정하려고 합니다.",
+   "b_text": "동료 Aoife (EE-fa라고 발음)가 푸터의 오타를 수정하려고 합니다."
+  },
+  "item-0003": {
+   "seq": "chat-ja-ko-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "나도 산에 찬성이야. 별을 보고 싶어.",
+   "b_text": "私も山に賛成です。星が見たいです"
+  },
+  "item-0004": {
+   "seq": "docs-ko-en-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "개발 환경 설정은 엄서진(Seojin Um) 님이 도와 드립니다.",
+   "b_text": "Seojin Um will assist you with setting up the development environment."
+  },
+  "item-0005": {
+   "seq": "docs-ja-en-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "You can edit them offline and they sync immediately when you connect.",
+   "b_text": "You can edit them offline, and they will sync immediately when you connect."
+  },
+  "item-0006": {
+   "seq": "chat-zh-ko-1",
+   "line": 32,
+   "kind": "calibration",
+   "a_text": "放心,都记着呢。婷姐,先给你发个红包,生日提前快乐!",
+   "b_text": "放心,都记着呢。婷姐,先给你发个红包,生日提前快乐!"
+  },
+  "item-0007": {
+   "seq": "docs-en-ko-1",
+   "line": 21,
+   "kind": "real",
+   "a_text": "충돌이 발생하면 ‘우리’ 브랜치가 여러분이 있는 브랜치이고, ‘그들의’ 브랜치가 병합하는 브랜치입니다.",
+   "b_text": "충돌이 발생하면 ‘우리’ 브랜치가 여러분이 있는 브랜치이고 ‘그들의’ 브랜치가 병합하는 브랜치입니다."
+  },
+  "item-0008": {
+   "seq": "docs-en-ko-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "중간에 작업을 전환해야 하는 경우, 편집을 스태시하세요.",
+   "b_text": "중간에 작업을 전환해야 하면 스태시를 사용하세요."
+  },
+  "item-0009": {
+   "seq": "docs-ja-en-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "This guide will explain using the examples of Public Relations Yamanashi-san and Sales Takanasai-san.",
+   "b_text": "このガイドでは、広報の月見里(やまなし)さんと営業の小鳥遊(たかなし)さんの例で説明します。"
+  },
+  "item-0010": {
+   "seq": "docs-ja-en-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "Memot is a note app that can consolidate text, tables, and images into one.",
+   "b_text": "メモットは、文章も表も画像も、ひとつにまとめられるノートアプリです。"
+  },
+  "item-0011": {
+   "seq": "docs-ja-en-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "Anyone can post notes to the Hiroba.",
+   "b_text": "Anyone can post notes to the Commons."
+  },
+  "item-0012": {
+   "seq": "docs-ko-en-1",
+   "line": 18,
+   "kind": "real",
+   "a_text": "New Moores Logistics hires will complete the 'Launchpad' task list during their first week.",
+   "b_text": "New Moa Logistics hires will complete the 'Launchpad' task list during their first week."
+  },
+  "item-0013": {
+   "seq": "chat-ja-ko-2",
+   "line": 3,
+   "kind": "real",
+   "a_text": "도움이 됩니다. 그런데, 견적서는 이미 받으셨나요?",
+   "b_text": "助かります。ところで、見積書はもう届きましたか？"
+  },
+  "item-0014": {
+   "seq": "chat-en-ko-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "저는 오후 5시까지 출근했는데, 시오반이 그분을 맡겨줄 수 있습니다.",
+   "b_text": "저는 오후 5시까지 출근했는데, 시오반이 그를 맡겨줄 수 있습니다."
+  },
+  "item-0015": {
+   "seq": "chat-en-ko-1",
+   "line": 20,
+   "kind": "calibration",
+   "a_text": "그래도 아오이프가 그 개 뒷정리를 직접 해야 해.",
+   "b_text": "그래도 아오이프가 그 개 뒷정리를 직접 해야 해."
+  },
+  "item-0016": {
+   "seq": "docs-ja-en-1",
+   "line": 27,
+   "kind": "real",
+   "a_text": "Kotori Yoyoi is dividing tags by project.",
+   "b_text": "Kotori Miyazuki divides tags by project."
+  },
+  "item-0017": {
+   "seq": "chat-ko-en-1",
+   "line": 13,
+   "kind": "calibration",
+   "a_text": "이사 끝나면 일요일엔 좀 쉬어. 보리도 보고 싶고ㅋㅋ 브런치나 먹을래?",
+   "b_text": "이사 끝나면 일요일엔 좀 쉬어. 보리도 보고 싶고ㅋㅋ 브런치나 먹을래?"
+  },
+  "item-0018": {
+   "seq": "docs-ko-en-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "문의는 인사팀 변준호(Joonho Byun) 매니저에게 하면 됩니다.",
+   "b_text": "You can contact Joonho Byun, the manager of the Human Resources team, for inquiries."
+  },
+  "item-0019": {
+   "seq": "docs-en-ko-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "모든 프로젝트는 \"main\"이라고 불리는 하나의 가지로 시작합니다.",
+   "b_text": "모든 프로젝트는 \"main\"이라는 이름의 한 브랜치로 시작한다."
+  },
+  "item-0020": {
+   "seq": "docs-en-ko-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "그녀가 거기에 하는 아무것도 main에 영향을 미치지 않을 때까지 병합되지 않습니다.",
+   "b_text": "그녀가 거기에서 하는 일은 당신이 병합할 때까지 main에 영향을 주지 않는다."
+  },
+  "item-0021": {
+   "seq": "chat-ja-ko-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "모두, 이번 주말 합숙은 어떻게 할까?",
+   "b_text": "みんな、今週末の合宿どうする?"
+  },
+  "item-0022": {
+   "seq": "docs-ja-en-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "Start with Memot",
+   "b_text": "メモットで始める"
+  },
+  "item-0023": {
+   "seq": "docs-ja-en-1",
+   "line": 26,
+   "kind": "real",
+   "a_text": "You can create tags freely ◆",
+   "b_text": "You can freely create tags."
+  },
+  "item-0024": {
+   "seq": "docs-ko-en-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "첫날",
+   "b_text": "First day"
+  },
+  "item-0025": {
+   "seq": "chat-ko-en-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "Suyeon-ah, it's still work?",
+   "b_text": "서윤아, 아직 회사야?"
+  },
+  "item-0026": {
+   "seq": "chat-ko-en-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "Yeah,ㅠㅠ The meeting hasn't ended. Jiwoo-yah, did you finish your work?",
+   "b_text": "응ㅠㅠ 회의가 안 끝나. 지우야, 너는 퇴근했어?"
+  },
+  "item-0027": {
+   "seq": "docs-ko-en-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "This document guides you through your first 2 weeks step-by-step ▶",
+   "b_text": "This document guides you through your tasks over the first two weeks in order ▶"
+  },
+  "item-0028": {
+   "seq": "docs-ja-en-1",
+   "line": 25,
+   "kind": "real",
+   "a_text": "The notes in the Hiroba are easier to find if you add tags.",
+   "b_text": "The memo in Hiroba is easier to find when you add tags."
+  },
+  "item-0029": {
+   "seq": "docs-ko-en-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "New Employee Onboarding Guide",
+   "b_text": "New employee onboarding guide"
+  },
+  "item-0030": {
+   "seq": "chat-ja-ko-2",
+   "line": 2,
+   "kind": "real",
+   "a_text": "도카와 과장님, 수고하셨습니다. 회의실은 준비되었습니다. 자료는 오늘 밤에 마무리하겠습니다.",
+   "b_text": "十河課長、お疲れ様です。会議室は押さえました。資料は今夜中に仕上げます。"
+  },
+  "item-0031": {
+   "seq": "chat-ja-ko-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "나는 산이 좋을 것 같아. 작년에는 물놀이해서 너무 추웠거든.",
+   "b_text": "俺は山がいいな。去年は川遊びで寒かったし"
+  },
+  "item-0032": {
+   "seq": "docs-ko-en-1",
+   "line": 27,
+   "kind": "real",
+   "a_text": "Your first practical session will be a code review with Ms. Eumseojin.",
+   "b_text": "Your first practical work will be a code review with Ms. Eumseojin."
+  },
+  "item-0033": {
+   "seq": "docs-ja-en-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "Yamashiri-san sticks sticky notes on important sections as a marker.",
+   "b_text": "Yamanashi-san uses sticky notes to mark important sections."
+  },
+  "item-0034": {
+   "seq": "docs-ja-en-1",
+   "line": 17,
+   "kind": "calibration",
+   "a_text": "Sync and history",
+   "b_text": "Sync and history"
+  },
+  "item-0035": {
+   "seq": "docs-ja-en-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "Yamashiri-san leaves the decisions of the meeting in one Quick Note.",
+   "b_text": "Yamanashi-san keeps meeting decisions as 'Quick Notes'."
+  },
+  "item-0036": {
+   "seq": "docs-ja-en-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "You can invite team members by email to the workspace.",
+   "b_text": "You can invite members to the workspace by email."
+  },
+  "item-0037": {
+   "seq": "docs-ja-en-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "We call short notes accompanying a page 'Quick Note'.",
+   "b_text": "We call short notes added to a page 'Quick Notes'."
+  },
+  "item-0038": {
+   "seq": "docs-ja-en-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "Kojiyayu-san shares his sales schedule with the team every morning on the Hiroba.",
+   "b_text": "Kojiyasu-san shares his sales schedule with the team every morning on the Commons."
+  },
+  "item-0039": {
+   "seq": "docs-ko-en-1",
+   "line": 20,
+   "kind": "real",
+   "a_text": "Company announcements and casual conversation are made in the 'Hearth' channel.",
+   "b_text": "Company announcements and casual conversation happen in the 'Hearth' channel."
+  },
+  "item-0040": {
+   "seq": "docs-ko-en-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "The disembarking work is observed while wearing safety shoes.",
+   "b_text": "The unloading work is observed while wearing safety shoes."
+  },
+  "item-0041": {
+   "seq": "docs-ko-en-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "On the second day, you spend the whole day on-site.",
+   "b_text": "On the second day, you spend the whole day on site."
+  },
+  "item-0042": {
+   "seq": "docs-en-ko-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "Pocket Git은 새로운 아이디어를 시도하면서 당신의 작업을 안전하게 보관합니다.",
+   "b_text": "Pocket Git는 새로운 아이디어를 시도하면서 당신의 작업을 안전하게 보관합니다."
+  },
+  "item-0043": {
+   "seq": "chat-zh-ko-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "시간 있으세요! 팅 찌야 30살이 되었으니, 꼭 제대로 축하해야 해요",
+   "b_text": "있어요 있어요!婷姐, 30살 생일이라서 꼭 제대로 축하해야 해요"
+  },
+  "item-0044": {
+   "seq": "docs-en-ko-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "이제 남은 것은 작업 트리에 남아 있습니다.",
+   "b_text": "나머지는 지금 당분간 워킹 트리에 남아있습니다."
+  },
+  "item-0045": {
+   "seq": "docs-ko-en-1",
+   "line": 26,
+   "kind": "real",
+   "a_text": "Once the deliverables are completed, you'll start working on real projects from the second week.",
+   "b_text": "Once the landing page is finished, you'll start working on real projects from the second week."
+  },
+  "item-0046": {
+   "seq": "chat-zh-ko-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "11월에 제 생일이에요, 칭하이에서 3일 동안 놀고 싶어요. 여러분 시간 있으세요?",
+   "b_text": "음력 11월 생일이라서, 3일 동안 타이밍에 엑심탄 여행을 하고 싶어요.你们有空吗?"
+  },
+  "item-0047": {
+   "seq": "chat-en-ko-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "오전 모두께. 보일러 기술자분이 금요일 오전 9시부터 12시 사이 방문 예정입니다.",
+   "b_text": "모두 아침 인사. 화상 보일러 기사가 금요일 오전 9시부터 12시 사이에 도착합니다."
+  },
+  "item-0048": {
+   "seq": "docs-en-ko-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "아오이프가 가지를 만들어서 그녀의 수정 사항이 당신의 길을 막지 않도록 합니다.",
+   "b_text": "아오이프가 브랜치를 만들어서 그녀의 수정 사항이 당신의 길을 막지 않도록 한다."
+  },
+  "item-0049": {
+   "seq": "chat-ko-en-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "I just got out. But the contract is finished well?",
+   "b_text": "방금 나왔어. 근데 계약은 잘 끝났어?"
+  },
+  "item-0050": {
+   "seq": "chat-ja-ko-2",
+   "line": 1,
+   "kind": "real",
+   "a_text": "히야마 씨, 수고하셨습니다. 내일 방문하실 분의 준비는 진행 중이신가요?",
+   "b_text": "日向さん、お疲れ様です。明日の先方のご来訪、準備は進んでいますか？"
+  }
+ }
+}

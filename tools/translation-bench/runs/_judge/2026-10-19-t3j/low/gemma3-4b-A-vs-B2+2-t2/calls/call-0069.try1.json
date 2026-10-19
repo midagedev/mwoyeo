@@ -1,0 +1,31 @@
+{
+ "call": 69,
+ "try": 1,
+ "ids": [
+  "item-0035.1",
+  "item-0198.2",
+  "item-0149.2",
+  "item-0343.2",
+  "item-0206.1",
+  "item-0056.1",
+  "item-0289.1",
+  "item-0036.2",
+  "item-0357.2",
+  "item-0148.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3e01cac0-ea71-4b19-bc57-c0736a7ada8e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 is much more natural and accurately captures the meaning.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 and natural Korean phrasing.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 bizarrely rewritten Chinese text instead of translating to Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말; Translation 2 correctly uses 반말.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 reads more naturally in casual text chat between coworkers.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"A user guide appropriately uses 'We' and natural plural phrasing.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 uses standard spacing and natural phrasing ('그걸').\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'이렇게 한다' is much more natural Korean than '이걸 한다'.\"}\n]\n```\n",
+  "duration_seconds": 7.073339,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17265,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17589
+  }
+ }
+}

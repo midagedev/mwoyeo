@@ -1,0 +1,31 @@
+{
+ "call": 74,
+ "try": 1,
+ "ids": [
+  "item-0244.2",
+  "item-0263.1",
+  "item-0095.2",
+  "item-0098.1",
+  "item-0301.2",
+  "item-0261.1",
+  "item-0232.1",
+  "item-0239.1",
+  "item-0287.2",
+  "item-0232.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ab7e6c2a-42d0-46cb-b893-8fd18150f033",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates 周姨 into Korean instead of leaving Chinese characters untouched.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses correct 반말 speech level and fits the cargo tub context.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally translate the line in 반말.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly uses 반말 as Liese speaks to Saku.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Accurately translates delivery driver instead of incorrectly translating 기사 as reporter.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both natural, accurate translations capturing the informal tone and context.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both natural and accurate Korean 반말 expressions for the casual line.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both accurately and naturally translate the instructional sentence.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"More natural rendering of 'put it' and 'along with your work'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both are equally valid and natural 반말 translations.\"}\n]\n```\n",
+  "duration_seconds": 5.466072,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17150,
+   "output_tokens": 316,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17466
+  }
+ }
+}

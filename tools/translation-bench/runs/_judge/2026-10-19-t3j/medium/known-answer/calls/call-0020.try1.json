@@ -1,0 +1,27 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0033.2",
+  "item-0015.2",
+  "item-0049.2",
+  "item-0074.1",
+  "item-0017.1",
+  "item-0046.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6222d9a6-a644-4bba-bb9a-9d2d6f26a05d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correctly transcribes the name Zēng Lán as 쩡란.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Irish name Aoife is accurately transcribed as 이파.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly translates 红茶 as black tea (홍차).\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 is translated into English; Candidate 2 is untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 is translated into English; Candidate 2 is untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly romanizes the surname 单 as Shan per facts.\"}\n]\n```\n",
+  "duration_seconds": 13.112333,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16228,
+   "output_tokens": 1555,
+   "thinking_tokens": 1355,
+   "cache_read_tokens": 0,
+   "total_tokens": 17783
+  }
+ }
+}

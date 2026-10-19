@@ -1,0 +1,27 @@
+{
+ "call": 1,
+ "try": 2,
+ "ids": [
+  "item-0279.2",
+  "item-0338.2",
+  "item-0053.2",
+  "item-0290.1",
+  "item-0266.2",
+  "item-0070.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8ea94049-1cba-46e1-8c0c-c7393480a2be",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean with the correct speech level.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both candidates failed to translate into the target language Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while translation 2 remains untranslated.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly uses informal 반말 speech level.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while translation 2 remains untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the feminine pronoun for the victim.\"}\n]\n",
+  "duration_seconds": 37.401979,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16281,
+   "output_tokens": 4633,
+   "thinking_tokens": 4444,
+   "cache_read_tokens": 0,
+   "total_tokens": 20914
+  }
+ }
+}

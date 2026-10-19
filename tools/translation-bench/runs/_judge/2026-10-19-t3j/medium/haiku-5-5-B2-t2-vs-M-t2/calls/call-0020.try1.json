@@ -1,0 +1,27 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0336.2",
+  "item-0160.1",
+  "item-0306.1",
+  "item-0108.1",
+  "item-0339.2",
+  "item-0367.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "34d8b01f-a0de-4f30-971a-b32384a17594",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Consistent speech level and naturally translates the sentence-ending '~し'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"More natural Korean phrasing without redundant translationese '아직'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses the appropriate technical term '푸터' instead of '바닥글'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'조심하겠습니다' is the natural response to not scratching equipment.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 completely misinterprets 'volunteering me' as helping her.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'여러분의' and '편집 내용' read much more naturally in tutorials.\"}\n]\n```\n",
+  "duration_seconds": 77.832855,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15906,
+   "output_tokens": 8950,
+   "thinking_tokens": 8744,
+   "cache_read_tokens": 0,
+   "total_tokens": 24856
+  }
+ }
+}

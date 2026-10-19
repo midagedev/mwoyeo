@@ -1,0 +1,31 @@
+{
+ "call": 35,
+ "try": 1,
+ "ids": [
+  "item-0126.2",
+  "item-0100.2",
+  "item-0354.2",
+  "item-0016.1",
+  "item-0290.2",
+  "item-0244.2",
+  "item-0004.2",
+  "item-0069.2",
+  "item-0116.2",
+  "item-0247.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6b28537a-e276-4840-8bb9-cbd10fa3b813",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 sounds much more natural in Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the phrase '星いいね' naturally as '별 예쁘다'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 uses correct 반말 register and natural phrasing.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both failed to translate into Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 naturally translates '聞こう' as 'Let me hear it'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 actually translated the Korean source line into English.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly asks for an interpretation without an unnatural 'should'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 'she's out' as quitting a job (퇴사).\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly recognizes the surname 万俟 (Wanqi) closer than 2.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 left the entire line untranslated in Chinese.\"}\n]\n```\n",
+  "duration_seconds": 5.612493,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17385,
+   "output_tokens": 336,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17721
+  }
+ }
+}

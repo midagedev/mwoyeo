@@ -1,0 +1,34 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0322.1",
+  "item-0081.1",
+  "item-0184.1",
+  "item-0235.2",
+  "item-0206.2",
+  "item-0019.2",
+  "item-0020.2",
+  "item-0099.1",
+  "item-0213.1",
+  "item-0257.1",
+  "item-0001.2",
+  "item-0162.2",
+  "item-0314.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d43c3ae5-41cf-4787-a5e8-6ee2e6893b63",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates '快' as 'Quickly'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly translates '开车' (drive) and the road name.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 incorrectly translates 'ma'am' as '저기요' (excuse me).\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 accurately translates the surname and present tense.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the defined term 'Quick Note'.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations convey the exact same meaning equally well.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the required 해요체 speech level.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 is entirely untranslated Japanese text.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 leaves Japanese words untranslated; Translation 2 is fully Korean.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the channel name 'Hearth'.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations are equally accurate interpretations of the heading.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 2 absurdly mistranslates the person's name as 'seafood'.\"}\n]\n",
+  "duration_seconds": 62.388456,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 18233,
+   "output_tokens": 7767,
+   "thinking_tokens": 7345,
+   "cache_read_tokens": 0,
+   "total_tokens": 26000
+  }
+ }
+}

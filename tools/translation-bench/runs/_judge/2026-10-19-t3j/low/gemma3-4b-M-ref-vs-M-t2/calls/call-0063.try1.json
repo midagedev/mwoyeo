@@ -1,0 +1,31 @@
+{
+ "call": 63,
+ "try": 1,
+ "ids": [
+  "item-0101.2",
+  "item-0284.2",
+  "item-0082.1",
+  "item-0375.2",
+  "item-0128.2",
+  "item-0117.2",
+  "item-0347.2",
+  "item-0079.2",
+  "item-0094.2",
+  "item-0324.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e0a17208-3708-43ab-9e33-9c1defc54c85",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Faithful to the original; translation 2 adds an unjustified '그렇게'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Accurately translates '말을 걸지 않는다' (do not speak to).\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 misgenders Yuki as 'Her' (Yuki is male).\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses the standard technical Git term '브랜치' instead of '가지'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Natural, accurate translation; translation 1 is awkward and unnatural.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are awkward and inaccurate representations of the question.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 has an incomplete, cut-off sentence ending.\"}\n]\n```\n",
+  "duration_seconds": 5.969853,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17122,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17446
+  }
+ }
+}

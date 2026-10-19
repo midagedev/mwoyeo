@@ -1,0 +1,31 @@
+{
+ "call": 48,
+ "try": 1,
+ "ids": [
+  "item-0310.1",
+  "item-0071.1",
+  "item-0121.2",
+  "item-0116.1",
+  "item-0029.2",
+  "item-0384.2",
+  "item-0211.1",
+  "item-0289.2",
+  "item-0017.1",
+  "item-0183.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b55e4b31-7921-435b-98a0-55c8567cac44",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 我 (제가) while Translation 2 omits it.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 natural phrasing matches context better than clumsy '마음 놓고 있어요'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 flows naturally; Translation 2 is overly literal and clunky.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly uses conversational 반말, matching the required speech level.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Xie Xuan is female; Translation 1 uses incorrect pronoun 'he'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly understands '일요일엔 좀 쉬어' as an imperative suggestion.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 내일 저녁 as 'tomorrow night'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Mina speaks 반말 to Yu; Translation 2 incorrectly uses 해요체.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations contain severe mistranslations and hallucinated terms.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English entirely.\"}\n]\n```\n",
+  "duration_seconds": 4.804383,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17638,
+   "output_tokens": 343,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17981
+  }
+ }
+}

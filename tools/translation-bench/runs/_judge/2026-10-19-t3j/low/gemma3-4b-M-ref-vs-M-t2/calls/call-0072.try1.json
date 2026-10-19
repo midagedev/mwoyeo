@@ -1,0 +1,31 @@
+{
+ "call": 72,
+ "try": 1,
+ "ids": [
+  "item-0351.2",
+  "item-0009.2",
+  "item-0035.1",
+  "item-0198.2",
+  "item-0149.2",
+  "item-0359.2",
+  "item-0206.1",
+  "item-0056.1",
+  "item-0289.1",
+  "item-0036.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1ea2b731-f4de-4a25-81d1-6625e0824a3f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 leaves English word 'anyway' untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the phrase 'チームで使う'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly identifies brother as '오빠' for a younger sister.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly uses casual speech level (반말) and natural phrasing.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 is more natural and uses correct phrasing for 'keep'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 properly matches the atmospheric noun-phrase style of the opening.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left Chinese text completely untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly translates '楽しみ' as '기대돼요'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 uses correct banmal speech level from Mina to Yu.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both fail the required term 'boss' and invert the lock meaning.\"}\n]\n```\n",
+  "duration_seconds": 5.408426,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17218,
+   "output_tokens": 334,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17552
+  }
+ }
+}

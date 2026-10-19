@@ -1,0 +1,31 @@
+{
+ "call": 48,
+ "try": 1,
+ "ids": [
+  "item-0115.2",
+  "item-0279.1",
+  "item-0144.1",
+  "item-0175.2",
+  "item-0046.1",
+  "item-0125.2",
+  "item-0205.1",
+  "item-0120.1",
+  "item-0282.1",
+  "item-0003.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "58168aa1-3429-429b-88d1-444119c60301",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"日向 speaks to 十河 in 합쇼체; Translation 1 uses correct speech level.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 uses the required term '카운슬 택스'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Hearth is a named channel; Translation 1 omits the unnecessary 'the'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified term '작업 디렉터리'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Rook speaks to Dex in 반말; Translation 1 fits naturally.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 uses the specified term '납품일' and honorific title.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the sentence into Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 'watch' and natural phrasing.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 translates 'hot tub' more accurately than '물통'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are clear, natural, and accurately convey the meaning.\"}\n]\n```\n",
+  "duration_seconds": 4.687094,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17283,
+   "output_tokens": 343,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17626
+  }
+ }
+}

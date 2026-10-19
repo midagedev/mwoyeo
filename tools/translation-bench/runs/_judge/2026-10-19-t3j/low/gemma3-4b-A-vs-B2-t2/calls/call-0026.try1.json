@@ -1,0 +1,31 @@
+{
+ "call": 26,
+ "try": 1,
+ "ids": [
+  "item-0209.2",
+  "item-0299.1",
+  "item-0274.1",
+  "item-0241.1",
+  "item-0119.1",
+  "item-0020.1",
+  "item-0307.2",
+  "item-0193.2",
+  "item-0003.1",
+  "item-0328.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "bc84419e-b9d2-401d-8949-d5884ace4e7a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Korean sentence into English.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly translates the idiom and inquiry using appropriate polite register.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translates 案件 as case, which fits better than project.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Natural Korean phrasing using 해요체 as specified in the facts.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"More natural phrasing for the speaker's informal monologue/banmal.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 mistranslated ホタル as carousel instead of the code name.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"More natural noun phrase header format in Korean tutorials.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 outputs hallucinated metadata instead of the dialogue.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 has nonsensical grammar and mistranslations.\"}\n]\n```\n",
+  "duration_seconds": 5.122518,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17314,
+   "output_tokens": 316,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17630
+  }
+ }
+}

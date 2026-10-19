@@ -1,0 +1,31 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0107.2",
+  "item-0020.2",
+  "item-0122.1",
+  "item-0022.2",
+  "item-0091.1",
+  "item-0088.1",
+  "item-0034.1",
+  "item-0012.1",
+  "item-0199.2",
+  "item-0140.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4766efe9-c55e-46a3-85f1-5f711acbba21",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified term '마정석' and avoids nonsensical phrasing.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 accurately translates the condition '早ければ来週、遅ければ再来月'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 naturally captures the contemplative nuance of 'ふむ'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 actually translates the line into Korean, whereas 2 left it untranslated.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 translated into English, while 1 left the Korean unchanged.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 translates the full sentence accurately using appropriate 반말.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 to Zhou Ting as specified in facts.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 follows the specified glossary term MoaLogis.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 uses the specified character name 루크 (Rook).\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 completely mistranslates '有空' ('have free time') as 'wish I had time'.\"}\n]\n```\n",
+  "duration_seconds": 5.528236,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17177,
+   "output_tokens": 357,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17534
+  }
+ }
+}

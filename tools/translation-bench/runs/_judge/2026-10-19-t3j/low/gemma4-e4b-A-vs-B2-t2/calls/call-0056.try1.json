@@ -1,0 +1,31 @@
+{
+ "call": 56,
+ "try": 1,
+ "ids": [
+  "item-0011.2",
+  "item-0018.1",
+  "item-0160.2",
+  "item-0184.1",
+  "item-0244.1",
+  "item-0010.1",
+  "item-0018.2",
+  "item-0072.2",
+  "item-0268.1",
+  "item-0170.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "947b67cb-d4b4-4296-a6be-8866863e260f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Scheduled future plan; Translation 2 incorrectly implies she is currently en route.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly transliterates character names into Korean per the facts.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translates the name and accurately conveys asking to be treated to food.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Maintains proper terminal punctuation matching a complete sentence.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Took out ... from' accurately conveys retrieving the item from inside.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly includes the contextually and literally present title 'new hire' (신입).\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correctly transliterates character names into Korean per the facts.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese text untranslated.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Better captures the instructional second-person tone and '직접' (yourself).\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"More natural heading style in English onboarding documentation.\"}\n]\n```\n",
+  "duration_seconds": 5.094189,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17414,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17738
+  }
+ }
+}

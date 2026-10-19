@@ -1,0 +1,31 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0048.2",
+  "item-0136.2",
+  "item-0127.2",
+  "item-0298.2",
+  "item-0264.1",
+  "item-0084.1",
+  "item-0346.1",
+  "item-0007.2",
+  "item-0196.2",
+  "item-0094.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7f67f57f-289e-4497-930f-5c27b51bed51",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Captain is defined as 선장, not 함장.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both use correct honorifics and terms; particle omission is natural.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the designated term 'Revisions'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses the specified term '카운슬 택스' and required 해요체 register.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese text.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'It's Nagi' is the natural answer to who was asked.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both correctly use 해요체 and convey the meaning naturally.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Lin Xia is female, so she addresses her brother as 오빠.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Hikaru is female, so 'she' is the correct pronoun.\"}\n]\n```\n",
+  "duration_seconds": 4.848635,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17515,
+   "output_tokens": 318,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17833
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0093.1",
+  "item-0115.2",
+  "item-0170.2",
+  "item-0012.2",
+  "item-0013.2",
+  "item-0055.1",
+  "item-0130.2",
+  "item-0333.1",
+  "item-0292.2",
+  "item-0001.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b2939f46-f1a9-4ef9-9996-fc0acab17dbe",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"간식 is more natural, though both misidentified 湊 as 미나.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly parses Ceres as destination and noon accurately.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 uses correct Korean particles and natural phrasing.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 expresses 'stage it' more naturally in Korean Git terminology.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 correctly reflects the hearsay '-そうですよ' structure.\"}\n]\n```\n",
+  "duration_seconds": 3.854622,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17582,
+   "output_tokens": 302,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17884
+  }
+ }
+}

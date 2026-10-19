@@ -1,0 +1,31 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0050.1",
+  "item-0033.1",
+  "item-0217.2",
+  "item-0363.1",
+  "item-0212.1",
+  "item-0110.1",
+  "item-0225.1",
+  "item-0349.2",
+  "item-0259.1",
+  "item-0327.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b47e4bfe-7000-4d2d-b6bb-fa10cac893db",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"In Git context, 'theirs' refers to the branch being merged.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both incorrectly translate 'ナギです' as 'I am 18'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'Pinned pages' is the natural standard terminology in English.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both misread 小鳥遊 (Takanashi) and mistranslate 'ワークスペース' (Space).\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 bizarrely mistranslates 'いいね' as '인싸'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"烏丸 (Karasuma) should be marked with the personal particle '에게'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'こりゃあ' is more accurately rendered as '이건'.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both failed to translate the Japanese text into Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Pronunciation note indicates Tomasz is '토마시', not '토마시스'.\"}\n]\n```\n",
+  "duration_seconds": 4.692854,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17123,
+   "output_tokens": 344,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17467
+  }
+ }
+}

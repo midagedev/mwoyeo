@@ -1,0 +1,27 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0016.1",
+  "item-0144.2",
+  "item-0212.1",
+  "item-0150.1",
+  "item-0043.1",
+  "item-0070.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "75bb5130-212e-4d1b-acf4-534eb2940003",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"저 is more polite and natural than 저기 when addressing a superior.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified pinyin Yuè Chuān.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 leaves the name 澪 untranslated into Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Keeping the spelling Aoife makes the pronunciation explanation make sense.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translates chasing the utility company much more naturally.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 as required for Mina.\"}\n]\n",
+  "duration_seconds": 33.528317,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16315,
+   "output_tokens": 3864,
+   "thinking_tokens": 3674,
+   "cache_read_tokens": 0,
+   "total_tokens": 20179
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0270.2",
+  "item-0201.1",
+  "item-0088.1",
+  "item-0363.2",
+  "item-0387.2",
+  "item-0365.1",
+  "item-0368.2",
+  "item-0277.2",
+  "item-0225.1",
+  "item-0344.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "14934dda-80df-4b47-971e-cda1cd4c63f7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Mina speaks 반말; 2 mistakenly uses 해요체.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Thorne speaks 해요체 to Rook; 2 incorrectly uses 반말.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"2 leaves kanji untranslated/unconverted.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"1 failed to translate the Korean source into English.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Both mistranslated 湊, but 1 correctly transcribed ユウ as 유우.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both make the exact same error mistranslating 湊 as 미나.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Target language is Korean; both failed to translate to Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"1 mistranslates the question as a declarative statement.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both use unnatural terms; neither captures military/subordinate banter appropriately.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"1 keeps 'Elder Qin' and captures the meaning better than 2.\"}\n]\n```\n",
+  "duration_seconds": 5.999529,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17497,
+   "output_tokens": 326,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17823
+  }
+ }
+}

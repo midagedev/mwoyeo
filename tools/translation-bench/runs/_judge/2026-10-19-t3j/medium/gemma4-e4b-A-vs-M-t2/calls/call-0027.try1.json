@@ -1,0 +1,27 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0232.1",
+  "item-0112.1",
+  "item-0200.2",
+  "item-0338.1",
+  "item-0331.1",
+  "item-0208.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1afd256d-953f-4efc-8c57-4012ef29a6a3",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and faithful.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified 해요체 speech level.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the specified term Karrot.\"}\n]\n```\n",
+  "duration_seconds": 16.564217,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16096,
+   "output_tokens": 2034,
+   "thinking_tokens": 1851,
+   "cache_read_tokens": 0,
+   "total_tokens": 18130
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0224.2",
+  "item-0180.2",
+  "item-0390.2",
+  "item-0004.1",
+  "item-0059.1",
+  "item-0277.2",
+  "item-0050.2",
+  "item-0341.1",
+  "item-0344.2",
+  "item-0358.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b1f929d6-4d50-44f6-907f-1918fe791275",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Uses the specified term 엠티 for 合宿.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both Day two and Day 2 are natural and accurate translations.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 completes the sentence properly; Translation 2 is cut off.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Xu Nuo speaks to Zhou Ting in 해요체.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Lu Ming addresses Xu Nuo in 반말 and refers to Zhou Ting.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Follows the specified terms 다방 and 부엉이.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Uses the designated term Bureau for 事務所.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Follows the specified term Space for ワークスペース.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both capture the meaning and register accurately.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"}\n]\n```\n",
+  "duration_seconds": 5.835384,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17166,
+   "output_tokens": 302,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17468
+  }
+ }
+}

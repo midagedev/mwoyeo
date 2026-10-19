@@ -1,0 +1,31 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0264.1",
+  "item-0308.2",
+  "item-0219.1",
+  "item-0093.2",
+  "item-0328.1",
+  "item-0331.2",
+  "item-0348.1",
+  "item-0051.2",
+  "item-0200.2",
+  "item-0020.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "279e2158-496d-4020-aa1f-94c44f281edb",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correctly transliterates Gareth as 개러스 and sounds natural.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses correct terminology (메리골드, 반말) and translates Ceres.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translates the elliptical phrasing correctly; female speaker cannot say '자고 있어'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly identifies the dog 'her' rather than 'me'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 mistranslates the person Kai (海) as Mina.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the Chinese line into Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Follows defined terms Pathfinder and fleet allocation, and correct meaning.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Thorne speaks in 반말 to Dex; Translation 2 uses 합쇼체.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Gareth speaks in 해요체, not 합쇼체.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Previous context established Bori's English name is Barley.\"}\n]\n```\n",
+  "duration_seconds": 5.394359,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17466,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17798
+  }
+ }
+}

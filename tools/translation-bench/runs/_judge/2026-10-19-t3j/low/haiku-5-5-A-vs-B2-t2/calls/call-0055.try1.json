@@ -1,0 +1,31 @@
+{
+ "call": 55,
+ "try": 1,
+ "ids": [
+  "item-0309.2",
+  "item-0011.2",
+  "item-0018.1",
+  "item-0160.2",
+  "item-0184.1",
+  "item-0244.1",
+  "item-0010.1",
+  "item-0018.2",
+  "item-0072.2",
+  "item-0268.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cb335304-3146-49f0-9afe-2d220e6e3f7f",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"ユウ uses honorifics toward seniors; 잘하세요 matches 해요체 with honorific suffix.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 sounds much more natural for in-person secondhand sales than direct pickup.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally render the sentence in context.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"The context is food (cake); 먹어보고 is faithful, whereas 써보고 means use.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 uses natural Korean phrasing between peers talking about someone's mom.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"The speaker speaks 반말 to their sibling, matching the tone in 1.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Lu Ming speaks 반말 to Xu Nuo; Translation 2 correctly uses 반말.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and fluent onboarding guide instructions.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Preserves the incomplete trailing sentence truncated on screen without inventing missing letters.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Lu Ming addresses Zhou Ting, whom he speaks to using 해요체.\"}\n]\n",
+  "duration_seconds": 5.269161,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17489,
+   "output_tokens": 340,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17829
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0125.1",
+  "item-0072.2",
+  "item-0107.2",
+  "item-0002.1",
+  "item-0156.2",
+  "item-0182.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dab541c5-9f7a-4320-85c2-eb124de9c693",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 does not omit the first clause.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"예의를 갖춰 is more natural when receiving a guest.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"The inspector conducts the questioning, so 'I'll' is more accurate.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Follows the specified term 펜션 for 民宿.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Follows the specified term Revisions for 履歴.\"}\n]\n",
+  "duration_seconds": 107.85661,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16178,
+   "output_tokens": 12794,
+   "thinking_tokens": 12615,
+   "cache_read_tokens": 0,
+   "total_tokens": 28972
+  }
+ }
+}

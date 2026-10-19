@@ -1,0 +1,31 @@
+{
+ "call": 58,
+ "try": 1,
+ "ids": [
+  "item-0123.1",
+  "item-0131.2",
+  "item-0365.2",
+  "item-0020.2",
+  "item-0056.2",
+  "item-0054.1",
+  "item-0025.1",
+  "item-0216.2",
+  "item-0041.1",
+  "item-0248.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4b43d3fa-2fcf-4029-87b2-d4857ff42540",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Matches the defined character name '쏜'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Matches tenant context without inventing '사장님'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly uses 반말 between Rory and Siobhan.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Avoids awkward and unnatural 'Manager Joonho Byun'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Korean phrasing '경례 그만해' is much more natural.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Follows the glossary term 民宿 = 펜션.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Clean English translation without retaining raw Japanese text.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correct female pronoun 'her' for Xie Xuan.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally in valid 반말.\"}\n]\n```\n",
+  "duration_seconds": 4.495831,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17442,
+   "output_tokens": 300,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17742
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0137.2",
+  "item-0148.2",
+  "item-0023.1",
+  "item-0054.1",
+  "item-0169.1",
+  "item-0167.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "44a12087-7556-49b5-b561-d83377bc0bfa",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"우리 correctly reflects shared family business between siblings, unlike 저희.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both miss the required honorific speech level; punctuation differences are ignored.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Follows the specified term 마정석 for 魔石.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"-잖아요 captures the argumentative, reproachful conversational tone much more naturally.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses the specified character name 루크 rather than 룩.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Accurately follows specified terms Pathfinder and fleet allocation.\"}\n]\n",
+  "duration_seconds": 35.264788,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16063,
+   "output_tokens": 4345,
+   "thinking_tokens": 4159,
+   "cache_read_tokens": 0,
+   "total_tokens": 20408
+  }
+ }
+}

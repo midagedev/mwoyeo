@@ -1,0 +1,31 @@
+{
+ "call": 60,
+ "try": 1,
+ "ids": [
+  "item-0216.2",
+  "item-0041.1",
+  "item-0248.1",
+  "item-0199.2",
+  "item-0101.2",
+  "item-0284.2",
+  "item-0082.1",
+  "item-0359.1",
+  "item-0128.2",
+  "item-0117.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "db17815e-9768-45ae-9dd5-462f11e11751",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Rook speaks to Dex in banmal and maintains the cut-off sentence.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 hallucinates metadata instead of translating the line.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly transliterates Tomasz as 토마시 per the pronunciation note.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Rook uses hapsyoche towards Thorne; '네' is appropriately polite.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Tessai speaks in banmal; 2 mistakenly mixes 해요체 (마세요).\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the line in Korean without translating.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translates 固定しておくと naturally as 'pin' in note apps.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Yuu speaks in haeyoche to Mina; translation 2 uses banmal.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translates only the line, whereas translation 1 includes previous lines.\"}\n]\n```\n",
+  "duration_seconds": 8.472509,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17341,
+   "output_tokens": 336,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17677
+  }
+ }
+}

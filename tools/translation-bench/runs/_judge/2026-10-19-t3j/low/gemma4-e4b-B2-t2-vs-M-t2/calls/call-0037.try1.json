@@ -1,0 +1,31 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0022.2",
+  "item-0170.2",
+  "item-0002.1",
+  "item-0128.2",
+  "item-0076.1",
+  "item-0164.2",
+  "item-0060.2",
+  "item-0133.2",
+  "item-0051.1",
+  "item-0152.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6cc7c948-a099-4088-92c6-7584802715fd",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly uses specified name 주정 instead of 팅.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Kiryu speaks to Takanashi using 해요체.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally natural and acceptable in context.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Accurately uses the required term 품의.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"ひとつ translates more precisely to 'one pocket watch'.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both misinterpret the clause '仇姑娘醒了,替我道声谢' similarly.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Follows the glossary term 모차 and appropriate polite register.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both convey the sentence with virtually identical quality.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Candidate 1 left Japanese untranslated.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan using 반말.\"}\n]\n```\n",
+  "duration_seconds": 4.60112,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5637,
+   "output_tokens": 304,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11818,
+   "total_tokens": 5941
+  }
+ }
+}

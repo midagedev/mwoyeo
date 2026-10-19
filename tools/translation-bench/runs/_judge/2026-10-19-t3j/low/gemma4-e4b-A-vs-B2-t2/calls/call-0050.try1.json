@@ -1,0 +1,31 @@
+{
+ "call": 50,
+ "try": 1,
+ "ids": [
+  "item-0335.1",
+  "item-0157.2",
+  "item-0174.2",
+  "item-0352.1",
+  "item-0078.1",
+  "item-0095.1",
+  "item-0003.2",
+  "item-0331.1",
+  "item-0310.1",
+  "item-0317.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "47d12e79-a5cd-48c5-9a6f-c2873f79dea9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates name Dex to 덱스 and uses natural Korean phrasing.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural with negligible punctuation differences.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left the source text completely untranslated.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated; Translation 2 translates to Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 mistranslates the UI feature name ひとこと as 'One thing is'.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are accurate and natural renderings of the dialogue line.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Active phrasing '제외한' accurately matches 'what you leave out'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Accurately conveys '懐中時計ひとつだけ' ('only one pocket watch').\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated into Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.467901,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17274,
+   "output_tokens": 334,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17608
+  }
+ }
+}

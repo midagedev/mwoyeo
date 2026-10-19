@@ -1,0 +1,31 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0067.2",
+  "item-0081.1",
+  "item-0202.2",
+  "item-0053.2",
+  "item-0107.1",
+  "item-0028.1",
+  "item-0146.2",
+  "item-0123.1",
+  "item-0061.1",
+  "item-0058.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "35258022-2a8a-4c0d-b164-11d5746444d4",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"온천 conveys hot tub much better than 탕 in Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"ひとこと refers to short messages/notes, not an individual word.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 uses correct natural Korean and appropriate polite honorific speech level.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 'what are you looking for'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 uses the specified term '마정석' and avoids severe mistranslations.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"App manuals naturally use inclusive 'we' or passive voice, not 'they'.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both candidates left the source text completely untranslated into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translated into English, while Translation 2 left Japanese untranslated.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 adheres to the specified term 수호막 for 結界.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 omits unnatural pronoun '그녀는' and flows much more naturally.\"}\n]\n",
+  "duration_seconds": 4.901178,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17481,
+   "output_tokens": 341,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17822
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0241.1",
+  "item-0052.1",
+  "item-0372.2",
+  "item-0047.2",
+  "item-0149.2",
+  "item-0372.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "db6bfef4-f5b7-492d-9aed-fc9d3160599c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 translates 'still' much more naturally than Translation 1.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 matching the speaker's speech level.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 and avoids the incorrect reading 철재.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly renders spaceship bridge and uses appropriate informal register.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"장인 fits the traditional tea craft context much better than 기술자.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 and avoids the incorrect reading 철재.\"}\n]\n```\n",
+  "duration_seconds": 47.370786,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16248,
+   "output_tokens": 5904,
+   "thinking_tokens": 5700,
+   "cache_read_tokens": 0,
+   "total_tokens": 22152
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0348.2",
+  "item-0175.1",
+  "item-0236.1",
+  "item-0312.2",
+  "item-0271.1",
+  "item-0121.1",
+  "item-0344.2",
+  "item-0086.2",
+  "item-0137.1",
+  "item-0045.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dec7c629-bb61-412f-a5e3-870da57537a8",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese source into English.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and convey the exact meaning.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Simple past matches 取り戻しました better than expressing ability ('was able to').\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'A previous state' accurately reflects 以前の状態 without assuming a specific state.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Natural Korean phrasing, correct register (해요체), and accurate terminology.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 did not translate into Korean; 1 correctly chose Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'변경 사항 저장' is the standard Korean UI heading for 'Saving your changes'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 hallucinates the surname 'Bae' instead of 'Byun'.\"}\n]\n```\n",
+  "duration_seconds": 4.841849,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16906,
+   "output_tokens": 330,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17236
+  }
+ }
+}

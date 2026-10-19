@@ -1,0 +1,31 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0222.2",
+  "item-0027.1",
+  "item-0098.2",
+  "item-0011.1",
+  "item-0254.2",
+  "item-0129.1",
+  "item-0218.2",
+  "item-0329.2",
+  "item-0328.1",
+  "item-0232.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b888b47c-dcef-4efd-a8c4-657572c6f550",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both mistranslate pronouns; neither correctly conveys that her brother will bring Bori.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 uses '왕도' and maintains better register.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the sentence completely in Japanese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Yuki is male according to the facts, but both used 'her'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 translates the name and uses correct polite level.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 translates '첫 실무' more accurately and naturally.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'딱딱한 얘기는 그만' captures '堅苦しいのはなし' much more accurately.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Both are awkward, but Translation 1 is slightly closer in meaning.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 sounds much more natural in Korean than '그때 전에'.\"}\n]\n```\n",
+  "duration_seconds": 4.909765,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17573,
+   "output_tokens": 330,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17903
+  }
+ }
+}

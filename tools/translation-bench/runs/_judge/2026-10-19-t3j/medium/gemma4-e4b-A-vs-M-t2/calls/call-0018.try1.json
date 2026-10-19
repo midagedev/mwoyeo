@@ -1,0 +1,27 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0016.2",
+  "item-0319.2",
+  "item-0022.2",
+  "item-0120.1",
+  "item-0175.1",
+  "item-0232.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2ef4ae79-b94e-4482-8197-4c890f99aabc",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 is completely untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 is completely untranslated.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 accurately translates into Korean using the correct speech level.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 avoids awkward pronouns and reads much more naturally.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly follows the defined term for 履歴 (Revisions).\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 is completely untranslated.\"}\n]\n```\n",
+  "duration_seconds": 17.275007,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16056,
+   "output_tokens": 2087,
+   "thinking_tokens": 1881,
+   "cache_read_tokens": 0,
+   "total_tokens": 18143
+  }
+ }
+}

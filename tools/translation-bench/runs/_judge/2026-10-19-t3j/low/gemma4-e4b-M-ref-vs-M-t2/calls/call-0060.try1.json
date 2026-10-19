@@ -1,0 +1,31 @@
+{
+ "call": 60,
+ "try": 1,
+ "ids": [
+  "item-0118.2",
+  "item-0162.1",
+  "item-0131.1",
+  "item-0043.2",
+  "item-0283.1",
+  "item-0209.1",
+  "item-0143.1",
+  "item-0235.1",
+  "item-0044.2",
+  "item-0003.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "40e68266-7f14-4444-861d-c2bfde8a0173",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"The speaker speaks to the listener in 반말.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 naturally omits the unnatural pronoun '그녀는'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both are equally good translations.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are natural and convey the meaning accurately.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'그 전에' is natural Korean, whereas '그때 전에' is awkward.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Zhou speaks to Lin Yuan using 해요체.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 naturally translates the Korean laughter 'ㅋㅋㅋㅋ' into English.\"}\n]\n",
+  "duration_seconds": 5.228942,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5620,
+   "output_tokens": 301,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11820,
+   "total_tokens": 5921
+  }
+ }
+}

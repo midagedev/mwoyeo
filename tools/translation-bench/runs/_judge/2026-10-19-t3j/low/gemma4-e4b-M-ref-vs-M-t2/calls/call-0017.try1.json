@@ -1,0 +1,31 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0026.2",
+  "item-0224.1",
+  "item-0074.1",
+  "item-0146.2",
+  "item-0295.1",
+  "item-0209.2",
+  "item-0190.2",
+  "item-0039.2",
+  "item-0243.1",
+  "item-0079.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "872ab7f7-329d-4b75-8f4b-8e8dcdfd84a5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 naturally omits the unnatural pronoun '그녀는'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 accurately captures 老人 as 'old Takanashi'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 naturally uses '걔' between close friends.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"The source sentence '어쩔 수 없' was cut off without punctuation.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Lin Yuan speaks to his younger sister Lin Xia in banmal.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly spells Chaeyul without an unnecessary hyphen.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Standard pinyin without tone mark matches the character naming style.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 accurately translates ひとつ ('one').\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Topic marker '은' sounds much more natural here than '이'.\"}\n]\n```\n",
+  "duration_seconds": 5.498118,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17341,
+   "output_tokens": 318,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17659
+  }
+ }
+}

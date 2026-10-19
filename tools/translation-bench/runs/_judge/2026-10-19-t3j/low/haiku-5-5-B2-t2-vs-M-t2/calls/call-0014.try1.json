@@ -1,0 +1,31 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0087.2",
+  "item-0235.2",
+  "item-0306.2",
+  "item-0112.2",
+  "item-0099.2",
+  "item-0145.2",
+  "item-0140.2",
+  "item-0077.2",
+  "item-0340.2",
+  "item-0341.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3c6ce1ce-a3ed-46db-bcff-e8d407f52a64",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified term '납품일' and proper 합쇼체 register.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 is faithful without hallucinating '태그' not present in the line.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"In web and software UI contexts, '푸터' is much more natural.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are virtually identical in meaning, tone, and register.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 is more natural and uses the appropriate customer-facing polite form.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 includes meta text, and Translation 1 translates to Korean properly.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Zeng Ruoshui speaks about Xie Xuan, though both have slight pronoun issues.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 accurately uses the established term 'ward' for 结界.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 translates 回灵丹 clearly and flows much more naturally.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally in 해요체 with equivalent politeness.\"}\n]\n```\n",
+  "duration_seconds": 4.998179,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17496,
+   "output_tokens": 349,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17845
+  }
+ }
+}

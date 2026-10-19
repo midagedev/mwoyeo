@@ -1,0 +1,31 @@
+{
+ "call": 57,
+ "try": 1,
+ "ids": [
+  "item-0070.2",
+  "item-0164.1",
+  "item-0314.1",
+  "item-0357.1",
+  "item-0247.2",
+  "item-0350.2",
+  "item-0011.2",
+  "item-0018.1",
+  "item-0160.2",
+  "item-0184.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "32c7eda6-67d4-463f-a37a-1b4991e854d1",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the source Japanese text untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Includes 'my' (내) and translates toolkit naturally.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"More complete translation representing '언제든'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"More natural Korean phrasing without the awkward pronoun '그녀는'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both failed: 1 is untranslated, 2 mistranslates 来られる as climb.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Concise and standard Korean noun phrase heading style.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"More accurately reflects the purpose clause 'so Tomasz can look it over'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Matches the required 합쇼체 speech level from Siobhan to Gareth.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left most of the sentence untranslated in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 5.339608,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17028,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17353
+  }
+ }
+}

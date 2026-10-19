@@ -1,0 +1,31 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0148.1",
+  "item-0109.1",
+  "item-0351.1",
+  "item-0259.2",
+  "item-0132.1",
+  "item-0184.2",
+  "item-0107.1",
+  "item-0093.1",
+  "item-0006.1",
+  "item-0292.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fa754c01-c15d-4c90-b56d-8e1d34057113",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"三红 is a tea name best rendered as 삼홍, not 세 홍.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural phrasing for trying food; Translation 1 is overly literal.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 leaves 'anyway' untranslated in English.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 mistranslates 'Quit saluting me' as '덤벼' (bring it on).\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translates @周婷 correctly to @주정 instead of keeping raw Chinese characters.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates into English completely; Translation 1 left Japanese untranslated.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Instructional tone fits onboarding guidelines better and translates imperative naturally.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 did not translate the Japanese text into Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Faithfully captures polite client reception and incomplete sentence structure.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translates the channel '모닥불' as location, whereas 2 mistranslates as topic.\"}\n]\n```\n",
+  "duration_seconds": 5.750309,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17241,
+   "output_tokens": 347,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17588
+  }
+ }
+}

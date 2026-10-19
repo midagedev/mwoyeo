@@ -1,0 +1,31 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0324.2",
+  "item-0252.2",
+  "item-0017.2",
+  "item-0348.1",
+  "item-0281.1",
+  "item-0126.2",
+  "item-0032.1",
+  "item-0103.2",
+  "item-0311.1",
+  "item-0012.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "79101df6-b86b-4b49-8072-e5b92bfcaa45",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both capture the meaning, tone, and register accurately.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly translates deposit receipt as 보증금 영수증 rather than 입금 영수증.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Matches the elliptical sentence ending of the Japanese source more faithfully.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly follows the specified 해요체 speech level.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly adheres to the specified 해요체 speech level to tenants.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Adheres to the specified term Captain = 선장.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Dex speaks to Rook in 반말 as specified.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the source sentence into Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correctly identifies the pronoun referent as Bori (her), not Seoyoon (me).\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Romanizes the Korean name 채율 instead of leaving Hangul untranslated.\"}\n]\n```\n",
+  "duration_seconds": 5.70846,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17714,
+   "output_tokens": 326,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18040
+  }
+ }
+}

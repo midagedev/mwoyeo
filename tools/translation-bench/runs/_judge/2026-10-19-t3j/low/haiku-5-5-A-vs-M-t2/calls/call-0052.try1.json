@@ -1,0 +1,31 @@
+{
+ "call": 52,
+ "try": 1,
+ "ids": [
+  "item-0259.2",
+  "item-0378.1",
+  "item-0380.1",
+  "item-0256.1",
+  "item-0332.1",
+  "item-0176.1",
+  "item-0087.2",
+  "item-0104.2",
+  "item-0074.1",
+  "item-0155.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "85112443-42af-403f-9238-5162346fe769",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Uses correct term '메리골드' and appropriate tone for Rook/Thorne context.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Dex speaks to Thorne in 합쇼체; uses 'Pell/펠' respectfully.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"The person found is a young woman, so pronoun 'her' is correct.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 completely failed to translate into Korean.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately convey booking full-service movers.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Kaoru is male, so pronoun 'his' is correct.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both 'at home' and 'at the house' are natural and accurate.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 leaves Chinese characters untranslated; 2 translates names properly.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Siobhan is female speaking to Rory in 반말, so '오빠' is correct.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Deposit here refers to rental deposit ('보증금'), not '입금'.\"}\n]\n```\n",
+  "duration_seconds": 4.87716,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17611,
+   "output_tokens": 347,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17958
+  }
+ }
+}

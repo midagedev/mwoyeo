@@ -1,0 +1,31 @@
+{
+ "call": 65,
+ "try": 1,
+ "ids": [
+  "item-0216.1",
+  "item-0203.1",
+  "item-0060.2",
+  "item-0197.1",
+  "item-0336.2",
+  "item-0068.1",
+  "item-0098.2",
+  "item-0261.2",
+  "item-0230.1",
+  "item-0097.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7d5c18c6-c5fa-433a-b0b8-dd092a648011",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Rook speaks to Dex in banmal and preserves truncation.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 reads more naturally for an onboarding guide.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 translates 'have free time' unnaturally and garbles the name.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translates 'clean up after' correctly into Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 invents a nonexistent given name 'Otani'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 'あまり' as '아무리' (however much).\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 is slightly better; both have issues with speech level and terms.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 gets the character name Nagi correct instead of Nagisa.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 left the text in Chinese without translating to Korean.\"}\n]\n```\n",
+  "duration_seconds": 6.299459,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17507,
+   "output_tokens": 334,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17841
+  }
+ }
+}

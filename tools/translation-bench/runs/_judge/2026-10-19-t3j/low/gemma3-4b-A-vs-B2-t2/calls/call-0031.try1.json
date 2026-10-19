@@ -1,0 +1,31 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0016.2",
+  "item-0036.1",
+  "item-0266.1",
+  "item-0170.1",
+  "item-0008.1",
+  "item-0120.1",
+  "item-0158.1",
+  "item-0362.2",
+  "item-0153.1",
+  "item-0337.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d3064bfa-d070-4ed1-a6e1-c53e8d42c256",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Neither translated the text into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Both failed required terms, but 2 captures dispatch and guide.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Female speaker should address older brother as '오빠', not '형'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly understands 'ひとこと' as a short comment/word.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 attempted Korean translation; Translation 2 left it untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 sounds much more natural for requesting time off.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 is complete garbled romaji nonsense.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 is much more natural Korean; 2 adds awkward '참고로'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correctly parses passive '전달됩니다' (delivered/forwarded upon confirmation).\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Both missed 'Memotto', but 'Memot' is closer phonetically than 'Memote'.\"}\n]\n```\n",
+  "duration_seconds": 7.121964,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16991,
+   "output_tokens": 338,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17329
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 71,
+ "try": 1,
+ "ids": [
+  "item-0044.2",
+  "item-0340.1",
+  "item-0003.1",
+  "item-0256.2",
+  "item-0151.2",
+  "item-0328.2",
+  "item-0120.2",
+  "item-0266.2",
+  "item-0101.1",
+  "item-0303.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "22d0c5d5-f0ae-4976-b98a-a9593d2ce2c1",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean; Translation 2 correctly translates it.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly romanizes 解玄 as Xie Xuan; Translation 2 mistranslates as Gu Xuan.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Thorne speaks to Rook in 해요체; Translation 2's '말해' is more natural.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Kaoru is male, but Translation 2 incorrectly uses 'her'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates 'there' (그곳에) and matches Tomasz pronunciation guide.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correctly reads 月見里 as Yamanashi and uses term 'sticky notes'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"三红 is a tea blend name ('삼홍'); Translation 2 mistranslates it literally.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Rook uses 합쇼체 with Thorne; '네' fits honorific register.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 is nonsensical; Translation 1 is closer in meaning.\"}\n]\n```\n",
+  "duration_seconds": 5.5647649999999995,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17273,
+   "output_tokens": 359,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17632
+  }
+ }
+}

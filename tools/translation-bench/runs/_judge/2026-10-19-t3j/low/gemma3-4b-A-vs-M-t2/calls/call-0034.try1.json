@@ -1,0 +1,31 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0347.1",
+  "item-0043.1",
+  "item-0097.1",
+  "item-0163.2",
+  "item-0244.2",
+  "item-0173.2",
+  "item-0270.2",
+  "item-0350.1",
+  "item-0310.2",
+  "item-0304.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "bc310cc0-2d2c-40b4-b604-da9347d85086",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 invents hot water; 2 accurately translates hot tub.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 contains severe typos and mangled character name.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 sounds much more natural in Korean dialogue.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified character name 시본.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly translates Saturday, while 2 mistranslates as weekend.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese text completely untranslated.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are equally valid translations of the sentence.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 accurately captures '사이잖아' for '仲でしょ'.\"}\n]\n```\n",
+  "duration_seconds": 4.614322,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17295,
+   "output_tokens": 310,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17605
+  }
+ }
+}

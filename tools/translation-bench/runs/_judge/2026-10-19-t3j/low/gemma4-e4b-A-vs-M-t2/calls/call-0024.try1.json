@@ -1,0 +1,31 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0346.1",
+  "item-0372.1",
+  "item-0306.2",
+  "item-0033.2",
+  "item-0264.2",
+  "item-0006.2",
+  "item-0004.2",
+  "item-0369.1",
+  "item-0178.2",
+  "item-0326.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "57d5cf3b-5c4e-4a85-9e52-57d94b624aa9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Uses the specified term 'Bureau' for 事務所.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Reflects the third-person subject referring to Xie Xuan's promise.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Reads much more naturally in English than the awkward passive phrasing.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Avoids awkward repetition of 'deposit the deposit'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses the specified Korean name 개러스 instead of untranslated English.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly translates into Korean with appropriate banmal speech level.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correctly translates into Korean instead of leaving Chinese text.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Uses the specified spelling 'Seoyoon' and natural phrasing 'at the office'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correctly reads 小鳥遊 as Takanashi rather than Kotori.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translates into Korean using the established term 조합 for ギルド.\"}\n]\n```\n",
+  "duration_seconds": 5.326767,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17232,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17556
+  }
+ }
+}

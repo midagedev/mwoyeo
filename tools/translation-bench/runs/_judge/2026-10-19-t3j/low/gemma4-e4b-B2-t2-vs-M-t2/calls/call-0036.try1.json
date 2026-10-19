@@ -1,0 +1,31 @@
+{
+ "call": 36,
+ "try": 1,
+ "ids": [
+  "item-0203.1",
+  "item-0059.2",
+  "item-0081.2",
+  "item-0066.1",
+  "item-0022.1",
+  "item-0142.1",
+  "item-0105.1",
+  "item-0072.1",
+  "item-0168.2",
+  "item-0118.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "86e7555c-710f-4e65-b1aa-9a5641cf6b99",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 uses the established term '작업 디렉터리' for working tree.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 naturally matches the urgent nuance and Saku's 해요체 register.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 translates 'まあな' more naturally in Korean casual speech.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural renderings of the line.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 uses the specified name '주정' instead of mistranslating Ting.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"The context defines ひろば as Commons/plaza, whereas Space is ワークスペース.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Speaker Lin Yuan addresses his elder colleague Zhou in natural 해요체.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in 반말, which Translation 1 uses.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both incorrectly use 존댓말 instead of 반말, making them equally flawed.\"}\n]\n```\n",
+  "duration_seconds": 4.862392,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17318,
+   "output_tokens": 341,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17659
+  }
+ }
+}

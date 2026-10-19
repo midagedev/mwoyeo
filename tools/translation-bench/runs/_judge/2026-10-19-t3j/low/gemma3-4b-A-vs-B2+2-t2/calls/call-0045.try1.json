@@ -1,0 +1,31 @@
+{
+ "call": 45,
+ "try": 1,
+ "ids": [
+  "item-0344.1",
+  "item-0243.2",
+  "item-0270.1",
+  "item-0035.2",
+  "item-0054.2",
+  "item-0358.1",
+  "item-0150.1",
+  "item-0057.1",
+  "item-0099.1",
+  "item-0055.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "96b5a1fc-6b60-4b1b-b4fe-2020ec6e7b3b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated into English.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly preserves the sentence-ending period from the source.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the text completely untranslated.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese source untranslated into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese source completely untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 contains broken, ungrammatical mixed-script Korean ('맡せて 줘').\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"十河 speaks to junior 日向 using 해요체, not 합쇼체.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 is completely unrelated hallucinated text.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese text completely untranslated into Korean.\"}\n]\n```\n",
+  "duration_seconds": 5.629419,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17437,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17762
+  }
+ }
+}

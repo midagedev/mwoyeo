@@ -1,0 +1,31 @@
+{
+ "call": 75,
+ "try": 1,
+ "ids": [
+  "item-0143.1",
+  "item-0336.1",
+  "item-0235.1",
+  "item-0044.2",
+  "item-0340.1",
+  "item-0003.1",
+  "item-0256.2",
+  "item-0151.2",
+  "item-0328.2",
+  "item-0120.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c367d0ed-f1c1-4696-94fb-90eb51c46643",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"The speaker speaks 반말 to Dex/Rook and Gerald is transliterated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses the specified term 'ward' instead of 'barrier'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Follows the specified term 'stash = 임시 저장'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'헐' expresses shock/surprise naturally captured by 'Wait'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'좋아하지 않아?' correctly captures present preference, unlike past tense.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Context defines 'ひとこと' as a note, not a comment.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Tea processing uses '덖다' and natural spoken tone.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Lin Xia is female speaking to her older brother ('오빠').\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Akira asked to be called just Akira; reads more naturally.\"}\n]\n```\n",
+  "duration_seconds": 5.11035,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17101,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17425
+  }
+ }
+}

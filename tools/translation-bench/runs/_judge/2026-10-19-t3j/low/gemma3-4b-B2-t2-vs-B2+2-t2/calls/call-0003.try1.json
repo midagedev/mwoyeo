@@ -1,0 +1,31 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0037.2",
+  "item-0011.2",
+  "item-0020.2",
+  "item-0025.1",
+  "item-0043.1",
+  "item-0002.1",
+  "item-0024.1",
+  "item-0046.2",
+  "item-0012.1",
+  "item-0044.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fb22f389-10df-4773-b6bc-cd277c781897",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches plural 'short notes' naturally and reflects UI term formatting.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses the established English term 'Commons' from context.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 is severely mistranslated and ungrammatical.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into English entirely.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 leaves Chinese untranslated and uses incorrect subject phrasing.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 sounds much more natural and concise in Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both fail on tone, place names, and National Day (十一) meaning.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Moa Logistics correctly reflects the company name '모아' unlike Moores.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Uses '작업 트리' which is closer to the terminology guidelines.\"}\n]\n```\n",
+  "duration_seconds": 5.445298,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16580,
+   "output_tokens": 318,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16898
+  }
+ }
+}

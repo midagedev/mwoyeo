@@ -1,0 +1,31 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0035.2",
+  "item-0112.1",
+  "item-0097.2",
+  "item-0289.1",
+  "item-0009.1",
+  "item-0016.2",
+  "item-0063.2",
+  "item-0151.2",
+  "item-0216.2",
+  "item-0341.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f923b8b3-55cb-4d9f-9f16-edd681c1112b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'골치 아픈' captures the idiomatic meaning of 骨の折れる better.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural English phrasing using 'help you set up'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Better flow without the unnecessary comma before 'without looking back'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 is in Chinese; Translation 2 correctly translates into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Chinese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Reads more naturally and idiomatically for an onboarding guide.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 translates Gareth into the specified Korean name 개러스.\"}\n]\n```\n",
+  "duration_seconds": 4.505829,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17551,
+   "output_tokens": 320,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17871
+  }
+ }
+}

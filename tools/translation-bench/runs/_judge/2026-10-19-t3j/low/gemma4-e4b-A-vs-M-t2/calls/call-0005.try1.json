@@ -1,0 +1,31 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0022.1",
+  "item-0011.1",
+  "item-0206.1",
+  "item-0238.1",
+  "item-0242.2",
+  "item-0219.2",
+  "item-0060.1",
+  "item-0082.2",
+  "item-0175.2",
+  "item-0145.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7d86ae70-f863-4bb5-b244-f897ebc24da0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both left the Japanese text untranslated into Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly uses female pronoun 'her' for the injured woman.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Siobhan speaks to fellow tenant Rory in 반말, not 존댓말.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Properly transliterates Tomasz to Korean based on the pronunciation guide.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 mistranslates the meaning as sleeping there herself.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Properly preserves Modakbul as the app/service name instead of literal translation.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly translates to Korean using the prescribed term 엠티.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Adheres to the prescribed term 'Revisions' for 履歴.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean; Translation 2 leaves Japanese untranslated.\"}\n]\n```\n",
+  "duration_seconds": 4.738161,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17250,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17582
+  }
+ }
+}

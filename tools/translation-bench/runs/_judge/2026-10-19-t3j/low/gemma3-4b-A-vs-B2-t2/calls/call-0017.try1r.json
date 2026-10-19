@@ -1,0 +1,24 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0225.1",
+  "item-0192.2",
+  "item-0088.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "bdd66208-4fa2-49a5-80c2-cafcfbe9b7f6",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 uses proper 합쇼체, better terms, and accurate meaning.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 misreads the furigana/name and invents 'Otani'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 contains untranslated Japanese and incorrect speech level.\"}\n]\n```\n",
+  "duration_seconds": 3.79474,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15153,
+   "output_tokens": 111,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15264
+  }
+ }
+}

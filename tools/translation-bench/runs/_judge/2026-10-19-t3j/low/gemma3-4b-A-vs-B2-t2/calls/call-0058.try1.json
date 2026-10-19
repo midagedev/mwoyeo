@@ -1,0 +1,26 @@
+{
+ "call": 58,
+ "try": 1,
+ "ids": [
+  "item-0123.1",
+  "item-0131.2",
+  "item-0054.1",
+  "item-0025.1",
+  "item-0248.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b43acfab-02e7-484b-a232-04537eac15dd",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the entire line using the proper 반말 register.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 is much closer in meaning, despite the plural address.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly translates into Korean 해요체, while 2 is untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses the correct demonstrative '그', though both missed the speech level.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 accurately conveys 'thought it would be difficult/complicated'.\"}\n]\n",
+  "duration_seconds": 4.471672,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15839,
+   "output_tokens": 173,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16012
+  }
+ }
+}

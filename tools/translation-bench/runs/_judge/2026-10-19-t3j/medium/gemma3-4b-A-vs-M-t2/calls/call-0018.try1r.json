@@ -1,0 +1,24 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0121.2",
+  "item-0238.1",
+  "item-0344.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "490ca678-8de0-4102-8e1d-8d8ebd9edc61",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 spells Bori correctly and translates '오 좋다' more faithfully.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 is natural; Translation 2 uses an ungrammatical dictionary form.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 構え (holding/readying) instead of swinging.\"}\n]\n```\n",
+  "duration_seconds": 41.330471,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15261,
+   "output_tokens": 4740,
+   "thinking_tokens": 4626,
+   "cache_read_tokens": 0,
+   "total_tokens": 20001
+  }
+ }
+}

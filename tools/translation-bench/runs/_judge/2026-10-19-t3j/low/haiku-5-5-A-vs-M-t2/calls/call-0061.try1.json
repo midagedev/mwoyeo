@@ -1,0 +1,31 @@
+{
+ "call": 61,
+ "try": 1,
+ "ids": [
+  "item-0373.1",
+  "item-0144.1",
+  "item-0375.1",
+  "item-0346.1",
+  "item-0246.1",
+  "item-0318.1",
+  "item-0065.2",
+  "item-0036.1",
+  "item-0090.2",
+  "item-0267.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c5e965a8-1060-4fcb-a35e-4ce9a94d5c39",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Jiu refers to his older brother ('우리 형'), using 'he'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses correct pinyin 'Yuè Chuān' and 'Yún Zhōu' per facts.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Thorne speaks 반말 to Dex; captures meaning naturally.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 untranslated Chinese; Translation 2 left '解辰' in hanja.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Lin Xia/Zhou Yi spoken context ends in 반말 between siblings.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Matches designated term 'Dawn Team' and consistent romanization 'Seojin Um'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Zhou Ting speaks to Lu Ming and Xu Nuo in 반말.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Narrative past tense '돌이었다' and natural verb '닦고 있는' fit well.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Akira is female, so 'her umbrella' is correct.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Takanashi is an old man ('小鳥遊老人'), making 'Ms.' incorrect.\"}\n]\n```\n",
+  "duration_seconds": 6.411356,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17774,
+   "output_tokens": 355,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18129
+  }
+ }
+}

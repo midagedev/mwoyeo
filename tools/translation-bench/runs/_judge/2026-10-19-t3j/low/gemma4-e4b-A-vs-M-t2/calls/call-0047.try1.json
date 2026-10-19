@@ -1,0 +1,24 @@
+{
+ "call": 47,
+ "try": 1,
+ "ids": [
+  "item-0215.1",
+  "item-0128.1",
+  "item-0277.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0a673c35-c37c-4b50-bb72-41ebb1de4df9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly transliterates 解玄 as Xie Xuan per the facts.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.158502,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15213,
+   "output_tokens": 95,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15308
+  }
+ }
+}

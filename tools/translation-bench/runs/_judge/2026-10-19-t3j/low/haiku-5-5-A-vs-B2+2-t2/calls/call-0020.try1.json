@@ -1,0 +1,31 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0270.2",
+  "item-0349.1",
+  "item-0188.2",
+  "item-0082.2",
+  "item-0192.1",
+  "item-0204.2",
+  "item-0027.1",
+  "item-0177.1",
+  "item-0021.1",
+  "item-0309.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5c9c0639-8277-4f58-8ce7-f76642823608",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Accurately translates '突き当たり' as end of hall and appropriate polite expression.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly identifies 'Bori' as 'her' and translates the dog's name into English.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese source untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"More natural Korean phrasing for the manufacturer contact person.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly uses informal speech (반말) suited for dialogue between siblings.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates stash term and phrasing much more naturally.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly understands that the brother is dropping off Bori (her), not Seoyoon.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Properly translates and transcribes the Japanese reading into Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Correct polite sentence ending with proper punctuation matching speech level.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Much more natural Korean phrasing for expressing a parent's request.\"}\n]\n```\n",
+  "duration_seconds": 6.034954,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17586,
+   "output_tokens": 329,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17915
+  }
+ }
+}

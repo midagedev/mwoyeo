@@ -1,0 +1,27 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0109.2",
+  "item-0243.2",
+  "item-0246.2",
+  "item-0057.1",
+  "item-0128.1",
+  "item-0268.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0aac0c69-8d2e-4d60-90a5-9384ad5b5911",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Uses proper 해요체 and honorifics instead of awkward pronouns.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Faithfully translates active '도장 찍었어' rather than receiving a stamp.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses natural conversational 반말 ending instead of written plain form.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Phrases '先に言っておくが' much more naturally and idiomatically.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translates the bridge name naturally without awkward parenthetical Hanja.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'Foot of the mountain' is much more natural and idiomatic.\"}\n]\n```\n",
+  "duration_seconds": 50.107323,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16240,
+   "output_tokens": 6326,
+   "thinking_tokens": 6125,
+   "cache_read_tokens": 0,
+   "total_tokens": 22566
+  }
+ }
+}

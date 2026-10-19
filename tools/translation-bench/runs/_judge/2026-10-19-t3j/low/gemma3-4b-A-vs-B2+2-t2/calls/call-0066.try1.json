@@ -1,0 +1,31 @@
+{
+ "call": 66,
+ "try": 1,
+ "ids": [
+  "item-0287.1",
+  "item-0091.2",
+  "item-0250.1",
+  "item-0375.2",
+  "item-0031.2",
+  "item-0006.2",
+  "item-0052.2",
+  "item-0127.1",
+  "item-0069.2",
+  "item-0061.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0614e523-ae8e-470a-bbe6-1538e0703eea",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly translates '모아' as 'Moa' instead of 'Mora'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated metadata; 2 translates the actual line.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'You' refers to the listener, correctly translated as '당신이'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Gareth is a landlord, so '선생님' is far more appropriate than '팀장님'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean and kept Japanese text.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 reads much more naturally for xianxia dialogue and terminology.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'堅苦しいのはなし' correctly means no need to be formal/stiff.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are identical and accurate.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translates 朔 as '삭' correctly, unlike Translation 1's '숙'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 correctly translates '모닥불' as 'Hearth' and captures onboarding instruction register.\"}\n]\n```\n",
+  "duration_seconds": 4.982469,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17368,
+   "output_tokens": 360,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17728
+  }
+ }
+}

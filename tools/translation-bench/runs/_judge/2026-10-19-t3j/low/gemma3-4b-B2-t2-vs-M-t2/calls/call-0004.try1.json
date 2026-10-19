@@ -1,0 +1,31 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0037.1",
+  "item-0077.2",
+  "item-0096.2",
+  "item-0220.1",
+  "item-0143.2",
+  "item-0089.2",
+  "item-0083.2",
+  "item-0025.2",
+  "item-0186.1",
+  "item-0109.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9d516b9e-3754-4397-8273-84e52795d2cd",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"채율 is transcribed as Cha-eul, not Jae-yeol.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses required term qi stone and translates zongmen.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Uses correct 반말 speech level and term 소장/점장.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Accurately conveys indirect speech from incomplete source clause.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the text in Japanese.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both incorrectly use male pronoun 'he' for female character 解玄.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"押さえた in this context means booked/reserved (예약했어).\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly keeps inspector Akira's title and full name.\"}\n]\n```\n",
+  "duration_seconds": 4.731751,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17578,
+   "output_tokens": 312,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17890
+  }
+ }
+}

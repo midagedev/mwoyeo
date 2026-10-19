@@ -1,0 +1,31 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0093.1",
+  "item-0115.2",
+  "item-0170.2",
+  "item-0012.2",
+  "item-0013.2",
+  "item-0055.1",
+  "item-0130.2",
+  "item-0333.1",
+  "item-0292.2",
+  "item-0001.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7d3a46fe-9a73-476a-a546-8aba8588a84b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates Japanese kanji 澪 into Korean 미오.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말; Translation 2 uses unnatural pronouns and 해요체.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Captain Thorne speaks to Dex in 반말, matching Translation 1.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 transliterates Chaeyul instead of leaving untranslated Korean script.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both capture the meaning well; neither followed the term '작업 디렉터리'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 uses appropriate 합쇼체 register without adding unprompted 사장님.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 avoids the clunky and unnatural 'Mr./Ms.' honorific phrasing.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"The speaker used honorifics (해요체), defying the order; both convey this equally.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Context indicates the collapsed person is a young woman (年轻女).\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Siobhan speaks to Rory in 반말; Translation 1 uses 해요체.\"}\n]\n```\n",
+  "duration_seconds": 5.550967,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17405,
+   "output_tokens": 363,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17768
+  }
+ }
+}

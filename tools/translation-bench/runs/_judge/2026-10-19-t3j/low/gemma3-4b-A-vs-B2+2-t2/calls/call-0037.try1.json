@@ -1,0 +1,31 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0129.1",
+  "item-0212.1",
+  "item-0372.1",
+  "item-0319.2",
+  "item-0089.2",
+  "item-0268.2",
+  "item-0058.2",
+  "item-0188.1",
+  "item-0274.1",
+  "item-0187.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ebccfa62-4d72-4be8-8c0d-339ef95c5962",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Aoife is pronounced closer to 이프; '틀어지면' is unnatural here.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 naturally translates 'ついてる' as having each other's back.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both failed to translate into the target language Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Chinese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Chinese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly attributes the age to Nagi, not speaker.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Both mistranslated intranet name, but 2 translates '끝입니다' more naturally.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 translates '没什么' naturally as '별거 없어'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Rook speaks 반말 to Dex; translation 2 uses incorrect honorifics.\"}\n]\n```\n",
+  "duration_seconds": 6.107839,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17425,
+   "output_tokens": 333,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17758
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 13,
+ "try": 1,
+ "ids": [
+  "item-0074.1",
+  "item-0153.1",
+  "item-0227.2",
+  "item-0105.2",
+  "item-0266.1",
+  "item-0033.2",
+  "item-0028.1",
+  "item-0322.1",
+  "item-0265.1",
+  "item-0042.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4d3823c8-ff39-4225-ac82-98d0e9bd814b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural phrasing for '年寄り相手に' and smoother advice.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'푸터' is standard UI terminology in web/software development.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'예약해뒀어' better reflects the nuance of '押さえた' (secured/held).\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and accurately convey the meaning.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both accurately translate the Japanese sentence with natural English phrasing.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"More natural word order and particle usage in Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"First-year student speaking politely (해요체) naturally uses '저도', not '나도'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Consistently uses 해요체 as specified; Translation 1 mixes speech levels awkwardly.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'三成' means 30%/three tenths, not the pinyin name 'Sanzheng'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are natural and convey the meaning accurately.\"}\n]\n```\n",
+  "duration_seconds": 5.24837,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17338,
+   "output_tokens": 343,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17681
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 16,
+ "try": 1,
+ "ids": [
+  "item-0265.2",
+  "item-0094.2",
+  "item-0277.2",
+  "item-0071.1",
+  "item-0236.2",
+  "item-0001.2",
+  "item-0200.2",
+  "item-0225.1",
+  "item-0112.1",
+  "item-0017.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "bf6d18bb-07af-4e8e-bc92-f5921e26e10f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 accurately uses 'messenger' for 사내 메신저.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 completely failed to translate from Chinese to Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Yu speaks to Mina in 해요체; Translation 1 uses 해요체.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left Japanese untranslated; Translation 2 attempted Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Siobhan speaks to Rory in 반말; Translation 2 correctly uses 반말.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Bori's gender is unknown; 'He/She' is better than assuming male.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 completely mistranslates the meaning of 醒了,替我道声谢.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Both failed to translate the first half, but 2's Korean makes sense.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are accurate and natural translations of the onboarding guide title.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Both have untranslated English, but 2 clarifies the subject '네가'.\"}\n]\n```\n",
+  "duration_seconds": 5.143791,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17285,
+   "output_tokens": 351,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17636
+  }
+ }
+}

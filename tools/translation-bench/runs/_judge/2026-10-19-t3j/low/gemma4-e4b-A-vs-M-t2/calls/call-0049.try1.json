@@ -1,0 +1,25 @@
+{
+ "call": 49,
+ "try": 1,
+ "ids": [
+  "item-0065.1",
+  "item-0084.2",
+  "item-0353.1",
+  "item-0114.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "eba48a24-9a71-49c2-be40-d9cacebf8985",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Uses the specified romanization 'Jiu' from facts.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Follows the specified term 'watch' from facts.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both correctly convey the meaning and tone in 반말.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean.\"}\n]\n```\n",
+  "duration_seconds": 3.580386,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15272,
+   "output_tokens": 124,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15396
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 58,
+ "try": 1,
+ "ids": [
+  "item-0244.1",
+  "item-0010.1",
+  "item-0018.2",
+  "item-0072.2",
+  "item-0268.1",
+  "item-0170.1",
+  "item-0231.2",
+  "item-0071.2",
+  "item-0186.1",
+  "item-0048.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "289ce14c-b008-4bfb-a39b-c2f53471a1d0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"こりゃあ means 'this', matching 이건 naturally.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses singular 'The seat' and matches transliteration from facts.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Accurately conveys pushing to the server so Tomasz can check it.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both failed to translate into Korean and kept Chinese text.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"リーシア speaks 반말 to 朔, but both used 해요체; 2 has correct ending.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Accurately conveys 'I am relieved' with natural phrasing and correct register.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Correct pinyin 'Xiè Xuán' and correct female pronoun 'her'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Uses correct informal register (반말) without honorific suffix for niece.\"}\n]\n```\n",
+  "duration_seconds": 5.015526,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17560,
+   "output_tokens": 323,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17883
+  }
+ }
+}

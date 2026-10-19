@@ -1,0 +1,31 @@
+{
+ "call": 16,
+ "try": 1,
+ "ids": [
+  "item-0219.1",
+  "item-0344.1",
+  "item-0281.2",
+  "item-0015.2",
+  "item-0302.1",
+  "item-0177.2",
+  "item-0361.2",
+  "item-0309.2",
+  "item-0285.2",
+  "item-0345.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9ab50de7-f545-47d5-938f-982748cfb21a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"In tea processing, 叶子 refers to tea leaves and 炒 to parching.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are accurate and natural UI/documentation headings.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Pell speaks to Thorne; Translation 1 translates Thorne and uses proper honorifics.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"あの人 refers to Kiryu, who just left, making 저 사람 more natural.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both are natural and faithful English translations.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Dex speaks to Rook using 반말 and Rook is spelled 루크.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both are virtually identical, though both misinterpret 醒了 as already awake.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Referring to an external vendor's representative internally is naturally ~씨 in Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"온수 욕조 directly translates hot tub consistent with context.\"}\n]\n```\n",
+  "duration_seconds": 5.1929549999999995,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17253,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17578
+  }
+ }
+}

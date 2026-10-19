@@ -1,0 +1,31 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0116.2",
+  "item-0223.2",
+  "item-0183.2",
+  "item-0207.2",
+  "item-0082.2",
+  "item-0167.2",
+  "item-0018.1",
+  "item-0124.1",
+  "item-0215.2",
+  "item-0217.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "feb2f780-331c-4e01-bfda-fc8421d8f6fc",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Surname 月見里 is parsed properly as a family name.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses correct term '조합' and appropriate 반말 speech level.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations awkwardly mistranslate 'ma'am' into Korean.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both mistranslate proper name 海 as literal '바다' (sea).\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Cargo/delivery unloading is correctly translated as unloading, not disembarking.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"합쇼체 with honorific '연락드리겠습니다' correctly addresses the section chief.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately with appropriate politeness.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 respects term 'fleet allocation' and avoids confusing 'guide'.\"}\n]\n```\n",
+  "duration_seconds": 4.9925239999999995,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17261,
+   "output_tokens": 323,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17584
+  }
+ }
+}

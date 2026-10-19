@@ -1,0 +1,31 @@
+{
+ "call": 70,
+ "try": 1,
+ "ids": [
+  "item-0151.2",
+  "item-0328.2",
+  "item-0120.2",
+  "item-0266.2",
+  "item-0101.1",
+  "item-0303.2",
+  "item-0226.2",
+  "item-0168.1",
+  "item-0238.2",
+  "item-0016.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cfee7fe9-4768-4092-9468-0ed6f381e93b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Zhou Ting speaks to friends in 반말, matched by Translation 1.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate headings for '둘째 날'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly follows the defined term '先輩 = boss'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Lin Yuan uses 반말 to Lin Xia, unlike Translation 2's 해요체.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Kai speaks to juniors/members in 반말, matched by Translation 1.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, whereas Translation 2 is Japanese.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translates or transliterates app terms rather than leaving raw Japanese characters.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are completely natural, accurate, and equivalent in meaning.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are accurate and equally natural literary Korean translations.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'got in' means arrived directly, not reported speech ('도착했대').\"}\n]\n```\n",
+  "duration_seconds": 5.654833,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17043,
+   "output_tokens": 333,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17376
+  }
+ }
+}

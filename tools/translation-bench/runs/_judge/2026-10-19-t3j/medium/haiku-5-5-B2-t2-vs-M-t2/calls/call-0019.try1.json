@@ -1,0 +1,27 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0124.1",
+  "item-0101.2",
+  "item-0096.1",
+  "item-0326.1",
+  "item-0149.1",
+  "item-0241.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "05eb618d-4f37-4ede-b828-8385f7bfdc71",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 and the specified term 부엉이.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 according to the speaker facts.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates '只' (만) and the original nuance.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 時計 as watch per the facts.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 better captures the experiential aspect and contrastive particle.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and convey the same meaning.\"}\n]\n```\n",
+  "duration_seconds": 57.72469,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16128,
+   "output_tokens": 6734,
+   "thinking_tokens": 6535,
+   "cache_read_tokens": 0,
+   "total_tokens": 22862
+  }
+ }
+}

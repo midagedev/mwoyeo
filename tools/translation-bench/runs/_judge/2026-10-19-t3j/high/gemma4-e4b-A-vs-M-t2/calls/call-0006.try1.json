@@ -1,0 +1,36 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0077.1",
+  "item-0085.2",
+  "item-0273.1",
+  "item-0191.2",
+  "item-0073.1",
+  "item-0369.1",
+  "item-0231.1",
+  "item-0236.1",
+  "item-0109.1",
+  "item-0085.1",
+  "item-0194.2",
+  "item-0063.2",
+  "item-0012.2",
+  "item-0099.2",
+  "item-0174.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7365ebb8-a859-4c9d-b5f4-fafb9e4a3e7d",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly keeps Modakbul as a tool name rather than bonfire.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly translates ship bridge as 조타실 instead of 다리.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Uses specified name spelling Seoyoon and natural term office.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translates edits and out of your way much more naturally.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Chinese.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Chinese.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Past perfect reads more naturally for narrative scene setting.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translates names into Korean as specified in the facts.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Search scope is standard and more natural for software documentation.\"}\n]\n",
+  "duration_seconds": 78.519202,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 18632,
+   "output_tokens": 10848,
+   "thinking_tokens": 10418,
+   "cache_read_tokens": 0,
+   "total_tokens": 29480
+  }
+ }
+}

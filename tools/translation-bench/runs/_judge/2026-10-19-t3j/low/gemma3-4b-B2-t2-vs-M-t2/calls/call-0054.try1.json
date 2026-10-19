@@ -1,0 +1,31 @@
+{
+ "call": 54,
+ "try": 1,
+ "ids": [
+  "item-0003.1",
+  "item-0256.2",
+  "item-0151.2",
+  "item-0120.2",
+  "item-0266.2",
+  "item-0101.1",
+  "item-0226.2",
+  "item-0168.1",
+  "item-0238.2",
+  "item-0016.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "448fcfb1-3ad3-4cff-b78b-de6d5db5a671",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"출입증 is accurately translated as access card rather than ID card.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Supplies the necessary subject 'he' missing in Translation 2.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'Clean up after' referring to a pet means 뒷정리, not 짐.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Context specifies pocket watch; Translation 2 mistranslates watch as clock.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses the confirmed spelling Subin from facts instead of Soobin.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into the target language English.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean; Translation 1 attempted Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translated into target language Korean using correct reading 타카나시.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 remained in Chinese instead of target language Korean.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Successfully translated into Korean, while Translation 1 remained in Chinese.\"}\n]\n```\n",
+  "duration_seconds": 5.07649,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17539,
+   "output_tokens": 329,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17868
+  }
+ }
+}

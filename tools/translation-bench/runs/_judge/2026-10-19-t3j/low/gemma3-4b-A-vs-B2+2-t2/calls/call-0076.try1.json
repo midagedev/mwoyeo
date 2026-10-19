@@ -1,0 +1,23 @@
+{
+ "call": 76,
+ "try": 1,
+ "ids": [
+  "item-0287.2",
+  "item-0232.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f04e1ea8-d547-497c-8f9f-96c6751cf1a1",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 misspells the company name as Mora instead of Moa.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the meaning; Translation 2 is completely garbled.\"}\n]\n```\n",
+  "duration_seconds": 2.748017,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 2911,
+   "output_tokens": 76,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11811,
+   "total_tokens": 2987
+  }
+ }
+}

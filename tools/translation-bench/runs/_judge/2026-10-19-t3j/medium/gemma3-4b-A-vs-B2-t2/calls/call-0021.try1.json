@@ -1,0 +1,27 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0027.2",
+  "item-0209.2",
+  "item-0312.1",
+  "item-0241.2",
+  "item-0057.1",
+  "item-0367.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f903a3a9-e1f6-41e2-bbfb-04601e6a3608",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates brother rather than inventing an older boyfriend.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated, whereas Translation 2 translates accurately.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated Chinese, while Translation 1 translated into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 is natural and accurately translates trying food from their bakery.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 uses the correct 반말 register and conveys the intended meaning.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese text completely untranslated.\"}\n]\n```\n",
+  "duration_seconds": 38.663706,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16169,
+   "output_tokens": 4776,
+   "thinking_tokens": 4571,
+   "cache_read_tokens": 0,
+   "total_tokens": 20945
+  }
+ }
+}

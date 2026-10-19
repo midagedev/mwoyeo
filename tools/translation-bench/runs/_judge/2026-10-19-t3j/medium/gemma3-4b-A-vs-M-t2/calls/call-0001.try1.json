@@ -1,0 +1,27 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0061.2",
+  "item-0319.1",
+  "item-0064.1",
+  "item-0145.2",
+  "item-0369.1",
+  "item-0304.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1db03a9b-d1a7-4343-a6d2-d7a80210a193",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"2 gets the surname closer and preserves the term formation eye.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"1 translated the line, while 2 left it in Japanese.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"1 translated the line, while 2 left it in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"1 is more natural using 간식 담당 instead of 과자 담당.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"1 translates the greeting naturally; 2 translates Morning literally as 오전.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"1 is natural, while 2 contains ungrammatical phrasing (친구들인데로 하자).\"}\n]\n",
+  "duration_seconds": 30.558878,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16209,
+   "output_tokens": 3518,
+   "thinking_tokens": 3321,
+   "cache_read_tokens": 0,
+   "total_tokens": 19727
+  }
+ }
+}

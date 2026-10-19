@@ -1,0 +1,25 @@
+{
+ "call": 56,
+ "try": 1,
+ "ids": [
+  "item-0018.1",
+  "item-0160.2",
+  "item-0018.2",
+  "item-0072.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "26d4538f-54dd-4aec-868e-e7e8704ab772",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 mistranslates 'she's out' as resigning from a job.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 was not translated into English at all.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 'she's out' as resigning from a job.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 was not translated into Korean at all.\"}\n]\n```\n",
+  "duration_seconds": 3.5466569999999997,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15555,
+   "output_tokens": 141,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15696
+  }
+ }
+}

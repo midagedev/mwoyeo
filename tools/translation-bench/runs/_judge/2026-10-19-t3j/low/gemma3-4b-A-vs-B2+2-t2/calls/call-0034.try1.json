@@ -1,0 +1,31 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0253.2",
+  "item-0100.2",
+  "item-0063.1",
+  "item-0262.2",
+  "item-0032.2",
+  "item-0201.1",
+  "item-0026.1",
+  "item-0053.1",
+  "item-0167.2",
+  "item-0231.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4e06b819-9ba9-462e-a4d4-cf85db7e66f4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Thorne uses 해요체 to Rook; Translation 2 incorrectly uses 반말.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 completely mistranslates the meaning and names.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both incorrectly use female pronouns for the male client Yuki.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'First day' is more natural as a section heading.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Chinese.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses correct informal register (반말) and Sino-Korean numbers for price.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 hallucinates metadata instead of translating the line.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'How do you interpret' accurately translates どう見る (what's your take).\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the pinyin and English for 蓑衣.\"}\n]\n```\n",
+  "duration_seconds": 4.4845369999999996,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17416,
+   "output_tokens": 323,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17739
+  }
+ }
+}

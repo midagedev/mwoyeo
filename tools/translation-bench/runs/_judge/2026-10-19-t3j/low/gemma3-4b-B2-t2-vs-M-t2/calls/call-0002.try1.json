@@ -1,0 +1,31 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0196.1",
+  "item-0171.1",
+  "item-0050.1",
+  "item-0031.2",
+  "item-0079.1",
+  "item-0007.2",
+  "item-0121.2",
+  "item-0174.1",
+  "item-0046.2",
+  "item-0270.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "860dee62-e8d6-4e68-a5c7-89adbbba22cb",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 actually translated the text into Korean, unlike Translation 1.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the character's name Kaoru.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Dex speaks to Thorne in 합쇼체; Translation 1 uses appropriate honorifics.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 is completely unrelated hallucinated UI metadata.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translated into Korean, while Translation 2 left it in Japanese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 translated into English, while Translation 2 left it in Chinese.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly capitalizes the name and is much more natural.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly follows the term rule Captain = 선장.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Rook speaks to Dex in 반말 and preserves the truncated sentence ending.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 translated into Korean, while Translation 1 remained in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 4.609736,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17402,
+   "output_tokens": 336,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17738
+  }
+ }
+}

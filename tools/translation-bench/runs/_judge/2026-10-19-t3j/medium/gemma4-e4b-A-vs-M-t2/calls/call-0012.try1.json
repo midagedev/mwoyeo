@@ -1,0 +1,27 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0145.1",
+  "item-0153.2",
+  "item-0158.2",
+  "item-0069.2",
+  "item-0056.2",
+  "item-0233.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "77f6feb1-d13c-4532-aa82-42cdbe9fc552",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 naturally translates \\\"Yes sir\\\" instead of using \\\"사장님\\\".\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 mistranslates the feature name as \\\"One thing is,\\\".\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly transcribes the name into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"}\n]\n```\n",
+  "duration_seconds": 27.004786,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16168,
+   "output_tokens": 3176,
+   "thinking_tokens": 2987,
+   "cache_read_tokens": 0,
+   "total_tokens": 19344
+  }
+ }
+}

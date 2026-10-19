@@ -1,0 +1,27 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0135.1",
+  "item-0202.1",
+  "item-0078.2",
+  "item-0221.1",
+  "item-0080.2",
+  "item-0330.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1f469fcd-be3d-4c13-8b98-ac4b4009a7e9",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly includes 'from my mother' (母の形見).\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into English, leaving garbled romaji.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 'hot' as '야수' (beast).\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Rory speaks 반말 to Siobhan; translation 2 uses correct speech level.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 better reflects the pronunciation guide provided in parentheses.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 is natural and grammatically correct English.\"}\n]\n",
+  "duration_seconds": 4.175285,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16038,
+   "output_tokens": 205,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16243
+  }
+ }
+}

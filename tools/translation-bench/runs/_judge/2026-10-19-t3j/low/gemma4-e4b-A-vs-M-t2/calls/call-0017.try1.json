@@ -1,0 +1,31 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0076.2",
+  "item-0150.2",
+  "item-0363.1",
+  "item-0171.1",
+  "item-0004.1",
+  "item-0199.1",
+  "item-0098.2",
+  "item-0043.2",
+  "item-0337.2",
+  "item-0311.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5ec1fcfa-89be-41cf-8c8d-44e9a9a1b7c2",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches standard software documentation phrasing better than literal translation.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates Chinese name 林远 to 린위안 per specified facts.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'Go well' is much more natural English for contracts/negotiations than 'finish'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly follows the term mapping 'ワークスペース = Space'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Accurately translates into Korean, unlike Translation 1 which left Chinese text.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates the line into Korean using appropriate honorifics.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translates into Korean using 해요체 and proper transliteration.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly interprets relaying a message in person rather than leaving one.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Properly translates into Korean matching speaker's informal 반말 speech level.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'Ride in the car' is much more natural English than 'take'.\"}\n]\n```\n",
+  "duration_seconds": 4.328828,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17288,
+   "output_tokens": 329,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17617
+  }
+ }
+}

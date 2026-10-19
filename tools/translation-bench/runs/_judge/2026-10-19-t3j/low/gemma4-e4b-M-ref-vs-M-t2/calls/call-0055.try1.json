@@ -1,0 +1,31 @@
+{
+ "call": 55,
+ "try": 1,
+ "ids": [
+  "item-0289.2",
+  "item-0109.2",
+  "item-0216.1",
+  "item-0203.1",
+  "item-0060.2",
+  "item-0197.1",
+  "item-0286.1",
+  "item-0068.1",
+  "item-0098.2",
+  "item-0261.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3637fcdc-cc30-40c1-b75b-38a368de20f4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 uses the correct 해요체 (-네요) fitting the facts.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'고랑위는' reads more naturally as a topic marker than '고랑위에는'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Speaker is younger sister speaking 반말 to her older brother.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"许诺 speaks to 周婷 in 해요체 as specified in facts.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"周婷 speaks 반말 to friends; correctly transcribes 解 (xiè) as 셰.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'Old man Takanashi' accurately renders Japanese 老人.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan using 반말 as stated in the facts.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 is actually translated into Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 naturally renders '你爸' politely without awkward '당신 아버지'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Dex is speaking to Rook, using 반말 as specified.\"}\n]\n```\n",
+  "duration_seconds": 6.918093,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17621,
+   "output_tokens": 338,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17959
+  }
+ }
+}

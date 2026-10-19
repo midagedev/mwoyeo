@@ -1,0 +1,31 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0019.2",
+  "item-0108.1",
+  "item-0102.2",
+  "item-0097.1",
+  "item-0121.1",
+  "item-0014.1",
+  "item-0054.2",
+  "item-0055.2",
+  "item-0001.1",
+  "item-0005.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "20eba32c-e85f-49c3-9e8c-6cdfc6ddf274",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"소꼬지칭 아소코(あそこ)를 '거기'로 더 정확하게 지칭했습니다.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"린위안의 대사로, 동생에게 반말을 쓰고 이름 표기가 맞습니다.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"지정된 인명 표기 '타카나시'를 바르게 사용했습니다.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"지정된 용어 '合宿 = 엠티'를 정확히 반영했습니다.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"지정된 용어 '打卡 = 인증샷'을 잘 반영했습니다.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"두 번역 모두 반말 종결어미와 뉘앙스를 자연스럽게 살렸습니다.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"두 번역 모두 반말이 아닌 존댓말로 번역되어 동등하게 어색합니다.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"지정된 인명 '주정(정 언니)'을 반영했고 선배에게 존댓말이 누락되었습니다.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"두 번역 모두 정해진 용어(Hearth)를 지키며 자연스럽습니다.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"화자인 펠 의사가 선장에게 말하는 친근한 반말 맥락에 부합합니다.\"}\n]\n```\n",
+  "duration_seconds": 6.327935,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17574,
+   "output_tokens": 404,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17978
+  }
+ }
+}

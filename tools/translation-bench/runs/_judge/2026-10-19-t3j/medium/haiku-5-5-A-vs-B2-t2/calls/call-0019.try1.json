@@ -1,0 +1,27 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0038.1",
+  "item-0132.1",
+  "item-0205.1",
+  "item-0074.1",
+  "item-0342.2",
+  "item-0052.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e84591b7-9be4-44f8-a11d-69bc95a9bf30",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates '守住' accurately as 'guard' rather than 'hold'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly uses the required 해요체 speech level.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Maintains consistent honorific polite tone matching '마세요'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"More faithful to 'ちょうだい' and avoids awkward Japanese translationese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Transcribes the name into Korean instead of leaving Japanese text.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly uses the required 해요체 speech level.\"}\n]\n```\n",
+  "duration_seconds": 104.269629,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16277,
+   "output_tokens": 12721,
+   "thinking_tokens": 12528,
+   "cache_read_tokens": 0,
+   "total_tokens": 28998
+  }
+ }
+}

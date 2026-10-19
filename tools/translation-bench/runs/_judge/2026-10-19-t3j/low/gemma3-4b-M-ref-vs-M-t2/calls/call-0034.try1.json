@@ -1,0 +1,31 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0318.2",
+  "item-0365.2",
+  "item-0133.2",
+  "item-0326.2",
+  "item-0283.2",
+  "item-0121.1",
+  "item-0360.2",
+  "item-0086.2",
+  "item-0137.1",
+  "item-0045.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a351bd1a-cac1-429e-9fea-b828e922d91c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Adding '브랜치' after '우리/그들의' makes the meaning much clearer.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Punctuation difference only; ignore formatting per instructions.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left the source text untranslated.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"More faithfully captures the incomplete sentence structure and nuance.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'고객용 주차장' is more natural Korean than '고객님을 위한 주차장'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'裂了' means cracked, not breached.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 leaves Chinese characters untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"More concise and natural phrasing without unnecessary passive construction.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both awkwardly translate 'Morning both' literally.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 leaves Chinese characters untranslated.\"}\n]\n```\n",
+  "duration_seconds": 4.441078,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17281,
+   "output_tokens": 312,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17593
+  }
+ }
+}

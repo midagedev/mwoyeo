@@ -1,0 +1,31 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0267.2",
+  "item-0315.2",
+  "item-0316.2",
+  "item-0176.2",
+  "item-0334.1",
+  "item-0127.2",
+  "item-0196.2",
+  "item-0334.2",
+  "item-0182.2",
+  "item-0093.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "299028a3-447a-46ca-b4b9-24405e652282",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates Japanese to Korean.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate representations of 300.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 translates the text into appropriate Korean 해요체.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly translates into Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly translates into Korean using proper honorifics.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses the specified name 저우 이모 from facts.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both English translations are accurate, natural, and equivalent.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean using appropriate deferential style.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both 'unpacking' and 'organizing' naturally translate 정리하는 거 in moving context.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 correctly translates the line into Korean.\"}\n]\n```\n",
+  "duration_seconds": 4.399094,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17514,
+   "output_tokens": 309,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17823
+  }
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0086.2",
+  "item-0180.1",
+  "item-0046.2",
+  "item-0099.2",
+  "item-0266.2",
+  "item-0199.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9b7dbd04-5442-40b2-990b-a0328bf92d3f",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Uses specified term 품의서 for 稟議.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 was left untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Captures 반말 and the cut-off sentence ending.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Uses specified company name MoaLogis.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses specified name spelling Subin.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses specified character name 루크.\"}\n]\n```\n",
+  "duration_seconds": 13.692418,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16133,
+   "output_tokens": 1346,
+   "thinking_tokens": 1172,
+   "cache_read_tokens": 0,
+   "total_tokens": 17479
+  }
+ }
+}

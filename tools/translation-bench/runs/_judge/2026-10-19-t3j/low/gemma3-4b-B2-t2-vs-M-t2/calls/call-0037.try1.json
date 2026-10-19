@@ -1,0 +1,31 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0187.2",
+  "item-0005.1",
+  "item-0053.1",
+  "item-0230.1",
+  "item-0072.2",
+  "item-0216.1",
+  "item-0158.1",
+  "item-0158.2",
+  "item-0269.2",
+  "item-0243.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0fac56d9-b597-4b61-a821-367181e64acc",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 changed the text to Japanese instead of translating to English.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly follows the defined term '灵石 = qi stone'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese, while Translation 2 translates to Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 is completely wrong, copying the episode title.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly translates '할 일을' as 'your tasks'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 uses the established name '루크' instead of '룩'.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both mistranslate 厦门 (Xiamen) and 十一 (National Day).\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both mistranslate 厦门 (Xiamen) and 十一 (National Day).\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 uses the established name spelling 'Jiu'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Rook speaks to Thorne in 합쇼체, correctly used in Translation 2.\"}\n]\n```\n",
+  "duration_seconds": 4.694851,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17058,
+   "output_tokens": 347,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17405
+  }
+ }
+}

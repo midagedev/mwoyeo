@@ -1,0 +1,31 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0142.2",
+  "item-0198.1",
+  "item-0085.1",
+  "item-0321.1",
+  "item-0280.1",
+  "item-0114.2",
+  "item-0290.1",
+  "item-0250.2",
+  "item-0377.2",
+  "item-0278.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8f9d4186-148b-4cdb-9cfb-fcabe6d38db3",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 mistranslates 'you' as 'she' ('그녀가').\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 uses correct informal speech level (반말) and natural phrasing.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Rook speaks to Thorne in 합쇼체; Translation 2 uses 반말.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 translates into English; Translation 2 leaves pinyin untranslated.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 leaves the name '林远' in untranslated Chinese characters.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly preserves 'Chaeyul' as intended, while 2 reverses them.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly transliterates '호타루'; Translation 2 mistranslates it as '달팽이'.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and virtually identical.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 寿星 (birthday person); 1 mistranslates as 수하.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 is grammatically correct and fluent English; Translation 1 is ungrammatical.\"}\n]\n```\n",
+  "duration_seconds": 5.203926,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17576,
+   "output_tokens": 375,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17951
+  }
+ }
+}

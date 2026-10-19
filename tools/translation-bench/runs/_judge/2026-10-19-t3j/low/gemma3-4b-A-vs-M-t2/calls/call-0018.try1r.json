@@ -1,0 +1,28 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0190.1",
+  "item-0188.2",
+  "item-0358.1",
+  "item-0126.1",
+  "item-0254.2",
+  "item-0026.2",
+  "item-0199.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "02d64c31-eecb-4d21-a86f-4fb097e1880b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 모닥불 as Mokbul and garbles the phrasing.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are completely identical except for an optional comma.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Source is passive/conditional; Translation 1 is an incorrect imperative command.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean altogether.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 butchers the name 日向 as 히야카.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"이동장 refers to a pet carrier/crate, not a chest of drawers.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 is natural and grammatically correct; 2 has incorrect particle usage.\"}\n]\n```\n",
+  "duration_seconds": 4.542731,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16382,
+   "output_tokens": 237,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16619
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 66,
+ "try": 1,
+ "ids": [
+  "item-0346.1",
+  "item-0109.2",
+  "item-0216.1",
+  "item-0203.1",
+  "item-0060.2",
+  "item-0197.1",
+  "item-0342.2",
+  "item-0068.1",
+  "item-0098.2",
+  "item-0261.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6d8c20e0-9960-4d0a-8a64-c720fd66ff95",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches specified Marigold term (메리골드) instead of 마리골드.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Accurately translates '警部' as Inspector rather than detective.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are identical and correct.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are natural and convey the meaning accurately.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Rook/Dex/Thorne context: 반말 fits informal ship banter.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, whereas 1 left Chinese untranslated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, whereas 2 left Chinese untranslated.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean with correct names and speech level.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 properly translates into Korean with appropriate speech level.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, whereas 2 left Japanese untranslated.\"}\n]\n```\n",
+  "duration_seconds": 4.16873,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17452,
+   "output_tokens": 328,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17780
+  }
+ }
+}

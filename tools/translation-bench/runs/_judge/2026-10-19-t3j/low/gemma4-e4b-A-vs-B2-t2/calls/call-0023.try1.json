@@ -1,0 +1,31 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0376.1",
+  "item-0163.2",
+  "item-0162.2",
+  "item-0068.2",
+  "item-0143.2",
+  "item-0174.1",
+  "item-0092.2",
+  "item-0366.2",
+  "item-0155.2",
+  "item-0333.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3fae53fe-29df-4b09-9012-53cc30b74402",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural phrasing for an onboarding guide instruction.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Active voice reads much more naturally in instructional onboarding guides.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 to tenants and respectful reference.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are completely accurate and natural with or without comma.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Chinese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"More natural English phrasing and parallel structure for onboarding items.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese sentence untranslated.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese line completely untranslated.\"}\n]\n```\n",
+  "duration_seconds": 4.577229,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5666,
+   "output_tokens": 306,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11820,
+   "total_tokens": 5972
+  }
+ }
+}

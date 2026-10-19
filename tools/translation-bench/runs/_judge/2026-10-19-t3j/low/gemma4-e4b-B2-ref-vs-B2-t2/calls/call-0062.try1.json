@@ -1,0 +1,31 @@
+{
+ "call": 62,
+ "try": 1,
+ "ids": [
+  "item-0230.1",
+  "item-0097.1",
+  "item-0287.1",
+  "item-0091.2",
+  "item-0250.1",
+  "item-0354.2",
+  "item-0031.2",
+  "item-0006.2",
+  "item-0052.2",
+  "item-0127.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "65b6bc21-395a-4221-b8d8-f95c9e8519b1",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese source line into Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Keeps the addressee Hikaru and natural phrasing without omitting the name.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Dex is male and Thorne uses 해요체, but Rook/Dex to Thorne uses 합쇼체; '회수' fits.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correct subject interpretation ('take Sunday off') rather than 'we move'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the line into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Japanese.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both failed to translate the line into the target language Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 uses a redundant 'out ... outside the window'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly follows the specified name '저우 이모'.\"}\n]\n```\n",
+  "duration_seconds": 6.954918,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17512,
+   "output_tokens": 333,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17845
+  }
+ }
+}

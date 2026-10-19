@@ -1,0 +1,31 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0047.2",
+  "item-0014.1",
+  "item-0074.2",
+  "item-0012.2",
+  "item-0136.1",
+  "item-0115.2",
+  "item-0322.1",
+  "item-0286.1",
+  "item-0178.1",
+  "item-0253.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f495200d-5277-4dbf-ad9b-fce9533046b5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"旦那 means husband, not wife.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translates Chinese characters to Pinyin name Jiě Xuán.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 nonsensically translates 'afterwards' as 'after deleting'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 is untranslated romaji gibberish.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 translates the wrong line entirely.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately with minor punctuation differences.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly translates the line as a question to the listener.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Both are flawed, but Translation 1 is less convoluted.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"有空 means having time, which Translation 2 correctly reflects.\"}\n]\n```\n",
+  "duration_seconds": 6.59968,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17343,
+   "output_tokens": 309,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17652
+  }
+ }
+}

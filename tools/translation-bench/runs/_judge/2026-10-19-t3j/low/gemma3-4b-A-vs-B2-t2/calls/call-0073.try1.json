@@ -1,0 +1,25 @@
+{
+ "call": 73,
+ "try": 1,
+ "ids": [
+  "item-0047.1",
+  "item-0073.2",
+  "item-0315.1",
+  "item-0263.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "89a6c1b1-989f-4b27-a6f4-969b7f7ed70b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both mistranslated ホタル (internal project/sensor code name) into wrong animals.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly translated 'Elder Qin' and 三成 (thirty percent / three shares).\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 hallucinated game title context, though 1 garbled the names.\"}\n]\n```\n",
+  "duration_seconds": 4.191143,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15653,
+   "output_tokens": 147,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15800
+  }
+ }
+}

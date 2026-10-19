@@ -1,0 +1,28 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0194.2",
+  "item-0112.1",
+  "item-0087.2",
+  "item-0122.1",
+  "item-0373.1",
+  "item-0104.1",
+  "item-0221.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "006406fa-79bc-4a54-8e6a-c5128ca0185d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is pinyin instead of English translation.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural phrasing for UI action 'pin'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses required term Sticky and closer name reading.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the meaning equally well despite missing Space term.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Follows Gareth's speech level (해요체) to tenants.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"三红 is a tea blend name, not three red packages.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Rory speaks 반말 to Siobhan in the second clause.\"}\n]\n```\n",
+  "duration_seconds": 6.016403,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16452,
+   "output_tokens": 217,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16669
+  }
+ }
+}

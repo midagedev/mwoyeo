@@ -1,0 +1,31 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0170.1",
+  "item-0236.1",
+  "item-0194.1",
+  "item-0207.2",
+  "item-0165.2",
+  "item-0162.2",
+  "item-0130.1",
+  "item-0191.2",
+  "item-0129.2",
+  "item-0237.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d56a7c51-c795-40e3-a8c2-33f30bef8f47",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Captures the nuance of 倒教训起~来了 better ('훈계하려 드네').\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 leaves '阁主' untranslated in Chinese characters.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both 'beforehand' and 'upfront' accurately and naturally translate 先に.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Younger sister calls older brother 오빠, not 형.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Includes the question mark appropriate for the interrogative sentence.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Omits the unnatural third-person pronoun '그녀는' in Korean dialogue.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'더 심한 상황도 견뎌냈어' is much more natural Korean than '더 심한 것도 살아남았어'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Pell is a peer/doctor speaking informally (반말) to Thorne.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both 'on-site' and 'in the field' accurately translate 현장.\"}\n]\n```\n",
+  "duration_seconds": 4.861763,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17438,
+   "output_tokens": 357,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17795
+  }
+ }
+}

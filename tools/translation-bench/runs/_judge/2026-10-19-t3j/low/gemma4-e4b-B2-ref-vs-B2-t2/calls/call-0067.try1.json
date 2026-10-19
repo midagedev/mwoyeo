@@ -1,0 +1,31 @@
+{
+ "call": 67,
+ "try": 1,
+ "ids": [
+  "item-0044.2",
+  "item-0003.1",
+  "item-0256.2",
+  "item-0151.2",
+  "item-0328.2",
+  "item-0120.2",
+  "item-0266.2",
+  "item-0101.1",
+  "item-0303.2",
+  "item-0226.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "201c8562-bc23-486e-a35f-c023428632d8",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Matches the document title 'New hire onboarding' in facts.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'電話の伝言' means phone message; 'gasping for breath' is more natural.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'지정한 곳' reads much more naturally than '놓은 곳' for tags.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Semi-packing' is the established standard term for 반포장이사.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'Search scope' is more natural in UI/software documentation than 'search range'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Active phrasing avoids awkward 'guide will be explained' passive construction.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 leaves Chinese characters untranslated and uses awkward phrasing.\"}\n]\n",
+  "duration_seconds": 5.906108,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17197,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17529
+  }
+ }
+}

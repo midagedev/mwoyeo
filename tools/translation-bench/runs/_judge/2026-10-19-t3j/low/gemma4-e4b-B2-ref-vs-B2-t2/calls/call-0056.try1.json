@@ -1,0 +1,31 @@
+{
+ "call": 56,
+ "try": 1,
+ "ids": [
+  "item-0201.2",
+  "item-0123.1",
+  "item-0131.2",
+  "item-0351.2",
+  "item-0020.2",
+  "item-0056.2",
+  "item-0054.1",
+  "item-0025.1",
+  "item-0216.2",
+  "item-0041.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0711301b-1d10-4c09-abb1-c9262f809b98",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Facts state Thorne is 쏜, not 토른.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'For team use' is more natural and standard than 'For teams to use'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 translates Japanese into Korean; Translation 2 leaves Japanese katakana.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Chinese; Translation 1 is partially translated into Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese; Translation 1 translates into Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"More natural phrasing for an authoritative inspector warning detectives.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"More natural English flow and accurate phrasing for 辛苦攒下的.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Japanese.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 transliterates Gerald to 제럴드; Translation 2 leaves it in English.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese; Translation 2 translates correctly to Korean 반말.\"}\n]\n```\n",
+  "duration_seconds": 5.618699,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17354,
+   "output_tokens": 340,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17694
+  }
+ }
+}

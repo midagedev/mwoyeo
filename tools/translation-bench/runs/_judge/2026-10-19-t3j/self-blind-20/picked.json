@@ -1,0 +1,102 @@
+[
+ {
+  "case": 1,
+  "pair": "gemma4-e4b-A-vs-M-t2",
+  "id": "item-0187.2"
+ },
+ {
+  "case": 2,
+  "pair": "gemma3-4b-A-vs-B2-t2",
+  "id": "item-0286.2"
+ },
+ {
+  "case": 3,
+  "pair": "gemma4-e4b-B2-t2-vs-M-t2",
+  "id": "item-0198.1"
+ },
+ {
+  "case": 4,
+  "pair": "gemma4-e4b-A-vs-B2-t2",
+  "id": "item-0080.1"
+ },
+ {
+  "case": 5,
+  "pair": "gemma4-e4b-B2-t2-vs-M-t2",
+  "id": "item-0175.2"
+ },
+ {
+  "case": 6,
+  "pair": "gemma3-4b-A-vs-M-t2",
+  "id": "item-0250.2"
+ },
+ {
+  "case": 7,
+  "pair": "gemma3-4b-A-vs-B2-t2",
+  "id": "item-0058.1"
+ },
+ {
+  "case": 8,
+  "pair": "gemma3-4b-B2-t2-vs-M-t2",
+  "id": "item-0224.2"
+ },
+ {
+  "case": 9,
+  "pair": "gemma4-e4b-A-vs-M-t2",
+  "id": "item-0084.1"
+ },
+ {
+  "case": 10,
+  "pair": "gemma3-4b-A-vs-B2-t2",
+  "id": "item-0225.1"
+ },
+ {
+  "case": 11,
+  "pair": "gemma3-4b-A-vs-B2-t2",
+  "id": "item-0171.2"
+ },
+ {
+  "case": 12,
+  "pair": "gemma4-e4b-A-vs-B2-t2",
+  "id": "item-0066.2"
+ },
+ {
+  "case": 13,
+  "pair": "gemma3-4b-A-vs-M-t2",
+  "id": "item-0058.1"
+ },
+ {
+  "case": 14,
+  "pair": "gemma3-4b-A-vs-B2-t2",
+  "id": "item-0341.2"
+ },
+ {
+  "case": 15,
+  "pair": "gemma3-4b-A-vs-M-t2",
+  "id": "item-0287.2"
+ },
+ {
+  "case": 16,
+  "pair": "gemma3-4b-A-vs-M-t2",
+  "id": "item-0012.1"
+ },
+ {
+  "case": 17,
+  "pair": "gemma4-e4b-A-vs-B2-t2",
+  "id": "item-0086.1"
+ },
+ {
+  "case": 18,
+  "pair": "gemma4-e4b-A-vs-M-t2",
+  "id": "item-0097.2"
+ },
+ {
+  "case": 19,
+  "pair": "gemma3-4b-A-vs-B2-t2",
+  "id": "item-0228.1"
+ },
+ {
+  "case": 20,
+  "pair": "gemma3-4b-B2-t2-vs-M-t2",
+  "id": "item-0162.2"
+ }
+]

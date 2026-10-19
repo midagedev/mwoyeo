@@ -1,0 +1,31 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0026.1",
+  "item-0053.1",
+  "item-0323.2",
+  "item-0119.2",
+  "item-0208.2",
+  "item-0129.2",
+  "item-0146.2",
+  "item-0141.2",
+  "item-0306.2",
+  "item-0002.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "19159d0a-3b93-429a-837c-3eb2f2dcf786",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates 쓰래 as 'write it as' more naturally in context.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both are natural and accurate Korean translations for the title/heading.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Matches the specified banmal speech level and translates proper names.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly uses haeyo-che towards Rook and accurate names.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both misinterpret the conditional/imperative 醒了, 替我道声谢.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both provide accurate, virtually identical translations.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both accurately translate the sentence in natural banmal.\"}\n]\n```\n",
+  "duration_seconds": 8.403025,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17670,
+   "output_tokens": 308,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17978
+  }
+ }
+}

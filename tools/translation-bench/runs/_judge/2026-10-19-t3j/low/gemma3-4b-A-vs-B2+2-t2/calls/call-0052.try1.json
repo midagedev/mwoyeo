@@ -1,0 +1,31 @@
+{
+ "call": 52,
+ "try": 1,
+ "ids": [
+  "item-0187.1",
+  "item-0214.1",
+  "item-0291.2",
+  "item-0060.1",
+  "item-0363.2",
+  "item-0042.1",
+  "item-0037.2",
+  "item-0007.1",
+  "item-0195.1",
+  "item-0196.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "05c7fb29-0c32-433b-aed2-2d762fa0eb86",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Speaker Rook talks to Dex in 반말; 1 incorrectly uses 존댓말.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both correctly translate the sentence; contraction difference is negligible.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 left the entire line in untranslated Chinese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Lu Ming speaks to Zhou Ting in 해요체; 2 leaves Chinese characters untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Xie Xuan is female; Translation 2 incorrectly uses 'He'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"이동장 refers to a pet carrier; 1 is closer than transfer cart.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"The context specifies 仇 is pronounced qiú (Chou), not Chu.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the source text.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Thorne speaks to Dex in 반말; 1 inconsistently mixes 해요체 and 반말.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly transliterates 日向 as 히나타; 2 mistranslates as 히야카.\"}\n]\n```\n",
+  "duration_seconds": 6.053309,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17454,
+   "output_tokens": 355,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17809
+  }
+ }
+}

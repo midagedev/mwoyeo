@@ -1,0 +1,31 @@
+{
+ "call": 43,
+ "try": 1,
+ "ids": [
+  "item-0294.1",
+  "item-0374.1",
+  "item-0167.1",
+  "item-0080.1",
+  "item-0373.1",
+  "item-0147.1",
+  "item-0282.1",
+  "item-0182.1",
+  "item-0250.2",
+  "item-0278.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e5b9c4c9-a043-4f06-baa2-80188fa073a9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Matches doctor title and respectful speech level to captain.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 left text in Japanese without translating to Korean.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both are accurate and natural translations of the source sentence.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Dex speaks to Rook in banmal.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese; Translation 2 correctly translates into Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly follows the specified term mapping '先輩 = boss'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese; Translation 2 correctly translates into Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Uses the specified term '포켓 깃' and reads more naturally.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Captain Thorne speaks to Rook in haeyo-che.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly translates '기사' as drivers, whereas 2 mistranslates as article.\"}\n]\n```\n",
+  "duration_seconds": 5.506359,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17149,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17474
+  }
+ }
+}

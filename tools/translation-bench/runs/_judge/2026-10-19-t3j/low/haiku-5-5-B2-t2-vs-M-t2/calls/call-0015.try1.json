@@ -1,0 +1,32 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0019.2",
+  "item-0074.2",
+  "item-0155.1",
+  "item-0208.2",
+  "item-0115.2",
+  "item-0297.2",
+  "item-0123.2",
+  "item-0221.1",
+  "item-0178.1",
+  "item-0337.1"
+ ],
+ "problem": "status ERROR",
+ "event": {
+  "conversation_id": "c3ce0c82-7958-4e2e-8a62-24d1b2023824",
+  "status": "ERROR",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Matches the meaning of forgiving Dex, unlike translation 2.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses the specified name 텟사이 instead of the literal 철사이.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both untranslated the name 澪(みお\n```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Accurately conveys forgiving Dex instead of an unnatural expression.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses the specified name 텟사이 instead of 철사이.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both left the name untranslated; equally acceptable phrasing otherwise.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Rory speaks 반말 to Siobhan and names are translated.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Sounds much more natural in Korean chat context.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Properly translates the Japanese kanji name to Yamanashi-san.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Uses the specified name 쏜 instead of 쏘른.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly follows the specified term 모차 without redundant parenthetical gloss.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Lu Ming speaks 해요체 to Zhou Ting.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Better reflects the meaning of 意外 (unexpected mishap/accident).\"}\n]\n```\n",
+  "error": "The stream was interrupted. Please continue the task you were working on.",
+  "duration_seconds": 12.867448,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 35221,
+   "output_tokens": 407,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 35628
+  }
+ }
+}

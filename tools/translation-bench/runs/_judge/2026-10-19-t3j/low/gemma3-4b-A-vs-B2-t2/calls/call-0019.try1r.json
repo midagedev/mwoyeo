@@ -1,0 +1,26 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0246.2",
+  "item-0265.2",
+  "item-0076.1",
+  "item-0079.1",
+  "item-0310.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8958a707-6c1d-4b47-9d60-e8ef5c8a2a53",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is in Korean instead of the target language English.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 'hot tub' into nonsensical '야수 욕조'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 kept the source text in Chinese instead of translating.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"App manuals use impersonal 'we' rather than personal 'I'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'Row' is much more natural and standard for office seating than 'line'.\"}\n]\n```\n",
+  "duration_seconds": 3.845589,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15727,
+   "output_tokens": 175,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15902
+  }
+ }
+}

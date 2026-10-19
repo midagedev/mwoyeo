@@ -1,0 +1,31 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0317.1",
+  "item-0112.1",
+  "item-0247.1",
+  "item-0159.2",
+  "item-0084.1",
+  "item-0205.1",
+  "item-0103.1",
+  "item-0250.2",
+  "item-0245.2",
+  "item-0359.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "392c6649-3819-48ff-8fea-be895d317af8",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 is completely wrong metadata text, not a translation.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses natural 반말 register between coworkers.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are completely identical in meaning, naturalness, and tone.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 uses 해요체 and honorifics; Translation 1 uses 당신 and 하십시오체.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left Japanese untranslated.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 uses proper polite business register and reads much more naturally.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Source says 'you pay', not 'she pays'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 translates 固定 to 'pin' idiomatically and naturally.\"}\n]\n```\n",
+  "duration_seconds": 4.663213,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17280,
+   "output_tokens": 314,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17594
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 38,
+ "try": 1,
+ "ids": [
+  "item-0231.1",
+  "item-0249.1",
+  "item-0168.2",
+  "item-0138.1",
+  "item-0190.1",
+  "item-0028.2",
+  "item-0115.1",
+  "item-0298.2",
+  "item-0341.1",
+  "item-0013.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "38e76f76-a530-448f-8ac7-a4f654e17e44",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates UI terms into Romanized names rather than raw kanji/hiragana.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations accurately convey the casual tone, meaning, and numbers.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translates character name properly and fits conversational Korean context better.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly uses informal speech (반말) between siblings; 2 incorrectly uses 해요체.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both convey the meaning and informal tone naturally despite untranslated names.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and properly render the tone and names.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses spoken dialogue speech level (반말) rather than written narrative style.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both accurately explain git status/working tree in tutorial honorifics.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both 'call for' and 'book' accurately translate '불렀어' in this context.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Uses natural conversational spoken ending (-마) rather than written narrative (-마라).\"}\n]\n```\n",
+  "duration_seconds": 5.3114419999999996,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17352,
+   "output_tokens": 345,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17697
+  }
+ }
+}

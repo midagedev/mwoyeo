@@ -1,0 +1,25 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0140.2",
+  "item-0158.2",
+  "item-0048.2",
+  "item-0119.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fe5be550-ce5d-4561-a7d2-86f563b87f5f",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"1 uses '선생님'; Gareth is a landlord, not a team leader.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"1 uses the required term '메리골드' and maintains consistent speech level.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"2 correctly translates uncle as '숙부님' instead of aunt ('고모').\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"2 translates into English, while 1 leaves Korean text untranslated.\"}\n]\n",
+  "duration_seconds": 129.238125,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15431,
+   "output_tokens": 15663,
+   "thinking_tokens": 15520,
+   "cache_read_tokens": 0,
+   "total_tokens": 31094
+  }
+ }
+}

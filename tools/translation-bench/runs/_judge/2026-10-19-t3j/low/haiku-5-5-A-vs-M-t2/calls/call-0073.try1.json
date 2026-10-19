@@ -1,0 +1,31 @@
+{
+ "call": 73,
+ "try": 1,
+ "ids": [
+  "item-0351.2",
+  "item-0009.2",
+  "item-0035.1",
+  "item-0198.2",
+  "item-0149.2",
+  "item-0364.2",
+  "item-0206.1",
+  "item-0056.1",
+  "item-0289.1",
+  "item-0036.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1fe21b3e-4735-410b-a40d-695362ee92b9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"틀린 is more natural than 잘못된 for a version being wrong.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Matches the defined term 'Space' and avoids unnecessary Japanese kanji.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 accurately reflects the Japanese sentence's meaning and tone.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Dex is speaking to Rook in conversation; 반말 fits better.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Transliterates 烏丸 into 카라스마 instead of leaving raw kanji.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly identifies the unconscious victim as female ('she' instead of 'him').\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Mina speaks to both Yū and Kai in 반말.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural with correct 합쇼체 endings.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"磨く is more accurately translated as 닦다 than 갈다.\"}\n]\n```\n",
+  "duration_seconds": 5.191878,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17398,
+   "output_tokens": 330,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17728
+  }
+ }
+}

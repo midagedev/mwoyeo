@@ -1,0 +1,31 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0048.1",
+  "item-0337.1",
+  "item-0359.1",
+  "item-0259.1",
+  "item-0343.1",
+  "item-0367.1",
+  "item-0151.2",
+  "item-0096.1",
+  "item-0196.2",
+  "item-0153.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c21d23e0-7207-4318-8cd0-122a8e4cba4d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses present tense and closer name reading.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both fail to use the defined term 'Memotto'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Second-person pronoun 'you' fits onboarding guide instructions much better.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Matches heading style established by earlier context '첫날'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 did not translate the text into Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 did not translate the Japanese text into Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 did not translate the text into Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 incorrectly translated character name 朔 as '숙하'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 left untranslated Chinese characters and raw pinyin.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly translates the passive voice and conditional '확인하시면'.\"}\n]\n```\n",
+  "duration_seconds": 4.525452,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17193,
+   "output_tokens": 316,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17509
+  }
+ }
+}

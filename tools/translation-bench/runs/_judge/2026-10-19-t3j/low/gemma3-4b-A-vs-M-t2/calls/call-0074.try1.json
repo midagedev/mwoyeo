@@ -1,0 +1,24 @@
+{
+ "call": 74,
+ "try": 1,
+ "ids": [
+  "item-0271.2",
+  "item-0333.2",
+  "item-0316.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0ec74f94-d3e6-44a9-90f1-c7320fc5a829",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 misnames Hinata as Hiyaka.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"T1 correctly translates the imperative 쉬어, while T2 uses 'I'll rest'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"T2 uses narrative plain style fitting JRPG storytelling.\"}\n]\n```\n",
+  "duration_seconds": 3.215544,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15156,
+   "output_tokens": 106,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15262
+  }
+ }
+}

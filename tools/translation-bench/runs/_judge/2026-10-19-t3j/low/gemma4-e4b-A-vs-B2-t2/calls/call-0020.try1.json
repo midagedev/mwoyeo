@@ -1,0 +1,30 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0297.1",
+  "item-0173.2",
+  "item-0146.1",
+  "item-0364.2",
+  "item-0310.2",
+  "item-0302.1",
+  "item-0309.2",
+  "item-0217.1",
+  "item-0081.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b1d8fab8-910b-4496-b1e5-a97fafb33fca",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally in 반말.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both capture the meaning and rhetorical questioning tone equally well.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in 반말, not 해요체.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both correctly translate the sentence with minor punctuation differences.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Natural Korean omits unnatural pronouns like '그녀는' and uses appropriate tense.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are identical.\"}\n]\n```\n",
+  "duration_seconds": 4.018247,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16945,
+   "output_tokens": 266,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17211
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0030.1",
+  "item-0171.2",
+  "item-0181.2",
+  "item-0211.1",
+  "item-0176.2",
+  "item-0135.1",
+  "item-0188.2",
+  "item-0078.2",
+  "item-0288.2",
+  "item-0204.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c62b02f2-1b03-4284-8e3b-9406832defb0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"The defined term specifies '履歴 = Revisions'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Dex speaks to Thorne (Captain) in 합쇼체, but neither candidate uses 합쇼체; 1 is closer in tone.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 is more natural and fluent English.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Subin is male according to the facts, not female ('She').\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Yuu uses 해요체 with honorifics towards seniors ('잘하세요?').\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 reads more naturally in a software context.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"The term list specifies 'ワークスペース = Space'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Gareth is in the group chat, where Siobhan speaks in 해요체/합쇼체.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"An onboarding guide uses imperative/instructional tone rather than first person.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are identical.\"}\n]\n```\n",
+  "duration_seconds": 4.9476890000000004,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17275,
+   "output_tokens": 332,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17607
+  }
+ }
+}

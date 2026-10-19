@@ -1,0 +1,31 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0173.2",
+  "item-0159.1",
+  "item-0146.1",
+  "item-0339.2",
+  "item-0351.2",
+  "item-0347.1",
+  "item-0278.2",
+  "item-0269.2",
+  "item-0312.1",
+  "item-0208.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "071f9532-93d3-48d6-9377-6809d32192c1",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates the Japanese name 湊(そう) into Korean as 소우.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the meaning and informal register accurately.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Thorne speaks to Rook using informal speech (반말).\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in informal language (반말), not 존댓말.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both accurately translate the sentence into natural English.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate in Korean.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both capture the meaning and contemplative tone accurately in English.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both 'at home' and 'home' are natural and accurate translations.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both naturally convey the informal reported request in Korean.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말 and uses Korean name 시본.\"}\n]\n```\n",
+  "duration_seconds": 4.411281,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17217,
+   "output_tokens": 317,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17534
+  }
+ }
+}

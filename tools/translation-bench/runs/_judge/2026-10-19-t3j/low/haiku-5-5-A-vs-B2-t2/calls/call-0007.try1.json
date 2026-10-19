@@ -1,0 +1,31 @@
+{
+ "call": 7,
+ "try": 1,
+ "ids": [
+  "item-0179.1",
+  "item-0353.1",
+  "item-0007.2",
+  "item-0238.1",
+  "item-0276.1",
+  "item-0067.2",
+  "item-0159.1",
+  "item-0147.2",
+  "item-0316.2",
+  "item-0077.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "721f86a6-e59b-4fc6-96b1-7ce5515dba1d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 includes translator commentary/scratch text.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translate the sentence accurately and naturally.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 leaves untranslated characters and typos.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both capture meaning, tone, and register well.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Mina speaks in banmal to the other members in the chat.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both are faithful and natural translations of the tutorial instruction.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Correctly uses female pronoun 'she' for Nagi (十八の少女).\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both are accurate and natural renderings of the request.\"}\n]\n```\n",
+  "duration_seconds": 5.312247,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17376,
+   "output_tokens": 297,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17673
+  }
+ }
+}

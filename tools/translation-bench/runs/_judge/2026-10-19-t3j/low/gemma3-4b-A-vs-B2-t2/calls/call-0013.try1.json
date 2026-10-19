@@ -1,0 +1,31 @@
+{
+ "call": 13,
+ "try": 1,
+ "ids": [
+  "item-0031.1",
+  "item-0019.1",
+  "item-0200.2",
+  "item-0252.2",
+  "item-0206.1",
+  "item-0340.1",
+  "item-0253.1",
+  "item-0165.1",
+  "item-0031.2",
+  "item-0119.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d9ac1bd5-4900-4fd7-9ff7-53c423f78275",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Chinese source text.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 uses the correct 반말 speech level.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 phrases the sibling teasing much more naturally.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly translates Git 'conflict' as 충돌.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 naturally translates 'ついてるから' as '있으니까'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 mistranslates 'cleans up after that dog' as 치워야.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 uses natural wording; dogs are brought, not '가져온다'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 mistranslates the speech level to 해요체 and leaves Chinese.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese source text.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Chinese text.\"}\n]\n```\n",
+  "duration_seconds": 4.489679,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17697,
+   "output_tokens": 330,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18027
+  }
+ }
+}

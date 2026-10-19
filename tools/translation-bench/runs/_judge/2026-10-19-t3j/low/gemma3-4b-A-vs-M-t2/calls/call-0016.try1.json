@@ -1,0 +1,31 @@
+{
+ "call": 16,
+ "try": 1,
+ "ids": [
+  "item-0041.1",
+  "item-0121.1",
+  "item-0070.2",
+  "item-0121.2",
+  "item-0022.2",
+  "item-0077.1",
+  "item-0378.1",
+  "item-0144.2",
+  "item-0359.1",
+  "item-0164.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8b5e50a0-7104-418f-9efc-d4881f33db23",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'이렇게 한다' is much more natural Korean than '이것을 한다'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correct spelling of 'Bori' matching the context.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both mistranslate or fail to translate Xie Chen correctly.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly spells 'Bori' rather than 'Borri'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 misreads '婷姐' as '팅지'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly transcribes the name 朔 as 사쿠, not 스카.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correct speech level (반말) and character name transliteration.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly translates 電車 to 전철 and conveys hearsay accurately.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the source text into Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 completely reverses the subject and object of the action.\"}\n]\n```\n",
+  "duration_seconds": 6.096943,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17568,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17893
+  }
+ }
+}

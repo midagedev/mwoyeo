@@ -1,0 +1,24 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0368.1",
+  "item-0208.1",
+  "item-0014.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1f55a849-6f9b-4342-bbd7-447a3b10d752",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly understands the meaning of the phrase.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses established term Dawn Team and Romanization Um, plus natural row.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"고객용 is more natural in business context than 고객님을 위한.\"}\n]\n```\n",
+  "duration_seconds": 3.258432,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 15224,
+   "output_tokens": 103,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 15327
+  }
+ }
+}

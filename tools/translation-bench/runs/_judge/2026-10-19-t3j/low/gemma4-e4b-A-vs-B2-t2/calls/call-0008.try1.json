@@ -1,0 +1,31 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0353.2",
+  "item-0185.2",
+  "item-0381.1",
+  "item-0225.2",
+  "item-0340.2",
+  "item-0322.2",
+  "item-0270.2",
+  "item-0154.2",
+  "item-0059.1",
+  "item-0366.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "50eed5d4-08da-4d0c-9c23-ddfb3cc096cf",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Matches the document title 'New hire onboarding' in the facts.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'Until you merge' is active; '어떤 것도' sounds natural.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'Deposit back from the old place' is more natural and idiomatic.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Refers to the injured woman with 'her' rather than 'it'.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally convey the same meaning.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both use correct 해요체 from Thorne to Rook and mean the same.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'Launchpad item 1' and 'logging into' read much more naturally.\"}\n]\n```\n",
+  "duration_seconds": 4.549535,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17235,
+   "output_tokens": 324,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17559
+  }
+ }
+}

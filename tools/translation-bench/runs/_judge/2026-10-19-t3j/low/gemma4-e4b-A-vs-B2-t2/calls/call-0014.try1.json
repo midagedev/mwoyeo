@@ -1,0 +1,31 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0297.2",
+  "item-0048.2",
+  "item-0344.2",
+  "item-0348.2",
+  "item-0360.1",
+  "item-0103.1",
+  "item-0172.2",
+  "item-0328.1",
+  "item-0180.2",
+  "item-0042.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e30093bd-b8e7-4f72-8754-708c0f373045",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 translates to Korean, whereas Translation 2 left Japanese untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly captures the subject I rather than an imperative.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 remains in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 is translated into Korean, while Translation 2 is untranslated.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 reads much more naturally in Korean technical writing context.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 properly translates into Korean with the correct honorifics.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean banmal matching character speech guidelines.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean with the correct speaker name and tone.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 uses the prescribed name 쏜 instead of 토른.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are identical.\"}\n]\n```\n",
+  "duration_seconds": 6.069285,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17373,
+   "output_tokens": 325,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17698
+  }
+ }
+}

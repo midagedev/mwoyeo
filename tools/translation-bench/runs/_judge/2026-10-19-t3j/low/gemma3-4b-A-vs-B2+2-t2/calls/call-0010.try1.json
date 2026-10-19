@@ -1,0 +1,31 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0275.2",
+  "item-0107.1",
+  "item-0349.2",
+  "item-0326.1",
+  "item-0225.1",
+  "item-0085.1",
+  "item-0365.1",
+  "item-0112.2",
+  "item-0006.1",
+  "item-0021.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "76ae993f-15bd-4e99-ae39-6917bf257418",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated into Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 remains in Japanese instead of translating to Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 uses nonsensical word '또래니' instead of '다시인지'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 translates Dr. to Korean instead of leaving English untranslated.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the line entirely untranslated in Japanese.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Rory talks to Siobhan in 반말; Translation 2 correctly renders '쫓겨나요'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 accurately conveys the apology and conversational 반말 tone.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 translates 阵眼令 and phrasing much more naturally.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 leaves Chinese characters untranslated and mistranslates the meaning.\"}\n]\n```\n",
+  "duration_seconds": 4.618451,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17596,
+   "output_tokens": 341,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17937
+  }
+ }
+}

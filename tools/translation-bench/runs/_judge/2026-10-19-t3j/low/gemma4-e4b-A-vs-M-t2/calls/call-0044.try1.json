@@ -1,0 +1,27 @@
+{
+ "call": 44,
+ "try": 1,
+ "ids": [
+  "item-0291.2",
+  "item-0213.1",
+  "item-0083.1",
+  "item-0116.2",
+  "item-0364.2",
+  "item-0332.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "eb78c3dd-cd5e-40ce-afcf-ae9cec4d97b2",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally in 반말.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'와' correctly translates the scheduled future arrival instead of currently coming.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 was left untranslated in Chinese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 adheres to the designated term 'Revisions'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 3.7662269999999998,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16076,
+   "output_tokens": 185,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 16261
+  }
+ }
+}

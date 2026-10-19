@@ -1,0 +1,31 @@
+{
+ "call": 39,
+ "try": 1,
+ "ids": [
+  "item-0197.1",
+  "item-0066.2",
+  "item-0268.2",
+  "item-0181.1",
+  "item-0201.2",
+  "item-0062.1",
+  "item-0066.1",
+  "item-0132.1",
+  "item-0010.2",
+  "item-0028.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e5e9bf4c-5c24-46fd-8526-d9f65a5d2197",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 leaves the line untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly follows specified terms: ward for 结界 and qi stone for 灵石.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 completely hallucinates; 2 translates the title and dialogue.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the line in untranslated Japanese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 uses incorrect Vietnamese orthography for the character's name.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses the specified terms 'ward' and 'qi stones'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 left the sentence in Japanese instead of Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"两成 means twenty percent, not twofold (2배), and uses 반말.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"App manuals naturally use inclusive 'we' rather than external 'they'.\"}\n]\n```\n",
+  "duration_seconds": 4.824977,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17539,
+   "output_tokens": 328,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17867
+  }
+ }
+}

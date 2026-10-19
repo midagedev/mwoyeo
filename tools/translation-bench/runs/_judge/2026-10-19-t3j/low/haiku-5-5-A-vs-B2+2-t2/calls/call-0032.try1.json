@@ -1,0 +1,31 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0311.2",
+  "item-0225.1",
+  "item-0167.2",
+  "item-0242.2",
+  "item-0010.2",
+  "item-0240.2",
+  "item-0130.1",
+  "item-0090.1",
+  "item-0005.1",
+  "item-0273.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dae139f6-2bb3-4a15-92c9-9b667b8ee645",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates the Japanese name into Korean reading 미오.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translates the source Chinese text into Korean.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the line.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Identical translations except for minor ending punctuation.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Follows the specified name 저우 이모 rather than 주이모.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses correct informal register (반말) between Rory and Siobhan.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correctly reflects 해요체 speech level used by 十河 to 日向.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translates the Japanese name and title into Korean properly.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both express the meaning and conversational nuance accurately.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Accurately captures the meaning of '守' (guarding/protecting).\"}\n]\n```\n",
+  "duration_seconds": 5.300449,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17783,
+   "output_tokens": 312,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 18095
+  }
+ }
+}

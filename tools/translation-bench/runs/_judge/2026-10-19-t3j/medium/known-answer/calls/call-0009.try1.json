@@ -1,0 +1,27 @@
+{
+ "call": 9,
+ "try": 1,
+ "ids": [
+  "item-0021.2",
+  "item-0020.1",
+  "item-0048.1",
+  "item-0043.1",
+  "item-0049.1",
+  "item-0080.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "38ab0d74-b40c-4285-8ca6-69cf0f1bf374",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"That one refers to tag, which does not move.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Follows the specified term 포켓 깃.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses the specified term 납품일 for 納期.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Uses the specified term 품의 for 稟議.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly translates 红茶 as 홍차 rather than 붉은 차.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Aoife is correctly transcribed as 이파 based on pronunciation.\"}\n]\n",
+  "duration_seconds": 12.637342,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16035,
+   "output_tokens": 1469,
+   "thinking_tokens": 1287,
+   "cache_read_tokens": 0,
+   "total_tokens": 17504
+  }
+ }
+}

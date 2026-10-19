@@ -1,0 +1,31 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0134.2",
+  "item-0043.1",
+  "item-0144.2",
+  "item-0075.1",
+  "item-0286.1",
+  "item-0135.2",
+  "item-0113.1",
+  "item-0057.2",
+  "item-0166.1",
+  "item-0149.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cbafd598-3960-4eb4-823f-6f032f5ca2fe",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Refers naturally to father without written pronoun '그는'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Lin Xia speaks 반말 to her brother Lin Yuan.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate in 반말.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Gareth speaks to tenants using 해요체.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Faithfully translates 'Morning both' and uses appropriate 해요체.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Appropriately uses honorific register for Professor Han.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Preserves established term 'watch' and original terminal punctuation.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Git footer file is standardly transliterated as 푸터.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'쓰래' reports past indirect speech, matching 'said'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Traditional tea masters are more naturally called 장인 than 기술자.\"}\n]\n```\n",
+  "duration_seconds": 4.651269,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17313,
+   "output_tokens": 307,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17620
+  }
+ }
+}

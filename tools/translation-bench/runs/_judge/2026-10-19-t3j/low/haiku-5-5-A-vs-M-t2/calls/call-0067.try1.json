@@ -1,0 +1,31 @@
+{
+ "call": 67,
+ "try": 1,
+ "ids": [
+  "item-0005.2",
+  "item-0133.1",
+  "item-0227.1",
+  "item-0360.1",
+  "item-0075.2",
+  "item-0022.2",
+  "item-0052.1",
+  "item-0296.1",
+  "item-0329.2",
+  "item-0309.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "30b8604f-ba8d-4164-9eb7-650d772a1025",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Rook uses 합쇼체 with Thorne; Translation 2 correctly uses polite speech.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'Internal messenger' is a more accurate translation of 사내 메신저.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Rook speaks to Dex in 반말; 'tub' refers to coolant tank.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"抢 here means snatching/booking tickets, but 2 has proper punctuation.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 naturally captures 桐生's tone in 해요체 without awkward honorifics.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Addresses onboarding reader naturally with 'you'; 'on the floor' fits logistics.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into English.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Uses the specified term '포켓 깃' instead of untranslated English.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"十河 speaks to junior employee 日向 in 해요체 (~설명드릴게요).\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'Changes sync' provides clear subject resolution for Japanese zero-anaphora.\"}\n]\n```\n",
+  "duration_seconds": 5.906653,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17303,
+   "output_tokens": 350,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17653
+  }
+ }
+}

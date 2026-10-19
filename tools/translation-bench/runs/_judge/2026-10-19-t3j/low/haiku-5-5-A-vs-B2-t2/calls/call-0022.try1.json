@@ -1,0 +1,31 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0311.2",
+  "item-0092.2",
+  "item-0360.2",
+  "item-0202.1",
+  "item-0240.2",
+  "item-0016.2",
+  "item-0314.1",
+  "item-0302.1",
+  "item-0228.1",
+  "item-0014.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a316edee-2770-4033-880b-5fa4d8493f46",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly refers to the dog Boli as 'her' rather than 'me'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Akira specifically told Hikaru not to use honorifics and just Akira.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Zhou Yi speaks in 해요체 to Lin Yuan, matching Translation 1.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Reads much more natural and concise for onboarding documentation.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말; Rory is male, but T2 uses 해요체.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 mistakenly translates Hikaru talking about Nagi as first person.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Lu Ming speaks to Zhou Ting using 해요체, matching Translation 1.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Active and natural phrasing for guide instructions, unlike awkward passive T2.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Rory speaks to Gareth in 해요체; Translation 2 correctly uses 해요체.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 합쇼체, matching Hyuga's required speech level.\"}\n]\n```\n",
+  "duration_seconds": 4.752157,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17468,
+   "output_tokens": 350,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17818
+  }
+ }
+}

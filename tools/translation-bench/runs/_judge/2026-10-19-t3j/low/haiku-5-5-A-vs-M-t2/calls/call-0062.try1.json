@@ -1,0 +1,31 @@
+{
+ "call": 62,
+ "try": 1,
+ "ids": [
+  "item-0151.1",
+  "item-0252.1",
+  "item-0306.1",
+  "item-0340.2",
+  "item-0132.2",
+  "item-0201.2",
+  "item-0123.1",
+  "item-0131.2",
+  "item-0394.2",
+  "item-0020.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f3686792-5686-47eb-9f38-0c4ef90ae9d4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Matches tea terminology (덖다) and proper 해요체 speech level.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and convey the original meaning.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Naturally translates directions to a restroom, avoiding literal awkwardness.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately in appropriate 반말 to Lu Ming.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Xu Nuo speaks to Lu Ming in 반말, not 해요체.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Section chief uses 해요체 to subordinate without honorific -시-.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly keeps the channel name 'Hearth' instead of translating to campfire.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'화장실 좀 쓸게요' is much more natural Korean than '빌릴게요'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Smoothly translates the established English term without unnecessary Japanese text.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both accurately and naturally translate 头采 (first flush / first harvest).\"}\n]\n```\n",
+  "duration_seconds": 5.332522,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17453,
+   "output_tokens": 334,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17787
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0012.2",
+  "item-0013.2",
+  "item-0055.1",
+  "item-0327.2",
+  "item-0326.1",
+  "item-0338.2",
+  "item-0001.2",
+  "item-0183.2",
+  "item-0148.1",
+  "item-0109.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7cf7d8d8-34b1-4c5d-a4a8-91a4d8a73115",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is in Japanese instead of Korean.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and equivalent in meaning.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both correctly convey the user manual instruction naturally in English.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Omits Japanese honorific '-san' and uses natural English preposition 'in'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Terms specify 時計 = watch; 'watch' matches the pocket watch context.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses the specified spelling 'Jiu' from the facts block.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both convey 稟議が回せません naturally with correct speech level.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both accurately translate the sentence in natural 반말.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 leaves '周姨' untranslated in Chinese characters.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"盒 means box/상자, not generic 개.\"}\n]\n```\n",
+  "duration_seconds": 5.188842,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17209,
+   "output_tokens": 319,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17528
+  }
+ }
+}

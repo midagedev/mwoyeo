@@ -1,0 +1,31 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0187.1",
+  "item-0008.1",
+  "item-0105.1",
+  "item-0074.2",
+  "item-0106.2",
+  "item-0189.1",
+  "item-0137.2",
+  "item-0252.2",
+  "item-0138.1",
+  "item-0086.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c267210c-06b9-4354-9238-2ba7ec6dd412",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated and hallucinated inspector.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Matches 저우 이모 from facts, though both translations are awkward.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly transliterates Marigold as 메리골드 per facts.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 'bridge' (spaceship bridge) instead of literal '다리'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Korean.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translates the meaning naturally; 2 is an ungrammatical calque.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 hallucinated window metadata instead of translating the dialogue.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 mistranslated the ship's bridge as a physical '다리'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 uses the specified term 품의 for 稟議.\"}\n]\n```\n",
+  "duration_seconds": 6.03161,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5525,
+   "output_tokens": 342,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11816,
+   "total_tokens": 5867
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0079.1",
+  "item-0303.1",
+  "item-0299.2",
+  "item-0102.1",
+  "item-0367.1",
+  "item-0082.2",
+  "item-0198.1",
+  "item-0331.1",
+  "item-0027.1",
+  "item-0162.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "db5b437b-afa3-4aed-85fb-30e2b392f034",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Rory speaks 반말 to Siobhan; Translation 2 uses honorifics.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate in this context.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 transliterates Japanese name 澪 as 미오.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"殿门口 is hall doorway, not palace gate.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both convey the meaning naturally in 반말.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 failed to translate the Chinese text into English.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"병합해 들어오는 accurately captures the incoming branch in merge conflicts.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"아직 안 왔어 naturally answers 'Did the bill come yet?'\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Dialogue between peers uses spoken 반말 rather than literary plain form.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both singular and plural naturally translate Japanese 招待された人.\"}\n]\n```\n",
+  "duration_seconds": 4.932033,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17509,
+   "output_tokens": 317,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17826
+  }
+ }
+}

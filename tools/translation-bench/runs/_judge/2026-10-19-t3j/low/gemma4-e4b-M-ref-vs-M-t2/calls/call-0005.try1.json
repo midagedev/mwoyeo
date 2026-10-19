@@ -1,0 +1,31 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0214.2",
+  "item-0184.2",
+  "item-0292.1",
+  "item-0025.2",
+  "item-0172.2",
+  "item-0092.1",
+  "item-0301.1",
+  "item-0262.1",
+  "item-0048.1",
+  "item-0050.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e8af019c-dd6d-4f4a-b0f4-953f9e25d182",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"'until you merge' is active ('병합하기 전까지는').\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Target particle '에게' is correct for people; sounds much more natural.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations fail to accurately render the source UI concepts.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Semicolon properly avoids a comma splice.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Separating sentences after the name tag improves readability and punctuation.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correct informal speech level (반말) and natural idiomatic translation.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 left the text in Japanese.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both fail to use the required 해요체 speech level to Rook.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 left the text in Japanese.\"}\n]\n```\n",
+  "duration_seconds": 5.143788,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17501,
+   "output_tokens": 306,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17807
+  }
+ }
+}

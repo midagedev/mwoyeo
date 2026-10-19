@@ -1,0 +1,31 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0035.2",
+  "item-0124.2",
+  "item-0033.2",
+  "item-0117.1",
+  "item-0096.1",
+  "item-0095.1",
+  "item-0161.2",
+  "item-0063.1",
+  "item-0054.1",
+  "item-0198.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "17d9cbac-702c-4a72-a68a-53faeecb1776",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Faithfully translates 'turns out wrong' and 'instead'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural rendering of '끝입니다'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Follows the specified term: ワークスペース = Space.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both store and shop are equally natural and accurate.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly conveys '请我吃饭' (treat me to a meal).\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Uses the specified terms 다방 and 부엉이.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Follows the specified term: 合宿 = 엠티.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly uses the established name 개러스.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both incorrectly use 존댓말 instead of 반말.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both accurately translate the sentence in 반말 register.\"}\n]\n```\n",
+  "duration_seconds": 5.954064,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17264,
+   "output_tokens": 304,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17568
+  }
+ }
+}

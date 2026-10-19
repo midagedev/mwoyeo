@@ -1,0 +1,31 @@
+{
+ "call": 43,
+ "try": 1,
+ "ids": [
+  "item-0157.2",
+  "item-0174.2",
+  "item-0037.2",
+  "item-0078.1",
+  "item-0249.2",
+  "item-0003.2",
+  "item-0355.1",
+  "item-0290.1",
+  "item-0169.2",
+  "item-0158.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "faba2dbc-4ae8-4857-822e-187a21f73470",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates the text to Korean and correctly renders the name Zeng Lan.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translates the name Pell and uses the appropriate honorific.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left the source Japanese text untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 left the Japanese untranslated, while 1 translates it.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"伝言 means a message/verbal message, not a voicemail.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"맨 끝 describes the hallway's end more naturally than 막다른 곳.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translates the character name Thorne into Korean (쏜).\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translate the sentence accurately and naturally.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Explains the pronunciation guide accurately for the original name Tomasz.\"}\n]\n```\n",
+  "duration_seconds": 4.759347,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17341,
+   "output_tokens": 315,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17656
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "call": 72,
+ "try": 1,
+ "ids": [
+  "item-0333.2",
+  "item-0316.1",
+  "item-0335.2",
+  "item-0369.2",
+  "item-0203.2",
+  "item-0305.2",
+  "item-0022.1",
+  "item-0325.2",
+  "item-0356.1",
+  "item-0276.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0a39cf52-5353-4503-8282-2f70e1f5c0a7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 properly translates the name Xiè Xuán into English.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are natural and grammatically correct Korean translations using appropriate 반말.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 awkwardly duplicates the name in parentheses.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Accurately uses defined term fleet allocation and follows role context.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both natural renderings expressing 'before then' in Korean informal speech.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Active phrasing accurately captures the honorific subject referring to the landlord.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 matches the established spelling Seoyoon from the facts.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are completely identical except for optional comma placement.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 contains an untranslated name and typo.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 sounds more natural as conversational Korean in this context.\"}\n]\n```\n",
+  "duration_seconds": 5.164295,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 5195,
+   "output_tokens": 317,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 11821,
+   "total_tokens": 5512
+  }
+ }
+}

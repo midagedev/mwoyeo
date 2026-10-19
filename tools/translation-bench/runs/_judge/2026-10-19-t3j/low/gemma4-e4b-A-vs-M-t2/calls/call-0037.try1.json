@@ -1,0 +1,29 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0379.1",
+  "item-0210.2",
+  "item-0066.2",
+  "item-0337.1",
+  "item-0279.1",
+  "item-0293.1",
+  "item-0378.2",
+  "item-0306.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ada5ed19-bc29-419a-b087-c08a4dbe4126",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean using proper 해요체 and honorifics.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Neither candidate translated the line into Korean.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly translates into Korean with the appropriate speech level.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean with natural informal 반말 register.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 left text untranslated, though Translation 2 misgenders male speaker's sister.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly translates into natural Korean 반말.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 transliterates Dex and sounds far more natural in Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 reads much more naturally in onboarding documentation context.\"}\n]\n```\n",
+  "duration_seconds": 4.166311,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16794,
+   "output_tokens": 262,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17056
+  }
+ }
+}

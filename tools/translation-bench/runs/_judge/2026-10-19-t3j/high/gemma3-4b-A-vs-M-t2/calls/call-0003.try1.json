@@ -1,0 +1,36 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0093.1",
+  "item-0294.2",
+  "item-0086.1",
+  "item-0142.2",
+  "item-0359.1",
+  "item-0267.2",
+  "item-0275.1",
+  "item-0242.1",
+  "item-0336.2",
+  "item-0085.2",
+  "item-0212.1",
+  "item-0251.1",
+  "item-0028.1",
+  "item-0326.1",
+  "item-0089.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e50a3af1-2c76-4b7d-b8b6-7909821d5683",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated into English.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 follows the defined terms and correct speech level.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly translates batch instead of mistranslating as loan.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated Chinese text.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 accurately conveys leaving review notes on changed lines.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated into English.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 uses the defined term and correct Korean grammar.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 is natural Korean, while Translation 2 is awkward.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly adheres to the required 해요체 speech level.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations fail the contextual name Takanashi and term Space.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 reads naturally in English without untranslated Japanese honorifics.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated Japanese.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese, while Translation 1 translates to Korean.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 does not leave raw Chinese characters untranslated.\"}\n]\n",
+  "duration_seconds": 227.661804,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 19101,
+   "output_tokens": 29210,
+   "thinking_tokens": 28744,
+   "cache_read_tokens": 0,
+   "total_tokens": 48311
+  }
+ }
+}

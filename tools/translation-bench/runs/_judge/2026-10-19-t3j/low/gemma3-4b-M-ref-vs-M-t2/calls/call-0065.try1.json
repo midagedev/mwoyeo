@@ -1,0 +1,31 @@
+{
+ "call": 65,
+ "try": 1,
+ "ids": [
+  "item-0125.1",
+  "item-0299.1",
+  "item-0107.2",
+  "item-0385.1",
+  "item-0039.1",
+  "item-0038.2",
+  "item-0357.2",
+  "item-0152.2",
+  "item-0169.1",
+  "item-0313.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c4b894ed-0436-417a-9407-e9e4bf600c2b",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 at least attempted Korean, while 2 is untranslated Japanese.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly romanizes the surname 解 as Xie (Xiè Xuán) instead of Jié.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"More natural phrasing for an instructional onboarding rule.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into English and called him an inspector.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'욕조를 계속 사용해' is natural Korean, whereas '욕조를 계속 해' is unnatural.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates 인사팀 to HR and does not leave Korean untranslated.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"More natural spoken dialogue without an awkward, unnatural '그녀는' pronoun.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Accurately captures the exclamatory '-네(요)' tone of '安いですね'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Follows standard Korean loanword orthography for long vowels (라이조 vs 라이조우).\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly refers to the invited member as 'they' matching prior context.\"}\n]\n```\n",
+  "duration_seconds": 6.625006,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17246,
+   "output_tokens": 358,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17604
+  }
+ }
+}

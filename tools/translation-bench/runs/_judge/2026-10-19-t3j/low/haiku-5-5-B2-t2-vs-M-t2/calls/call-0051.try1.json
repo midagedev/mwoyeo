@@ -1,0 +1,31 @@
+{
+ "call": 51,
+ "try": 1,
+ "ids": [
+  "item-0266.1",
+  "item-0004.2",
+  "item-0147.2",
+  "item-0275.2",
+  "item-0222.1",
+  "item-0300.1",
+  "item-0314.2",
+  "item-0242.2",
+  "item-0367.1",
+  "item-0220.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d0272467-5d94-4bf6-bf4c-82dad3c65dbf",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Lin Yuan speaks to his younger sister Lin Xia in banmal.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately use banmal.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Sogou speaks to Hinata in haeyoche; Translation 2 fits best.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both accurately translate the line with the correct haeyoche register.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"More natural phrasing for the timeline in English onboarding instructions.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Rook speaks to Dex using informal banmal.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Follows the specified term mapping '先輩 = boss'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Identifies Elder Qin as the subject and flows much more naturally.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"More natural and idiomatic Korean phrasing for user tutorial text.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly reflects that the team channel is inside Hearth/Modakbul.\"}\n]\n```\n",
+  "duration_seconds": 5.551829,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17348,
+   "output_tokens": 317,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17665
+  }
+ }
+}

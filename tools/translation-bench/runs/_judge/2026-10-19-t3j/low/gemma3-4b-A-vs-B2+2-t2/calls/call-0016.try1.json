@@ -1,0 +1,31 @@
+{
+ "call": 16,
+ "try": 1,
+ "ids": [
+  "item-0367.2",
+  "item-0185.1",
+  "item-0295.2",
+  "item-0369.2",
+  "item-0351.1",
+  "item-0288.1",
+  "item-0015.2",
+  "item-0258.1",
+  "item-0184.2",
+  "item-0368.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "98a728c6-933e-49a0-b49f-6abdc12c2727",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Siobhan speaks to Rory in 반말, but 2's meaning is closer.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Rook speaks to Thorne in 합쇼/해요체; 1 translates 'dying' properly.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Hyuga speaks to Sogo in 합쇼체; 2 uses appropriate formal tone.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and use correct 반말.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 reads more naturally in Korean without redundant pronouns.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates Git 'conflict' correctly as 충돌 rather than 갈등.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 failed to translate into English.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Elder Qin is standard; 榻 is a couch/bed, not table.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correctly attributes the instruction to the landlady (she), not you.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese text.\"}\n]\n```\n",
+  "duration_seconds": 4.978877,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17343,
+   "output_tokens": 338,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17681
+  }
+ }
+}

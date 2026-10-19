@@ -1,0 +1,27 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0121.2",
+  "item-0152.1",
+  "item-0074.2",
+  "item-0342.2",
+  "item-0027.2",
+  "item-0144.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7e779172-60f2-441b-b873-99448199cabe",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses banmal according to the speaker's speech level.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 uses the specified name romanization Jiu instead of Jiwoo.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Female speaker uses oppa and banmal to Rory, not hyeong.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates the bridge name 鵲橋 as 작교.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Translation 1 uses the term; Translation 2 correctly transliterates the name.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 uses the correct pinyin Yuè Chuān from the facts.\"}\n]\n```\n",
+  "duration_seconds": 206.066735,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 16385,
+   "output_tokens": 25530,
+   "thinking_tokens": 25319,
+   "cache_read_tokens": 0,
+   "total_tokens": 41915
+  }
+ }
+}

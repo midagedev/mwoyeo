@@ -1,0 +1,31 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0381.1",
+  "item-0062.1",
+  "item-0196.1",
+  "item-0240.1",
+  "item-0350.2",
+  "item-0074.2",
+  "item-0064.2",
+  "item-0142.2",
+  "item-0270.2",
+  "item-0282.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "bdbd4694-a447-4a2c-9501-6b4be13d02a0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Kiryu speaks in 해요체 to Takanashi.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translates term '先輩' as 'boss'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Lu Ming speaks to Zhou Ting in 해요체.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correct third-person pronoun 'She's'.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Female speaker correctly refers to older brother as 오빠.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are faithful; punctuation difference is negligible.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"More natural Korean phrasing for conversational 반말.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Properly capitalizes the term 'Sticky'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both convey the meaning, though both misgender 哥.\"}\n]\n```\n",
+  "duration_seconds": 4.208678,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 17479,
+   "output_tokens": 291,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 17770
+  }
+ }
+}

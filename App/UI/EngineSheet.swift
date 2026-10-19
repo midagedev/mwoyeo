@@ -11,6 +11,8 @@ struct EngineSheet: View {
     var editing: EngineConfig?
     /// For the capture harness: fills the sheet as a user would, through the same code paths.
     var autopilot: Autopilot?
+    /// Opened from the engine list's "Allow…": the box that allows sending to the engine's host has the focus.
+    var focusConsent = false
 
     struct Autopilot {
         /// A preset's name: opens step 2 for it.
@@ -19,6 +21,8 @@ struct EngineSheet: View {
         var setup: String?
         /// A key, typed into the key field.
         var key: String?
+        /// Tick the box that allows sending to the engine's host, as a click on it would.
+        var allow = false
         /// Press Add once the sample has run.
         var commit = false
     }
@@ -65,6 +69,10 @@ struct EngineSheet: View {
     /// Editing: the key as it was when the sheet opened, put back if the sheet closes without Save.
     @State private var keyAtOpen: String?
     @State private var showAdvanced = false
+    /// The host the person ticked "Send the text the lens reads to …" for. The box counts as ticked only while it is the host the engine
+    /// has now, so changing the address un-ticks it. Nothing sets it but the box (and an edit of an engine that already has the record).
+    @State private var allowedHost: String?
+    @FocusState private var consentFocused: Bool
 
     private enum Work: Equatable {
         case idle, working
@@ -239,9 +247,22 @@ struct EngineSheet: View {
                 if custom, case .chat = family { TextField("Base URL", text: $baseURL, prompt: Text(verbatim: "http://localhost:8080/v1")) }
             } header: {
                 Text(headerTitle)
-            } footer: {
-                if let host = remoteHost {
-                    Text("Text the lens reads is sent to \(host).").font(.caption).foregroundStyle(.secondary)
+            }
+            if let host = remoteHost {
+                Section {
+                    Toggle("Send the text the lens reads to \(host)", isOn: consent)
+                        .toggleStyle(.checkbox)
+                        .focused($consentFocused)
+                } footer: {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Group {
+                            Text("Your engine's provider handles that text under its own privacy policy.")
+                            if sendsContext { Text("Recent lines are sent too, for context.") }
+                        }
+                        .foregroundStyle(.secondary)
+                        Link("Privacy Policy", destination: Distribution.privacyPolicy)
+                    }
+                    .font(.caption)
                 }
             }
             Section { resultRow }
@@ -271,6 +292,22 @@ struct EngineSheet: View {
     private var remoteHost: String? {
         guard let c = build(), !c.isOnThisMac else { return nil }
         return c.endpointName
+    }
+
+    /// The host the box is about (lower case, as the record keeps it); nil while the engine stays on this Mac.
+    private var consentHost: String? { build().flatMap(EnginePermissions.host(of:)) }
+
+    private var consentGiven: Bool { consentHost != nil && allowedHost == consentHost }
+
+    private var consent: Binding<Bool> {
+        Binding(get: { consentGiven }, set: { allowedHost = $0 ? consentHost : nil })
+    }
+
+    /// Whether recent lines can go along with the text: the engine's context switch, or an app's override, can turn context on.
+    private var sendsContext: Bool {
+        guard var c = build() else { return false }
+        c.context = model.settings.engines.first { $0.id == id }?.context
+        return EnginePermissions.sendsContext(c, profiles: model.settings.appProfiles)
     }
 
     private var keyRow: some View {
@@ -405,6 +442,7 @@ struct EngineSheet: View {
     private func load(_ c: EngineConfig, blankURL: Bool) {
         id = c.id
         nameText = c.name
+        allowedHost = nil
         models = []
         work = .idle
         thinking = .off
@@ -487,6 +525,7 @@ struct EngineSheet: View {
 
     private var canAdd: Bool {
         guard let c = build() else { return false }
+        guard EnginePermissions.mayCommit(c, ticked: allowedHost) else { return false }
         switch c.kind {
         case .openAICompatible, .anthropic: return c.modelName != nil && (!needsKey || keyPresent)
         case .deepL: return keyPresent
@@ -509,6 +548,7 @@ struct EngineSheet: View {
         saveKey()
         guard let config = build() else { return }
         added = true
+        model.setSendingAllowed(consentGiven, for: config)
         if isEdit { model.updateEngine(config) } else { model.addEngine(config) }
         dismiss()
     }
@@ -591,7 +631,9 @@ struct EngineSheet: View {
             needsKey = { if case .command = e.kind { return false }; return !e.isOnThisMac }()
             keyAtOpen = (try? model.secrets.secret(for: e.id)) ?? nil
             keySaved = keyAtOpen != nil
+            allowedHost = model.settings.enginePermissions.allows(e) ? EnginePermissions.host(of: e) : nil
             step = .configure
+            consentFocused = focusConsent
             if keySaved || e.isOnThisMac { await run(loadModels: true) }
         } else {
             async let running: Void = detectLocal()
@@ -603,6 +645,7 @@ struct EngineSheet: View {
     private func drive(_ a: Autopilot) async {
         if let name = a.preset, let p = Self.preset(name) { begin(preset: p) }
         if let setup = a.setup { pasted = setup; readPasted() }
+        if a.allow { allowedHost = consentHost }
         if let k = a.key {
             try? await Task.sleep(for: .milliseconds(400)) // the key field has to be on screen to be typed into
             key = k

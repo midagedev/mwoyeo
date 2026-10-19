@@ -26,11 +26,17 @@ enum SettingsImporter {
         return panel.runModal() == .OK ? panel.url : nil
     }
 
-    /// One line for the result: what was applied, or the first problem.
-    static func summary(_ r: SettingsImport) -> String {
+    /// Whether the import brought engines that cannot send text until the person allows them: an import never grants (`EnginePermissions`).
+    static func needsAllowing(_ r: SettingsImport, in s: AppSettings) -> Bool {
+        r.parsed && r.applied.contains("engines") && s.engines.contains { !s.enginePermissions.allows($0) }
+    }
+
+    /// One line for the result: what was applied, or the first problem. `askingToAllow`: the engines it brought wait for the person.
+    static func summary(_ r: SettingsImport, askingToAllow: Bool = false) -> String {
         if !r.parsed { return r.issues.first.map { String(localized: "Nothing was imported: \($0.message)") } ?? String(localized: "Nothing was imported.") }
         let n = r.applied.count
         var text = n == 0 ? String(localized: "Nothing to change; these settings are already here.") : String(localized: "Imported \(n) settings.")
+        if askingToAllow { text += " " + String(localized: "Allow each online engine in Settings.") }
         if let first = r.issues.first {
             let line = first.line.map { String(localized: "Line \($0): \(first.message)") } ?? first.message
             text += " " + (r.issues.count > 1 ? String(localized: "\(line) · \(r.issues.count - 1) more") : line)
@@ -49,7 +55,8 @@ struct ImportSettingsRow: View {
         VStack(alignment: .leading, spacing: 4) {
             Button("Import settings from the GitHub version…") {
                 guard let url = SettingsImporter.chooseFile() else { return }
-                result = SettingsImporter.summary(model.importSettings(from: url))
+                let imported = model.importSettings(from: url)
+                result = SettingsImporter.summary(imported, askingToAllow: SettingsImporter.needsAllowing(imported, in: model.settings))
             }
             .buttonStyle(.borderless)
             .foregroundStyle(.tint)

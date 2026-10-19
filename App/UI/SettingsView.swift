@@ -247,7 +247,7 @@ struct TranslationSettings: View {
                         .tag(EngineSelection.builtIn(choice))
                     }
                     ForEach(model.settings.engines) { engine in
-                        AddedEngineLabel(engine: engine) { engineActions(engine) }.tag(EngineSelection.added(engine.id))
+                        AddedEngineLabel(engine: engine, allow: { sheet = .allow(engine) }) { engineActions(engine) }.tag(EngineSelection.added(engine.id))
                     }
                 }
                 .pickerStyle(.radioGroup)
@@ -287,6 +287,7 @@ struct TranslationSettings: View {
                 switch target {
                 case .add: EngineSheet().environment(model)
                 case let .edit(engine): EngineSheet(editing: engine).environment(model)
+                case let .allow(engine): EngineSheet(editing: engine, focusConsent: true).environment(model)
                 }
             }
             .confirmationDialog("Remove this engine?", isPresented: Binding(get: { removing != nil }, set: { if !$0 { removing = nil } }),
@@ -661,7 +662,7 @@ private struct AboutView: View {
 
             Divider().frame(width: 300).padding(.vertical, 6)
             VStack(alignment: .leading, spacing: 6) {
-                Label("Screen text is read, erased and translated on this Mac and never leaves it", systemImage: "lock.shield")
+                Label("By default, screen text is read, erased and translated on this Mac and never leaves it", systemImage: "lock.shield")
                 #if !MAS
                 Label("Update checks ask GitHub for the latest version and count installs without any identifier", systemImage: "arrow.down.circle")
                 #endif
@@ -697,10 +698,12 @@ private struct AboutView: View {
 enum EngineSheetTarget: Identifiable {
     case add
     case edit(EngineConfig)
+    /// "Allow…" on an engine that needs the person's permission: the edit sheet, at the box.
+    case allow(EngineConfig)
     var id: String {
         switch self {
         case .add: "add"
-        case let .edit(e): e.id.uuidString
+        case let .edit(e), let .allow(e): e.id.uuidString
         }
     }
 }
@@ -709,6 +712,7 @@ enum EngineSheetTarget: Identifiable {
 private struct AddedEngineLabel<Actions: View>: View {
     @Environment(AppModel.self) private var model
     let engine: EngineConfig
+    let allow: () -> Void
     @ViewBuilder let actions: Actions
 
     var body: some View {
@@ -720,6 +724,7 @@ private struct AddedEngineLabel<Actions: View>: View {
                 }
             }
             Spacer(minLength: 0)
+            if engine.needsPermission(model.settings.enginePermissions) { Button("Allow…", action: allow).buttonStyle(.borderless).foregroundStyle(.tint) }
             Menu { actions } label: { Image(nsImage: .moreActions) }
                 .menuStyle(.borderlessButton)
                 .menuIndicator(.hidden)
@@ -730,7 +735,9 @@ private struct AddedEngineLabel<Actions: View>: View {
     }
 
     private var detail: String {
-        engine.listSubtitle() + (model.translator.measuredSeconds(for: engine.id).map { String(format: " · ~%.1f s", $0) } ?? "")
+        let permissions = model.settings.enginePermissions
+        let seconds = engine.needsPermission(permissions) ? nil : model.translator.measuredSeconds(for: engine.id)
+        return engine.listSubtitle(permissions: permissions) + (seconds.map { String(format: " · ~%.1f s", $0) } ?? "")
     }
 }
 

@@ -42,9 +42,17 @@ extension EngineConfig {
         return true
     }
 
-    /// `subtitle` for the engine list; "Not available in this version" while this build cannot run it.
-    func listSubtitle(allowsCommands: Bool = !Distribution.isAppStore) -> String {
-        isAvailable(allowsCommands: allowsCommands) ? subtitle : String(localized: "Not available in this version")
+    /// Whether the engine list asks for the person's permission to send text to this engine's host (`EnginePermissions`): it runs in this
+    /// build, is off this Mac and has no record for its current host.
+    func needsPermission(_ permissions: EnginePermissions, allowsCommands: Bool = !Distribution.isAppStore) -> Bool {
+        isAvailable(allowsCommands: allowsCommands) && !permissions.allows(self)
+    }
+
+    /// `subtitle` for the engine list; "Not available in this version" while this build cannot run it, "Needs your permission" while the
+    /// person has not allowed sending to its host.
+    func listSubtitle(allowsCommands: Bool = !Distribution.isAppStore, permissions: EnginePermissions = EnginePermissions()) -> String {
+        if !isAvailable(allowsCommands: allowsCommands) { return String(localized: "Not available in this version") }
+        return permissions.allows(self) ? subtitle : String(localized: "Needs your permission")
     }
 
     /// The lens pill's mark for this engine (SF Symbol).

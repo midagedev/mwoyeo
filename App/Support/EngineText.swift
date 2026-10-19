@@ -20,6 +20,7 @@ extension EngineError {
         case let .network(m): String(localized: "Could not reach the engine: \(m)")
         case let .commandFailed(m): String(localized: "The command failed: \(m)")
         case .commandUnavailable: String(localized: "Not available in this version")
+        case let .needsPermission(host): String(localized: "Allow sending to \(host) in Settings")
         case .cancelled: String(localized: "Cancelled.")
         }
     }

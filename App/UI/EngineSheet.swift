@@ -25,6 +25,8 @@ struct EngineSheet: View {
         var allow = false
         /// Press Add once the sample has run.
         var commit = false
+        /// Editing: open the Context section, as a click on it would.
+        var expandContext = false
     }
 
     @Environment(AppModel.self) private var model
@@ -257,7 +259,7 @@ struct EngineSheet: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Group {
                             Text("Your engine's provider handles that text under its own privacy policy.")
-                            if sendsContext { Text("Recent lines are sent too, for context.") }
+                            ForEach(contextFootnotes, id: \.self) { Text(verbatim: $0) }
                         }
                         .foregroundStyle(.secondary)
                         Link("Privacy Policy", destination: Distribution.privacyPolicy)
@@ -266,11 +268,23 @@ struct EngineSheet: View {
                 }
             }
             Section { resultRow }
+            if let engine = contextEngine {
+                Section { EngineContextSection(engine: engine, opensExpanded: autopilot?.expandContext ?? false) }
+            }
             Section {
                 DisclosureGroup("Advanced", isExpanded: $showAdvanced) { advancedFields }
             }
         }
         .formStyle(.grouped)
+    }
+
+    /// The engine the Context section is about: only one that is already added (its switches live in settings, and a new engine has none
+    /// yet), and only one the context layout reaches. The family never changes while editing, and the address may be half typed, so an
+    /// engine the form cannot build yet falls back to the one the sheet opened with.
+    private var contextEngine: EngineConfig? {
+        guard isEdit, var engine = build() ?? editing, EngineContextRules.shows(engine.kind) else { return nil }
+        engine.context = model.settings.engines.first { $0.id == id }?.context
+        return engine
     }
 
     private var headerTitle: String {
@@ -303,11 +317,11 @@ struct EngineSheet: View {
         Binding(get: { consentGiven }, set: { allowedHost = $0 ? consentHost : nil })
     }
 
-    /// Whether recent lines can go along with the text: the engine's context switch, or an app's override, can turn context on.
-    private var sendsContext: Bool {
-        guard var c = build() else { return false }
+    /// What goes along with the text besides the lines to translate, one sentence each (`EngineContextSent` owns the words and the rule).
+    private var contextFootnotes: [String] {
+        guard var c = build() else { return [] }
         c.context = model.settings.engines.first { $0.id == id }?.context
-        return EnginePermissions.sendsContext(c, profiles: model.settings.appProfiles)
+        return EngineContextSent.footnotes(for: c, in: model)
     }
 
     private var keyRow: some View {

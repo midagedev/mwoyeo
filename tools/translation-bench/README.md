@@ -259,6 +259,17 @@ live corpus moved on, and new runs get a new snapshot. Probe accuracy of runs on
 `score.py` scores against the live corpus unless given `--root runs/_corpus/<hash>`, so rerun the condition under the new
 corpus (a new run name) to compare.
 
+## Model findings (closed)
+
+- **Gemma 4 (2026-10-19), runs `*-gemma4-*`:** not usable as a Mwoyeo engine with today's request.
+  - gemma4:e4b returns ja/zh→ko lines as their own source text (142 of 436 echoed, 23.4 % probe accuracy, A-gemma4-e4b).
+  - Folding the system prompt into the user message lowers the echo (the `-fold` runs). The product carries no
+    per-model request rules, so this stays a bench note and is not shipped.
+  - gemma4:26b does not echo, but at 18 GB it swaps a 32 GB Mac.
+  - The judge pass for M vs A was stopped unfinished; its 249 raw verdicts are not counted.
+- **TranslateGemma 4b:** it accepts the JSON request but fails 13.5 % of A requests. Some batches repeat a sentence
+  until the deadline. Not recommended either.
+
 ## Metrics (`score.py`)
 
 - **Probe accuracy** per run: overall, by evidence (`memory`, `lines`, `none`), by type, by pair and kind, and for

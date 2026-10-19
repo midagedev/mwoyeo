@@ -84,6 +84,12 @@ targets:
     platform: macOS
     sources:
       - path: App
+        excludes:
+          - AppIcon.icon
+      # The Icon Composer icon (tools/app-icon/make-icon.swift): one file reference, so actool compiles it as AppIcon.
+      - path: App/AppIcon.icon
+        type: file
+        buildPhase: resources
       - path: Shared
       # MI-GAN (MIT), converted by tools/inpaint/convert_migan.sh; the app falls back to flat fill without it.
       - path: tools/inpaint/models/MIGAN_512.mlpackage

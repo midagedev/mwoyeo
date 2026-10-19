@@ -8,10 +8,13 @@
   asc.py shots [--dry]   the Mac screenshots of every locale (APP_DESKTOP set of the version being prepared): Korean gets
                          tools/app-store/screenshots/out/ko, every other locale out/en (compose.sh makes them); the set's
                          screenshots are replaced, in file order
+  asc.py previews [--dry]  the Mac app preview of every locale (DESKTOP set of the version being prepared): Korean gets
+                         tools/app-store/previews/out/ko.mp4, every other locale out/en.mp4 (cut.sh makes them, with the poster
+                         frame's time code in out/<lang>.poster); the set's previews are replaced
 
 Key: ASC_KEY_ID (default J6C3DV9S7R), ASC_ISSUER_ID, ASC_KEY_FILE (default ~/.appstoreconnect/private_keys/AuthKey_<id>.p8).
 What the API does not cover (App Privacy answers, price, review contact) is done in the web page."""
-import base64, hashlib, importlib.util, json, os, subprocess, sys, time, urllib.error, urllib.request
+import base64, hashlib, importlib.util, json, os, shutil, subprocess, sys, time, urllib.error, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 BUNDLE = 'dev.midagedev.mwoyeo.appstore'
@@ -24,6 +27,7 @@ SUPPORT = 'https://github.com/midagedev/mwoyeo/issues'
 MARKETING = 'https://github.com/midagedev/mwoyeo'
 COPYRIGHT = '2026 Hyeoncheol Kim'
 SHOTS = os.path.join(ROOT, 'tools/app-store/screenshots/out')
+PREVIEWS = os.path.join(ROOT, 'tools/app-store/previews/out')
 
 
 def b64(b):
@@ -173,14 +177,15 @@ def apply(dry):
         print('build', builds[0]['attributes']['version'], 'attached')
 
 
-def delivered(shot_id, timeout=300):
-    """The screenshot's asset delivery state once Apple has processed it (COMPLETE or FAILED), with its errors."""
+def delivered(path, field='assetDeliveryState', timeout=300):
+    """The asset's delivery state once Apple has processed it (COMPLETE or FAILED), with its errors; the last state seen at the
+    timeout. A screenshot reports it in assetDeliveryState, a preview video in videoDeliveryState."""
     end = time.time() + timeout
     while True:
-        at = call('GET', f'/v1/appScreenshots/{shot_id}')['data']['attributes']
-        state = (at.get('assetDeliveryState') or {}).get('state')
+        at = call('GET', path)['data']['attributes']
+        state = (at.get(field) or {}).get('state')
         if state in ('COMPLETE', 'FAILED') or time.time() > end:
-            return state, (at.get('assetDeliveryState') or {}).get('errors') or []
+            return state, (at.get(field) or {}).get('errors') or []
         time.sleep(2)
 
 
@@ -221,8 +226,88 @@ def shots(dry):
                 put_chunk(op['url'], op['method'], op.get('requestHeaders'), data[op['offset']:op['offset'] + op['length']])
             call('PATCH', f'/v1/appScreenshots/{shot["id"]}', {'data': {'type': 'appScreenshots', 'id': shot['id'],
                  'attributes': {'uploaded': True, 'sourceFileChecksum': hashlib.md5(data).hexdigest()}}})
-            state, errors = delivered(shot['id'])
+            state, errors = delivered(f'/v1/appScreenshots/{shot["id"]}')
             print(f'  {name}: {state}', '; '.join(f'{e.get("code")}: {e.get("description")}' for e in errors))
+
+
+def preview_problems(path):
+    """What App Store Connect would fail a Mac preview for, read with ffprobe (skipped without it): 1920x1080, at most 30 fps,
+    15 to 30 s, H.264 or ProRes, an audio track, at most 500 MB. Processing fails on these only after the upload."""
+    problems = []
+    if os.path.getsize(path) > 500 * 1024 * 1024:
+        problems.append('over 500 MB')
+    if not shutil.which('ffprobe'):
+        return problems
+    out = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'stream=codec_type,codec_name,width,height,avg_frame_rate:format=duration',
+                          '-of', 'json', path], capture_output=True, text=True)
+    info = json.loads(out.stdout or '{}')
+    video = [s for s in info.get('streams', []) if s.get('codec_type') == 'video']
+    if not video:
+        return problems + ['no video track']
+    v = video[0]
+    num, _, den = v.get('avg_frame_rate', '0/1').partition('/')
+    fps = float(num) / float(den or 1) if float(den or 1) else 0
+    seconds = float(info.get('format', {}).get('duration', 0))
+    if (v.get('width'), v.get('height')) != (1920, 1080):
+        problems.append(f'{v.get("width")}x{v.get("height")}, not 1920x1080')
+    if fps > 30.01:
+        problems.append(f'{fps:.2f} fps, over 30')
+    if not 15 <= seconds <= 30:
+        problems.append(f'{seconds:.2f} s, not 15 to 30')
+    if v.get('codec_name') not in ('h264', 'prores'):
+        problems.append(f'codec {v.get("codec_name")}')
+    if not any(s.get('codec_type') == 'audio' for s in info.get('streams', [])):
+        problems.append('no audio track')
+    return problems
+
+
+def previews(dry):
+    a = app()
+    v = editable_version(a['id'])
+    print('version', v['attributes']['versionString'], v['attributes']['appStoreState'])
+    files, posters = {}, {}
+    for lang in ('ko', 'en'):
+        files[lang] = os.path.join(PREVIEWS, f'{lang}.mp4')
+        if not os.path.isfile(files[lang]):
+            sys.exit(f'{files[lang]}: missing (run tools/app-store/previews/cut.sh)')
+        problems = preview_problems(files[lang])
+        if problems:
+            sys.exit(f'{files[lang]}: {", ".join(problems)}')
+        poster = os.path.join(PREVIEWS, f'{lang}.poster')
+        posters[lang] = open(poster).read().strip() if os.path.isfile(poster) else None
+    have = {x['attributes']['locale']: x for x in call('GET', f'/v1/appStoreVersions/{v["id"]}/appStoreVersionLocalizations')['data']}
+    for ours, theirs in LOCALES.items():
+        lang = 'ko' if ours == 'ko' else 'en'
+        loc = have.get(theirs) or sys.exit(f'no version localization {theirs}: run apply first')
+        sets = call('GET', f'/v1/appStoreVersionLocalizations/{loc["id"]}/appPreviewSets')['data']
+        preview_set = next((x for x in sets if x['attributes']['previewType'] == 'DESKTOP'), None)
+        old = call('GET', f'/v1/appPreviewSets/{preview_set["id"]}/appPreviews')['data'] if preview_set else []
+        data_size = os.path.getsize(files[lang])
+        print(f'{theirs}: DESKTOP set {preview_set["id"] if preview_set else "(create)"}, delete {len(old)}, upload out/{lang}.mp4 '
+              f'({data_size} bytes), poster frame {posters[lang] or "(Apple default, 5 s)"}')
+        if dry:
+            continue
+        if not preview_set:
+            preview_set = call('POST', '/v1/appPreviewSets', {'data': {'type': 'appPreviewSets',
+                               'attributes': {'previewType': 'DESKTOP'},
+                               'relationships': {'appStoreVersionLocalization': {'data': {'type': 'appStoreVersionLocalizations', 'id': loc['id']}}}}})['data']
+        for o in old:
+            call('DELETE', f'/v1/appPreviews/{o["id"]}')
+        data = open(files[lang], 'rb').read()
+        attrs = {'fileName': f'mwoyeo-{lang}.mp4', 'fileSize': len(data), 'mimeType': 'video/mp4'}
+        if posters[lang]:
+            attrs['previewFrameTimeCode'] = posters[lang]
+        preview = call('POST', '/v1/appPreviews', {'data': {'type': 'appPreviews', 'attributes': attrs,
+                       'relationships': {'appPreviewSet': {'data': {'type': 'appPreviewSets', 'id': preview_set['id']}}}}})['data']
+        for op in preview['attributes']['uploadOperations']:
+            put_chunk(op['url'], op['method'], op.get('requestHeaders'), data[op['offset']:op['offset'] + op['length']])
+        commit = {'uploaded': True, 'sourceFileChecksum': hashlib.md5(data).hexdigest()}
+        if posters[lang]:
+            commit['previewFrameTimeCode'] = posters[lang]
+        call('PATCH', f'/v1/appPreviews/{preview["id"]}', {'data': {'type': 'appPreviews', 'id': preview['id'], 'attributes': commit}})
+        # Apple says processing takes up to 24 h; a state still PROCESSING at the timeout is reported, not an error.
+        state, errors = delivered(f'/v1/appPreviews/{preview["id"]}', 'videoDeliveryState', timeout=600)
+        print(f'  {lang}.mp4: {state}', '; '.join(f'{e.get("code")}: {e.get("description")}' for e in errors))
 
 
 if __name__ == '__main__':
@@ -233,5 +318,7 @@ if __name__ == '__main__':
         apply('--dry' in sys.argv)
     elif cmd == 'shots':
         shots('--dry' in sys.argv)
+    elif cmd == 'previews':
+        previews('--dry' in sys.argv)
     else:
         sys.exit(__doc__)

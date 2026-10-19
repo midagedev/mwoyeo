@@ -393,6 +393,7 @@ enum UICapture {
             failed += await firstRunChecks()
             failed += SettingsFileChecks.run(model)
             failed += SandboxDataChecks.run()
+            failed += CodeKeepChecks.run()
             failed += await LensRobustChecks.run(model)
             failed += await ContextChecks.run()
             failed += DriftChecks.run()

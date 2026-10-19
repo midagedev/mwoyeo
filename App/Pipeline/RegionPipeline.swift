@@ -161,6 +161,8 @@ actor RegionPipeline {
     private var lensMoved: TimeInterval = 0
     private var seamlessDone = false
     private var blocks: [Block] = []
+    /// The blocks of the latest read that stay as written because they sit in a region of code (`CodeKeep`); the self-test lists them.
+    private var keptBlocks: [CodeKeep.Kept] = []
     private var working = false
     private var settleTask: Task<Void, Never>?
     /// Sources waiting for translation, and whether the translation worker runs.
@@ -357,6 +359,9 @@ actor RegionPipeline {
         clearRecovery()
         kick()
     }
+
+    /// For the headless self-test: the blocks left as written by `CodeKeep`, and why.
+    func keptState() -> [CodeKeep.Kept] { keptBlocks }
 
     /// For the headless self-test: whether work is pending, and what each block reads.
     func debugState() -> (busy: Bool, translating: Bool, paused: Bool, parked: Int, blocks: [(String, String?)], flight: [String], motion: (moving: Bool, velocity: CGVector, expected: Double?), lens: (total: Int, untranslated: Int)) {
@@ -814,6 +819,7 @@ actor RegionPipeline {
     private func fastPass(_ frame: CapturedFrame, dirty: CGRect, stale: Staleness) async {
         setActivity(.reading)
         let start = startPass()
+        defer { looks = nil }
         let useFast = options.sourceLanguage != "auto" && Languages.isLatinScript(options.sourceLanguage)
         // Blocks whose pixels did not change stay as they are (seamless ones keep their erased background).
         let staleIDs = Set(blocks.filter { $0.rect.intersects(dirty) && stale.touches($0.rect, step: frame.grayStep) }.map(\.id))
@@ -845,7 +851,10 @@ actor RegionPipeline {
         }
         found = readBlocks(found, in: frame.image)
         Trace.mark("fast: OCR \(Int(dirty.width))×\(Int(dirty.height))px → \(found.count) blocks", since: t)
-        let verdicts = found.map { TextRecognizer.verdict($0.text, target: options.targetLanguage) }
+        let (verdicts, kept) = CodeKeep.apply(found.map { TextRecognizer.verdict($0.text, target: options.targetLanguage) }, to: found, frame: frame.image) {
+            appearance(of: $0, in: frame.image)
+        }
+        keptBlocks = Array((keptBlocks.filter { !$0.rect.intersects(dirty) } + kept).suffix(256))   // a long scroll must not grow it
         onRead?(TextRecognizer.tally(verdicts, partial: dirty.width < CGFloat(frame.image.width) || dirty.height < CGFloat(frame.image.height)))
         let fresh = zip(found, verdicts).filter { ocr, verdict in
             verdict == .needs && !keptRects.contains { $0.contains(CGPoint(x: ocr.rect.midX, y: ocr.rect.midY)) }
@@ -895,6 +904,7 @@ actor RegionPipeline {
         setActivity(.reading)
         layoutStale = false
         let start = startPass()
+        defer { looks = nil }
         var t = Trace.now
         var found: [OCRBlock]
         do {
@@ -925,7 +935,10 @@ actor RegionPipeline {
             return true
         }
         let read = readBlocks(found, in: frame.image)
-        let verdicts = read.map { TextRecognizer.verdict($0.text, target: options.targetLanguage) }
+        let (verdicts, kept) = CodeKeep.apply(read.map { TextRecognizer.verdict($0.text, target: options.targetLanguage) }, to: read, frame: frame.image) {
+            appearance(of: $0, in: frame.image)
+        }
+        keptBlocks = kept
         onRead?(TextRecognizer.tally(verdicts))
         found = zip(read, verdicts).filter { $1 == .needs }.map(\.0)
         let places = layoutPlaces(of: found, among: read, in: frame.image)
@@ -1349,7 +1362,20 @@ actor RegionPipeline {
         return text.contains(where: { "gjpqy".contains($0) }) ? h / 0.95 : h / 0.72
     }
 
+    /// The looks measured in the frame being read. The style split, the label rule and the code keep ask for the same line rectangles,
+    /// so each line is measured once per pass (a pass ends by emptying it, so no frame is kept alive).
+    private var looks: (frame: CGImage, byRect: [CGRect: TextAppearance])?
+
     private func appearance(of lineRect: CGRect, in image: CGImage) -> TextAppearance {
+        if looks?.frame !== image { looks = (image, [:]) }
+        if let hit = looks?.byRect[lineRect] { return hit }
+        let look = Self.appearance(of: lineRect, in: image)
+        looks?.byRect[lineRect] = look
+        return look
+    }
+
+    /// What one line looks like (colours, background noise): the memo above measures with it, and so does `CodeKeepChecks`.
+    nonisolated static func appearance(of lineRect: CGRect, in image: CGImage) -> TextAppearance {
         let ring = max(2, Int(lineRect.height * 0.15))
         let crop = PixelRect(lineRect.insetBy(dx: -CGFloat(ring), dy: -CGFloat(ring))).clamped(width: image.width, height: image.height)
         let text = PixelRect(lineRect).clamped(width: image.width, height: image.height)

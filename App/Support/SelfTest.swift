@@ -302,9 +302,9 @@ enum SelfTest {
             }
         }
         printPace(translator)
-        for (source, translation) in await pipeline.debugState().blocks {
-            print("  \(source)\n    → \(translation ?? "(no translation)")")
-        }
+        for (source, translation) in await pipeline.debugState().blocks { print("  \(source)\n    → \(translation ?? "(no translation)")") }
+        // The blocks left as written (code regions) are listed as shown, with a third line that names the reason.
+        for kept in await pipeline.keptState() { print("  \(kept.text)\n    → \(kept.text)\n    kept: \(kept.reason.rawValue)") }
         await printEngineSummary(translator, issues: issues, wasAdded: !settings.engines.isEmpty)
 
         printLayout(still.latest)

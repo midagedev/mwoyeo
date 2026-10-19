@@ -15,6 +15,8 @@ public enum EngineError: Error, Equatable, Sendable {
     case commandFailed(String)
     /// A command engine reached a build that does not run programs (the Mac App Store build).
     case commandUnavailable
+    /// The engine is off this Mac and the person has not allowed sending the lens's text to `host` (the app keeps that record).
+    case needsPermission(host: String)
     case cancelled
 
     /// A short sentence for the lens or the add-engine sheet.
@@ -31,6 +33,7 @@ public enum EngineError: Error, Equatable, Sendable {
         case let .network(m): "Could not reach the engine: \(m)"
         case let .commandFailed(m): "The command failed: \(m)"
         case .commandUnavailable: "Not available in this version"
+        case let .needsPermission(host): "Allow sending to \(host) in Settings"
         case .cancelled: "Cancelled."
         }
     }

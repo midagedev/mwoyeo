@@ -14,11 +14,19 @@ Each check names the failure it blocks:
   caption   a caption over the lens, or a headline that wraps to a second line
   coverage  the app scene (cards and panel) under 55 % of the frame
   capheight the headline's capital height under 80 px at 2880 wide (unreadable at the store's thumbnail size)
+  live      a live frame claims the screen changed under one lens: its cards must be one page (same file, window, crop, lens and
+            parameters) at history counts one message apart, placed left to right at one height with the lens in the same place in
+            each (a lens moved, another page or a skipped message would show a change the screen did not make)
+  cut       a live frame whose cards show too much of the page that does not change: the lens (the only part that changes from
+            moment to moment) starting below 40 % of the card, or with no original line above it (the in-place effect unreadable)
+  step      the arrow and "+3s" between two moments too small to read at the store's thumbnail size (the label's capitals under
+            63 px high at 2880 wide, 14 px at 640; the arrow under 82 px wide), the label saying other than the seconds the pages
+            show, or a row not above the cards
   count     a locale folder that is not exactly the frames scenes.json lists, numbered 01.. without a gap, 1 to 10 of them
             (asc.py uploads every PNG in the folder in name order, and App Store Connect takes at most 10 per set)
 The self-test breaks a copy of a frame once per check and expects that check to FAIL (FAIL-first).
 """
-import copy, json, os, sys
+import copy, json, os, sys, urllib.parse
 
 import numpy as np
 from PIL import Image
@@ -28,6 +36,13 @@ CFG = json.load(open(os.path.join(HERE, 'scenes.json'), encoding='utf-8'))
 FW, FH = 2880, 1800
 GLOW_ZONE = 24          # CSS px around a lens where the ring and glow may change the source (glow: 3 px out + blur 5)
 SHADOW_TAIL = 24        # CSS px past a shadow's offset + blur where its Gaussian tail still rounds a pixel by 1
+# 2026-10-19 as3b (vision FIX on frame 01: at 640 px wide the three panels read as the same chat, "+3s" was 5 px high). The cut:
+# a live card's unchanged top (lens y over card height) at most 40 %, measured 212/566 = 37.5 % (was 334/688 = 48.5 %); 566 pt is
+# the shortest panel the 55 % coverage floor allows for 3 x 420 pt cards (3 x 420 x 566 / (1440 x 900) = 55.03 %), so the share
+# cannot go lower here without moving that floor. The label: capitals >= 63 px at 2880 (= 14 px at 640; it was 24, 5.3 px),
+# the arrow >= 82 px wide (2 x the 41 px it was).
+LIVE_TOP_MAX, LIVE_TOP_MIN_PT = 0.40, 24
+STEP_CAP_MIN, STEP_ARROW_MIN = 63, 82
 
 
 def load(path):
@@ -111,9 +126,11 @@ def check_keep(render, source_card, scene):
     return errs, notes
 
 
-def check_caption(frame, placed):
-    """Rows of caption ink (near-white) above the scene: one headline band and one sub band, ending above every lens."""
+def check_caption(frame, placed, steps=()):
+    """Rows of caption ink (near-white) above the scene: one headline band and one sub band, ending above every lens (and above
+    the step rows of a live frame, which sit between the caption and the cards and are checked by check_step)."""
     top = min(box(p['rect'])[1] for p in placed)
+    top = min([top] + [2 * s['rect'][1] for s in steps])
     lens_top = min(box(p['lens'])[1] for p in placed if p['kind'] == 'source')
     band = frame[:top, 120:FW - 120]
     ink = (band.min(axis=2) > 170).any(axis=1)
@@ -130,6 +147,8 @@ def check_caption(frame, placed):
         errs.append(f'{len(runs)} text bands above the scene (headline wrapped?): {runs}')
     if rows[-1] >= lens_top:
         errs.append(f'caption ink at row {rows[-1]} reaches the lens (top {lens_top})')
+    if steps and rows[-1] >= top - 12:
+        errs.append(f'caption ink at row {rows[-1]} runs into the step rows (top {top})')
     return errs, [f'bands {[(int(a), int(b)) for a, b in runs]}']
 
 
@@ -148,6 +167,73 @@ def check_capheight(probe):
     rows = np.where((a.min(axis=2) > 128).any(axis=1))[0]
     h = int(rows[-1] - rows[0] + 1) if rows.size else 0
     return ([f'cap height {h} px < 80'] if h < 80 else []), [f'cap height {h} px (at 640 wide: {h * 640 / FW:.1f} px)']
+
+
+def check_live(placed, scenes):
+    """placed: a live frame's placements; scenes: the scenes.json entries of its moments, in time order."""
+    errs = []
+    urls = [urllib.parse.urlsplit(s.get('page', '')) for s in scenes]
+    q = [dict(urllib.parse.parse_qsl(u.query)) for u in urls]
+    rest = [({k: v for k, v in d.items() if k != 'history'}, u.path, s.get('window'), s.get('crop'), s.get('lens'), s.get('budget'))
+            for d, u, s in zip(q, urls, scenes)]
+    if len(scenes) < 2 or any(r != rest[0] for r in rest):
+        errs.append('the moments are not one page, window, crop and lens')
+    try:
+        hist = [int(d['history']) for d in q]
+    except (KeyError, ValueError):
+        hist = []
+    if not hist or any(b - a != 1 for a, b in zip(hist, hist[1:])) or int(q[0].get('every', 0)) <= 0:
+        errs.append(f'history {hist or "missing"}, every {q[0].get("every") if q else None}: not one new message apart')
+    srcs = [p for p in placed if p['kind'] == 'source']
+    offs = {(p['lens'][0] - p['rect'][0], p['lens'][1] - p['rect'][1], p['lens'][2], p['lens'][3], p['rect'][2], p['rect'][3]) for p in srcs}
+    if len(srcs) != len(scenes) or len(offs) != 1:
+        errs.append(f'{len(srcs)} cards for {len(scenes)} moments, lens/card geometry {sorted(offs)}')
+    if any(b['rect'][0] < a['rect'][0] + a['rect'][2] or b['rect'][1] != a['rect'][1] for a, b in zip(srcs, srcs[1:])):
+        errs.append('the cards are not left to right at one height')
+    return errs, [f'{len(srcs)} moments, history {hist}, every {q[0].get("every") if q else None} s, one lens']
+
+
+def check_cut(placed):
+    """placed: a live frame's placements. The lens's offset in each card, over the card's height."""
+    errs, notes = [], []
+    for p in (q for q in placed if q['kind'] == 'source'):
+        off, h = p['lens'][1] - p['rect'][1], p['rect'][3]
+        notes.append(f'lens at {off} of {h} pt ({off / h:.1%})')
+        if off / h > LIVE_TOP_MAX:
+            errs.append(f'{os.path.basename(p["file"])}: the unchanged top is {off / h:.1%} of the card (> {LIVE_TOP_MAX:.0%})')
+        if off < LIVE_TOP_MIN_PT:
+            errs.append(f'{os.path.basename(p["file"])}: {off} pt of original above the lens (< {LIVE_TOP_MIN_PT})')
+    return errs, sorted(set(notes))
+
+
+def ink_extent(frame, rect, axis):
+    """First and last row (axis 0) or column (axis 1) of near-white ink in `rect` (CSS px) of the 2880 x 1800 frame."""
+    x0, y0, x1, y1 = box(rect)
+    ink = (frame[y0:y1, x0:x1].min(axis=2) > 128).any(axis=1 - axis)
+    idx = np.where(ink)[0]
+    return (int(idx[0]), int(idx[-1])) if idx.size else None
+
+
+def check_step(frame, steps, placed, every, moments):
+    """steps: a live frame's step rows (layout.json), one between each two of its `moments`; every: seconds between the pages."""
+    errs, notes = [], []
+    if len(steps) != moments - 1:
+        errs.append(f'{len(steps)} step rows between {moments} moments')
+    top = min(p['rect'][1] for p in placed)
+    for s in steps:
+        if s['text'] != f'+{every}s':
+            errs.append(f'label {s["text"]!r}, the pages are {every} s apart')
+        lab, arr = ink_extent(frame, s['label'], 0), ink_extent(frame, s['arrow'], 1)
+        cap = lab[1] - lab[0] + 1 if lab else 0
+        width = arr[1] - arr[0] + 1 if arr else 0
+        notes.append(f'{s["text"]} capitals {cap} px (at 640 wide: {cap * 640 / FW:.1f}), arrow {width} px wide')
+        if cap < STEP_CAP_MIN:
+            errs.append(f'{s["text"]}: capitals {cap} px high < {STEP_CAP_MIN}')
+        if width < STEP_ARROW_MIN:
+            errs.append(f'{s["text"]}: arrow {width} px wide < {STEP_ARROW_MIN}')
+        if s['rect'][1] + s['rect'][3] > top:
+            errs.append(f'{s["text"]}: the row reaches the cards (bottom {s["rect"][1] + s["rect"][3]}, cards at {top})')
+    return errs, notes
 
 
 def check_count(files, numbers):
@@ -177,11 +263,17 @@ def run(out, layout, frames, pics, probes):
         arr = np.asarray(im.convert('RGB')).astype(np.int16)
         results = {'format': (check_format(path, im), [f'{os.path.getsize(path) / 1e6:.1f} MB']),
                    'truth': check_truth(arr, fr['placed'], pics),
-                   'caption': check_caption(arr, fr['placed']),
+                   'caption': check_caption(arr, fr['placed'], fr['steps']),
                    'coverage': check_coverage(fr['placed'])}
         if 'keep' in CFG['scenes'][fr['scene']]:
             render, source = keep_files(fr)
             results['keep'] = check_keep(pics[render], pics[source], fr['scene'])
+        if fr['layout'] == 'live':
+            moments = [CFG['scenes'][s] for s in fr['scenes']]
+            every = int(dict(urllib.parse.parse_qsl(urllib.parse.urlsplit(moments[0]['page']).query)).get('every', 0))
+            results['live'] = check_live(fr['placed'], moments)
+            results['cut'] = check_cut(fr['placed'])
+            results['step'] = check_step(arr, fr['steps'], fr['placed'], every, len(moments))
         for name, (errs, notes) in results.items():
             fails += bool(errs)
             lines.append(f'{"FAIL" if errs else "ok  "} {key} {name}: {"; ".join(errs) if errs else ", ".join(notes)}')
@@ -246,14 +338,57 @@ def self_test(out, layout, frames, pics, probes):
     kx, ky, _, _ = next(iter(CFG['scenes'][kf['scene']]['keep'].values()))
     paper[2 * ky + 10, 2 * kx + 10, 1] ^= 0x20
     caught.append(('keep: one formula pixel changed', bool(check_keep(paper, pics[source_file], kf['scene'])[0])))
+    lf = next(f for f in layout.values() if f['layout'] == 'live')
+    moments = [CFG['scenes'][s] for s in lf['scenes']]
+    moved = copy.deepcopy(lf['placed'])
+    [p for p in moved if p['kind'] == 'source'][-1]['lens'][1] += 1
+    caught.append(('live: the lens 1 pt lower in the last moment', bool(check_live(moved, moments)[0])))
+    skipped = copy.deepcopy(moments)
+    u = urllib.parse.urlsplit(skipped[-1]['page'])
+    qd = dict(urllib.parse.parse_qsl(u.query))
+    qd['history'] = str(int(qd['history']) + 1)
+    skipped[-1]['page'] = urllib.parse.urlunsplit(u._replace(query=urllib.parse.urlencode(qd)))
+    caught.append(('live: a message skipped between two moments', bool(check_live(lf['placed'], skipped)[0])))
+    other = copy.deepcopy(moments)
+    other[0]['page'] = other[0]['page'].replace('lang=ja', 'lang=en')
+    caught.append(('live: one moment from another page', bool(check_live(lf['placed'], other)[0])))
     low = copy.deepcopy(fr['placed'])
     for p in low:
         if p['kind'] == 'source':
             p['lens'][1] = 20
-    caught.append(('caption: lens moved under the caption', bool(check_caption(arr, low)[0])))
+    caught.append(('caption: lens moved under the caption', bool(check_caption(arr, low, fr['steps'])[0])))
     wrapped = arr.copy()
     wrapped[2 * 190:2 * 196, 400:2400] = 255
-    caught.append(('caption: a third text band', bool(check_caption(wrapped, fr['placed'])[0])))
+    caught.append(('caption: a third text band', bool(check_caption(wrapped, fr['placed'], fr['steps'])[0])))
+    sub_low = arr.copy()
+    sub_low[2 * 175:2 * fr['steps'][0]['rect'][1] - 2, 400:2400] = 255      # the sub line's ink continued down into the step rows
+    caught.append(('caption: ink running into the step rows', bool(check_caption(sub_low, fr['placed'], fr['steps'])[0])))
+    cut = copy.deepcopy(lf['placed'])
+    for p in cut:
+        if p['kind'] == 'source':
+            p['rect'][3] = 688
+            p['lens'][1] = p['rect'][1] + 334
+    caught.append(('cut: the lens 334 pt down a 688 pt card (49 %, the card before as3b)', bool(check_cut(cut)[0])))
+    none = copy.deepcopy(lf['placed'])
+    for p in none:
+        if p['kind'] == 'source':
+            p['lens'][1] = p['rect'][1] + 8
+    caught.append(('cut: no original line above the lens', bool(check_cut(none)[0])))
+    every = int(dict(urllib.parse.parse_qsl(urllib.parse.urlsplit(moments[0]['page']).query)).get('every', 0))
+    big = np.asarray(frames[next(k for k, f in layout.items() if f is lf)].convert('RGB')).astype(np.int16)
+    for what, name in (('label', 'label at half size'), ('arrow', 'arrow at half size')):
+        small_step = big.copy()
+        x0, y0, x1, y1 = box(lf['steps'][0][what])
+        crop = Image.fromarray(big[y0:y1, x0:x1].astype(np.uint8))
+        shrunk = np.asarray(crop.resize((crop.width // 2, crop.height // 2), Image.BOX)).astype(np.int16)
+        small_step[y0:y1, x0:x1] = big[y0, x0]
+        oy, ox = (y1 - y0 - shrunk.shape[0]) // 2, (x1 - x0 - shrunk.shape[1]) // 2
+        small_step[y0 + oy:y0 + oy + shrunk.shape[0], x0 + ox:x0 + ox + shrunk.shape[1]] = shrunk
+        caught.append((f'step: {name}', bool(check_step(small_step, lf['steps'], lf['placed'], every, len(moments))[0])))
+    caught.append(('step: a label saying +9s over pages 3 s apart', bool(check_step(big, [{**lf['steps'][0], 'text': '+9s'}] + lf['steps'][1:], lf['placed'], every, len(moments))[0])))
+    lowrow = copy.deepcopy(lf['steps'])
+    lowrow[0]['rect'][1] += 40
+    caught.append(('step: a row 40 px lower, on the cards', bool(check_step(big, lowrow, lf['placed'], every, len(moments))[0])))
     small = copy.deepcopy(fr['placed'])
     for p in small:
         p['rect'][2] //= 2

@@ -1,0 +1,392 @@
+Use-case bench: code regions kept as written (C2 wiring), 2026-10-19
+
+Question   Does wiring CodeRegion.keep into the read (RegionPipeline fast and seamless pass, verdict site) keep the code, terminal, log,
+           config and diff regions of the code use case as written, without changing the other five use cases?
+Binaries   main      Release build of main 7f8d1af (git archive of the commit, so no untracked file), universal
+           candidate Release build of wt/c2-code-region (main 7f8d1af + C2 working tree), universal
+           both built with  xcodebuild -scheme Mwoyeo -configuration Release -destination platform=macOS -derivedDataPath <dd> \
+                              MWOYEO_APP_ID=dev.midagedev.mwoyeo.c2bench build
+           Same scratch app id for both (bench-id-cache: the e5rt cache is per id). Each binary was warmed by one unscored render of k01.
+Pictures   the 40 pictures of ~/.cache/mwoyeo-gates/usecases/set plus the 12 code pictures drawn by tools/keep-labels/render-cases.sh
+           (the eight that C1 drew in /tmp/l0/png are byte-identical to these: same sha256). 52 scenes, all three paths (auto, vn, swift).
+Runs       Score lines below are of the FINAL candidate (built after the per-pass memo of RegionPipeline.appearance and the timing trace were
+           added); a first candidate run, before them, gave the same score lines on all three paths and the same kept lists (see Noise).
+Runner     tools/usecase-bench/bench.sh as it is, PNGS=<the 52>, MWOYEO_MEMORY_SECRETS=1, scratch MWOYEO_DEFAULTS_SUITE and
+           MWOYEO_SETTINGS_FILE. One render at a time. The machine was shared (load average 6 to 53 at the starts and ends; the
+           ANECompilerService was not busy). Per path: main 225 s, candidate 216 s (auto).
+Scorer     tools/usecase-bench/score.py as it is. The render prints the blocks it left as written after the translated ones, as
+           "  <source>", "    -> <source>" and a third line "    kept: <reason>" (SelfTest.swift, RegionPipeline.keptState); the
+           scorer reads the first two lines, so a kept block counts as shown as written, and the segmentation score still sees it.
+           (Without that listing a kept block would be missing from the output and every code and terminal scene would lose "correct".)
+           bench.sh and score.py were not changed. No threshold was tuned.
+
+Prediction written before the runs (appendix at the end): scenes with a kept block: d10 and d11 among the old five, the k scenes
+(except those whose keep units are kept by the old rules); code kept_ok +8 to +30 units, translated_ok -0 to -1; the five old
+categories equal; k07 one false fire; no "$ " prose line kept.
+
+## Score lines, path auto: main, then candidate (all lines of score.py; only the code and TOTAL lines can differ)
+
+main:
+chat       auto   all  n= 5 correct  20/ 36 split 5 merged 0 misread 6 missing 5
+chat       auto   even n= 2 correct   8/ 13 split 0 merged 0 misread 3 missing 2
+chat       auto   odd  n= 3 correct  12/ 23 split 5 merged 0 misread 3 missing 3
+code       auto   all  n=12 correct  85/143 split 9 merged 4 misread 25 missing 20 | kept_ok 34/60 translated_ok 61/62 inline_ok 21/29
+code       auto   even n= 6 correct  50/ 75 split 2 merged 0 misread 11 missing 12 | kept_ok 20/29 translated_ok 34/34 inline_ok 10/12
+code       auto   odd  n= 6 correct  35/ 68 split 7 merged 4 misread 14 missing 8 | kept_ok 14/31 translated_ok 27/28 inline_ok 11/17
+docs-web   auto   all  n=11 correct  59/ 89 split 4 merged 7 misread 6 missing 13
+docs-web   auto   even n= 5 correct  28/ 42 split 3 merged 5 misread 2 missing 4
+docs-web   auto   odd  n= 6 correct  31/ 47 split 1 merged 2 misread 4 missing 9
+games      auto   all  n= 8 correct  25/ 38 split 2 merged 3 misread 2 missing 6
+games      auto   even n= 4 correct  13/ 15 split 1 merged 0 misread 1 missing 0
+games      auto   odd  n= 4 correct  12/ 23 split 1 merged 3 misread 1 missing 6
+papers     auto   all  n= 7 correct  40/ 69 split 4 merged 4 misread 15 missing 6
+papers     auto   even n= 3 correct  14/ 27 split 3 merged 0 misread 6 missing 4
+papers     auto   odd  n= 4 correct  26/ 42 split 1 merged 4 misread 9 missing 2
+subtitles  auto   all  n= 9 correct  16/ 19 split 1 merged 2 misread 0 missing 0
+subtitles  auto   even n= 4 correct   7/  9 split 0 merged 2 misread 0 missing 0
+subtitles  auto   odd  n= 5 correct   9/ 10 split 1 merged 0 misread 0 missing 0
+TOTAL      auto   all  n=52 correct 245/394 | kept_ok 34/60 translated_ok 61/62 inline_ok 21/29
+TOTAL      auto   odd  n=28 correct 125/213 | kept_ok 14/31 translated_ok 27/28 inline_ok 11/17
+TOTAL      auto   even n=24 correct 120/181 | kept_ok 20/29 translated_ok 34/34 inline_ok 10/12
+
+candidate:
+chat       auto   all  n= 5 correct  20/ 36 split 5 merged 0 misread 6 missing 5
+chat       auto   even n= 2 correct   8/ 13 split 0 merged 0 misread 3 missing 2
+chat       auto   odd  n= 3 correct  12/ 23 split 5 merged 0 misread 3 missing 3
+code       auto   all  n=12 correct  85/143 split 9 merged 4 misread 25 missing 20 | kept_ok 56/60 translated_ok 61/62 inline_ok 21/29
+code       auto   even n= 6 correct  50/ 75 split 2 merged 0 misread 11 missing 12 | kept_ok 29/29 translated_ok 34/34 inline_ok 10/12
+code       auto   odd  n= 6 correct  35/ 68 split 7 merged 4 misread 14 missing 8 | kept_ok 27/31 translated_ok 27/28 inline_ok 11/17
+docs-web   auto   all  n=11 correct  59/ 89 split 4 merged 7 misread 6 missing 13
+docs-web   auto   even n= 5 correct  28/ 42 split 3 merged 5 misread 2 missing 4
+docs-web   auto   odd  n= 6 correct  31/ 47 split 1 merged 2 misread 4 missing 9
+games      auto   all  n= 8 correct  25/ 38 split 2 merged 3 misread 2 missing 6
+games      auto   even n= 4 correct  13/ 15 split 1 merged 0 misread 1 missing 0
+games      auto   odd  n= 4 correct  12/ 23 split 1 merged 3 misread 1 missing 6
+papers     auto   all  n= 7 correct  40/ 69 split 4 merged 4 misread 15 missing 6
+papers     auto   even n= 3 correct  14/ 27 split 3 merged 0 misread 6 missing 4
+papers     auto   odd  n= 4 correct  26/ 42 split 1 merged 4 misread 9 missing 2
+subtitles  auto   all  n= 9 correct  16/ 19 split 1 merged 2 misread 0 missing 0
+subtitles  auto   even n= 4 correct   7/  9 split 0 merged 2 misread 0 missing 0
+subtitles  auto   odd  n= 5 correct   9/ 10 split 1 merged 0 misread 0 missing 0
+TOTAL      auto   all  n=52 correct 245/394 | kept_ok 56/60 translated_ok 61/62 inline_ok 21/29
+TOTAL      auto   odd  n=28 correct 125/213 | kept_ok 27/31 translated_ok 27/28 inline_ok 11/17
+TOTAL      auto   even n=24 correct 120/181 | kept_ok 29/29 translated_ok 34/34 inline_ok 10/12
+
+## Score lines, path vn: main, then candidate (all lines of score.py; only the code and TOTAL lines can differ)
+
+main:
+chat       vn     all  n= 5 correct  21/ 36 split 4 merged 0 misread 8 missing 3
+chat       vn     even n= 2 correct   9/ 13 split 0 merged 0 misread 3 missing 1
+chat       vn     odd  n= 3 correct  12/ 23 split 4 merged 0 misread 5 missing 2
+code       vn     all  n=12 correct  66/143 split 6 merged 14 misread 21 missing 36 | kept_ok 24/44 translated_ok 61/62 inline_ok 23/29
+code       vn     even n= 6 correct  39/ 75 split 2 merged 8 misread 9 missing 17 | kept_ok 15/24 translated_ok 34/34 inline_ok 11/12
+code       vn     odd  n= 6 correct  27/ 68 split 4 merged 6 misread 12 missing 19 | kept_ok 9/20 translated_ok 27/28 inline_ok 12/17
+docs-web   vn     all  n=11 correct  45/ 89 split 6 merged 19 misread 5 missing 14
+docs-web   vn     even n= 5 correct  22/ 42 split 3 merged 11 misread 0 missing 6
+docs-web   vn     odd  n= 6 correct  23/ 47 split 3 merged 8 misread 5 missing 8
+games      vn     all  n= 8 correct  26/ 38 split 2 merged 3 misread 2 missing 5
+games      vn     even n= 4 correct  14/ 15 split 0 merged 0 misread 1 missing 0
+games      vn     odd  n= 4 correct  12/ 23 split 2 merged 3 misread 1 missing 5
+papers     vn     all  n= 7 correct  27/ 69 split 1 merged 29 misread 3 missing 9
+papers     vn     even n= 3 correct  12/ 27 split 0 merged 10 misread 0 missing 5
+papers     vn     odd  n= 4 correct  15/ 42 split 1 merged 19 misread 3 missing 4
+subtitles  vn     all  n= 9 correct   8/ 19 split 0 merged 10 misread 1 missing 0
+subtitles  vn     even n= 4 correct   3/  9 split 0 merged 6 misread 0 missing 0
+subtitles  vn     odd  n= 5 correct   5/ 10 split 0 merged 4 misread 1 missing 0
+TOTAL      vn     all  n=52 correct 193/394 | kept_ok 24/44 translated_ok 61/62 inline_ok 23/29
+TOTAL      vn     odd  n=28 correct  94/213 | kept_ok 9/20 translated_ok 27/28 inline_ok 12/17
+TOTAL      vn     even n=24 correct  99/181 | kept_ok 15/24 translated_ok 34/34 inline_ok 11/12
+
+candidate:
+chat       vn     all  n= 5 correct  21/ 36 split 4 merged 0 misread 8 missing 3
+chat       vn     even n= 2 correct   9/ 13 split 0 merged 0 misread 3 missing 1
+chat       vn     odd  n= 3 correct  12/ 23 split 4 merged 0 misread 5 missing 2
+code       vn     all  n=12 correct  66/143 split 6 merged 14 misread 21 missing 36 | kept_ok 41/44 translated_ok 61/62 inline_ok 23/29
+code       vn     even n= 6 correct  39/ 75 split 2 merged 8 misread 9 missing 17 | kept_ok 23/24 translated_ok 34/34 inline_ok 11/12
+code       vn     odd  n= 6 correct  27/ 68 split 4 merged 6 misread 12 missing 19 | kept_ok 18/20 translated_ok 27/28 inline_ok 12/17
+docs-web   vn     all  n=11 correct  45/ 89 split 6 merged 19 misread 5 missing 14
+docs-web   vn     even n= 5 correct  22/ 42 split 3 merged 11 misread 0 missing 6
+docs-web   vn     odd  n= 6 correct  23/ 47 split 3 merged 8 misread 5 missing 8
+games      vn     all  n= 8 correct  26/ 38 split 2 merged 3 misread 2 missing 5
+games      vn     even n= 4 correct  14/ 15 split 0 merged 0 misread 1 missing 0
+games      vn     odd  n= 4 correct  12/ 23 split 2 merged 3 misread 1 missing 5
+papers     vn     all  n= 7 correct  27/ 69 split 1 merged 29 misread 3 missing 9
+papers     vn     even n= 3 correct  12/ 27 split 0 merged 10 misread 0 missing 5
+papers     vn     odd  n= 4 correct  15/ 42 split 1 merged 19 misread 3 missing 4
+subtitles  vn     all  n= 9 correct   8/ 19 split 0 merged 10 misread 1 missing 0
+subtitles  vn     even n= 4 correct   3/  9 split 0 merged 6 misread 0 missing 0
+subtitles  vn     odd  n= 5 correct   5/ 10 split 0 merged 4 misread 1 missing 0
+TOTAL      vn     all  n=52 correct 193/394 | kept_ok 41/44 translated_ok 61/62 inline_ok 23/29
+TOTAL      vn     odd  n=28 correct  94/213 | kept_ok 18/20 translated_ok 27/28 inline_ok 12/17
+TOTAL      vn     even n=24 correct  99/181 | kept_ok 23/24 translated_ok 34/34 inline_ok 11/12
+
+## Score lines, path swift: main, then candidate (all lines of score.py; only the code and TOTAL lines can differ)
+
+main:
+chat       swift  all  n= 5 correct  20/ 36 split 5 merged 0 misread 6 missing 5
+chat       swift  even n= 2 correct   8/ 13 split 0 merged 0 misread 3 missing 2
+chat       swift  odd  n= 3 correct  12/ 23 split 5 merged 0 misread 3 missing 3
+code       swift  all  n=12 correct  85/143 split 9 merged 4 misread 25 missing 20 | kept_ok 34/60 translated_ok 61/62 inline_ok 21/29
+code       swift  even n= 6 correct  50/ 75 split 2 merged 0 misread 11 missing 12 | kept_ok 20/29 translated_ok 34/34 inline_ok 10/12
+code       swift  odd  n= 6 correct  35/ 68 split 7 merged 4 misread 14 missing 8 | kept_ok 14/31 translated_ok 27/28 inline_ok 11/17
+docs-web   swift  all  n=11 correct  59/ 89 split 4 merged 7 misread 6 missing 13
+docs-web   swift  even n= 5 correct  28/ 42 split 3 merged 5 misread 2 missing 4
+docs-web   swift  odd  n= 6 correct  31/ 47 split 1 merged 2 misread 4 missing 9
+games      swift  all  n= 8 correct  21/ 38 split 4 merged 4 misread 3 missing 6
+games      swift  even n= 4 correct  11/ 15 split 2 merged 0 misread 2 missing 0
+games      swift  odd  n= 4 correct  10/ 23 split 2 merged 4 misread 1 missing 6
+papers     swift  all  n= 7 correct  40/ 69 split 4 merged 4 misread 15 missing 6
+papers     swift  even n= 3 correct  14/ 27 split 3 merged 0 misread 6 missing 4
+papers     swift  odd  n= 4 correct  26/ 42 split 1 merged 4 misread 9 missing 2
+subtitles  swift  all  n= 9 correct  16/ 19 split 1 merged 2 misread 0 missing 0
+subtitles  swift  even n= 4 correct   7/  9 split 0 merged 2 misread 0 missing 0
+subtitles  swift  odd  n= 5 correct   9/ 10 split 1 merged 0 misread 0 missing 0
+TOTAL      swift  all  n=52 correct 241/394 | kept_ok 34/60 translated_ok 61/62 inline_ok 21/29
+TOTAL      swift  odd  n=28 correct 123/213 | kept_ok 14/31 translated_ok 27/28 inline_ok 11/17
+TOTAL      swift  even n=24 correct 118/181 | kept_ok 20/29 translated_ok 34/34 inline_ok 10/12
+
+candidate:
+chat       swift  all  n= 5 correct  20/ 36 split 5 merged 0 misread 6 missing 5
+chat       swift  even n= 2 correct   8/ 13 split 0 merged 0 misread 3 missing 2
+chat       swift  odd  n= 3 correct  12/ 23 split 5 merged 0 misread 3 missing 3
+code       swift  all  n=12 correct  85/143 split 9 merged 4 misread 25 missing 20 | kept_ok 56/60 translated_ok 61/62 inline_ok 21/29
+code       swift  even n= 6 correct  50/ 75 split 2 merged 0 misread 11 missing 12 | kept_ok 29/29 translated_ok 34/34 inline_ok 10/12
+code       swift  odd  n= 6 correct  35/ 68 split 7 merged 4 misread 14 missing 8 | kept_ok 27/31 translated_ok 27/28 inline_ok 11/17
+docs-web   swift  all  n=11 correct  59/ 89 split 4 merged 7 misread 6 missing 13
+docs-web   swift  even n= 5 correct  28/ 42 split 3 merged 5 misread 2 missing 4
+docs-web   swift  odd  n= 6 correct  31/ 47 split 1 merged 2 misread 4 missing 9
+games      swift  all  n= 8 correct  21/ 38 split 4 merged 4 misread 3 missing 6
+games      swift  even n= 4 correct  11/ 15 split 2 merged 0 misread 2 missing 0
+games      swift  odd  n= 4 correct  10/ 23 split 2 merged 4 misread 1 missing 6
+papers     swift  all  n= 7 correct  40/ 69 split 4 merged 4 misread 15 missing 6
+papers     swift  even n= 3 correct  14/ 27 split 3 merged 0 misread 6 missing 4
+papers     swift  odd  n= 4 correct  26/ 42 split 1 merged 4 misread 9 missing 2
+subtitles  swift  all  n= 9 correct  16/ 19 split 1 merged 2 misread 0 missing 0
+subtitles  swift  even n= 4 correct   7/  9 split 0 merged 2 misread 0 missing 0
+subtitles  swift  odd  n= 5 correct   9/ 10 split 1 merged 0 misread 0 missing 0
+TOTAL      swift  all  n=52 correct 241/394 | kept_ok 56/60 translated_ok 61/62 inline_ok 21/29
+TOTAL      swift  odd  n=28 correct 123/213 | kept_ok 27/31 translated_ok 27/28 inline_ok 11/17
+TOTAL      swift  even n=24 correct 118/181 | kept_ok 29/29 translated_ok 34/34 inline_ok 10/12
+
+## Old five categories: main versus candidate
+
+Every score line of chat, docs-web, games, papers and subtitles is identical, on all three paths (the diff of the two score files holds
+only the code and TOTAL lines; commands: diff <(sed 's/ | .*//' main) <(sed 's/ | .*//' candidate) prints nothing).
+Per scene, the blocks and translations differ in three places, each a case flip inside one OCR word and none a kept block:
+  c01-slack-en (vn, swift)   "Safari" read as "SafarI" in the candidate's run
+  k04-stackoverflow-en       "JavaScript" read as "JavaScrIpt" (main in the auto run, the candidate in the vn run)
+  p01-paper-en-2col (vn)     "lili" read as "lIlI"
+These are Vision's own run to run changes: the block text differs before the code runs, there is nothing kept in c01 and p01, and the
+candidate against a second candidate run (same source, built again) shows the same kind of flips in other scenes. They are not counted
+in the scores (norm() lowercases).
+Scenes with a kept block among the old five: d11-code-ko-comments, two blocks on every path (the two Korean comments of a code
+listing "// ..."; reason code). Predicted: d10-terminal-en and d11. d10 did not fire (below).
+
+## Kept blocks per scene, path auto (compare.py main vs candidate; 'changed' = a translation that differs for a block that is not kept)
+
+d11-code-ko-comments auto: blocks main 3 cand 3; kept 2; changed 0; only_main 0; only_cand 0
+    kept[code]: 사용자가 로그인했는지 확인한다.
+    kept[code]: 1/ 토큰이 만료되었으면 로그아웃 상태로 본다.
+k01-readme-en auto: blocks main 10 cand 10; kept 1; changed 0; only_main 0; only_cand 0
+    kept[config]: # ~/. ledgerrc
+k02-readme-ko auto: blocks main 11 cand 11; kept 3; changed 0; only_main 0; only_cand 0
+    kept[code]: C = Canvas(640, 480) # 캔버스를 만든다
+    kept[code]: C.fiLL("#ffffff")# 흰색으로 채운다
+    kept[code]: c. save ("out. png")
+k04-stackoverflow-en auto: blocks main 11 cand 11; kept 3; changed 1; only_main 0; only_cand 0
+    kept[code]: const nested = [1, 12, [3, [4]]]];
+    kept[code]: flatten every level at once
+    kept[code]: console. log(flat); // [1, 2, 3, 4]
+    changed: How do I flatten a nested array in JavaScript?  main→ JavaScrIpt에서 중첩 배열을 평탄하게 만들려면 어떻게 해야 하나요?  cand→ JavaScript에서 중첩 배열을 평탄하게 만들려면 어떻게 해야 하나요?
+k06-ide-diff-ko auto: blocks main 16 cand 16; kept 7; changed 0; only_main 0; only_cand 0
+    kept[code]: Cart. swift
+    kept[code]: 장바구니 합계를 계산한다.
+    kept[code]: func total(items: [Item]) > Int
+    kept[code]: var sum = 0
+    kept[code]: var sum: Int = 0
+    kept[code]: 할인은 결제 단계에서 적용한다.
+    kept[code]: return sum
+k07-algorithm-en auto: blocks main 14 cand 14; kept 9; changed 0; only_main 0; only_cand 0
+    kept[code]: for i ‹ 2 to n do
+    kept[code]: d + top(l¡) - bottom(lj-1) D vertical gap
+    kept[code]: if d < T • height(lj) then
+    kept[code]: append I to the last group of G
+    kept[code]: else
+    kept[code]: open a new group with li
+    kept[code]: end if
+    kept[code]: end for
+    kept[code]: return G
+k08-algorithm-zh auto: blocks main 11 cand 11; kept 6; changed 0; only_main 0; only_cand 0
+    kept[code]: lo ‹ 1, hi < n
+    kept[code]: while lo ≤ hi do
+    kept[code]: mid ← I（lo+hi）/2」 ▶ 取中点
+    kept[code]: else hi ← mid-1
+    kept[code]: end while
+    kept[code]: return0 ▶ 未找到
+k09-git-release-en auto: blocks main 9 cand 9; kept 1; changed 0; only_main 0; only_cand 0
+    kept[terminal]: a3f9c21 Fix rounding of negative balances 7be04d2 Add the month filter to the report c19e8
+TOTAL {'scenes': 52, 'differ': 8, 'kept_blocks': 32, 'kept_scenes': 8}
+
+## Kept blocks per scene, path vn (compare.py main vs candidate; 'changed' = a translation that differs for a block that is not kept)
+
+d11-code-ko-comments vn: blocks main 3 cand 3; kept 2; changed 0; only_main 0; only_cand 0
+    kept[code]: 사용자가 로그인했는지 확인한다.
+    kept[code]: 토큰이 만료되었으면 로그아웃 상태로 본다.
+k02-readme-ko vn: blocks main 9 cand 9; kept 1; changed 0; only_main 0; only_cand 0
+    kept[code]: from pixelmint import Canvas C = Canvas(640, 480) # 캔버스를 만든다 C.filL("#ffffff") # 흰색으로 채운다 
+k04-stackoverflow-en vn: blocks main 9 cand 9; kept 1; changed 1; only_main 0; only_cand 0
+    kept[code]: const nested = |1, 12, 13, [4]]]]; flatten every level at once const flat = nested. flat(I
+    changed: How do I flatten a nested array in JavaScript?  main→ JavaScrIpt에서 중첩 배열을 평탄하게 만들려면 어떻게 해야 하나요?  cand→ JavaScript에서 중첩 배열을 평탄하게 만들려면 어떻게 해야 하나요?
+k06-ide-diff-ko vn: blocks main 14 cand 14; kept 5; changed 0; only_main 0; only_cand 0
+    kept[code]: Cart.switt
+    kept[code]: 장바구니 합계를 계산한다.
+    kept[code]: func total(items: [Item]) -> Int t
+    kept[code]: 할인은 결제 단계에서 적용한다.
+    kept[code]: return sum
+k07-algorithm-en vn: blocks main 10 cand 10; kept 6; changed 0; only_main 0; only_cand 0
+    kept[code]: for i ‹ 2 to n do
+    kept[code]: d + top(l¡) - bottom(lj-1) → vertical gap
+    kept[code]: if d < T • height(lj) then
+    kept[code]: append li to the last group of G else open a new group with li end if
+    kept[code]: end for
+    kept[code]: return G
+k08-algorithm-zh vn: blocks main 10 cand 10; kept 2; changed 0; only_main 0; only_cand 0
+    kept[code]: mid← L（lo +hi）/2」 ▶ 取中点if A［mid］=x then return mid else if A［mid］ <x then 1o ← mid+1
+    kept[code]: else hi←mid-1
+p01-paper-en-2col vn: blocks main 11 cand 11; kept 0; changed 1; only_main 0; only_cand 0
+    changed: I= Eid (lili+1) + 21G| (1)  main→ I= Eid (lili+1) + 21G| (1)  cand→ I= EId (lili+1) + 21G| (1)
+TOTAL {'scenes': 52, 'differ': 7, 'kept_blocks': 17, 'kept_scenes': 6}
+
+## Kept blocks per scene, path swift (compare.py main vs candidate; 'changed' = a translation that differs for a block that is not kept)
+
+d11-code-ko-comments swift: blocks main 3 cand 3; kept 2; changed 0; only_main 0; only_cand 0
+    kept[code]: 사용자가 로그인했는지 확인한다.
+    kept[code]: 1/ 토큰이 만료되었으면 로그아웃 상태로 본다.
+k01-readme-en swift: blocks main 10 cand 10; kept 1; changed 0; only_main 0; only_cand 0
+    kept[config]: # ~/. ledgerrc
+k02-readme-ko swift: blocks main 11 cand 11; kept 3; changed 0; only_main 0; only_cand 0
+    kept[code]: C = Canvas(640, 480) # 캔버스를 만든다
+    kept[code]: C.fiLL("#ffffff")# 흰색으로 채운다
+    kept[code]: c. save ("out. png")
+k04-stackoverflow-en swift: blocks main 11 cand 11; kept 3; changed 1; only_main 0; only_cand 0
+    kept[code]: const nested = [1, 12, [3, [4]]]];
+    kept[code]: flatten every level at once
+    kept[code]: console. log(flat); // [1, 2, 3, 4]
+    changed: How do I flatten a nested array in JavaScript?  main→ JavaScript에서 중첩 배열을 평탄하게 만들려면 어떻게 해야 하나요?  cand→ JavaScrIpt에서 중첩 배열을 평탄하게 만들려면 어떻게 해야 하나요?
+k06-ide-diff-ko swift: blocks main 16 cand 16; kept 7; changed 0; only_main 0; only_cand 0
+    kept[code]: Cart. swift
+    kept[code]: 장바구니 합계를 계산한다.
+    kept[code]: func total(items: [Item]) > Int
+    kept[code]: var sum = 0
+    kept[code]: var sum: Int = 0
+    kept[code]: 할인은 결제 단계에서 적용한다.
+    kept[code]: return sum
+k07-algorithm-en swift: blocks main 14 cand 14; kept 9; changed 0; only_main 0; only_cand 0
+    kept[code]: for i ‹ 2 to n do
+    kept[code]: d + top(l¡) - bottom(lj-1) D vertical gap
+    kept[code]: if d < T • height(lj) then
+    kept[code]: append I to the last group of G
+    kept[code]: else
+    kept[code]: open a new group with li
+    kept[code]: end if
+    kept[code]: end for
+    kept[code]: return G
+k08-algorithm-zh swift: blocks main 11 cand 11; kept 6; changed 0; only_main 0; only_cand 0
+    kept[code]: lo ‹ 1, hi < n
+    kept[code]: while lo ≤ hi do
+    kept[code]: mid ← I（lo+hi）/2」 ▶ 取中点
+    kept[code]: else hi ← mid-1
+    kept[code]: end while
+    kept[code]: return0 ▶ 未找到
+k09-git-release-en swift: blocks main 9 cand 9; kept 1; changed 0; only_main 0; only_cand 0
+    kept[terminal]: a3f9c21 Fix rounding of negative balances 7be04d2 Add the month filter to the report c19e8
+TOTAL {'scenes': 52, 'differ': 8, 'kept_blocks': 32, 'kept_scenes': 8}
+
+## The code category, before -> after (main -> candidate; score.py columns)
+
+  path    correct      kept_ok            translated_ok      inline_ok
+  auto    85/143       34/60 -> 56/60     61/62 -> 61/62     21/29 -> 21/29     (even 20/29 -> 29/29, odd 14/31 -> 27/31)
+  swift   85/143       34/60 -> 56/60     61/62 -> 61/62     21/29 -> 21/29
+  vn      66/143       24/44 -> 41/44     61/62 -> 61/62     23/29 -> 23/29     (the vn path splits more, so fewer units are read whole)
+
+kept_ok rose by 22 units (auto, swift) and 17 (vn); translated_ok and inline_ok did not move; the segmentation columns (correct, split,
+merged, misread, missing) of every category are identical to main. The detail.txt lines that disappear are the kept_fail units (the
+code lines, the pseudo-code of k07 and k08, the git log of k09, the Korean comments of k02 and k06); none appears in translated_fail.
+Still failing kept_ok on auto (4 of 60): "ledgerline 0.4.2" (k01, the output line under a `$ ledgerline --version` prompt), "dev@mbp:~/shop$
+# 先同步依赖再构建" (k05), "Input: l1, ..., ln; t" and "Output: G" (k07, the two header lines of the pseudo-code box). The one translated_fail
+(k09 "The rounding fix landed in commit a3f9c21. ...") is the same unit in main and in the candidate.
+What was kept, by reason (blocks): auto and swift: code 30, config 1, terminal 1; vn: code 17. Scenes: d11, k01, k02, k04, k06, k07, k08,
+k09 (auto, swift); d11, k02, k04, k06, k07, k08 (vn). No kept block in k03, k05, k10, k11, k12 and d10 (see below).
+
+## Prediction against result (written before the runs, /tmp/c2/prediction.txt)
+
+  U1  scenes with a kept block among the old five: predicted d10 and d11; got d11 only (2 blocks on every path). MISS on d10.
+      d10-terminal-en is a terminal that fills the whole picture: the frame's dominant colour IS the terminal's, so no block is tinted;
+      the two prompt lines ("$ npm run build", "$ _") are not read by Vision (both are "missing" in main's detail.txt too), and the
+      remaining lines ("> app@1.2.0 build", "warning: ...", "error: ...") carry no code feature. The same holds for k05, k10, k11 and
+      k12: a lens that sits entirely inside a terminal window has no tint to compare with, and depends on the text evidence alone.
+      C1 measured terminals as boxes on a lighter page; the whole-frame terminal is a limit of the "tint differs from the frame" evidence.
+  U2  code kept_ok +8 to +30 units: +22 / +22 / +17. translated_ok -0 to -1: 0. HIT.
+  U3  k07 margin note: predicted one false fire. The block C1 calls the false fire ("d + top(l) - bottom(l) D vertical gap", doc-6 /
+      vn-4) is kept on every path. In this bench it is a keep unit ("d <- top(li) - bottom(li-1) |> vertical gap", marked (keep) in
+      k07-algorithm-en.expected.txt), so it counts for kept_ok and costs no translated_ok. The "false fire" is word-level: C1's labels
+      call the comment words "vertical gap" translate, the bench scores the whole line as keep. The prose unit of k07 ("Algorithm 1 groups
+      the recognized lines greedily ...") is translated on all three paths.
+  U4  "$ " prompt on prose: no prose line of the 52 scenes starts with "$ ": 0 prose units kept as terminal; the one terminal reason (k09,
+      the git log lines) is a keep unit. Measured outside the bench with CodeRegion.keep on a single untinted block: "$ 20 per month for
+      the team plan" -> terminal, "$ 5 off every order today" -> terminal, "$ 1,000 was the budget for the first year ..." -> terminal,
+      "$5 off every order" -> nil. So the risk is real for a prose line that a reader starts with "$ <number>" (a price list typeset with a
+      space, or Vision splitting "$" from "20"); no scene of the set has one. Not tuned.
+  T   cost of the keep stage on the 150 reads of the final candidate (the 6 renders of vertical text, d08 and d09 on three paths, return before the verdict): mean frame 1.3 ms, look
+      0.0 ms, rule 18.7 ms, total 20.6 ms, max 57 ms (mean 9 blocks a read). PREDICTED at most 15 ms a scene: a small miss, the same cause as
+      on the paper pages (CodeRegion.features, about 2 ms a block), see tools/paper-bench/RESULTS-own-c2-2026-10-19.txt.
+
+## Noise of the instrument
+
+Two candidate runs of the same source (the first candidate, then the final candidate with the per-pass memo of RegionPipeline.appearance and
+the timing trace) give identical score lines on all three paths and the same kept lists; their per-scene outputs differ in case flips of
+Vision's reading (c01 "Safari"/"SafarI", k04 "JavaScript"/"JavaScrIpt", p01 "lili"/"lIlI"), once per path in two or three scenes. A
+difference in a scene with no kept block is therefore not the change's.
+A third run (auto only) with the binary of the last edit (a cap of 256 on the debug list of kept blocks, no effect on a render) gives the
+same score lines as the second and the same 32 kept blocks in 8 scenes; ANECompilerService was at 98 % cpu at its start (another round's
+compile, not ours) and 0 % at its end.
+
+## Appendix: the decomposition and prediction as written before the runs (verbatim, /tmp/c2/prediction.txt)
+
+C2 prediction, written before the benches (2026-10-19)
+
+TERMS ADDED PER READ (host, between the OCR answer and the erase)
+  T_hist  frame sampling: CG draw to 1/3 size + 15-bit histogram. Frames of the benches are 1.7k x 1.4k px at most -> ~270k samples,
+          ~1-3 ms. Dense paper page 3.4k x 4.4k px (scale 2.67) -> ~1.6M samples, ~5-10 ms.
+  T_look  one appearance(of:in:) per recognised line (crop + TextEraser.mask): ~0.1-0.2 ms a line; 10-60 lines in a use-case scene
+          (2-12 ms), up to ~300 lines on a paper page (30-60 ms). THE ONE TERM THE DERIVATION CANNOT FIX: measured from the trace
+          line "keep: N blocks, M kept as code <ms> ms" over the paper bench. Expected: mean 10-60 ms per page read, p100 < 150 ms.
+  T_keep  CodeRegion.keep: O(n^2) pair loops over n blocks (n <= 100 per read) ~1 ms + regex features of the groups ~2-5 ms.
+  Sum: <= 15 ms on a use-case scene, <= 80 ms on a paper page, against a read of 3.8-5.7 s (paper bench renders) -> <= 1.5 %.
+  Saved on a screen with code: the kept blocks skip erase (mask + fill/inpaint) and translation; proportional to the kept share.
+
+RESOURCE TIMELINE PER READ (one lens pass; bench: one --render)
+  ANE   Vision text read + document read 1.5-5 s  <- the wall (RESULTS-own: page 5.7 s mean, crop 3.8 s)
+  host  verdicts + layout + erase + render 0.1-1.5 s, serial after the read, then + T_hist + T_look + T_keep (<= 80 ms)
+  card (GPU)  MI-GAN 13 ms a tile, off in the benches (--no-inpaint) / unused in the paper bench render
+  PCIe none (unified memory); DRAM: one 1/3-size copy of the frame (<= 2 MB transient); NVMe none on the live path
+  Wall = ANE + host (serial inside a pass). Flow levers: bulk is already taken (one CodeRegion.keep per read, not per block);
+  async (keep under the erase of the non-candidates) would hide at most the 1.5 % term -> predicts 0, not taken.
+  No gate waits on a clock: the checks run on injected arguments (enabled: Bool, a closure for the line look, a drawn picture).
+
+BENCH PREDICTIONS (decisive terms; each with the next action)
+  U1 use-case, five old categories vs main, same id: scenes with a kept block: only d10-terminal-en and d11-code-ko-comments
+     (docs-web). Everything else 0 kept. The segmentation score of every scene is equal (kept blocks are listed in the render output
+     as source -> source plus a "kept:" line), so the old-five scores are equal; any other difference is OCR/engine noise and is
+     attributed with the scene's own kept count (0 kept = not ours).
+       if a scene other than d10/d11 shows a kept block: it is a false fire; report its text and reason, do not tune.
+  U2 code category (12 scenes): offline CodeRegion on the same pictures flipped 22 blocks of the doc read (dev 13, hold 9) and 13 of
+     the vn read, block keep recall 0.56 -> 0.91 (dev) and 0.78 -> 1.00 (hold). Predicted: kept_ok rises by 8-30 units (main's kept_ok
+     is whatever it is; band is for the delta), translated_ok falls by 0-1 (k07 margin-note false fire).
+       if translated_ok falls by 2 or more: list the units and the reasons, report as a regression and do not land.
+  U3 k07: the margin note ("d <- top(l_i) - bottom(l_{i-1}) ... vertical gap") fires as code: 1 block (doc), 1 block (vn). Measured, not tuned.
+  U4 "$ " prompt on prose: no scene of the set starts a prose line with "$ <word>" -> 0 terminal reasons on prose units.
+  P1 paper bench vs main at the same id: kept blocks only on pages with the three Swift listings; every metric equal or better
+     (blocks fall by the kept count, clipped may fall); pages without a listing equal to main up to ANE noise.
+       if a page without a listing worsens: check its ocr.kept.code count; 0 = noise, not ours.
+  C  timing: the keep stage <= 80 ms a page read (T_hist + T_look + T_keep above).

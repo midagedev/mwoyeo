@@ -1,0 +1,184 @@
+# Paper bench on our own paper with the code regions kept as written (C2 wiring), 2026-10-19
+
+Document   tools/paper-own/mwoyeo-method/main.pdf, 13 pages, sha256 2ebf808fac14905ea7372954abd782b191eb7d8c41c8e342d0ef0673a9d1bd72: the same
+           document as tools/paper-bench/RESULTS-own-2026-10-19.txt. The 41 pictures (13 pages, 26 crops, 2 side crops) are the ones pages.sh wrote
+           for that run (copied from its scratch, /tmp/own-paper/bench/pages, 42 files with the manifest; p1.png sha256 b56eaeb2...), so the input
+           is byte-identical. This tree's paper sources (listings cut by line range from the repository) were not rebuilt.
+Binaries   main      Release build of main 7f8d1af (git archive of the commit), universal
+           candidate Release build of wt/c2-code-region (main 7f8d1af + C2), universal
+           xcodebuild -scheme Mwoyeo -configuration Release -destination platform=macOS -derivedDataPath <dd> MWOYEO_APP_ID=dev.midagedev.mwoyeo.c2bench build
+           Both at the scratch id dev.midagedev.mwoyeo.c2bench, because the same code gave other numbers under another id (memory bench-id-cache): the
+           committed RESULTS-own-2026-10-19.txt was made at id ...paperown, so main is re-run here at this id and the candidate is compared with it.
+Machine    Apple M1 Pro, macOS 27.0; a shared machine, load average at the starts of the renders 9.5 to 43.8 (mean 28 for main, 13 for the candidate);
+           ANECompilerService 0 % cpu at every start and end. MWOYEO_DEFAULTS_SUITE=paperq.bench, scratch MWOYEO_SETTINGS_FILE, MWOYEO_MEMORY_SECRETS=1 (run.sh sets them).
+Warm       one unscored render of page 3 with the main binary (warm-up 1.7 s: the document model was warm from the use-case runs at this id).
+Commands   (from the repository root; the sandbox was off)
+             PAGES=/tmp/c2/pages tools/paper-bench/run.sh <main binary> /tmp/c2/pb-main
+             PAGES=/tmp/c2/pages tools/paper-bench/run.sh <candidate binary> /tmp/c2/pb-cand
+Final     A third candidate run (pb-cand3) with the binary of the last source edit (a cap on the debug list of kept blocks; no effect on a render)
+           gave a score.py output identical to the candidate's below (41 renders, rc=0, load 10.8 at the start, 8.8 at the end, wall 200 s).
+Outcome    41 renders each, every render rc=0 (the .load files), every .out holds a pipeline line. Wall: main 218 s, candidate 208 s. Mean
+           pipeline time per render: main 4021 ms, candidate 3901 ms (the machine load differs; the difference is not an effect of the change).
+
+## Result: no metric worse than main, except `spill` on one crop (0 -> 2)
+
+Per row, a metric of the candidate is equal to or better than main in every row but p12-s1. Page totals are equal in every metric except
+`blocks` (525 -> 520: the five code blocks of page 12 that are no longer drawn).
+
+                       blocks formula math_kept overlaps spill cut clipped ellipsis big cross | pages 3-6: formula, debris
+  own pages, committed   524      22         3        0     0   0      27        2   7    36 | 11, 7      (RESULTS-own-2026-10-19.txt, id paperown)
+  own pages, main        525      22         3        0     0   0      27        2   7    36 | 11, 7      (this run, id c2bench)
+  own pages, candidate   520      22         3        0     0   0      27        2   7    36 | 11, 7
+  own crops, committed   519      27        10        0     0   0      55        1   7    53 | edge_cut 10, side_cut 20
+  own crops, main        519      27        10        0     0   0      55        1   7    53 | edge_cut 10, side_cut 20
+  own crops, candidate   492      23        10        0     2   0      37        1   4    33 | edge_cut 10, side_cut 19  (the `edge` and `side` columns of the table: 14 -> 13 and 20 -> 19)
+
+Crops that changed (main -> candidate; the rest are equal): p5-c1 blocks 29 -> 23, clipped 1 -> 0; p7-c2 blocks 14 -> 13; p8-c1 blocks 25 -> 16;
+p9-c1 blocks 30 -> 22, formula 6 -> 2; p12-c1 blocks 15 -> 13, clipped 1 -> 0; p12-s1 blocks 21 -> 20, edge 1 -> 0, side 10 -> 9, spill 0 -> 2,
+clipped 17 -> 1, big 3 -> 0, cross 20 -> 0. Page 12: blocks 38 -> 33.
+
+What was kept (the trace's "kept code" lines of the candidate; 41 blocks in 7 renders, all on pages with a listing or a pseudo-code box):
+  p5-c1   12 lines of the listing of CodeRegion.verdict                                  code
+  p8-c1    9 lines of the pseudo-code box of the scroll predictor (Algorithm 1)          code
+  p9-c1    9 lines of a Swift listing (the first is a sentence of the text beside it, not looked at: its comment or a false keep)  code
+  p12      6 lines of a C listing in the appendix, one of them a two-letter piece         code
+  p12-c1   3 lines of the same listing                                                   code
+  p7-c2    1 piece of a formula (an OCR reading of a brace)                              code
+  p12-s1   1 block, the page-sized one the Docs reader makes of two columns (a prose line + 3 command lines)  terminal   <- below
+Every other render (12 of the 13 pages, 22 of the 28 crops): nothing kept, and the rows are equal to main.
+
+## The one worse cell: p12-s1 spill 0 -> 2, and the merged block behind it
+
+The kept block of p12-s1 is a reader block that glues the last prose line of the left column ("ch becomes pL (Eq. 14, first case). A second
+event") to the three command lines of Listing 4 in the right column: `$ cd ../paper-bench && ./...`, `$ ./run.sh <Mwoyeo binary> ...`,
+`$ cd ../usecase-bench && ...` (the trace's ocr-block 11 of p12-s1.err; core 2,22 1256x975, the block P1 reported as the main papers gap).
+The prompt rule (C1's isPrompt, `^\s*\$\s+\S`) fires on the three command lines and the whole block is kept as a terminal. Keeping the commands
+is right; the one prose line that rides along stays English (one line not translated). It is the "$ " prompt risk of the backlog,
+measured on the paper instead of on the use cases: here it is a reader failure (two columns in one block) and not a prose line starting
+with "$ 20".
+Effect on the metrics: in main, 17 blocks of this crop are clipped (a text rectangle of size 0), 20 pairs are cross-column (this block holds
+the others) and 3 are big; with the block kept as written those fall to 1, 0 and 0, the other blocks get their own rectangles, and two of
+them (the translated lines "frame at to = 1.045s ..." and "firmed a shift. The report ..." in p12-s1.out) are drawn at 30.6 and 28.4 px with a text rectangle wider than their
+column: spill 2 (text 725 and 696 px against a core of 599 and 607). So the spill is the layout's own overflow, shown once the block that
+hid it is gone. Nothing was tuned: the rule is C1's, and the bench is run as it is.
+Options for the lead: (1) accept and record (clipped -16, cross -20, big -3 in that crop, spill +2; one prose line left English); (2) in
+CodeKeep, never keep a block whose rectangle spans more than one column of text (the reader's failure, not a listing) -- the block would then
+be translated as today; (3) wait for the reader fix (D1 page block), which removes the merged block itself. Each is a follow-up with its own
+FAIL-first; this round changes none of them.
+
+## Cost of the keep stage (the trace line "keep: N blocks, L lines, K kept as code; frame A + look B + rule C ms, total T ms")
+
+41 reads of the candidate: 1527 blocks (mean 37, max 89), 2758 lines, mean frame 1.3 ms, look 0.0 ms, rule 130.8 ms, total 132.7 ms, max total
+882 ms (p10, 72 blocks, 12 ms a block, a single outlier under load; the next largest is 239 ms). Against a mean pipeline time of 3.9 s per
+render: 3.4 % on average; the outlier is 9 % of that render's 9.8 s.
+ - frame (the 1/3-size histogram of the frame) 1.3 ms: as predicted (2 to 10 ms).
+ - look (the per-line appearance): 0.0 ms, because RegionPipeline.appearance(of:in:) now remembers each line's look for the pass: the style
+   split and the label rule had already measured the same rectangles. Before the memo, the same renders measured 165 ms (p3, 107 lines) and
+   53 ms (p7, 104 lines); the memo also removes the old duplicate measurements, so the pass does less work than main did.
+ - rule (CodeRegion.keep): 131 ms mean, 3.5 ms per block. PREDICTED 1 to 5 ms PER READ: the prediction missed by a factor of 30 to 100. The
+   cost is the text evidence (`CodeRegion.features`, about 16 regular expressions per line with Swift Regex) of every group, linear in the
+   blocks (a standalone Release build of CodeRegion.swift: 86 ms for 50 prose blocks, 173 ms for 100, 345 ms for 200, 687 ms for 400; the
+   geometry part is under 1 ms). Cheap necessary tests before each expression (a comment needs `/`, `*`, `-`, `#` or the arrow at the start; a
+   prompt needs one of `$ % # > ❯`; a diff line `@@`, `+`, `-`; an assignment `=`) would cut it by a large factor without changing a
+   verdict; they are not in this round (CodeRegion.swift is C1's, and its `verdict` function is cut by line number into the paper's
+   listing, tools/paper-own/mwoyeo-method/build.sh).
+
+## score.py output, main (python3 -I tools/paper-bench/score.py /tmp/c2/pb-main)
+
+page     blocks  formula math_kept overlaps    spill      cut  clipped ellipsis      big    cross
+p1           25        0        0        0        0        0        0        0        0        0
+p2           33        1        0        0        0        0       17        1        7       32
+p3           61        2        1        0        0        0        1        0        0        0
+p4           47        3        0        0        0        0        0        0        0        0
+p5           47        2        0        0        0        0        2        0        0        1
+p6           36        4        0        0        0        0        1        0        0        1
+p7           37        3        2        0        0        0        0        0        0        0
+p8           42        2        0        0        0        0        2        0        0        1
+p9           46        0        0        0        0        0        3        1        0        1
+p10          35        0        0        0        0        0        0        0        0        0
+p11          31        0        0        0        0        0        1        0        0        0
+p12          38        2        0        0        0        0        0        0        0        0
+p13          47        3        0        0        0        0        0        0        0        0
+TOTAL       525       22        3        0        0        0       27        2        7       36
+formula_translated pages 3-6: 11   debris pages 3-6: 7
+crop     blocks  formula math_kept     edge     near     side overlaps    spill      cut  clipped ellipsis      big    cross
+p1-c1        11        0        0        0        0        0        0        0        0        2        0        0        5
+p1-c2        10        0        0        0        1        0        0        0        0        0        0        0        0
+p2-c1        16        0        0        1        0        0        0        0        0        0        0        0        0
+p2-c2        15        1        0        0        1        0        0        0        0        1        0        0        0
+p3-c1        43        2        1        1        0        0        0        0        0        2        0        0        0
+p3-c2         9        0        0        0        0        0        0        0        0        0        0        0        0
+p4-c1        33        2        1        0        1        0        0        0        0        2        0        0        0
+p4-c2        10        1        0        1        0        0        0        0        0        7        1        3        9
+p5-c1        29        2        0        2        0        0        0        0        0        1        0        0        0
+p5-c2        13        0        0        0        0        0        0        0        0        1        0        0        0
+p6-c1        16        3        2        2        0        0        0        0        0        0        0        0        0
+p6-c2        14        1        0        0        0        0        0        0        0        0        0        0        0
+p7-c1        20        2        2        0        0        0        0        0        0       18        0        1       19
+p7-c2        14        0        1        0        1        0        0        0        0        0        0        0        0
+p7-s1        14        1        1        3        0       10        0        0        0        0        0        0        0
+p8-c1        25        0        0        1        0        0        0        0        0        0        0        0        0
+p8-c2         9        0        0        0        0        0        0        0        0        1        0        0        0
+p9-c1        30        6        2        0        0        0        0        0        0        0        0        0        0
+p9-c2        13        0        0        0        0        0        0        0        0        0        0        0        0
+p10-c1       25        0        0        1        1        0        0        0        0        0        0        0        0
+p10-c2        7        0        0        1        0        0        0        0        0        0        0        0        0
+p11-c1       10        0        0        0        0        0        0        0        0        0        0        0        0
+p11-c2       12        0        0        0        0        0        0        0        0        1        0        0        0
+p12-c1       15        0        0        0        0        0        0        0        0        1        0        0        0
+p12-c2       15        2        0        0        0        0        0        0        0        1        0        0        0
+p12-s1       21        2        0        1        0       10        0        0        0       17        0        3       20
+p13-c1       54        2        0        0        0        0        0        0        0        0        0        0        0
+p13-c2       16        0        0        0        0        0        0        0        0        0        0        0        0
+TOTAL       519       27       10       14        5       20        0        0        0       55        1        7       53
+edge_cut (top/bottom crops c1,c2): 10  side_cut (crops s1): 20
+
+## score.py output, candidate (python3 -I tools/paper-bench/score.py /tmp/c2/pb-cand)
+
+page     blocks  formula math_kept overlaps    spill      cut  clipped ellipsis      big    cross
+p1           25        0        0        0        0        0        0        0        0        0
+p2           33        1        0        0        0        0       17        1        7       32
+p3           61        2        1        0        0        0        1        0        0        0
+p4           47        3        0        0        0        0        0        0        0        0
+p5           47        2        0        0        0        0        2        0        0        1
+p6           36        4        0        0        0        0        1        0        0        1
+p7           37        3        2        0        0        0        0        0        0        0
+p8           42        2        0        0        0        0        2        0        0        1
+p9           46        0        0        0        0        0        3        1        0        1
+p10          35        0        0        0        0        0        0        0        0        0
+p11          31        0        0        0        0        0        1        0        0        0
+p12          33        2        0        0        0        0        0        0        0        0
+p13          47        3        0        0        0        0        0        0        0        0
+TOTAL       520       22        3        0        0        0       27        2        7       36
+formula_translated pages 3-6: 11   debris pages 3-6: 7
+crop     blocks  formula math_kept     edge     near     side overlaps    spill      cut  clipped ellipsis      big    cross
+p1-c1        11        0        0        0        0        0        0        0        0        2        0        0        5
+p1-c2        10        0        0        0        1        0        0        0        0        0        0        0        0
+p2-c1        16        0        0        1        0        0        0        0        0        0        0        0        0
+p2-c2        15        1        0        0        1        0        0        0        0        1        0        0        0
+p3-c1        43        2        1        1        0        0        0        0        0        2        0        0        0
+p3-c2         9        0        0        0        0        0        0        0        0        0        0        0        0
+p4-c1        33        2        1        0        1        0        0        0        0        2        0        0        0
+p4-c2        10        1        0        1        0        0        0        0        0        7        1        3        9
+p5-c1        23        2        0        2        0        0        0        0        0        0        0        0        0
+p5-c2        13        0        0        0        0        0        0        0        0        1        0        0        0
+p6-c1        16        3        2        2        0        0        0        0        0        0        0        0        0
+p6-c2        14        1        0        0        0        0        0        0        0        0        0        0        0
+p7-c1        20        2        2        0        0        0        0        0        0       18        0        1       19
+p7-c2        13        0        1        0        1        0        0        0        0        0        0        0        0
+p7-s1        14        1        1        3        0       10        0        0        0        0        0        0        0
+p8-c1        16        0        0        1        0        0        0        0        0        0        0        0        0
+p8-c2         9        0        0        0        0        0        0        0        0        1        0        0        0
+p9-c1        22        2        2        0        0        0        0        0        0        0        0        0        0
+p9-c2        13        0        0        0        0        0        0        0        0        0        0        0        0
+p10-c1       25        0        0        1        1        0        0        0        0        0        0        0        0
+p10-c2        7        0        0        1        0        0        0        0        0        0        0        0        0
+p11-c1       10        0        0        0        0        0        0        0        0        0        0        0        0
+p11-c2       12        0        0        0        0        0        0        0        0        1        0        0        0
+p12-c1       13        0        0        0        0        0        0        0        0        0        0        0        0
+p12-c2       15        2        0        0        0        0        0        0        0        1        0        0        0
+p12-s1       20        2        0        0        0        9        0        2        0        1        0        0        0
+p13-c1       54        2        0        0        0        0        0        0        0        0        0        0        0
+p13-c2       16        0        0        0        0        0        0        0        0        0        0        0        0
+TOTAL       492       23       10       13        5       19        0        2        0       37        1        4       33
+edge_cut (top/bottom crops c1,c2): 10  side_cut (crops s1): 19

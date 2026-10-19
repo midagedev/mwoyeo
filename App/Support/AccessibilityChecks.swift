@@ -18,9 +18,13 @@ enum AccessibilityChecks {
     /// PASS/FAIL lines and their count of failures.
     private final class Report {
         var failed = 0
-        func check(_ what: String, _ ok: Bool) {
+        func check(_ what: String, _ ok: Bool, detail: @autoclosure () -> String = "") {
             print("check-logic: \(ok ? "PASS" : "FAIL") accessibility: \(what)")
-            if !ok { failed += 1 }
+            if !ok {
+                failed += 1
+                let d = detail()
+                if !d.isEmpty { print("check-logic: note accessibility: \(d)") }
+            }
         }
     }
 
@@ -276,18 +280,74 @@ enum AccessibilityChecks {
         return FileManager.default.contents(atPath: path)
     }
 
-    /// A view on the screen, shot twice `gap` seconds apart: whether anything in it moved.
-    private static func moves<V: View>(_ view: V, size: CGSize, model: AppModel, gap: Double = 0.7) async -> Bool {
+    /// Pictures taken one after the other, compared in pairs until two in a row are the same or `count` pairs have been compared:
+    /// one entry per pair, whether it was the same picture. `shoot` takes the next picture (nil: none was taken, and a shot that was
+    /// not taken is no picture and makes no pair). A window that has only just opened is still settling under load (its first layout,
+    /// the title bar turning active, the material behind it), so the first pairs of a view that holds still can differ for that
+    /// alone: what a view does is read from the run of pairs, never from one pair. It has settled when a pair is the same, and it
+    /// moves when every pair differs.
+    private static func pairs(count: Int, shoot: () async -> Data?) async -> [Bool] {
+        var same: [Bool] = []
+        var before: Data?
+        for _ in 0..<(count * 3) where same.count < count {          // the bound is on shots, so a screen that never answers ends the run
+            let shot = await shoot()
+            if let before, let shot {
+                same.append(before == shot)
+                if before == shot { break }
+            }
+            before = shot
+        }
+        return same
+    }
+
+    /// A view on the screen, shot `gap` seconds apart (`pairs`).
+    private static func pairs<V: View>(_ view: V, size: CGSize, model: AppModel, count: Int, gap: Double = 0.5) async -> [Bool] {
         let w = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.titled], backing: .buffered, defer: false)
         w.contentView = NSHostingView(rootView: view.environment(model))
         w.setFrameTopLeftPoint(NSPoint(x: 80, y: (NSScreen.main?.frame.height ?? 900) - 60))
         w.orderFrontRegardless()
-        try? await Task.sleep(for: .seconds(0.8))
-        let first = pixels(of: w)
-        try? await Task.sleep(for: .seconds(gap))
-        let second = pixels(of: w)
-        w.orderOut(nil)
-        return first != second
+        defer { w.orderOut(nil) }
+        // The first layout pass and the first commit happen before the first shot, not on the clock of the shots.
+        w.contentView?.layoutSubtreeIfNeeded()
+        w.displayIfNeeded()
+        CATransaction.flush()
+        var first = true
+        return await pairs(count: count) {
+            if !first { try? await Task.sleep(for: .seconds(gap)) }
+            first = false
+            return pixels(of: w)
+        }
+    }
+
+    /// The view settled: two shots in a row were the same.
+    private static func holdsStill(_ same: [Bool]) -> Bool { same.contains(true) }
+    /// The view kept moving: every one of `count` pairs of shots differed.
+    private static func keepsMoving(_ same: [Bool], count: Int) -> Bool { same.count == count && !same.contains(true) }
+
+    private static func moves<V: View>(_ view: V, size: CGSize, model: AppModel) async -> Bool {
+        keepsMoving(await pairs(view, size: size, model: model, count: movePairs), count: movePairs)
+    }
+
+    /// How many pairs of shots a view that holds still has to settle in (the first ones may be a window settling). A view that
+    /// settles stops at the first pair that is the same, so the budget costs time only when a view does not hold still.
+    private static let settleBudget = 6
+    /// How many pairs of shots must all differ for a view to count as moving.
+    private static let movePairs = 3
+
+    /// The shots instrument on scripted pictures (no window, no clock): what a settling window, a moving one and a screen that
+    /// gives no picture each read as. `shots` run out on their last entry.
+    private static func shotsChecks(_ r: Report) async {
+        func run(_ shots: [Data?], count: Int) async -> [Bool] {
+            var next = 0
+            return await pairs(count: count) { defer { next += 1 }; return shots[min(next, shots.count - 1)] }
+        }
+        let a = Data([1]), b = Data([2]), c = Data([3])
+        let settling = await run([a, b, c, c], count: settleBudget), moving = await run([a, b, a, b, a, b], count: movePairs)
+        let blank = await run([nil], count: settleBudget), late = await run([nil, a, nil, b, b], count: settleBudget)
+        r.check("Reduce Motion shots: a window that changes while it settles and stops is still; one that changes in every pair is moving",
+                holdsStill(settling) && !keepsMoving(settling, count: settleBudget) && keepsMoving(moving, count: movePairs) && !holdsStill(moving))
+        r.check("Reduce Motion shots: a screen that gives no picture is neither still nor moving, and a pair needs two shots taken in a row",
+                !holdsStill(blank) && !keepsMoving(blank, count: movePairs) && late == [true])
     }
 
     private static func reduceMotionChecks(_ model: AppModel, _ r: Report) async {
@@ -316,20 +376,24 @@ enum AccessibilityChecks {
         lens.sweep()
         r.check("Reduce Motion on: the sweep does not run", !animations(layer).contains("sweep"))
 
-        // The SwiftUI motion: a ring that turns, a lens that glides. Shot twice, the pictures differ off and are the same on.
+        await shotsChecks(r)
+
+        // The SwiftUI motion: a ring that turns, a lens that glides. Shot again and again (`pairs`): off, every pair differs; on, the view settles.
         Motion.shared.force(false)
         let spinningOff = await moves(LensChip(state: .busy), size: CGSize(width: 120, height: 60), model: model)
         let glidingOff = await moves(OnboardingView(close: {}), size: CGSize(width: 600, height: 760), model: model)
         r.check("Reduce Motion off: the reading lens chip and the Onboarding lens move (the instrument sees them)", spinningOff && glidingOff)
         Motion.shared.force(true)
-        let spinningOn = await moves(LensChip(state: .busy), size: CGSize(width: 120, height: 60), model: model)
-        let glidingOn = await moves(OnboardingView(close: {}), size: CGSize(width: 600, height: 760), model: model)
-        r.check("Reduce Motion on: the lens chip's ring and the Onboarding lens hold still", !spinningOn && !glidingOn)
+        let spinningOn = await pairs(LensChip(state: .busy), size: CGSize(width: 120, height: 60), model: model, count: Self.settleBudget)
+        let glidingOn = await pairs(OnboardingView(close: {}), size: CGSize(width: 600, height: 760), model: model, count: Self.settleBudget)
+        r.check("Reduce Motion on: the lens chip's ring and the Onboarding lens hold still", holdsStill(spinningOn) && holdsStill(glidingOn),
+                detail: "pairs of shots that were the same, chip \(spinningOn), Onboarding \(glidingOn)")
         if model.regions.isEmpty {
-            let emptyOn = await moves(MenuPanel(), size: CGSize(width: 340, height: 400), model: model)
+            let emptyOn = await pairs(MenuPanel(), size: CGSize(width: 340, height: 400), model: model, count: Self.settleBudget)
             Motion.shared.force(false)
             let emptyOff = await moves(MenuPanel(), size: CGSize(width: 340, height: 400), model: model)
-            r.check("the menu panel's empty state glides with Reduce Motion off and holds still with it on", emptyOff && !emptyOn)
+            r.check("the menu panel's empty state glides with Reduce Motion off and holds still with it on", emptyOff && holdsStill(emptyOn),
+                    detail: "pairs of shots that were the same, Reduce Motion on \(emptyOn)")
         }
         Motion.shared.force(nil)
     }

@@ -4,8 +4,8 @@
 
 <h1 align="center">Mwoyeo</h1>
 <p align="center"><a href="README.md">한국어</a> · <a href="README.en.md">English</a> · <a href="README.ja.md">日本語</a> · <b>简体中文</b></p>
-<p align="center"><b>不管什么画面，外文都在原处变成中文。</b><br>
-把透镜罩在聊天、信息流或游戏画面上，原文随即消失，译文就写在原来的位置。</p>
+<p align="center"><b>实时屏幕翻译：画面在变，译文就在原处跟着变。</b><br>
+聊天消息刷新、字幕切换、页面滚动，透镜下的译文都会紧跟画面。</p>
 
 <p align="center">
   <a href="https://github.com/midagedev/mwoyeo/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/midagedev/mwoyeo?style=flat-square&label=release&color=ff9f0a"></a>
@@ -25,7 +25,7 @@ brew install midagedev/tap/mwoyeo
 <p align="center"><img src="docs/media/hero.zh-CN.gif" width="600" alt="一个小透镜罩在韩语聊天上，只有透镜下的文字原地变成中文。把透镜拖上去再拖回来，经过的地方马上翻译。"><br>
 <sub><a href="docs/media/hero.zh-CN.full.gif">观看 20 秒完整演示（含滚动、显示原文）</a></sub></p>
 
-Mwoyeo 会识别透镜下的文字，**把原文从画面上抹掉**，再按原来的位置、大小和颜色写上译文。没有弹窗，也没有字幕条，屏幕上直接就是中文（或你设定的其他语言）；新消息进来、页面滚动，翻译也一直跟着走。默认情况下，所有处理都在 Mac 本地完成，屏幕上的内容不会发往任何地方。只有当你自己添加云端翻译引擎时，透镜读到的文字才会发送给该引擎。
+画面变化时，Mwoyeo 会一直翻译下去。它反复识别透镜下的文字，**把原文从画面上抹掉**，再按原来的位置、大小和颜色写上译文：新消息一进来就译，字幕一切换就译，页面滚到哪里就译到哪里。没有弹窗，也没有字幕条，屏幕上直接就是中文（或你设定的其他语言）。默认情况下，所有处理都在 Mac 本地完成，屏幕上的内容不会发往任何地方。只有当你自己添加云端翻译引擎时，透镜读到的文字才会发送给该引擎。
 
 ## 安装
 

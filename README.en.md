@@ -4,8 +4,8 @@
 
 <h1 align="center">Mwoyeo</h1>
 <p align="center"><a href="README.md">한국어</a> · <b>English</b> · <a href="README.ja.md">日本語</a> · <a href="README.zh-CN.md">简体中文</a></p>
-<p align="center"><b>Read any screen in your language, right where the text is.</b><br>
-Put a lens over a chat, a feed or a game. The original text disappears and the translation is written in its place.</p>
+<p align="center"><b>Live screen translation, right where the text is.</b><br>
+Chats arrive, subtitles change, pages scroll: under the lens the translation keeps up with the screen.</p>
 
 <p align="center">
   <a href="https://github.com/midagedev/mwoyeo/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/midagedev/mwoyeo?style=flat-square&label=release&color=ff9f0a"></a>
@@ -25,9 +25,10 @@ brew install midagedev/tap/mwoyeo
 <p align="center"><img src="docs/media/hero.en.gif" width="600" alt="A small lens over a Korean chat: only the text under it turns English, in place. Dragged up and back down, it translates wherever it goes."><br>
 <sub><a href="docs/media/hero.en.full.gif">Watch the full 20-second demo (scrolling, showing the original)</a></sub></p>
 
-Mwoyeo reads the text under a lens, **erases it from the picture**, and paints the translation back in the same
-place, size and colour. It is not a popup or a subtitle bar: the screen simply reads in your language, and keeps
-reading as messages arrive and the page scrolls. By default everything runs on your Mac and nothing on your screen is
+Mwoyeo keeps translating while the screen changes. It reads the text under a lens again and again, **erases it from
+the picture**, and paints the translation back in the same place, size and colour: a new message is translated as it
+arrives, a subtitle as it changes, a page as you scroll it. No popup, no subtitle bar: the screen simply reads in your
+language. By default everything runs on your Mac and nothing on your screen is
 sent anywhere. Only if you add a cloud translation engine yourself does the text a lens reads go to that engine.
 
 ## Install

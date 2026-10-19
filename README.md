@@ -4,8 +4,8 @@
 
 <h1 align="center">Mwoyeo</h1>
 <p align="center"><b>한국어</b> · <a href="README.en.md">English</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-CN.md">简体中文</a></p>
-<p align="center"><b>화면 속 외국어를 그 자리에서 한국어로.</b><br>
-채팅이든 피드든 게임이든 렌즈만 올려 두면 원문은 지워지고 그 자리에 번역이 들어가요.</p>
+<p align="center"><b>실시간 화면 번역. 바뀌는 화면을 그 자리에서 바로 한국어로.</b><br>
+채팅이 올라오고 자막이 넘어가고 페이지를 스크롤해도, 렌즈 아래 번역이 화면을 따라 바로 바뀌어요.</p>
 
 <p align="center">
   <a href="https://github.com/midagedev/mwoyeo/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/midagedev/mwoyeo?style=flat-square&label=release&color=ff9f0a"></a>
@@ -25,9 +25,9 @@ brew install midagedev/tap/mwoyeo
 <p align="center"><img src="docs/media/hero.ko.gif" width="600" alt="일본어 채팅 한가운데 작은 렌즈. 렌즈 아래 글자만 그 자리에서 한국어로 바뀌어요. 렌즈를 위로 끌었다가 다시 내리면 지나가는 곳마다 바로 번역돼요."><br>
 <sub><a href="docs/media/hero.ko.full.gif">20초 전체 데모 보기 (스크롤, 원문 보기 포함)</a></sub></p>
 
-번역 팝업도, 화면 아래 자막 줄도 없어요. Mwoyeo는 렌즈 아래 글자를 읽어서 **화면에서 지우고** 같은 자리에 같은
-크기와 색으로 번역을 다시 써요. 그래서 원래 한국어로 된 화면을 보는 것처럼 읽히고 새 메시지가 올라오거나
-페이지를 스크롤해도 계속 그렇게 보여요. 기본 설정에서는 모든 처리가 Mac 안에서 끝나고 화면 내용은 어디에도
+Mwoyeo는 화면이 바뀌는 동안 계속 번역해요. 렌즈 아래 글자를 쉬지 않고 읽어서 **화면에서 지우고** 같은 자리에
+같은 크기와 색으로 번역을 다시 써요. 새 메시지가 올라오면 바로, 자막이 넘어가면 바로, 페이지를 스크롤하면 스크롤하는
+대로 번역이 따라와요. 번역 팝업도, 화면 아래 자막 줄도 없어서 원래 한국어로 된 화면을 보는 것처럼 읽혀요. 기본 설정에서는 모든 처리가 Mac 안에서 끝나고 화면 내용은 어디에도
 보내지 않아요. 클라우드 번역 엔진을 직접 붙였을 때만 렌즈가 읽은 글자가 그 엔진으로 가요.
 
 ## 설치

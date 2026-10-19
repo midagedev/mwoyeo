@@ -1,0 +1,91 @@
+import CoreGraphics
+
+/// Recorded: page 2 of our own paper (tools/paper-own/mwoyeo-method, 1634 x 2114 px, `--render p2.png --scale 2`, main a53646c),
+/// the 33 blocks the pipeline laid out, as `block:` core rects with the median line height of their lines, in drawn order, and the seven
+/// lines of the block that holds two columns (reader paragraph 19: three lines at the bottom of column 1, four at the top of column 2).
+/// `bigIndex` is that block in `cores`. `traced` is the patch the render traced for each block (x, y, width without spare, height).
+enum ColumnBreakP2 {
+    static let image = CGSize(width: 1634, height: 2114)
+    static let bigIndex = 18
+    /// x, y, width, height, median line height
+    static let cores: [(CGRect, Double)] = [
+        (CGRect(x: 145, y: 158, width: 648, height: 92), 26),
+        (CGRect(x: 146, y: 295, width: 552, height: 30), 30),
+        (CGRect(x: 144, y: 343, width: 648, height: 61), 28.0),
+        (CGRect(x: 143, y: 409, width: 653, height: 281), 26),
+        (CGRect(x: 171, y: 695, width: 420, height: 30), 30),
+        (CGRect(x: 145, y: 731, width: 651, height: 92), 26),
+        (CGRect(x: 144, y: 823, width: 651, height: 127), 30.0),
+        (CGRect(x: 146, y: 990, width: 482, height: 30), 30),
+        (CGRect(x: 144, y: 1043, width: 652, height: 92), 26),
+        (CGRect(x: 145, y: 1136, width: 432, height: 26), 26),
+        (CGRect(x: 149, y: 1171, width: 647, height: 154), 26),
+        (CGRect(x: 182, y: 1330, width: 610, height: 26), 26),
+        (CGRect(x: 182, y: 1360, width: 611, height: 118), 24.0),
+        (CGRect(x: 148, y: 1488, width: 644, height: 61), 30),
+        (CGRect(x: 182, y: 1554, width: 610, height: 26), 26),
+        (CGRect(x: 182, y: 1585, width: 329, height: 26), 26),
+        (CGRect(x: 143, y: 1616, width: 653, height: 158), 26),
+        (CGRect(x: 146, y: 1814, width: 257, height: 26), 26),
+        (CGRect(x: 144, y: 154, width: 1349, height: 1805), 28),
+        (CGRect(x: 843, y: 334, width: 322, height: 35), 35),
+        (CGRect(x: 841, y: 387, width: 652, height: 123), 26.0),
+        (CGRect(x: 842, y: 515, width: 651, height: 191), 28.0),
+        (CGRect(x: 843, y: 760, width: 479, height: 44), 44),
+        (CGRect(x: 840, y: 832, width: 650, height: 281), 26),
+        (CGRect(x: 842, y: 1167, width: 406, height: 26), 26),
+        (CGRect(x: 842, y: 1219, width: 647, height: 57), 26.0),
+        (CGRect(x: 840, y: 1369, width: 653, height: 158), 30),
+        (CGRect(x: 840, y: 1537, width: 653, height: 57), 26.0),
+        (CGRect(x: 842, y: 1642, width: 238, height: 26), 26),
+        (CGRect(x: 1109, y: 1642, width: 384, height: 26), 26.0),
+        (CGRect(x: 842, y: 1677, width: 651, height: 26), 26),
+        (CGRect(x: 840, y: 1708, width: 653, height: 154), 30),
+        (CGRect(x: 840, y: 1867, width: 649, height: 92), 30),
+    ]
+    static let traced: [[Int]?] = [
+        [141, 154, 656, 49],
+        [141, 290, 562, 1],
+        [139, 338, 658, 1],
+        [139, 408, 661, 15],
+        [166, 694, 202, 36],
+        [141, 729, 329, 95],
+        [139, 823, 331, 139],
+        [141, 985, 245, 47],
+        [140, 1039, 330, 98],
+        [141, 1136, 220, 33],
+        [145, 1168, 325, 161],
+        [178, 1644, 618, 1],
+        [178, 1660, 619, 1],
+        [143, 1724, 654, 1],
+        [178, 1757, 618, 1],
+        [178, 1584, 150, 31],
+        [139, 1788, 661, 1],
+        [142, 1887, 265, 1],
+        [470, 430, 697, 1215],
+        [837, 328, 334, 1],
+        [837, 383, 660, 1],
+        [837, 513, 661, 1],
+        [1168, 752, 162, 68],
+        [1166, 828, 328, 295],
+        [1167, 1163, 85, 39],
+        [1167, 1215, 326, 71],
+        [835, 1664, 663, 1],
+        [836, 1748, 661, 1],
+        [838, 1801, 246, 1],
+        [1105, 1801, 392, 1],
+        [838, 1818, 659, 1],
+        [835, 1834, 663, 32],
+        [835, 1913, 659, 57],
+    ]
+    /// The big block's lines (reader paragraph 19), x, y, width, height, text.
+    static let bigLines: [(CGRect, String)] = [
+        (CGRect(x: 141, y: 1867, width: 661, height: 26), "The lines of a block are translated by an engine the per-"),
+        (CGRect(x: 141, y: 1898, width: 656, height: 31), "son chooses: Apple's Translation framework [5] with a"),
+        (CGRect(x: 141, y: 1929, width: 656, height: 31), "language pack, or an engine added in the settings. Lines"),
+        (CGRect(x: 837, y: 154, width: 661, height: 35), "are sent in batches of at most three new lines in reading"),
+        (CGRect(x: 837, y: 194, width: 656, height: 26), "order. By default nothing from the screen leaves the ma-"),
+        (CGRect(x: 841, y: 225, width: 652, height: 26), "chine; text goes to a network engine only if the person"),
+        (CGRect(x: 837, y: 255, width: 119, height: 28), "adds one."),
+    ]
+}

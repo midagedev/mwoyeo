@@ -105,6 +105,20 @@ public enum Territory {
     /// descender to include), and the tails of "g, p, y, ," under it still have to be erased with the line.
     static let descender = 0.3
 
+    /// Background around a block's text (pixels) that its patch takes in, for the glyph mask's ring: 0.18 of the line height, at least 3.
+    public static func ring(lineHeight: CGFloat) -> Int { max(3, Int(lineHeight * 0.18)) }
+
+    /// A territory smaller than this share of its block's core leaves part of the source unerased or the translation without room.
+    public static let squeezedShare: CGFloat = 0.5
+
+    /// Whether `territory` covers less than `squeezedShare` of `core`: nothing is wrong with the cut itself, but the block is
+    /// drawn in half of its place or not at all (a patch of 0-1 px has no text area). `layout.squeezed` counts these.
+    public static func squeezed(core: CGRect, territory: CGRect) -> Bool {
+        let kept = core.intersection(territory)
+        guard core.width > 0, core.height > 0 else { return false }
+        return kept.isNull || kept.width * kept.height < squeezedShare * core.width * core.height
+    }
+
     /// The depth under a line's box that is erased with the line: room for descenders, never less than `ring`.
     public static func below(lineHeight: CGFloat, ring: CGFloat) -> CGFloat { max(ring, (lineHeight * descender).rounded(.up)) }
 
@@ -342,13 +356,20 @@ public enum LayoutCheck {
         public var cut: [(Int, Int)] = []
         /// Drawn translations that did not fit their patch at the smallest size.
         public var clipped: [Int] = []
+        /// Pairs of blocks where one block's source rect holds half of the other's (`ColumnBreak.holds`): a block that spans two
+        /// columns, or a join of lines across a gutter. The drawn translations need not touch, but the territories were cut
+        /// against the large rect.
+        public var holds: [(Int, Int)] = []
 
         public static func == (a: Report, b: Report) -> Bool {
             a.blocks == b.blocks && a.spill == b.spill && a.clipped == b.clipped && a.overlaps.elementsEqual(b.overlaps, by: ==) && a.cut.elementsEqual(b.cut, by: ==)
+                && a.holds.elementsEqual(b.holds, by: ==)
         }
 
-        /// The one line the gates read.
-        public var summary: String { "layout: blocks=\(blocks) overlaps=\(overlaps.count) spill=\(spill.count) cut=\(cut.count) clipped=\(clipped.count)" }
+        /// The one line the gates read. `holds` is appended: `score.py` reads the fields before it by name.
+        public var summary: String {
+            "layout: blocks=\(blocks) overlaps=\(overlaps.count) spill=\(spill.count) cut=\(cut.count) clipped=\(clipped.count) holds=\(holds.count)"
+        }
     }
 
     public static func check(_ drawn: [DrawnBlock]) -> Report {
@@ -363,6 +384,7 @@ public enum LayoutCheck {
             for j in drawn.indices where j > i {
                 if crosses(drawn[i].text, drawn[j].text) { r.overlaps.append((i, j)) }
                 if crosses(drawn[i].text, drawn[j].patch) { r.cut.append((i, j)) }
+                if ColumnBreak.holds(drawn[i].core, drawn[j].core) { r.holds.append((i, j)) }
             }
         }
         return r

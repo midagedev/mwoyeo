@@ -353,6 +353,7 @@ enum UICapture {
             check("the corners style sits between subtle and minimal", LensStyle.allCases == [.glow, .subtle, .corners, .minimal])
             failed += await firstRunChecks()
             failed += SettingsFileChecks.run(model)
+            failed += SandboxDataChecks.run()
             failed += await LensRobustChecks.run(model)
             failed += await ContextChecks.run()
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")

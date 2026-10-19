@@ -1,0 +1,12 @@
+d8e50d8 Dev scripts launch through ane-env.sh run pool|cold; ps pcpu snapshots replaced by one..
+f28b09d ane-census: the compiler service's networks per pid and window, .tmp leftovers, per-id..
+ca12b7c ane-env.sh: one entry point for dev runs that may compile Neural Engine networks: a le..
+8f4d453 asc.py previews: a rerun keeps the previews Apple already took; reads retry a server e..
+6cf74c4 Translation bench runs 2026-10-19: product layout on gemma3 4b, gemma4 e4b and Claude ..
+26259d6 Translation bench: pairwise judge (judge-pairs, judge-run, judge-report) with both ord..
+2927051 Translation bench runner: the product's request layout (memory-only, nearby, conversat..
+ad2ad15 asc.py: replace the API token after 10 minutes, so a long preview upload does not stop..
+8d431ad Strings: the 1.1.4 strings in de, es, fr, it, ja, pt-BR, ru, uk, zh-Hans and zh-Hant    
+48b01d7 Settings file checks: the child run speaks this run's language, so --settings-schema c..
+7469e87 Engine permission checks: the Apple path check pins its target, which defaults to the ..
+841d6fb asc.py previews: the Mac app preview of every locale (ko gets the Korean one), checked..

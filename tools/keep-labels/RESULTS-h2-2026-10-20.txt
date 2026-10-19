@@ -1,0 +1,540 @@
+Where the keep rules still fail on screens they were not tuned on (round k3a, 2026-10-20)
+=================================================================================================
+Question  keep-boundary.md stage 3 (a small region model) starts only if the rules still fail on enough of what users see. The cases k01-k12 are
+          hand-written and set the CodeRegion thresholds, so they overstate the rules. H2 is new material: 46 screens of this repo's own developer
+          content with labels known by construction. Does the stage-1 stop rule (P and R >= 0.95 per reason slice) hold on it, and is a model needed?
+Binaries  keeprules, regionfeed, snap, ocrdump built from this worktree (main d8e50d8 + tools/keep-labels edits) with SwiftPM into /tmp/k3a/build; Vision
+          reads through tools/ane-env.sh run pool (ocrdump is no app: the lease is taken for every read); one read at a time; Core and App untouched.
+Data      tools/keep-labels/labels-h2/h2.jsonl (leg B of three, see Determinism); text sources frozen in h2/MANIFEST.tsv (sha256 d2f6953dcc2a...).
+Run       tools/keep-labels/make-h2.sh, KEEP_WORK=/tmp/k3a/wb; run-rules.sh labels-h2 (appendix A); h2_report.py (appendix B); the disagreement sheet.
+
+ANSWER
+  1. The rules are NOT enough on H2. Rules OR CodeRegion (what the app does today), word level: doc read P 0.98 / R 0.78, vn read P 0.99 / R 0.79
+     (keep words found 3281 of 4227 and 4766 of 6020; the rules alone find P 0.98 / R 0.63 doc, P 0.99 / R 0.66 vn). Against the stop rule only diffmark passes; code R 0.93 (doc) / 0.87 (vn), log 0.78,
+     cmd 0.76, config 0.37, path 0.55, id 0.19 miss on recall (table below). The cases overstated the rules: word recall after CodeRegion was
+     0.85 (cases dev) and 0.87 (cases hold) against 0.78 here; block-keep recall 0.91 / 1.00 against 0.89 (doc) and 0.84 (vn).
+  2. The region shape holds on new material (the lead's prior, section 3): 93 % of the keep words (doc; 95 % vn) sit in blocks that hold nothing
+     else (3919 of 4227 scored words), 146 of the 1092 doc blocks are pure translate, and the document read cuts a code region into several blocks
+     (39 of 42 regions split, 0 merged with prose; vn: 14 whole / 27 split / 1 merged).
+  3. The misses split into two kinds, and only one of them is a model's job:
+       region misses   670 of the 945 missed words (doc; 983 of 1254 vn) are in pure-keep blocks the rules and CodeRegion translate: 64 blocks of
+                       605. They fall in four clusters: three closed by a rule (clusters 1-3 below, sizes given there), one UI chrome whose label is uncertain
+                       (cluster 4). They are the code, log and config slices.
+       inline misses   275 of the 308 keep words that sit inside prose blocks (doc; 271 of 300 vn) are missed: inline recall 0.11. Identifiers,
+                       file names, commands and config keys written in a sentence have no text shape; the rules caught 33 of the 308. This is
+                       the id / path / cmd / config share of the table, and no block rule reaches it.
+       precision       65 translate words kept (doc; 45 vn; 3.1 % / 2.1 % of translate words), from two rule defects (a span that swallows the CJK
+                       text around an underscore identifier; a sentence with a long path and a URL kept whole), not from CodeRegion.
+  4. VERDICT: "rule fix X closes it" for the region slices (code, log, config lines: clusters 1-3, S to M, plus the two precision defects 6 and 7, S, listed below; the word recall that remains
+     after all region misses are fixed is 0.935 doc / 0.955 vn, a ceiling, not a measurement: the fixes would turn H2 into a dev set and need a new
+     hold-out); "model needed" only for the inline slice (id, path, cmd, config pieces inside prose: 6.5 points of word recall doc, 4.5 vn), whose
+     shape is the section 3 word / span judge on the band the rules do not decide. flag, url, hash, hotkey, lineno are thin: no verdict.
+  5. Stage 3 estimate from the measured sizes: see the last section. Short form: do not build the model now; one rules round (five fixes with
+     FAIL-first from H2's lines) plus one new hold-out (H3, the generator makes it a scene list: ~1 round) first; the inline model is three more
+     rounds (data, trees, integration) and its gain is 4.5-6.5 points of recall, only worth it once a kept inline span can be drawn.
+
+STEP 1  BASELINE ON TODAY'S MAIN (labels/ of the repo: two CC BY papers and the 12 cases; the local 1706.03762 labels are not in the repo, so the papers
+        dev rows differ from RESULTS-code-region-2026-10-19.txt; the cases rows are identical to it)
+  tools/keep-labels/run-rules.sh, KEEP_WORK = the 10-19 pictures and reads (/tmp/l0/g4b-work; regenerating code.jsonl from them is byte-identical to labels/code.jsonl).
+  Today's rules alone, the cases (rows of rules_report.py):
+  cases dev   doc words      P 0.91 [0.84,0.95]  R 0.40 [0.34,0.47]  (tp 97 fp 10 fn 143)
+                 block keep P 0.95 [0.76,0.99]  R 0.56 [0.39,0.71]  (tp 19 fp 1 fn 15)   [truth keep = keep words and no translate word]
+  cases dev   vn  words      P 0.96 [0.92,0.98]  R 0.60 [0.55,0.64]  (tp 228 fp 10 fn 154)
+                 block keep P 0.92 [0.67,0.99]  R 0.57 [0.37,0.76]  (tp 12 fp 1 fn 9)   [truth keep = keep words and no translate word]
+  cases hold  doc words      P 1.00 [0.97,1.00]  R 0.58 [0.51,0.64]  (tp 120 fp 0 fn 88)
+                 block keep P 1.00 [0.89,1.00]  R 0.78 [0.62,0.88]  (tp 31 fp 0 fn 9)   [truth keep = keep words and no translate word]
+  cases hold  vn  words      P 1.00 [0.96,1.00]  R 0.39 [0.33,0.46]  (tp 90 fp 0 fn 140)
+                 block keep P 1.00 [0.84,1.00]  R 0.77 [0.58,0.89]  (tp 20 fp 0 fn 6)   [truth keep = keep words and no translate word]
+  After CodeRegion (rules OR region), the cases:
+  [cases dev, read doc] block keep after  P 0.94 [0.80,0.98]  R 0.91 [0.77,0.97]  (tp 31 fp 2 fn 3)
+  [cases dev, read doc] keep->translated words  143 -> 35 of 240;  translate->kept words 10 -> 12 of 362 (+2 = 0.55 % of translate words)
+  [cases hold, read doc] block keep after  P 1.00 [0.91,1.00]  R 1.00 [0.91,1.00]  (tp 40 fp 0 fn 0)
+  [cases hold, read doc] keep->translated words  88 -> 27 of 208;  translate->kept words 0 -> 0 of 249 (+0 = 0.00 % of translate words)
+  [cases hold, read doc] block keep after  P 0.95 [0.77,0.99]  R 0.59 [0.42,0.74]  (tp 20 fp 1 fn 14)
+  [cases hold, read doc] keep->translated words  689 -> 689 of 910;  translate->kept words 10 -> 10 of 2490 (+0 = 0.00 % of translate words)
+  [cases hold, read doc] block keep after  P 0.78 [0.62,0.88]  R 0.60 [0.45,0.72]  (tp 28 fp 8 fn 19)
+  [cases hold, read doc] keep->translated words  303 -> 303 of 509;  translate->kept words 24 -> 24 of 4743 (+0 = 0.00 % of translate words)
+  [cases dev, read vn] block keep after  P 0.90 [0.71,0.97]  R 0.90 [0.71,0.97]  (tp 19 fp 2 fn 2)
+  [cases dev, read vn] keep->translated words  154 -> 36 of 382;  translate->kept words 10 -> 12 of 362 (+2 = 0.55 % of translate words)
+  [cases hold, read vn] block keep after  P 1.00 [0.87,1.00]  R 0.96 [0.81,0.99]  (tp 25 fp 0 fn 1)
+  [cases hold, read vn] keep->translated words  140 -> 33 of 230;  translate->kept words 0 -> 0 of 249 (+0 = 0.00 % of translate words)
+  The 4 code use-cases still missed (kept_ok 56/60 after CodeRegion, usecase-bench/RESULTS-c2-code-region-2026-10-19.txt line 315, auto path), with the
+  reason that file gives:
+    1. "ledgerline 0.4.2" (k01): the output line under a `$ ledgerline --version` prompt (one short output line).
+    2. "dev@mbp:~/shop$ # 先同步依赖再构建" (k05): a prompt with a Chinese comment; k05 is a terminal that fills the whole picture, so the frame colour is the
+       terminal's, no block is tinted, and a block depends on text evidence alone (RESULTS-c2 U1: the same holds for k10, k11, k12 and d10).
+    3. "Input: l1, ..., ln; t" and 4. "Output: G" (k07): the two header lines of the pseudo-code box.
+  Cross-check at the label level (rules OR CodeRegion on labels/, pure-keep blocks still translated): doc read k05-terminal-zh-doc-4 ("修改：", the first word of a
+  git status line), k07-algorithm-en-doc-2 ("Input: b1, ..., In; t") and doc-3 ("Output: G"); the vn read adds k08-algorithm-zh-vn-12 ("returnO ▶ 未找到").
+  Both views show the same kinds: a short line with no text feature of its own, in a container that gives no tint evidence (a whole-frame terminal) or
+  next to nothing to join. The k01 line is not in the label-level list (its labels differ from the bench's units).
+
+STEP 2  H2
+  Construction. 27 scenes in 11 looks (table in appendix B): Swift, shell, JSON and YAML excerpts of this repo at the pinned commit d8e50d8, every code
+  line checked against the repo file (comments replaced by Korean / Japanese ones, English ones kept in swift-en); README passages (checked against
+  the three READMEs); tool outputs captured once into h2/src/ (git log of midagedev's commits, git diff, swift test (811 tests, rc 0), xcodebuild of
+  the Core package); terminal sessions with `date` / `git status` / `swift build` output in Korean and Japanese; chats and issue pages; a shortcut
+  cheat sheet. Looks: dark terminal full-bleed, light terminal as a window on a desktop, IDE with a gutter (light, dark), browser page (light, dark),
+  chat (dark, light), and three untinted code looks (code on the page background: md-dark-plain, md-light-plain, chat-light-plain). Monospace faces:
+  Menlo, SF Mono, Monaco, Courier New (the cases are Menlo on #1e1e1e / #f6f8fa tints), addendum A1.6.
+  Labels. Only the construction's class (A1.1): keep for a code / command / log / config line, a path, a hotkey and inline code (reason chosen by the author in
+  the INLINE table), translate for every token of a heading, paragraph, item, cell and window text that is not marked, either for names {n:}, times and
+  numbers {t:}, CJK program output (as k05 does) and a token without a letter. truth.py's shape rules are not called. The IDE gutter and the diff
+  marks are known without a text: a block of integers 1..n that nothing aligned is keep lineno, a lone + or - on a diff screen keep diffmark.
+  Independence (A1.2): no k-case line (test_h2.sh checks 531 units of 3+ words), no RESULTS / CODE-FEATURES / CodeRegion.swift source, only midagedev commits. The
+  manifest was frozen (h2/MANIFEST.tsv, 08:20) before any rule ran on H2, and h2_scenes.py was last written at 08:18; the baseline of step 1 had run
+  before addendum A1 arrived. The scenes were written after reading the design note's stage-0 clusters (section 9) and the cases' per-reason recall,
+  never after a rule result on H2; no scene was added, dropped or edited once the rules ran.
+  Size. 46 screens (ko 21, ja 15, en 10), 42 code regions, 1092 doc blocks / 675 vn blocks. Doc read words: keep 4402, translate 2121, either 452
+  (name 154, punctuation or no letter 142, CJK program output 104, number 52), no label 129 (glyphs the construction does not list: the modifier-key
+  glyphs of the hotkeys that Vision does not read at all, icon glyphs, a stray mark). vn read: keep 6191, translate 2133, either 475, none 136.
+  Uncertain words (the construction does not settle them): 1055 doc / 1168 vn, mostly comment lines of code regions (the v1 decision keeps them).
+  Words per reason (doc): code 1847, log 1324, config 522, cmd 258, path 159, lineno 152, diffmark 72, id 64, flag 2, hash 1, url 1; hotkey 0 read.
+  Slices with fewer than 40 keep words read "thin - no verdict" (A1.5): flag, url, hash, lineno (the gutter blocks have no letter and are left
+  out of the rule scores, as for every source), hotkey (the 42 hotkey cells of 6 screens: no OCR word aligned to any of them, Vision does not read the modifier glyphs; the units are listed as
+  "no aligned word" in the label log, and the rules cannot be scored on what Vision does not read).
+
+STEP 3-5  MEASUREMENT, VERDICT, CLUSTERS, SHEET: appendix B (h2_report.py, both reads) and appendix A (rules_report.py via run-rules.sh).
+  Verdict table, rules OR CodeRegion, doc read first (vn in the appendix): stop rule P and R >= 0.95, n < 40 thin.
+    slice      n     R doc / vn       P     verdict
+    code     1838    0.93 / 0.87     1.00   MISS (R): rule fix, S-M. Region misses: comment-only lines, keyword-less lines (clusters 1 and 3)
+    log      1323    0.78 / 0.78     1.00   MISS (R): rule fix, S. Tool-output lines (cluster 2); inline 36 words need the model
+    cmd       258    0.76 / 0.77     1.00   MISS (R): 56 of the 61 missed words are commands written in prose (model); 5 are one terminal line
+    config    520    0.37 / 0.53     0.95   MISS (R, P): rule fix, S-M for comment lines and `"key": value` / `key: value` lines (clusters 1, 3); 61 inline words (model)
+    path      159    0.55 / 0.47     0.81   MISS (R, P): 63 of 71 missed words are file names and paths inside sentences (model)
+    id         64    0.19 / 0.24     0.26   MISS (R, P): 52 of 52 missed words inside prose (model): a bare identifier has no text shape
+    diffmark   57    1.00 / 1.00     1.00   rules enough
+    flag 2, url 1, hash 1, lineno 3, hotkey 0: thin - no verdict
+    precision across slices: 65 translate words kept (doc, 3.1 %), 45 (vn, 2.1 %): two rule defects (cluster 6 and 7), not a model's job.
+
+CLUSTERS (at most 8; doc read; counts from appendix B; "feature" = the cheapest feature that would separate the cluster, checked with
+          code_features.py at the thresholds of the code cases, which H2 holds out; FRAME=dominant for the tint)
+  1. comment-only lines of a code region   11 blocks, 338 words (yaml-ja 6, shell-ko 3, swift-ko 1, shell-ja 1)  looks ide-dark, md-dark, term-dark, ide-light and more
+       e.g. "// failures번 실패한 뒤에 기다릴 시간", "# 컴파일러 서비스는 한 번에 네트워크 하나만 컴파일해요 ..."
+       none of the five features separates them (mono 0 of 11: too few ASCII words; indent 6 of 11). Feature: a line that opens with a comment marker
+       (# // ///) and shares the container, the indent run or the neighbours' left edge with kept lines. Fix: region adjacency for comment lines, S.
+  2. log / tool-output lines   39 blocks, 260 words (tests-en 38 in term-dark and md-dark, chat-en 1)
+       e.g. "Test Suite 'All tests' started at 2026-10-20 08:12:52.200.", "✔ Test benchTruthIsNotNewlyLiteral() passed after 0.599 seconds."
+       lines of English words with a timestamp or a duration: no keyword, no symbol, no line end, inside a tinted box (md-dark) or a full-bleed terminal
+       (term-dark). Feature: monospace pitch (CV < 0.06 of the width per character over 3+ ASCII words): 30 of 39 blocks, 2 false fires on 146
+       pure-translate blocks (1.4 %). Fix: add the pitch as text evidence for a tinted or indented run, S.
+  3. code / config lines without a keyword hit   11 blocks, 59 words (swift-en 6, json-ko 2, readme-en-b 2, shell-ko 1)  looks term-dark, ide-light, md-light
+       e.g. "public private(set) var state = State.idle", "public init() {}", "\"note\": \"...\"", "\"transcriptFormats\": [...]"
+       the keyword list has no public / enum / struct / init / case, no `"key": value` or `key: value` shape. Feature: indent 8 of 11, mono 2 of 11, lineend
+       3 of 11; the shape tests would need new patterns. Fix: widen the shape list (S), but only on a fresh hold-out.
+  4. path / window chrome   2 blocks, 8 words (swift-en ide-light: the breadcrumb "Core > Sources > MwoyeoCore > ReadWait.swift", the language field)
+       UI text of the editor; the construction is uncertain (breadcrumb kept as a path). No fix proposed; both rows are on the sheet.
+  5. inline pieces in prose blocks   42 blocks, 275 words (swift-ko 4, readme-ko-b 4, chat-ko 4, issue-ko 4; md-light 17, md-dark 9, chat-dark 7, md-dark-plain 4)
+       e.g. "Backoff.swift", "wait(after:)", "factor", "Mwoyeo --check-settings", "settings.json:14"
+       no block feature applies. Feature: the chip itself: monospace face on a tinted ground inside the line (every inline piece of H2 except the
+       [[bare]] ones is drawn so, as GitHub, Slack and most chats draw them), found from the word boxes' own background; a bare identifier with no chip
+       has no feature. Fix: model / span judge, M-L (stage 3 shape); a chip detector is an M rule round that would cover the styled share.
+  6. FALSE KEEP: a span that swallows CJK text around an underscore identifier   2 blocks, 45 words (gitdiff-ja md-light: one span covers the whole
+       sentence "...TOKEN_ATに作った時刻を残して..."; yaml-ja md-dark: the tail after MARKETING_VERSION)
+       InlineMath.spans returns one span for an ASCII identifier glued to CJK text and the text around it: a Japanese sentence stays untranslated.
+       Feature: the span's CJK share. Fix: stop growth at CJK letters, S, with H2's two lines as FAIL-first.
+  7. FALSE KEEP: a sentence with a long path and a URL kept whole   1 block, 16 words (issue-en md-light-plain: "Expected: the pill clears at once. The state is in
+       Core/Sources/.../ReadWait.swift; a build to try is at https://..."), plus 4 words in two README blocks (a span over the UI path "設定 > 一般の",
+       a garbled line kept whole)
+       TranslationFilter.needsTranslation says no for the block (its formula / heavy / identifier / literal flags are all false, mathShare 0.195); the
+       cause was not isolated here. Feature: the sentence has 14 prose words. Fix: S once the cause is found.
+  (remaining clusters of the vn read: code lines 19 blocks / 350 words, config lines 5 blocks / 230 words and comment lines 4 blocks / 147 words, the same kinds
+   as 1 and 3 with the vn read's different block cuts; see appendix B.)
+
+DISAGREEMENT SHEET (step 4)
+  /tmp/k3a/disagree.tsv and /tmp/k3a/disagree/ (18 rows, one PNG crop each; the lead sends them to a vision round, the user sees only the residue).
+  Rows are doc-read blocks where rules OR CodeRegion and the construction labels disagree on a word the construction is not certain of: 12 comment-only
+  lines of code regions (CJK and English comments; the v1 decision keeps them, the rules translate them), 3 bare paths in sentences (rows 05, 10, 11),
+  2 `"note"` string values of a JSON config (rows 01, 08), 1 breadcrumb (row 04). Columns: crop, block id, OCR text, rules say, labels say, uncertain words.
+  I did not judge the crops.
+
+DETERMINISM AND GATES (all lines from test_h2.sh unless noted)
+  - generator twice: byte-identical, 94 files; FAIL-first: H2_MUTATE=1 output differs (diff -r exit 1).
+  - frozen manifest: regenerated MANIFEST.tsv equals h2/MANIFEST.tsv; FAIL-first: one added line in a fixture changes it.
+  - verify: an invented code line is refused (exit non-zero), a real line of Backoff.swift accepted.
+  - labeller on a fake OCR: 15 checks pass; FAIL-first: with every keep unit flipped 5 checks fail.
+  - independence: 531 units of 3+ words, 0 overlaps with the k-cases, 0 excluded sources; FAIL-first: a unit copied from k09 is reported.
+  - label pass twice on the same reads: byte-identical (both legs). Fresh Vision reads of the same pictures (legs A, B, C; pictures byte-identical in all
+    three): the vn read never differed, the doc read cut one block differently on 1 screen of 46 (A vs B: json-ko.ide-light), 1 (B vs C: swift-ko.md-light), 2
+    (A vs C); headline numbers are equal to within one keep word (tp 3282 / 3281 / 3281). So the legs are NOT byte-identical (regen.sh's G1 held for the
+    cases and the papers; the document read of Vision is not byte-stable on a picture), and the gate counts differing screens: at most 2 of 46;
+    FAIL-first: a leg with 6 altered screens differs on 6. First leg A also met a transient e5rtError 13 on its first cold compile (the next try read the
+    picture in 114 s): make-h2.sh retries a read once.
+  - tools/keep-labels/test_keep_score.sh: rc 0 (5 PASS lines). cd Core && swift test: rc 0, 811 tests in 73 suites passed (Core untouched; the log is also
+    the swift-test fixture; scratch build dirs of mine, /tmp/k3a/core-build and /tmp/k3a/dd, deleted).
+  - rules_report.py and keeprules gained a guard (FAIL-first line): a run on labels whose pictures the feed lacks used to read as a rule that never fires;
+    keeprules now writes "region":"nofeed" and the reports print "WARNING: 1767 labelled blocks have no picture in the feed" (KEEP_FEED=an empty file).
+    rules_report.py also had a tie order that changed with the hash seed (keep-mass lines); sorted by name now (the baseline report is identical otherwise).
+
+STAGE 3 ESTIMATE (from the measured sizes; the lead decides)
+  What a model would have to do, and what it would buy:
+    - region slice (670 of 945 missed words, 64 of 605 pure-keep blocks): no model. Five rule fixes (clusters 1, 2, 3, 6, 7), one round, then a new
+      hold-out H3 (new scenes in h2_scenes.py: the generator, units, labeller and report exist, so ~20-30 scenes are one small round plus ~10 min of
+      Vision reads) to say whether the fixes generalise. The ceiling after the region fixes is word R 0.935 (doc) / 0.955 (vn).
+    - inline slice (275 words doc, 271 vn: 6.5 / 4.5 points of word recall): a span judge on the band the rules do not decide (the section 3 word shape).
+      Data: H2 already holds 7.0k (doc) and 8.8k (vn) labelled words in 1767 blocks (+ cases, papers); rung-1 boosted trees train in minutes. Rounds: (1) features
+      from the word boxes (chip tint, pitch, neighbours) and the training set from H2 + a second generated set, (2) train and measure on H3 against the rules,
+      (3) integrate behind an off-by-default flag with a no-regression gate (default path stays safe). About 3 rounds, ~1.5-2 days of wall time with the
+      usual review; the cheaper first step is a chip detector as a rule (clusters 5), which covers styled inline code (all of H2's but the bare paths).
+    - value check: a kept inline span helps only when the engine is told to leave it (ProtectedSpans) or when it can be drawn from the original pixels
+      (the inline-math pixel path, deferred); until then the inline slice costs a mistranslated identifier, not a missing region.
+  Recommendation: no model now. Fix the five rules, build H3, re-measure; ask for the model only if the inline slice still matters after that.
+
+OUTSIDE THE ASSIGNMENT (report only, not touched)
+  - Core/Sources/MwoyeoCore/InlineMath.swift: a span that swallows the CJK text around an underscore identifier (cluster 6); S, H2's two blocks are the FAIL-first.
+  - Core/Sources/MwoyeoCore/CodeRegion.swift: keyword list without public / enum / struct / init / case; no `"key": value` shape; no pitch evidence; comment-only
+    lines not joined to a region (clusters 1-3); M.
+  - Core/Sources/MwoyeoCore/Text.swift (needsTranslation): a path + URL sentence kept whole by character share (cluster 7); S.
+  - tools/keep-labels/rules_report.py DECISION section: precision is one number for every slice (it cannot say which slice a false keep belongs to); the H2 report
+    charges false keeps to the dominant keep reason of their block; S to port.
+
+=================================================================================================
+APPENDIX A  rules_report.py on labels-h2 (run-rules.sh labels-h2, KEEP_WORK = leg B; rules alone in the tables, CODE REGIONS section for the region)
+=================================================================================================
+labels: 1767 blocks of 46 papers / cases
+
+LABEL COUNTS
+  h2           doc blocks 1092 ({'either': 73, 'keep': 782, 'mixed': 46, 'none': 45, 'translate': 146}), noletter 193
+               words {'translate': 2121, 'keep': 4402, 'none': 129, 'either': 452}; keep words by reason {'code': 1847, 'log': 1324, 'config': 522, 'cmd': 258, 'path': 159, 'lineno': 152, 'diffmark': 72, 'id': 64, 'flag': 2, 'hash': 1, 'url': 1}
+               keep spans 871 by reason {'code': 256, 'log': 179, 'lineno': 152, 'config': 94, 'path': 80, 'cmd': 61, 'diffmark': 28, 'id': 17, 'flag': 2, 'hash': 1, 'url': 1}; near-negative words 0: translate 0, either 0, keep 0
+  h2           vn  blocks 675 ({'either': 57, 'keep': 385, 'mixed': 48, 'none': 41, 'translate': 144}), noletter 102
+               words {'keep': 6191, 'translate': 2133, 'none': 136, 'either': 475}; keep words by reason {'code': 3419, 'log': 1343, 'config': 738, 'cmd': 268, 'lineno': 152, 'path': 133, 'diffmark': 85, 'id': 50, 'hash': 1, 'url': 1, 'flag': 1}
+               keep spans 482 by reason {'code': 144, 'log': 83, 'path': 82, 'lineno': 67, 'config': 42, 'cmd': 29, 'id': 17, 'diffmark': 15, 'hash': 1, 'url': 1, 'flag': 1}; near-negative words 0: translate 0, either 0, keep 0
+
+TODAY'S RULES ON THE KEEP BOUNDARY: (a) words (b) spans (c) blocks (d) the two costly errors
+  [h2, read doc]
+    (a) words      P 0.98 [0.97,0.98]  R 0.63 [0.61,0.64]  (tp 2657 fp 65 fn 1569)
+        precision by decider: block 0.99 [0.99,1.00] (tp 2576 fp 18), span 0.63 [0.55,0.71] (tp 81 fp 47)
+        recall by reason: code 0.60 [0.58,0.62] n=1838, log 0.76 [0.74,0.79] n=1323, config 0.37 [0.33,0.42] n=520, cmd 0.72 [0.66,0.77] n=258, path 0.55 [0.48,0.63] n=159, id 0.19 [0.11,0.30] n=64, diffmark 1.00 [0.94,1.00] n=57, lineno 1.00 [0.44,1.00] n=3, flag 0.50 [0.09,0.91] n=2, hash 0.00 [0.00,0.79] n=1, url 1.00 [0.21,1.00] n=1
+    (b) spans      exact-boundary F1 0.81  (P 0.96 R 0.71; truth 695, predicted 511, exact 490, overlapped 509, missed 186)   edge error over overlapped spans: mean 0.47 words, exact 490, <=1 490, >=3 14
+        exact by reason: code 186/247, log 125/178, config 58/92, path 57/80, cmd 43/61, id 4/17, diffmark 13/13, lineno 3/3, flag 1/2, hash 0/1, url 0/1
+    (c) block keep P 1.00 [0.99,1.00]  R 0.80 [0.77,0.83]  (tp 487 fp 2 fn 119)   [truth keep = keep words and no translate word]
+        near-pure   P 1.00 [0.99,1.00]  R 0.80 [0.77,0.83]  (tp 487 fp 2 fn 119)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 1569 of 4226 keep words; spans fully kept 495, partly 14, lost 186
+        spans lost or partly by reason: code 54+7/247, log 47+6/178, config 33+0/92, path 21+0/80, cmd 17+1/61, id 12+0/17, diffmark 0+0/13, lineno 0+0/3, flag 1+0/2, hash 1+0/1, url 0+0/1
+        translate->kept: 65 of 2121 translate words kept by: block 18, span 47; translate/mixed blocks kept whole: {'mixed': 2}; by shape: plain prose word 65
+  [h2, read vn]
+    (a) words      P 0.99 [0.99,0.99]  R 0.66 [0.65,0.68]  (tp 3994 fp 45 fn 2026)
+        precision by decider: block 1.00 [1.00,1.00] (tp 3712 fp 0), span 0.86 [0.82,0.90] (tp 282 fp 45)
+        recall by reason: code 0.71 [0.69,0.72] n=3411, log 0.72 [0.69,0.74] n=1343, config 0.42 [0.38,0.45] n=738, cmd 0.59 [0.53,0.65] n=268, path 0.47 [0.39,0.56] n=133, diffmark 1.00 [0.95,1.00] n=74, id 0.24 [0.14,0.37] n=50, hash 0.00 [0.00,0.79] n=1, url 1.00 [0.21,1.00] n=1, flag 0.00 [0.00,0.79] n=1
+    (b) spans      exact-boundary F1 0.68  (P 0.86 R 0.56; truth 396, predicted 257, exact 222, overlapped 242, missed 154)   edge error over overlapped spans: mean 1.95 words, exact 222, <=1 223, >=3 17
+        exact by reason: code 84/136, log 51/83, path 55/82, config 9/42, cmd 14/29, id 4/17, diffmark 4/4, hash 0/1, url 1/1, flag 0/1
+    (c) block keep P 1.00 [0.98,1.00]  R 0.73 [0.68,0.78]  (tp 219 fp 0 fn 80)   [truth keep = keep words and no translate word]
+        near-pure   P 1.00 [0.98,1.00]  R 0.73 [0.68,0.78]  (tp 219 fp 0 fn 80)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 2026 of 6020 keep words; spans fully kept 223, partly 19, lost 154
+        spans lost or partly by reason: code 42+10/136, log 27+5/83, path 27+0/82, config 30+3/42, cmd 14+1/29, id 12+0/17, diffmark 0+0/4, hash 1+0/1, url 0+0/1, flag 1+0/1
+        translate->kept: 45 of 2133 translate words kept by: span 45; by shape: plain prose word 45
+
+BLOCK PURITY, KEEP-MASS SPLIT, REGION FIT (all blocks, noletter included)
+  read doc
+    source       blocks pure keep pure transl  mixed  purity   keep words: in pure-keep blocks / in mixed blocks (of which near-pure >= 0.9)   region fit (whole / split / merged)
+    h2              974       782         146     46    0.95   4094 (0.93) / 308 (0.07) (0)   3 / 39 / 0  of 42 read regions (0 not read at all)
+    keep words by reason, share in pure-keep blocks vs inside mixed blocks (inline spans among translated text):
+      h2           code 1842/5, log 1288/36, config 444/78, cmd 201/57, path 93/66, lineno 152/0, diffmark 72/0, id 1/63, flag 1/1, hash 0/1, url 0/1
+      mixed example, h2: chat-en.chat-light-plain-doc-3 keep 5 translate 9 (id,log,path): Can someone look at tools/keep-labels/run-rules.sh? tfalls with swift build failed on my b
+      mixed example, h2: issue-ja.md-light-doc-7 keep 19 translate 13 (config): •"'savesTranscripts"： true にして、レンズで何か読み取る。
+      mixed example, h2: readme-ko-b.md-dark-doc-9 keep 1 translate 10 (config): transcriptFormats 에 "jsonl" 을 더하면 번역된 줄마다 JSON 한 줄씩, 생기는 즉시 덧붙여요.
+  read vn
+    source       blocks pure keep pure transl  mixed  purity   keep words: in pure-keep blocks / in mixed blocks (of which near-pure >= 0.9)   region fit (whole / split / merged)
+    h2              577       385         144     48    0.92   5891 (0.95) / 300 (0.05) (0)   14 / 27 / 1  of 42 read regions (0 not read at all)
+    keep words by reason, share in pure-keep blocks vs inside mixed blocks (inline spans among translated text):
+      h2           code 3413/6, log 1295/48, config 660/78, cmd 213/55, lineno 152/0, path 71/62, diffmark 85/0, id 1/49, flag 0/1, hash 0/1, url 1/0
+      mixed example, h2: chat-en.chat-light-plain-vn-2 keep 5 translate 8 (id,log,path): Can someonelook at tools/keep-labels/run-rules.sh? tfails with swift build failed on my br
+      mixed example, h2: issue-ja.md-light-vn-7 keep 19 translate 13 (config): • 『savesTranscripts"： true にして、レンズで何か読み取る。
+      mixed example, h2: readme-ko-b.md-dark-vn-7 keep 3 translate 18 (config): 번역 로그. "savesTranscripts": true 로 두면 렌즈마다 읽은 원문과 번역을 transcriptFormats 에 "jsonl" 을 더하면 번역된
+
+WHERE THE MISSES CLUSTER
+  [h2, read doc] keep words the rules translate, by reason and shape:
+    code       732: plain word run (IP, softmax) 244 (niL. cap niL. cap); single letter 189 (이 줄 이 줄); garbled symbol / CJK text 175 (실패할 때마다 대기 시간을); other 76 (self.cap = seLf.cap =)
+    config     326: single letter 252 (M A S は); garbled symbol / CJK text 31 ("내 Mac에서 도는 모델이라); plain word run (IP, softmax) 27 (API engines off provider); other 16 ("note": # # #)
+    log        313: plain word run (IP, softmax) 190 (Building for debugging... Test); other 64 ('All tests' 08:12:52.200. 'All); bare number 28 (0 0 0.000 0.592); weak operator (- / *) 20 (2026-10-20 2026-10-20 2026-10-20 2026-10-20)
+    cmd         73: single letter 29 (p r e v); plain word run (IP, softmax) 18 (cat git log Core); weak operator (- / *) 16 (Core/Sources/MwoyeoCore/ReadWait.swift -p tools/app-store/asc.py Mroyeo--settings-path); other 6 (ca12b7c python3 && [path])
+    path        71: single letter 40 (D e a d); weak operator (- / *) 10 (Core/Sources/MwoyeoCore/Backoff.swift예요. Core/Sources/MwoyeoCore/Deadline.swift Core/Sources/MwoyeoCore/ReadWait.swift. tools/ane-env.sh); other 10 (Backoff.swift . ReadWait.swift settings.json); plain word run (IP, softmax) 6 (Core Sources MwoyeoCore Swift)
+    id          52: single letter 38 (D e a d); plain word run (IP, softmax) 6 (factor cap cap RecognitionWait); garbled symbol / CJK text 5 (wait(after:)는 （ ： ：); weak operator (- / *) 2 (wt/k3a. wt/k3a.)
+    hash         1: other 1 (ca12b7c)
+    flag         1: weak operator (- / *) 1 (--check-settings)
+  [h2, read doc] translate words the rules keep, by mechanism and shape:
+    span   plain prose word     47  e.g. ト ー ク ン の 有
+    block  plain prose word     18  e.g. O| У72(7ES Expected: the pill clears
+  whole-block keep by the keep share of the block, read doc, papers (all) and cases (all)
+    keep share [0.00,0.01):  146 blocks, kept whole    0 (0.00)
+    keep share [0.01,0.15):   12 blocks, kept whole    0 (0.00)
+    keep share [0.15,0.30):   15 blocks, kept whole    1 (0.07)
+    keep share [0.30,0.50):   13 blocks, kept whole    1 (0.08)
+    keep share [0.50,0.70):    6 blocks, kept whole    0 (0.00)
+    keep share [0.70,0.90):    0 blocks, kept whole    0 (nan)
+    keep share [0.90,1.00):  606 blocks, kept whole  487 (0.80)
+
+PER PAPER / CASE
+  per paper / case, read doc: keep words found (recall), translate words kept by mistake, exact keep spans
+    chat-en.chat-light-plain h2           keep words   12 found 0.08 | translate words   25 kept   0 | keep spans   5 exact   0
+    chat-ja.chat-dark      h2           keep words   40 found 0.30 | translate words   69 kept   0 | keep spans   7 exact   4
+    chat-ko.chat-dark      h2           keep words   23 found 0.70 | translate words   29 kept   0 | keep spans   9 exact   3
+    chat-ko.chat-light     h2           keep words   24 found 0.71 | translate words   29 kept   0 | keep spans   9 exact   3
+    gitdiff-ja.ide-light   h2           keep words  121 found 1.00 | translate words    8 kept   0 | keep spans  25 exact  25
+    gitdiff-ja.md-light    h2           keep words  139 found 0.93 | translate words   79 kept  34 | keep spans  20 exact  18
+    gitdiff-ja.term-dark   h2           keep words  115 found 1.00 | translate words    0 kept   0 | keep spans  19 exact  19
+    gitlog-ko.md-light     h2           keep words  192 found 0.96 | translate words   23 kept   0 | keep spans  10 exact   7
+    gitlog-ko.term-dark    h2           keep words  184 found 1.00 | translate words    0 kept   0 | keep spans  50 exact  50
+    gitlog-ko.term-light   h2           keep words  186 found 1.00 | translate words    0 kept   0 | keep spans   5 exact   5
+    issue-en.md-light-plain h2           keep words   18 found 0.89 | translate words   80 kept  16 | keep spans   5 exact   1
+    issue-ja.md-light      h2           keep words   44 found 0.23 | translate words  136 kept   0 | keep spans   6 exact   2
+    issue-ko.md-dark-plain h2           keep words   23 found 0.74 | translate words   38 kept   0 | keep spans   7 exact   3
+    json-ko.ide-light      h2           keep words   40 found 0.78 | translate words    1 kept   0 | keep spans  18 exact  17
+    json-ko.md-light       h2           keep words   38 found 0.63 | translate words   24 kept   0 | keep spans  17 exact  11
+    keys-en.md-light-plain h2           keep words    0 found nan | translate words   73 kept   0 | keep spans   0 exact   0
+    keys-ja.md-dark-plain  h2           keep words    0 found nan | translate words  190 kept   0 | keep spans   0 exact   0
+    keys-ko.md-light       h2           keep words    0 found nan | translate words   60 kept   0 | keep spans   0 exact   0
+    readme-en-a.md-light   h2           keep words    0 found nan | translate words  161 kept   0 | keep spans   0 exact   0
+    readme-en-b.md-light   h2           keep words   51 found 0.00 | translate words   99 kept   0 | keep spans  14 exact   0
+    readme-ja-a.md-light   h2           keep words    0 found nan | translate words  415 kept   0 | keep spans   0 exact   0
+    readme-ko-a.md-light   h2           keep words    0 found nan | translate words  111 kept   0 | keep spans   0 exact   0
+    readme-ko-b.md-dark    h2           keep words   45 found 0.73 | translate words   80 kept   4 | keep spans  14 exact   6
+    session-ja.chat-dark   h2           keep words   40 found 0.68 | translate words   49 kept   0 | keep spans   7 exact   5
+    session-ja.term-dark   h2           keep words   50 found 1.00 | translate words    0 kept   0 | keep spans  11 exact  11
+    session-ko.term-dark   h2           keep words   38 found 0.87 | translate words    0 kept   0 | keep spans  12 exact  11
+    session-ko.term-light  h2           keep words   39 found 0.92 | translate words    0 kept   0 | keep spans  11 exact  10
+    shell-ja.ide-dark      h2           keep words   93 found 1.00 | translate words   10 kept   0 | keep spans  24 exact  24
+    shell-ja.term-light    h2           keep words  128 found 0.63 | translate words    0 kept   0 | keep spans  18 exact  17
+    shell-ko.ide-light     h2           keep words  131 found 0.59 | translate words    1 kept   0 | keep spans  23 exact  18
+    shell-ko.md-light      h2           keep words  125 found 0.60 | translate words   29 kept   0 | keep spans  25 exact  19
+    shell-ko.term-dark     h2           keep words  121 found 0.72 | translate words    0 kept   0 | keep spans  20 exact  17
+    swift-en.ide-light     h2           keep words  113 found 0.05 | translate words    3 kept   0 | keep spans  18 exact   5
+    swift-en.md-light      h2           keep words  107 found 0.02 | translate words   42 kept   0 | keep spans  15 exact   1
+    swift-en.term-dark     h2           keep words  102 found 0.01 | translate words    0 kept   0 | keep spans  12 exact   0
+    swift-ja.ide-dark      h2           keep words  150 found 0.81 | translate words   10 kept   0 | keep spans  31 exact  30
+    swift-ja.md-dark       h2           keep words  275 found 0.40 | translate words   87 kept   0 | keep spans  24 exact  17
+    swift-ko.chat-dark     h2           keep words   43 found 0.81 | translate words   22 kept   0 | keep spans   7 exact   4
+    swift-ko.ide-light     h2           keep words  158 found 0.67 | translate words    1 kept   0 | keep spans  26 exact  21
+    swift-ko.md-light      h2           keep words  155 found 0.61 | translate words   27 kept   0 | keep spans  24 exact  14
+    tests-en.md-dark       h2           keep words  138 found 0.07 | translate words   39 kept   0 | keep spans  21 exact   1
+    tests-en.term-dark     h2           keep words  136 found 0.02 | translate words    0 kept   0 | keep spans  20 exact   0
+    xcode-ko.md-dark       h2           keep words  167 found 0.98 | translate words   22 kept   0 | keep spans  28 exact  26
+    xcode-ko.term-light    h2           keep words  197 found 1.00 | translate words    0 kept   0 | keep spans  22 exact  22
+    yaml-ja.ide-dark       h2           keep words  177 found 0.32 | translate words    8 kept   0 | keep spans  28 exact  25
+    yaml-ja.md-dark        h2           keep words  248 found 0.39 | translate words   41 kept  11 | keep spans  28 exact  18
+
+DECISION (precision and recall both >= 0.95 on the hold-out -> defer the model for the slice; else train for the band; n < 20: thin)
+  [papers hold, read doc] word precision nan; recall by reason (precision is of all kept words, one number for every slice):
+    spans: exact-boundary F1 nan -> train for the band   (keep-boundary.md section 5 asks F1 >= 0.90 for a model)
+    whole-block keep: P nan R nan -> train for the band
+  [cases hold, read doc] word precision nan; recall by reason (precision is of all kept words, one number for every slice):
+    spans: exact-boundary F1 nan -> train for the band   (keep-boundary.md section 5 asks F1 >= 0.90 for a model)
+    whole-block keep: P nan R nan -> train for the band
+  [h2, read doc] word precision 0.98; recall by reason (precision is of all kept words, one number for every slice):
+    code      R 0.60 (n=1838)  -> train for the band
+    log       R 0.76 (n=1323)  -> train for the band
+    config    R 0.37 (n=520)  -> train for the band
+    cmd       R 0.72 (n=258)  -> train for the band
+    path      R 0.55 (n=159)  -> train for the band
+    id        R 0.19 (n=64)  -> train for the band
+    diffmark  R 1.00 (n=57)  -> defer
+    lineno    R 1.00 (n=3, thin)  -> defer
+    flag      R 0.50 (n=2, thin)  -> train for the band
+    hash      R 0.00 (n=1, thin)  -> train for the band
+    url       R 1.00 (n=1, thin)  -> defer
+    spans: exact-boundary F1 0.81 -> train for the band   (keep-boundary.md section 5 asks F1 >= 0.90 for a model)
+    whole-block keep: P 1.00 R 0.80 -> train for the band
+
+CODE REGIONS (Core CodeRegion, tools/keep-labels/Sources/keeprules; kept = today's rules OR a region verdict)
+  [h2, read doc]
+    block keep   before P 1.00 [0.99,1.00]  R 0.80 [0.77,0.83]  (tp 487 fp 2 fn 119)
+                 after  P 1.00 [0.99,1.00]  R 0.89 [0.87,0.92]  (tp 542 fp 2 fn 64)
+    keep->translated words  1569 -> 945 of 4226;  translate->kept words 65 -> 65 of 2121 (+0 = 0.00 % of translate words)
+    blocks flipped to keep by region: 56 {'config': 9, 'code': 45, 'terminal': 2}; of them with translate words in the truth: 0
+  [h2, read vn]
+    block keep   before P 1.00 [0.98,1.00]  R 0.73 [0.68,0.78]  (tp 219 fp 0 fn 80)
+                 after  P 1.00 [0.98,1.00]  R 0.84 [0.80,0.88]  (tp 252 fp 0 fn 47)
+    keep->translated words  2026 -> 1254 of 6020;  translate->kept words 45 -> 45 of 2133 (+0 = 0.00 % of translate words)
+    blocks flipped to keep by region: 34 {'config': 8, 'code': 24, 'terminal': 2}; of them with translate words in the truth: 0
+  pure-translate case blocks (read doc, dev + hold-out): 0; fired by the region (and translated today): 0  
+
+=================================================================================================
+APPENDIX B  h2_report.py (rules alone and rules OR CodeRegion, verdict per slice, cuts, clusters, false keeps, sheet)
+=================================================================================================
+H2 SIZE
+screens 46 (scenes 27, looks 11, languages {'ko': 21, 'ja': 15, 'en': 10}), code regions 42
+looks: chat-dark 4, chat-light 1, chat-light-plain 1, ide-dark 3, ide-light 5, md-dark 5, md-dark-plain 2, md-light 12, md-light-plain 2, term-dark 7, term-light 4
+  read doc: blocks 1092 {'either': 73, 'keep': 782, 'mixed': 46, 'none': 45, 'translate': 146}; words {'translate': 2121, 'keep': 4402, 'none': 129, 'either': 452}; uncertain words 1055
+    keep words by reason {'code': 1847, 'log': 1324, 'config': 522, 'cmd': 258, 'path': 159, 'lineno': 152, 'diffmark': 72, 'id': 64, 'flag': 2, 'hash': 1, 'url': 1}
+    either words by reason {'name': 154, 'punct': 142, 'cjk-output': 104, 'number': 52}
+  read vn: blocks 675 {'either': 57, 'keep': 385, 'mixed': 48, 'none': 41, 'translate': 144}; words {'keep': 6191, 'translate': 2133, 'none': 136, 'either': 475}; uncertain words 1168
+    keep words by reason {'code': 3419, 'log': 1343, 'config': 738, 'cmd': 268, 'lineno': 152, 'path': 133, 'diffmark': 85, 'id': 50, 'hash': 1, 'url': 1, 'flag': 1}
+    either words by reason {'punct': 149, 'name': 147, 'cjk-output': 119, 'number': 60}
+
+TODAY'S RULES (InlineMath + TranslationFilter) ON H2
+  [h2, read doc]
+    (a) words      P 0.98 [0.97,0.98]  R 0.63 [0.61,0.64]  (tp 2657 fp 65 fn 1569)
+        precision by decider: block 0.99 [0.99,1.00] (tp 2576 fp 18), span 0.63 [0.55,0.71] (tp 81 fp 47)
+        recall by reason: code 0.60 [0.58,0.62] n=1838, log 0.76 [0.74,0.79] n=1323, config 0.37 [0.33,0.42] n=520, cmd 0.72 [0.66,0.77] n=258, path 0.55 [0.48,0.63] n=159, id 0.19 [0.11,0.30] n=64, diffmark 1.00 [0.94,1.00] n=57, lineno 1.00 [0.44,1.00] n=3, flag 0.50 [0.09,0.91] n=2, hash 0.00 [0.00,0.79] n=1, url 1.00 [0.21,1.00] n=1
+    (b) spans      exact-boundary F1 0.81  (P 0.96 R 0.71; truth 695, predicted 511, exact 490, overlapped 509, missed 186)   edge error over overlapped spans: mean 0.47 words, exact 490, <=1 490, >=3 14
+        exact by reason: code 186/247, log 125/178, config 58/92, path 57/80, cmd 43/61, id 4/17, diffmark 13/13, lineno 3/3, flag 1/2, hash 0/1, url 0/1
+    (c) block keep P 1.00 [0.99,1.00]  R 0.80 [0.77,0.83]  (tp 487 fp 2 fn 119)   [truth keep = keep words and no translate word]
+        near-pure   P 1.00 [0.99,1.00]  R 0.80 [0.77,0.83]  (tp 487 fp 2 fn 119)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 1569 of 4226 keep words; spans fully kept 495, partly 14, lost 186
+        spans lost or partly by reason: code 54+7/247, log 47+6/178, config 33+0/92, path 21+0/80, cmd 17+1/61, id 12+0/17, diffmark 0+0/13, lineno 0+0/3, flag 1+0/2, hash 1+0/1, url 0+0/1
+        translate->kept: 65 of 2121 translate words kept by: block 18, span 47; translate/mixed blocks kept whole: {'mixed': 2}; by shape: plain prose word 65
+  [h2, read vn]
+    (a) words      P 0.99 [0.99,0.99]  R 0.66 [0.65,0.68]  (tp 3994 fp 45 fn 2026)
+        precision by decider: block 1.00 [1.00,1.00] (tp 3712 fp 0), span 0.86 [0.82,0.90] (tp 282 fp 45)
+        recall by reason: code 0.71 [0.69,0.72] n=3411, log 0.72 [0.69,0.74] n=1343, config 0.42 [0.38,0.45] n=738, cmd 0.59 [0.53,0.65] n=268, path 0.47 [0.39,0.56] n=133, diffmark 1.00 [0.95,1.00] n=74, id 0.24 [0.14,0.37] n=50, hash 0.00 [0.00,0.79] n=1, url 1.00 [0.21,1.00] n=1, flag 0.00 [0.00,0.79] n=1
+    (b) spans      exact-boundary F1 0.68  (P 0.86 R 0.56; truth 396, predicted 257, exact 222, overlapped 242, missed 154)   edge error over overlapped spans: mean 1.95 words, exact 222, <=1 223, >=3 17
+        exact by reason: code 84/136, log 51/83, path 55/82, config 9/42, cmd 14/29, id 4/17, diffmark 4/4, hash 0/1, url 1/1, flag 0/1
+    (c) block keep P 1.00 [0.98,1.00]  R 0.73 [0.68,0.78]  (tp 219 fp 0 fn 80)   [truth keep = keep words and no translate word]
+        near-pure   P 1.00 [0.98,1.00]  R 0.73 [0.68,0.78]  (tp 219 fp 0 fn 80)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 2026 of 6020 keep words; spans fully kept 223, partly 19, lost 154
+        spans lost or partly by reason: code 42+10/136, log 27+5/83, path 27+0/82, config 30+3/42, cmd 14+1/29, id 12+0/17, diffmark 0+0/4, hash 1+0/1, url 0+0/1, flag 1+0/1
+        translate->kept: 45 of 2133 translate words kept by: span 45; by shape: plain prose word 45
+
+RULES OR CodeRegion ON H2 (what the app does today)
+  [h2, read doc]
+    (a) words      P 0.98 [0.98,0.98]  R 0.78 [0.76,0.79]  (tp 3281 fp 65 fn 945)
+        precision by decider: block 0.99 [0.99,1.00] (tp 3243 fp 18), span 0.45 [0.35,0.55] (tp 38 fp 47)
+        recall by reason: code 0.93 [0.91,0.94] n=1838, log 0.78 [0.75,0.80] n=1323, config 0.37 [0.33,0.42] n=520, cmd 0.76 [0.71,0.81] n=258, path 0.55 [0.48,0.63] n=159, id 0.19 [0.11,0.30] n=64, diffmark 1.00 [0.94,1.00] n=57, lineno 1.00 [0.44,1.00] n=3, flag 0.50 [0.09,0.91] n=2, hash 0.00 [0.00,0.79] n=1, url 1.00 [0.21,1.00] n=1
+    (b) spans      exact-boundary F1 0.87  (P 0.97 R 0.78; truth 695, predicted 560, exact 545, overlapped 560, missed 135)   edge error over overlapped spans: mean 0.23 words, exact 545, <=1 545, >=3 11
+        exact by reason: code 233/247, log 129/178, config 58/92, path 57/80, cmd 47/61, id 4/17, diffmark 13/13, lineno 3/3, flag 1/2, hash 0/1, url 0/1
+    (c) block keep P 1.00 [0.99,1.00]  R 0.89 [0.87,0.92]  (tp 542 fp 2 fn 64)   [truth keep = keep words and no translate word]
+        near-pure   P 1.00 [0.99,1.00]  R 0.89 [0.87,0.92]  (tp 542 fp 2 fn 64)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 945 of 4226 keep words; spans fully kept 550, partly 10, lost 135
+        spans lost or partly by reason: code 11+3/247, log 43+6/178, config 33+0/92, path 21+0/80, cmd 13+1/61, id 12+0/17, diffmark 0+0/13, lineno 0+0/3, flag 1+0/2, hash 1+0/1, url 0+0/1
+        translate->kept: 65 of 2121 translate words kept by: block 18, span 47; translate/mixed blocks kept whole: {'mixed': 2}; by shape: plain prose word 65
+  [h2, read vn]
+    (a) words      P 0.99 [0.99,0.99]  R 0.79 [0.78,0.80]  (tp 4766 fp 45 fn 1254)
+        precision by decider: block 1.00 [1.00,1.00] (tp 4580 fp 0), span 0.81 [0.75,0.85] (tp 186 fp 45)
+        recall by reason: code 0.87 [0.86,0.88] n=3411, log 0.78 [0.76,0.80] n=1343, config 0.53 [0.49,0.56] n=738, cmd 0.77 [0.72,0.82] n=268, path 0.47 [0.39,0.56] n=133, diffmark 1.00 [0.95,1.00] n=74, id 0.24 [0.14,0.37] n=50, hash 0.00 [0.00,0.79] n=1, url 1.00 [0.21,1.00] n=1, flag 0.00 [0.00,0.79] n=1
+    (b) spans      exact-boundary F1 0.75  (P 0.91 R 0.64; truth 396, predicted 281, exact 255, overlapped 271, missed 125)   edge error over overlapped spans: mean 0.95 words, exact 255, <=1 256, >=3 13
+        exact by reason: code 112/136, log 54/83, path 55/82, config 10/42, cmd 15/29, id 4/17, diffmark 4/4, hash 0/1, url 1/1, flag 0/1
+    (c) block keep P 1.00 [0.98,1.00]  R 0.84 [0.80,0.88]  (tp 252 fp 0 fn 47)   [truth keep = keep words and no translate word]
+        near-pure   P 1.00 [0.98,1.00]  R 0.84 [0.80,0.88]  (tp 252 fp 0 fn 47)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 1254 of 6020 keep words; spans fully kept 256, partly 15, lost 125
+        spans lost or partly by reason: code 17+7/136, log 24+5/83, path 27+0/82, config 30+2/42, cmd 13+1/29, id 12+0/17, diffmark 0+0/4, hash 1+0/1, url 0+0/1, flag 1+0/1
+        translate->kept: 45 of 2133 translate words kept by: span 45; by shape: plain prose word 45
+
+VERDICT PER REASON SLICE (stop rule: P and R >= 0.95; fewer than 40 keep words: thin)
+  rules only, read doc: slice  n keep words   R (kept/n)       false keeps charged   P            verdict
+    code          1838   R 0.60 [0.58,0.62] (1106/1838)   fp    0   P 1.00   MISS (R)
+    cmd            258   R 0.72 [0.66,0.77] (185/258)   fp    0   P 1.00   MISS (R)
+    log           1323   R 0.76 [0.74,0.79] (1010/1323)   fp    0   P 1.00   MISS (R)
+    config         520   R 0.37 [0.33,0.42] (194/520)   fp   11   P 0.95   MISS (R) (P)
+    path           159   R 0.55 [0.48,0.63] (88/159)   fp   20   P 0.81   MISS (R) (P)
+    id              64   R 0.19 [0.11,0.30] (12/64)   fp   34   P 0.26   MISS (R) (P)
+    flag             2   R 0.50 [0.09,0.91] (1/2)   fp    0   P 1.00   thin - no verdict
+    url              1   R 1.00 [0.21,1.00] (1/1)   fp    0   P 1.00   thin - no verdict
+    hash             1   R 0.00 [0.00,0.79] (0/1)   fp    0   P  n/a   thin - no verdict
+    lineno           3   R 1.00 [0.44,1.00] (3/3)   fp    0   P 1.00   thin - no verdict
+    diffmark        57   R 1.00 [0.94,1.00] (57/57)   fp    0   P 1.00   rules enough
+    all words: kept keep words 2657, false keeps 65
+  rules only, read vn: slice  n keep words   R (kept/n)       false keeps charged   P            verdict
+    code          3411   R 0.71 [0.69,0.72] (2411/3411)   fp    0   P 1.00   MISS (R)
+    cmd            268   R 0.59 [0.53,0.65] (158/268)   fp    0   P 1.00   MISS (R)
+    log           1343   R 0.72 [0.69,0.74] (966/1343)   fp    0   P 1.00   MISS (R)
+    config         738   R 0.42 [0.38,0.45] (309/738)   fp   11   P 0.97   MISS (R)
+    path           133   R 0.47 [0.39,0.56] (63/133)   fp    0   P 1.00   MISS (R)
+    id              50   R 0.24 [0.14,0.37] (12/50)   fp   34   P 0.26   MISS (R) (P)
+    flag             1   R 0.00 [0.00,0.79] (0/1)   fp    0   P  n/a   thin - no verdict
+    url              1   R 1.00 [0.21,1.00] (1/1)   fp    0   P 1.00   thin - no verdict
+    hash             1   R 0.00 [0.00,0.79] (0/1)   fp    0   P  n/a   thin - no verdict
+    diffmark        74   R 1.00 [0.95,1.00] (74/74)   fp    0   P 1.00   rules enough
+    all words: kept keep words 3994, false keeps 45
+  rules OR CodeRegion, read doc: slice  n keep words   R (kept/n)       false keeps charged   P            verdict
+    code          1838   R 0.93 [0.91,0.94] (1701/1838)   fp    0   P 1.00   MISS (R)
+    cmd            258   R 0.76 [0.71,0.81] (197/258)   fp    0   P 1.00   MISS (R)
+    log           1323   R 0.78 [0.75,0.80] (1027/1323)   fp    0   P 1.00   MISS (R)
+    config         520   R 0.37 [0.33,0.42] (194/520)   fp   11   P 0.95   MISS (R) (P)
+    path           159   R 0.55 [0.48,0.63] (88/159)   fp   20   P 0.81   MISS (R) (P)
+    id              64   R 0.19 [0.11,0.30] (12/64)   fp   34   P 0.26   MISS (R) (P)
+    flag             2   R 0.50 [0.09,0.91] (1/2)   fp    0   P 1.00   thin - no verdict
+    url              1   R 1.00 [0.21,1.00] (1/1)   fp    0   P 1.00   thin - no verdict
+    hash             1   R 0.00 [0.00,0.79] (0/1)   fp    0   P  n/a   thin - no verdict
+    lineno           3   R 1.00 [0.44,1.00] (3/3)   fp    0   P 1.00   thin - no verdict
+    diffmark        57   R 1.00 [0.94,1.00] (57/57)   fp    0   P 1.00   rules enough
+    all words: kept keep words 3281, false keeps 65
+  rules OR CodeRegion, read vn: slice  n keep words   R (kept/n)       false keeps charged   P            verdict
+    code          3411   R 0.87 [0.86,0.88] (2968/3411)   fp    0   P 1.00   MISS (R)
+    cmd            268   R 0.77 [0.72,0.82] (207/268)   fp    0   P 1.00   MISS (R)
+    log           1343   R 0.78 [0.76,0.80] (1052/1343)   fp    0   P 1.00   MISS (R)
+    config         738   R 0.53 [0.49,0.56] (389/738)   fp   11   P 0.97   MISS (R)
+    path           133   R 0.47 [0.39,0.56] (63/133)   fp    0   P 1.00   MISS (R)
+    id              50   R 0.24 [0.14,0.37] (12/50)   fp   34   P 0.26   MISS (R) (P)
+    flag             1   R 0.00 [0.00,0.79] (0/1)   fp    0   P  n/a   thin - no verdict
+    url              1   R 1.00 [0.21,1.00] (1/1)   fp    0   P 1.00   thin - no verdict
+    hash             1   R 0.00 [0.00,0.79] (0/1)   fp    0   P  n/a   thin - no verdict
+    diffmark        74   R 1.00 [0.95,1.00] (74/74)   fp    0   P 1.00   rules enough
+    all words: kept keep words 4766, false keeps 45
+
+CUTS
+  by look and by language, rules OR CodeRegion, read doc: word P / R (keep words), block-keep P / R, keep words n
+    look chat-dark        P 1.00 R 0.66 (n 146)   block P 1.00 R 1.00   fp words 0
+    look chat-light       P 1.00 R 0.71 (n 24)   block P 1.00 R 1.00   fp words 0
+    look chat-light-plain P 1.00 R 0.08 (n 12)   block P  n/a R 0.00   fp words 0
+    look ide-dark         P 1.00 R 0.71 (n 420)   block P 1.00 R 0.96   fp words 0
+    look ide-light        P 1.00 R 0.94 (n 563)   block P 1.00 R 0.95   fp words 0
+    look md-dark          P 0.97 R 0.60 (n 873)   block P 0.99 R 0.76   fp words 15
+    look md-dark-plain    P 1.00 R 0.74 (n 23)   block P 1.00 R 1.00   fp words 0
+    look md-light         P 0.95 R 0.85 (n 851)   block P 1.00 R 0.96   fp words 34
+    look md-light-plain   P 0.50 R 0.89 (n 18)   block P 0.50 R 1.00   fp words 16
+    look term-dark        P 1.00 R 0.75 (n 746)   block P 1.00 R 0.81   fp words 0
+    look term-light       P 1.00 R 0.91 (n 550)   block P 1.00 R 0.98   fp words 0
+    lang en               P 0.95 R 0.48 (n 677)   block P 0.97 R 0.44   fp words 16
+    lang ja               P 0.96 R 0.71 (n 1620)   block P 1.00 R 0.97   fp words 45
+    lang ko               P 1.00 R 0.93 (n 1929)   block P 1.00 R 0.98   fp words 4
+  by look and by language, rules OR CodeRegion, read vn: word P / R (keep words), block-keep P / R, keep words n
+    look chat-dark        P 1.00 R 0.62 (n 165)   block P 1.00 R 1.00   fp words 0
+    look chat-light       P 1.00 R 0.67 (n 24)   block P 1.00 R 1.00   fp words 0
+    look chat-light-plain P 1.00 R 0.09 (n 11)   block P  n/a R 0.00   fp words 0
+    look ide-dark         P 1.00 R 0.73 (n 1049)   block P 1.00 R 0.90   fp words 0
+    look ide-light        P 1.00 R 0.88 (n 777)   block P 1.00 R 0.89   fp words 0
+    look md-dark          P 0.99 R 0.73 (n 1145)   block P 1.00 R 0.79   fp words 11
+    look md-dark-plain    P 1.00 R 0.58 (n 26)   block P 1.00 R 1.00   fp words 0
+    look md-light         P 0.96 R 0.82 (n 1110)   block P 1.00 R 0.82   fp words 34
+    look md-light-plain   P 1.00 R 0.82 (n 17)   block P 1.00 R 1.00   fp words 0
+    look term-dark        P 1.00 R 0.74 (n 1024)   block P 1.00 R 0.75   fp words 0
+    look term-light       P 1.00 R 1.00 (n 672)   block P 1.00 R 1.00   fp words 0
+    lang en               P 1.00 R 0.33 (n 669)   block P 1.00 R 0.40   fp words 0
+    lang ja               P 0.98 R 0.84 (n 3428)   block P 1.00 R 0.94   fp words 45
+    lang ko               P 1.00 R 0.87 (n 1923)   block P 1.00 R 0.93   fp words 0
+
+CLUSTERS (rules OR CodeRegion)
+  clusters of the missed keep words, read doc: 7 (block kind), top 7
+     338 words in  11 blocks  comment-only line of a code region scenes {'yaml-ja': 6, 'shell-ko': 3, 'swift-ko': 1, 'shell-ja': 1}  looks {'ide-dark': 3, 'md-dark': 3, 'term-dark': 2, 'ide-light': 1}
+         caught by (of 11): indent 6 mono 0 lineend 0 keyword 0 tint 0   e.g. // failures번 실패한 뒤에 기다릴 시간 | # 컴파일러 서비스는 한 번에 네트워크 하나만 컴파일해요. 새 번들 ID의 첫 실행은 락을 잡고 줄을 서요.
+     275 words in  42 blocks  inline piece in a prose block      scenes {'swift-ko': 4, 'readme-ko-b': 4, 'chat-ko': 4, 'issue-ko': 4}  looks {'md-light': 17, 'md-dark': 9, 'chat-dark': 7, 'md-dark-plain': 4}
+         caught by (of 42): no block feature applies   e.g. Backoff.swift의 wait(after:)는 factor | cap Backoff(base: 1, cap: 30) Core/Sources/MwoyeoCore/Backoff.swift예요.
+     260 words in  39 blocks  log / tool-output line             scenes {'tests-en': 38, 'chat-en': 1}  looks {'term-dark': 19, 'md-dark': 19, 'chat-light-plain': 1}
+         caught by (of 39): indent 21 mono 30 lineend 0 keyword 2 tint 0   e.g. Building for debugging... | Test Suite 'All tests' started at 2026-10-20 08:12:52.200.
+      36 words in   7 blocks  code line                          scenes {'swift-en': 6, 'shell-ko': 1}  looks {'term-dark': 5, 'ide-light': 2}
+         caught by (of 7): indent 4 mono 1 lineend 2 keyword 1 tint 0   e.g. public private(set) var state = State.idle | public init() {}
+      23 words in   4 blocks  config line                        scenes {'json-ko': 2, 'readme-en-b': 2}  looks {'md-light': 3, 'ide-light': 1}
+         caught by (of 4): indent 4 mono 1 lineend 1 keyword 1 tint 2   e.g. "note": "내 Mac에서 도는 모델이라 API 키가 필요 없어요" | "note":"내 Mac에서 도는 모델이라 API 키가 필요 없어요"
+       8 words in   2 blocks  path / window chrome               scenes {'swift-en': 2}  looks {'ide-light': 2}
+         caught by (of 2): indent 2 mono 0 lineend 0 keyword 0 tint 1   e.g. Core › Sources › MwoyeoCore › ReadWait.swift | Swift
+       5 words in   1 blocks  command line                       scenes {'tests-en': 1}  looks {'term-dark': 1}
+         caught by (of 1): indent 1 mono 1 lineend 0 keyword 0 tint 0   e.g. cd Core && swift test
+  false fires of each feature on the 146 pure-translate blocks of H2, read doc: indent 62, mono 2, lineend 5, keyword 6, tint 25   (tint against the dominant colour)
+  clusters of the missed keep words, read vn: 6 (block kind), top 6
+     350 words in  19 blocks  code line                          scenes {'swift-en': 10, 'shell-ko': 5, 'swift-ja': 2, 'swift-ko': 1}  looks {'term-dark': 7, 'md-light': 5, 'ide-light': 4, 'ide-dark': 2}
+         caught by (of 19): indent 15 mono 1 lineend 5 keyword 1 tint 0   e.g. public private(set) var failures = 0 1/ 마지막 실패의 대기가 끝나는 시각. 기다리는 중이 아니 | 11結果がすでに決まっていたら、二つのタスクはすぐに止める。if done ｛ work.cancel（）； timer.cancel（） 
+     271 words in  47 blocks  inline piece in a prose block      scenes {'issue-ko': 6, 'swift-ko': 4, 'readme-ko-b': 4, 'chat-ko': 4}  looks {'md-light': 17, 'md-dark': 10, 'chat-dark': 8, 'md-dark-plain': 6}
+         caught by (of 47): no block feature applies   e.g. Backoff.swift의 Wait(after:)는 factor | cap Backoff(base: 1, cap: 30) Core/Sources/MwoyeoCore/Backoff.swift예요.
+     248 words in  17 blocks  log / tool-output line             scenes {'tests-en': 16, 'chat-en': 1}  looks {'term-dark': 9, 'md-dark': 7, 'chat-light-plain': 1}
+         caught by (of 17): indent 10 mono 15 lineend 0 keyword 0 tint 0   e.g. cd Core && swift test Building for debugging... Build complete! (48.34 | Executed ø tests, with 0 failures (0 unexpected) in 0.000 (0.002) seco
+     230 words in   5 blocks  config line                        scenes {'json-ko': 2, 'yaml-ja': 2, 'readme-en-b': 1}  looks {'md-light': 2, 'ide-dark': 2, 'ide-light': 1}
+         caught by (of 5): indent 5 mono 3 lineend 1 keyword 0 tint 1   e.g. "name": "oLLama-gemma3-46", "kind": "openAICompatible", "baseURL": "ht | "name': "olLama-gemma3-46", "kind": "openAICompat ible", "baseURL": "h
+     147 words in   4 blocks  comment-only line of a code region scenes {'swift-en': 1, 'shell-ko': 1, 'shell-ja': 1, 'yaml-ja': 1}  looks {'term-dark': 1, 'md-light': 1, 'ide-dark': 1, 'md-dark': 1}
+         caught by (of 4): indent 2 mono 0 lineend 0 keyword 0 tint 0   e.g. /// No reader is ready yet, and one will be (a compile, a restart): "P | #!/bin/bash # 컴파일러 서비스는 한 번에 네트워크 하나만 컴파일해요. 새 번들 ID의 첫 실행은 락을 잡고 줄을 서
+       8 words in   2 blocks  path / window chrome               scenes {'swift-en': 2}  looks {'ide-light': 2}
+         caught by (of 2): indent 2 mono 0 lineend 0 keyword 0 tint 1   e.g. Core › Sources › MwoyeoCore › ReadWait.swift | Swift
+  false fires of each feature on the 144 pure-translate blocks of H2, read vn: indent 62, mono 2, lineend 5, keyword 5, tint 30   (tint against the dominant colour)
+
+  translate words kept (rules OR CodeRegion), read doc: 65; by screen: {('gitdiff-ja', 'md-light'): 34, ('issue-en', 'md-light-plain'): 16, ('yaml-ja', 'md-dark'): 11, ('readme-ko-b', 'md-dark'): 4}
+    gitdiff-ja.md-light-doc-3: 34 of 49 words kept (span): トークンの有効期限は15分です。TOKEN_ATに作った時刻を残して、10分たったら作り直します。
+    yaml-ja.md-dark-doc-24: 11 of 36 words kept (span): バージョンは MARKETING_VERSION】の一か所だけで決めます。
+    readme-ko-b.md-dark-doc-2: 2 of 30 words kept (span): 모든 설정은 JSON 파일로도 있어서, 클릭하지 않고 직접(또는 Claude Code에게 시켜서) 바꿀 수 있어요. 파일 위치는 ~/Library/Ap
+    readme-ko-b.md-dark-doc-8: 2 of 5 words kept (block): <exportfolder>/Transcripts O| У72(7ES Markdown SRT).
+    issue-en.md-light-plain-doc-10: 16 of 19 words kept (block): Expected: the pill clears at once. The state is in Core/Sources/MwoyeoCore/ReadWait.
+  translate words kept (rules OR CodeRegion), read vn: 45; by screen: {('gitdiff-ja', 'md-light'): 34, ('yaml-ja', 'md-dark'): 11}
+    gitdiff-ja.md-light-vn-3: 34 of 49 words kept (span): トークンの有効期限は15分です。TOKEN_ATに作った時刻を残して、10分たったら作り直します。
+    yaml-ja.md-dark-vn-9: 11 of 36 words kept (span): バージョンは ［MARKETING_VERSIONの一か所だけで決めます。
+
+DISAGREEMENT SHEET: 18 doc-read blocks disagree on an uncertain word; 18 rows written to /tmp/k3a/disagree.tsv with the crops in /tmp/k3a/disagree/
+

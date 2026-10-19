@@ -1,0 +1,90 @@
+# sources of the text (path or command, sha256 of the text read); authored = written for the scene, in h2_scenes.py
+id	kind	source	sha256	lang
+Core/Sources/MwoyeoCore/Backoff.swift	repo-file	git show d8e50d8:Core/Sources/MwoyeoCore/Backoff.swift	44c99c0cdd0bd793d677abb93e0ec32bdd516400d0d6f35c33a1660fc4094834	
+Core/Sources/MwoyeoCore/Deadline.swift	repo-file	git show d8e50d8:Core/Sources/MwoyeoCore/Deadline.swift	c8ec59a68b65acc09f2b320b5542dc7e9f4361ac8e5a7055917d21528b9c6a71	
+Core/Sources/MwoyeoCore/ReadWait.swift	repo-file	git show d8e50d8:Core/Sources/MwoyeoCore/ReadWait.swift	e4f35ace2045f43c0e4d3824af80b207d0388017dc36f280d5721ba2b8425a69	
+README.en.md	repo-file	git show d8e50d8:README.en.md	b6f599bb647ac1527901ca148c1e680cde1ac7285fff119b8b097714c992503b	
+README.ja.md	repo-file	git show d8e50d8:README.ja.md	2bc476be89eca9e44839a755b4a225869ed861d7de5d36cde0b5cfa6d4a9dfe4	
+README.md	repo-file	git show d8e50d8:README.md	ce8616e14c8b9c348955b6a96aa1143cd001165d9156bc42c4c9ad8f418b0290	
+h2/src/git-diff.txt	tool-output	git diff ad2ad15~1 ad2ad15	5a9e9ac0b43253b8068876093998fae84531e03946ac229a75d8e71bd4feb7ec	
+h2/src/git-log.txt	tool-output	git log d8e50d8 --format='%h %<(88,trunc)%s' --author=midagedev@gmail.com -n 12	fd2628dcb752b493496f2a88816b375ef70325f79e428846ce471acad932e8f3	
+h2/src/swift-test.txt	tool-output	cd Core && swift test --scratch-path <scratch>/core-build  (first 12 non-progress lines, last 8)	b3280b0f356bab63b3ee38949b5d7a9ec25b8427566473e681b9138a51cbce97	
+h2/src/xcodebuild.txt	tool-output	cd Core && xcodebuild -scheme MwoyeoCore -destination 'platform=macOS' -derivedDataPath <scratch>/dd build  (first 28 non-blank lines, last 4)	15af9c4a7a144df5d5d8f5f2307e9d4dc6c80413dea830e28b8c995477805980	
+project.yml	repo-file	git show d8e50d8:project.yml	326b29a96d7b86dc5634b88d8d1d7f184b7db7d7bd671f1a05b82cd78daff269	
+scripts/cask.sh	repo-file	git show d8e50d8:scripts/cask.sh	9b3db5f1438e650803ae51eb1395fb4099cf7a73ba26a20e14fdcf6b1fc96741	
+tools/ane-env.sh	repo-file	git show d8e50d8:tools/ane-env.sh	566282d4a1fa929fb9e14eff71fda6d8ed48257f262ba54321275ede229e01b2	
+tools/translation-bench/engines/ollama-gemma3-4b.json	repo-file	git show d8e50d8:tools/translation-bench/engines/ollama-gemma3-4b.json	a3b7520a22bb78fcd4768be17ad763a3903b9e1e365d10d225060a2d1f48009c	
+swift-ko	authored	h2_scenes.py scene swift-ko	-	ko
+swift-ja	authored	h2_scenes.py scene swift-ja	-	ja
+swift-en	authored	h2_scenes.py scene swift-en	-	en
+shell-ko	authored	h2_scenes.py scene shell-ko	-	ko
+shell-ja	authored	h2_scenes.py scene shell-ja	-	ja
+gitlog-ko	authored	h2_scenes.py scene gitlog-ko	-	ko
+gitdiff-ja	authored	h2_scenes.py scene gitdiff-ja	-	ja
+tests-en	authored	h2_scenes.py scene tests-en	-	en
+xcode-ko	authored	h2_scenes.py scene xcode-ko	-	ko
+json-ko	authored	h2_scenes.py scene json-ko	-	ko
+yaml-ja	authored	h2_scenes.py scene yaml-ja	-	ja
+readme-ko-a	authored	h2_scenes.py scene readme-ko-a	-	ko
+readme-ko-b	authored	h2_scenes.py scene readme-ko-b	-	ko
+readme-en-a	authored	h2_scenes.py scene readme-en-a	-	en
+readme-en-b	authored	h2_scenes.py scene readme-en-b	-	en
+readme-ja-a	authored	h2_scenes.py scene readme-ja-a	-	ja
+keys-ko	authored	h2_scenes.py scene keys-ko	-	ko
+keys-ja	authored	h2_scenes.py scene keys-ja	-	ja
+keys-en	authored	h2_scenes.py scene keys-en	-	en
+session-ko	authored	h2_scenes.py scene session-ko	-	ko
+session-ja	authored	h2_scenes.py scene session-ja	-	ja
+chat-ko	authored	h2_scenes.py scene chat-ko	-	ko
+chat-ja	authored	h2_scenes.py scene chat-ja	-	ja
+chat-en	authored	h2_scenes.py scene chat-en	-	en
+issue-en	authored	h2_scenes.py scene issue-en	-	en
+issue-ko	authored	h2_scenes.py scene issue-ko	-	ko
+issue-ja	authored	h2_scenes.py scene issue-ja	-	ja
+# screens: name, scene, look, language given to ocrdump, monospace face
+swift-ko.ide-light	screen	swift-ko ide-light	Menlo	ko
+swift-ko.md-light	screen	swift-ko md-light	Menlo	ko
+swift-ko.chat-dark	screen	swift-ko chat-dark	Courier New	ko
+swift-ja.ide-dark	screen	swift-ja ide-dark	ui-monospace	ja
+swift-ja.md-dark	screen	swift-ja md-dark	ui-monospace	ja
+swift-en.ide-light	screen	swift-en ide-light	Menlo	en
+swift-en.term-dark	screen	swift-en term-dark	Menlo	en
+swift-en.md-light	screen	swift-en md-light	Menlo	en
+shell-ko.term-dark	screen	shell-ko term-dark	Menlo	ko
+shell-ko.ide-light	screen	shell-ko ide-light	Menlo	ko
+shell-ko.md-light	screen	shell-ko md-light	Menlo	ko
+shell-ja.term-light	screen	shell-ja term-light	Monaco	ja
+shell-ja.ide-dark	screen	shell-ja ide-dark	ui-monospace	ja
+gitlog-ko.term-dark	screen	gitlog-ko term-dark	Menlo	ko
+gitlog-ko.term-light	screen	gitlog-ko term-light	Monaco	ko
+gitlog-ko.md-light	screen	gitlog-ko md-light	Menlo	ko
+gitdiff-ja.term-dark	screen	gitdiff-ja term-dark	Menlo	ja
+gitdiff-ja.ide-light	screen	gitdiff-ja ide-light	Menlo	ja
+gitdiff-ja.md-light	screen	gitdiff-ja md-light	Menlo	ja
+tests-en.term-dark	screen	tests-en term-dark	Menlo	en
+tests-en.md-dark	screen	tests-en md-dark	ui-monospace	en
+xcode-ko.term-light	screen	xcode-ko term-light	Monaco	ko
+xcode-ko.md-dark	screen	xcode-ko md-dark	ui-monospace	ko
+json-ko.ide-light	screen	json-ko ide-light	Menlo	ko
+json-ko.md-light	screen	json-ko md-light	Menlo	ko
+yaml-ja.ide-dark	screen	yaml-ja ide-dark	ui-monospace	ja
+yaml-ja.md-dark	screen	yaml-ja md-dark	ui-monospace	ja
+readme-ko-a.md-light	screen	readme-ko-a md-light	Menlo	ko
+readme-ko-b.md-dark	screen	readme-ko-b md-dark	ui-monospace	ko
+readme-en-a.md-light	screen	readme-en-a md-light	Menlo	en
+readme-en-b.md-light	screen	readme-en-b md-light	Menlo	en
+readme-ja-a.md-light	screen	readme-ja-a md-light	Menlo	ja
+keys-ko.md-light	screen	keys-ko md-light	Menlo	ko
+keys-ja.md-dark-plain	screen	keys-ja md-dark-plain	Monaco	ja
+keys-en.md-light-plain	screen	keys-en md-light-plain	Courier New	en
+session-ko.term-dark	screen	session-ko term-dark	Menlo	ko
+session-ko.term-light	screen	session-ko term-light	Monaco	ko
+session-ja.term-dark	screen	session-ja term-dark	Menlo	ja
+session-ja.chat-dark	screen	session-ja chat-dark	Courier New	ja
+chat-ko.chat-dark	screen	chat-ko chat-dark	Courier New	ko
+chat-ko.chat-light	screen	chat-ko chat-light	Courier New	ko
+chat-ja.chat-dark	screen	chat-ja chat-dark	Courier New	ja
+chat-en.chat-light-plain	screen	chat-en chat-light-plain	ui-monospace	en
+issue-en.md-light-plain	screen	issue-en md-light-plain	Courier New	en
+issue-ko.md-dark-plain	screen	issue-ko md-dark-plain	Monaco	ko
+issue-ja.md-light	screen	issue-ja md-light	Menlo	ja

@@ -45,9 +45,37 @@ translated_ok, inline_ok. `code_labels.py` aligns every OCR block with the whole
 a block that holds code and prose together is not lost. A block of nothing but line numbers or diff marks is the gutter the case
 draws (keep, reason lineno / diffmark).
 
+## H2: own developer screens (round k3a, 2026-10-20)
+
+The cases k01-k12 were written by hand and also set the CodeRegion thresholds, so they overstate the rules. H2 measures the same rules on
+material written for the purpose and never looked at while the rules were tuned: 46 screens (27 scenes in 11 looks, ko / ja / en) of this repo's
+own developer content, with labels known by construction. Results: `RESULTS-h2-2026-10-20.txt` (rules OR CodeRegion: word P 0.98 / R 0.78 on the doc read).
+
+    ./make-h2.sh                  # h2.py (html + units) -> snap (2x pictures) -> ocrdump through tools/ane-env.sh run pool -> h2_labels.py -> labels-h2/h2.jsonl
+    ./test_h2.sh [A.jsonl B.jsonl] # generator determinism, frozen manifest, label test on a fake OCR; every check has its FAIL-first line
+    KEEP_WORK=<dir> ./run-rules.sh labels-h2      # the rules report on H2 (needs <dir>/h2 from make-h2.sh for CodeRegion; the report warns when a block has no picture)
+    python3 -B -I h2_report.py labels-h2 <rules.jsonl> --sheet <dir> --pics <KEEP_WORK>/h2    # sizes, verdict per reason slice, cuts, clusters, disagreement sheet
+                                                  # rules.jsonl = KEEP_FEED=<regionfeed output> keeprules labels-h2/h2.jsonl
+
+- **What a screen is.** `h2_scenes.py` holds the scenes: Swift, shell, JSON and YAML excerpts of the repo at the pinned commit (`h2.verify` checks every code line
+  against `git show d8e50d8:<path>`; comments are replaced by Korean / Japanese ones), README passages (checked as passages of the three READMEs), tool outputs
+  (git log, git diff, swift test, xcodebuild: captured once into `h2/src/*.txt` by `h2/capture.sh`; the generator reads only those), terminal sessions, chats and
+  issue pages written for the scene, and a shortcut cheat sheet. `h2.py` draws each scene in a look: dark or light terminal (the light one is a window on a desktop),
+  an IDE with a gutter, a browser page (GitHub-like), a chat window; two looks have untinted code, and the monospace face is Menlo, SF Mono, Monaco or Courier New.
+- **Labels by construction** (addendum A1.1). `h2.py` writes the units of a screen in reading order with the class the author gives them: a line of code, a command, a log
+  line, a config line, a path, a hotkey is keep (with its reason); a heading, a paragraph, a list item, a table cell and the window's text are translate, every token of
+  them, except inline code (keep, the reason from the author's INLINE table), a name `{n:..}` or a time or number `{t:..}` (either); program output with CJK is either
+  (as the notes of k05 do). `h2_labels.py` aligns the OCR words with the units (difflib, as `code_labels.py`) and a word takes its unit's class; it calls none of
+  truth.py's shape rules, so the rules are not graded against themselves. A token without a letter in a translate unit is either. What the construction does not
+  settle is `uncertain` (the prose-looking comment of a code region, a bare path in a sentence): those words feed the disagreement sheet.
+- **Independence** (A1.2): nothing from `usecase-bench/set/k*`, `RESULTS-*`, `CODE-FEATURES-*` or `CodeRegion.swift`; only commits by midagedev in the git log. The sources
+  are frozen in `h2/MANIFEST.tsv` (path or command with the sha256 of the text read, the language given to ocrdump per screen); `make-h2.sh` and `test_h2.sh` refuse a different manifest.
+- **Own labels dir.** `labels-h2/` holds H2 alone (set `h2` in rules_report.py's SOURCES, not under `hold`), so `run-rules.sh` on `labels/` is unchanged.
+- **Vision is not byte-stable across cache states** (bench-id-cache): warm the binary with one pass, then compare legs.
+
 ## Files
 
-`truth.py` word truth rules | `label.py`, `code_labels.py` labellers | `rules_report.py` the report | `Sources/keeprules` Core rules on
+`truth.py` word truth rules | `label.py`, `code_labels.py` labellers | `h2.py`, `h2_scenes.py`, `h2_labels.py`, `h2_report.py` the H2 screens, their labels and report | `rules_report.py` the report | `Sources/keeprules` Core rules on
 every block | `Sources/ocrdump` both Vision reads of the app (`VisionExec.swift` linked from `Shared/`) | `Sources/snap` HTML -> picture.
 
 Record kinds (JSONL): `paper` header (schema 2, `word_fields`, counts, regions), `block` (id, read, rect, text, `keep` class, `reason`, stats, words

@@ -1,0 +1,32 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -scheme MwoyeoCore -destination platform=macOS -derivedDataPath /tmp/dd build
+Resolve Package Graph
+2026-10-20 08:12:16.975 xcodebuild[11204:559301960] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+Resolved source packages:
+  MwoyeoCore: /Users/dev/mwoyeo/Core
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, id:00000000-0000000000000000, name:My Mac }
+{ platform:macOS, arch:x86_64, id:00000000-0000000000000000, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Mac Catalyst, id:00000000-0000000000000000, name:My Mac }
+{ platform:macOS, arch:x86_64, variant:Mac Catalyst, id:00000000-0000000000000000, name:My Mac }
+{ platform:macOS, arch:arm64, variant:DriverKit, id:00000000-0000000000000000, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:00000000-0000000000000000, name:My Mac }
+{ platform:macOS, arch:arm64e.x1, variant:Designed for [iPad,iPhone], id:00000000-0000000000000000, name:My Mac }
+{ platform:macOS, arch:arm64_32, variant:Designed for [iPad,iPhone], id:00000000-0000000000000000, name:My Mac }
+ComputePackagePrebuildTargetDependencyGraph
+Prepare packages
+CreateBuildRequest
+SendProjectDescription
+CreateBuildOperation
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (2 targets)
+    Target 'MwoyeoCore-product' in project 'MwoyeoCore'
+        ➜ Explicit dependency on target 'MwoyeoCore' in project 'MwoyeoCore'
+    Target 'MwoyeoCore' in project 'MwoyeoCore' (no dependencies)
+GatherProvisioningInputs
+CreateBuildDescription
+PruneExplicitPrecompiledModules /tmp/dd/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+PruneExplicitPrecompiledModules /tmp/dd/Build/Intermediates.noindex/ExplicitPrecompiledModules
+PruneExplicitPrecompiledModules /tmp/dd/SDKExplicitPrecompiledModules
+** BUILD SUCCEEDED **

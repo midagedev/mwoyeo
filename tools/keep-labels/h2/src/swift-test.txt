@@ -1,0 +1,20 @@
+Building for debugging...
+Build complete! (48.34초)
+Test Suite 'All tests' started at 2026-10-20 08:12:52.200.
+Test Suite 'All tests' passed at 2026-10-20 08:12:52.202.
+     Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+Test Suite 'All tests' started at 2026-10-20 08:12:52.766.
+Test Suite 'MwoyeoCoreTests.xctest' started at 2026-10-20 08:12:52.767.
+Test Suite 'LensCalmTests' started at 2026-10-20 08:12:52.767.
+Test Case '-[MwoyeoCoreTests.LensCalmTests testBlipDuringShownDoesNotTurnOff]' started.
+Test Case '-[MwoyeoCoreTests.LensCalmTests testBlipDuringShownDoesNotTurnOff]' passed (0.001 seconds).
+Test Case '-[MwoyeoCoreTests.LensCalmTests testDifferentHeadlineAtMostOncePerTenSeconds]' started.
+Test Case '-[MwoyeoCoreTests.LensCalmTests testDifferentHeadlineAtMostOncePerTenSeconds]' passed (0.000 seconds).
+✔ Suite TranslationContextCardTests passed after 0.592 seconds.
+✔ Test testNeverSendsRev3ToDocs() passed after 0.585 seconds.
+✔ Suite ReadRouterTests passed after 0.600 seconds.
+✔ Test benchTruthIsNotNewlyLiteral() passed after 0.599 seconds.
+✔ Suite FormulaLiteralTests passed after 0.611 seconds.
+✔ Test deadlineTimesOutEvenWhenTheWorkIgnoresCancellation() passed after 0.740 seconds.
+✔ Suite TranslationRecoveryTests passed after 0.744 seconds.
+✔ Test run with 811 tests in 73 suites passed after 0.744 seconds.

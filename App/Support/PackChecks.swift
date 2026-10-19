@@ -56,9 +56,12 @@ enum PackChecks {
         model.received(.languagePackMissing(source: "ja", target: "en"))
 
         // 0. The words (English; the same literals the base-tree harness expects).
-        check("the new lines read as designed", LensHintText.downloading(ja) == "Downloading Japanese…"
-              && LensHintText.notFinished(ja) == "Japanese download didn’t finish — try again"
-              && LensHintText.notSupported(PackPair(source: "ko", target: "ko")) == "Korean → Korean isn’t supported",
+        // The expected words go through the catalogue too, so the check holds in every language the app runs in (it read English only,
+        // and failed on a Mac whose language is Korean: 2026-10-19, lead gate).
+        let japanese = Languages.name("ja"), korean = Languages.name("ko")
+        check("the new lines read as designed", LensHintText.downloading(ja) == String(localized: "Downloading \(japanese)…")
+              && LensHintText.notFinished(ja) == String(localized: "\(japanese) download didn’t finish — try again")
+              && LensHintText.notSupported(PackPair(source: "ko", target: "ko")) == String(localized: "\(korean) → \(korean) isn’t supported"),
               "\(LensHintText.downloading(ja)) | \(LensHintText.notFinished(ja))")
 
         // 1. Nothing asked yet: the ask, with its action.
@@ -166,12 +169,13 @@ enum PackChecks {
         // 11. The panel's banner, for a trouble no lens says in its row: one message and one action per state.
         let notice = LanguageNotice(.languagePackMissing(source: "ja", target: "en"))
         var ledger = PackLedger()
-        check("the banner offers the download", notice?.action(ledger) == "Download" && notice?.isDownloading(ledger) == false)
+        check("the banner offers the download", notice?.action(ledger) == String(localized: "Download") && notice?.isDownloading(ledger) == false)
         ledger.requested(ja)
         check("the banner shows the download", notice?.message(ledger) == LensHintText.downloading(ja) && notice?.isDownloading(ledger) == true)
         ledger.ended(ja, installed: false)
-        check("the banner offers the retry, and does not say it twice", notice?.action(ledger) == "Try again" && notice?.message(ledger) == "Japanese download didn’t finish")
-        check("a lens row has the short line, and the arrow is its action", LensHintText.rowLine(.downloadNotFinished(ja)) == "Japanese download didn’t finish"
+        check("the banner offers the retry, and does not say it twice", notice?.action(ledger) == String(localized: "Try again")
+              && notice?.message(ledger) == String(localized: "\(Languages.name("ja")) download didn’t finish"))
+        check("a lens row has the short line, and the arrow is its action", LensHintText.rowLine(.downloadNotFinished(ja)) == String(localized: "\(Languages.name("ja")) download didn’t finish")
               && LensHintText.rowLine(.downloadingPack(ja)) == LensHintText.downloading(ja))
         check("an issue that is not about the pair has no language banner", LanguageNotice(.timedOut) == nil)
         return failed

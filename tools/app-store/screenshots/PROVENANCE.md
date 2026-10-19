@@ -28,48 +28,64 @@ Run:
     rerun     2026-10-19T10:51:10Z paper-p2 : binary sha256 84ff80082d81c8e2f91aac47fe701f986ea01f02ba492f9530366fb477f8658b, tree 4b30eabb8606e7ea04e0d6afed53c0f50453553a, Google Chrome 155.0.8059.82, main.pdf sha256 2ebf808fac14905ea7372954abd782b191eb7d8c41c8e342d0ef0673a9d1bd72
     rerun     2026-10-19T10:51:18Z paper-p2 : binary sha256 84ff80082d81c8e2f91aac47fe701f986ea01f02ba492f9530366fb477f8658b, tree 4b30eabb8606e7ea04e0d6afed53c0f50453553a, Google Chrome 155.0.8059.82, main.pdf sha256 2ebf808fac14905ea7372954abd782b191eb7d8c41c8e342d0ef0673a9d1bd72
     rerun     2026-10-19T10:51:26Z paper-p2 : binary sha256 84ff80082d81c8e2f91aac47fe701f986ea01f02ba492f9530366fb477f8658b, tree 4b30eabb8606e7ea04e0d6afed53c0f50453553a, Google Chrome 155.0.8059.82, main.pdf sha256 2ebf808fac14905ea7372954abd782b191eb7d8c41c8e342d0ef0673a9d1bd72
+    rerun     2026-10-19T13:33:18Z chat-live5 chat-live6 chat-live7 : binary sha256 84ff80082d81c8e2f91aac47fe701f986ea01f02ba492f9530366fb477f8658b, tree a7d8c6cdcc43af3ad39c5fe19094a4ef971e9fbd, Google Chrome 155.0.8059.82
+    recut     2026-10-19T13:51:22Z chat-live5 chat-live6 chat-live7 : source cards cut again from the recorded cards (rows 244 to 1376 px of each: the card's top 122 pt dropped, scenes.json crop 312,180,420,688 to 312,302,420,566, lens 8,334,400,266 to 8,212,400,266); the lens pictures are byte for byte the ones the renders read, the renders were not made again, no app run
 
 ## Scenes
 
 | scene | source | window (pt) | card crop (pt, in the window) | lens (pt, in the card) | shown in |
 |---|---|---|---|---|---|
 | chat-ja | `demo/chat.html?lang=ja&every=0&history=7`, headless Chrome at 2x | 1220x688 | [0, 0, 1220, 688] | [320, 50, 888, 556] | retired: 2026-10-19 vision verdict: the lens holds the whole log, so no original shows above it (reads as a native chat); en has 草 as "Grass." |
-| chat-ja7 | `demo/chat.html?lang=ja&every=0&history=7`, headless Chrome at 2x | 1220x688 | [0, 0, 1220, 688] | [320, 236, 888, 370] | ko-01 |
-| chat-ja19 | `demo/chat.html?lang=ja&every=0&history=19`, headless Chrome at 2x | 1220x688 | [0, 0, 1220, 688] | [320, 362, 888, 244] | en-01 |
-| chat-en | `demo/chat.html?lang=en&history=14&every=3`, headless Chrome at 2x | 1220x688 | [0, 0, 1220, 688] | [320, 212, 888, 394] | ko-02 |
-| chat-ja16 | `demo/chat.html?lang=ja&history=16&every=3`, headless Chrome at 2x | 1220x688 | [0, 0, 1220, 688] | [320, 222, 888, 384] | en-02 |
-| vn | `demo/vn.html`, headless Chrome at 2x | 1220x760 | [0, 0, 1220, 688] | [64, 64, 1092, 600] | en-03, ko-03 |
+| chat-ja7 | `demo/chat.html?lang=ja&every=0&history=7`, headless Chrome at 2x | 1220x688 | [0, 0, 1220, 688] | [320, 236, 888, 370] | ko-02 |
+| chat-ja19 | `demo/chat.html?lang=ja&every=0&history=19`, headless Chrome at 2x | 1220x688 | [0, 0, 1220, 688] | [320, 362, 888, 244] | en-02 |
+| chat-live5 | `demo/chat.html?lang=ja&every=3&history=5`, headless Chrome at 2x | 732x868 | [312, 302, 420, 566] | [8, 212, 400, 266] | en-01, ko-01 |
+| chat-live6 | `demo/chat.html?lang=ja&every=3&history=6`, headless Chrome at 2x | 732x868 | [312, 302, 420, 566] | [8, 212, 400, 266] | en-01, ko-01 |
+| chat-live7 | `demo/chat.html?lang=ja&every=3&history=7`, headless Chrome at 2x | 732x868 | [312, 302, 420, 566] | [8, 212, 400, 266] | en-01, ko-01 |
+| chat-en | `demo/chat.html?lang=en&history=14&every=3`, headless Chrome at 2x | 1220x688 | [0, 0, 1220, 688] | [320, 212, 888, 394] | ko-03 |
+| chat-ja16 | `demo/chat.html?lang=ja&history=16&every=3`, headless Chrome at 2x | 1220x688 | [0, 0, 1220, 688] | [320, 222, 888, 384] | en-03 |
+| vn | `demo/vn.html`, headless Chrome at 2x | 1220x760 | [0, 0, 1220, 688] | [64, 64, 1092, 600] | en-04, ko-04 |
 | paper | `tools/paper-own/mwoyeo-method` main.pdf (build.sh) page 6 at 4.2 px/pt | 1285x1663 | [32, 728, 1220, 688] | [60, 48, 1104, 590] | retired: 2026-10-19 vision verdict: the paragraphs with inline mathematics come out flattened (20 s-1, T(1 - 2-1/3)) and at jumping sizes |
-| paper-p2 | `tools/paper-own/mwoyeo-method` main.pdf (build.sh) page 2 at 4.2 px/pt | 1285x1663 | [32, 570, 1220, 688] | [614, 16, 542, 482] | ko-04 |
-| forum-en | `demo/forum.html`, headless Chrome at 2x | 1120x800 | [220, 56, 600, 624] | [24, 210, 552, 346] | ko-05 |
+| paper-p2 | `tools/paper-own/mwoyeo-method` main.pdf (build.sh) page 2 at 4.2 px/pt | 1285x1663 | [32, 570, 1220, 688] | [614, 16, 542, 482] | ko-05 |
+| forum-en | `demo/forum.html`, headless Chrome at 2x | 1120x800 | [220, 56, 600, 624] | [24, 210, 552, 346] | ko-06 |
 | forum-ja | `demo/forum.html?lang=ja`, headless Chrome at 2x | 1120x800 | [220, 56, 600, 624] | [24, 210, 552, 346] | retired: 2026-10-19 vision verdict: the action row and time stamps come out garbled (共有 as Sha/red, "7 7 hours", "318 cases" squeezed) and the 雑談 flair stays untranslated |
-| article | `demo/article.html`, headless Chrome at 2x | 1220x688 | [0, 0, 1220, 688] | [68, 104, 748, 552] | en-05, ko-06 |
-| article-body | `demo/article.html`, headless Chrome at 2x | 980x1840 | [22, 1183, 600, 624] | [12, 49, 576, 525] | en-04 |
+| article | `demo/article.html`, headless Chrome at 2x | 1220x688 | [0, 0, 1220, 688] | [68, 104, 748, 552] | en-06, ko-07 |
+| article-body | `demo/article.html`, headless Chrome at 2x | 980x1840 | [22, 1183, 600, 624] | [12, 49, 576, 525] | en-05 |
 
 ## Frames
 
 | frame | scene | render (scale 1.0) | render sha256 | source sha256 | lens in the frame (pt) |
 |---|---|---|---|---|---|
-| en-01 | chat-ja19 ja>en | renders/chat-ja19.en.png | 8bcd05497df9c430 | 67c49e09958ceb70 | [430, 574, 888, 244] |
-| en-02 | chat-ja16 ja>en | renders/chat-ja16.en.png | a443f5ce30bae18e | 01b33c987fc07268 | [430, 434, 888, 384] |
-| en-03 | vn ja>en | renders/vn.en.png | f36ba2b5c106fffd | cab351bf7a61c321 | [174, 276, 1092, 600] |
-| en-04 | article-body ja>en | renders/article-body.en.png | cd3b38f93f00c18c | bb3fd4125b6bbe8d | [800, 285, 576, 525] |
-| en-05 | article ja>en | renders/article.en.png | 408512ce23e22b9a | d6e240b8dd021367 | [178, 316, 748, 552] |
-| en-05 panel | menu-default | renders/menu.en.png | b7c4cc1da05b92dc | - | panel at [984, 336, 340, 248] |
-| ko-01 | chat-ja7 ja>ko | renders/chat-ja7.ko.png | 24af188a7c6c879e | caf9a8aaf7284faa | [430, 448, 888, 370] |
-| ko-02 | chat-en en>ko | renders/chat-en.ko.png | 7abc7815693b5bf8 | 44d81ab06edac825 | [430, 424, 888, 394] |
-| ko-03 | vn ja>ko | renders/vn.ko.png | 3050b0d8f271633a | cab351bf7a61c321 | [174, 276, 1092, 600] |
-| ko-04 | paper-p2 en>ko | renders/paper-p2.ko.png | 58804af112c80309 | e065c211d85f3a73 | [724, 228, 542, 482] |
-| ko-05 | forum-en en>ko | renders/forum-en.ko.png | b5fca63d48a7828d | 2e10c6bdde3266cd | [812, 446, 552, 346] |
-| ko-06 | article ja>ko | renders/article.ko.png | 9445647ea7b7deea | d6e240b8dd021367 | [178, 316, 748, 552] |
-| ko-06 panel | menu-default | renders/menu.ko.png | d3a578ab12d2c4cc | - | panel at [984, 336, 340, 248] |
+| en-01 1/3 | chat-live5 ja>en | renders/chat-live5.en.png | f9d3fbba9169b76f | fb1ddf429f1fa392 | [50, 546, 400, 266] |
+| en-01 2/3 | chat-live6 ja>en | renders/chat-live6.en.png | 1da30e89ffad838e | 57d7160309427668 | [518, 546, 400, 266] |
+| en-01 3/3 | chat-live7 ja>en | renders/chat-live7.en.png | dff18226a6b6cae0 | dbb99d5bcd938d36 | [986, 546, 400, 266] |
+| en-02 | chat-ja19 ja>en | renders/chat-ja19.en.png | 8bcd05497df9c430 | 67c49e09958ceb70 | [430, 574, 888, 244] |
+| en-03 | chat-ja16 ja>en | renders/chat-ja16.en.png | a443f5ce30bae18e | 01b33c987fc07268 | [430, 434, 888, 384] |
+| en-04 | vn ja>en | renders/vn.en.png | f36ba2b5c106fffd | cab351bf7a61c321 | [174, 276, 1092, 600] |
+| en-05 | article-body ja>en | renders/article-body.en.png | cd3b38f93f00c18c | bb3fd4125b6bbe8d | [800, 285, 576, 525] |
+| en-06 | article ja>en | renders/article.en.png | 408512ce23e22b9a | d6e240b8dd021367 | [178, 316, 748, 552] |
+| en-06 panel | menu-default | renders/menu.en.png | b7c4cc1da05b92dc | - | panel at [984, 336, 340, 248] |
+| ko-01 1/3 | chat-live5 ja>ko | renders/chat-live5.ko.png | 6e1a84e783a6619e | fb1ddf429f1fa392 | [50, 546, 400, 266] |
+| ko-01 2/3 | chat-live6 ja>ko | renders/chat-live6.ko.png | 817692f033cc6852 | 57d7160309427668 | [518, 546, 400, 266] |
+| ko-01 3/3 | chat-live7 ja>ko | renders/chat-live7.ko.png | abd11a7123d6726b | dbb99d5bcd938d36 | [986, 546, 400, 266] |
+| ko-02 | chat-ja7 ja>ko | renders/chat-ja7.ko.png | 24af188a7c6c879e | caf9a8aaf7284faa | [430, 448, 888, 370] |
+| ko-03 | chat-en en>ko | renders/chat-en.ko.png | 7abc7815693b5bf8 | 44d81ab06edac825 | [430, 424, 888, 394] |
+| ko-04 | vn ja>ko | renders/vn.ko.png | 3050b0d8f271633a | cab351bf7a61c321 | [174, 276, 1092, 600] |
+| ko-05 | paper-p2 en>ko | renders/paper-p2.ko.png | 58804af112c80309 | e065c211d85f3a73 | [724, 228, 542, 482] |
+| ko-06 | forum-en en>ko | renders/forum-en.ko.png | b5fca63d48a7828d | 2e10c6bdde3266cd | [812, 446, 552, 346] |
+| ko-07 | article ja>ko | renders/article.ko.png | 9445647ea7b7deea | d6e240b8dd021367 | [178, 316, 748, 552] |
+| ko-07 panel | menu-default | renders/menu.ko.png | d3a578ab12d2c4cc | - | panel at [984, 336, 340, 248] |
 
-The pair frames (en-04, ko-05) show the same lens twice: on the left showing the original (the source, grey ring), on the
+The pair frames (en-05, ko-06) show the same lens twice: on the left showing the original (the source, grey ring), on the
 right translating.
+The live frames (en-01, ko-01) show one lens at moments of one page, left to right (k/n in the table): each moment is its own
+page state shot and rendered on its own; the page adds a message every `every` seconds and the moments are one message
+apart, so the label above the seam between two moments (+<every>s, compose.py live_steps) is the time that passed on the page.
 Paper frames show our English paper translated en>ko; `check.py` measures their formula boxes in the render against the source:
-ko-04 (paper-p2.keep). A retired scene is one no frame shows any more; its renders stay in `renders/` as the record of why.
-A partial render.sh run adds a `rerun` line to RUN.txt; the last line naming a scene made its current render.
+ko-05 (paper-p2.keep). A retired scene is one no frame shows any more; its renders stay in `renders/` as the record of why.
+A partial render.sh run adds a `rerun` line to RUN.txt; the last line naming a scene made its current render. A `recut` line
+says a scene's source card was cut again from the recorded card (new crop in scenes.json) and its renders were left as they were.
 
 Notes:
 
+- chat-live5: the live hero's moments (chat-live5, 6, 7): with five to seven messages the log does not fill the window yet, so it does not scroll and every message stays where it landed; the lens sits where the new ones land and fills up as rin's question, Maya's answer and rin's reply arrive, and the messages above it stay the same original in all three. Chosen in scratch trial renders over states of a full, scrolling log: a fixed lens edge then cuts a different message at each moment unless the new messages have the same heights as the ones they push out, and the only such run at a 420 pt column (history 14 to 16) puts Ollie's wrapped line into the lens, where the reader split its 3-character tail into its own line (イだわ as Idawa, 이다야). The card is the 420 x 688 pt column cut 122 pt lower (crop y 180 to 302, the lens 334 to 212 in the card; the lens in the window is where it was, so the lens pictures and renders are unchanged): 566 pt is the tallest cut the frame's coverage floor allows (3 x 420 x 566 = 55.03 % of 1440 x 900), the cut falls in the empty rows between junpark's reactions and Ollie's reply (card rows 110 to 132 pt are background), and the unchanged top of the card is then 212 of 566 pt (37 %) instead of 334 of 688 (49 %)
 - paper-p2: rendered 9 times (the rerun lines in RUN.txt that name paper-p2): once with a crop 92 pt higher, whose top edge cut a line of the left column, once with the lens 6 pt lower, where the OCR split the section number off the heading, then 7 times with this lens, because on the same input Apple Translation returns the identifiers TranslationFilter and CodeRegion in varying case (trAnslationFilter, TrAnslationFilter, translationFilter, Coderegion); the frame uses the first run that returned both unchanged (the last line)

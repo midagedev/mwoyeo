@@ -18,6 +18,9 @@ final class AppModel {
             if settings.checksForUpdates != oldValue.checksForUpdates { Updates.shared.schedule(enabled: settings.checksForUpdates) }
             #endif
             pushSettings()
+            if settings.savesTranscripts, !oldValue.savesTranscripts || settings.exportFolder != oldValue.exportFolder {
+                learnedFile?.savingTurnedOn(for: learnedCounts.filter { $0.value.usable > 0 }.map(\.key))
+            }
         }
     }
 
@@ -57,6 +60,10 @@ final class AppModel {
     var settingsTab = SettingsTab.general
 
     @ObservationIgnored let translator: TranslationService
+    /// How many learned rows each app has (`learnedRowsChanged` sets it); a view of the Memory sheet reads it to know when to look again.
+    var learnedCounts: [String: LearnedCounts] = [:]
+    /// Writes the apps' learned rows beside the transcripts while Save transcripts is on (`LearnedMemoryWriter`).
+    @ObservationIgnored var learnedFile: LearnedMemoryWriter?
     /// Where added engines keep their API keys (the Keychain; memory only when `MWOYEO_MEMORY_SECRETS` is set, for captures).
     @ObservationIgnored let secrets: any SecretStore
     /// settings.json, the source of truth of `settings`; the preferences keep a copy for a downgrade.
@@ -207,6 +214,10 @@ final class AppModel {
         TextRecognizer.setNoticeHandler { issue in Task { @MainActor in AppModel.shared.recognitionNotice(issue) } }
         VisionSetup.shared.onChange = { [weak self] in self?.visionSetupChanged() }
         await translator.setRejectionHandler { id, fields in Task { @MainActor in AppModel.shared.learned(fields, for: id) } }
+        learnedFile = LearnedMemoryWriter.live(settings: { AppModel.shared.settings },
+                                               store: { AppModel.shared.chooseExportFolder($1, bookmark: $0) },
+                                               records: { await AppModel.shared.translator.learnedRows(for: $0) })
+        await translator.setLearnedHandler { bundleID in Task { @MainActor in AppModel.shared.learnedRowsChanged(bundleID) } }
         await translator.prewarm()
         inpainter = await Task.detached(priority: .userInitiated) { Inpainter.load() }.value
         inpaintingAvailable = inpainter != nil

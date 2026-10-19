@@ -864,8 +864,11 @@ extension TranslationService {
     /// the note and names, and the lines before and after. A group the engine fails or misses its deadline goes the old way (Apple takes
     /// it while the engine rests). The same health bookkeeping as the old path: the engine's cooldown, the lens's events, the issue.
     private func translateWithContext(_ texts: [String], engine: EngineConfig, options: MwoyeoCore.ContextOptions, profile: AppProfile?,
-                                      lens: LensContext, onResult: (@Sendable (String, String) -> Void)?) async -> TranslationOutcome {
+                                      lens document: LensContext, onResult: (@Sendable (String, String) -> Void)?) async -> TranslationOutcome {
         var outcome = TranslationOutcome()
+        // Memory only takes the app and nothing of the document: no title, no screen, no lines. The thread is then the app's, the
+        // pair's and the engine's alone, and no line of the screen is kept for this call at all.
+        let lens = options.memoryOnly ? document.appOnly : document
         let space = cache.namespace
         let target = settings.targetLanguage
         let pass = contexts.begin(lens, profile: profile, pair: LanguagePair(settings.sourceLanguage, target), engineID: engine.id.uuidString,
@@ -892,7 +895,9 @@ extension TranslationService {
         }
         // The lines of this call join the thread when it is over, in the order they were asked for, cache hits included (§8.1).
         defer {
-            contexts.observe(lens, key: pass.key, lines: needing.map { ($0, outcome.translations[$0]) }, now: ProcessInfo.processInfo.systemUptime)
+            if !options.memoryOnly {
+                contexts.observe(lens, key: pass.key, lines: needing.map { ($0, outcome.translations[$0]) }, now: ProcessInfo.processInfo.systemUptime)
+            }
         }
         guard !todo.isEmpty else { return outcome }
 
@@ -1083,6 +1088,12 @@ extension TranslationService {
     func learnedRows(for bundleID: String) -> [ContextMemory.LearnedRecord] { contexts.learned(for: bundleID) }
 
     func forgetLearned(for bundleID: String) { contexts.forgetLearned(bundleID) }
+
+    /// "Remove" on one learned row, and the drop after "Pin" (`AppModel.pinLearned`: the profile has the row now).
+    func removeLearned(src: String, for bundleID: String) { contexts.removeLearned(src: src, for: bundleID) }
+
+    /// Told with the app's bundle id when its usable learned rows changed (`ContextBook.learnedChanged`). One handler.
+    func setLearnedHandler(_ h: @escaping @Sendable (String) -> Void) { contexts.learnedChanged = h }
 
     /// "Start fresh" for the app's current thread: the transcript and the referents go, and the namespace generation moves on.
     func startFresh(for bundleID: String) { contexts.startFresh(bundleID) }

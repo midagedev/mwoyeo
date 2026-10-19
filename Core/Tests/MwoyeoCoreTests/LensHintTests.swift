@@ -45,6 +45,33 @@ import Testing
         #expect(LensSignals(recognition: .notResponding, alreadyInTarget: "en").hint() != .alreadyInTarget(target: "en"))
     }
 
+    @Test func theDiskSitsAboveTheOtherWaitsAndBelowThePackAndTheGrant() {
+        // priority: screen > pack > pair > the disk > not responding > restart > preparing (the app's setup) > translation > already-in
+        var s = LensSignals(recognitionPreparing: true, recognition: .needsDiskSpace)
+        #expect(s.hint() == .recognitionNeedsDiskSpace, "above the app's own setup, which would say 'preparing' for ever")
+        s.translation = TranslationTrouble(kind: .notAnswering, engine: "Apple", addedEngine: false)
+        s.alreadyInTarget = "en"
+        #expect(s.hint() == .recognitionNeedsDiskSpace, "and above the translator's trouble and 'already in'")
+        s.unsupportedPair = PackPair(source: "ko", target: "ko")
+        #expect(s.hint() == .pairNotSupported(PackPair(source: "ko", target: "ko")))
+        s.unsupportedPair = nil
+        s.missingPack = ja
+        #expect(s.hint() == .downloadPack(ja), "the pack is what stops every translation")
+        s.missingPack = nil
+        s.screen = .notActive
+        #expect(s.hint() == .restartToFinish)
+        s.screen = .notAllowed
+        #expect(s.hint() == .allowScreenRecording)
+        s.screen = .fine
+        s.showsTranslations = true
+        #expect(s.hint() == nil, "a lens that translates needs no line")
+    }
+
+    @Test func theDiskHintOpensStorageAndIsNotAboutLanguages() {
+        let hint = LensHint.recognitionNeedsDiskSpace
+        #expect(hint.action == .openStorageSettings && !hint.isAboutLanguages && hint.showsTabAlways)
+    }
+
     @Test func theLensOwnWaitSaysMoreThanTheAppsSetup() {
         #expect(LensSignals(recognition: .preparing).hint() == .preparingRecognition)
         #expect(LensSignals(recognitionPreparing: true, recognition: .notResponding).hint() == .recognitionNotResponding)

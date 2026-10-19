@@ -49,6 +49,9 @@ public enum LensHint: Equatable, Sendable {
     case preparingRecognition
     /// A recognition worker was stuck for minutes, was restarted, and was stuck again (`RecognitionWait.notResponding`).
     case recognitionNotResponding
+    /// The text model does not compile and the Mac is short of disk space: each try preallocates 2.4 GB and fails
+    /// (`RecognitionWait.needsDiskSpace`). It names the cause, so it sits above "isn't responding" and "preparing".
+    case recognitionNeedsDiskSpace
     /// The lens read text and the translator keeps failing it: two batches in a row, none translated (`TranslationWait`).
     /// `engine` is the name the user knows it by; `addedEngine`: it is one they added, so its settings are where to look.
     case translationNotAnswering(engine: String, addedEngine: Bool)
@@ -65,6 +68,8 @@ public enum LensHint: Equatable, Sendable {
         case openTranslationSettings
         /// Settings on General, where the languages are chosen.
         case chooseLanguages
+        /// System Settings on General › Storage, where space is freed.
+        case openStorageSettings
     }
 
     /// The one thing the user can do about it, nil where there is nothing to do (waiting, or nothing to translate).
@@ -75,6 +80,7 @@ public enum LensHint: Equatable, Sendable {
         case let .downloadPack(pair), let .downloadNotFinished(pair): .downloadPack(pair)
         case .downloadingPack: .openTranslationSettings
         case .pairNotSupported: .chooseLanguages
+        case .recognitionNeedsDiskSpace: .openStorageSettings
         case let .translationNotAnswering(_, addedEngine): addedEngine ? .openTranslationSettings : nil
         case .preparingRecognition, .recognitionNotResponding, .translationSlow, .alreadyInTarget: nil
         }
@@ -139,7 +145,8 @@ public struct LensSignals: Equatable, Sendable {
     /// The text recognizer is in its first-time setup (the menu panel's "Preparing text recognition…"). App-wide; the lens's own
     /// state is `recognition`, which says more and wins over it.
     public var recognitionPreparing = false
-    /// What this lens's own read waits for (`ReadWait.hint`): no reader ready, none responding, or the worker switched off.
+    /// What this lens's own read waits for (`ReadWait.hint`): no reader ready, none responding, the worker switched off, or no room
+    /// on the disk to prepare one.
     public var recognition: RecognitionWait?
     /// The lens shows something translated: it is evidently working, so waiting for the setup needs no line, and some text
     /// was not in the target language after all.
@@ -165,7 +172,8 @@ public struct LensSignals: Equatable, Sendable {
 
     /// The line for the pill: Screen Recording first (nothing works without it), then the language pack (what stops every
     /// translation; said as asking, downloading or not finished) and a pair that cannot be translated, then recognition (the lens's own wait for a reader, else the app's first-time setup: both end by themselves
-    /// except "not responding" and "restart"), then the translator's trouble (text was read and nothing comes back translated),
+    /// except "not responding" and "restart"; a lens's wait for the disk is named ahead of
+    /// "not responding" and "preparing": it is their cause), then the translator's trouble (text was read and nothing comes back translated),
     /// then "already in" (news, not a fault); nil when all is well.
     public func hint() -> LensHint? {
         switch screen {
@@ -184,6 +192,7 @@ public struct LensSignals: Equatable, Sendable {
         if let unsupportedPair, !showsTranslations { return .pairNotSupported(unsupportedPair) }
         if !showsTranslations {
             switch recognition {
+            case .needsDiskSpace: return .recognitionNeedsDiskSpace
             case .notResponding: return .recognitionNotResponding
             // A worker that is switched off for this run: the one thing to do is the restart the Screen Recording grant also needs.
             case .restartApp: return .restartToFinish

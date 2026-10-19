@@ -155,6 +155,9 @@ public struct WorkerHealth: Sendable, Equatable {
         /// A fast error saying the programs are not ready (`OCRHealth.programsNotReady`) or no result at all (`nilError`): the
         /// worker is alive, and the rev3 rung rests on `Backoff.rev3Rung`.
         case notReady
+        /// The compiler service failed to compile (`OCRHealth.compileFailed`): the worker is alive, and the rev3 rung rests like
+        /// `notReady`, on `Backoff.compileRung` instead while the volume is short of space (`ReaderTiming.lowDisk`).
+        case compileFailed
         /// Any other error: the worker answered, but this request would fail again.
         case failed
     }
@@ -169,8 +172,8 @@ public struct WorkerHealth: Sendable, Equatable {
         case warmed(WorkerJob, after: TimeInterval)
         /// `readerReady(worker)`: the recovery re-reads (`ReadScheduler.readerReady`) and every waiting lens read again.
         case readerReady
-        /// The worker is usable again without having answered (restart ended, rev3 rung rest ended, an error ended a suspect):
-        /// lenses that waited re-run, but nothing is "recovered".
+        /// The worker is usable again without having answered (restart ended, rev3 rung rest ended, an error ended a suspect, free
+        /// space came back): lenses that waited re-run, but nothing is "recovered".
         case usableAgain
         /// suspect → stuck.
         case stuck(WorkerJob, after: TimeInterval)
@@ -218,7 +221,13 @@ public struct WorkerHealth: Sendable, Equatable {
     public let timing: ReaderTiming
     private var restart: Backoff
     private var rung3: Backoff
+    private var rungCompile: Backoff
     private var rung3RestUntil: TimeInterval?
+    /// When the last two compile failures happened (oldest first), until a rev3 answer, a new process or free space ends them.
+    private var compileFails: [TimeInterval] = []
+    /// Two compile failures came within `ReaderTiming.compileWindow` while the volume was short of space: the disk is held to be why,
+    /// for as long as the volume stays short (the rung's rests grow past the window, so the pair cannot be asked for again).
+    private var diskIsWhy = false
     /// The rung's rest ended and nobody was told.
     private var rung3NoticePending = false
     private var rung3Answered = false
@@ -235,6 +244,7 @@ public struct WorkerHealth: Sendable, Equatable {
         self.timing = timing
         restart = timing.restart
         rung3 = timing.rung
+        rungCompile = timing.compileRung
     }
 
     // MARK: asking
@@ -253,6 +263,24 @@ public struct WorkerHealth: Sendable, Equatable {
         _ = copy.tick(now: now)
         return copy.state
     }
+
+    /// Free bytes on the volume at the host's last sample, nil before it or when it could not be read (`sampledDisk`).
+    public private(set) var freeBytes: UInt64?
+    /// When the rev3 rung's rest ends, nil if it has none.
+    public var restUntil: TimeInterval? { rung3RestUntil }
+    /// When the newest of the last two compile failures happened.
+    public var lastCompileFailure: TimeInterval? { compileFails.last }
+    /// How many of the last two compile failures fall within `ReaderTiming.compileWindow` of the newest.
+    public var compileFailuresInWindow: Int { compileFails.filter { (compileFails.last ?? 0) - $0 < timing.compileWindow }.count }
+
+    /// The volume has less free space than a compile needs (`ReaderTiming.lowDisk`). Unknown free space is not short: no cause is invented.
+    private var shortOfSpace: Bool { (freeBytes ?? .max) < timing.lowDisk }
+
+    /// The one decision of "the disk is why recognition does not get ready": two compile failures came within
+    /// `ReaderTiming.compileWindow` of each other while the volume was short of space (`reply`), and it still is. Pure in what it holds
+    /// (`freeBytes` comes from the host's sample). It stays true until a rev3 answer, free space coming back or a new process ends it.
+    /// A compile that is only slow raises nothing (no failure), nor does a failure with room on the volume.
+    public var lacksDiskSpace: Bool { diskIsWhy && shortOfSpace }
 
     /// Whether the rev3 rung is resting (its last Code-13 error is recent and rev3 has not answered since).
     public func isResting(_ via: ReadVia, now: TimeInterval) -> Bool {
@@ -372,23 +400,18 @@ public struct WorkerHealth: Sendable, Equatable {
             stats.answered[job.via, default: 0] += 1
             restart.success(now: now)
             if job.via == .rev3 {
-                rung3.reset()
-                rung3RestUntil = nil
-                rung3NoticePending = false
+                forgetRung()
                 rung3Answered = true
-                code13Since = nil
-                stats.code13Streak = 0
             }
-        case .notReady, .failed:
+        case .notReady:
             stats.failed[job.via, default: 0] += 1
-            if outcome == .notReady, job.via == .rev3 {
-                stats.code13Streak += 1
-                code13Since = code13Since ?? now
-                let wait = rung3.failure(now: now)
-                rung3RestUntil = now + wait
-                rung3NoticePending = true
-                events.append(.rungResting(.rev3, for: wait))
-            }
+            events += restRung(after: outcome, via: job.via, now: now)
+        case .compileFailed:
+            stats.failed[job.via, default: 0] += 1
+            noteCompileFailure(now: now)
+            events += restRung(after: outcome, via: job.via, now: now)
+        case .failed:
+            stats.failed[job.via, default: 0] += 1
         }
         if wasDown { stats.maxSuspectSeconds = max(stats.maxSuspectSeconds, age) }
 
@@ -415,6 +438,19 @@ public struct WorkerHealth: Sendable, Equatable {
             events += recycle(.code13, now: now)
         }
         return events
+    }
+
+    /// The host sampled the free space (nil: it could not be read, and the last number stands). Back above `ReaderTiming.lowDisk` after
+    /// compile failures, the failures stop counting and the rung's rest ends now, not when its backoff does: the next `tick` says
+    /// `usableAgain`, as it does at the end of any rest.
+    public mutating func sampledDisk(_ bytes: UInt64?, now: TimeInterval) {
+        let wasShort = shortOfSpace
+        freeBytes = bytes ?? freeBytes
+        guard wasShort, !shortOfSpace, !compileFails.isEmpty else { return }
+        rungCompile.reset()
+        compileFails = []
+        diskIsWhy = false
+        rung3RestUntil = now
     }
 
     /// The XPC connection was interrupted or invalidated. In `stuck` that is the recycle's own exit; after our own exit (`cold`,
@@ -477,15 +513,46 @@ public struct WorkerHealth: Sendable, Equatable {
         resetProcess(clearWarm: true)
     }
 
+    /// A compile failed: the last two are kept, and two within `ReaderTiming.compileWindow` on a volume short of space make the disk
+    /// the cause (`lacksDiskSpace`). Docs keeps the same record; it has no rung to rest.
+    private mutating func noteCompileFailure(now: TimeInterval) {
+        compileFails = Array((compileFails + [now]).suffix(2))
+        let twoInAWindow = compileFails.count == 2 && compileFails[1] - compileFails[0] < timing.compileWindow
+        diskIsWhy = diskIsWhy || shortOfSpace && twoInAWindow
+    }
+
+    /// The rev3 rung rests after a request that says the model is not ready (Code 13) or did not compile (Code 11): on the compile
+    /// backoff while a compile fails on a volume short of space, on the ordinary one otherwise. Only rev3 has a rung.
+    private mutating func restRung(after outcome: Outcome, via: ReadVia, now: TimeInterval) -> [Event] {
+        guard via == .rev3 else { return [] }
+        stats.code13Streak += 1
+        code13Since = code13Since ?? now
+        let wait = switch outcome {
+        case .compileFailed where shortOfSpace: rungCompile.failure(now: now)
+        default: rung3.failure(now: now)
+        }
+        rung3RestUntil = now + wait
+        rung3NoticePending = true
+        return [.rungResting(.rev3, for: wait)]
+    }
+
+    /// The rev3 rung starts over: no rest, no streak, no compile failures. An answer of rev3 and a new process do this.
+    private mutating func forgetRung() {
+        rung3.reset()
+        rungCompile.reset()
+        compileFails = []
+        diskIsWhy = false
+        rung3RestUntil = nil
+        rung3NoticePending = false
+        code13Since = nil
+        stats.code13Streak = 0
+    }
+
     /// A new process starts from nothing: the rung, the Code-13 streak and the footprint baseline are the old process's.
     private mutating func resetProcess(clearWarm: Bool) {
         if clearWarm { warm = [] }
-        rung3.reset()
-        rung3RestUntil = nil
-        rung3NoticePending = false
+        forgetRung()
         rung3Answered = false
-        code13Since = nil
-        stats.code13Streak = 0
         baselineFootprint = nil
         idleSince = nil
     }

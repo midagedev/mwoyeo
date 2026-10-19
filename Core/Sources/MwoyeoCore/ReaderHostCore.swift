@@ -148,6 +148,9 @@ public struct ReaderHostCore: Sendable {
     public let path: PathOverride?
     /// Packs the picture of an order before it is dispatched; false when it cannot be packed (the pass fails). The app's wiring.
     public var pack: @Sendable (SendOrder) -> Bool = { _ in true }
+    /// The free bytes on the volume the compiler writes to, nil when they cannot be told. The app's wiring; asked at most once per
+    /// `timing.diskSampleEvery` (`sampleDisk`). Core never touches the file system.
+    public var freeSpace: @Sendable () -> UInt64? = { nil }
 
     public private(set) var health: [WorkerRole: WorkerHealth]
     public private(set) var scheduler = ReadScheduler()
@@ -159,6 +162,7 @@ public struct ReaderHostCore: Sendable {
     public private(set) var ring: [String] = []
 
     private var rewarmPending = false
+    private var diskSampledAt: TimeInterval?
     /// Workers that lost their process (a crash or a recycle): when one is usable again it has nothing warm, and the plan runs again.
     private var restarted: Set<WorkerRole> = []
     private var jobs: [Int: Pending] = [:]
@@ -319,21 +323,24 @@ public struct ReaderHostCore: Sendable {
     public mutating func replied(_ role: WorkerRole, _ job: ReadScheduler.Job, error: ReadFailure?, ms: Int, pid: Int32 = 0,
                                  now: TimeInterval) -> ReadFailure? {
         // A request that took S or longer is suspect by now, whether or not the timer ran yet: its answer is what recovers it.
+        sampleDisk(now)
         var events = health[role]!.tick(now: now, wanted: wantsWorker(role))
         switch error {
         case nil: events += health[role]!.reply(.answered, now: now)
         case .programsNotReady?: events += health[role]!.reply(.notReady, now: now)
+        case .compileFailed?: events += health[role]!.reply(.compileFailed, now: now)
         case .interrupted?, .unavailable?:
             // Nothing answered: the service is gone (the connection's own event says the same, and is a no-op after this).
             events += health[role]!.interrupted(now: now)
         case .failed?, .badJob?: events += health[role]!.reply(.failed, now: now)
         }
-        if let error {
-            out.append(.log("reader failed role=\(role.rawValue) via=\(job.target.via.rawValue) why=\(Self.name(error))"))
+        let named = error.map { Self.name($0, diskIsWhy: health[role]!.lacksDiskSpace) }
+        if let named {
+            out.append(.log("reader failed role=\(role.rawValue) via=\(job.target.via.rawValue) why=\(named)"))
         } else {
             out.append(.log("reader answered role=\(role.rawValue) via=\(job.target.via.rawValue) ms=\(ms) pid=\(pid)"))
         }
-        note("reply \(role.rawValue)/\(job.target.via.rawValue) client=\(job.client) frame=\(job.frame) \(error.map(Self.name) ?? "ok") ms=\(ms)", now)
+        note("reply \(role.rawValue)/\(job.target.via.rawValue) client=\(job.client) frame=\(job.frame) \(named ?? "ok") ms=\(ms)", now)
         let delivery = scheduler.complete(role, id: job.id)
         if case .drop = delivery { out.append(.count("reader.dropped")) }
         if let p = jobs.removeValue(forKey: job.id) {
@@ -346,9 +353,12 @@ public struct ReaderHostCore: Sendable {
         return error
     }
 
-    public static func name(_ error: ReadFailure) -> String {
+    /// What the log and the ring call a failure. A compile failure is called `nospace` once the worker's health holds the disk to be
+    /// why (`WorkerHealth.lacksDiskSpace`): the one place that names it, for the failed line and the ring alike.
+    public static func name(_ error: ReadFailure, diskIsWhy: Bool = false) -> String {
         switch error {
         case .programsNotReady: "programsNotReady"
+        case .compileFailed: diskIsWhy ? "nospace" : "compileFailed"
         case .failed: "failed"
         case .badJob: "badJob"
         case .interrupted: "interrupted"
@@ -388,7 +398,7 @@ public struct ReaderHostCore: Sendable {
         // is gone is `restarting`, and a document model that failed leaves the layout to the grouper.
         p.tries += 1
         if doc { out.append(.count("ocr.swift.failed")) }
-        if p.tries <= 3, doc || error.isProgramsNotReady || error.isServiceLost {
+        if p.tries <= 3, doc || error.isModelNotReady || error.isServiceLost {
             p.noDocs = p.noDocs || doc
             counts.retried += 1
             out.append(.count("reader.retried"))
@@ -423,7 +433,18 @@ public struct ReaderHostCore: Sendable {
     }
 
     private mutating func tickBoth(_ now: TimeInterval) {
+        sampleDisk(now)
         for role in WorkerRole.allCases { handle(role, health[role]!.tick(now: now, wanted: wantsWorker(role)), now: now) }
+    }
+
+    /// Asks the app for the free space, at most once per `timing.diskSampleEvery`, and tells both workers. Free space back above the
+    /// line ends the rest of a rung that compile failures put on (`WorkerHealth.sampledDisk`); their next `tick` says so.
+    private mutating func sampleDisk(_ now: TimeInterval) {
+        guard diskSampledAt.map({ now - $0 >= timing.diskSampleEvery }) ?? true else { return }
+        diskSampledAt = now
+        let bytes = freeSpace()
+        note("disk free=\(bytes.map { "\($0 >> 20) MB" } ?? "?")", now)
+        for role in WorkerRole.allCases { health[role]!.sampledDisk(bytes, now: now) }
     }
 
     /// Whether anything wants this worker alive (it keeps an idle worker from exiting). R3b: Lines only while a lens is on.
@@ -557,8 +578,9 @@ public struct ReaderHostCore: Sendable {
             warmPhase = .performing(pf)
             return .sleep(timing.warmPoll)
         }
-        if error.isProgramsNotReady, now - pf.began < timing.coldWait {
-            let wait = pf.again.failure(now: now)
+        if error.isModelNotReady, now - pf.began < timing.coldWait {
+            // Not before the worker's rung has rested: on a full disk each ask preallocates 2.4 GB and fails 35-55 s later.
+            let wait = max(pf.again.failure(now: now), (health[pf.step.role]!.restUntil ?? now) - now)
             warmPhase = .performing(pf)
             return .sleep(wait)
         }
@@ -659,7 +681,19 @@ extension ReadFailure {
         }
     }
 
-    public var isProgramsNotReady: Bool {
-        if case .programsNotReady = self { true } else { false }
+    /// The newest model is not ready: its programs are not (Code 13) or its compile failed (Code 11). The read goes on with what is
+    /// left and the model is asked again later. `isCompileFailed` is the second alone.
+    public var isModelNotReady: Bool {
+        switch self {
+        case .programsNotReady, .compileFailed: true
+        default: false
+        }
+    }
+
+    public var isCompileFailed: Bool {
+        switch self {
+        case .compileFailed: true
+        default: false
+        }
     }
 }

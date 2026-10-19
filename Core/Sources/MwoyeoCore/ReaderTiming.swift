@@ -24,6 +24,15 @@ public struct ReaderTiming: Sendable, Equatable {
     public var rung: Backoff
     /// Docs' rest after consecutive answers past S (`DocsRest`).
     public var docsRest: Backoff
+    /// The rev3 rung's rest after a compile failure with the volume short of space (`Backoff.compileRung`).
+    public var compileRung: Backoff
+    /// Two compile failures this close together, with the volume short of space, are the disk's (`WorkerHealth.lacksDiskSpace`).
+    public var compileWindow: TimeInterval
+    /// Under this many free bytes the volume is short of space for a compile: one failed preallocation was 2.41 GB (2026-10-19),
+    /// so 3 GiB. [provisional — backlog]
+    public var lowDisk: UInt64
+    /// How often the host asks the app for the free space (`ReaderHostCore.freeSpace`).
+    public var diskSampleEvery: TimeInterval
     /// How long a warm-up waits for a busy worker, and keeps asking while the programs are not ready (`OCRHealth.coldWait`).
     public var coldWait: TimeInterval
     /// How often a warm-up looks at a worker that is busy or restarting.
@@ -35,7 +44,8 @@ public struct ReaderTiming: Sendable, Equatable {
 
     public init(patience: [ReadVia: TimeInterval], stuckAfter: TimeInterval, warmingBound: TimeInterval, idleExitAfter: TimeInterval,
                 code13Span: TimeInterval, recycleWindow: TimeInterval, crashWindow: TimeInterval, restart: Backoff, rung: Backoff,
-                docsRest: Backoff, coldWait: TimeInterval, warmPoll: TimeInterval, waitsForDocs: Bool, docsWaitPoll: TimeInterval) {
+                docsRest: Backoff, compileRung: Backoff, compileWindow: TimeInterval, lowDisk: UInt64, diskSampleEvery: TimeInterval,
+                coldWait: TimeInterval, warmPoll: TimeInterval, waitsForDocs: Bool, docsWaitPoll: TimeInterval) {
         self.patience = patience
         self.stuckAfter = stuckAfter
         self.warmingBound = warmingBound
@@ -46,6 +56,10 @@ public struct ReaderTiming: Sendable, Equatable {
         self.restart = restart
         self.rung = rung
         self.docsRest = docsRest
+        self.compileRung = compileRung
+        self.compileWindow = compileWindow
+        self.lowDisk = lowDisk
+        self.diskSampleEvery = diskSampleEvery
         self.coldWait = coldWait
         self.warmPoll = warmPoll
         self.waitsForDocs = waitsForDocs
@@ -57,8 +71,8 @@ public struct ReaderTiming: Sendable, Equatable {
         patience: Dictionary(uniqueKeysWithValues: ReadVia.allCases.map { ($0, $0.patience) }),
         stuckAfter: WorkerHealth.stuckAfter, warmingBound: WorkerHealth.warmingBound, idleExitAfter: WorkerHealth.idleExitAfter,
         code13Span: WorkerHealth.code13Span, recycleWindow: WorkerHealth.recycleWindow, crashWindow: WorkerHealth.crashWindow,
-        restart: .workerRestart, rung: .rev3Rung, docsRest: .rev3Rung, coldWait: OCRHealth.coldWait, warmPoll: 0.2,
-        waitsForDocs: false, docsWaitPoll: 0.1)
+        restart: .workerRestart, rung: .rev3Rung, docsRest: .rev3Rung, compileRung: .compileRung, compileWindow: 300,
+        lowDisk: 3 << 30, diskSampleEvery: 30, coldWait: OCRHealth.coldWait, warmPoll: 0.2, waitsForDocs: false, docsWaitPoll: 0.1)
 
     public func patience(_ via: ReadVia) -> TimeInterval { patience[via] ?? via.patience }
 

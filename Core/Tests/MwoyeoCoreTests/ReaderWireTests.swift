@@ -232,4 +232,40 @@ import Testing
         let mb = ReaderWire.physFootprint() >> 20
         #expect(mb > 5 && mb < 100_000)
     }
+
+    @Test func aCompileFailureIsItsOwnFailureTypedFromTheCompilerCall() throws {
+        struct Thrown: Error, CustomStringConvertible { let description: String }
+        let d = ReaderFakeAction.nospaceDescription
+        #expect(ReadFailure.from(Thrown(description: d)) == .compileFailed(d), "the text the service logged on 2026-10-19")
+        #expect(ReadFailure.from(Thrown(description: ReaderFakeAction.e5rtDescription)) == .programsNotReady(ReaderFakeAction.e5rtDescription),
+                "Code 13 is what it was")
+        #expect(ReadFailure.from(ReadFailure.compileFailed(d)) == .compileFailed(d))
+        #expect(ReadFailure.compileFailed(d).description == d)
+        let failure = ReadFailure.compileFailed(d)
+        #expect(failure.isCompileFailed && failure.isModelNotReady, "a compile failure still goes on with what is left, like Code 13")
+        #expect(!ReadFailure.programsNotReady(ReaderFakeAction.e5rtDescription).isCompileFailed && !ReadFailure.failed("x").isModelNotReady)
+        #expect(OCRHealth.passFailureIsTransient(failure), "the pass is read again after a backoff")
+        // A fake fails with what the classifier makes of its text: the gate and the real error are one thing.
+        for action in [ReaderFakeAction.e5rt, .nospace] {
+            let made = try #require(action.failure)
+            #expect(ReadFailure.from(Thrown(description: made.description)) == made)
+        }
+        #expect(ReaderFakeAction.slow(ms: 1).failure == nil && ReaderFakeAction.crash.failure == nil && ReaderFakeAction.shift1.failure == nil)
+        let reply = ReadReply(id: 7, role: .lines, pid: 1, error: failure)
+        #expect(try ReaderWire.decode(ReadReply.self, from: ReaderWire.encode(reply)).error == failure, "it crosses the wire as itself")
+    }
+
+    @Test func nospaceFakesCountDownLikeE5rtAndAreOneModePerRole() {
+        let plan = ReaderFakePlan("lines-nospace:2,docs-nospace")
+        #expect(plan.unrecognized.isEmpty)
+        #expect(plan.actions(role: .lines, kind: .rev3) == [.nospace])
+        #expect(plan.actions(role: .lines, kind: .warmLines) == [.nospace])
+        #expect(plan.actions(role: .lines, kind: .rev3).isEmpty, "two jobs, then it reads")
+        #expect(plan.actions(role: .lines, kind: .rev2).isEmpty && plan.actions(role: .lines, kind: .fast).isEmpty, "only the newest model compiles")
+        #expect(plan.actions(role: .docs, kind: .doc) == [.nospace] && plan.actions(role: .docs, kind: .warmDoc) == [.nospace])
+        #expect(ReaderFakePlan("lines-nospace:x").unrecognized == ["lines-nospace:x"])
+        #expect(ReaderFakePlan("lines-e5rt:1,lines-nospace:1").actions(role: .lines, kind: .rev3) == [.nospace], "the last mode named wins")
+        let job = ReadJob(kind: .rev3, fake: [.nospace])
+        #expect((try? ReaderWire.decode(ReadJob.self, from: ReaderWire.encode(job)))?.fake == [.nospace])
+    }
 }

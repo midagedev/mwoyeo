@@ -91,8 +91,8 @@ public enum ReadRouter {
     /// 3. Lines ready → Lines with the best healthy rung for the languages: rev3, or rev2 or `.fast` while rev3 rests.
     /// 4. Lines busy within S → queue behind it.
     /// 5. Lines not usable → Docs/doc if Docs is ready and warm for the key (a doc read gives lines too); else Docs/`.fast` if the
-    ///    ladder has `.fast`; else unavailable: not responding when Lines is stuck (or stuck twice), restart when it crash-looped,
-    ///    preparing otherwise.
+    ///    ladder has `.fast`; else unavailable: restart when Lines crash-looped, the disk when its compile keeps failing on a Mac
+    ///    short of space (`WorkerHealth.lacksDiskSpace`), not responding when it is stuck (or stuck twice), preparing otherwise.
     ///
     /// 6. A kind never goes to a worker that is cold for it unless that worker is its home (`WorkerHealth.readiness`): rev3 never
     ///    goes to Docs, doc never to Lines. `.fast` never compiles and goes anywhere.
@@ -129,9 +129,10 @@ public enum ReadRouter {
 
     /// Why a lens that has no reader waits, from the worker that reads lines.
     public static func unavailableReason(lines: WorkerHealth, now: TimeInterval) -> RecognitionWait {
-        switch lines.effectiveState(now: now) {
-        case .stuck, .disabled(.stuckTwice): .notResponding
-        case .disabled(.crashLoop): .restartApp
+        switch (lines.lacksDiskSpace, lines.effectiveState(now: now)) {
+        case (_, .disabled(.crashLoop)): .restartApp
+        case (true, _): .needsDiskSpace
+        case (_, .stuck), (_, .disabled(.stuckTwice)): .notResponding
         default: .preparing
         }
     }

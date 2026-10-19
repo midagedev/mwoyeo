@@ -166,6 +166,9 @@ public struct ReadLine: Codable, Sendable, Equatable {
 public enum ReadFailure: Error, Codable, Sendable, Equatable, CustomStringConvertible {
     /// The Neural Engine programs are not ready (e5rt Code 13, `OCRHealth.programsNotReady`).
     case programsNotReady(String)
+    /// The compiler service failed to compile the model (`e5rt_e5_compiler_compile`, Code 11, `OCRHealth.compileFailed`). Seen on
+    /// a Mac short of disk space: the compile preallocates 2.4 GB of temp space, fails, and caches nothing (2026-10-19).
+    case compileFailed(String)
     /// Vision threw something else.
     case failed(String)
     /// The service could not run the job as described (wrong role, missing or mismatched picture, undecodable).
@@ -177,7 +180,7 @@ public enum ReadFailure: Error, Codable, Sendable, Equatable, CustomStringConver
 
     public var description: String {
         switch self {
-        case let .programsNotReady(d), let .failed(d): d
+        case let .programsNotReady(d), let .compileFailed(d), let .failed(d): d
         case let .badJob(m): "bad reader job: \(m)"
         case .interrupted: "the reader service stopped while it was reading"
         case let .unavailable(m): "the reader service is unavailable: \(m)"
@@ -187,7 +190,11 @@ public enum ReadFailure: Error, Codable, Sendable, Equatable, CustomStringConver
     public static func from(_ error: Error) -> ReadFailure {
         if let failure = error as? ReadFailure { return failure }
         let d = String(describing: error)
-        return OCRHealth.programsNotReady(description: d) ? .programsNotReady(d) : .failed(d)
+        switch (OCRHealth.compileFailed(description: d), OCRHealth.programsNotReady(description: d)) {
+        case (true, _): return .compileFailed(d)
+        case (_, true): return .programsNotReady(d)
+        default: return .failed(d)
+        }
     }
 }
 
@@ -291,6 +298,8 @@ public enum ReaderFakeAction: Codable, Sendable, Equatable {
     case slow(ms: Int)
     /// Fails as a Mac does while its programs are not ready (Code 13).
     case e5rt
+    /// Fails as a Mac short of disk space does: the model does not compile (Code 11).
+    case nospace
     /// `exit(1)` on this job.
     case crash
     /// Moves every rect 1 px to the right.
@@ -298,17 +307,30 @@ public enum ReaderFakeAction: Codable, Sendable, Equatable {
 
     /// What a Mac logs while its programs are not ready; `OCRHealth.programsNotReady` knows it by "e5rtError".
     public static let e5rtDescription = "e5rtError(\"e5rt_execution_stream_operation_create_precompiled_compute_operation_with_options call failed\", 13)"
+    /// What the same Mac logs when the compile fails (`OCRHealth.compileFailed` knows it by "e5rt_e5_compiler_compile").
+    public static let nospaceDescription = "e5rtError(\"e5rt_e5_compiler_compile call failed\", 11)"
+
+    /// What the service answers with instead of reading, nil for the actions that only change the timing or the pixels.
+    public var failure: ReadFailure? {
+        switch self {
+        case .e5rt: .programsNotReady(Self.e5rtDescription)
+        case .nospace: .compileFailed(Self.nospaceDescription)
+        case .slow, .crash, .shift1: nil
+        }
+    }
 }
 
 /// `MWOYEO_FAKE_READER=<mode>[,<mode>…]`, read by the client (`ReaderFakePlan.environment`, App/Reader/ReaderConnection.swift):
 /// - `docs-slow:<ms>`, `lines-slow:<ms>`: every job of that role sleeps, then answers;
 /// - `lines-e5rt[:<n>]`, `docs-e5rt[:<n>]`: the first n (20) jobs of its newest model (`rev3`/`warmLines`, `doc`/`warmDoc`) fail with Code 13;
+/// - `lines-nospace[:<n>]`, `docs-nospace[:<n>]`: the same jobs fail as a Mac short of disk space does (the compile fails, Code 11);
+///   a role holds one of the two modes (the last one named wins);
 /// - `crash`, `crash:lines`, `crash:docs`: the next job (of that role) makes its service exit(1), once;
 /// - `shift1`: every rect of every reply moves 1 px (the mutation of the equivalence gate).
 public final class ReaderFakePlan: @unchecked Sendable {
     private let lock = NSLock()
     private var slow: [ReaderRole: Int] = [:]
-    private var e5rtLeft: [ReaderRole: Int] = [:]
+    private var failing: [ReaderRole: (action: ReaderFakeAction, left: Int)] = [:]
     private var crashArmed = false
     private var crashRole: ReaderRole?
     private var shift = false
@@ -325,9 +347,10 @@ public final class ReaderFakePlan: @unchecked Sendable {
             case "docs-slow", "lines-slow":
                 guard let ms = argument.flatMap({ Int($0) }) else { unknown.append(mode); continue }
                 slow[parts[0].hasPrefix("docs") ? .docs : .lines] = ms
-            case "docs-e5rt", "lines-e5rt":
+            case "docs-e5rt", "lines-e5rt", "docs-nospace", "lines-nospace":
                 guard argument == nil || Int(argument ?? "") != nil else { unknown.append(mode); continue }
-                e5rtLeft[parts[0].hasPrefix("docs") ? .docs : .lines] = argument.flatMap { Int($0) } ?? 20
+                failing[parts[0].hasPrefix("docs") ? .docs : .lines] =
+                    (parts[0].hasSuffix("nospace") ? .nospace : .e5rt, argument.flatMap { Int($0) } ?? 20)
             case "crash":
                 guard argument == nil || ReaderRole(rawValue: argument ?? "") != nil else { unknown.append(mode); continue }
                 crashArmed = true
@@ -347,9 +370,9 @@ public final class ReaderFakePlan: @unchecked Sendable {
             var out: [ReaderFakeAction] = []
             if let ms = slow[role] { out.append(.slow(ms: ms)) }
             let newest: [ReadKind] = role == .lines ? [.rev3, .warmLines] : [.doc, .warmDoc]
-            if newest.contains(kind), let left = e5rtLeft[role], left > 0 {
-                e5rtLeft[role] = left - 1
-                out.append(.e5rt)
+            if newest.contains(kind), let fail = failing[role], fail.left > 0 {
+                failing[role] = (fail.action, fail.left - 1)
+                out.append(fail.action)
             }
             if crashArmed, crashRole == nil || crashRole == role {
                 crashArmed = false

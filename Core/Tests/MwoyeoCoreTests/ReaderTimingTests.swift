@@ -17,6 +17,15 @@ import Testing
         #expect(!t.waitsForDocs, "the mutation of the silence gates is never the default")
     }
 
+    @Test func theDiskNumbersAreTheOnesTheDesignDerived() {
+        // New pins, 2026-10-20 (ane-disk). One failed preallocation was 2,407,530,496 bytes (2.41 GB, /tmp/ane-root/nospace.log), so a
+        // volume under 3 GiB cannot take the next one: [provisional — backlog] until a Mac with a full disk has reported.
+        let t = ReaderTiming.standard
+        #expect(t.lowDisk == 3 << 30 && t.lowDisk > 2_407_530_496)
+        #expect(t.compileRung.schedule(7) == [60, 120, 240, 480, 600, 600, 600] && t.compileRung.healthyWindow == nil)
+        #expect(t.compileWindow == 300 && t.diskSampleEvery == 30)
+    }
+
     @Test func aHealthTakesItsLimitsFromTheTiming() {
         var t = ReaderTiming.standard
         t.patience[.doc] = 0.2

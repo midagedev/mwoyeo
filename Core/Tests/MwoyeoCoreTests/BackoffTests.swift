@@ -69,6 +69,10 @@ import Testing
             .engineCooldown: [2, 4, 8, 16, 30, 30, 30],
             .lensRead: [1, 2, 4, 5, 5, 5, 5],
             .rev3Rung: [1, 2, 4, 8, 16, 30, 30],
+            // 2026-10-20 (ane-disk): a new row, no old row moved. Every compile that fails for want of disk space preallocates 2.4 GB
+            // and fails 35-55 s later (2026-10-19), so the rung rests a minute and doubles to ten: 60 120 240 480 600 600 600.
+            // [provisional — backlog] until a Mac with a full disk has been seen.
+            .compileRung: [60, 120, 240, 480, 600, 600, 600],
             .workerRestart: [1, 2, 4, 8, 16, 30, 30],
             .captureRestart: [1, 2, 5, 15, 30, 30, 30],
         ]

@@ -8,6 +8,8 @@ public enum RecognitionWait: String, Sendable, Equatable {
     case notResponding
     /// The worker crash-looped and is switched off for this run: "Restart Mwoyeo".
     case restartApp
+    /// The model does not compile and the Mac is short of disk space (`WorkerHealth.lacksDiskSpace`): "Free up a few GB".
+    case needsDiskSpace
 }
 
 /// One lens's wait for a reader (design §4.7). Driven only by what the router said about its read: a lens never has a state of

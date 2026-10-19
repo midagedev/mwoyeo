@@ -95,6 +95,10 @@ extension Backoff {
         /// The rev3 rung of a Lines worker after `programsNotReady` / `nilError` (Code 13); rev2 and `.fast` serve meanwhile.
         /// Reset by a rev3 answer. A streak of 20 over 60 s recycles the worker (`WorkerHealth`).
         case rev3Rung
+        /// The rev3 rung after a compile failure while the volume is short of space (`WorkerHealth.reply`): every ask preallocates
+        /// 2.4 GB and fails 35-55 s later, so it rests a minute, then doubles to 10 minutes. Reset by a rev3 answer, or by free space
+        /// coming back.
+        case compileRung
         /// A worker restart after a crash or a recycle. Reset by 10 minutes without a crash.
         case workerRestart
         /// A capture restart (`CaptureRecoveryPolicy.standard`, the same values). A stream that ran 30 s starts a new episode.
@@ -106,6 +110,7 @@ extension Backoff {
             case .engineCooldown: Backoff(base: 2, cap: 30, healthyWindow: 60)
             case .lensRead: Backoff(base: 1, cap: 5)
             case .rev3Rung: Backoff(base: 1, cap: 30)
+            case .compileRung: Backoff(base: 60, cap: 600)
             case .workerRestart: Backoff(base: 1, cap: 30, healthyWindow: 600)
             case .captureRestart: Backoff(steps: [1, 2, 5, 15, 30], healthyWindow: 30)
             }
@@ -116,6 +121,7 @@ extension Backoff {
     public static var engineCooldown: Backoff { Use.engineCooldown.backoff }
     public static var lensRead: Backoff { Use.lensRead.backoff }
     public static var rev3Rung: Backoff { Use.rev3Rung.backoff }
+    public static var compileRung: Backoff { Use.compileRung.backoff }
     public static var workerRestart: Backoff { Use.workerRestart.backoff }
     public static var captureRestart: Backoff { Use.captureRestart.backoff }
 

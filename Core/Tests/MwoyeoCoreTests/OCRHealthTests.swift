@@ -191,4 +191,13 @@ import Testing
         h.notReady(id, now: 1)
         #expect(h.plan(canFallBack: true, now: 20) == .run(seconds: 8))
     }
+
+    @Test func aCompileFailureIsRecognisedByTheCompilerCallNotByTheCode() {
+        let logged = "e5rtError(\"e5rt_e5_compiler_compile call failed\", 11)"
+        #expect(H.compileFailed(description: logged))
+        #expect(H.compileFailed(description: "e5rtError(\"e5rt_e5_compiler_compile call failed\", 9)"))
+        #expect(!H.compileFailed(description: "e5rtError(\"e5rt_execution_stream_operation_create_precompiled_compute_operation_with_options call failed\", 13)"))
+        #expect(!H.compileFailed(description: "nilError"))
+        #expect(H.programsNotReady(description: logged) && H.passFailureIsTransient(Logged(description: logged)), "and a transient of the pass, as before")
+    }
 }

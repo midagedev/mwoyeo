@@ -41,13 +41,29 @@ final class HostWorld {
         var event: Event
     }
 
+    /// The free bytes the app's sampler (`ReaderHostCore.freeSpace`) reads; a test sets it (`disk.bytes`) and counts the asks.
+    final class Disk: @unchecked Sendable {
+        private let lock = NSLock()
+        private var value: UInt64?
+        private var asked = 0
+        var bytes: UInt64? {
+            get { lock.withLock { value } }
+            set { lock.withLock { value = newValue } }
+        }
+        var asks: Int { lock.withLock { asked } }
+        func read() -> UInt64? { lock.withLock { asked += 1; return value } }
+    }
+
     var core: ReaderHostCore
+    let disk = Disk()
     private(set) var now: TimeInterval = 0
     let fakes: ReaderFakePlan
     /// How long a warm service takes to answer a kind, before the fake's own delay.
     var base: [ReadKind: TimeInterval] = [.rev3: 0.30, .rev2: 0.25, .fast: 0.10, .doc: 0.40, .warmLines: 0.60, .warmDoc: 0.60]
     /// How long the first job after a crash waits for launchd to start the service again.
     var relaunch: TimeInterval = 10
+    /// How long a compile that fails for want of disk space (`lines-nospace`) runs before it throws (35-55 s on a real Mac).
+    var compileFailsAfter: TimeInterval = 35
 
     private var queue: [Scheduled] = []
     private var seq = 0
@@ -68,6 +84,8 @@ final class HostWorld {
 
     init(timing: ReaderTiming = .standard, fakes: String = "", path: PathOverride? = nil) {
         core = ReaderHostCore(timing: timing, path: path)
+        let disk = disk
+        core.freeSpace = { disk.read() }
         self.fakes = ReaderFakePlan(fakes)
         precondition(self.fakes.unrecognized.isEmpty, "fake mode not understood: \(self.fakes.unrecognized)")
     }
@@ -237,10 +255,12 @@ final class HostWorld {
         var slow = 0.0
         var crash = false
         var e5rt = false
+        var nospace = false
         for action in fakes.actions(role: role, kind: kind) {
             switch action {
             case let .slow(ms): slow += Double(ms) / 1000
             case .e5rt: e5rt = true
+            case .nospace: nospace = true
             case .crash: crash = true
             case .shift1: break
             }
@@ -256,6 +276,9 @@ final class HostWorld {
         if e5rt {
             delay += 0.012
             error = .programsNotReady(ReaderFakeAction.e5rtDescription)
+        } else if nospace {
+            delay += compileFailsAfter
+            error = ReaderFakeAction.nospace.failure
         } else {
             delay += base[kind] ?? 0.3
         }
@@ -277,7 +300,7 @@ final class HostWorld {
     var rungWaits: [Int] {
         logs.compactMap { entry in
             guard entry.line.hasPrefix("reader rung resting role=lines via=rev3 for="),
-                  let value = entry.line.split(separator: "=").last?.split(separator: " ").first else { return nil }
+                  let value = entry.line.split(separator: "=")[3].split(separator: " ").first else { return nil }
             return Int(value)
         }
     }

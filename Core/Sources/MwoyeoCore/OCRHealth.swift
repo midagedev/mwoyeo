@@ -31,6 +31,11 @@ public struct OCRHealth: Sendable, Equatable {
 
     public static func programsNotReady(description: String) -> Bool { description.contains("e5rtError") }
 
+    /// The error says the compiler service failed to compile the model: `e5rtError("e5rt_e5_compiler_compile call failed", 11)`, seen
+    /// 35-55 s after the request on a Mac short of disk space (2026-10-19; the compile preallocates 2.4 GB and the failure caches
+    /// nothing). It also matches `programsNotReady` (the same "e5rtError"), so it is still a transient of the read pass.
+    public static func compileFailed(description: String) -> Bool { description.contains("e5rt_e5_compiler_compile") }
+
     /// A failed read pass that the system's recognizer recovers from by itself, so the picture is read again after a backoff
     /// rather than counted as read: programs not ready, a read that returned neither a result nor an error (`nilError`, logged on a
     /// saturated Neural Engine, 2026-10-18), or a read that did not answer in time (`ReadTimeout`; until 2026-10-18 the pass ran

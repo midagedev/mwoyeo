@@ -21,7 +21,7 @@
 # the .out holds `reader: <role> pid=<p> gui pid=<q>` per service.
 BIN=${1:?usage: reader-equal.sh <Mwoyeo binary> <out dir> <swift|vn|direct> [inprocess] [xpc] [mutation]}; OUT=${2:?out dir}; OCR=${3:?swift, vn or direct}; shift 3
 MODES=${*:-inprocess xpc mutation}
-HERE=$(cd "$(dirname "$0")" && pwd)
+HERE=$(cd "$(dirname "$0")" && pwd); ANE=$HERE/../ane-env.sh
 PNGS=${PNGS:-/Users/hckim/.cache/mwoyeo-gates/usecases/set}
 PAGES=${PAGES:-/tmp/paper-quality/paper}
 mkdir -p "$OUT"
@@ -44,7 +44,7 @@ if [ "$OCR" = direct ]; then
         done < <(pictures)
         [ ${#list[@]} -gt 0 ] || continue
         [ -e "$OUT/direct/$lang.rc" ] && continue
-        env MWOYEO_MEMORY_SECRETS=1 MWOYEO_TRACE=1 "$BIN" --reader-check equal "$lang" "${list[@]}" > "$OUT/direct/$lang.log" 2> "$OUT/direct/$lang.err" < /dev/null
+        env MWOYEO_MEMORY_SECRETS=1 MWOYEO_TRACE=1 "$ANE" run pool -- "$BIN" --reader-check equal "$lang" "${list[@]}" > "$OUT/direct/$lang.log" 2> "$OUT/direct/$lang.err" < /dev/null
         echo $? > "$OUT/direct/$lang.rc"
         grep -E 'check: equal (same:|PASS|FAIL)' "$OUT/direct/$lang.log"
     done
@@ -64,7 +64,7 @@ for mode in $MODES; do
         o="$dir/$n"
         [ -e "$o.rc" ] && continue
         s=$(date +%s)
-        env "${env[@]}" "$BIN" --render "$png" "$o.png" --src "$l" --tgt "$t" --no-inpaint --warm --max-wait 120 > "$o.out" 2> "$o.err" < /dev/null
+        env "${env[@]}" "$ANE" run pool -- "$BIN" --render "$png" "$o.png" --src "$l" --tgt "$t" --no-inpaint --warm --max-wait 120 > "$o.out" 2> "$o.err" < /dev/null
         echo "$? $(( $(date +%s) - s )) s" > "$o.rc"
     done
 done

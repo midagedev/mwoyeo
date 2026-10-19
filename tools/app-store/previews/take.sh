@@ -10,7 +10,7 @@
 # Needs: the Bash sandbox off; a Release build of this tree with MWOYEO_APP_ID=dev.midagedev.mwoyeo.preview in $DD;
 # the terminal's Screen Recording and Accessibility permissions; the ja->ko and ko->en translation packs.
 set -u
-HERE=$(cd "$(dirname "$0")" && pwd); REPO=$(cd "$HERE/../../.." && pwd)
+HERE=$(cd "$(dirname "$0")" && pwd); REPO=$(cd "$HERE/../../.." && pwd); ANE=$HERE/../../ane-env.sh
 WORK=${WORK:-/tmp/as4}
 DD=${DD:-$WORK/dd}
 APP=$DD/Build/Products/Release/Mwoyeo.app/Contents/MacOS/Mwoyeo
@@ -58,7 +58,7 @@ app)
     defaults write $SUITE settingsMirror -data $BLOB
     printf '{"sourceLanguage":"%s","targetLanguage":"%s"}\n' $SRC $DST > "$WORK/scratch/settings.json"
     MWOYEO_SETTINGS_FILE=$WORK/scratch/settings.json MWOYEO_DEFAULTS_SUITE=$SUITE MWOYEO_MEMORY_SECRETS=1 \
-        "$APP" --add-region $LENS -AppleLanguages "($L)" > "$WORK/app-$L.log" 2>&1 &
+        "$ANE" run pool -- "$APP" --add-region $LENS -AppleLanguages "($L)" > "$WORK/app-$L.log" 2>&1 &
     echo $! > "$WORK/pids/app"
     date +%s > "$WORK/pids/app.start"
     echo "app $L pid $(cat $WORK/pids/app)"

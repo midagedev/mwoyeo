@@ -12,7 +12,7 @@
 # One summary line per use case and path (all 40, odd-numbered pictures, even-numbered): score.py.
 BIN=${1:?usage: bench.sh <Mwoyeo binary> [vn|swift|auto ...]}; shift
 PATHS=${*:-vn swift auto}
-HERE=$(cd "$(dirname "$0")" && pwd)
+HERE=$(cd "$(dirname "$0")" && pwd); ANE=$HERE/../ane-env.sh
 PNGS=${PNGS:-/Users/hckim/.cache/mwoyeo-gates/usecases/set}
 OUT=${OUT:-/tmp/usecase-bench}
 mkdir -p "$OUT/out"
@@ -25,7 +25,7 @@ tail -n +2 "$HERE/set/index.tsv" | while IFS=$'\t' read -r n uc l w h; do
         echo "$(uptime | sed 's/.*averages: //' | cut -d' ' -f1)" > "$o.load"
         env=(MWOYEO_TRACE=1); [ "$p" != auto ] && env+=(MWOYEO_OCR_PATH=$p)
         [ "$p" = auto ] && [ -n "$LINES" ] && env+=(MWOYEO_TRACE_LINES=1)
-        env "${env[@]}" "$BIN" --render "$PNGS/$n.png" "$o.png" --src "$l" --tgt "$T" --no-inpaint --warm --max-wait 120 \
+        env "${env[@]}" "$ANE" run pool -- "$BIN" --render "$PNGS/$n.png" "$o.png" --src "$l" --tgt "$T" --no-inpaint --warm --max-wait 120 \
             > "$o.out" 2> "$o.err" < /dev/null
     done
 done

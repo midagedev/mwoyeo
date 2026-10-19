@@ -8,10 +8,11 @@
 # Prints `PASS <page> rc=0` or `FAIL <page> rc=<n>`; exit 0 when every page passed. Needs the Bash sandbox off (headless --render).
 BIN=${1:?usage: trace-render.sh <Mwoyeo binary> [page ...]}; shift
 PAGES=${PAGES:-/tmp/paper-quality/paper}; OUT=${OUT:-/tmp/trace-render}; OCR=${OCR:-vn}
+ANE=$(cd "$(dirname "$0")/.." && pwd)/ane-env.sh
 mkdir -p "$OUT"; fail=0
 for page in ${*:-p6}; do
     MWOYEO_TRACE=1 MWOYEO_MEMORY_SECRETS=1 MWOYEO_DEFAULTS_SUITE=tracerender.test MWOYEO_SETTINGS_FILE="$OUT/s.json" MWOYEO_OCR_PATH=$OCR \
-        "$BIN" --render "$PAGES/$page.png" "$OUT/$page.png" --src en --tgt ko --scale 2 --warm --max-wait 120 > "$OUT/$page.out" 2> "$OUT/$page.err" < /dev/null
+        "$ANE" run pool -- "$BIN" --render "$PAGES/$page.png" "$OUT/$page.png" --src en --tgt ko --scale 2 --warm --max-wait 120 > "$OUT/$page.out" 2> "$OUT/$page.err" < /dev/null
     rc=$?
     if [ $rc = 0 ] && grep -q '^silence:' "$OUT/$page.out"; then echo "PASS $page rc=0"; else echo "FAIL $page rc=$rc $(grep -m1 'cannot be converted' "$OUT/$page.err")"; fail=1; fi
 done

@@ -32,6 +32,7 @@ GATES=${*:-crash}
 PNGS=${PNGS:-/Users/hckim/.cache/mwoyeo-gates/usecases/set}
 OUT=${OUT:-/tmp/host-gates/$(date +%Y%m%d-%H%M%S)}
 LIMIT_S=20
+ANE=$(cd "$(dirname "$0")/.." && pwd)/ane-env.sh
 mkdir -p "$OUT"
 fail=0
 say() { echo "$@" | tee -a "$OUT/summary.txt"; }
@@ -44,7 +45,7 @@ run() {
     mkdir -p "$OUT/$g"
     date '+%Y-%m-%d %H:%M:%S' > "$OUT/$g/start.txt"
     env MWOYEO_MEMORY_SECRETS=1 MWOYEO_SETTINGS_FILE="$OUT/$g/s.json" MWOYEO_DEFAULTS_SUITE=hostgates.$g MWOYEO_TRACE=1 "${ENVS[@]}" \
-        "$BIN" --render "$pic" "$OUT/$g/out.png" "$@" > "$OUT/$g/render.out" 2> "$OUT/$g/render.err" < /dev/null
+        "$ANE" run pool -- "$BIN" --render "$pic" "$OUT/$g/out.png" "$@" > "$OUT/$g/render.out" 2> "$OUT/$g/render.err" < /dev/null
     echo $? > "$OUT/$g/rc"
 }
 logfor() { /usr/bin/log show --start "$(cat "$OUT/$1/start.txt")" --predicate 'subsystem == "dev.midagedev.mwoyeo" AND category == "reader"' --info --style compact 2>/dev/null; }

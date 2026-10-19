@@ -6,24 +6,25 @@
 # Exit 2 with one line on stderr when PAGES is missing or holds no *.png, or when no page matches the patterns: a bench that scored 0 renders is not a result.
 # Outputs <out>/<name>.out (the render's stdout: sources, translations, the layout and block lines), .err (the trace: among its
 # lines `kept math`, the blocks left as written because they are mostly inline mathematics), .png, and .load (the
-# machine load and ANECompilerService CPU at start). A name whose .out exists is skipped, so a cut run resumes. Every run sets
+# machine load and the start and end times of the render), and <out>/ane-census.txt (the Neural Engine compiler service's networks during the whole run, tools/ane-census). A name whose .out exists is skipped, so a cut run resumes. Every run sets
 # MWOYEO_MEMORY_SECRETS and a scratch defaults suite: nothing of the user's settings is read or written.
 BIN=${1:?usage: run.sh <Mwoyeo binary> <out dir> [pattern ...]}; OUT=${2:?out dir}; shift 2
 PAGES=${PAGES:-/tmp/paper-quality/pages-own}
-HERE=$(cd "$(dirname "$0")" && pwd)
+HERE=$(cd "$(dirname "$0")" && pwd); ANE=$HERE/../ane-env.sh
 names=$(cd "$PAGES" 2>/dev/null && ls *.png 2>/dev/null | sed 's/\.png$//' | awk '/^p[0-9]+$/{print 1, $0; next} {print 2, $0}' | sort -k1,1n -k2,2V | cut -d' ' -f2)
 [ -n "$names" ] || { echo "run.sh: no pages: $PAGES is missing or holds no *.png (run pages.sh first, or set PAGES=<dir>)" >&2; exit 2; }
 mkdir -p "$OUT"
-picked=0
+picked=0; T0=$(date '+%Y-%m-%d %H:%M:%S')
 for n in $names; do
     if [ $# -gt 0 ]; then ok=; for p in "$@"; do [[ "$n" == "$p" || "$n" == "$p"-* ]] && ok=1; done; [ -z "$ok" ] && continue; fi
     picked=$((picked + 1))
     o="$OUT/$n"
     [ -s "$o.out" ] && continue
-    echo "load=$(uptime | sed 's/.*averages: //' | cut -d' ' -f1) ane_cpu=$(ps -Ao pcpu,comm | awk '/ANECompilerService/{s+=$1} END{print s+0}') start=$(date +%s)" > "$o.load"
+    echo "load=$(uptime | sed 's/.*averages: //' | cut -d' ' -f1) start=$(date +%s)" > "$o.load"
     MWOYEO_TRACE=1 MWOYEO_MEMORY_SECRETS=1 MWOYEO_DEFAULTS_SUITE=paperq.bench MWOYEO_SETTINGS_FILE="$OUT/settings.json" \
-        "$BIN" --render "$PAGES/$n.png" "$o.png" --src en --tgt ko --scale 2 --warm --max-wait 300 > "$o.out" 2> "$o.err" < /dev/null
-    echo "rc=$? end=$(date +%s) ane_cpu=$(ps -Ao pcpu,comm | awk '/ANECompilerService/{s+=$1} END{print s+0}')" >> "$o.load"
+        "$ANE" run pool -- "$BIN" --render "$PAGES/$n.png" "$o.png" --src en --tgt ko --scale 2 --warm --max-wait 300 > "$o.out" 2> "$o.err" < /dev/null
+    echo "rc=$? end=$(date +%s)" >> "$o.load"
 done
 [ "$picked" -gt 0 ] || { echo "run.sh: no page of $PAGES matches: $*" >&2; exit 2; }
+python3 -I "$HERE/../ane-census/census.py" window "$T0" > "$OUT/ane-census.txt" 2>&1
 python3 -I "$HERE/score.py" "$OUT"

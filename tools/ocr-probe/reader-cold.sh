@@ -25,9 +25,10 @@
 #          PAGES  the paper pages p<N>.png           (default /tmp/paper-quality/paper)
 #          PNGS   the use-case pictures              (default /Users/hckim/.cache/mwoyeo-gates/usecases/set)
 #          BIN    skip the build, use this binary    (it must be built with MWOYEO_APP_ID=$ID, ID given as well)
-#          ID     the bundle id (default fresh: dev.midagedev.mwoyeo.cold<stamp>)
+#          ID     the bundle id (default fresh: `tools/ane-env.sh id cold`)
 #          WARM   "--warm" (default) or empty: see step 3
-# Needs the Bash sandbox off (the Neural Engine, headless --render) and one render at a time.
+# Needs the Bash sandbox off (the Neural Engine, headless --render). Every launch is `ane-env.sh run cold`: no cache seeding (the empty
+# cache is the point) and the Neural Engine lease, so no other leased cold start compiles in the one lane meanwhile.
 #
 # 1. Builds the app AND its two services with a fresh id (`xcodebuild … MWOYEO_APP_ID=<id>`, the services become <id>.reader.lines
 #    and <id>.reader.docs): each has its own e5rt cache under ~/Library/Caches/<that id>/, all empty. No copied bundle is re-signed.
@@ -55,7 +56,8 @@ case $PAGE in ja|ja:*) JA=1; PIC=${PAGE#ja}; PIC=${PIC#:}; PIC=${PIC:-d02-timeta
 PNGS=${PNGS:-/Users/hckim/.cache/mwoyeo-gates/usecases/set}
 STAMP=$(date +%Y%m%d-%H%M%S)
 OUT=${OUT:-/tmp/reader-cold/$STAMP}
-ID=${ID:-dev.midagedev.mwoyeo.cold$(date +%s)}
+ANE=$HERE/../ane-env.sh
+ID=${ID:-$("$ANE" id cold)}
 PAGES=${PAGES:-/tmp/paper-quality/paper}
 DD=${DD:-$OUT/dd}
 LIMIT=8000
@@ -94,7 +96,7 @@ export MWOYEO_MEMORY_SECRETS=1 MWOYEO_SETTINGS_FILE="$OUT/s.json" MWOYEO_DEFAULT
 # Banned by the contract: killing a process that is loading. This script only waits for its own children.
 fresh=$(snapshot); say "cache fresh:  $fresh"
 t0=$(date +%s)
-"$BIN" --capture-ui "$OUT/capW" vision-reads --src en --for 900 > "$OUT/warm.out" 2> "$OUT/warm.err" < /dev/null &
+"$ANE" run cold -- "$BIN" --capture-ui "$OUT/capW" vision-reads --src en --for 900 > "$OUT/warm.out" 2> "$OUT/warm.err" < /dev/null &
 pid=$!
 wait $pid; rc=$?
 say "warm-up: rc=$rc $(( $(date +%s) - t0 )) s ($(grep -c 'read ' "$OUT/warm.out") probe reads) $(grep 'vision-reads: end' "$OUT/warm.out" | sed 's/^\[ *[0-9.]*\] //')"
@@ -103,15 +105,16 @@ before=$(snapshot); say "cache before: $before"
 export MWOYEO_TRACE_READS=1
 t0=$(date +%s)
 if [ $JA = 1 ]; then
-    "$BIN" --render "$PNGS/$PIC.png" "$OUT/$PIC.png" --src ja --tgt ko --mode adaptive --max-wait 600 --then reader-ready > "$OUT/render.out" 2> "$OUT/render.err" < /dev/null &
+    "$ANE" run cold -- "$BIN" --render "$PNGS/$PIC.png" "$OUT/$PIC.png" --src ja --tgt ko --mode adaptive --max-wait 600 --then reader-ready > "$OUT/render.out" 2> "$OUT/render.err" < /dev/null &
 else
-    "$BIN" --render "$PAGES/$PAGE.png" "$OUT/$PAGE.png" --src en --tgt ko --mode adaptive --max-wait 600 ${WARM---warm} --then reader-ready,again > "$OUT/render.out" 2> "$OUT/render.err" < /dev/null &
+    "$ANE" run cold -- "$BIN" --render "$PAGES/$PAGE.png" "$OUT/$PAGE.png" --src en --tgt ko --mode adaptive --max-wait 600 ${WARM---warm} --then reader-ready,again > "$OUT/render.out" 2> "$OUT/render.err" < /dev/null &
 fi
 pid=$!
 echo $pid > "$OUT/render.pid"
-# Footprint (MB, footprint -p) of the app and of the Docs service every 3 s: numbers for the report, not an assertion.
+# Footprint (MB, footprint -p) of the app and of the Docs service every 3 s: numbers for the report, not an assertion. (The app is the
+# child of the lease's parent process when ane-env.sh holds the lease, else the pid itself.)
 ( while kill -0 $pid 2>/dev/null; do
-      echo "gui $(fp $pid)" >> "$OUT/footprint.txt"
+      kid=$(pgrep -P $pid); echo "gui $(fp "${kid:-$pid}")" >> "$OUT/footprint.txt"
       dp=$(sed -n 's/^reader: docs pid=\([0-9]*\) .*/\1/p' "$OUT/render.out" | head -1)
       [ -n "$dp" ] && echo "docs $(fp "$dp")" >> "$OUT/footprint.txt"
       sleep 3

@@ -19,6 +19,7 @@ SP=${SP:?set SP to a folder holding in/chat.png (English chat), in/vn.png (Japan
 NEW=${NEW:-/tmp/ocr-stall/dd/Build/Products/Debug/Mwoyeo.app/Contents/MacOS/Mwoyeo}
 MAIN=${MAIN:-/tmp/mwoyeo-main/dd/Build/Products/Debug/Mwoyeo.app/Contents/MacOS/Mwoyeo}
 OUT=${OUT:-/tmp/ocr-stall/healthy}
+ANE=$(cd "$(dirname "$0")/.." && pwd)/ane-env.sh
 mkdir -p "$OUT"
 fails=0
 
@@ -26,7 +27,7 @@ fails=0
 # EXTRA adds arguments; OCRPATH sets MWOYEO_OCR_PATH (vn: never ask the Docs service).
 run() {
     local t0=$SECONDS
-    env ${OCRPATH:+MWOYEO_OCR_PATH=$OCRPATH} MWOYEO_FAKE_OCR="$3" "$2" --render "$SP/in/$4" "$OUT/$1.png" --src "$5" --tgt ko --max-wait "$6" $EXTRA > "$OUT/$1.out" 2> "$OUT/$1.err" < /dev/null
+    env ${OCRPATH:+MWOYEO_OCR_PATH=$OCRPATH} MWOYEO_FAKE_OCR="$3" "$ANE" run pool -- "$2" --render "$SP/in/$4" "$OUT/$1.png" --src "$5" --tgt ko --max-wait "$6" $EXTRA > "$OUT/$1.out" 2> "$OUT/$1.err" < /dev/null
     echo $((SECONDS - t0)) > "$OUT/$1.s"
 }
 # Lines "    → text" that carry a translation.

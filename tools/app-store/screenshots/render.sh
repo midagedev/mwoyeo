@@ -15,11 +15,11 @@
 #   3. Mwoyeo --render on each lens picture -> renders/<scene>.<target>.png (and its stdout, the lines it read and wrote, .out);
 #   4. the menu panel in English and Korean (--capture-ui menu-default, one scratch lens listed) -> renders/menu.<loc>.png;
 #   5. renders/MANIFEST.tsv (bytes, sha256) and renders/RUN.txt (binary, Chrome, tree).
-# Scratch settings only: MWOYEO_SETTINGS_FILE, MWOYEO_DEFAULTS_SUITE=as1.shots, in-memory secrets; the app id is the film's so the
-# warm text-recognition cache is shared.
+# Scratch settings only: MWOYEO_SETTINGS_FILE, MWOYEO_DEFAULTS_SUITE=as1.shots, in-memory secrets. The app's id is the one the binary
+# was built with (nothing reads MWOYEO_APP_ID at run time); tools/ane-env.sh takes the Neural Engine lease when the binary's id has no compiled bundle yet.
 set -uo pipefail
 BIN=${1:?usage: render.sh <Mwoyeo binary> [scene ... | menu]}; shift
-HERE=$(cd "$(dirname "$0")" && pwd); REPO=$(cd "$HERE/../../.." && pwd)
+HERE=$(cd "$(dirname "$0")" && pwd); REPO=$(cd "$HERE/../../.." && pwd); ANE=$HERE/../../ane-env.sh
 R=$HERE/renders; SCR=${SCRATCH:-${TMPDIR:-/tmp}/as-shots-render}
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 PY="python3 -I $HERE/prep.py"
@@ -39,7 +39,7 @@ else
     for id in $ONLY; do rm -f "$R/$id".*; done
     [ $MENU = 1 ] && rm -f "$R"/menu.*.png
 fi
-export MWOYEO_APP_ID=dev.midagedev.mwoyeo.film MWOYEO_SETTINGS_FILE=$SCR/settings.json MWOYEO_DEFAULTS_SUITE=$SUITE MWOYEO_MEMORY_SECRETS=1
+export MWOYEO_SETTINGS_FILE=$SCR/settings.json MWOYEO_DEFAULTS_SUITE=$SUITE MWOYEO_MEMORY_SECRETS=1
 echo '{}' > "$SCR/settings.json"
 
 if [ $# -eq 0 ] || [ -n "$ONLY" ]; then        # not `render.sh <bin> menu` alone
@@ -73,7 +73,7 @@ $PY cards "$SCR" "$R" $ONLY || fail "cards"
 $PY renders $ONLY > "$SCR/renders.tsv"
 while IFS=$'\t' read -r id src tgt; do
     t0=$(date +%s)
-    "$BIN" --render "$SCR/lens/$id.png" "$R/$id.$tgt.png" --src "$src" --tgt "$tgt" --scale 2 --warm --max-wait 240 \
+    "$ANE" run pool -- "$BIN" --render "$SCR/lens/$id.png" "$R/$id.$tgt.png" --src "$src" --tgt "$tgt" --scale 2 --warm --max-wait 240 \
         > "$R/$id.$tgt.out" 2> "$SCR/$id.$tgt.err" < /dev/null
     rc=$?
     texts=$(grep -o 'translate.texts=[0-9]*' "$R/$id.$tgt.out" | head -1 | cut -d= -f2)
@@ -94,7 +94,7 @@ if [ $MENU = 1 ]; then
         defaults delete "$SUITE" > /dev/null 2>&1
         defaults write "$SUITE" regions -data "$($PY region "$loc")" || fail "seed the scratch lens"
         mkdir -p "$SCR/ui/$loc"
-        MWOYEO_SETTINGS_FILE=$SCR/ui/settings-$loc.json "$BIN" --capture-ui "$SCR/ui/$loc" menu-default -AppleLanguages "($loc)" \
+        MWOYEO_SETTINGS_FILE=$SCR/ui/settings-$loc.json "$ANE" run pool -- "$BIN" --capture-ui "$SCR/ui/$loc" menu-default -AppleLanguages "($loc)" \
             > "$SCR/ui/$loc.log" 2>&1 < /dev/null
         [ -s "$SCR/ui/$loc/menu-default.png" ] || fail "no menu capture ($loc)"
         $PY panel "$SCR/ui/$loc/menu-default.png" "$R/menu.$loc.png" "$(python3 -I -c "import json,sys; print(json.load(open(sys.argv[1]))['panel']['titlebar_px'])" "$HERE/scenes.json")" || fail "panel $loc"

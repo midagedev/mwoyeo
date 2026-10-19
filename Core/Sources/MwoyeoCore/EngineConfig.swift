@@ -11,6 +11,8 @@ public enum EngineConfigError: Error, Equatable, Sendable {
     /// A shared payload carries a field named like a secret; the associated value is its key path.
     case secretField(String)
     case notAnEngineFile
+    /// The file holds a command engine and this build does not run programs (`decode(_:allowsCommands:)`).
+    case commandNotAllowed
     case malformed(String)
 }
 
@@ -152,7 +154,8 @@ public enum EngineShare {
         return String(decoding: out, as: UTF8.self)
     }
 
-    public static func decode(_ s: String) throws -> EngineConfig {
+    /// `allowsCommands: false` (the Mac App Store build) rejects a command engine instead of importing it.
+    public static func decode(_ s: String, allowsCommands: Bool = true) throws -> EngineConfig {
         guard let root = try? JSONSerialization.jsonObject(with: Data(s.utf8)) as? [String: Any] else {
             throw EngineConfigError.malformed("not a JSON object")
         }
@@ -164,7 +167,9 @@ public enum EngineShare {
         // The same rule on the way in: a file cannot switch context on for the user who imports it.
         engine["context"] = nil
         let data = try JSONSerialization.data(withJSONObject: engine)
-        return try JSONDecoder().decode(EngineConfig.self, from: data)
+        let config = try JSONDecoder().decode(EngineConfig.self, from: data)
+        if !allowsCommands, case .command = config.kind { throw EngineConfigError.commandNotAllowed }
+        return config
     }
 
     static func isSecretName(_ name: String) -> Bool { secretNames.contains(name.lowercased()) }

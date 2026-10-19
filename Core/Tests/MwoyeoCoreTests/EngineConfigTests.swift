@@ -82,4 +82,12 @@ import Testing
         #expect(throws: EngineConfigError.notAnEngineFile) { try EngineShare.decode(#"{"name": "E"}"#) }
         #expect(throws: EngineConfigError.self) { try EngineShare.decode("nope") }
     }
+
+    @Test func pasteRejectsACommandEngineWhenCommandsAreNotAllowed() throws {
+        let shared = EngineShare.encode(EngineConfig(name: "C", kind: .command(CommandSpec(executable: "/usr/bin/python3"))))
+        #expect(throws: EngineConfigError.commandNotAllowed) { try EngineShare.decode(shared, allowsCommands: false) }
+        guard case .command = try EngineShare.decode(shared).kind else { Issue.record("default must still import it"); return }
+        let http = EngineShare.encode(EngineConfig(name: "H", kind: .deepL(baseURL: URL(string: "https://api.deepl.com")!, formality: nil)))
+        #expect(throws: Never.self) { try EngineShare.decode(http, allowsCommands: false) }
+    }
 }

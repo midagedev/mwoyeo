@@ -103,4 +103,23 @@ import MwoyeoCore
         #expect(gone)
         if !gone { kill(pid, SIGKILL) }
     }
+
+    // The Mac App Store build passes allowsCommands: false (docs/app-store/audit-2026-10-17.md §2).
+    @Test func aCommandEngineIsRefusedWhenCommandsAreNotAllowed() async throws {
+        let marker = FileManager.default.temporaryDirectory.appendingPathComponent("mas-gate-\(UUID().uuidString)")
+        let e = engine("/bin/sh", ["-c", "touch \(marker.path); echo '{\"lines\":[\"x\"]}'"])
+        let gated = EngineClient(secrets: MemorySecrets(), allowsCommands: false)
+        await #expect(throws: EngineError.commandUnavailable) {
+            try await gated.translate(["a"], source: nil, target: "ko", glossary: [], engine: e)
+        }
+        #expect(!FileManager.default.fileExists(atPath: marker.path), "the program must not have been started")
+        let probe = await gated.probe(e, target: "ko")
+        #expect(probe.error == .commandUnavailable)
+    }
+
+    @Test func aCommandEngineStillRunsWhenCommandsAreAllowed() async throws {
+        let out = try await EngineClient(secrets: MemorySecrets(), allowsCommands: true)
+            .translate(["a"], source: "ja", target: "ko", glossary: [], engine: engine("python3", [echoEngine]))
+        #expect(out == ["[ko] a"])
+    }
 }

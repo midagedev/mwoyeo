@@ -10,11 +10,16 @@ public actor EngineClient {
     private let metrics: (@Sendable (URLSessionTaskMetrics) -> Void)?
     private var rejections: [UUID: Set<String>] = [:]
     private var modelLists: [String: [String]] = [:]
+    private let allowsCommands: Bool
 
     /// `metrics` sees every finished HTTP task (timing and `isReusedConnection`); the client logs nothing itself.
-    public init(secrets: any SecretStore, metrics: (@Sendable (URLSessionTaskMetrics) -> Void)? = nil) {
+    /// `allowsCommands` is false in the Mac App Store build: a command engine is refused at dispatch, whatever file or
+    /// setting brought it in (Core cannot see the app's `#if MAS`, so the app passes it on).
+    public init(secrets: any SecretStore, metrics: (@Sendable (URLSessionTaskMetrics) -> Void)? = nil,
+                allowsCommands: Bool = true) {
         self.secrets = secrets
         self.metrics = metrics
+        self.allowsCommands = allowsCommands
     }
 
     // MARK: remembered rejections
@@ -74,6 +79,7 @@ public actor EngineClient {
         case let .httpTemplate(template):
             return TranslationReply(lines: try await httpTemplate(template, engine: engine, lines: lines, source: source, target: target))
         case let .command(spec):
+            guard allowsCommands else { throw .commandUnavailable }
             let reply = try await CommandRunner.run(spec, input: CommandEngine.encodeRequest(lines: lines, source: source, target: target),
                                                     scrub: Scrubber(key: nil))
             return TranslationReply(lines: try mapped { () throws(ChatTranslationError) in try CommandEngine.decodeResponse(reply, count: lines.count) })

@@ -13,6 +13,8 @@ public enum EngineError: Error, Equatable, Sendable {
     case malformed(String)
     case network(String)
     case commandFailed(String)
+    /// A command engine reached a build that does not run programs (the Mac App Store build).
+    case commandUnavailable
     case cancelled
 
     /// A short sentence for the lens or the add-engine sheet.
@@ -28,6 +30,7 @@ public enum EngineError: Error, Equatable, Sendable {
         case .malformed: "The engine's answer was not in the expected format."
         case let .network(m): "Could not reach the engine: \(m)"
         case let .commandFailed(m): "The command failed: \(m)"
+        case .commandUnavailable: "Not available in this version"
         case .cancelled: "Cancelled."
         }
     }

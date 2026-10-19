@@ -1,0 +1,29 @@
+Round ane-dev, 2026-10-20. Machine: Apple M1 Pro, macOS 27.0 (26A428), load average 140-200 during the runs (other rounds built and
+rendered: counts below are reliable, times are not clean). One measurement at a time, each under tools/ane-env.sh's lease.
+
+E4  Does seeding a fresh bundle id's e5rt cache from a warm id remove the compiles?   ANSWER: NO. Seeding was dropped from ane-env.sh.
+  Builds (Release, one derived data dir; id changed only): A MWOYEO_APP_ID=dev.midagedev.mwoyeo.e4a1792448077 (full build 8 min, load 200),
+  B ...e4b1792448428 and C ...e4c1792448440 (6 s each: link and sign). Each app copied out after its build.
+  Run = probes/e4-run.sh: `Mwoyeo --capture-ui vision-reads --src ja` (reads the drawn probe picture until the text and document models
+  are ready), Lines and Docs services in their own caches ~/Library/Caches/<id>.reader.lines|docs (the app's own cache dir never appears).
+  run  id            how                                   wall   first read      compiles  e5rt lookups hit/miss (lines | docs)
+  A    e4a (fresh)   cold lease, nothing seeded            102 s  34.6 s (403 ms)  5         0/4 | 0/6      -> 4 + 6 bundles, no app cache
+  B    e4b (fresh)   `cp -cR` of A's three cache dirs      102 s  35.3 s (456 ms)  5         2/2 | 3/3      -> documentModel 65.5 s (A: 66.3 s)
+  C    e4c (fresh)   cold lease, nothing seeded (control)  124 s  62.1 s (409 ms)  6         2/6 | 0/6
+  A2   e4a, 2nd run  pool (warm: no lease)                 33 s   31.7 s           1         4/2 | 3/0      -> docs 0.7 s, textModel 31.2 s
+  A3   e4a, 3rd run  pool (warm: no lease)                 3 s    <3 s             0         5/0 | 3/0      -> textModel 1.4 s, docs 0.6 s
+  Windows (log show, local time): A 07:18:24-07:20:06, B 07:22:02-07:23:44, A2 07:24:16-07:24:49, C 07:26:18-07:28:22.
+  Reading: the seeded id B found some of its entries (5 of 10 lookups hit) yet started the same 5 compiles as the unseeded A and took as
+  long; the cache files it wrote over the seeded ones are byte-identical (cmp) with equal com.apple.provenance. The e5rt cache is usable
+  only by the id that wrote it; the same id is warm from its second or third run (A3: 3 s, 0 compiles). The fix for a round is one
+  stable id (ane-env.sh id pool), not copies. C's sixth compile and its 62 s first read (A: 35 s, same build) are not explained; the load was 140-200.
+
+E3  Does MLComputeUnits.cpuAndGPU stay off the Neural Engine compiler?   ANSWER: YES (for this model).
+  Model: a Core ML NeuralNetwork written as raw protobuf by probes/mkmodel.py (no coremltools, no install): three conv 3x3 + ReLU and one
+  conv, 32 channels, 64x64 input, fp32 weights, 148,347 bytes. probes/e3.swift: compileModel, load with the units, 20 predictions.
+  pid 45750  cpuAndGPU  window 07:16:36-07:16:40  ANEServicesDeviceOpen lines 0   `Start of compilation of network` lines 0
+             (load 42 ms, first prediction 579 ms = the GPU path's own warm-up, the 20th 17 ms; no line of the process mentions ANE)
+  pid 46866  all        window 07:16:50-07:16:53  ANEServicesDeviceOpen lines 3   `Start of compilation of network` lines 1 (07:16:51.154)
+             (load 253 ms, first prediction 2 ms: it ran on the Neural Engine; the control sees what the count is meant to see)
+  Limit: one tiny network; a large model on cpuAndGPU was not run. It answers "does the unit setting keep a client out of the ANE
+  service", which is what a cpuAndGPU OCR model would need (ane-root C1).

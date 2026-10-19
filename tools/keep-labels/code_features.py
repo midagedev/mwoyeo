@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Which cheap block feature would have caught a keep block that today's rules translate?
 usage: code_features.py <ocr dir> <labels/code.jsonl> <rules.jsonl>      (<ocr dir>/<case>.ocr.jsonl and <case>.png from make-code-labels.sh)
+  env FRAME=dominant: the frame colour is the most common colour of the picture (what the app's FrameBackground takes), not the pixel at (3, 3):
+  the screens of H2 (labels-h2, <KEEP_WORK>/h2) have a header bar in the corner, which made `tint` fire on every block.
 
 The blocks: pure-keep blocks of the code cases (keep words, no translate word, a letter in the text) for which TranslationFilter
 .needsTranslation is true, per read. For each, five features that need no model (keep-boundary.md section 5, design note section 8), all
@@ -20,6 +22,14 @@ from PIL import Image
 KEYWORDS = set('const let var func function return import from class def elif else end while print console async await null none true false self this '
                'struct enum fn lambda then do for if in to'.split())
 LINE_END = set(';{})]')
+
+
+def frame_colour(img):
+    """(3, 3) by default; with FRAME=dominant the most common colour of the picture (every third pixel in each direction)."""
+    if os.environ.get('FRAME') != 'dominant': return img.getpixel((3, 3))
+    small = img.crop((0, 0, img.width, img.height)).resize((img.width // 3, img.height // 3), Image.NEAREST)
+    pix = small.tobytes()
+    return collections.Counter(zip(pix[0::3], pix[1::3], pix[2::3])).most_common(1)[0][0]
 
 
 def lines_of(words):
@@ -91,7 +101,7 @@ def main():
                 o = json.loads(open(f'{ocr_dir}/{case}.ocr.jsonl').read())
                 img = Image.open(f'{ocr_dir}/{case}.png').convert('RGB')
                 margins = {rd: min(b['r'][0] for b in o[rd] if len(b['w']) >= 2) for rd in ('doc', 'vn')}
-                cache[case] = (o, img, img.getpixel((3, 3)), margins)
+                cache[case] = (o, img, frame_colour(img), margins)
             o, img, corner, margins = cache[case]
             f, v = features(o[read][idx], margins[read], img, corner)
             rows.append((rec['keep'], f, v, rec))

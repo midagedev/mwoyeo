@@ -3,7 +3,7 @@ import Foundation
 import ImageIO
 import MwoyeoCore
 
-// usage: regionfeed <KEEP_WORK> > feed.jsonl
+// usage: regionfeed <KEEP_WORK> > feed.jsonl        (the pictures of KEEP_WORK/<paper id>/, KEEP_WORK/code/ and KEEP_WORK/h2/)
 // The inputs CodeRegion takes, for every block of every read of the labelled pictures (papers and code cases): the text, the block rect,
 // the line rects (the words of the OCR read grouped by baseline), the background colour the app computes for the block
 // (RegionPipeline.appearance(of:in:) per line, the per-channel median over the lines) and the frame's dominant background.
@@ -120,8 +120,11 @@ for pid in ["1706.03762", "2401.10066", "2310.06142"] {
         emit(ocr: o, png: "\(work)/\(pid)/pages/p\(page).png", idPrefix: { "\(pid)-p\(page)-\($0)" }, pic: "\(pid)-p\(page)")
     }
 }
-for f in ((try? fm.contentsOfDirectory(atPath: "\(work)/code")) ?? []).sorted() where f.hasSuffix(".ocr.jsonl") {
-    let name = String(f.dropLast(".ocr.jsonl".count))
-    guard let data = fm.contents(atPath: "\(work)/code/\(f)"), let o = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { continue }
-    emit(ocr: o, png: "\(work)/code/\(name).png", idPrefix: { "\(name)-\($0)" }, pic: name)
+// the code cases (work/code) and the H2 screens (work/h2): <name>.ocr.jsonl and <name>.png side by side
+for dir in ["code", "h2"] {
+    for f in ((try? fm.contentsOfDirectory(atPath: "\(work)/\(dir)")) ?? []).sorted() where f.hasSuffix(".ocr.jsonl") {
+        let name = String(f.dropLast(".ocr.jsonl".count))
+        guard let data = fm.contents(atPath: "\(work)/\(dir)/\(f)"), let o = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { continue }
+        emit(ocr: o, png: "\(work)/\(dir)/\(name).png", idPrefix: { "\(name)-\($0)" }, pic: name)
+    }
 }

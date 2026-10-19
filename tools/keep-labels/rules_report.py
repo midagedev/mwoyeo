@@ -24,7 +24,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from truth import keep_runs, SCORED, KEEP, TRANSLATE, EITHER
 
-SOURCES = ('papers dev', 'papers hold', 'cases dev', 'cases hold')
+SOURCES = ('papers dev', 'papers hold', 'cases dev', 'cases hold', 'h2')      # h2: the own screens of h2.py, a labels dir of its own (labels-h2/)
 READS = ('doc', 'vn')
 
 
@@ -57,11 +57,12 @@ def load(labels_dir):
         pid = fn[:-6]
         lines = [json.loads(l) for l in open(os.path.join(labels_dir, fn))]
         head = lines[0]
-        if pid == 'code':
+        if pid in ('code', 'h2'):
+            pre = 'cases ' if pid == 'code' else ''
             sets = {c['case']: c['set'] for c in head['cases']}
             for r in lines[1:]:
-                if r['kind'] == 'block': r['src'] = 'cases ' + sets[r['paper']]; blocks.append(r)
-            for c in head['cases']: regions['cases ' + c['set']].update(c['regions'])
+                if r['kind'] == 'block': r['src'] = pre + sets[r['paper']]; blocks.append(r)
+            for c in head['cases']: regions[pre + c['set']].update(c['regions'])
         else:
             for r in lines[1:]:
                 if r['kind'] == 'block': r['src'] = 'papers ' + papers[pid]; blocks.append(r)
@@ -250,7 +251,7 @@ def purity_tables(blocks, regions, out):
                     if b['keep'] == 'keep': pure[r] += v
                     elif b['keep'] == 'mixed': mixed[r] += v
             if not pure and not mixed: continue
-            rows = sorted(set(pure) | set(mixed), key=lambda r: -(pure[r] + mixed[r]))
+            rows = sorted(set(pure) | set(mixed), key=lambda r: (-(pure[r] + mixed[r]), r))              # ties by name: set order changes with the hash seed
             out.append(f'      {src:12s} ' + ', '.join(f'{r} {pure[r]}/{mixed[r]}' for r in rows))
         for src in SOURCES:
             mixed = sorted((b for b in blocks if b['src'] == src and b['read'] == read and b['keep'] == 'mixed'), key=lambda b: b['id'])
@@ -341,8 +342,9 @@ def group_table(blocks, rules, out):
 
 def decision(accs, out):
     out.append('DECISION (precision and recall both >= 0.95 on the hold-out -> defer the model for the slice; else train for the band; n < 20: thin)')
-    for src in ('papers hold', 'cases hold'):
+    for src in ('papers hold', 'cases hold', 'h2'):
         a = accs[(src, 'doc')]
+        if src == 'h2' and a.tp + a.fn == 0: continue                          # no H2 labels in this run
         P = ratio(a.tp, a.tp + a.fp)
         out.append(f'  [{src}, read doc] word precision {P:.2f}; recall by reason (precision is of all kept words, one number for every slice):')
         for r, v in sorted(a.rec.items(), key=lambda kv: -kv[1][1]):
@@ -358,6 +360,8 @@ def region_tables(blocks, rules, out):
     """CodeRegion (keeprules with KEEP_FEED): the rules alone, and the rules OR the region verdict, per source and read. A block the region
     keeps and today's rules translate is `flipped`; a flipped block whose truth is not pure keep is a false fire and is listed by name."""
     out.append('CODE REGIONS (Core CodeRegion, tools/keep-labels/Sources/keeprules; kept = today\'s rules OR a region verdict)')
+    nofeed = sum(1 for b in blocks if rules[b['id']].get('region') == 'nofeed')
+    if nofeed: out.append(f'  WARNING: {nofeed} labelled blocks have no picture in the feed (KEEP_WORK lacks their pictures): CodeRegion is not run on them')
     only = os.environ.get('KEEP_SETS')                       # e.g. "cases dev,papers dev": fit on these, leave the hold-outs unread
     if only: out.append(f'  (only the sets {only})')
     for read in READS:
@@ -371,7 +375,7 @@ def region_tables(blocks, rules, out):
                 r = rules[b['id']]
                 accumulate(a0, b, r)
                 r1 = dict(r)
-                if r.get('region') and r['needs']:
+                if r.get('region') and r['region'] != 'nofeed' and r['needs']:
                     r1['needs'] = False
                     fired[r['region']] += 1
                     st = b['stats']

@@ -21,8 +21,9 @@ func json(_ s: String) -> String {
     return o + "\""
 }
 
-/// CodeRegion on every (picture, read) of the feed: block id -> reason.
-func regions(feedPath: String) -> [String: String] {
+/// CodeRegion on every (picture, read) of the feed: block id -> reason, and the ids the feed holds (a labelled block whose picture the feed lacks is
+/// reported as "nofeed", not as a block CodeRegion left alone: a run without its pictures must not read as a rule that never fires).
+func regions(feedPath: String) -> (verdicts: [String: String], fed: Set<String>) {
     guard let data = FileManager.default.contents(atPath: feedPath), let text = String(data: data, encoding: .utf8) else {
         FileHandle.standardError.write(Data("cannot read \(feedPath)\n".utf8)); exit(1)
     }
@@ -41,15 +42,17 @@ func regions(feedPath: String) -> [String: String] {
         groups["\(pic)|\(read)", default: []].append(Row(idx: idx, id: id, block: block, frame: RGBA(UInt8(frame[0]), UInt8(frame[1]), UInt8(frame[2]))))
     }
     var out: [String: String] = [:]
+    var fed = Set<String>()
     for rows in groups.values {
+        for row in rows { fed.insert(row.id) }
         let sorted = rows.sorted { $0.idx < $1.idx }
         let verdicts = CodeRegion.keep(blocks: sorted.map(\.block), frameBackground: sorted[0].frame)
         for (row, v) in zip(sorted, verdicts) { if let v { out[row.id] = v.rawValue } }
     }
-    return out
+    return (out, fed)
 }
 
-let regionOf: [String: String]? = ProcessInfo.processInfo.environment["KEEP_FEED"].map(regions(feedPath:))
+let regionOf = ProcessInfo.processInfo.environment["KEEP_FEED"].map(regions(feedPath:))
 
 var out = ""
 for path in CommandLine.arguments.dropFirst() {
@@ -66,7 +69,7 @@ for path in CommandLine.arguments.dropFirst() {
         out += "{\"id\":\(json(id)),\"spans\":[\(spans)],\"formula\":\(TranslationFilter.isFormula(t)),\"mathHeavy\":\(TranslationFilter.isMathHeavy(t)),"
             + "\"identifier\":\(TranslationFilter.isIdentifier(t)),\"literal\":\(TranslationFilter.isLiteral(t)),"
             + "\"needs\":\(TranslationFilter.needsTranslation(t, cjkSource: cjk)),\"share\":\(String(format: "%.3f", share.share)),\"signs\":\(share.signs)"
-            + (regionOf.map { ",\"region\":" + ($0[id].map(json) ?? "null") } ?? "") + "}\n"
+            + (regionOf.map { ",\"region\":" + ($0.verdicts[id].map(json) ?? ($0.fed.contains(id) ? "null" : "\"nofeed\"")) } ?? "") + "}\n"
     }
 }
 FileHandle.standardOutput.write(Data(out.utf8))

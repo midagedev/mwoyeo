@@ -1,4 +1,5 @@
 import AppKit
+import MwoyeoCore
 import QuartzCore
 
 /// The draggable "lens" around a region: a glowing gradient ring (in the colours of Apple Intelligence) that breathes
@@ -24,6 +25,11 @@ final class RegionFrameWindow: NSPanel {
     var onContextMenu: (() -> NSMenu?)?
     /// The pill's hint (`setHint`) was clicked.
     var onHintAction: (() -> Void)?
+    /// VoiceOver's actions for the lens (`LensAccessElement`): show the original or the translation, pause every lens.
+    var onToggleOriginal: (() -> Void)?
+    var onPause: (() -> Void)?
+    /// What the lens translated, in reading order: VoiceOver reads the start of it. Asked when a screen reader asks, never otherwise.
+    var translationLines: (() -> [String])?
 
     private let chrome: FrameChromeView
     private var tabPosition = LensTabPosition.topLeading
@@ -46,6 +52,9 @@ final class RegionFrameWindow: NSPanel {
     }
 
     override var canBecomeKey: Bool { false }
+
+    /// What a screen reader's window list calls the lens ("Translation lens, Safari"); the window itself has no title.
+    override func accessibilityTitle() -> String? { "\(String(localized: "Translation lens")), \(chrome.name)" }
 
     /// The window around `region`: the margin on every side, and room for the name tag above it or below it.
     static func windowFrame(for region: NSRect, position: LensTabPosition) -> NSRect {
@@ -116,7 +125,7 @@ private final class FrameChromeView: NSView {
     var detail = "" { didSet { needsDisplay = true } }
     var badge: String? { didSet { needsDisplay = true } }
     var busy = false { didSet { if busy != oldValue { updateGlow(); needsDisplay = true } } }
-    var original = false { didSet { if original != oldValue { applyStyle(); sweep() } } }
+    var original = false { didSet { if original != oldValue { applyStyle(); sweep(); accessibilityChanged() } } }
     var following = false { didSet { if following != oldValue { needsDisplay = true; updateToolTip() } } }
     var style = LensStyle.glow { didSet { if style != oldValue { applyStyle() } } }
     var tint = LensTint.spectrum { didSet { if tint != oldValue { applyStyle() } } }
@@ -125,11 +134,13 @@ private final class FrameChromeView: NSView {
         didSet { if tabPosition != oldValue { needsLayout = true; needsDisplay = true; updateToolTip() } }
     }
     private var accentObserver: NSObjectProtocol?
+    /// Reduce Motion switched while the lens is reading: the breathing starts or stops at once.
+    private var motionObserver: NSObjectProtocol?
     /// A short message that takes the place of the pill's second line.
-    private var notice: String? { didSet { needsDisplay = true } }
+    private var notice: String? { didSet { needsDisplay = true; if let notice, notice != oldValue { announce(notice) } } }
     private var noticeTimer: Timer?
     /// What the lens says about itself (`RegionFrameWindow.setHint`) in the second line's place, after any notice.
-    private var hint: String? { didSet { needsDisplay = true } }
+    private var hint: String? { didSet { needsDisplay = true; if hint != oldValue { accessibilityChanged() } } }
     private var hintActionable = false
     private var hintForcesTab = false
     /// Where the hint was last drawn (view coordinates), for clicks and the cursor; nil when it is not on the pill.
@@ -147,6 +158,9 @@ private final class FrameChromeView: NSView {
     private var emphasized = false
     private var hovering = false
     private var tracking: NSTrackingArea?
+
+    /// What a screen reader sees inside the lens group (`LensAccessElement`): kept, so its focus survives a query.
+    private lazy var accessElements = Dictionary(uniqueKeysWithValues: LensAccessElement.Kind.allCases.map { ($0, LensAccessElement($0, in: self)) })
 
     private let band: CGFloat = 10         // grabbable width of the ring
     private let corner: CGFloat = 20       // resize handle size
@@ -196,10 +210,16 @@ private final class FrameChromeView: NSView {
         accentObserver = NotificationCenter.default.addObserver(forName: NSColor.systemColorsDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { if self?.tint == .accent { self?.applyStyle() } }
         }
+        motionObserver = NotificationCenter.default.addObserver(forName: Motion.changed, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.updateGlow() }
+        }
         applyStyle()
     }
 
-    deinit { accentObserver.map(NotificationCenter.default.removeObserver) }
+    deinit {
+        accentObserver.map(NotificationCenter.default.removeObserver)
+        motionObserver.map(NotificationCenter.default.removeObserver)
+    }
 
     private func applyStyle() {
         CATransaction.begin()
@@ -358,8 +378,9 @@ private final class FrameChromeView: NSView {
         CATransaction.commit()
         // Minimal has no glow: its ring breathes instead.
         let breathing = style == .minimal ? ring : glow
-        for l in [ring, glow] where l !== breathing || !busy || original { l.removeAnimation(forKey: "breathe") }
-        if busy, !original {
+        for l in [ring, glow] where l !== breathing || !busy || original || Motion.shared.reduced { l.removeAnimation(forKey: "breathe") }
+        // Reduce Motion: the busy glow stays at its brighter, steady level instead of breathing.
+        if busy, !original, !Motion.shared.reduced {
             let breathe = CABasicAnimation(keyPath: "opacity")
             breathe.fromValue = breathing.opacity * 0.45
             breathe.toValue = breathing.opacity
@@ -386,6 +407,7 @@ private final class FrameChromeView: NSView {
     }
 
     func sweep() {
+        guard !Motion.shared.reduced else { return }
         let move = CABasicAnimation(keyPath: "position.x")
         move.fromValue = regionRect.minX - regionRect.width / 2
         move.toValue = regionRect.maxX + regionRect.width / 2
@@ -595,6 +617,138 @@ private final class FrameChromeView: NSView {
         NSColor.white.withAlphaComponent(0.9).setStroke()
         g.stroke()
     }
+}
+
+// MARK: - Accessibility
+
+/// A screen reader sees the lens as one group: "Translation lens", what it is doing in words (and the start of what it translated),
+/// with the name pill's buttons and the translation inside it, and the lens's actions beside them (show the original, pause, close,
+/// the menu). Everything is answered when asked: nothing runs while no screen reader is attached. The look is not touched.
+extension FrameChromeView {
+    override func isAccessibilityElement() -> Bool { true }
+    override func accessibilityRole() -> NSAccessibility.Role? { .group }
+    override func accessibilityLabel() -> String? { String(localized: "Translation lens") }
+    override func accessibilityValue() -> Any? { accessibilityStateText() }
+    /// Which lens, and the pair: "Safari, English → Korean".
+    override func accessibilityHelp() -> String? { [name, detail].filter { !$0.isEmpty }.joined(separator: ", ") }
+
+    override func accessibilityChildren() -> [Any]? {
+        LensAccessElement.Kind.allCases.filter(accessHas).compactMap { accessElements[$0] }
+    }
+
+    override func accessibilityCustomActions() -> [NSAccessibilityCustomAction]? {
+        let w = window_
+        return [
+            NSAccessibilityCustomAction(name: original ? String(localized: "Show Translation") : String(localized: "Show Original")) {
+                w?.onToggleOriginal?(); return w?.onToggleOriginal != nil
+            },
+            NSAccessibilityCustomAction(name: String(localized: "Pause all")) { w?.onPause?(); return w?.onPause != nil },
+            NSAccessibilityCustomAction(name: String(localized: "Remove Lens")) { w?.onClose?(); return w?.onClose != nil },
+            NSAccessibilityCustomAction(name: String(localized: "Open Lens Menu")) { [weak self] in self?.accessibilityOpenMenu() ?? false },
+        ]
+    }
+
+    /// The lens's translations in reading order, as the session has them now.
+    fileprivate var accessibilityLines: [String] { window_?.translationLines?() ?? [] }
+
+    /// The group's value: the state in words (the pill's order, `LensAccessState`), and after "Translated" the first 200 characters of it.
+    func accessibilityStateText() -> String {
+        let lines = accessibilityLines
+        switch LensAccessState(notice: notice, original: original, hint: hintLine, busy: busy, translated: !lines.isEmpty) {
+        case let .notice(text), let .hint(text): return text
+        case .showingOriginal: return String(localized: "Showing original")
+        case .reading: return String(localized: "Reading")
+        case .waiting: return String(localized: "Waiting for text")
+        case .translated:
+            let excerpt = LensAccessSummary.excerpt(lines)
+            return excerpt.isEmpty ? String(localized: "Translated") : "\(String(localized: "Translated")): \(excerpt)"
+        }
+    }
+
+    /// The menu of the pill's right-click, from the actions: opened after this call returns, since its tracking would hold the answer.
+    fileprivate func accessibilityOpenMenu() -> Bool {
+        guard let menu = window_?.onContextMenu?() else { return false }
+        let at = NSPoint(x: tabRect.minX, y: tabRect.minY)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            menu.popUp(positioning: nil, at: at, in: self)
+        }
+        return true
+    }
+
+    /// The state changed in a way worth a word from a screen reader focused on the lens.
+    fileprivate func accessibilityChanged() { NSAccessibility.post(element: self, notification: .valueChanged) }
+
+    /// A notice is said once, whatever has the focus.
+    fileprivate func announce(_ text: String) {
+        NSAccessibility.post(element: NSApp as Any, notification: .announcementRequested,
+                             userInfo: [.announcement: text, .priority: NSAccessibilityPriorityLevel.medium.rawValue])
+    }
+
+    // The children: the translation, and the pill's buttons while the pill is there.
+
+    fileprivate func accessHas(_ kind: LensAccessElement.Kind) -> Bool {
+        switch kind {
+        case .translation: !accessibilityLines.isEmpty
+        case .mode, .close: showsTab
+        case .hint: hintActionable && hint != nil && notice == nil && !original && showsTab
+        }
+    }
+
+    fileprivate func accessLabel(_ kind: LensAccessElement.Kind) -> String {
+        switch kind {
+        case .translation: String(localized: "Translation")
+        case .mode: modeHelp
+        case .close: String(localized: "Close")
+        case .hint: hintLine ?? ""
+        }
+    }
+
+    fileprivate func accessValue(_ kind: LensAccessElement.Kind) -> String? {
+        kind == .translation ? accessibilityLines.joined(separator: "\n") : nil
+    }
+
+    fileprivate func accessFrame(_ kind: LensAccessElement.Kind) -> NSRect {
+        let r: NSRect = switch kind {
+        case .translation: regionRect
+        case .mode: modeRect
+        case .close: closeRect
+        case .hint: hintHit ?? tabRect
+        }
+        guard let w = window else { return .zero }
+        return w.convertToScreen(convert(r, to: nil))
+    }
+
+    fileprivate func accessPress(_ kind: LensAccessElement.Kind) -> Bool {
+        switch kind {
+        case .translation: return false
+        case .mode: window_?.onToggleFollowing?()
+        case .close: window_?.onClose?()
+        case .hint: window_?.onHintAction?()
+        }
+        return true
+    }
+}
+
+/// One thing inside the lens group: the translated text, or a button of the name pill. It holds no state of its own: the lens answers.
+private final class LensAccessElement: NSAccessibilityElement {
+    enum Kind: CaseIterable { case translation, mode, close, hint }
+    let kind: Kind
+    private weak var lens: FrameChromeView?
+
+    init(_ kind: Kind, in lens: FrameChromeView) {
+        self.kind = kind
+        self.lens = lens
+        super.init()
+    }
+
+    override func isAccessibilityElement() -> Bool { true }
+    override func accessibilityParent() -> Any? { lens }
+    override func accessibilityRole() -> NSAccessibility.Role? { kind == .translation ? .staticText : .button }
+    override func accessibilityLabel() -> String? { lens?.accessLabel(kind) }
+    override func accessibilityValue() -> Any? { lens?.accessValue(kind) }
+    override func accessibilityFrame() -> NSRect { lens?.accessFrame(kind) ?? .zero }
+    override func accessibilityPerformPress() -> Bool { lens?.accessPress(kind) ?? false }
 }
 
 extension FrameChromeView: NSViewToolTipOwner {

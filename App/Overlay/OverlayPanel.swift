@@ -42,6 +42,10 @@ final class OverlayPanel: NSPanel {
     override var canBecomeKey: Bool { false }
     override var canBecomeMain: Bool { false }
 
+    /// The panel only draws what the lens shows; the lens window (`RegionFrameWindow`) is what a screen reader reads, with the text. An
+    /// empty full-screen window in its window list would be noise.
+    override func isAccessibilityElement() -> Bool { false }
+
     private static func display(of lens: NSRect) -> NSRect {
         NSScreen.screens.max { a, b in
             let ia = a.frame.intersection(lens), ib = b.frame.intersection(lens)

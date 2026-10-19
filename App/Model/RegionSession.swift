@@ -31,6 +31,8 @@ final class RegionSession {
     private let translator: TranslationService
     private let panel: OverlayPanel
     private let chrome: RegionFrameWindow
+    /// The lens window, for the accessibility checks.
+    var lensWindow: NSWindow { chrome }
     private var fps: Double
     private var trackTimer: Timer?
     private var mouseMonitors: [Any] = []
@@ -690,6 +692,10 @@ final class RegionSession {
         chrome.onClose = { [weak self] in self?.onCloseRequest?() }
         chrome.onToggleFollowing = { [weak self] in self?.toggleFollowing() }
         chrome.onContextMenu = { [weak self] in self?.contextMenu() }
+        // A screen reader's actions and text (RegionFrameWindow, Accessibility).
+        chrome.onToggleOriginal = { [weak self] in self?.onToggleOriginal?() }
+        chrome.onPause = { Task { await AppModel.shared.togglePause() } }
+        chrome.translationLines = { [weak self] in LensText.translations(self?.lensBlocks() ?? []) }
     }
 
     private func lensMoved(_ appKitFrame: NSRect) {

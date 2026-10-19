@@ -5,7 +5,7 @@ import MwoyeoEngines
 import SwiftUI
 
 /// Window captures of the engine UI, for checking a look without clicking through the app:
-///   Mwoyeo --capture-ui outdir scenario… [--mock http://host:port/v1] [--delay s] [--image picture]
+///   Mwoyeo --capture-ui outdir scenario… [--mock http://host:port/v1] [--delay s] [--image picture] [--lang ko]
 /// `vision-reads [--src ja] [--image picture] [--for seconds]` is a probe, not a capture: it starts the initialization of the text
 /// models for the language and reads the picture in this process every half second until every step is done, printing each
 /// read's latency and the steps as they change (what a lens sees during a cold compile; no window).
@@ -16,7 +16,7 @@ import SwiftUI
 /// mock, then with Show Original on; when the text recognizer reads nothing the picture stands in for its translation, which
 /// still shows the toggle's two states), appearance (Settings › Appearance), lens-gallery (every lens style in every tint on a dark and
 /// a light backdrop: one PNG each, lens-<style>-<tint>-<dark|light>.png, and a grid per backdrop), lens-tab-positions (the name tag
-/// in its four places, one carrying a notice), lens-reading (the default glow while the lens reads), sheet-pick, sheet-config, sheet-config-remote (the box that allows sending to the host, unticked), sheet-config-remote-allowed (ticked), sheet-config-remote-context (ticked, with the context caption), translation-engines-permission (the list with an engine that needs the person's permission), about-privacy (Settings › About), lens-badge, lens-notice, lens-menu, add-flow (adds an
+/// in its four places, one carrying a notice), lens-reading (the default glow while the lens reads), sheet-pick, sheet-config, sheet-config-remote (the box that allows sending to the host, unticked), sheet-config-remote-allowed (ticked), sheet-config-remote-context (ticked, with the context caption), sheet-context-collapsed-off, sheet-context-collapsed-on, sheet-context-chat, sheet-context-chat-off, sheet-context-local, sheet-context-deepl, sheet-context-template and sheet-context-memory (the sheet of an engine already added, its Context section collapsed or open, the last with Context off and a note written for an app; `--lang ko` for Korean), engine-context-checks (only that section's checks; `--dump` also writes the accessibility trees it read, a11y-engine-context-*.txt), translation-engines-permission (the list with an engine that needs the person's permission), about-privacy (Settings › About), lens-badge, lens-notice, lens-menu, add-flow (adds an
 /// engine through the sheet, prints where the key is), check-logic (prints PASS/FAIL for the engine selection and the
 /// engine notice's dismissal; no window). Run it with `MWOYEO_MEMORY_SECRETS=1` so it does not touch the Keychain. It keeps its
 /// preferences in a scratch suite of its own (deleted at exit; `MWOYEO_DEFAULTS_SUITE` names one to keep), never the app's real
@@ -24,6 +24,11 @@ import SwiftUI
 enum UICapture {
     static func run(_ args: [String]) -> Never {
         setvbuf(stdout, nil, _IOLBF, 0)
+        // `--lang ko`: the sheet and the lines in that language, as the launch argument `-AppleLanguages (ko)` would give (it cannot come
+        // first here, and the entry point wants `--capture-ui` first). The argument domain is in memory only, so no preference is written.
+        if let i = args.firstIndex(of: "--lang"), i + 1 < args.count {
+            UserDefaults.standard.setVolatileDomain(["AppleLanguages": [args[i + 1]], "AppleLocale": args[i + 1]], forName: UserDefaults.argumentDomain)
+        }
         // Scratch preferences (AppModel reads the suite when it is first used): a capture never writes the app's real ones.
         // CFFIXED_USER_HOME does not move them. A suite named in the environment is kept.
         let suite = "dev.midagedev.mwoyeo.capture-\(getpid())"
@@ -56,7 +61,7 @@ enum UICapture {
             var names: [String] = [], skip = false
             for a in args.dropFirst() {
                 if skip { skip = false; continue }
-                if a == "--mock" || a == "--delay" || a == "--key" || a == "--image" || a == "--engine-name" { skip = true; continue }
+                if a == "--mock" || a == "--delay" || a == "--key" || a == "--image" || a == "--engine-name" || a == "--lang" { skip = true; continue }
                 if a == "--keep-key" || a == "--dump" { continue }
                 names.append(a)
             }
@@ -187,6 +192,13 @@ enum UICapture {
                 await shoot(name, EngineSheet(autopilot: .init(setup: setup, key: "sk-test-capture", allow: name != "sheet-config-remote")),
                             CGSize(width: 480, height: 560), wait: 5)
                 if withContext { model.settings.appProfiles = [] }
+            case "sheet-context-collapsed-off", "sheet-context-collapsed-on", "sheet-context-chat", "sheet-context-chat-off", "sheet-context-local",
+                 "sheet-context-deepl", "sheet-context-template", "sheet-context-memory":
+                await contextSheet(name)
+            case "engine-context-checks":
+                // Only the Context section's checks (the whole of check-logic takes minutes).
+                let failed = await EngineContextChecks.run(model, dump: args.contains("--dump") ? out : nil)
+                print("engine context: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
             case "appearance": await shoot(name, AppearanceSettings(), CGSize(width: 560, height: 520))
             case "lens-gallery": await lensGallery()
             case "lens-tab-positions": await lensTabPositions()
@@ -203,6 +215,38 @@ enum UICapture {
             case "add-flow": await addFlow()
             default: print("unknown scenario \(name)")
             }
+        }
+
+        /// The engine sheet open on an engine that is already added, with its Context section collapsed or open. The engine is a cloud chat
+        /// engine unless the scene says otherwise (`-local` on this Mac, `-deepl`, `-template`); the key is in the scratch store, so the key
+        /// row reads as it does for an engine in use. Run it with `-AppleLanguages "(ko)"` for the Korean sheet.
+        private func contextSheet(_ name: String) async {
+            let chat = engine("Gemini", "https://gemini.example.invalid/v1beta/openai/", "gemini-3.1-flash-lite")
+            var e = chat
+            if name.hasSuffix("-local") { e = engine("Ollama", mock, "qwen3:8b") }
+            if name.hasSuffix("-deepl") { e = EngineConfig(name: "DeepL", kind: .deepL(baseURL: URL(string: "https://api-free.deepl.invalid/")!, formality: nil)) }
+            if name.hasSuffix("-template") {
+                e = EngineConfig(name: "My service", kind: .httpTemplate(HTTPTemplate(url: "https://service.example.invalid/translate", resultPath: "translatedText")))
+            }
+            switch name {
+            case "sheet-context-collapsed-off", "sheet-context-chat-off": break
+            case "sheet-context-memory":
+                // Context off, and a note written for Mail: what the sheet says it sends (the context service's memory-only mode).
+                model.settings.appProfiles = [AppProfile(bundleID: "com.apple.mail", appName: "Mail", source: "ja", target: "ko", note: "Formal register.")]
+            case "sheet-context-collapsed-on": e.context = EngineContext(enabled: true, previousLines: 3)
+            case "sheet-context-deepl": e.context = EngineContext(enabled: true, previousLines: 3, deepLInstructions: true)
+            default: e.context = EngineContext(enabled: true, previousLines: 3, includeTitle: !name.hasSuffix("-chat"), useLearned: true)
+            }
+            let expanded = !name.contains("collapsed")
+            model.settings.engines = [e]
+            model.settings.customEngineID = e.id
+            model.settings.enginePermissions.set(true, for: e)
+            if !e.isOnThisMac { try? model.secrets.setSecret("sk-test-capture", for: e.id) }
+            await shoot(name, EngineSheet(editing: e, autopilot: .init(expandContext: expanded)), CGSize(width: 480, height: 560), wait: 5)
+            try? model.secrets.setSecret(nil, for: e.id)
+            model.settings.appProfiles = []
+            model.settings.engines = []
+            model.settings.customEngineID = nil
         }
 
         /// A gate in the middle of the initialization, on a clock of its own: the text reader done in 34 s, then the paragraph reader
@@ -398,6 +442,7 @@ enum UICapture {
             failed += await ContextChecks.run()
             failed += DriftChecks.run()
             failed += await EnginePermissionChecks.run(model)
+            failed += await EngineContextChecks.run(model)
             failed += await AccessibilityChecks.run(model)
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
         }

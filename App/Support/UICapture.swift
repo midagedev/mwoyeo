@@ -21,7 +21,7 @@ import SwiftUI
 /// lens-hint-pack-notfinished and lens-hint-unsupported (the pill in the states a pack or a pair can be in), menu-pack-rows (the panel's lens
 /// rows with each of those lines), menu-pack-banner-ask|downloading|notfinished|unsupported (the panel's banner when no lens says it),
 /// translation-packs-states (Settings › Translation with a row in each state), image-window-pack-ask|downloading|notfinished|unsupported
-/// (the Translate Image window's status line), check-logic (prints PASS/FAIL for the engine selection and the
+/// (the Translate Image window's status line), memory-profile-row, memory-menu, memory-sheet-empty, memory-sheet-filled, memory-sheet-tall (the filled sheet at 820 pt, every section in view), memory-sheet-fresh (the app profile's row with its memory, its ⋯ menu, and the Memory sheet empty, filled with learned rows, and asking whether to start fresh), check-logic (prints PASS/FAIL for the engine selection and the
 /// engine notice's dismissal; no window). Run it with `MWOYEO_MEMORY_SECRETS=1` so it does not touch the Keychain. It keeps its
 /// preferences in a scratch suite of its own (deleted at exit; `MWOYEO_DEFAULTS_SUITE` names one to keep), never the app's real
 /// ones; `CFFIXED_USER_HOME` does not move those. `--mock` is a tools/mock-openai server the sample translations go to.
@@ -226,6 +226,7 @@ enum UICapture {
                 await lensHints(name)
             case "image-window-pack", "image-window-blocked": await imageWindowBlocked(name)
             case "add-flow": await addFlow()
+            case "memory-profile-row", "memory-menu", "memory-sheet-empty", "memory-sheet-filled", "memory-sheet-tall", "memory-sheet-fresh": await memoryScene(name)
             default: print("unknown scenario \(name)")
             }
         }
@@ -456,6 +457,7 @@ enum UICapture {
             failed += DriftChecks.run()
             failed += await EnginePermissionChecks.run(model)
             failed += await EngineContextChecks.run(model)
+            failed += await MemorySheetChecks.run(model)
             failed += await AccessibilityChecks.run(model)
             failed += await PackChecks.run(model)
             print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
@@ -628,6 +630,113 @@ enum UICapture {
             check("clicking the row text selects it", model.settings.customEngineID == model.settings.engines.first { $0.name == "Ollama" }?.id)
             w.orderOut(nil)
             print("engine-row-click: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+        }
+
+        // MARK: the app profile's memory
+
+        /// The profile row, its ⋯ menu and the Memory sheet of an app (Messages: a real bundle, so the card has its category). The engine is
+        /// the mock in `terms` mode, which teaches the app two names (one seen twice, one seen once); nothing leaves this Mac.
+        private func memoryScene(_ name: String) async {
+            let messages = "com.apple.MobileSMS"
+            let saved = model.settings
+            defer { model.settings = saved }
+            guard let mock = ContextChecks.Mock(mode: "terms") else { print("\(name): the mock server did not start"); return }
+            defer { mock.stop() }
+            let engine = ContextChecks.engine("openai", base: mock.base, context: EngineContext(enabled: true, previousLines: 2, useLearned: true))
+            let names = [MemoryEntry(src: "Alice", dst: "앨리스", kind: .person, gender: .f, note: "17, class rep", reading: nil,
+                                     addressing: [Addressing(to: "the teacher", register: .polite)]),
+                         MemoryEntry(src: "Bob", dst: "밥", kind: .person, gender: .m),
+                         MemoryEntry(src: "Sakura High", dst: "사쿠라 고등학교", kind: .org)]
+            let filled = name != "memory-sheet-empty"
+            model.settings.engines = [engine]
+            model.settings.customEngineID = engine.id
+            model.settings.sourceLanguage = "en"
+            model.settings.targetLanguage = "ko"
+            model.settings.appProfiles = [
+                AppProfile(bundleID: messages, appName: "Messages", source: "en", target: "ko",
+                           note: filled ? "Friends in one class chatting after school; casual, a little teasing." : "",
+                           entries: filled ? names : [], context: filled ? AppContextOverride(mode: .nearby) : nil),
+                AppProfile(bundleID: "com.apple.Safari", appName: "Safari", source: "ja", target: "en"),
+                AppProfile(bundleID: "com.example.vn", appName: "Visual Novel Reader With A Very Long Name", source: "ja", target: "en",
+                           paragraphReader: .lineGrouping, note: "Fantasy setting, formal speech.", entries: Array(names.prefix(2)))]
+            await model.translator.update(settings: model.effectiveSettings)
+            if name.hasPrefix("memory-sheet"), filled {
+                let lens = LensContext(bundleID: messages, appName: "Messages", categoryWord: "social", confirmedTitle: "Alice", lensID: "L1", screen: [])
+                for text in ["Haruka wrote line one", "Haruka wrote line two", "Mika wrote line three"] {
+                    _ = await model.translator.translate([text], context: lens)
+                }
+                try? await Task.sleep(for: .milliseconds(300))
+            }
+            switch name {
+            case "memory-profile-row":
+                await shoot(name, TranslationSettings(), CGSize(width: 560, height: 1000))
+            case "memory-menu":
+                await memoryMenu(name)
+            case "memory-sheet-fresh":
+                await shoot(name, AppMemorySheet(bundleID: messages, model: model, askingToStartFresh: true), CGSize(width: 520, height: 640))
+            case "memory-sheet-tall":
+                await shoot(name, AppMemorySheet(bundleID: messages, model: model, height: 820), CGSize(width: 520, height: 820))
+            default:
+                await shoot(name, AppMemorySheet(bundleID: messages, model: model, openDetails: filled ? [0] : []), CGSize(width: 520, height: 640))
+            }
+            await model.translator.forgetLearned(for: messages)
+        }
+
+        /// The ⋯ menu of the first profile row, open: the popup button is pressed in code (no pointer event), the window and the menu are
+        /// captured while it tracks, and the order of its items is checked: Paragraphs, then Memory…, then Forget This App.
+        private func memoryMenu(_ name: String) async {
+            let w = NSWindow(contentRect: NSRect(origin: .zero, size: CGSize(width: 560, height: 700)), styleMask: [.titled], backing: .buffered, defer: false)
+            let host = NSHostingView(rootView: TranslationSettings().environment(model))
+            w.contentView = host
+            w.setFrameTopLeftPoint(NSPoint(x: 80, y: (NSScreen.main?.frame.height ?? 900) - 60))
+            NSApp.activate(ignoringOtherApps: true)
+            w.makeKeyAndOrderFront(nil)
+            try? await Task.sleep(for: .seconds(delay))
+            // The ⋯ buttons are popup buttons, top to bottom: the added engine's, then the profile rows' (Messages, Safari, Visual Novel).
+            let popups = views(host).filter { String(describing: type(of: $0)).contains("PopupButton") }
+                .sorted { $0.convert($0.bounds, to: nil).maxY > $1.convert($1.bounds, to: nil).maxY }
+            guard popups.count == 4, let button = popups[1] as? NSButton else {
+                print("\(name): FAIL the ⋯ button of the Messages row was not found among \(popups.count) popup buttons")
+                w.orderOut(nil)
+                return
+            }
+            nonisolated(unsafe) var titles: [String] = []
+            nonisolated(unsafe) var tracked: NSMenu?
+            let token = NotificationCenter.default.addObserver(forName: NSMenu.didBeginTrackingNotification, object: nil, queue: nil) { n in
+                tracked = n.object as? NSMenu
+                titles = tracked?.items.map { $0.isSeparatorItem ? "-" : $0.title } ?? []
+            }
+            let frame = w.frame
+            let screen = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1512, height: 982)
+            // A plain backdrop behind the window and the menu: the capture shows nothing of the desktop.
+            let backdrop = NSWindow(contentRect: frame.insetBy(dx: -30, dy: -30).offsetBy(dx: 120, dy: 0).union(frame.insetBy(dx: -30, dy: -30)), styleMask: [.borderless],
+                                    backing: .buffered, defer: false)
+            backdrop.backgroundColor = NSColor(white: 0.55, alpha: 1)
+            // Above other apps' windows (an alert of theirs must not show), below the menu, with the settings window over it.
+            backdrop.level = NSWindow.Level(rawValue: 24)
+            w.level = NSWindow.Level(rawValue: 25)
+            backdrop.orderFrontRegardless()
+            w.makeKeyAndOrderFront(nil)
+            let path = out.appendingPathComponent("\(name).png").path
+            // Menu tracking runs the run loop in its own mode: the capture is timed in common modes, then ends the tracking.
+            let t = Timer(timeInterval: 0.8, repeats: false) { _ in
+                MainActor.assumeIsolated {
+                    let r = backdrop.frame
+                    self.run("/usr/sbin/screencapture", ["-x", "-R", "\(Int(r.minX)),\(Int(screen.height - r.maxY)),\(Int(r.width)),\(Int(r.height))", path])
+                    tracked?.cancelTrackingWithoutAnimation()
+                }
+            }
+            RunLoop.main.add(t, forMode: .common)
+            button.performClick(nil)
+            t.invalidate()
+            NotificationCenter.default.removeObserver(token)
+            print("wrote \(path)")
+            backdrop.orderOut(nil)
+            let memory = titles.firstIndex(of: String(localized: "Memory…")), forget = titles.firstIndex(of: String(localized: "Forget This App"))
+            let paragraphs = titles.firstIndex(of: String(localized: "Paragraphs"))
+            print("memory-menu: \(titles)")
+            print("memory-menu: \(paragraphs != nil && memory != nil && forget != nil && paragraphs! < memory! && memory! < forget! ? "PASS" : "FAIL") Memory… sits below Paragraphs and above Forget This App")
+            w.orderOut(nil)
         }
 
         // MARK: capture

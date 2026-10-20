@@ -35,7 +35,9 @@ def make_handler(upstream, dump):
                     n = next(COUNT)
                 with open(os.path.join(dump, "%04d.request.json" % n), "wb") as f:
                     f.write(body)
-            conn = http.client.HTTPConnection(up.hostname, up.port or 80, timeout=900)
+            # An https upstream (the Anthropic API) is reached over TLS; the request headers (the key) are forwarded, never written.
+            conn = (http.client.HTTPSConnection(up.hostname, up.port or 443, timeout=900) if up.scheme == "https"
+                    else http.client.HTTPConnection(up.hostname, up.port or 80, timeout=900))
             headers = {k: v for k, v in self.headers.items() if k.lower() not in ("host", "connection", "content-length")}
             conn.request(self.command, self.path, body=body, headers=headers)
             r = conn.getresponse()

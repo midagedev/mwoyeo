@@ -73,7 +73,13 @@ def run_of(directory, seq):
             read = "".join(src for src, _ in body)
             if squash(read) != squash(line["text"]):
                 ocr[line["id"]] = read
-    meta = {"engine": "Ollama gemma3:4b", "condition": os.path.basename(os.path.normpath(directory))}
+    # The engine the render used, from the engine.json render.sh wrote beside the plates.
+    try:
+        with open(os.path.join(directory, "engine.json"), encoding="utf-8") as f:
+            engine = json.load(f)["engine"]["name"]
+    except (OSError, ValueError, KeyError):
+        engine = "?"
+    meta = {"engine": engine, "condition": os.path.basename(os.path.normpath(directory))}
     return {"path": directory, "meta": meta, "outs": {SEQ_ID: {"id": SEQ_ID, "translations": translations}}}, plates, ocr, missing
 
 

@@ -33,9 +33,14 @@ echo $! > "$OUT/tap.pid"
 stop_tap() { kill "$(cat "$OUT/tap.pid")" 2>/dev/null; }
 trap stop_tap EXIT
 for _ in $(seq 1 50); do curl -s -o /dev/null "http://127.0.0.1:$PORT/v1/models" && break; sleep 0.1; done
-cat > "$OUT/engine.json" <<JSON
-{"mwoyeoEngine": 1, "engine": {"name": "Ollama $MODEL", "kind": "openAICompatible", "baseURL": "http://127.0.0.1:$PORT/v1", "model": "$MODEL", "thinking": "off"}}
-JSON
+# KIND=anthropic: an added Anthropic engine (MODEL e.g. claude-sonnet-5-5, UPSTREAM https://api.anthropic.com); its key goes to the app as
+# MWOYEO_ENGINE_KEY from ANTHROPIC_API_KEY, in memory only. Default: Ollama as an OpenAI-compatible engine.
+case ${KIND:-openAICompatible} in
+    anthropic) ENGINE='{"name": "Claude '"$MODEL"'", "kind": "anthropic", "baseURL": "http://127.0.0.1:'"$PORT"'", "model": "'"$MODEL"'", "thinking": "off"}'
+               export MWOYEO_ENGINE_KEY="${ANTHROPIC_API_KEY:?KIND=anthropic needs ANTHROPIC_API_KEY}" ;;
+    *)         ENGINE='{"name": "Ollama '"$MODEL"'", "kind": "openAICompatible", "baseURL": "http://127.0.0.1:'"$PORT"'/v1", "model": "'"$MODEL"'", "thinking": "off"}' ;;
+esac
+echo '{"mwoyeoEngine": 1, "engine": '"$ENGINE"'}' > "$OUT/engine.json"
 
 for id in "${ids[@]}"; do
     "$ANE_ENV" run pool -- "$BIN" --render "$STAGE/L$id.png" "$OUT/L$id.png" --src ja --tgt ko --scale 2.25 --warm --max-wait 240 \

@@ -1,0 +1,30 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Claude claude-sonnet-5-5 anthropic
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=14682 gui pid=14665
+reader: docs pid=14716 gui pid=14665
+warm-up: 1080 ms
+pipeline: 7315 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=4 translate.wasted=0 lens_wait_ms[p50=1493 max=1493 last=1493 n=2] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=1 first=0.12s perLine=0.05s batch[p50=0.17s p90=0.17s n=1] cancelled=0 lines[cached=0 translated=2]
+pace: ja>ko|ext:4BB5CD98:223c7112df81bdb1 samples=0 first=n/as perLine=n/as batch[p50=n/as p90=n/as n=0] cancelled=0 lines[cached=0 translated=0]
+  ハク
+    → 하쿠
+  よくやった。目覚めの時じゃ、夜明けの守り手よ
+    → 잘했어요. 깨어날 때는 새벽의 수호자여
+issues=1
+engine_ms[n=0]
+learned=[]
+cache[ja>ko|apple:auto|8415632921257692666] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=214,1610,129,69 text=214,1607,125,76 size=72.7 lines=1 chars=2 clipped=0 ellipsis=0 "ハク"
+block: core=174,1792,1757,100 text=174,1794,1280,97 size=86.4 lines=1 chars=22 clipped=0 ellipsis=0 "よくやった。目覚めの時じゃ、夜明けの守り手よ"
+wrote /Users/hckim/repo/mwoyeo/tools/film2/plates/out/before-sonnet/L33.png
+silence: longest=6706 total=6706
+drain: 0 in-flight=0
+reader: docs state=idle pid=14716 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=19922 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=94 MB gui=91 MB last-ms=472 ms=472
+reader: lines state=idle pid=14682 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=19922 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=148 MB gui=91 MB last-ms=325 ms=460,325
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

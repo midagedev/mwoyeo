@@ -1,0 +1,1 @@
+{"max_tokens":384,"messages":[{"content":"{\"lines\":[\"ハク\",\"月涙石は月影のの奥、水鏡の底に沈んでおる。取ってこられるかな\"]}","role":"user"}],"model":"claude-sonnet-5-5","system":"Translate each line of the user's JSON into Korean from Japanese. Keep names, numbers, emoji, URLs and @handles unchanged. Give one translation per line, in the same order.\nReply with only {\"translations\": [...]}."}

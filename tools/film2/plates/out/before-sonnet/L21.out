@@ -1,0 +1,30 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Claude claude-sonnet-5-5 anthropic
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=98466 gui pid=98388
+reader: docs pid=98510 gui pid=98388
+warm-up: 1704 ms
+pipeline: 19743 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=4 translate.wasted=0 lens_wait_ms[p50=3251 max=3251 last=3251 n=2] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=1 first=0.73s perLine=0.17s batch[p50=0.90s p90=0.90s n=1] cancelled=0 lines[cached=0 translated=2]
+pace: ja>ko|ext:25530436:223c7112df81bdb1 samples=0 first=n/as perLine=n/as batch[p50=n/as p90=n/as n=0] cancelled=0 lines[cached=0 translated=0]
+  エルヴェ
+    → 엘베
+  冷たいだけならよいがな。底は、触れた者の迷いを映すのじゃ
+    → 차갑기만 하면 좋겠네. 바닥은 만진 자의 망설이를 비춥니다.
+issues=1
+engine_ms[n=0]
+learned=[]
+cache[ja>ko|apple:auto|-2971936849256273936] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=216,1610,269,72 text=216,1606,131,81 size=76.0 lines=1 chars=4 clipped=0 ellipsis=0 "エルヴェ"
+block: core=167,1789,1773,207 text=167,1793,1635,200 size=87.5 lines=2 chars=28 clipped=0 ellipsis=0 "冷たいだけならよいがな。底は、触れた者の迷いを映すのじゃ"
+wrote /Users/hckim/repo/mwoyeo/tools/film2/plates/out/before-sonnet/L21.png
+silence: longest=18906 total=18906
+drain: 0 in-flight=0
+reader: docs state=idle pid=98510 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=21624 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=92 MB gui=107 MB last-ms=655 ms=655
+reader: lines state=idle pid=98466 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=21624 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=150 MB gui=107 MB last-ms=402 ms=611,402
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

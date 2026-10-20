@@ -1,0 +1,30 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Claude claude-sonnet-5-5 anthropic
+inpainter: MI-GAN loaded (1 ms)
+reader: lines pid=16251 gui pid=16224
+reader: docs pid=16277 gui pid=16224
+warm-up: 1335 ms
+pipeline: 11613 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=4 translate.wasted=0 lens_wait_ms[p50=3859 max=3859 last=3859 n=2] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=1 first=0.28s perLine=0.03s batch[p50=0.32s p90=0.32s n=1] cancelled=0 lines[cached=0 translated=2]
+pace: ja>ko|ext:38EDD6FB:223c7112df81bdb1 samples=0 first=n/as perLine=n/as batch[p50=n/as p90=n/as n=0] cancelled=0 lines[cached=0 translated=0]
+  九十九
+    → 구십구
+  はい、エルヴェさんのおかげです
+    → 네, 엘베님 덕분입니다.
+issues=1
+engine_ms[n=0]
+learned=[]
+cache[ja>ko|apple:auto|5772686742330314429] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=213,1610,212,75 text=213,1607,197,81 size=76.1 lines=1 chars=3 clipped=0 ellipsis=0 "九十九"
+block: core=174,1786,1195,104 text=174,1790,740,97 size=86.4 lines=1 chars=15 clipped=0 ellipsis=0 "はい、エルヴェさんのおかげです"
+wrote /Users/hckim/repo/mwoyeo/tools/film2/plates/out/before-sonnet/L35.png
+silence: longest=10806 total=10806
+drain: 0 in-flight=0
+reader: docs state=idle pid=16277 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=21846 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=93 MB gui=87 MB last-ms=538 ms=538
+reader: lines state=idle pid=16251 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=21846 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=146 MB gui=87 MB last-ms=316 ms=586,316
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

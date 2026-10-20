@@ -1,0 +1,30 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Claude claude-sonnet-5-5 anthropic
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=83404 gui pid=83376
+reader: docs pid=83446 gui pid=83376
+warm-up: 1064 ms
+pipeline: 9148 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=4 translate.wasted=0 lens_wait_ms[p50=1672 max=1672 last=1672 n=2] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=1 first=0.11s perLine=0.08s batch[p50=0.19s p90=0.19s n=1] cancelled=0 lines[cached=0 translated=2]
+pace: ja>ko|ext:18C6214F:223c7112df81bdb1 samples=0 first=n/as perLine=n/as batch[p50=n/as p90=n/as n=0] cancelled=0 lines[cached=0 translated=0]
+  エルヴェ
+    → 엘베
+  シュザンヌ様、あれが祠の番人ですか。獣の姿をしておりますな
+    → 슈잔느님, 저것이 사당의 파수인입니까? 짐승의 모습을 하고 있습니다.
+issues=1
+engine_ms[n=0]
+learned=[]
+cache[ja>ko|apple:auto|-1154829782614816145] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=216,1610,269,72 text=216,1606,131,81 size=76.0 lines=1 chars=4 clipped=0 ellipsis=0 "エルヴェ"
+block: core=175,1789,1757,206 text=175,1790,1607,205 size=89.8 lines=2 chars=29 clipped=0 ellipsis=0 "シュザンヌ様、あれが祠の番人ですか。獣の姿をしておりますな"
+wrote /Users/hckim/repo/mwoyeo/tools/film2/plates/out/before-sonnet/L11.png
+silence: longest=8506 total=8506
+drain: 0 in-flight=0
+reader: docs state=idle pid=83446 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=24396 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=94 MB gui=109 MB last-ms=466 ms=466
+reader: lines state=idle pid=83404 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=24396 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=147 MB gui=109 MB last-ms=305 ms=482,305
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

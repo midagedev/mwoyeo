@@ -1,0 +1,30 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Claude claude-sonnet-5-5 anthropic
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=89403 gui pid=89389
+reader: docs pid=89475 gui pid=89389
+warm-up: 1076 ms
+pipeline: 11416 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=4 translate.wasted=0 lens_wait_ms[p50=2570 max=2570 last=2570 n=2] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=1 first=0.29s perLine=0.07s batch[p50=0.36s p90=0.36s n=1] cancelled=0 lines[cached=0 translated=2]
+pace: ja>ko|ext:04ACC5CD:223c7112df81bdb1 samples=0 first=n/as perLine=n/as batch[p50=n/as p90=n/as n=0] cancelled=0 lines[cached=0 translated=0]
+  シュザンヌ
+    → 슈잔느
+  それなら話が早いわ。エルヴェ、続きを聞かせて
+    → 그렇다면 이야기가 빨라요. 엘베, 이어지는 이야기를 들려 주세요
+issues=1
+engine_ms[n=0]
+learned=[]
+cache[ja>ko|apple:auto|6802394497728413173] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=220,1609,337,73 text=220,1605,200,82 size=77.3 lines=1 chars=5 clipped=0 ellipsis=0 "シュザンヌ"
+block: core=170,1792,1763,100 text=170,1801,1757,82 size=72.4 lines=1 chars=22 clipped=0 ellipsis=0 "それなら話が早いわ。エルヴェ、続きを聞かせて"
+wrote /Users/hckim/repo/mwoyeo/tools/film2/plates/out/before-sonnet/L16.png
+silence: longest=10706 total=10706
+drain: 0 in-flight=0
+reader: docs state=idle pid=89475 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=24410 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=93 MB gui=92 MB last-ms=472 ms=472
+reader: lines state=idle pid=89403 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=24410 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=150 MB gui=92 MB last-ms=308 ms=466,308
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

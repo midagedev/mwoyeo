@@ -16,7 +16,7 @@ import SwiftUI
 /// mock, then with Show Original on; when the text recognizer reads nothing the picture stands in for its translation, which
 /// still shows the toggle's two states), appearance (Settings › Appearance), lens-gallery (every lens style in every tint on a dark and
 /// a light backdrop: one PNG each, lens-<style>-<tint>-<dark|light>.png, and a grid per backdrop), lens-tab-positions (the name tag
-/// in its four places, one carrying a notice), lens-reading (the default glow while the lens reads), sheet-pick, sheet-config, sheet-config-remote (the box that allows sending to the host, unticked), sheet-config-remote-allowed (ticked), sheet-config-remote-context (ticked, with the context caption), sheet-context-collapsed-off, sheet-context-collapsed-on, sheet-context-chat, sheet-context-chat-off, sheet-context-local, sheet-context-deepl, sheet-context-template and sheet-context-memory (the sheet of an engine already added, its Context section collapsed or open, the last with Context off and a note written for an app; `--lang ko` for Korean), engine-context-checks (only that section's checks; `--dump` also writes the accessibility trees it read, a11y-engine-context-*.txt), translation-engines-permission (the list with an engine that needs the person's permission), about-privacy (Settings › About), lens-badge, lens-notice, lens-menu, add-flow (adds an
+/// in its four places, one carrying a notice), lens-reading (the default glow while the lens reads), sheet-pick, sheet-preset-deepl-free (the DeepL Free row chosen, key field empty), sheet-config, sheet-config-remote (the box that allows sending to the host, unticked), sheet-config-remote-allowed (ticked), sheet-config-remote-context (ticked, with the context caption), sheet-context-collapsed-off, sheet-context-collapsed-on, sheet-context-chat, sheet-context-chat-off, sheet-context-local, sheet-context-deepl, sheet-context-template and sheet-context-memory (the sheet of an engine already added, its Context section collapsed or open, the last with Context off and a note written for an app; `--lang ko` for Korean), engine-context-checks (only that section's checks; `--dump` also writes the accessibility trees it read, a11y-engine-context-*.txt), translation-engines-permission (the list with an engine that needs the person's permission), about-privacy (Settings › About), lens-badge, lens-notice, lens-menu, add-flow (adds an
 /// engine through the sheet, prints where the key is), pack-checks (only the language pack flow's PASS/FAIL lines), lens-hint-disk (the pill
 /// when the Mac has no room to prepare text recognition), lens-hint-pack-downloading,
 /// lens-hint-pack-notfinished and lens-hint-unsupported (the pill in the states a pack or a pair can be in), menu-pack-rows (the panel's lens
@@ -215,9 +215,17 @@ enum UICapture {
                 // Only the Hide Lenses checks (the whole of check-logic takes minutes).
                 let failed = await HideLensChecks.run(model)
                 report("hide-lens", failed)
+            case "trust-checks":
+                // Only the trust1 checks: the secret store of scratch runs, who translated a line, a line that reaches a busy engine.
+                var t = ContextChecks.Tally()
+                await ContextChecks.trustChecks(t)
+                report("trust", t.failures)
             case "inpaint-footprint": await LensRobustChecks.inpaintFootprint()
             case "menu-icon": LensRobustChecks.menuIcon(into: out.appendingPathComponent("menu-icon.png"))
             case "sheet-pick": await shoot(name, EngineSheet(), CGSize(width: 480, height: 560))
+            case "sheet-preset-deepl-free":
+                // The picker's DeepL Free row chosen: step 2 with the Free host filled in and the key field empty (no key is typed, so nothing is sent).
+                await shoot(name, EngineSheet(autopilot: .init(preset: "DeepL Free")), CGSize(width: 480, height: 560), wait: 2)
             case "sheet-config":
                 let setup = EngineShare.encode(engine("Gemini", mock, "mock-model"))
                 await shoot(name, EngineSheet(autopilot: .init(setup: setup, key: "sk-test-capture")), CGSize(width: 480, height: 560), wait: 5)

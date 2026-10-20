@@ -155,6 +155,10 @@ enum UICapture {
                 model.settingsTab = .about
                 await shoot(name, SettingsView(), CGSize(width: 560, height: 760))
                 model.settingsTab = .general
+            case "settings-shortcuts":
+                model.settingsTab = .shortcuts
+                await shoot(name, SettingsView(), CGSize(width: 560, height: 760))
+                model.settingsTab = .general
             case "engine-row-click": await engineRowClick()
             case "menu-switcher":
                 await seedEngines()
@@ -207,6 +211,10 @@ enum UICapture {
                 // Only the MCP server's checks (the whole of check-logic takes minutes).
                 let failed = MCPChecks.run(model)
                 report("mcp", failed)
+            case "hide-lens-checks":
+                // Only the Hide Lenses checks (the whole of check-logic takes minutes).
+                let failed = await HideLensChecks.run(model)
+                report("hide-lens", failed)
             case "inpaint-footprint": await LensRobustChecks.inpaintFootprint()
             case "menu-icon": LensRobustChecks.menuIcon(into: out.appendingPathComponent("menu-icon.png"))
             case "sheet-pick": await shoot(name, EngineSheet(), CGSize(width: 480, height: 560))
@@ -482,6 +490,7 @@ enum UICapture {
             failed += await AccessibilityChecks.run(model)
             failed += await PackChecks.run(model)
             failed += MCPChecks.run(model)
+            failed += await HideLensChecks.run(model)
             report("check-logic", failed)
         }
 

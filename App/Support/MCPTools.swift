@@ -440,8 +440,9 @@ enum MCPMemory {
         var before: [MemoryEntry] = []
         let (stored, issues) = try MCPSettingsWrite.change(world, tool: "set_memory") { settings in
             existing = AppProfiles.profile(for: bundleID, in: settings.appProfiles)
-            var profile = existing ?? AppProfile(bundleID: bundleID, appName: world.appName(bundleID) ?? bundleID,
-                                                 source: settings.sourceLanguage, target: settings.targetLanguage)
+            // The one function that makes a profile (the Memory sheet's first edit and Pin come here too).
+            let i = settings.ensuringProfile(for: bundleID, appName: world.appName(bundleID) ?? bundleID)
+            var profile = settings.appProfiles[i]
             before = profile.entries
             if let appName { profile.appName = appName }
             if mode == .replace {
@@ -458,7 +459,7 @@ enum MCPMemory {
                     throw MCPToolError("set_memory was not run: entries: \"\(entry.src)\" has no src or no dst once cleaned")
                 }
             }
-            settings.appProfiles = AppProfiles.remembering(profile, in: settings.appProfiles)
+            settings.appProfiles[i] = profile
         }
         guard let profile = AppProfiles.profile(for: bundleID, in: stored.appProfiles) else {
             throw MCPToolError("set_memory could not write \(world.settingsURL.path); nothing changed")

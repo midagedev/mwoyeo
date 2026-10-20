@@ -3,10 +3,8 @@ import MwoyeoCore
 
 /// What an edit of one app's memory did (`AppModel.setMemoryNote` and the like). The Memory sheet shows `.full` and `.invalid`.
 enum MemoryEdit: Equatable {
-    /// Written to the profile (and so to settings.json).
+    /// Written to the profile (and so to settings.json); the first edit of an app without a profile makes it (`AppSettings.ensuringProfile`).
     case saved
-    /// The app has no profile; an edit never creates one (a profile also fixes the app's language pair).
-    case noProfile
     /// The profile already has `AppProfile.maxEntries` rows.
     case full
     /// The row has no source or no translation.
@@ -21,6 +19,22 @@ struct LearnedCounts: Equatable {
     init(_ records: [ContextMemory.LearnedRecord] = []) {
         usable = records.filter(\.isUsable).count
         waiting = records.count - usable
+    }
+}
+
+extension AppSettings {
+    /// The pair a new profile of `bundleID` takes: what `effective(frontmost:)` gives while that app is in front (the base choice, as the app
+    /// has no profile), and no engine of its own, so it follows the base. Nothing translates differently when the profile is made.
+    func newProfilePair(for bundleID: String) -> LanguageChoice {
+        let now = effective(frontmost: bundleID)
+        return LanguageChoice(source: now.sourceLanguage, target: now.targetLanguage, customEngineID: nil)
+    }
+
+    /// The index in `appProfiles` of the profile of `bundleID`, made first when the app has none: `AppProfiles.ensuring`, the one place a
+    /// profile is made, with `newProfilePair`. The Memory sheet's first edit, Pin and MCP `set_memory` all come here.
+    @discardableResult
+    mutating func ensuringProfile(for bundleID: String, appName: String) -> Int {
+        AppProfiles.ensuring(bundleID, appName: appName, in: &appProfiles, creatingWith: newProfilePair(for: bundleID))
     }
 }
 
@@ -59,6 +73,25 @@ extension AppModel {
 
     func remember(_ profile: AppProfile) {
         settings.appProfiles = AppProfiles.remembering(profile, in: settings.appProfiles)
+    }
+
+    /// The lens menu's "Remember Languages for <App>": the pair and the engine go into the app's profile, and its note, names, context
+    /// choice and reader stay (`AppProfiles.remembering(_:for:appName:in:)`).
+    func rememberLanguages(_ choice: LanguageChoice, for bundleID: String, named name: String) {
+        settings.appProfiles = AppProfiles.remembering(choice, for: bundleID, appName: name, in: settings.appProfiles)
+    }
+
+    /// The lens menu's "Memory for <App>…": Settings on Translation with the app's Memory sheet up. Opening makes no profile; the first
+    /// edit does. Without a way to open Settings (`openSettingsAction`) nothing is left waiting for the next time it opens.
+    func openMemory(of bundleID: String, named name: String) {
+        memoryTarget = MemoryTarget(id: bundleID, name: name)
+        if !openSettings(on: .translation) { memoryTarget = nil }
+    }
+
+    /// What an app is called when only its bundle ID is known (the sheet opened without a lens, an agent's call): its profile's name, else
+    /// the installed app's, else the bundle ID.
+    func displayName(ofApp bundleID: String) -> String {
+        profile(for: bundleID)?.appName ?? MCPWorld.installedName(bundleID) ?? bundleID
     }
 
     func forgetProfile(_ bundleID: String) {
@@ -100,26 +133,33 @@ extension AppModel {
 
 /// The memory of one app, as the Memory sheet edits it (design §3): the note, the names and terms, the context override, and the
 /// rows the app learned. The user's part is the profile's (`appProfiles[].note`, `.entries`, `.context` in settings.json); the learned
-/// rows are the translator's, in RAM. Nothing here creates a profile: the sheet is entered from an existing profile's menu.
+/// rows are the translator's, in RAM. Opening the sheet makes no profile; the first edit that changes something does, through the one
+/// function every profile is made by (`AppSettings.ensuringProfile`).
 extension AppModel {
-    private func editProfile(_ bundleID: String, _ body: (inout AppProfile) -> MemoryEdit) -> MemoryEdit {
-        guard let i = settings.appProfiles.firstIndex(where: { $0.bundleID == bundleID }) else { return .noProfile }
-        var p = settings.appProfiles[i]
+    /// - `name`: what the app is called, for a profile this edit makes; nil asks `displayName(ofApp:)`.
+    private func editProfile(_ bundleID: String, named name: String?, _ body: (inout AppProfile) -> MemoryEdit) -> MemoryEdit {
+        var edited = settings
+        let i = edited.ensuringProfile(for: bundleID, appName: name ?? displayName(ofApp: bundleID))
+        var p = edited.appProfiles[i]
         let result = body(&p)
-        if result == .saved, p != settings.appProfiles[i] { settings.appProfiles[i] = p }
+        // An edit that changed nothing (an empty note over no note) or failed leaves the app as it was, a missing profile still missing.
+        if result == .saved, p != edited.appProfiles[i] {
+            edited.appProfiles[i] = p
+            settings.appProfiles = edited.appProfiles
+        }
         return result
     }
 
     /// The note for the translator. Trimmed and cut at `AppProfile.maxNoteLength`; empty clears it.
     @discardableResult
-    func setMemoryNote(_ note: String, for bundleID: String) -> MemoryEdit {
-        editProfile(bundleID) { $0.note = note; return .saved }
+    func setMemoryNote(_ note: String, for bundleID: String, named name: String? = nil) -> MemoryEdit {
+        editProfile(bundleID, named: name) { $0.note = note; return .saved }
     }
 
     /// Adds a name or term, or replaces the row whose source is `replacing` (the source may change). See `AppProfile.setEntry`.
     @discardableResult
-    func setMemoryEntry(_ entry: MemoryEntry, replacing src: String? = nil, for bundleID: String) -> MemoryEdit {
-        editProfile(bundleID) { p in
+    func setMemoryEntry(_ entry: MemoryEntry, replacing src: String? = nil, for bundleID: String, named name: String? = nil) -> MemoryEdit {
+        editProfile(bundleID, named: name) { p in
             switch p.setEntry(entry, replacing: src) {
             case .saved: .saved
             case .full: .full
@@ -128,14 +168,14 @@ extension AppModel {
         }
     }
 
-    func removeMemoryEntry(src: String, for bundleID: String) {
-        _ = editProfile(bundleID) { $0.removeEntry(src: src); return .saved }
+    func removeMemoryEntry(src: String, for bundleID: String, named name: String? = nil) {
+        _ = editProfile(bundleID, named: name) { $0.removeEntry(src: src); return .saved }
     }
 
     /// The app's own context choice; nil follows the engine (and the default, which is off).
     @discardableResult
-    func setContextOverride(_ override: AppContextOverride?, for bundleID: String) -> MemoryEdit {
-        editProfile(bundleID) { $0.context = override; return .saved }
+    func setContextOverride(_ override: AppContextOverride?, for bundleID: String, named name: String? = nil) -> MemoryEdit {
+        editProfile(bundleID, named: name) { $0.context = override; return .saved }
     }
 
     // MARK: learned rows
@@ -144,13 +184,15 @@ extension AppModel {
     func learnedRows(for bundleID: String) async -> [ContextMemory.LearnedRecord] { await translator.learnedRows(for: bundleID) }
 
     /// "Pin": the learned row becomes a name of the app's profile (a user row, saved in settings.json) and leaves the learned rows.
-    /// Not the translator's own pin, which would last until the next request: the memory follows the profile.
-    func pinLearned(src: String, for bundleID: String) async -> PinResult {
+    /// Not the translator's own pin, which would last until the next request: the memory follows the profile. An app without a profile
+    /// gets one (`AppProfiles.pin`), as for any first edit.
+    func pinLearned(src: String, for bundleID: String, named name: String? = nil) async -> PinResult {
         let key = MemoryEntry.id(forSource: src)
         let row = await translator.learnedRows(for: bundleID).first { $0.entry.id == key }
-        var profiles = settings.appProfiles
-        let result = AppProfiles.pin(row?.entry, bundleID: bundleID, in: &profiles)
-        if result == .pinned { settings.appProfiles = profiles }
+        var edited = settings
+        let result = AppProfiles.pin(row?.entry, bundleID: bundleID, appName: name ?? displayName(ofApp: bundleID),
+                                     creatingWith: edited.newProfilePair(for: bundleID), in: &edited.appProfiles)
+        if result == .pinned { settings.appProfiles = edited.appProfiles }
         if result == .pinned || result == .alreadyYours { await translator.removeLearned(src: src, for: bundleID) }
         return result
     }
@@ -177,7 +219,8 @@ extension AppModel {
 
     /// The engine sheet's "Sent:" line for `engine` as the sheet has it now (its pending switches too), over the apps' written memory.
     func sentPreview(forEngine engine: EngineConfig) -> SentSummary {
-        ContextPreview.engineSummary(engine: engine, profiles: settings.appProfiles, category: { Self.category(ofApp: $0) })
+        ContextPreview.engineSummary(engine: engine, profiles: settings.appProfiles, category: { Self.category(ofApp: $0) },
+                                     glossary: settings.glossaryPairs)
     }
 
     /// What `engine` could be sent beyond the lines to translate: the lines of the window, the memory written for these apps.
@@ -187,13 +230,65 @@ extension AppModel {
 
     /// What the engine in effect while this app is in front is sent of this app, as fields (and `text`, the English line). Apple Translation
     /// takes no context. The pairing is the request path's (`ContextRoute`).
-    func sentPreview(for bundleID: String) -> SentSummary {
+    func sentPreview(for bundleID: String, named name: String? = nil) -> SentSummary {
         let pairing = ContextRoute.own(bundleID, in: settings)
-        return ContextPreview.summary(engine: pairing.engine, profile: pairing.profile, appName: pairing.profile?.appName ?? bundleID,
-                                      category: Self.category(ofApp: bundleID), learnedUsable: learnedCounts[bundleID]?.usable ?? 0)
+        return ContextPreview.summary(engine: pairing.engine, profile: pairing.profile, appName: pairing.profile?.appName ?? name ?? bundleID,
+                                      category: Self.category(ofApp: bundleID), learnedUsable: learnedCounts[bundleID]?.usable ?? 0,
+                                      glossary: settings.glossaryPairs)
     }
 
     /// The other added engines that get this app's memory or context when another app is in front and a lens covers this app's window
     /// ("Also sent to …" under the Memory sheet's "Sent:" line). Empty in the usual case: one engine for everything.
     func otherReceivers(of bundleID: String) -> [EngineConfig] { ContextRoute.otherReceivers(of: bundleID, in: settings) }
+}
+
+/// The memory block of the lens menu (design names-and-context §3.2, §3.3): the item names, the info line above "Memory for …", and the
+/// alert "Forget <App>…" asks. Pure but for the words, so `check-logic` drives it with its own.
+enum LensMemoryMenu {
+    /// The app's name in an item is cut in the middle here, the info line at the tail at `lineLimit`.
+    static let nameLimit = 24
+    static let lineLimit = 48
+
+    /// `name` cut in the middle at `nameLimit` characters: the first twelve, "…", the last eleven.
+    static func cut(_ name: String) -> String {
+        guard name.count > nameLimit else { return name }
+        return String(name.prefix(nameLimit / 2)) + "…" + String(name.suffix(nameLimit / 2 - 1))
+    }
+
+    /// The words of the info line, in the app's language; the app's name is its own.
+    struct Words {
+        var names: (Int) -> String
+        var allApps: (Int) -> String
+
+        @MainActor static var current: Words {
+            Words(names: { String(localized: "Names: \($0)") }, allApps: { String(localized: "all apps \($0)") })
+        }
+    }
+
+    /// "Names: 5 — <App> 3 · all apps 2": how many names apply to a lens over the app, and whose they are. At most `lineLimit` characters,
+    /// cut at the tail; nil while no row applies (the line is left out of the menu). A scope with no names is not mentioned.
+    static func infoLine(app: String, appNames: Int, allApps: Int, words: Words) -> String? {
+        guard appNames + allApps > 0 else { return nil }
+        var scopes: [String] = []
+        if appNames > 0 { scopes.append("\(cut(app)) \(appNames)") }
+        if allApps > 0 { scopes.append(words.allApps(allApps)) }
+        let line = "\(words.names(appNames + allApps)) — \(scopes.joined(separator: " · "))"
+        return line.count > lineLimit ? String(line.prefix(lineLimit - 1)) + "…" : line
+    }
+
+    /// Forgetting an app that has a memory removes the memory with the languages, so it asks first (§3.2).
+    static func forgetAlert(app: String, names: Int) -> NSAlert {
+        let alert = NSAlert()
+        alert.alertStyle = .warning
+        alert.messageText = String(localized: "Forget the languages and the memory for \(app)?")
+        alert.informativeText = String(localized: "Its note and \(names) names are removed.")
+        alert.addButton(withTitle: String(localized: "Forget")).hasDestructiveAction = true
+        alert.addButton(withTitle: String(localized: "Cancel"))
+        return alert
+    }
+
+    @MainActor static func askToForget(app: String, names: Int) -> Bool {
+        NSApp.activate(ignoringOtherApps: true)
+        return forgetAlert(app: app, names: names).runModal() == .alertFirstButtonReturn
+    }
 }

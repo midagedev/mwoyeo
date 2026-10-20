@@ -63,6 +63,9 @@ public struct AppProfile: Codable, Equatable, Identifiable, Sendable {
 
     public var id: String { bundleID }
 
+    /// The part of the profile that "Remember Languages" is about: the pair and the added engine.
+    public var languages: LanguageChoice { LanguageChoice(source: source, target: target, customEngineID: customEngineID) }
+
     public init(bundleID: String, appName: String, source: String, target: String, customEngineID: UUID? = nil,
                 paragraphReader: ParagraphReader? = nil, note: String = "", entries: [MemoryEntry] = [],
                 context: AppContextOverride? = nil) {
@@ -180,8 +183,6 @@ public enum PinResult: Equatable, Sendable {
     case alreadyYours
     /// The profile has `AppProfile.maxEntries` rows.
     case full
-    /// The app has no profile; pinning never creates one (a profile also fixes the app's language pair).
-    case noProfile
     /// The learned row is not there any more (forgotten, removed or already pinned).
     case gone
 }
@@ -208,9 +209,11 @@ public enum AppProfiles {
 
     /// Makes `learned` a user row of the profile of `bundleID`: it is added to `entries` with `origin == .user`, so it is saved with
     /// the profile and the translator's memory follows it. The caller then drops the learned row (`ContextMemory.removeLearned`).
-    public static func pin(_ learned: MemoryEntry?, bundleID: String, in profiles: inout [AppProfile]) -> PinResult {
-        guard let i = profiles.firstIndex(where: { $0.bundleID == bundleID }) else { return .noProfile }
+    /// An app without a profile gets one first (`ensuring`, with `pair`), but only for a row that is still there.
+    public static func pin(_ learned: MemoryEntry?, bundleID: String, appName: String, creatingWith pair: LanguageChoice,
+                           in profiles: inout [AppProfile]) -> PinResult {
         guard let learned else { return .gone }
+        let i = ensuring(bundleID, appName: appName, in: &profiles, creatingWith: pair)
         if profiles[i].entries.contains(where: { $0.id == learned.id }) { return .alreadyYours }
         switch profiles[i].setEntry(learned) {
         case .saved: return .pinned
@@ -219,10 +222,34 @@ public enum AppProfiles {
         }
     }
 
-    /// `profiles` with `profile` added, or replacing the one for the same app.
+    /// `profiles` with `profile` in the place of the one for the same app (added when there is none). It replaces the whole profile: to
+    /// remember a pair and keep the rest, use `remembering(_:for:appName:in:)`.
     public static func remembering(_ profile: AppProfile, in profiles: [AppProfile]) -> [AppProfile] {
         var out = profiles
-        if let i = out.firstIndex(where: { $0.bundleID == profile.bundleID }) { out[i] = profile } else { out.append(profile) }
+        let i = ensuring(profile.bundleID, appName: profile.appName, in: &out, creatingWith: profile.languages)
+        out[i] = profile
+        return out
+    }
+
+    /// The index of the profile of `bundleID` in `profiles`, added first when the app has none. The one place a profile is made: the
+    /// first edit of an app's memory, MCP `set_memory`, Pin and "Remember Languages" all come here. A new profile takes `pair`: for an
+    /// edit that is what `AppSettings.effective(frontmost:)` gives while the app is in front (the base choice, as the app has no profile
+    /// yet), so nothing translates differently at that moment; for "Remember Languages" it is the pair being remembered.
+    @discardableResult
+    public static func ensuring(_ bundleID: String, appName: String, in profiles: inout [AppProfile], creatingWith pair: LanguageChoice) -> Int {
+        if let i = profiles.firstIndex(where: { $0.bundleID == bundleID }) { return i }
+        profiles.append(AppProfile(bundleID: bundleID, appName: appName, source: pair.source, target: pair.target, customEngineID: pair.customEngineID))
+        return profiles.count - 1
+    }
+
+    /// `profiles` with the pair and the engine of `choice` remembered for the app. A profile the app has keeps everything else it holds
+    /// (name, note, names, context choice, reader); an app without one gets a new profile.
+    public static func remembering(_ choice: LanguageChoice, for bundleID: String, appName: String, in profiles: [AppProfile]) -> [AppProfile] {
+        var out = profiles
+        let i = ensuring(bundleID, appName: appName, in: &out, creatingWith: choice)
+        out[i].source = choice.source
+        out[i].target = choice.target
+        out[i].customEngineID = choice.customEngineID
         return out
     }
 }

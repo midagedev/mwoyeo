@@ -33,6 +33,44 @@ import Testing
         #expect(out == [again])
     }
 
+    /// 2026-10-21 (round nameslens, design names-and-context §3.2, D1): "Remember Languages" of the lens menu used to replace the app's
+    /// whole profile with a fresh one of the pair, so the note, the names, the context choice and the reader were lost. Derivation: the
+    /// profile has nine fields; remembering is about three of them (source, target, engine), so the other six must come out as they went in.
+    private let rich = AppProfile(bundleID: "com.example.rich", appName: "Rich", source: "ja", target: "en", paragraphReader: .lineGrouping,
+                                  note: "Fantasy, formal speech.", entries: [CtxFix.alice, CtxFix.tanaka], context: AppContextOverride(mode: .nearby))
+
+    @Test func rememberingLanguagesKeepsTheAppsMemory() {
+        let choice = LanguageChoice(source: "ko", target: "de", customEngineID: engineB)
+        let after = AppProfiles.remembering(choice, for: rich.bundleID, appName: "Renamed", in: [jaEn, rich])
+        let got = after.first { $0.bundleID == rich.bundleID }
+        #expect(got?.source == "ko" && got?.target == "de" && got?.customEngineID == engineB)
+        #expect(got?.note == rich.note && got?.entries == rich.entries && got?.context == rich.context && got?.paragraphReader == rich.paragraphReader)
+        #expect(got?.appName == "Rich" && after.count == 2 && after[0] == jaEn)
+    }
+
+    @Test func rememberingLanguagesForANewAppMakesItsProfile() {
+        let choice = LanguageChoice(source: "ko", target: "de", customEngineID: engineB)
+        #expect(AppProfiles.remembering(choice, for: "com.example.new", appName: "New", in: [jaEn])
+                == [jaEn, AppProfile(bundleID: "com.example.new", appName: "New", source: "ko", target: "de", customEngineID: engineB)])
+        #expect(rich.languages == LanguageChoice(source: "ja", target: "en", customEngineID: nil))
+    }
+
+    /// An app without a profile gets one from the one function (`ensuring`), with the pair it is given; an app with one keeps it.
+    @Test func ensuringMakesAProfileOnceWithThePairItIsGiven() {
+        var profiles = [jaEn]
+        let pair = LanguageChoice(source: "auto", target: "ko", customEngineID: nil)
+        let i = AppProfiles.ensuring("com.example.new", appName: "New", in: &profiles, creatingWith: pair)
+        #expect(i == 1 && profiles.count == 2 && profiles[1] == AppProfile(bundleID: "com.example.new", appName: "New", source: "auto", target: "ko"))
+        #expect(AppProfiles.ensuring("com.example.new", appName: "Other", in: &profiles, creatingWith: LanguageChoice(source: "ja", target: "en", customEngineID: engineA)) == 1)
+        #expect(profiles.count == 2 && profiles[1].appName == "New" && profiles[1].target == "ko")
+        #expect(AppProfiles.ensuring(jaEn.bundleID, appName: "x", in: &profiles, creatingWith: pair) == 0 && profiles[0] == jaEn)
+        // Nothing translates differently when the profile is made: the pair it takes is what the base gave the app.
+        let effective = AppProfiles.effective(base: base, profiles: [], frontmost: "com.example.new", engines: [engineA])
+        var made: [AppProfile] = []
+        AppProfiles.ensuring("com.example.new", appName: "New", in: &made, creatingWith: LanguageChoice(source: effective.source, target: effective.target, customEngineID: nil))
+        #expect(AppProfiles.effective(base: base, profiles: made, frontmost: "com.example.new", engines: [engineA]) == effective)
+    }
+
     @Test func decodesLeniently() throws {
         let p = try JSONDecoder().decode(AppProfile.self, from: Data(#"{"bundleID":"a.b","future":1}"#.utf8))
         #expect(p.bundleID == "a.b" && p.appName == "a.b" && p.source == "auto" && p.customEngineID == nil)

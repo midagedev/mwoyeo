@@ -53,21 +53,22 @@ func frameBackground(_ img: RGBAImage) -> RGBA {
 
 func medianByte(_ v: [UInt8]) -> Int { v.isEmpty ? 0 : Int(v.sorted()[v.count / 2]) }
 
-func lines(of words: [[Any]]) -> [(rect: CGRect, start: Int, end: Int)] {
+func lines(of words: [[Any]]) -> [(rect: CGRect, start: Int, end: Int, words: [[Any]])] {
     guard !words.isEmpty else { return [] }
     func num(_ a: Any) -> Double { (a as? NSNumber)?.doubleValue ?? 0 }
     let hs = words.map { num($0[5]) }.sorted()
     let h = hs[hs.count / 2]
-    var out: [(cy: Double, rect: CGRect, start: Int, end: Int)] = []
+    var out: [(cy: Double, rect: CGRect, start: Int, end: Int, words: [[Any]])] = []
     for w in words.sorted(by: { (num($0[3]) + num($0[5]) / 2, num($0[2])) < (num($1[3]) + num($1[5]) / 2, num($1[2])) }) {
         let r = CGRect(x: num(w[2]), y: num(w[3]), width: num(w[4]), height: num(w[5]))
         let cy = num(w[3]) + num(w[5]) / 2
         let s = Int(num(w[0])), e = Int(num(w[1]))
         if let last = out.last, abs(cy - last.cy) <= 0.6 * h {
             out[out.count - 1].rect = last.rect.union(r); out[out.count - 1].start = min(last.start, s); out[out.count - 1].end = max(last.end, e)
-        } else { out.append((cy, r, s, e)) }
+            out[out.count - 1].words.append(w)
+        } else { out.append((cy, r, s, e, [w])) }
     }
-    return out.map { ($0.rect, $0.start, $0.end) }
+    return out.map { ($0.rect, $0.start, $0.end, $0.words.sorted { num($0[2]) < num($1[2]) }) }
 }
 
 func json(_ s: String) -> String {
@@ -84,9 +85,12 @@ func json(_ s: String) -> String {
 
 func r1(_ v: CGFloat) -> String { String(format: "%.1f", Double(v)) }
 
-func lineJSON(_ l: (rect: CGRect, start: Int, end: Int), _ chars: [Character]) -> String {
+/// A line with its words: {"r":[x,y,w,h],"t":"...","w":[[x,y,w,h,"word"]...]} (the boxes CodeRegion measures the pitch of).
+func lineJSON(_ l: (rect: CGRect, start: Int, end: Int, words: [[Any]]), _ chars: [Character]) -> String {
     let a = min(l.start, chars.count), b = min(max(l.end, l.start), chars.count)
-    return "{\"r\":[\(r1(l.rect.minX)),\(r1(l.rect.minY)),\(r1(l.rect.width)),\(r1(l.rect.height))],\"t\":\(json(String(chars[a..<b])))}"
+    func num(_ a: Any) -> CGFloat { CGFloat((a as? NSNumber)?.doubleValue ?? 0) }
+    let words = l.words.map { "[\(r1(num($0[2]))),\(r1(num($0[3]))),\(r1(num($0[4]))),\(r1(num($0[5]))),\(json(($0[6] as? String) ?? ""))]" }
+    return "{\"r\":[\(r1(l.rect.minX)),\(r1(l.rect.minY)),\(r1(l.rect.width)),\(r1(l.rect.height))],\"t\":\(json(String(chars[a..<b]))),\"w\":[\(words.joined(separator: ","))]}"
 }
 
 func emit(ocr: [String: Any], png: String, idPrefix: (String) -> String, pic: String) {

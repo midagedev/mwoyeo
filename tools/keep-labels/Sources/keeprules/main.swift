@@ -35,7 +35,11 @@ func regions(feedPath: String) -> (verdicts: [String: String], fed: Set<String>)
               let bg = o["bg"] as? [Int], let frame = o["frame"] as? [Int], let ls = o["lines"] as? [[String: Any]] else { continue }
         let lines = ls.compactMap { l -> CodeRegion.Line? in
             guard let lr = l["r"] as? [Double], let lt = l["t"] as? String else { return nil }
-            return CodeRegion.Line(text: lt, rect: CGRect(x: lr[0], y: lr[1], width: lr[2], height: lr[3]))
+            let words = (l["w"] as? [[Any]] ?? []).compactMap { w -> CodeRegion.Word? in
+                guard w.count == 5, let x = w[0] as? Double, let y = w[1] as? Double, let ww = w[2] as? Double, let hh = w[3] as? Double, let wt = w[4] as? String else { return nil }
+                return CodeRegion.Word(text: wt, rect: CGRect(x: x, y: y, width: ww, height: hh))
+            }
+            return CodeRegion.Line(text: lt, rect: CGRect(x: lr[0], y: lr[1], width: lr[2], height: lr[3]), words: words)
         }
         let block = CodeRegion.Block(text: t, rect: CGRect(x: r[0], y: r[1], width: r[2], height: r[3]), lines: lines,
                                      background: RGBA(UInt8(bg[0]), UInt8(bg[1]), UInt8(bg[2])))

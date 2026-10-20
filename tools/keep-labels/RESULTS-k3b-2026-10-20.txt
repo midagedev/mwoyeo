@@ -1,0 +1,120 @@
+ROUND k3b (2026-10-20): the five keep-rule fixes that H2 found. No model, no new generator; H2 is now the dev set (H3 is another round's hold-out and was not read).
+
+INPUTS (no new Vision read anywhere; Vision's document read is not byte-stable on a picture)
+  H2 pictures and reads: the leg B work dir of round k3a (copied to /tmp/k3b/work/h2; h2_labels.py on it reproduces labels-h2/h2.jsonl byte for byte, cmp).
+  Cases + papers: /tmp/l0/g4a-work (the work dir of k3a's step-1 baseline: its baseline report equals mine on every number, only the order of tied
+  rows in rules_report.py differs, the hash seed's; python -I ignores PYTHONHASHSEED).
+  Feed: regionfeed on those pictures, now with the word boxes of every line (A1.1): 4022 rows, identical to k3a's feed outside the new "w" field.
+  Build: KEEP_BUILD=/tmp/k3b/build. "base" = HEAD 5c25067 Core; "final" = this tree. Same feed, same labels, only Core differs.
+
+THE FIVE FIXES (owner; change; cluster of RESULTS-h2 before -> after, H2 doc read)
+  1  comment-only lines of a code region   CodeRegion.Info.linked: a comment line (Info.lead, from the table `commentMarkers` # // -- ; /* *) and a
+     neighbour on its left edge (K.edge 0.3 line heights) are one region; the region keeps or not by the evidence of its lines, as before. The marks
+     themselves are not evidence. 338 words / 11 blocks -> 0. (6 of the 11 are rescued by fix 2 as well: a yaml run in a box.)
+  2  log / tool-output lines               CodeRegion.Features.mono (one term in `strong`), from the word boxes (Line.words): the width per character of
+     the ASCII words varies by less than 6 %. 260 words / 39 blocks -> 132 / 20: the 19 md-dark blocks are kept; the 19 of the full-bleed terminal
+     (term-dark: no tint, no indent, nothing contains them) are not, by the spec's own wording (a tinted or indented run). See OPTION A.
+  3  code / config lines without a keyword CodeRegion keyword tables (data) + `assignmentShapes` (table: x = v, "key": v, key: v) + `listing` (three lines
+     of one shape, one strong term). 59 words / 11 blocks -> 55 / 9. Honest: the keyword rows rescue lone lines that carry two features anyway
+     (`public init() {}`); `public private(set) var state = State.idle`, `public enum ...` as a lone line carry one strong feature and stay open; the
+     json-ko `"note"` lines stay open (a run with one measurable block, see below).
+  6  FALSE KEEP, a span over CJK text         InlineMath.tokenize/classify: a token never mixes CJK text with anything else; a token with CJK text is prose.
+     45 translate words (gitdiff-ja 34, yaml-ja 11) -> 0, and the "설정 > 일반의" span of cluster 7 (2 words) -> 0.
+  7  FALSE KEEP, a sentence with a link      TranslationFilter.needsTranslation: the cause (proved by CoreTests, the same words with and without the link:
+     only the second failed) was `t.contains("://")`, which kept any block holding a link. Now `isMostlyLink` (the link words are at least half of the
+     characters of the words): "Source: https://arxiv.org/abs/1706.03762" stays, a sentence with a link is a sentence. 16 words -> 0.
+     Trade, both visible in the numbers: the commit hash and the link inside such a sentence are keep words that the sentence now carries to the engine
+     (labels/ k09-git-release-en-vn-3: keep->translated +2 words, translate->kept -10; H2 doc `url` recall 1/1 -> 0/1).
+
+H2 ON THE DOC READ, rules OR CodeRegion (the app's behaviour)             base                     final
+  keep words P / R                                                         0.98 / 0.78              1.00 / 0.89
+  tp / fp / fn                                                             3281 / 65 / 945          3765 / 2 / 461
+  translate words kept (the costly error)                                  65 of 2121               2 of 2121   (readme-ko-b doc-8, a garbled line kept whole)
+  keep words translated (the other)                                        945 of 4226              461 of 4226
+  recall by reason   code / log / config / cmd / path / id                 .93/.78/.37/.76/.55/.19  .98/.87/.87/.76/.54/.19
+  precision by slice  path / id                                            .81 / .26                .98 / 1.00
+  vn read: P / R, fp                                                       0.99 / 0.79, 45          1.00 / 0.82, 0
+
+LABELS/ (cases dev + hold, papers dev + hold), rules OR CodeRegion, doc read | vn read
+                              translate->kept words   keep->translated words
+  papers dev   doc            32 -> 32                664 -> 664
+  papers hold  doc            8 -> 8                  312 -> 312
+  cases dev    doc            12 -> 12                35 -> 35
+  cases hold   doc            0 -> 0                  27 -> 27
+  papers dev   vn             10 -> 10                689 -> 689
+  papers hold  vn             24 -> 24                303 -> 303
+  cases dev    vn             12 -> 2                 36 -> 38     (the k09 sentence above: 10 false keeps gone, hash and link now sent with it)
+  cases hold   vn             0 -> 0                  33 -> 33
+  The only labelled block that changed in the five sets is k09-git-release-en-vn-3. Pure-translate case blocks fired by the region: 1 -> 1 (k07, as before).
+  An intermediate state (the comment link at 0.75 line heights, a pitch with no minimum of blocks) added 5 translate words on the dev papers (a garbled
+  equation of three words, CV 0.038) and 13 on k01 (a settings box 0.66 line heights inside the paragraph's margin): both are unit tests now, FAIL-first.
+
+THRESHOLDS AND THEIR DERIVATION (all from H2, doc read; the cases and papers only checked)
+  K.pitchVariation 0.06   the CV of width/char over the ASCII words (3 or more, 3 characters or more each). H2 pure-translate blocks: 0.06 fires on 2 of
+                          146 (1.4 %), 0.07 on 5 (3.4 %); keep blocks: 184 of 297 measurable fire at 0.06.
+  K.pitchShare 0.5        those words are at least half of the block's words. Inline code in prose is set in a fixed face too: the 9 mixed blocks it
+                          fired on stand at 0.17-0.30, the 184 keep blocks at 0.25-1.0 with 179 at 0.5 and more (none between 0.34 and 0.5).
+  K.pitchBlocks 2         the region needs two blocks that can be measured, none proportional. One measured block fired on a prose line (CV 0.028, 7
+                          words) beside non-measurable lines, and on a garbled equation (3 words, 0.038).
+  K.edge 0.3              line heights between first glyphs: H2's comment lines lie within 0.26 of their neighbours, k01's box inside a margin at 0.66.
+  K.listing 3             three lines of one shape; two label lines are a pair (judgement, no H2 slice separates 2 from 3: take the safer, H3 tells).
+  The keyword rows: `public private protected override case static final guard extension protocol interface defer yield` are weak (they count
+  beside a strong keyword only), so "public or private" in a tinted callout is prose (unit test); `init deinit fileprivate typealias` are strong.
+
+FAIL-FIRST (unit tests written first; the unfixed behaviour or the data switched off; the failing line, then rc 0 with the fix)
+  F4+F5  ProtectedSpansTests.swift:167-170, CoreTests.swift:521-522 on HEAD (the line before, 520, passed: the link is the cause):
+         `found("トークンの有効期限は15分です。TOKEN_ATに作った時刻を残して、10分たったら作り直します。") == ["TOKEN_AT"]` and 5 more expectations failed
+  F3+F2  new data switched off (the old keyword tables, one shape, K.pitchVariation 0): `verdicts([block(["public init() {}"], y: 100)]) == [.code]`,
+         `CodeRegion.hasFixedPitch([box("Test", 60), box("Suite", 75), box("started", 105)])`, `assignment(line)` x6, `verdicts([prose(100)] + spoken(testLog,
+         fixed: true, bg: darkBox)) == [nil, .code, .code, .code, .code]`
+  F2 share 0 / blocks 1 / any-block semantics: the `chips.count == 15 && !...` line, the `pair` line, the `mixed` line
+  F1     the link disjunct removed: `verdicts([prose(100)] + script) == [nil, .config, .config, .config]` and `verdicts(swift) == [.code, .code]`;
+         K.edge 1.0: `verdicts([block(["Run it with --month 2026-09 ..."], x: 70, y: 160)] + settings) == [nil, .config, .config, .config]`
+  listing K.listing 99: `verdicts([prose(100)] + stack(run, x: 90, y: 200)) == [nil, .config, .config, .config, .config]`
+  Each pass: cd Core && swift test rc=0; the whole suite at the end: 842 tests in 74 suites passed.
+
+OPTION A (measured, NOT in the tree): a run of fixed-pitch blocks on one left edge as its own container
+  Info.linked gets `|| (a.pitch == true && c.pitch == true && edge)` and `container` gets `|| $0.pitch == true` in its allSatisfy. H2 doc: R 0.89 -> 0.91
+  (tp 3765 -> 3864), fp 2 -> 2, vn R 0.82 -> 0.83, the labels/ rows above identical. It would keep the 19 term-dark log blocks. Not done: H2 holds no
+  prose in a fixed face (a terminal chat, a man page, a mail in a fixed face would be kept whole); H3 needs those negatives first.
+
+ELSEWHERE (not touched)
+  - 5 of the pure-keep misses left: lone declaration lines (`public private(set) var state = State.idle`, 2 screens; `public enum RecognitionWait: ...`) carry
+    one strong feature; `disk_ok() {# ...` (hasCommentAfterCode has no `{` in its class); the editor's breadcrumb/status chrome; `cd Core && swift test`.
+  - json-ko `"note"` (ide-light) and readme-en-b's two `"key": value` lines: a run with one measurable block (the rest are too short to measure).
+  - FrameBackground.dominant takes the code box as the frame when the box is the largest area (md-dark, md-light): the prose is then "tinted", and any
+    strong evidence keeps whole prose blocks with chips (the pitch share above guards exactly this). App/Pipeline/FrameBackground.swift, M.
+
+DEFAULT PATH (the app, same pool id, same settings for both binaries: base = HEAD 5c25067 built in a copy, after = this tree; Debug, `xcodebuild ... MWOYEO_APP_ID=<pool id>`)
+  use-case bench, auto path, all 52 pictures (the 12 code cases k01-k12 included: their pictures are the ones of the keep-labels work dir, the bench
+  script's own directory holds only the 40 others), through tools/ane-env.sh run pool, `bench.sh <bin> auto` with PNGS=<40 + 12 pictures>:
+    TOTAL  correct 242/394 | kept_ok 56/60 translated_ok 61/62 inline_ok 21/29        base
+    TOTAL  correct 242/394 | kept_ok 56/60 translated_ok 61/62 inline_ok 21/29        after   (the score tables are identical, every category)
+    (the first after run scored papers 36/69 and subtitles 15/19: two pictures, p07-paper-ko and s09-sub-ko, ran with "no reader is available (preparing)",
+     a cold ko-Kore reader compile of 78 s; re-rendered, the tables above.)
+  paper bench, our own paper (/tmp/paper-quality/pages-own, 13 pages + 28 crops), run.sh:
+    every column of every page and every crop equal, except `blocks` of p5: 47 -> 44. Cause: the page shows the listing of CodeRegion.swift; `ocr.kept.code`
+    0 -> 4 ("guard keepe, basDensity(meabere, tinted: tinted) else", "f. prompt", "1 return ail", "Il t.atrong x=2": code lines of the figure, now kept as written).
+    Two other pages differed in the first pass (p1 27 -> 25 blocks, p3 37 -> 61, formula 0 -> 2): reader-path variance, not the change: the base binary
+    rendered again gives 25 and 61, the same as the after binary twice (the Docs service was not ready for the first base render of p3).
+  The use-case bench caught a crash in the first build of the word plumbing (20 of 52 pictures: "String index range is out of bounds"): see EXTRA HUNK.
+
+APP GATES
+  xcodebuild ... MWOYEO_APP_ID=dev.midagedev.mwoyeo.pool3 build: rc=0, ** BUILD SUCCEEDED ** (Mwoyeo.app's CFBundleIdentifier = the pool id).
+  check-logic, `--capture-ui <dir> check-logic --lang en` and `--lang ko`: 648 PASS, 0 FAIL, "check-logic: all passed" in both.
+
+EXTRA HUNK (outside the spec's file list; A2 accepted it as its own hunk)
+  The word boxes reach CodeRegion through App/Pipeline/CodeKeep.swift (`line.text[word.range]`). RegionPipeline.styleRuns cut a line at its colour
+  changes into run lines whose words kept ranges into the PARENT line's text: out of bounds in the child. The first build crashed on 20 of 52 use-case
+  pictures. Fix at the owner: `OCRLine.run(_:in:)` (Shared/VisionExec.swift) rebases the ranges; styleRuns uses it (3 lines); the check
+  "a run cut out of a line has its own text, and its words' ranges index it" in App/Support/CodeKeepChecks.swift. FAIL-first: with the run keeping the
+  parent's ranges, check-logic dies at that check: "Swift/StringIndexValidation.swift:210: Fatal error: String index range is out of bounds", rc=133.
+  The other two hunks of the same plumbing: tools/keep-labels/Sources/regionfeed (the feed lines carry "w": [[x,y,w,h,"word"]...]) and keeprules (reads them).
+
+NOTES
+  - tools/keep-labels/README.md is untouched; a feed made before this round has no "w" (CodeRegion then sees no word boxes: the pitch term stays off).
+  - /tmp/k3b/design.md (the design note the spec asked for) was written after the F4/F5 edits and the first F2/F3 code, not before.
+  - `xcodebuild` takes the pool id only as a build setting argument (`xcodebuild ... MWOYEO_APP_ID=<id>`); `MWOYEO_APP_ID=<id> xcodebuild` in the
+    environment builds the default id (the first two builds of this round did). Twice, check-logic was started with `-AppleLanguages` before `--capture-ui`
+    (the entry point wants `--capture-ui` first; the language is `check-logic --lang ko`), which starts the GUI app instead: ~10 min on the default-id build,
+    ~22 min on the pool-id build, scratch settings file and defaults suite set both times (nothing of the user's read or written); both killed.

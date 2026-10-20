@@ -31,7 +31,8 @@ enum CodeKeep {
         guard let page = FrameBackground.dominant(of: frame) else { return (verdicts, []) }
         let t = Trace.now
         let blocks = read.map { b in
-            CodeRegion.Block(text: b.text, rect: b.rect, lines: b.lines.map { .init(text: $0.text, rect: $0.rect) },
+            CodeRegion.Block(text: b.text, rect: b.rect,
+                             lines: b.lines.map { line in .init(text: line.text, rect: line.rect, words: line.words.map { .init(text: String(line.text[$0.range]), rect: $0.rect) }) },
                              background: CodeRegion.background(ofLines: b.lines.map { look($0.rect).backgroundColor }))
         }
         let measured = Trace.now

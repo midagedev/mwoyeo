@@ -8,21 +8,34 @@ import Foundation
 /// where it sits). Measured in tools/keep-labels (docs/design/keep-boundary.md section 9).
 ///
 /// Evidence is of two kinds. A *container* says the blocks belong together: a tint that differs from the frame's (a code box, a
-/// terminal), an indented run, a line-number gutter. *Text* features say what they hold: keywords, line ends `; { } ) ]`, symbols, a
-/// comment marker, a prompt, a hash-led line, diff marks, `key = value`. The container alone keeps nothing (a callout box, a bullet
-/// list and a table are containers of prose); the text alone keeps only when it is strong.
+/// terminal), an indented run, a line-number gutter, a comment line against the left edge of its neighbour. *Text* features say what
+/// they hold: keywords, line ends `; { } ) ]`, symbols, a comment marker, a prompt, a hash-led line, diff marks, `key = value`, a
+/// typeface of fixed pitch. The container alone keeps nothing (a callout box, a bullet list and a table are containers of prose); the
+/// text alone keeps only when it is strong.
 public enum CodeRegion {
     /// Why a block is kept. New kinds, apart from the math kinds of `ProtectedSpans.Kind`.
     public enum Reason: String, Sendable, Equatable {
         case code, terminal, log, config, diff
     }
 
-    public struct Line: Sendable, Equatable {
+    /// One word of a line with its box, as the reader placed it (a script it cannot place has no words).
+    public struct Word: Sendable, Equatable {
         public var text: String
         public var rect: CGRect
         public init(text: String, rect: CGRect) {
             self.text = text
             self.rect = rect
+        }
+    }
+
+    public struct Line: Sendable, Equatable {
+        public var text: String
+        public var rect: CGRect
+        public var words: [Word]
+        public init(text: String, rect: CGRect, words: [Word] = []) {
+            self.text = text
+            self.rect = rect
+            self.words = words
         }
     }
 
@@ -61,14 +74,39 @@ public enum CodeRegion {
         /// A region of this many content blocks or more needs this share of them to show some text feature on their own.
         static let denseFrom = 4
         static let denseShare = 0.3
+        /// A typeface of fixed pitch: the width per character of three ASCII words or more (three characters or more each) varies by less than
+        /// this share of its mean, and those words are at least this share of all the words. H2 (round k3b, doc read): the variation 0.06 fires on
+        /// 2 of 146 pure-translate blocks (1.4 %), 0.07 on 5 (3.4 %); the share separates prose with inline code (9 mixed blocks, 0.17 to 0.30,
+        /// the chips are set in a fixed face) from output (184 keep blocks, 179 of them 0.5 and more, none between 0.34 and 0.5).
+        static let pitchWords = 3
+        static let pitchVariation = 0.06
+        static let pitchShare = 0.5
+        /// Blocks that can be measured: fewer say nothing (a garbled displayed equation of three words once looked fixed).
+        static let pitchBlocks = 2
+        /// Lines of one shape (`name = value`, `"key": value`) that make a listing of settings, and not a label or two.
+        static let listing = 3
+        /// Two lines start on one left edge when their first glyphs are this many line heights apart at most. H2: the comment lines of a code run
+        /// lie within 0.26 of their neighbours; a settings box inside a paragraph's margin lies at 0.66 (k01).
+        static let edge = 0.3
     }
 
     /// Per block of one read: the reason it is kept as written, or nil (today's rules decide). `frameBackground` is the dominant
     /// background of the frame the blocks were read from.
     public static func keep(blocks: [Block], frameBackground: RGBA) -> [Reason?] {
+        let (infos, groups) = regions(of: blocks, frameBackground: frameBackground)
+        var out = [Reason?](repeating: nil, count: blocks.count)
+        for members in groups {
+            guard let reason = verdict(members.map { infos[$0] }) else { continue }
+            for i in members { out[i] = reason }
+        }
+        return out
+    }
+
+    /// The blocks with their geometry, and the regions they form: indices of the blocks that sit together in one box, one indented
+    /// run or one line-number gutter (`Info.linked`). Apart from `keep` so that a probe can say why a block sits where it does.
+    static func regions(of blocks: [Block], frameBackground: RGBA) -> (infos: [Info], groups: [[Int]]) {
         var infos = blocks.map { Info($0, frame: frameBackground) }
         let n = infos.count
-        guard n > 0 else { return [] }
         for i in 0..<n {
             var margin = infos[i].x0
             for c in infos where c.words >= 2 {
@@ -90,19 +128,16 @@ public enum CodeRegion {
         }
         var groups: [Int: [Int]] = [:]
         for i in 0..<n { groups[find(i), default: []].append(i) }
-
-        var out = [Reason?](repeating: nil, count: n)
-        for members in groups.values {
-            guard let reason = verdict(members.map { infos[$0] }) else { continue }
-            for i in members { out[i] = reason }
-        }
-        return out
+        return (infos, groups.values.sorted { $0[0] < $1[0] })
     }
 
     // MARK: - Geometry
 
     struct Info {
         var lines: [String]
+        /// Whether its own words are set in a typeface of fixed pitch, nil when it has too few ASCII words to say; opening with a comment marker.
+        var pitch: Bool?
+        var lead: Bool
         var x0, y0, x1, y1, lineHeight: Double
         var tinted: Bool
         var background: RGBA
@@ -114,6 +149,8 @@ public enum CodeRegion {
 
         init(_ b: Block, frame: RGBA) {
             lines = b.lines.isEmpty ? [b.text] : b.lines.map(\.text)
+            pitch = fixedPitch(b.lines.flatMap(\.words))
+            lead = lines.first.map { l in commentMarkers.contains { l.drop(while: \.isWhitespace).hasPrefix($0) } } ?? false
             x0 = b.rect.minX; y0 = b.rect.minY; x1 = b.rect.maxX; y1 = b.rect.maxY
             let heights = (b.lines.isEmpty ? [b.rect.height] : b.lines.map(\.rect.height)).sorted()
             lineHeight = max(1, heights[heights.count / 2])
@@ -128,7 +165,8 @@ public enum CodeRegion {
             max(abs(Int(a.r) - Int(b.r)), abs(Int(a.g) - Int(b.g)), abs(Int(a.b) - Int(b.b)))
         }
 
-        /// Neighbours (stacked within 1.5 line heights, or side by side on one row) that share a tint, an indent or a gutter.
+        /// Neighbours (stacked within 1.5 line heights, or side by side on one row) that share a tint, an indent or a gutter, or that start
+        /// on the left edge of a comment line.
         static func linked(_ a: Info, _ c: Info) -> Bool {
             let lh = min(a.lineHeight, c.lineHeight)
             let vgap = max(c.y0 - a.y1, a.y0 - c.y1)
@@ -137,9 +175,11 @@ public enum CodeRegion {
             let overlapX = min(a.x1, c.x1) > max(a.x0, c.x0)
             let near = (vgap <= K.gap * lh && !sameRow && overlapX) || (sameRow && hgap <= K.rowGap * lh)
             guard near else { return false }
-            if a.tinted && c.tinted && delta(a.background, c.background) <= K.tint { return true }
-            if a.indented && c.indented { return true }
-            return ((a.gutter || c.gutter) && sameRow) || (a.gutter && c.gutter)
+            let edge = abs(a.x0 - c.x0) < K.edge * lh
+            return (a.tinted && c.tinted && delta(a.background, c.background) <= K.tint)    // one box
+                || (a.indented && c.indented)                                               // one indented run
+                || ((a.lead || c.lead) && edge)                                             // a comment against the left edge of its neighbour
+                || ((a.gutter || c.gutter) && sameRow) || (a.gutter && c.gutter)           // line numbers
         }
     }
 
@@ -149,22 +189,26 @@ public enum CodeRegion {
         "const", "let", "var", "func", "function", "def", "elif", "else", "end", "return", "import", "class", "while", "print", "console",
         "async", "await", "struct", "enum", "fn", "lambda", "include", "void", "bool", "char", "fi", "done", "echo", "null", "nil",
         "undefined", "typeof", "instanceof", "switch", "catch", "except", "raise", "throw", "extends", "implements", "namespace",
-        "typedef", "println", "printf",
+        "typedef", "println", "printf", "fileprivate", "init", "deinit", "typealias",
     ]
     /// Words of prose as well: they count only beside a strong keyword.
-    static let weakKeywords: Set<String> = ["for", "if", "in", "to", "do", "then", "from", "true", "false"]
+    static let weakKeywords: Set<String> = ["for", "if", "in", "to", "do", "then", "from", "true", "false", "public", "private", "protected", "override",
+                                            "case", "static", "final", "guard", "extension", "protocol", "interface", "defer", "yield"]
 
     struct Features {
         var keyword = false, lineEnd = false, symbol = false, comment = false, prompt = false
         var log = false, diff = false, assignment = false
+        /// Set in a typeface of fixed pitch (`fixedPitch`); three lines or more of one `name = value` shape (`assignmentShapes`).
+        var mono = false, listing = false
 
         /// Evidence that holds by itself in a container.
-        var strong: Int { [keyword, lineEnd, comment, prompt, log, diff].filter { $0 }.count }
+        var strong: Int { [keyword, lineEnd, comment, prompt, log, diff, mono, listing].filter { $0 }.count }
         var all: Int { strong + [symbol, assignment].filter { $0 }.count }
     }
 
-    static func features(of lines: [String], tinted: Bool) -> Features {
+    static func features(of lines: [String], fixedPitch: Bool, tinted: Bool) -> Features {
         var f = Features()
+        f.mono = fixedPitch
         let text = lines.joined(separator: " ")
         let tokens = text.matches(of: /[A-Za-z_][A-Za-z0-9_]*/).map { $0.output.lowercased() }
         let strongCount = tokens.filter { strongKeywords.contains($0) }.count
@@ -195,9 +239,32 @@ public enum CodeRegion {
         let minus = lines.filter { $0.firstMatch(of: /^\s*-\s?\S/) != nil }.count
         // A line starting with + or - is also a displayed equation or a list: marks count as a diff only inside a tinted view.
         f.diff = lines.contains { $0.firstMatch(of: /^\s*@@/) != nil } || (tinted && plus >= 1 && minus >= 1)
-        f.assignment = lines.contains { $0.wholeMatch(of: /\s*[\w.\-\[\]]*[A-Za-z_][\w.\-\[\]]*\s*(?:=|:=|\+=|-=)\s*(?:"[^"]*"|'[^']*'|\S+)\s*[;,]?\s*/) != nil }
+        let shaped = lines.filter { l in assignmentShapes.contains { l.range(of: $0, options: .regularExpression) != nil } }.count
+        f.assignment = shaped >= 1
+        f.listing = shaped >= K.listing
         return f
     }
+
+    /// A whole line that sets a name to a value, one pattern per shape.
+    static let assignmentShapes = [
+        #"^\s*[\w.\-\[\]]*[A-Za-z_][\w.\-\[\]]*\s*(?:=|:=|\+=|-=)\s*(?:"[^"]*"|'[^']*'|\S+)\s*[;,]?\s*$"#,                  // total = 2;  round_to = 2
+        #"^\s*["'“”‘’][\w.\-]+["'“”‘’]\s*:\s*\S.*$"#,                                                                 // "key": value  (JSON; the reader's quotes drift)
+        #"^\s*(?:[a-z_][\w.\-]*|[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)\s*:(?:\s+(?:"[^"]*"|'[^']*'|\[.*\]|\{.*\}|\S+))?\s*$"#,   // key: value  (YAML; a key is a name, not a label)
+    ]
+
+    /// Code, logs and terminals are set in a typeface of fixed pitch: every ASCII word is as wide as its characters times one width. nil
+    /// when the block has too few such words, or too small a share of its words, to say (prose in another script, a label, a few chips).
+    static func fixedPitch(_ boxes: [Word]) -> Bool? {
+        let ascii = boxes.filter { $0.text.count >= 3 && $0.text.allSatisfy { $0.isASCII && $0 > " " } }
+        guard ascii.count >= K.pitchWords, Double(ascii.count) >= K.pitchShare * Double(boxes.count) else { return nil }
+        let widths = ascii.map { $0.rect.width / Double($0.text.count) }
+        let mean = widths.reduce(0, +) / Double(widths.count)
+        let spread = (widths.reduce(0) { $0 + ($1 - mean) * ($1 - mean) } / Double(widths.count)).squareRoot()
+        return spread < K.pitchVariation * mean
+    }
+
+    /// A line that opens with one of these sits against the left edge of the code it explains, in any script, with or without a space after the mark.
+    static let commentMarkers = ["#", "//", "--", ";", "/*", "*"]
 
     static func isCommentLine(_ l: String) -> Bool {
         l.firstMatch(of: /^\s*(?:\/\/|\/\*|\*\/|--\s|#\s|#!|▶)/) != nil
@@ -242,7 +309,7 @@ public enum CodeRegion {
         let content = members.filter { !$0.gutter }
         guard content.count >= K.denseFrom else { return true }
         let withEvidence = content.filter { m in
-            features(of: m.lines, tinted: tinted).all >= 1
+            features(of: m.lines, fixedPitch: m.pitch == true, tinted: tinted).all >= 1
                 || m.lines.joined(separator: " ").matches(of: /[A-Za-z_][A-Za-z0-9_]*/).contains { strongKeywords.contains($0.output.lowercased()) }
         }.count
         return Double(withEvidence) / Double(content.count) >= K.denseShare
@@ -250,7 +317,8 @@ public enum CodeRegion {
 
     static func verdict(_ members: [Info]) -> Reason? {
         let tinted = members.contains { $0.tinted }
-        let f = features(of: members.flatMap(\.lines), tinted: tinted)
+        let measured = members.compactMap(\.pitch)       // two blocks or more can be measured, and every one of them is set in a fixed pitch
+        let f = features(of: members.flatMap(\.lines), fixedPitch: measured.count >= K.pitchBlocks && !measured.contains(false), tinted: tinted)
         let container = tinted || (members.count > 1 && members.allSatisfy { $0.indented || $0.gutter })
         let weak = f.all - f.strong
         let keeps = (tinted && (f.strong >= 1 || weak >= 2))

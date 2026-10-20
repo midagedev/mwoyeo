@@ -1,0 +1,188 @@
+latin-runs: a Latin run inside a CJK word is one word (2026-10-20)
+
+The change (Shared/VisionExec.swift, wordRanges): a word that holds a CJK character is cut into its CJK characters (one a word)
+and its Latin runs (one word a run: a URL, a path, an identifier). A word without a CJK character is unchanged.
+Base = main 9ec26a6 (git archive), after = this worktree. The reads of H2 / H3 are fixed; the re-segmented reads are written by
+tools/keep-labels/resegment.py (the read's word offsets are CHARACTERS, not UTF-8 bytes: measured 57808 of 57808 words of
+H2 + H3 match on character offsets, 22010 on byte offsets).
+
+===============================================================================================================================
+PART 1 — the product change
+===============================================================================================================================
+
+FAIL-first (the check in App/Support/CodeKeepChecks.swift, the app built with the check but without the wordRanges change):
+  check-logic: FAIL code keep: a Latin run inside a CJK word stays one word [["詳", "細", "は", "h", "t", "t", "p", "s", ":", "/", "/", "e", "x", "a", "m", "p", "l", "e", ".", "c", "o", "m", "/", "a", "を", "参", "照"]]
+  check-logic: PASS code keep: a line without CJK keeps its words
+  check-logic: PASS code keep: a CJK line is one character a word
+  check-logic: 1 FAILED                       (en and ko)
+FAIL-first (tools/keep-labels/test_resegment.sh, run before resegment.py existed):
+  FAIL resegment.py is missing (/Users/hckim/repo/mwoyeo-wt-latin-runs/tools/keep-labels/resegment.py): nothing to check
+  FAIL the words of a CJK word with a Latin run
+  FAIL the words of a line without CJK
+  FAIL the words of a CJK line
+  FAIL a read is rewritten: the URL of a CJK line is one word, its box the union of the characters'
+  (rc=1)
+
+GATES (after the change)
+  /tmp/latin-runs/build-after.rc      xcodebuild rc=0
+  Core swift test                     ✔ Test run with 53 tests in 7 suites passed after 3.525 seconds.
+                                       ✔ Test run with 842 tests in 74 suites passed after 0.552 seconds.
+  /tmp/latin-runs/cl-after.rc         en rc=0
+                                       ko rc=0
+  check-logic en                      162:check-logic: PASS code keep: a Latin run inside a CJK word stays one word
+                                       163:check-logic: PASS code keep: a line without CJK keeps its words
+                                       164:check-logic: PASS code keep: a CJK line is one character a word
+                                       655:check-logic: all passed
+  check-logic ko                      162:check-logic: PASS code keep: a Latin run inside a CJK word stays one word
+                                       163:check-logic: PASS code keep: a line without CJK keeps its words
+                                       164:check-logic: PASS code keep: a CJK line is one character a word
+                                       655:check-logic: all passed
+  test_resegment.sh                   PASS the words of a CJK word with a Latin run
+                                       PASS the words of a line without CJK
+                                       PASS the words of a CJK line
+                                       PASS a read is rewritten: the URL of a CJK line is one word, its box the union of the characters'
+                                       PASS the picture of the new read is a link to the old one
+                                       PASS the html of the new read is a copy
+                                       PASS the text of the line is not touched
+                                       (rc=0)
+
+NO-REGRESSION BENCHES (the use-case bench, 52 pictures, path auto; the paper bench, our own papers)
+
+  use-case bench, base (main 9ec26a6) and after: the score files are byte-identical (diff empty).
+    chat       auto   all  n= 5 correct  20/ 36 split 5 merged 0 misread 6 missing 5
+    chat       auto   odd  n= 3 correct  12/ 23 split 5 merged 0 misread 3 missing 3
+    code       auto   all  n=12 correct  85/143 split 9 merged 4 misread 25 missing 20 | kept_ok 56/60 translated_ok 61/62 inline_ok 21/29
+    code       auto   even n= 6 correct  50/ 75 split 2 merged 0 misread 11 missing 12 | kept_ok 29/29 translated_ok 34/34 inline_ok 10/12
+    code       auto   odd  n= 6 correct  35/ 68 split 7 merged 4 misread 14 missing 8 | kept_ok 27/31 translated_ok 27/28 inline_ok 11/17
+    docs-web   auto   all  n=11 correct  59/ 89 split 4 merged 7 misread 6 missing 13
+    docs-web   auto   even n= 5 correct  28/ 42 split 3 merged 0 misread 2 missing 4
+    docs-web   auto   odd  n= 6 correct  31/ 47 split 1 merged 2 misread 4 missing 9
+    games      auto   all  n= 8 correct  25/ 38 split 2 merged 3 misread 2 missing 6
+    games      auto   even n= 4 correct  13/ 15 split 1 merged 0 misread 1 missing 0
+    games      auto   odd  n= 4 correct  12/ 23 split 1 merged 3 misread 1 missing 6
+    papers     auto   all  n= 7 correct  40/ 69 split 4 merged 4 misread 15 missing 6
+    papers     auto   even n= 3 correct  14/ 27 split 3 merged 0 misread 6 missing 4
+    papers     auto   odd  n= 4 correct  26/ 42 split 1 merged 4 misread 9 missing 2
+    subtitles  auto   all  n= 9 correct  16/ 19 split 1 merged 2 misread 0 missing 0
+    subtitles  auto   even n= 4 correct   7/  9 split 0 merged 2 misread 0 missing 0
+    subtitles  auto   odd  n= 5 correct   9/ 10 split 1 merged 0 misread 0 missing 0
+    TOTAL      auto   all  n=52 correct 245/394 | kept_ok 56/60 translated_ok 61/62 inline_ok 21/29
+    TOTAL      auto   odd  n=28 correct 125/213 | kept_ok 27/31 translated_ok 27/28 inline_ok 11/17
+    TOTAL      auto   even n=24 correct 120/181 | kept_ok 29/29 translated_ok 34/34 inline_ok 10/12
+
+  paper bench (our own papers, tools/paper-bench/run.sh, --scale 2, 41 renders): the score files are byte-identical (diff empty).
+    page     blocks  formula math_kept overlaps    spill      cut  clipped ellipsis      big    cross colbreak squeezed
+    TOTAL       518       22        3        0        0        0       10        1        0        4        1        2
+    TOTAL       496       23       10       14        5       20        0        0        0        9        0        0        0        4        0
+    edge_cut (top/bottom crops c1,c2): 10  side_cut (crops s1): 20
+    column_break fired on 5 of 41 renders: p2 p1-c1 p4-c2 p7-c1 p12-s1
+  (the first TOTAL line is the pages, the second the crops)
+
+===============================================================================================================================
+PART 2 — the keep boundary, re-measured without new Vision reads
+===============================================================================================================================
+
+THE RE-SEGMENTED READS
+  resegment: /tmp/h3/legA/h3 -> /tmp/latin-runs/h3m/h3: 5526 lines, 11226 characters merged into Latin runs, 183 runs broken by a
+             character Vision gave no box for
+  resegment: /tmp/k3a/wb/h2 -> /tmp/latin-runs/h2m/h2: 1767 lines, 2300 characters merged into Latin runs, 134 runs broken by a
+             character Vision gave no box for
+  (a run broken by a dropped character cannot be rebuilt whole: the letters around the hole stay single words)
+
+RULES ON H3 (run-h3.sh, the same rules.jsonl, the same labels; the feed is the re-segmented read)
+  base  H3_WORK=/tmp/h3/legA    -> /tmp/latin-runs/h3-rules-base
+  after H3_WORK=/tmp/latin-runs/h3m -> /tmp/latin-runs/h3-rules
+
+  RULES OR CodeRegion ON H3 (what the app does today)
+    [h3, read doc]
+      (a) words      P 0.99 [0.98,0.99]  R 0.68 [0.67,0.69]  (tp 6455 fp 90 fn 2992)
+          recall by reason: code 0.97 [0.97,0.98] n=5190, url 0.04 [0.03,0.05] n=1841, config 0.80 [0.77,0.84] n=569, log 0.25 [0.22,0.30] n=472, cmd 0.34 [0.30,0.39] n=426, path 0.48 [0.42,0.55] n=230, id 0.34 [0.28,0.41] n=212, diffmark 0.85 [0.79,0.90] n=181, flag 0.76 [0.68,0.83] n=121, hotkey 0.84 [0.76,0.90] n=101, hash 0.97 [0.91,0.99] n=99, lineno 1.00 [0.57,1.00] n=5
+    [h3, read vn]
+      (a) words      P 0.99 [0.99,0.99]  R 0.69 [0.68,0.70]  (tp 9265 fp 68 fn 4110)
+          recall by reason: code 0.93 [0.93,0.94] n=8233, url 0.01 [0.01,0.02] n=2512, config 0.40 [0.36,0.43] n=722, log 0.88 [0.85,0.91] n=504, cmd 0.31 [0.27,0.36] n=388, path 0.44 [0.38,0.50] n=234, diffmark 1.00 [0.98,1.00] n=232, id 0.44 [0.36,0.51] n=172, flag 0.75 [0.67,0.81] n=154, hotkey 0.81 [0.72,0.87] n=105, hash 0.75 [0.66,0.82] n=103, lineno 0.81 [0.57,0.93] n=16
+
+  The two runs are IDENTICAL line for line in this section (base = after): the Core rules decide on the block's TEXT (the
+  InlineMath spans) and on CodeRegion's verdict; the re-segmented words change neither the spans nor the numbers.
+  The only difference in the whole H3 report (218 lines) is inside the rules.jsonl: 16 of 5526 blocks change their CodeRegion
+  verdict from None to 'terminal' (the fixed-pitch test now sees the Latin run of a CJK line as one ASCII word). All 16 are
+  truth-keep blocks with no translate word, so the word-level numbers do not move.
+    rules.jsonl (base -> after): 16 blocks  region None -> 'terminal'
+    false fires of each feature on the 853 pure-translate blocks of H3, read doc: indent 603, mono 13, lineend 2, keyword 16, tint 144
+    false fires of each feature on the 834 pure-translate blocks of H3, read vn: indent 583, mono 16, lineend 0, keyword 16, tint 155
+  (both runs: the same lines)
+
+THE LEARNED WORD JUDGE (tools/keep-labels/mbench, judge gbt-nopix; HYBRID = the rules OR CodeRegion decide the block, the word model
+protects the spans in the blocks the rules translate)
+
+  The judge pipeline aligns the truth's words with the read's words BY POSITION (mbench/dataset.py builds the word table from the
+  read's words and the truth's classes from the labels' words; the two must be one list). The first run on the re-segmented reads
+  died with
+    ValueError: all the input array dimensions except for the concatenation axis must match exactly, but along dimension 0, the
+    array at index 0 has size 9935 and the array at index 1 has size 15658
+  (mbench/train.py, judges.py word_X). The truth's words are therefore re-segmented the same way (resegment.py --labels): the
+  labels of H2 and H3 are copied into a scratch tree, their blocks' words are merged like the read's words, and the check that the
+  two lists are one list passes:
+    H3: 5526 blocks, word-count mismatch 0, word-text mismatch 0
+    H2: 1767 blocks, word-count mismatch 0, word-text mismatch 0
+  The truth's word population follows the read: H3 doc read keep words 9447 -> 5764, translate words 7302 -> 7205, either
+  809 -> 615, none 964 -> 690. The recall numbers below are therefore measured on a smaller truth and are not one-to-one with
+  the base's; the counts of wrongly kept TRANSLATE words are.
+
+  HYBRID (H3, test, doc read)
+  judge @operating point             wordP wordR wordF1  tr->kept keep->tr  spanF1
+  base  (RESULTS-mbench-2026-10-20.txt)
+  gbt-nopix @F1                    0.93 0.99 0.96      661     53   0.88
+  gbt-nopix @P98                   0.95 0.99 0.97      538     62   0.89
+  after (the re-segmented reads and the re-segmented truth)
+  gbt-nopix @F1                    0.93 0.99 0.96      400     53   0.90
+  gbt-nopix @P98                   0.94 0.99 0.96      378     55   0.90
+
+  The price, in translate words kept (the base's line: "translate words kept 538 of 7302 (7.4 %) against 90 (1.2 %); 444 of the
+  538 (83 %) are in ja / zh-Hans reads"):
+  base  @P98   538 of 7302 (7.4 %) kept, 444 of them (83 %) in ja / zh-Hans
+  after @P98   378 of 7205 (5.2 %) kept, 270 of them (71 %) in ja / zh-Hans      (ja 128, zh-Hans 142, ko 31, en 77)
+  after @P98   word P 0.94 (ko 0.98, ja 0.92, zh-Hans 0.89, en 0.96), word R 0.99 (ko 1.00, ja 1.00, zh-Hans 1.00, en 0.97)
+
+  URL KEEP WORDS, BLOCK-WEIGHTED (h3, doc read, BOTH): mean over blocks of the share of the block's url words kept
+  base  judge 1  rules OR CodeRegion   all: 0.59 (113 blocks)   ko: 0.79 (28 blocks)   ja: 0.04 (27 blocks)   en: 1.00 (29 blocks)   zh-Hans: 0.52 (29 blocks)
+  base  gbt-nopix @P98                 all: 1.00 (113 blocks)   ko: 1.00 (28 blocks)   ja: 1.00 (27 blocks)   en: 1.00 (29 blocks)   zh-Hans: 1.00 (29 blocks)
+  after gbt-nopix @P98                 all: 0.99 (112 blocks)   ko: 1.00 (28 blocks)   ja: 0.96 (27 blocks)   en: 1.00 (29 blocks)   zh-Hans: 1.00 (28 blocks)
+
+  The rules' own step of the same run on H2 (the re-segmented H2 and its re-segmented labels), from the run's own output:
+  H2 rules only           read doc: word P 1.00 R 0.65 (tp 2525 fp 2 fn 1343); block keep P 1.00 R 0.80 F1 0.89 (tp 487 fp 1 fn 119)
+  H2 rules OR CodeRegion  read doc: word P 1.00 R 0.92 (tp 3547 fp 2 fn 321); block keep P 1.00 R 0.95 F1 0.97 (tp 576 fp 1 fn 30)
+  H2 rules only           read vn: word P 1.00 R 0.58 (tp 2423 fp 0 fn 1763); block keep P 1.00 R 0.73 F1 0.85 (tp 219 fp 0 fn 80)
+  H2 rules OR CodeRegion  read vn: word P 1.00 R 0.80 (tp 3355 fp 0 fn 831); block keep P 1.00 R 0.89 F1 0.94 (tp 266 fp 0 fn 33)
+  REPRODUCTION (RESULTS-h2-2026-10-20.txt: rules OR CodeRegion, doc read, tp 3281 fp 65 fn 945, P 0.98 R 0.78): got tp 3547 fp 2
+  fn 321 -> DIFFERENT      (the gate of the run: the numbers of the recorded base are not reproduced, because the truth's words and
+  the reads are the re-segmented ones; the run therefore exits 1 and the train step must be started by hand)
+
+===============================================================================================================================
+SPEC CORRECTIONS AND WHAT WAS LEFT OUT
+===============================================================================================================================
+  - The spec says the reads' word offsets are "UTF-8 offsets into t". They are CHARACTER offsets: 57808 of the 57808 words of
+    H2 + H3 match t[start:end] on characters, 22010 on bytes (tools/keep-labels/README.md:116 says "ranges in Characters"). The
+    first re-segmentation (byte slicing) merged CJK characters with each other; it was corrected and every number above is from
+    the corrected run.
+  - The judge pipeline needs the truth's words to be the read's words (it aligns them by position): the first train on the
+    re-segmented reads died with a ValueError (quoted above). The labels of H2 and H3 were therefore re-segmented as well, in a
+    scratch copy of the keep-labels tree (/tmp/latin-runs/klrun/kl; the repo's labels are untouched). resegment.py got a second
+    mode for it (--labels), beyond the read-dir mode of the spec.
+  - The rules' URL recall does not move: the Core rules (InlineMath, TranslationFilter) decide on the block's TEXT, so the word
+    boxes do not reach them. The word-box consumers that do move are the fixed-pitch test (16 more terminal blocks on H3) and the
+    judge's word features.
+  - mbench/run.sh rules exits 1 on the re-segmented reads (score.py's reproduction gate: the recorded base numbers are not
+    reproduced), so the train and the table were started by hand.
+  - Not done: the app's own paper of the change (a new read of a ja / zh page with a URL, read by the app itself) — the reads
+    are fixed inputs here and no new Vision read was made, as the spec asked.
+===============================================================================================================================
+  - The rules do not move on H3: the URL slice stays at 0.04 of 1841 words (doc) and 0.01 of 2512 (vn). The Core rules keep a URL
+    by its text (InlineMath), not by the word boxes, so the segmentation does not reach them.
+  - The re-segmentation is visible in two places: the fixed-pitch test (16 more terminal blocks on H3) and the word judge's
+    features (the word table is per word: a URL is one row, not 21). There the wrongly kept translate words drop from 538 to 378
+    (-30 %; 7.4 % -> 5.2 % of the truth's translate words) and their ja / zh-Hans share from 83 % to 71 %.
+  - The re-segmented reads and the re-segmented truth are the same cut, so the judge's numbers are comparable with each other; the
+    base row of RESULTS-mbench-2026-10-20.txt was measured on the old cut (its truth has 9447 keep words, the new one 5764), so
+    the recall numbers of the two rows are not one-to-one.
+  - Nothing of the app's own behaviour regressed: the use-case bench (52 pictures) and the paper bench (41 renders) are byte-identical
+    before and after.

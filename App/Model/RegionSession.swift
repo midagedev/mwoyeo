@@ -36,9 +36,9 @@ final class RegionSession {
     private var fps: Double
     private var trackTimer: Timer?
     private var mouseMonitors: [Any] = []
-    private var hiddenByOcclusion = false
-    /// Frames reach the pipeline only while the lens is uncovered (`ReadingGate`); they arrive on the capture's queue.
-    private let readingGate = OSAllocatedUnfairLock(initialState: ReadingGate())
+    /// Why the lens is off the screen (`OffScreen`); empty while it is on it. Frames reach the pipeline only while it is empty, and they
+    /// arrive on the capture's queue, so the one owner of the reasons is behind a lock.
+    private let offScreenGate = OSAllocatedUnfairLock(initialState: OffScreen())
     /// The window under the lens is read a few times a second (`SampleGate`), and only while the settings could put context on:
     /// its app, category and confirmed title go to the pipeline for the translator (`LensWatch`, `LensContext`).
     private let sampleGate = OSAllocatedUnfairLock(initialState: SampleGate())
@@ -143,10 +143,12 @@ final class RegionSession {
         let tap = SnapshotTap()
         pipeline = RegionPipeline(options: PipelineOptions(settings, lensApp: AppModel.readerContext(for: config)), capture: capture, translator: translator,
                                   inpainter: inpainter, onSnapshot: { snapshot in Task { @MainActor in panel.apply(snapshot); tap.handler?(snapshot) } })
-        let gate = readingGate, sampling = sampleGate
+        let gate = offScreenGate, sampling = sampleGate
         capturer.onFrame = { [pipeline, weak self] frame in
-            // Covered: the capture shows the window above, whose text is not the user's to have translated (or sent away).
-            guard gate.withLock({ $0.admitsFrames }) else { Trace.count("lens.dropped.occluded"); return }
+            // Covered: the capture shows the window above, whose text is not the user's to have translated (or sent away). Hidden by
+            // the person: nothing is read until they bring the lens back.
+            let off = gate.withLock { $0 }
+            guard off.isEmpty else { Trace.count("lens.dropped.\(off.counterName)"); return }
             if sampling.withLock({ $0.admit(now: ProcessInfo.processInfo.systemUptime) }) { Task { @MainActor in self?.sampleWindow() } }
             Task { await pipeline.ingest(frame) }
         }
@@ -192,9 +194,7 @@ final class RegionSession {
         outcomeObserver = await translator.observe { [weak self] event in Task { @MainActor in self?.translationEvent(event) } }
         panel.prediction = { [weak self] since, now in self?.predictedScroll(since: since, now: now) }
         await pipeline.setVisible(config.rect)
-        panel.orderFrontRegardless()
-        chrome.orderFrontRegardless()
-        panel.setTranslationsVisible(translationsVisible, animated: false)
+        placeWindows(animated: false)
         chrome.setOriginal(!translationsVisible)
         await startCapture()
         startTracking()
@@ -291,11 +291,35 @@ final class RegionSession {
         await pipeline.refresh()
     }
 
+    /// What the lens's translations show: they follow Show Original, and give way to anything that takes the lens off the screen.
+    var showsTranslations: Bool { translationsVisible && offScreen.isEmpty }
+
     func setTranslationsVisible(_ visible: Bool) {
         translationsVisible = visible
-        panel.setTranslationsVisible(visible && !hiddenByOcclusion)
+        panel.setTranslationsVisible(showsTranslations)
         chrome.setOriginal(!visible)
     }
+
+    /// The Hide Lenses key over `lenses`: while any is hidden it brings every one back, otherwise it hides every one. True when they are
+    /// hidden now.
+    @discardableResult
+    static func toggleHiding(_ lenses: some Collection<RegionSession>) -> Bool {
+        let hide = !lenses.contains { $0.isHiddenByUser }
+        setHiding(hide, in: lenses)
+        return hide && !lenses.isEmpty
+    }
+
+    static func setHiding(_ hidden: Bool, in lenses: some Collection<RegionSession>) {
+        lenses.forEach { $0.setHiddenByUser(hidden) }
+    }
+
+    /// The person hid the lens (Hide Lenses): no window of it is up and it reads nothing, whatever else is true of it, until they bring it back.
+    var isHiddenByUser: Bool { offScreen.contains(.userHidden) }
+
+    func setHiddenByUser(_ hidden: Bool) { setOffScreen(.userHidden, hidden) }
+
+    /// How many of the lens's two windows (the panel of translations, the frame with the pill) are ordered in; for the checks.
+    var windowsUp: Int { [panel, chrome].filter(\.isVisible).count }
 
     /// Window lens ↔ screen lens. A screen lens follows the window under its centre, if there is one.
     private func toggleFollowing() {
@@ -572,7 +596,7 @@ final class RegionSession {
     /// Whether the lens (global Quartz points) is under `point`.
     func contains(_ point: CGPoint) -> Bool { config.rect.contains(point) }
 
-    private func received(_ snapshot: OverlaySnapshot) {
+    func received(_ snapshot: OverlaySnapshot) {
         let showedTranslations = lastSnapshot?.blocks.isEmpty == false
         lastSnapshot = snapshot
         if showedTranslations != !snapshot.blocks.isEmpty { refreshHint() }
@@ -608,7 +632,7 @@ final class RegionSession {
     /// The latest captured frame cropped to the lens, with the translations on it as the lens shows them.
     func saveLensImage() {
         guard let s = lastSnapshot, let frame = s.frame else { return NSSound.beep() }
-        let showing = translationsVisible && !hiddenByOcclusion
+        let showing = showsTranslations
         let layers = showing ? s.blocks.map { LensImage.Layer(frame: $0.frame, image: $0.image) } : []
         let crop = config.rect.offsetBy(dx: -s.origin.x, dy: -s.origin.y)
         // The folder opens for the write only (a person pressed Save): the panel asks when none is chosen or the bookmark went stale.
@@ -627,7 +651,7 @@ final class RegionSession {
     }
 
     private func observeTranscript() {
-        guard settings.savesTranscripts, !hiddenByOcclusion, let s = lastSnapshot else { return }
+        guard settings.savesTranscripts, !offScreen.contains(.occluded), let s = lastSnapshot else { return }
         let now = ProcessInfo.processInfo.systemUptime
         if transcript == nil {
             // No writer without a folder: a declined panel is not asked again until the person chooses one in Settings.
@@ -910,7 +934,7 @@ final class RegionSession {
         trackTimer?.invalidate()
         trackTimer = nil
         guard config.anchor != nil else {
-            if hiddenByOcclusion { setOccluded(false) }
+            if offScreen.contains(.occluded) { setOccluded(false) }
             return
         }
         let t = Timer(timeInterval: 0.2, repeats: true) { [weak self] _ in
@@ -963,19 +987,53 @@ final class RegionSession {
             ?? (anchorSeen ? nil : windows.first { $0.appName == a.appName })
     }
 
-    /// A covered, closed or minimized window hides the lens and stops its reading (`ReadingGate`): the capture shows whatever is
-    /// above it. Uncovered, one fresh frame is asked for, since content that did not change sends none.
-    func setOccluded(_ occluded: Bool) {
-        guard occluded != hiddenByOcclusion else { return }
-        hiddenByOcclusion = occluded
-        panel.setTranslationsVisible(translationsVisible && !occluded)
-        occluded ? chrome.orderOut(nil) : chrome.orderFrontRegardless()
-        switch readingGate.withLock({ $0.setOccluded(occluded) }) {
-        case .paused: Trace.count("lens.paused.occluded")
-        case .resumed:
-            Trace.count("lens.resumed.occluded")
+    /// A covered, closed or minimized window takes the lens off the screen and stops its reading: the capture shows whatever is above it.
+    func setOccluded(_ occluded: Bool) { setOffScreen(.occluded, occluded) }
+
+    /// The reasons the lens is off the screen, as they are now (`OffScreen`).
+    var offScreen: OffScreen { offScreenGate.withLock { $0 } }
+
+    /// Adds `reason` to the reasons the lens is off the screen, or takes it away. The windows follow the reasons that are left, and so does
+    /// the reading: with the first reason it stops, and with the last one gone one fresh frame is asked for, since content that did not
+    /// change sends none.
+    func setOffScreen(_ reason: OffScreen, _ on: Bool) {
+        let (before, after) = offScreenGate.withLock { reasons -> (OffScreen, OffScreen) in
+            let before = reasons
+            if on { reasons.insert(reason) } else { reasons.remove(reason) }
+            return (before, reasons)
+        }
+        guard after != before else { return }
+        placeWindows(animated: !before.union(after).contains(.userHidden))
+        switch (before.isEmpty, after.isEmpty) {
+        case (true, false): Trace.count("lens.paused.\(reason.counterName)")
+        case (false, true):
+            Trace.count("lens.resumed.\(reason.counterName)")
             scheduleCaptureUpdate()
-        case .none: break
+        default: break
         }
     }
+
+    /// The windows as the reasons say: the frame with the pill is up only while nothing keeps the lens off the screen, the panel of
+    /// translations is up unless the person hid the lens (a covered lens fades its translations out in place), and what it shows follows
+    /// Show Original.
+    private func placeWindows(animated: Bool) {
+        let reasons = offScreen
+        panel.setTranslationsVisible(showsTranslations, animated: animated)
+        reasons.isEmpty ? chrome.orderFrontRegardless() : chrome.orderOut(nil)
+        reasons.contains(.userHidden) ? panel.orderOut(nil) : panel.orderFrontRegardless()
+    }
+}
+
+/// Why a lens is off the screen. A lens is on it while the set is empty, and reads only then; each reason is one row of `names`, which
+/// names its work counters (`lens.dropped.<name>`, `lens.paused.<name>`, `lens.resumed.<name>`).
+struct OffScreen: OptionSet, Sendable {
+    let rawValue: Int
+    /// Its window is covered, closed or minimized: the capture shows what is above it, not what the lens is for.
+    static let occluded = OffScreen(rawValue: 1 << 0)
+    /// The person pressed Hide Lenses.
+    static let userHidden = OffScreen(rawValue: 1 << 1)
+
+    private static let names: [(reason: OffScreen, name: String)] = [(.occluded, "occluded"), (.userHidden, "hidden")]
+    /// The name of the first reason in the set that has one, in the order of `names`.
+    var counterName: String { Self.names.first { contains($0.reason) }?.name ?? "none" }
 }

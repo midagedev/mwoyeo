@@ -14,8 +14,9 @@ public enum AnthropicTranslation {
         min(8192, 256 + 4 * lines.reduce(0) { $0 + $1.count })
     }
 
-    /// `thinking` is never sent: `.off` is the API's default (no thinking block), and `.provider` adds nothing.
-    /// `temperature` follows `ModelQuirks` (never for Claude).
+    /// `ModelQuirks` has the rest: no `temperature` for Claude; for `thinking == .off` the model's way to stop reasoning (Claude 5
+    /// thinks by default, so each row says `disabled`, `between_tools` or `effort: low`; `.provider` adds nothing); and for a model
+    /// that takes it `output_config.format`, a JSON schema that makes the reply `{"translations": [...]}` and nothing else.
     public static func requestBody(lines: [String], source: String?, target: String,
                                    glossary: [(String, String)], model: String, thinking: Thinking = .off) -> Data {
         var body: [String: Any] = [
@@ -23,10 +24,46 @@ public enum AnthropicTranslation {
             "system": ChatTranslation.systemPrompt(source: source, target: target, glossary: glossary),
             "messages": [["role": "user", "content": ChatTranslation.userMessage(lines)]],
         ]
+        addQuirkFields(&body, model: model, thinking: thinking, schema: translationsSchema)
+        return ChatTranslation.encode(body)
+    }
+
+    /// `temperature`, the thinking-off fields and the reply schema `ModelQuirks` has for this model. `output_config` is one object
+    /// that can hold both `effort` (a thinking-off row) and `format` (the schema).
+    private static func addQuirkFields(_ body: inout [String: Any], model: String, thinking: Thinking, schema: [String: Any]) {
         let quirks = ModelQuirks.lookup(host: "api.anthropic.com", port: nil, model: model,
                                         kind: .anthropic(baseURL: EngineKind.anthropicDefaultBaseURL, model: model, thinking: thinking))
         if quirks.sendsTemperature { body["temperature"] = 0 }
-        return ChatTranslation.encode(body)
+        var fields = thinking == .off ? quirks.thinkingOff.mapValues(\.json) : [:]
+        if quirks.structuredReply {
+            let format: [String: Any] = ["format": ["type": "json_schema", "schema": schema] as [String: Any]]
+            fields["output_config"] = (fields["output_config"] as? [String: Any] ?? [:]).merging(format) { _, new in new }
+        }
+        body.merge(fields) { _, new in new }
+    }
+
+    /// The reply the plain request asks for, `{"translations": [...]}`, as the JSON schema Anthropic's structured outputs take
+    /// (every object closed, no length limits: those are refused).
+    static var translationsSchema: [String: Any] { [
+        "type": "object", "additionalProperties": false, "required": ["translations"],
+        "properties": ["translations": ["type": "array", "items": ["type": "string"]]],
+    ] }
+
+    /// The reply the context request asks for, `{"t": [{"id", "text"}], "terms": [{"src", "dst", "kind"?, "gender"?}]}`; `terms` only when
+    /// the request asks for them (`RequestLayout.rules`).
+    static func contextSchema(wantsTerms: Bool) -> [String: Any] {
+        var properties: [String: Any] = [
+            "t": ["type": "array", "items": ["type": "object", "additionalProperties": false, "required": ["id", "text"],
+                                             "properties": ["id": ["type": "integer"], "text": ["type": "string"]]]],
+        ]
+        if wantsTerms {
+            properties["terms"] = ["type": "array", "items": [
+                "type": "object", "additionalProperties": false, "required": ["src", "dst"],
+                "properties": ["src": ["type": "string"], "dst": ["type": "string"],
+                               "kind": ["type": "string", "enum": ["person", "place", "term", "org"]],
+                               "gender": ["type": "string", "enum": ["f", "m", "n"]]]]]
+        }
+        return ["type": "object", "additionalProperties": false, "required": ["t"], "properties": properties]
     }
 
     /// The context layout (design §4). `system` is two text blocks, each with a `cache_control` marker: the rules, then the
@@ -44,9 +81,7 @@ public enum AnthropicTranslation {
             "system": system,
             "messages": [["role": "user", "content": RequestLayout.lastMessage(items: request.items, p)]],
         ]
-        let quirks = ModelQuirks.lookup(host: "api.anthropic.com", port: nil, model: model,
-                                        kind: .anthropic(baseURL: EngineKind.anthropicDefaultBaseURL, model: model, thinking: thinking))
-        if quirks.sendsTemperature { body["temperature"] = 0 }
+        addQuirkFields(&body, model: model, thinking: thinking, schema: contextSchema(wantsTerms: p.wantsTerms))
         return ChatTranslation.encode(body)
     }
 

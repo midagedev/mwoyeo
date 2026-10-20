@@ -36,6 +36,7 @@ enum ContextChecks {
         await pinChecks(t)
         await appleChecks(t)
         await memoryExactChecks(t)
+        await trustChecks(t)
         return t.failures
     }
 
@@ -1099,6 +1100,11 @@ enum ContextChecks {
 /// What the unmodified tree sent for the G3 scenario, recorded 2026-10-19 from a plain `cp -R` copy of main bcf7d9a (the tree this branch
 /// started from; its request path is that of 7c67d1d) built with a harness that called `TranslationService.translate(texts)` twice per engine
 /// kind against `tools/mock-openai/server.py ok native --dump`. The bytes the three Off variants must give, call by call.
+///
+/// The two "anthropic" bodies were re-pinned 2026-10-21 (round trust1): claude-haiku-5-5 thinks when `thinking` is left out (measured in film 2:
+/// a thinking block and ~500 output tokens a call), so Off now sends the model's own off switch `thinking: {type: disabled}` and the reply's JSON
+/// schema `output_config.format` (`ModelQuirks`, the claude-api skill cached 2026-10-06; the same fields as Core's re-pinned anthropic-haiku fixture). Nothing else of the three Off variants changed: the "openai" and "deepl" bodies are still main's bytes. FAIL-first: against the old
+/// bytes the six "anthropic Off … the request bytes are main's" lines failed (/tmp/trust1/failfirst-5-checklogic-en.log).
 private enum Golden {
     static let bodies: [String: [String]] = [
         "openai": [
@@ -1106,8 +1112,8 @@ private enum Golden {
             #"{"messages":[{"content":"Translate each line of the user's JSON into Korean from English. Keep names, numbers, emoji, URLs and @handles unchanged. Give one translation per line, in the same order. Follow these glossary pairs exactly:\nMwoyeo → 뭐여\nReply with only {\"translations\": [...]}.","role":"system"},{"content":"{\"lines\":[\"The meeting is moved to noon\"]}","role":"user"}],"model":"m1","stream":false,"temperature":0}"#,
         ],
         "anthropic": [
-            #"{"max_tokens":452,"messages":[{"content":"{\"lines\":[\"Hello there, welcome back\",\"See you tomorrow at nine\"]}","role":"user"}],"model":"claude-haiku-5-5","system":"Translate each line of the user's JSON into Korean from English. Keep names, numbers, emoji, URLs and @handles unchanged. Give one translation per line, in the same order. Follow these glossary pairs exactly:\nMwoyeo → 뭐여\nReply with only {\"translations\": [...]}."}"#,
-            #"{"max_tokens":464,"messages":[{"content":"{\"lines\":[\"See you tomorrow at nine\",\"The meeting is moved to noon\"]}","role":"user"}],"model":"claude-haiku-5-5","system":"Translate each line of the user's JSON into Korean from English. Keep names, numbers, emoji, URLs and @handles unchanged. Give one translation per line, in the same order. Follow these glossary pairs exactly:\nMwoyeo → 뭐여\nReply with only {\"translations\": [...]}."}"#,
+            #"{"max_tokens":452,"messages":[{"content":"{\"lines\":[\"Hello there, welcome back\",\"See you tomorrow at nine\"]}","role":"user"}],"model":"claude-haiku-5-5","output_config":{"format":{"schema":{"additionalProperties":false,"properties":{"translations":{"items":{"type":"string"},"type":"array"}},"required":["translations"],"type":"object"},"type":"json_schema"}},"system":"Translate each line of the user's JSON into Korean from English. Keep names, numbers, emoji, URLs and @handles unchanged. Give one translation per line, in the same order. Follow these glossary pairs exactly:\nMwoyeo → 뭐여\nReply with only {\"translations\": [...]}.","thinking":{"type":"disabled"}}"#,
+            #"{"max_tokens":464,"messages":[{"content":"{\"lines\":[\"See you tomorrow at nine\",\"The meeting is moved to noon\"]}","role":"user"}],"model":"claude-haiku-5-5","output_config":{"format":{"schema":{"additionalProperties":false,"properties":{"translations":{"items":{"type":"string"},"type":"array"}},"required":["translations"],"type":"object"},"type":"json_schema"}},"system":"Translate each line of the user's JSON into Korean from English. Keep names, numbers, emoji, URLs and @handles unchanged. Give one translation per line, in the same order. Follow these glossary pairs exactly:\nMwoyeo → 뭐여\nReply with only {\"translations\": [...]}.","thinking":{"type":"disabled"}}"#,
         ],
         "deepl": [
             #"{"formality":"prefer_more","source_lang":"EN","target_lang":"KO","text":["Hello there, welcome back","See you tomorrow at nine"]}"#,

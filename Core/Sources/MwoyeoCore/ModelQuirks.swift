@@ -22,13 +22,13 @@ public struct ModelQuirks: Equatable, Sendable {
     public var sendsTemperature: Bool
     /// Fields that ask the model not to reason (sent when `thinking == .off`).
     public var thinkingOff: [String: QuirkValue]
+    /// The server takes a JSON schema for the reply (Anthropic's `output_config.format`), so the reply cannot be anything else.
+    public var structuredReply: Bool = false
 
     static let plain = ModelQuirks(sendsTemperature: true, thinkingOff: [:])
 
     public static func lookup(host: String, port: Int?, model: String, kind: EngineKind) -> ModelQuirks {
-        // Claude 5.x answers `temperature` with HTTP 400 ("`temperature` is deprecated for this model", 2026-10-17);
-        // `.off` is the API default, so no thinking block either.
-        if case .anthropic = kind { return ModelQuirks(sendsTemperature: false, thinkingOff: [:]) }
+        if case .anthropic = kind { return anthropic(model.lowercased()) }
         let host = host.lowercased()
         var id = model.lowercased()
         if id.hasPrefix("models/") { id.removeFirst("models/".count) }
@@ -46,6 +46,30 @@ public struct ModelQuirks: Equatable, Sendable {
             return with(["reasoning_effort": .string("none")])
         }
         return .plain
+    }
+
+    /// Claude 5.x answers `temperature` with HTTP 400 ("`temperature` is deprecated for this model", 2026-10-17), so none is sent.
+    /// Claude 5 models think when `thinking` is left out (haiku-5-5 measured 2026-10-21: a thinking block and ~500 output tokens per
+    /// call, past the deadline), and each says differently how to stop it (claude-api skill, cached 2026-10-06):
+    /// - Haiku 5.5, Sonnet 5, Opus 5: `{type: disabled}` (Haiku and Opus 5 only at effort high or below; their defaults are medium and
+    ///   high, and no request here sets another);
+    /// - Sonnet 5.5: `disabled` is a 400, `{type: between_tools}` (no other field) is the off switch;
+    /// - Opus 5.5, Fable 5 / 5.1 (and the Mythos counterparts): thinking cannot be disabled (400), so `thinking` is left out and
+    ///   `output_config.effort` is `low`.
+    /// Opus 4.8 / 4.7 / 4.6, Sonnet 4.6 and Haiku 4.5 do not think unless asked, and an id this table does not know is treated the same:
+    /// nothing is sent (the API default, today's behaviour). `structuredReply` holds for the rows above, probed 2026-10-21.
+    private static func anthropic(_ id: String) -> ModelQuirks {
+        func off(_ thinking: [String: QuirkValue]) -> ModelQuirks {
+            ModelQuirks(sendsTemperature: false, thinkingOff: thinking, structuredReply: true)
+        }
+        let disabled = ["thinking": QuirkValue.object(["type": .string("disabled")])]
+        switch id.replacing(/-\d{8}$/, with: "") {
+        case "claude-haiku-5-5", "claude-sonnet-5", "claude-opus-5": return off(disabled)
+        case "claude-sonnet-5-5": return off(["thinking": .object(["type": .string("between_tools")])])
+        case "claude-opus-5-5", "claude-fable-5", "claude-fable-5-1", "claude-mythos-5", "claude-mythos-5-1":
+            return off(["output_config": .object(["effort": .string("low")])])
+        default: return ModelQuirks(sendsTemperature: false, thinkingOff: [:])
+        }
     }
 
     private static func with(_ fields: [String: QuirkValue]) -> ModelQuirks {

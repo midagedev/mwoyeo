@@ -60,7 +60,8 @@ public enum ChatTranslation {
 
     /// The fields a 400 may name and we can then drop. `prompt_cache_key` and `store` are OpenAI's (a local server answers
     /// them with a 400); `context`, `custom_instructions` and `formality` are DeepL's (design §8.6).
-    static let rejectableFields = ["temperature", "reasoning_effort", "reasoning", "thinking", "enable_thinking",
+    /// `output_config` is Anthropic's (`effort` and the reply schema; a gateway that does not know it answers with a 400).
+    static let rejectableFields = ["temperature", "reasoning_effort", "reasoning", "thinking", "enable_thinking", "output_config",
                                    "prompt_cache_key", "store", "context", "custom_instructions", "formality"]
 
     /// For a 400 whose message names one of the fields we send, the request body without it and the field's name;

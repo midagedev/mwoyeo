@@ -50,10 +50,30 @@ import Testing
         #expect(chat("localhost", "x", port: 1234) == .plain)
     }
 
-    @Test func anthropicNeverSendsTemperatureOrThinking() {
-        let q = ModelQuirks.lookup(host: "api.anthropic.com", port: nil, model: "claude-haiku-5-5",
-                                   kind: .anthropic(baseURL: EngineKind.anthropicDefaultBaseURL, model: "claude-haiku-5-5", thinking: .off))
-        #expect(q == ModelQuirks(sendsTemperature: false, thinkingOff: [:]))
+    private func claude(_ model: String) -> ModelQuirks {
+        ModelQuirks.lookup(host: "api.anthropic.com", port: nil, model: model,
+                           kind: .anthropic(baseURL: EngineKind.anthropicDefaultBaseURL, model: model, thinking: .off))
+    }
+
+    /// 2026-10-21 (trust1). Was `anthropicNeverSendsTemperatureOrThinking`, which pinned `thinkingOff == [:]` for every Claude: wrong for
+    /// Claude 5, which thinks when `thinking` is left out (claude-api skill, cached 2026-10-06; haiku-5-5 measured in film 2). Each row is the
+    /// model's own off switch. FAIL-first: /tmp/trust1/failfirst-1.log (the old line failed on the new table).
+    @Test func anthropicRowsAreEachModelsOwnOffSwitch() {
+        let disabled: [String: QuirkValue] = ["thinking": .object(["type": .string("disabled")])]
+        for id in ["claude-haiku-5-5", "claude-sonnet-5", "claude-opus-5", "claude-haiku-5-5-20261001"] {
+            #expect(claude(id).thinkingOff == disabled && !claude(id).sendsTemperature && claude(id).structuredReply, "\(id)")
+        }
+        #expect(claude("claude-sonnet-5-5").thinkingOff == ["thinking": .object(["type": .string("between_tools")])])
+        for id in ["claude-opus-5-5", "claude-fable-5", "claude-fable-5-1", "claude-mythos-5-1"] {
+            #expect(claude(id).thinkingOff == ["output_config": .object(["effort": .string("low")])] && claude(id).structuredReply, "\(id)")
+        }
+    }
+
+    /// Opus 4.x, Sonnet 4.6 and Haiku 4.5 do not think unless asked, and an unknown id is left as it was: no thinking field, no schema.
+    @Test func anAnthropicIdThatDoesNotThinkByDefaultOrIsUnknownGetsNothingExtra() {
+        for id in ["claude-opus-4-8", "claude-opus-4-7", "claude-sonnet-4-6", "claude-haiku-4-5", "claude-x", "claude-haiku-6-0", ""] {
+            #expect(claude(id) == ModelQuirks(sendsTemperature: false, thinkingOff: [:]), "\(id)")
+        }
     }
 
     @Test func unknownHostAndModelKeepTemperatureZero() {
@@ -83,7 +103,8 @@ import Testing
         #expect(d["reasoning_effort"] == nil && d["temperature"] == nil)
         let claude = try! JSONSerialization.jsonObject(with: AnthropicTranslation.requestBody(
             lines: ["a"], source: nil, target: "ko", glossary: [], model: "claude-haiku-5-5")) as! [String: Any]
-        #expect(claude["temperature"] == nil && claude["thinking"] == nil)
+        // 2026-10-21 (trust1): was `claude["thinking"] == nil`; haiku-5-5's `.off` is `{type: disabled}` now (see anthropicRowsAreEachModelsOwnOffSwitch).
+        #expect(claude["temperature"] == nil && (claude["thinking"] as? [String: String]) == ["type": "disabled"])
     }
 
     // MARK: withoutRejectedField, on bodies captured live 2026-10-17
@@ -110,6 +131,14 @@ import Testing
         #expect(r2?.field == "temperature" && r2?.keys == ["model", "max_tokens"])
         let r3 = healed(["model": "gemini-3.8-flash", "temperature": 0, "reasoning_effort": "none"], geminiEffort)
         #expect(r3?.field == "reasoning_effort" && r3?.keys == ["model", "temperature"])
+    }
+
+    /// A gateway in front of Claude that does not know `output_config`: the 400 names it, the retry goes without it. FAIL-first: before
+    /// "output_config" was in `rejectableFields` this was nil.
+    @Test func anAnthropicGatewayThatRefusesOutputConfigIsHealed() {
+        let error = #"{"type":"error","error":{"type":"invalid_request_error","message":"output_config: Extra inputs are not permitted"}}"#
+        let r = healed(["model": "claude-haiku-5-5", "max_tokens": 9, "output_config": ["format": ["type": "json_schema"]]], error)
+        #expect(r?.field == "output_config" && r?.keys == ["model", "max_tokens"])
     }
 
     @Test func unrelatedOrAbsentFieldIsNil() {

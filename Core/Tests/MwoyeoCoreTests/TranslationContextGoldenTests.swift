@@ -34,6 +34,12 @@ import Testing
               source: "en", target: "ko", glossary: [])
     }
 
+    /// anthropic-haiku.json and anthropic-nosource.json were re-pinned 2026-10-21 (round trust1); the other fixtures are main 93e6acc's bytes.
+    /// Derivation: Claude 5 thinks when `thinking` is left out (haiku-5-5 measured 2026-10-21, film 2: a thinking block and ~500 output tokens
+    /// a call), so `.off` now sends the model's own off switch (haiku-5-5 `thinking: {type: disabled}`, sonnet-5-5 `{type: between_tools}`:
+    /// `disabled` is a 400 there; the claude-api skill, cached 2026-10-06), and both bodies carry `output_config.format`, the reply's JSON
+    /// schema (`ModelQuirks.structuredReply`). Both bodies were sent to the API on 2026-10-21 and answered 200 with the schema's shape.
+    /// FAIL-first: against the old fixtures the new code failed at the two `got == want` lines (/tmp/trust1/failfirst-1.log).
     @Test func anthropicOffIsToday() {
         let haiku = LayoutKind.engine(.anthropic(baseURL: EngineKind.anthropicDefaultBaseURL, model: "claude-haiku-5-5", thinking: .off))
         check("anthropic-haiku", haiku, source: "en", target: "ko", glossary: CtxFix.glossary)

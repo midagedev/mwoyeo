@@ -123,7 +123,9 @@ import MwoyeoCore
         let (server, client, engine) = try setup("ok", kind: { .anthropic(baseURL: $0.base, model: "claude-haiku-5-5", thinking: .off) })
         defer { server.stop() }
         #expect(try await run(client, engine) == ["⟦anthropic⟧ a", "⟦anthropic⟧ b"])
-        #expect(server.requests == ["POST /v1/messages lines=2 mode=ok auth=present thinking_off=no"])
+        // 2026-10-21 (trust1): was `thinking_off=no`, when no Claude row sent a thinking field. claude-haiku-5-5 thinks unless `thinking` is
+        // `{type: disabled}` (ModelQuirks), so `.off` sends it and the mock sees a thinking field. FAIL-first: /tmp/trust1/failfirst-1.log.
+        #expect(server.requests == ["POST /v1/messages lines=2 mode=ok auth=present thinking_off=yes"])
     }
 
     @Test func anthropicErrors() async throws {

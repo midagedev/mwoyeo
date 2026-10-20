@@ -27,6 +27,16 @@ import SwiftUI
 /// preferences in a scratch suite of its own (deleted at exit; `MWOYEO_DEFAULTS_SUITE` names one to keep), never the app's real
 /// ones; `CFFIXED_USER_HOME` does not move those. `--mock` is a tools/mock-openai server the sample translations go to.
 enum UICapture {
+    /// Checks that failed in this run, over every kind: the process exits 1 when any did, so a runner can trust its exit code (it was 0
+    /// with "check-logic: 1 FAILED" printed, 2026-10-20).
+    @MainActor private static var failures = 0
+
+    /// The one summary line of a kind of checks ("check-logic: all passed" / "… 2 FAILED"), counted toward the exit code.
+    @MainActor private static func report(_ kind: String, _ failed: Int) {
+        failures += failed
+        print("\(kind): \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+    }
+
     static func run(_ args: [String]) -> Never {
         setvbuf(stdout, nil, _IOLBF, 0)
         // `--lang ko`: the sheet and the lines in that language, as the launch argument `-AppleLanguages (ko)` would give (it cannot come
@@ -53,7 +63,7 @@ enum UICapture {
                 // The preferences daemon leaves the emptied file behind, in the real home.
                 try? FileManager.default.removeItem(atPath: NSHomeDirectoryForUser(NSUserName())! + "/Library/Preferences/\(suite).plist")
             }
-            exit(0)
+            exit(failures == 0 ? 0 : 1)
         }
         app.run()
         exit(0)
@@ -165,7 +175,7 @@ enum UICapture {
             case "check-logic": await checkLogic()
             case "pack-checks":
                 let failed = await PackChecks.run(model)
-                print("pack: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+                report("pack", failed)
             case "menu-pack-rows": await menuPackRows(name)
             case "menu-pack-banner-ask", "menu-pack-banner-downloading", "menu-pack-banner-notfinished", "menu-pack-banner-unsupported":
                 await menuPackBanner(name)
@@ -179,15 +189,15 @@ enum UICapture {
                 let record = model.settings.enginePermissions
                 print("engine permission: at launch \(model.settings.engines.count) engine(s) in settings, \(record.hosts.count) allowed, upgrade step ran: \(record.migrated)")
                 let failed = await EnginePermissionChecks.run(model)
-                print("engine permission: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+                report("engine permission", failed)
             case "accessibility-checks":
                 // Only the accessibility checks (the whole of check-logic takes minutes).
                 let failed = await AccessibilityChecks.run(model)
-                print("accessibility: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+                report("accessibility", failed)
             case "drift-checks":
                 // Only the drift meter's checks (the whole of check-logic takes minutes).
                 let failed = DriftChecks.run()
-                print("drift: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+                report("drift", failed)
             case "inpaint-footprint": await LensRobustChecks.inpaintFootprint()
             case "menu-icon": LensRobustChecks.menuIcon(into: out.appendingPathComponent("menu-icon.png"))
             case "sheet-pick": await shoot(name, EngineSheet(), CGSize(width: 480, height: 560))
@@ -212,7 +222,7 @@ enum UICapture {
             case "engine-context-checks":
                 // Only the Context section's checks (the whole of check-logic takes minutes).
                 let failed = await EngineContextChecks.run(model, dump: args.contains("--dump") ? out : nil)
-                print("engine context: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+                report("engine context", failed)
             case "appearance": await shoot(name, AppearanceSettings(), CGSize(width: 560, height: 520))
             case "lens-gallery": await lensGallery()
             case "lens-tab-positions": await lensTabPositions()
@@ -461,7 +471,7 @@ enum UICapture {
             failed += await MemorySheetChecks.run(model)
             failed += await AccessibilityChecks.run(model)
             failed += await PackChecks.run(model)
-            print("check-logic: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+            report("check-logic", failed)
         }
 
         // MARK: synthetic clicks
@@ -630,7 +640,7 @@ enum UICapture {
             try? await Task.sleep(for: .milliseconds(300))
             check("clicking the row text selects it", model.settings.customEngineID == model.settings.engines.first { $0.name == "Ollama" }?.id)
             w.orderOut(nil)
-            print("engine-row-click: \(failed == 0 ? "all passed" : "\(failed) FAILED")")
+            report("engine-row-click", failed)
         }
 
         // MARK: the app profile's memory

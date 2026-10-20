@@ -667,7 +667,7 @@ final class RegionSession {
             transcriptAppChecked = 0
             transcript = TranscriptWriter(directory: LensExport.transcriptsFolder(access.url), access: access, lens: config.name,
                                           sourceCode: settings.sourceLanguage, targetCode: settings.targetLanguage,
-                                          formats: settings.transcriptFormats, engine: settings.activeEngineConfig?.name ?? "apple",
+                                          formats: settings.transcriptFormats, engine: { [translator, chosen = settings.activeEngineConfig?.name ?? "apple"] in translator.translatedBy($0) ?? chosen },
                                           onError: { [weak self] in Task { @MainActor in self?.chrome.flash(String(localized: "Couldn’t save transcript"), seconds: 4) } })
             // A line that stays put makes no snapshots; looking again keeps it one line instead of many.
             let t = Timer(timeInterval: 1, repeats: true) { [weak self] _ in Task { @MainActor in self?.observeTranscript() } }

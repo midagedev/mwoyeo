@@ -89,6 +89,9 @@ actor TranslationService {
 
     private var settings: AppSettings
     private let cache = Memory()
+    /// Who produced each source's translation (`credit`, read by `translatedBy`): the transcript names the translator that really answered,
+    /// not the engine the lens is set to, which Apple stands in for while it rests. One entry per source text; memory only.
+    private let ledger = Memory()
     private var sessions: [String: TranslationSession] = [:]
     private var pairStatus: [String: LanguageAvailability.Status] = [:]
     private let intelligence = IntelligenceTranslator()
@@ -124,6 +127,7 @@ actor TranslationService {
         client = EngineClient(secrets: secrets, allowsCommands: !Distribution.isAppStore)
         cache.use(Self.namespace(settings))
         cache.capacity = settings.cacheSize
+        ledger.capacity = settings.cacheSize
         pace.use(Self.paceSlot(settings, engine: Self.activeEngine(settings)))
     }
 
@@ -136,6 +140,7 @@ actor TranslationService {
         settings = new
         enginesSynced = false
         cache.capacity = new.cacheSize
+        ledger.capacity = new.cacheSize
         let space = Self.namespace(new)
         pace.use(Self.paceSlot(new, engine: Self.activeEngine(new)))
         if space != cache.namespace {
@@ -326,6 +331,18 @@ actor TranslationService {
     /// Never waits, even while a translation is in progress.
     nonisolated func cached(_ text: String) -> String? { cache[text] }
 
+    /// The translator that last answered `source`: an added engine's name, or "apple" (Apple Translation and the on-device model,
+    /// also when one stands in for an engine that rests); nil for a text no translator was asked for (a name the memory answered, a
+    /// line kept as it was). Never waits.
+    nonisolated func translatedBy(_ source: String) -> String? { ledger.value(for: source, in: Self.ledgerSpace) }
+
+    private static let ledgerSpace = "translated-by"
+
+    /// Writes down who answered each of `sources`, once the group is over.
+    private func credit(_ sources: some Sequence<String>, to name: String) {
+        for s in sources { ledger.store(name, for: s, in: Self.ledgerSpace) }
+    }
+
     /// Translations held, over every language pair and engine.
     nonisolated var cachedCount: Int { cache.count }
     nonisolated func clearCache() { cache.removeAll() }
@@ -460,7 +477,12 @@ actor TranslationService {
 
     // MARK: - Routing
 
-    private enum Route { case apple, added(EngineConfig) }
+    private enum Route {
+        case apple, added(EngineConfig)
+
+        /// The name the transcript gives the translator of this route (`translatedBy`).
+        var credited: String { if case let .added(e) = self { e.name } else { "apple" } }
+    }
 
     private enum Status {
         case value
@@ -534,6 +556,7 @@ actor TranslationService {
         case .timedOut:
             a.status = .timedOut
         }
+        credit(a.translated.keys, to: route.credited)
         return a
     }
 
@@ -1034,6 +1057,7 @@ extension TranslationService {
         case .timedOut:
             a.status = .timedOut
         }
+        credit(a.translated.keys, to: engine.name)
         return a
     }
 

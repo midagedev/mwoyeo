@@ -127,7 +127,8 @@ final class TranscriptWriter: @unchecked Sendable {
     private let sourceCode: String
     private let targetCode: String
     private let formats: Set<TranscriptFileFormat>
-    private let engine: String
+    /// The name the JSON lines give the translator of a source text (`TranslationService.translatedBy`; a constant for a writer made by a check).
+    private let engineOf: @Sendable (String) -> String
     /// The languages as set ("auto" stays "auto"), for the JSON lines.
     private let sourceSetting: String
     private var app: String?
@@ -144,19 +145,27 @@ final class TranscriptWriter: @unchecked Sendable {
     private let access: ExportFolder.Access?
 
     /// `directory` is where the files go; `sourceCode` names the source SRT ("auto" becomes "source").
-    /// `formats` are the files written; `engine` is "apple" or the added engine's name (for the JSON lines).
+    /// `formats` are the files written; `engine` says, for a source text, who translated it ("apple" or the added engine's name), for the JSON lines.
     init(directory: URL, access: ExportFolder.Access? = nil, lens: String, sourceCode: String, targetCode: String, formats: [TranscriptFileFormat] = [.markdown, .srt],
-         engine: String = "apple", started: Date = Date(), onError: @escaping @Sendable () -> Void) {
+         engine: @escaping @Sendable (String) -> String, started: Date = Date(), onError: @escaping @Sendable () -> Void) {
         self.directory = directory
         self.access = access
         self.formats = Set(formats)
-        self.engine = engine
+        self.engineOf = engine
         self.sourceSetting = sourceCode
         self.lens = lens
         self.sourceCode = sourceCode == "auto" ? "source" : sourceCode
         self.targetCode = targetCode
         self.started = started
         self.onError = onError
+    }
+
+    /// One translator for every line: "apple" (the default) or an added engine's name.
+    convenience init(directory: URL, access: ExportFolder.Access? = nil, lens: String, sourceCode: String, targetCode: String,
+                     formats: [TranscriptFileFormat] = [.markdown, .srt], engine: String = "apple", started: Date = Date(),
+                     onError: @escaping @Sendable () -> Void) {
+        self.init(directory: directory, access: access, lens: lens, sourceCode: sourceCode, targetCode: targetCode, formats: formats,
+                  engine: { _ in engine }, started: started, onError: onError)
     }
 
     /// The bundle ID of the app in the lens, for the JSON lines that follow.
@@ -198,7 +207,7 @@ final class TranscriptWriter: @unchecked Sendable {
                 if formats.contains(.jsonl) {
                     // Appended and closed per line, so `tail -f` follows it.
                     try append(TranscriptFormat.jsonlLine(time: started.addingTimeInterval(e.time), timeZone: .current, lens: lens, app: app,
-                                                          source: sourceSetting, target: targetCode, engine: engine,
+                                                          source: sourceSetting, target: targetCode, engine: engineOf(e.source),
                                                           original: e.source, translation: e.translation), to: file("jsonl"))
                 }
             }

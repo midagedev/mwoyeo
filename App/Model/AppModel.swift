@@ -64,7 +64,7 @@ final class AppModel {
     var learnedCounts: [String: LearnedCounts] = [:]
     /// Writes the apps' learned rows beside the transcripts while Save transcripts is on (`LearnedMemoryWriter`).
     @ObservationIgnored var learnedFile: LearnedMemoryWriter?
-    /// Where added engines keep their API keys (the Keychain; memory only when `MWOYEO_MEMORY_SECRETS` is set, for captures).
+    /// Where added engines keep their API keys (`SecretStoreChoice`: the Keychain; memory only when `MWOYEO_MEMORY_SECRETS` is set, for captures).
     @ObservationIgnored let secrets: any SecretStore
     /// settings.json, the source of truth of `settings`; the preferences keep a copy for a downgrade.
     @ObservationIgnored let settingsFile = SettingsFileStore()
@@ -106,11 +106,7 @@ final class AppModel {
         s.enginePermissions.launch(engines: s.engines, grantsExisting: !Distribution.isAppStore)
         settings = s
         settingsIssues = settingsFile.issues
-        #if MAS
-        let store: any SecretStore = KeychainSecrets()
-        #else
-        let store: any SecretStore = ProcessInfo.processInfo.environment["MWOYEO_MEMORY_SECRETS"] != nil ? MemorySecrets() : KeychainSecrets()
-        #endif
+        let store = SecretStoreChoice.current()
         secrets = store
         translator = TranslationService(settings: s, secrets: store)
         regions = (defaults.data(forKey: "regions")).flatMap { try? JSONDecoder().decode([RegionConfig].self, from: $0) } ?? []

@@ -181,11 +181,7 @@ struct MCPWorld {
         let defaults = ProcessInfo.processInfo.environment["MWOYEO_DEFAULTS_SUITE"].flatMap { UserDefaults(suiteName: $0) } ?? .standard
         #endif
         // The keys are where the app keeps them (`AppModel`): the Keychain, and in a check run memory only.
-        #if MAS
-        let secrets: any SecretStore = KeychainSecrets()
-        #else
-        let secrets: any SecretStore = ProcessInfo.processInfo.environment["MWOYEO_MEMORY_SECRETS"] != nil ? MemorySecrets() : KeychainSecrets()
-        #endif
+        let secrets = SecretStoreChoice.current()
         return MCPWorld(settingsURL: SettingsFileStore.defaultURL,
                         saved: { defaults.data(forKey: "settings").flatMap { try? JSONDecoder().decode(AppSettings.self, from: $0) } ?? AppSettings() },
                         appName: installedName, secrets: secrets)

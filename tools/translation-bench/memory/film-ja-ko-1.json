@@ -1,0 +1,11 @@
+{
+ "entities": [
+  {"name": "九十九", "dst": "츠쿠모", "gender": "male", "role": "swordsman", "speaks_to": {"シュザンヌ": "합쇼체", "エルヴェ": "해요체"}},
+  {"name": "シュザンヌ", "dst": "쉬잔", "gender": "female", "role": "princess", "speaks_to": {"九十九": "반말", "エルヴェ": "해요체"}},
+  {"name": "エルヴェ", "dst": "에르베", "gender": "male", "role": "old tutor", "speaks_to": {"シュザンヌ": "합쇼체", "九十九": "반말"}},
+  {"name": "ハク", "dst": "하쿠", "role": "shrine keeper"}
+ ],
+ "document": {"domain": "fantasy RPG", "summary": "shrine quest"},
+ "window": {"app": "月涙譚", "category": "Games"},
+ "terms": [{"src": "月影の祠", "dst": "월영 사당"}, {"src": "月涙石", "dst": "월루석"}, {"src": "夜明けの守り手", "dst": "새벽지기"}]
+}

@@ -1,0 +1,98 @@
+{
+ "_note": "USD per 1M tokens. `in` is the price of an uncached prompt token, `cached` of a cache hit (default: `in`), `write` of a cache write (default: `in`), `out` of an output token. An engine file names its entry with `price` (default: its `model`). Prices drift: re-check the source before a decision. DeepL bills characters and has no entry; the run records `chars`.",
+ "models": {
+  "local": {
+   "in": 0,
+   "cached": 0,
+   "out": 0,
+   "source": "local engine (Ollama, llama-server, Apple Foundation Models): no per-token price"
+  },
+  "claude-haiku-5-5": {
+   "in": 0.1,
+   "cached": 0.01,
+   "write": 0.125,
+   "out": 0.5,
+   "source": "~/.cache/mwoyeo-gates/research-ctx-A.md Anthropic pricing: Haiku 5.5 (<=100k prompt) $0.10 in / $0.125 5m write / $0.01 hit / $0.50 out per MTok"
+  },
+  "claude-haiku-4-5": {
+   "in": 1.0,
+   "cached": 0.1,
+   "write": 1.25,
+   "out": 5.0,
+   "source": "~/.cache/mwoyeo-gates/research-ctx-A.md Anthropic pricing: Haiku 4.5 $1/$1.25/$2/$0.10/$5"
+  },
+  "claude-sonnet-5-5": {
+   "in": 2.0,
+   "cached": 0.1,
+   "write": 2.5,
+   "out": 10.0,
+   "source": "tools/engine-bench/MODELS.md ($2 in / $10 out); cache hit 0.05x and 5m write 1.25x from ~/.cache/mwoyeo-gates/research-ctx-A.md (Opus 5.5 and Sonnet 5.5 hits are 0.05x)"
+  },
+  "gpt-5.4-nano": {
+   "in": 0.2,
+   "cached": 0.02,
+   "out": 1.25,
+   "source": "~/.cache/mwoyeo-gates/research-ctx-A.md OpenAI pricing (per 1M in/cached/out)"
+  },
+  "gpt-5.4-mini": {
+   "in": 0.75,
+   "cached": 0.075,
+   "out": 4.5,
+   "source": "~/.cache/mwoyeo-gates/research-ctx-A.md OpenAI pricing"
+  },
+  "gpt-5-nano": {
+   "in": 0.05,
+   "cached": 0.005,
+   "out": 0.4,
+   "source": "~/.cache/mwoyeo-gates/research-ctx-A.md OpenAI pricing"
+  },
+  "gpt-6-luna": {
+   "in": 0.1,
+   "cached": 0.01,
+   "write": 0.125,
+   "out": 0.5,
+   "source": "~/.cache/mwoyeo-gates/research-ctx-A.md OpenAI pricing (write 0.125)"
+  },
+  "gpt-5.6-luna": {
+   "in": 0.2,
+   "cached": 0.02,
+   "write": 0.25,
+   "out": 1.2,
+   "source": "~/.cache/mwoyeo-gates/research-ctx-A.md OpenAI pricing (write 0.25); out 1.20 also in tools/engine-bench/MODELS.md"
+  },
+  "gpt-4o-mini": {
+   "in": 0.15,
+   "out": 0.6,
+   "source": "tools/engine-bench/MODELS.md"
+  },
+  "gemini-3.1-flash-lite": {
+   "in": 0.25,
+   "cached": 0.025,
+   "out": 1.5,
+   "source": "~/.cache/mwoyeo-gates/research-ctx-A.md Gemini pricing"
+  },
+  "gemini-2.5-flash-lite": {
+   "in": 0.1,
+   "cached": 0.01,
+   "out": 0.4,
+   "source": "~/.cache/mwoyeo-gates/research-ctx-A.md Gemini pricing"
+  },
+  "gemini-2.5-flash": {
+   "in": 0.3,
+   "cached": 0.03,
+   "out": 2.5,
+   "source": "~/.cache/mwoyeo-gates/research-ctx-A.md Gemini pricing"
+  },
+  "gemini-3.5-flash-lite": {
+   "in": 0.3,
+   "cached": 0.03,
+   "out": 2.5,
+   "source": "~/.cache/mwoyeo-gates/research-ctx-A.md Gemini pricing"
+  },
+  "gemini-3.8-flash": {
+   "in": 0.75,
+   "out": 3.75,
+   "source": "tools/engine-bench/MODELS.md (paid tier until 2026-12-31; 1.50 / 7.50 after); no cached price listed, so cached tokens are priced as input"
+  }
+ }
+}

@@ -1,0 +1,15 @@
+{
+  "batch_size" : 3,
+  "condition" : "M0",
+  "engine" : "ollama-gemma4-e4b",
+  "jobs" : 1,
+  "kind" : "openAICompatible",
+  "layout" : "t2",
+  "model" : "gemma4:e4b",
+  "price" : "local",
+  "seconds" : 75.235445708,
+  "sequences" : [
+    "film-ja-ko-1"
+  ],
+  "started" : "2026-10-20T09:10:29Z"
+}

@@ -18,6 +18,7 @@ python3 -I tests/test_failures.py
 if python3 -I tests/test_failures.py --neuter >/dev/null 2>&1; then echo "test_failures passed with the leak counter neutered" >&2; exit 1; fi
 python3 -I tests/test_latency.py
 python3 -I tests/test_summary.py
+bash tests/test_film_consistency.sh
 python3 -I summary.py --check
 (cd runner && swift test --scratch-path "$SCRATCH")
 (cd runner && swift build --scratch-path "$SCRATCH")

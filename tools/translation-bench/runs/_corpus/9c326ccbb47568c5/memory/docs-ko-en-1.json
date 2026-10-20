@@ -1,0 +1,5 @@
+{
+ "document": {"title": "New hire onboarding", "domain": "delivery logistics startup, internal wiki", "summary": "first two weeks for ops and engineering hires"},
+ "window": {"title": "온보딩 가이드 - 모아 위키", "app": "Chrome", "category": "Utilities"},
+ "terms": [{"src": "모아로지스", "dst": "MoaLogis"}, {"src": "길잡이", "dst": "Pathfinder"}, {"src": "배차", "dst": "fleet allocation"}, {"src": "새벽팀", "dst": "Dawn Team"}]
+}

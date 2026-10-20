@@ -1,0 +1,10 @@
+{
+ "entities": [
+  {"name": "小鳥遊", "dst": "타카나시", "gender": "male", "role": "detective", "speaks_to": {"日向": "반말", "桐生": "해요체"}},
+  {"name": "日向", "dst": "히나타", "gender": "female", "role": "his niece, sister's daughter", "speaks_to": {"小鳥遊": "반말", "桐生": "합쇼체"}},
+  {"name": "桐生", "dst": "키류", "gender": "female", "role": "client", "speaks_to": {"小鳥遊": "해요체", "日向": "해요체"}}
+ ],
+ "document": {"title": "喫茶ふくろう探偵局", "domain": "cozy detective drama", "summary": "an old woman's lost watch"},
+ "window": {"title": "ふくろう探偵局 S1E3", "app": "VLC", "category": "Entertainment"},
+ "terms": [{"src": "ふくろう", "dst": "부엉이"}, {"src": "喫茶", "dst": "다방"}]
+}

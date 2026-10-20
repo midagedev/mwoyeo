@@ -1,0 +1,15 @@
+{
+  "batch_size" : 3,
+  "condition" : "M0",
+  "engine" : "anthropic-haiku-5-5",
+  "jobs" : 1,
+  "kind" : "anthropic",
+  "layout" : "t2",
+  "model" : "claude-haiku-5-5",
+  "price" : "claude-haiku-5-5",
+  "seconds" : 55.316238291999994,
+  "sequences" : [
+    "film-ja-ko-1"
+  ],
+  "started" : "2026-10-20T09:10:25Z"
+}

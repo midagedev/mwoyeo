@@ -293,7 +293,7 @@ corpus (a new run name) to compare.
 - **Probe accuracy** per run: overall, by evidence (`memory`, `lines`, `none`), by type, by pair and kind, and for
   lines-evidence probes by lookback distance (1-2, 3-4, 5-8, 9-16, 17+), which is what picks the window size.
 - **Sign test** (exact, two-sided, on the probes where two runs disagree) of every run against the first (or `--baseline`),
-  overall and by evidence. A comparison needs at least 250 probes; the corpus has 312.
+  overall and by evidence. A comparison needs at least 250 probes; the corpus has 353.
 - **Speech level**: the share of judged lines whose sentence endings (`hapsyo` -니다, `haeyo` -요, `banmal` the rest) match
   the speaker's level for that addressee; mixed lines and speaker-level groups that show more than one level are counted.
   Scored by script, not by a judge (LoCar: judges confuse haeyo and hapsyo).

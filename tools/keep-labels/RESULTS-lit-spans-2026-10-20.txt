@@ -1,0 +1,32 @@
+InlineLiteral (wt/lit-spans) — 2026-10-20 — base main 9ec26a6
+FROZEN TABLE (written before the H3 run; no edit after this line)
+  Core/Sources/MwoyeoCore/InlineLiteral.swift
+  sha256 c152dcaa7f16b671ed1dac5613c4bbad0657a61fa51e831bcac339dacc1dab61  bytes 14831
+  rows 27, commands 109, subcommands 80, extensions 63
+H2 DEV CURVE (rules OR CodeRegion, same feed /tmp/lit-spans/feed-h2.jsonl)
+  v0 base       doc tp 3765 fp 2 R 0.89 | vn tp 4925 fp 0 R 0.82
+  v1 first      doc tp 3907 fp 7 R 0.92 cmd 0.91 path 0.81 id 0.42 | vn tp 5084 fp 5 R 0.84
+  v2 txt split  doc tp 3913 fp 3 R 0.93 path 0.84 | vn tp 5084 fp 1 R 0.84 path 0.68
+  v3 flag/lists doc tp 3913 fp 3 R 0.93 cmd 0.91 path 0.84 id 0.42 config 0.90 url/hash/flag 1.00 n small
+                vn tp 5084 fp 1 R 0.84 cmd 0.91 path 0.68 id 0.32 config 0.64 url 1.00
+  translate->kept  doc 3 of 2121 (base 2: 2 baseline CodeRegion, ours 1 "EXPLORER") | vn 1 of 2133 (ours, same)
+PAPERS/CASES (run-rules.sh, translate->kept, same before/after)
+  32/2508 8/4781 10/362 0/249 10/2490 24/4743 0/362 0/249
+  ("set up" and OCR "-that" keeps from the first table were removed by the v3 list/flag tighten;
+   H2 vn lost 3 code words: "-c1-4" x2 (not a flag) and "set" x1; -scheme still kept by its command span)
+TESTS  Core swift test 854 tests, 0 failures; keep-labels test_keep_score.sh rc 0
+CPU   littime, 2067 blocks / 11673 words, 20 reps, machine shared (uptime 12:49 load 343 before / 315 after)
+  InlineLiteral first 2.705 ms  block median 12708 ns p95 94333  word median 3708 ns p95 18834
+  InlineMath    first 0.393 ms  block median  9459 ns p95 78708  word median 3042 ns p95 11167
+  needsTranslation first 34.129 ms (cold, noisy) block 21166 / 75833  word 9062 / 27958
+H3 HOLD-OUT (scored once, after the freeze; 3064 doc + 2462 vn blocks)
+  base  doc tp 6455 fp 90 R 0.68 | vn tp 9265 fp 68 R 0.69; translate->kept 81/7302, 64/7528
+  new   doc tp 6804 fp 130 R 0.72 | vn tp 9839 fp 109 R 0.74; translate->kept 121/7302, 105/7528
+        slices doc url 0.04->0.07 cmd 0.34->0.53 path 0.48->0.73 id 0.34->0.79 flag 0.76->0.94 hash 0.97->1.00
+        slices vn  url 0.01->0.08 cmd 0.31->0.61 path 0.44->0.90 id 0.44->0.92 flag 0.75->0.94 config 0.40->0.43
+        keep->translated losses doc 4192->3779, vn 5581->4936 (spans hold words the rules dropped)
+KNOWN LIMITS
+  path misses: OCR-split/space-garbled breadcrumbs, bare Core/Sources; id misses: plain context-free words
+  (cap, factor, track); cmd misses: per-character OCR splits, && chains. url in ja/zh reads is split per char,
+  so H3 url recall only reaches 0.07/0.08 (the tokenizer sees one letter per token); no table fix without that.
+  Remaining H3 cost: 41 extra translate words per read (+0.55 pp), all inside literal spans (EXPLORER caps, OCR junk).

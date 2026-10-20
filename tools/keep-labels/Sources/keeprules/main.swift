@@ -68,11 +68,15 @@ for path in CommandLine.arguments.dropFirst() {
               let id = obj["id"] as? String, let t = obj["text"] as? String else { continue }
         let lang = obj["lang"] as? String ?? "en"
         let cjk = ["ja", "ko"].contains(lang) || lang.hasPrefix("zh")
-        let spans = InlineMath.spans(in: t).map { "[\($0.range.lowerBound),\($0.range.upperBound)]" }.joined(separator: ",")
+        let literals = InlineLiteral.spans(in: t)
+        let spans = (InlineMath.spans(in: t).map(\.range) + literals.map(\.range))
+            .sorted { ($0.lowerBound, $0.upperBound) < ($1.lowerBound, $1.upperBound) }
+            .map { "[\($0.lowerBound),\($0.upperBound)]" }.joined(separator: ",")
+        let literalSpans = literals.map { "[\($0.range.lowerBound),\($0.range.upperBound),\(json($0.reason.rawValue))]" }.joined(separator: ",")
         let share = TranslationFilter.mathShare(of: t)
         out += "{\"id\":\(json(id)),\"spans\":[\(spans)],\"formula\":\(TranslationFilter.isFormula(t)),\"mathHeavy\":\(TranslationFilter.isMathHeavy(t)),"
             + "\"identifier\":\(TranslationFilter.isIdentifier(t)),\"literal\":\(TranslationFilter.isLiteral(t)),"
-            + "\"needs\":\(TranslationFilter.needsTranslation(t, cjkSource: cjk)),\"share\":\(String(format: "%.3f", share.share)),\"signs\":\(share.signs)"
+            + "\"needs\":\(TranslationFilter.needsTranslation(t, cjkSource: cjk)),\"share\":\(String(format: "%.3f", share.share)),\"signs\":\(share.signs),\"literal_spans\":[\(literalSpans)]"
             + (regionOf.map { ",\"region\":" + ($0.verdicts[id].map(json) ?? ($0.fed.contains(id) ? "null" : "\"nofeed\"")) } ?? "") + "}\n"
     }
 }

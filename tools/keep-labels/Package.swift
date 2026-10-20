@@ -7,6 +7,7 @@ import PackageDescription
 //   keeprules  today's Core rules (InlineMath, TranslationFilter) run on labelled units
 //   regionfeed the inputs of CodeRegion (block rects, line rects, background colours) read off the labelled pictures
 //   snap       draws an HTML case to a PNG (the same recipe the use-case pictures were made with)
+//   littime    times InlineLiteral.spans against InlineMath.spans and TranslationFilter.needsTranslation on the labelled blocks
 let package = Package(
     name: "KeepLabels",
     platforms: [.macOS("26.0")],
@@ -18,5 +19,6 @@ let package = Package(
         .executableTarget(name: "keeprules", dependencies: [.product(name: "MwoyeoCore", package: "Core")]),
         .executableTarget(name: "regionfeed", dependencies: [.product(name: "MwoyeoCore", package: "Core")]),
         .executableTarget(name: "snap"),
+        .executableTarget(name: "littime", dependencies: [.product(name: "MwoyeoCore", package: "Core")]),
     ]
 )

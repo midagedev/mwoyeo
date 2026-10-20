@@ -35694,6 +35694,23 @@
           }
         }
       }
+    },
+    "Free plan key from deepl.com/pro-api, ends in :fx": {
+      "extractionState": "manual",
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Free plan key from deepl.com/pro-api, ends in :fx"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Free plan key from deepl.com/pro-api, ends in :fx"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

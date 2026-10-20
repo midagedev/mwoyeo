@@ -14,7 +14,7 @@ public enum EnginePresets {
         public var config: EngineConfig
 
         public func instantiate() -> EngineConfig {
-            EngineConfig(name: name, kind: config.kind)
+            EngineConfig(name: name, kind: config.kind, context: config.context)
         }
     }
 
@@ -56,6 +56,12 @@ public enum EnginePresets {
         Preset(name: "DeepL", hint: "Free or Pro key from deepl.com/pro-api", needsKey: true,
                keyURL: URL(string: "https://www.deepl.com/pro-api"),
                config: EngineConfig(name: "DeepL", kind: .deepL(baseURL: URL(string: "https://api.deepl.com")!, formality: nil))),
+        // "DeepL Free" starts the engine at the Free host with the memory sent as DeepL instructions (2026-10-21, trust1: DeepL kept the
+        // memory 8/8 in the film-2 live take once it was sent; a Free key is the way in without paying). The plain "DeepL" row is unchanged.
+        Preset(name: "DeepL Free", hint: "Free plan key from deepl.com/pro-api, ends in :fx", needsKey: true,
+               keyURL: URL(string: "https://www.deepl.com/pro-api"),
+               config: EngineConfig(name: "DeepL Free", kind: .deepL(baseURL: URL(string: "https://api-free.deepl.com")!, formality: nil),
+                                    context: EngineContext(enabled: true, deepLInstructions: true))),
         // https://docs.libretranslate.com/guides/api_usage/ (README of github.com/LibreTranslate/LibreTranslate links there)
         Preset(name: "LibreTranslate", hint: "Self-hosted, default http://localhost:5000; the key is optional", needsKey: false,
                keyURL: nil,

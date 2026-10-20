@@ -157,7 +157,7 @@ struct EngineSheet: View {
     }
 
     private static let localNames = ["Ollama", "LM Studio", "LibreTranslate", "DeepLX"]
-    private static let cloudNames = ["Gemini", "OpenAI", "Claude", "DeepSeek", "OpenRouter", "Groq", "Qwen (Alibaba Cloud)", "DeepL"]
+    private static let cloudNames = ["Gemini", "OpenAI", "Claude", "DeepSeek", "OpenRouter", "Groq", "Qwen (Alibaba Cloud)", "DeepL", "DeepL Free"]
     private static func preset(_ name: String) -> EnginePresets.Preset? { EnginePresets.all.first { $0.name == name } }
 
     private enum Custom { case server, template, command }
@@ -560,10 +560,16 @@ struct EngineSheet: View {
 
     private func commit() {
         saveKey()
-        guard let config = build() else { return }
+        guard var config = build() else { return }
         added = true
         model.setSendingAllowed(consentGiven, for: config)
-        if isEdit { model.updateEngine(config) } else { model.addEngine(config) }
+        if isEdit {
+            model.updateEngine(config)
+        } else {
+            // A new engine starts with the context its preset names (DeepL Free: the memory as instructions); an edit keeps the stored one.
+            config.context = preset?.config.context
+            model.addEngine(config)
+        }
         dismiss()
     }
 

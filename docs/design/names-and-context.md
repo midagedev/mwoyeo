@@ -398,3 +398,6 @@ scripts, both in 1.1.5, with agents as script authors. Both cost 0 tokens and li
 
 **Decided 2026-10-21 (the user):** window memory (Q3: its form); only glossary hits go; Apple uses every scope's names (as replace rows);
 "Memory for <App>…" in every lens menu; DeepL glossaries deferred; profiles, restore per tab, §10 and §11 all in 1.1.5.
+
+**Decided 2026-10-21 (the user):** Q1 languages and engine follow each lens's profile; Q2 a cloud engine gets earlier lines when a profile
+asks (the engine's allow switch can still say no); Q3 the window memory is a profile with a title rule; Q4 "learn names" moves to the profile.

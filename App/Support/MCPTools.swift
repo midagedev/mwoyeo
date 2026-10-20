@@ -8,8 +8,10 @@ import MwoyeoCore
 enum MCPTool: String, CaseIterable {
     case listApps = "list_apps"
     case readTranslationLog = "read_translation_log"
+    case termRenderings = "term_renderings"
     case getMemory = "get_memory"
     case setMemory = "set_memory"
+    case translateText = "translate_text"
     case getSettings = "get_settings"
     case setSettings = "set_settings"
     case getSettingsSchema = "get_settings_schema"
@@ -18,59 +20,82 @@ enum MCPTool: String, CaseIterable {
         switch self {
         case .listApps: "List apps"
         case .readTranslationLog: "Read the translation log"
+        case .termRenderings: "How names were translated"
         case .getMemory: "Get an app's memory"
         case .setMemory: "Set an app's memory"
+        case .translateText: "Translate lines"
         case .getSettings: "Get settings"
         case .setSettings: "Set settings"
         case .getSettingsSchema: "Get the settings schema"
         }
     }
 
-    /// What the tool is for, written for an agent.
+    /// What the tool is for and what it costs, written for an agent: one or two sentences, because a tool's description is read every time the tool is.
     var summary: String {
         switch self {
         case .listApps:
-            "Lists the apps Mwoyeo knows: the apps whose text is in the translation log (with their line counts and the time of the last line) and the apps that have a profile (whether it holds a memory, and how many names). Start here: the bundle IDs it lists are what the other tools take as app."
+            "Lists the apps in the translation log (line count, last time) and the apps that have a profile (whether it holds a memory). Its bundle IDs are the app argument of the other tools; the answer is small."
         case .readTranslationLog:
-            "Reads the newest lines of the translation log, oldest first: what a lens read on the screen (original) and how it was translated (translation), with the time, the app's bundle ID, the languages and the engine. Use it to see which names and terms an app's text carries and how they came out. It needs Save transcripts on and jsonl among the transcript formats; the error says how to turn that on."
+            "Reads the newest rows of the translation log, oldest first, as [id, time, original, translation] under a header that holds the app, languages and engine when they do not vary; it returns up to limit rows (default \(MCPLog.defaultLimit), max \(MCPLog.maxLimit)). With distinct (default) a row that a later read of the same lens within \(Int(MCPLogRows.foldWindow)) s starts with is folded into it (an OCR read of a line still being drawn) and an exact repeat is counted, not repeated; it needs Save transcripts on and jsonl among the transcript formats, and the error says how."
+        case .termRenderings:
+            "For names or terms (as they are written in the source) in one app's log, lists every distinct translation of the rows that contain each, as [count, translation, example row ids]: a cheap way to check a few names without reading the log. It returns up to \(MCPLog.maxRenderings) translations per term."
         case .getMemory:
-            "Returns an app's memory: the note for the translator and the names and terms (entries) that app's text must keep, with the app's languages. Each app has its own memory, found by its bundle ID. The glossary in settings.json is for every app and is not part of it."
+            "Returns an app's memory by its bundle ID: the note for the translator and the names and terms (entries). The glossary setting is for every app and is not part of it."
         case .setMemory:
-            "Writes an app's memory: a note for the translator (who is talking, the setting, the register) and names and terms with how they are translated (entries). It is for the names and terms of one app, such as a game's cast or a show's places; the glossary is for every app and is not set here. An app without a profile gets one, on the base source and target languages. A wrong field rejects the whole call, names its path and writes nothing. The running Mwoyeo applies a saved change within a second."
+            "Writes the memory of one app, a note for the translator and names and terms with their translations (the glossary is for every app and is not set here); mode merge replaces names by src and keeps the rest, replace makes the memory exactly what you give. A wrong field rejects the whole call and writes nothing, and the running Mwoyeo applies a saved change within a second."
+        case .translateText:
+            "Translates up to \(MCPTranslate.maxLines) lines the way a lens does, with the app's engine, languages and memory, to check a memory you wrote; it returns each translation and the engine that made it. The text goes to that engine (a cloud one sees it), Apple Translation uses the memory's names only while appleUsesPinnedTerms is on, and command engines are not run."
         case .getSettings:
-            "Returns Mwoyeo's settings as settings.json holds them: every setting, or the named keys. Engine API keys are not settings: they stay in the Keychain and are never returned."
+            "Returns Mwoyeo's settings as settings.json holds them: every setting, or the keys named. Engine API keys are not settings: they stay in the Keychain and are never returned."
         case .setSettings:
-            "Changes settings: any key of settings.json except agentConnection, which only the person turns on or off. An engine of kind command (a program of your own) is added or changed by the person in Settings, never here; the other engine kinds can be set. Each value is checked by the rules of its key (get_settings_schema lists every key with its values and limits), written the way the app writes settings.json, and applied by the running Mwoyeo within a second. One wrong value rejects the whole call, names its path and writes nothing. A list or an object setting (engines, appProfiles, shortcuts) is given whole and replaces the one in the file. Engine API keys are not settings: they stay in the Keychain and cannot be set here. For the names and terms of one app, set_memory is the shorter way."
+            "Changes settings, each value checked by the rules of its key (get_settings_schema with key gives them): one wrong value rejects the whole call and writes nothing, agentConnection and engines of kind command are the person's alone, and engine API keys stay in the Keychain. A list or object setting (engines, appProfiles, shortcuts) is given whole."
         case .getSettingsSchema:
-            "Returns the JSON Schema of settings.json, the same one the app writes beside it: every key with what it does, its allowed values and its limits. Read it before set_settings."
+            "Returns the JSON Schema of one setting when given key (its allowed values and limits), or of every setting without it, which is about 30 KB: give a key."
         }
     }
 
     /// Changes nothing.
     var readOnly: Bool { self != .setMemory && self != .setSettings }
 
+    /// Sends text beyond this Mac when the chosen engine is a cloud one.
+    var opensWorld: Bool { self == .translateText }
+
     var arguments: [FieldSpec] {
         switch self {
-        case .listApps, .getSettingsSchema:
+        case .listApps:
             []
         case .readTranslationLog:
-            [Self.app(required: false, doc: "Only the lines of this app, by bundle ID such as com.example.chat. Left out, the lines of every app."),
-             FieldSpec("limit", .integer(1...MCPLog.maxLimit), "How many lines at most: the newest ones. Default \(MCPLog.defaultLimit).", default: MCPLog.defaultLimit),
-             FieldSpec("since", .string, "Only the lines from this time on, ISO 8601 with a zone, such as 2026-10-20T09:00:00+09:00.")]
+            [Self.app(required: false, doc: "Only the rows of this app, by bundle ID such as com.example.chat. Left out, every app."),
+             FieldSpec("limit", .integer(1...MCPLog.maxLimit), "How many rows at most: the newest. Default \(MCPLog.defaultLimit).", default: MCPLog.defaultLimit),
+             FieldSpec("since", .string, "Only rows from this time on, ISO 8601 with a zone, such as 2026-10-20T09:00:00+09:00."),
+             FieldSpec("contains", .text(minLength: 1), "Only rows with this text in the original or the translation."),
+             FieldSpec("distinct", .bool, "true folds the pieces of a line being read and counts exact repeats; false returns every logged line.", default: true)]
+        case .termRenderings:
+            [Self.app(required: true, doc: "The app's bundle ID (list_apps lists them)."),
+             FieldSpec("terms", .list(.text(minLength: 1), maxItems: MCPLog.maxTerms, unique: true),
+                       "The names or terms to check, as they are written in the source text; 1 to \(MCPLog.maxTerms).", required: true),
+             FieldSpec("limit_examples", .integer(1...10), "How many example row ids for each translation. Default 2.", default: 2)]
         case .getMemory:
             [Self.app(required: true, doc: "The app's bundle ID, such as com.example.chat (the app field of a log line; list_apps lists them).")]
         case .setMemory:
-            [Self.app(required: true, doc: "The app's bundle ID, such as com.example.chat (the app field of a log line; list_apps lists them)."),
+            [Self.app(required: true, doc: "The app's bundle ID, such as com.example.chat (list_apps lists them)."),
              FieldSpec("appName", Self.profileKind("appName"), "The app's name, for display. Left out, a new profile takes the installed app's name and an existing one keeps its name."),
              FieldSpec("note", Self.profileKind("note"), "A note for the translator about this app: who is talking, the setting, the register. Up to \(AppProfile.maxNoteLength) characters. Left out, the note stays (mode merge) or is cleared (mode replace)."),
              FieldSpec("entries", Self.profileKind("entries"), "The names and terms of this app with their translations: the people, places and terms its text must keep. Up to \(AppProfile.maxEntries) rows. Two rows with the same src are one name: the later one wins."),
              FieldSpec("mode", .choice(MCPMemory.Mode.allCases.map(\.rawValue)), "merge adds the entries: one whose src is already in the memory is replaced, the others stay, and a note you leave out stays. replace makes the memory exactly this note and these entries: what you leave out is cleared.", default: MCPMemory.Mode.merge.rawValue)]
+        case .translateText:
+            [FieldSpec("lines", .list(.text(maxLength: MCPTranslate.maxLineLength, minLength: 1), maxItems: MCPTranslate.maxLines),
+                       "The lines to translate, 1 to \(MCPTranslate.maxLines), each up to \(MCPTranslate.maxLineLength) characters.", required: true),
+             Self.app(required: false, doc: "The app whose languages, engine and memory apply, by bundle ID. Left out, the base settings."),
+             FieldSpec("engine", .text(minLength: 1), "\"apple\" for Apple Translation, or the id of an added engine (get_settings engines). Left out, the engine the app uses.")]
         case .getSettings:
             [FieldSpec("keys", .list(.choice(SettingSpec.all.map(\.key)), unique: true), "The settings to return, by key. Left out, every setting.")]
         case .setSettings:
             [FieldSpec("values", .object(SettingSpec.all.map { FieldSpec($0.key, $0.kind, $0.doc) }),
                        "The settings to change, key to value, each in the shape get_settings_schema gives it, such as {\"targetLanguage\": \"ko\", \"lensStyle\": \"subtle\"}. A key left out keeps its value.",
                        required: true)]
+        case .getSettingsSchema:
+            [FieldSpec("key", .choice(SettingSpec.all.map(\.key)), "The setting whose schema to return. Left out, the schema of every setting (about 30 KB).")]
         }
     }
 
@@ -85,7 +110,7 @@ enum MCPTool: String, CaseIterable {
         for spec in arguments where shortInList.contains(spec.name) { properties[spec.name] = Self.short(spec) }
         schema["properties"] = properties
         return ["name": rawValue, "title": title, "description": summary, "inputSchema": schema,
-                "annotations": ["title": title, "readOnlyHint": readOnly, "idempotentHint": true, "openWorldHint": false] as [String: Any]]
+                "annotations": ["title": title, "readOnlyHint": readOnly, "idempotentHint": true, "openWorldHint": opensWorld] as [String: Any]]
     }
 
     private static func short(_ spec: FieldSpec) -> [String: Any] {
@@ -100,11 +125,13 @@ enum MCPTool: String, CaseIterable {
         switch self {
         case .listApps: return MCPLog.listApps(world)
         case .readTranslationLog: return try MCPLog.read(a, world)
+        case .termRenderings: return try MCPLog.termRenderings(a, world)
         case .getMemory: return MCPMemory.get(a["app"] as? String ?? "", world)
         case .setMemory: return try MCPMemory.set(a, world)
+        case .translateText: return try MCPTranslate.run(a, world)
         case .getSettings: return MCPSettings.get(a["keys"] as? [String], world)
         case .setSettings: return try MCPSettings.set(a["values"] as? [String: Any] ?? [:], world)
-        case .getSettingsSchema: return MCPSettings.schema()
+        case .getSettingsSchema: return MCPSettings.schema(key: a["key"] as? String)
         }
     }
 
@@ -145,8 +172,11 @@ enum MCPTool: String, CaseIterable {
 
 /// One line of the translation log, as `TranscriptFormat.jsonlLine` writes it.
 struct MCPLogLine {
+    /// Where the line stands in the whole log, oldest first, from 1: the same number in every tool, so a row read in one can be named in another.
+    var id = 0
     var time: Date
     var timeText: String
+    var lens: String
     var app: String?
     var source: String
     var target: String
@@ -160,6 +190,7 @@ struct MCPLogLine {
               let original = object["original"] as? String, let translation = object["translation"] as? String else { return nil }
         self.time = time
         self.timeText = timeText
+        lens = object["lens"] as? String ?? ""
         app = object["app"] as? String
         source = object["source"] as? String ?? ""
         target = object["target"] as? String ?? ""
@@ -168,9 +199,6 @@ struct MCPLogLine {
         self.translation = translation
     }
 
-    var json: [String: Any] {
-        ["time": timeText, "app": app ?? NSNull(), "source": source, "target": target, "engine": engine, "original": original, "translation": translation]
-    }
 }
 
 /// Why there is no log to read, and what to do about it. The words an agent hands on to the person.
@@ -198,8 +226,10 @@ enum MCPLogGap {
 
 /// The JSON Lines files the lenses write to `<folder>/Transcripts` (`TranscriptWriter`).
 enum MCPLog {
-    static let defaultLimit = 200
-    static let maxLimit = 2000
+    static let defaultLimit = 50
+    static let maxLimit = 500
+    /// The most terms `term_renderings` takes in one call.
+    static let maxTerms = 50
 
     /// Every line of the log, oldest first, and how many lines could not be read (one being written when the file was read).
     struct Loaded {
@@ -237,6 +267,7 @@ enum MCPLog {
         }
         // Ties keep the order of the files, which `sorted` alone does not promise.
         loaded.lines = read.enumerated().sorted { ($0.element.time, $0.offset) < ($1.element.time, $1.offset) }.map(\.element)
+        for i in loaded.lines.indices { loaded.lines[i].id = i + 1 }
         return loaded
     }
 
@@ -281,26 +312,6 @@ enum MCPLog {
         var info: [String: Any] = ["available": log.gap == nil, "lines": log.lines.count, "withoutApp": log.lines.filter { $0.app == nil }.count]
         if let gap = log.gap { info["reason"] = gap.message }
         return ["log": info, "loggedApps": loggedApps, "profiles": withProfile]
-    }
-
-    static func read(_ a: [String: Any], _ world: MCPWorld) throws -> [String: Any] {
-        let settings = world.settings()
-        let log = load(settings)
-        if let gap = log.gap { throw MCPToolError(gap.message) }
-        var since: Date?
-        if let text = a["since"] as? String {
-            guard let date = parseTime(text) else {
-                throw MCPToolError("read_translation_log was not run: since: \"\(text)\" is not an ISO 8601 time with a zone, such as 2026-10-20T09:00:00+09:00")
-            }
-            since = date
-        }
-        let app = a["app"] as? String
-        let limit = (a["limit"] as? NSNumber)?.intValue ?? defaultLimit
-        let matching = log.lines.filter { (app == nil || $0.app == app) && $0.time >= (since ?? .distantPast) }
-        let newest = matching.suffix(limit)
-        var result: [String: Any] = ["lines": newest.map(\.json), "returned": newest.count, "matching": matching.count, "skipped": log.skipped]
-        if !settings.savesTranscripts { result["note"] = "Save transcripts is off now: these lines were written earlier." }
-        return result
     }
 }
 
@@ -365,8 +376,11 @@ enum MCPSettings {
         return ["settings": Dictionary(wanted.compactMap { key in all[key].map { (key, $0) } }, uniquingKeysWith: { first, _ in first })]
     }
 
-    static func schema() -> [String: Any] {
-        (try? JSONSerialization.jsonObject(with: SettingsSchema.data())) as? [String: Any] ?? [:]
+    /// The schema of settings.json, or with a key the schema of that setting alone (each is self-contained: the file's schema has no references).
+    static func schema(key: String? = nil) -> [String: Any] {
+        let whole = (try? JSONSerialization.jsonObject(with: SettingsSchema.data())) as? [String: Any] ?? [:]
+        guard let key else { return whole }
+        return ["key": key, "schema": (whole["properties"] as? [String: Any])?[key] ?? NSNull()]
     }
 
     /// `values` has been read against the settings' own kinds already. The file reader then applies it over the file, the way the app's
@@ -450,15 +464,16 @@ enum MCPMemory {
             throw MCPToolError("set_memory could not write \(world.settingsURL.path); nothing changed")
         }
 
+        // What changed, by name, and how many names the memory holds now: the agent has the rows it sent, and get_memory returns the memory.
         let was = Dictionary(before.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         let kept = Set(profile.entries.map(\.id))
-        var result = json(profile)
-        result["created"] = existing == nil
-        result["mode"] = mode.rawValue
-        result["added"] = profile.entries.filter { was[$0.id] == nil }.map(\.src)
-        result["updated"] = profile.entries.filter { e in was[e.id].map { $0 != e } ?? false }.map(\.src)
-        result["removed"] = before.filter { !kept.contains($0.id) }.map(\.src)
-        result["issues"] = issues
+        var result: [String: Any] = ["app": bundleID, "appName": profile.appName, "source": profile.source, "target": profile.target,
+                                     "entries": profile.entries.count, "created": existing == nil, "mode": mode.rawValue]
+        let changes = [("added", profile.entries.filter { was[$0.id] == nil }.map(\.src)),
+                       ("updated", profile.entries.filter { e in was[e.id].map { $0 != e } ?? false }.map(\.src)),
+                       ("removed", before.filter { !kept.contains($0.id) }.map(\.src))]
+        for (key, names) in changes where !names.isEmpty { result[key] = names }
+        if !issues.isEmpty { result["issues"] = issues }
         return result
     }
 }

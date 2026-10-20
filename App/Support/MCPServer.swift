@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import MwoyeoCore
+import MwoyeoEngines
 
 /// `Mwoyeo --mcp`: the Model Context Protocol on stdin and stdout, so an agent (Claude Code and the like) reads the translation
 /// log and writes an app's memory through the app's own code instead of by hand in settings.json. The same executable runs in the
@@ -116,17 +117,23 @@ final class MCPServer {
 
     static var offMessage: String { "Agent connection is off. Turn it on in Mwoyeo Settings → \(MCPSettings.switchLabel)." }
 
+    /// The workflow, in the words an agent reads once at the start. One short paragraph per step; the tools' own descriptions hold the rest.
     static let instructions = """
-        Mwoyeo translates text on the screen. These tools read its translation log, write the memory of one app (the names and terms that app's text must keep, \
-        and a note for the translator) and read and change its settings. Start with list_apps, read the log of an app with read_translation_log, then write its \
-        memory with set_memory. The glossary setting is for every app; an app's own names go in its memory.
+        Mwoyeo translates text on the screen. Use these tools to make an app's names and terms come out the same on every line.
+        1. list_apps: the apps in the translation log; its bundle IDs are the app argument of the other tools.
+        2. read_translation_log: the newest lines of one app. For names you already suspect, term_renderings shows how each was translated, at a fraction of the size.
+        3. set_memory (mode merge): write the app's names and a note for the translator. The glossary setting is for every app; one app's names go in its memory.
+        4. translate_text: translate a few lines the way the lens does, with that memory, to check the fix.
+        Results are compact JSON: values that never vary sit once in a header, and a row is an array named by columns.
         """
 
     // MARK: replies
 
-    /// A tool's result: the structured content and, for a client that reads only text, the same as compact JSON.
-    private static func success(_ structured: [String: Any]) -> [String: Any] {
-        ["content": [["type": "text", "text": json(structured)]], "structuredContent": structured]
+    /// A tool's result: one text block of compact JSON, and no `structuredContent`. A client that reads the structured copy (Claude Code does,
+    /// and then ignores the text) or the text (the others) gets the payload once; both would send it twice over the wire and, for a client
+    /// that reads both, into the agent's context twice.
+    private static func success(_ result: [String: Any]) -> [String: Any] {
+        ["content": [["type": "text", "text": json(result)]]]
     }
 
     private static func failure(_ message: String) -> [String: Any] {
@@ -157,12 +164,14 @@ final class MCPServer {
 // MARK: - what the server touches
 
 /// The server's surroundings, so a check can point it at scratch files: where settings.json is, the preferences' copy of the settings
-/// (where the folder bookmark lives, and the whole of the settings when there is no file yet) and how an app's name is found.
+/// (where the folder bookmark lives, and the whole of the settings when there is no file yet), how an app's name is found and where the
+/// engines' API keys are (the Keychain, as for the app).
 struct MCPWorld {
     var settingsURL: URL
     var saved: () -> AppSettings
     /// The name of the app with this bundle ID, nil when none is installed.
     var appName: (String) -> String?
+    var secrets: any SecretStore = KeychainSecrets()
 
     /// The real surroundings, the way the app itself sees them (`SettingsFileStore.defaultURL`, `AppModel`'s preferences).
     static func live() -> MCPWorld {
@@ -171,9 +180,15 @@ struct MCPWorld {
         #else
         let defaults = ProcessInfo.processInfo.environment["MWOYEO_DEFAULTS_SUITE"].flatMap { UserDefaults(suiteName: $0) } ?? .standard
         #endif
+        // The keys are where the app keeps them (`AppModel`): the Keychain, and in a check run memory only.
+        #if MAS
+        let secrets: any SecretStore = KeychainSecrets()
+        #else
+        let secrets: any SecretStore = ProcessInfo.processInfo.environment["MWOYEO_MEMORY_SECRETS"] != nil ? MemorySecrets() : KeychainSecrets()
+        #endif
         return MCPWorld(settingsURL: SettingsFileStore.defaultURL,
                         saved: { defaults.data(forKey: "settings").flatMap { try? JSONDecoder().decode(AppSettings.self, from: $0) } ?? AppSettings() },
-                        appName: installedName)
+                        appName: installedName, secrets: secrets)
     }
 
     static func installedName(_ bundleID: String) -> String? {

@@ -58,7 +58,7 @@ Also: [settings-translation] and [settings-general] at defaults, [settings-gener
 
 ## 4. Vision checklist (each item yes/no or a number; the captures of §3)
 1. L0 [settings-translation, settings-general]: Translation shows exactly Translation engine, Apple Translation language packs,
-   Translation memory, Glossary; neither capture shows Restore Defaults.
+   Recent translations, Glossary; neither capture shows Restore Defaults.
 2. L0 [menu-default, lens-menu-l0]: no caption under the language bar, no engine menu; the lens menu has no "Profile" item and equals
    nameslens' list.
 3. L1 [sheet-l1]: Names and terms is the first section; Customize is one collapsed row with a one-line summary; at 640 pt no

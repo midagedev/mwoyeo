@@ -220,7 +220,12 @@ The user, 2026-10-21: "ui 잘 만들어줘. 직관적이어야 하고, 기본은
 capture scripts) and the vision checklist of R4 and R9 are in `profiles-ui-checklist.md`.
 
 ### 6.1 Three levels, on every screen
-- **L0, nothing set up** (no profile, no added engine, every preference default): each screen is today's, item for item (below).
+- **L0, nothing set up** (no profile, no added engine, every preference default): today's screens improved per the ui-audit
+  (R4a, 2026-10-21, ids from `ui-audit-1-1-5.md`; the user: "전후가 완전히 같아야 한다가 아니라 애플 디자인에 의거 개선하는 작업"),
+  with no new control unless listed. Allowed at L0: removing a row or button that cannot act,
+  hit areas ≥ 22 × 22 pt (X1, 2.1), secondary for tertiary text (X2), captions as row subtitles (3.1), regrouping (3.3-3.4),
+  renamed labels (1.3, 3.6, 4.1, 4.2, 5.1, 8.1-8.3, 9.1), keyboard shortcuts with no visible change (1.2). New visible
+  controls: none. The only new text is 9.2's sheet title and 5.2's two slider end labels.
 - **L1, after the one natural thing** (write a name from a lens, add an engine, write a glossary line): only what that act made
   appears, in its words: the names, the profile they made and its picker, the engine's rows. Both sheets are L1: reached only by an act.
 - **L2, sought**: every other option sits behind one explicit control where it takes effect (a disclosure row whose label says what
@@ -230,12 +235,15 @@ capture scripts) and the vision checklist of R4 and R9 are in `profiles-ui-check
   "chain", "head", "regex", "mode" stay in settings.json, MCP and this file. A menu item that cannot act is dimmed, a Settings row
   that cannot act is not drawn; no popovers (a warning is a caption on its row); no sheet over a sheet (a link out closes it first).
 
-| Screen | L0 (= today) |
+| Screen | L0 (today, improved) |
 |---|---|
-| Menu bar panel | header, language bar (no engine menu), lens rows or "No lenses yet", Add Lens, footer; no profile caption |
-| Lens menu | Show Original … Save Lens Image; nameslens' names line, "Memory for <App>…", "Remember Languages for <App>" |
-| Settings › Translation | Translation engine, Apple Translation language packs, Translation memory, Glossary; no Profiles section |
-| Other tabs | today's, but no Restore button while a tab is all defaults (§9): Shortcuts' no-op button goes, the one L0 change |
+| Menu bar panel | header (no status line at 0 lenses, 1.4), language bar (no engine menu), lens rows or "No lenses yet", Add Lens, footer: Show Original dimmed at 0 lenses (1.1), icons 22 pt (X1); no profile caption |
+| Lens menu | today's items: Show Original … Save Lens Image; nameslens' names line, "Memory for <App>…", "Remember Languages for <App>"; pill targets 22 pt (2.1) |
+| Settings › General | Open at login first (3.3); Languages; Display with Style + subtitle (3.1, 3.6); Performance; Saving, Folder only while on (3.5); Advanced (3.4); no accent on labels (3.2) |
+| Settings › Translation | Translation engine (no "Engine" label, 4.3), Apple Translation language packs, Recent translations (4.1), Glossary; no Profiles section |
+| Appearance, About | today's + Color (5.1), Opacity ends (5.2), aligned privacy lines (7.1), secondary version text (X2) |
+| Shortcuts | today's, no Restore button while all defaults (§9) |
+| Onboarding | today's cards; "Try It Now" is the default, "Done" closes (8.1); the Languages line names no Settings path (8.2) |
 
 ### 6.2 Settings › Translation › Profiles (replaces "App profiles", `App/UI/SettingsView.swift:227-265`)
 - **L1**, shown while a profile exists. Row 1 "All apps", subtitle "Everywhere else · <pair> · glossary n"; then the profiles in list

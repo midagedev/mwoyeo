@@ -1,0 +1,19 @@
+Building for production...
+[Planning deferred tasks]
+[17 / 22] snap-product
+[85 / 89] snap-product
+[87 / 89] snap-product
+[88 / 89] snap-product
+Build complete! (10.23초)
+Building for production...
+[Planning deferred tasks]
+[12 / 24] MwoyeoCore
+[15 / 26] MwoyeoCore
+[21 / 26] ocrdump-product
+[22 / 27] MwoyeoCore
+[22 / 27] ocrdump-product
+[38 / 42] ocrdump-product
+[40 / 42] ocrdump-product
+[41 / 42] ocrdump-product
+[42 / 42] ocrdump-product
+Build complete! (53.44초)

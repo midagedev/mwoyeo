@@ -1,0 +1,3 @@
+5c25067:Core/Tests/MwoyeoCoreTests/ReaderDiskTests.swift:10:/// The fakes are the real `MWOYEO_FAKE_READER` grammar (`lines-nospace:<n>`: the first n 
+5c25067:Core/Tests/MwoyeoCoreTests/ReaderHostTests.swift:7:/// (`MWOYEO_FAKE_READER`), same shipped durations (`ReaderTiming.standard`); the clock jum
+5c25067:Core/Tests/MwoyeoCoreTests/ReaderHostWorld.swift:5:/// `MWOYEO_FAKE_READER` (the real `ReaderFakePlan`, so a gate's spec string is the test's)

@@ -73,9 +73,29 @@ own developer content, with labels known by construction. Results: `RESULTS-h2-2
 - **Own labels dir.** `labels-h2/` holds H2 alone (set `h2` in rules_report.py's SOURCES, not under `hold`), so `run-rules.sh` on `labels/` is unchanged.
 - **Vision is not byte-stable across cache states** (bench-id-cache): warm the binary with one pass, then compare legs.
 
+## H3: a second hold-out (round h3, 2026-10-20)
+
+H2 turned into a development set when the five defects it showed were fixed. H3 is a fresh hold-out for those fixes, built with the H2 machinery (`h2.py` draws, `h2_labels.py --set h3`
+labels; `h2.py main(<scenes module>)` and `--set` are the only parameters added, and H2's generator output stays byte-identical to its pre-h3 digests, `h3/h2-generator.sha256`).
+68 screens (38 scenes, ko 18 / ja 16 / en 16 / zh-Hans 18, 57 code regions) in 15 looks that H2 does not have: terminal (`term-solarized`, `term-green`), editor (`ide-solar`, and `pane-*`, a narrow editor in a side panel
+whose lines wrap), browser page (`md-sepia`, `md-night`, and `docs-*`, a docs site with a left nav and a contents list), chat (`chat-dark-plain` with untinted inline code, `chat-mint`), `review-*` (a code review page: old and new line-number gutters, sign column, a commit panel with hashes)
+and `card-*` (notification-sized cards); monospace faces Andale Mono, PT Mono, Courier, Menlo, Monaco, SF Mono.
+
+    ./make-h3.sh                  # h3.py (html + units) -> snap -> ocrdump through tools/ane-env.sh run pool -> h2_labels.py --set h3 -> labels-h3/h3.jsonl  (set KEEP_WORK and KEEP_BUILD)
+    ./test_h3.sh [A/h3 B/h3]      # determinism, frozen manifest, label test on a fake OCR, independence, H2 unchanged, two legs; every check has its FAIL-first line
+    python3 -B -I h3_size.py labels-h3/h3.jsonl            # sizes, words by class, keep words per reason with the `thin` flag
+    H3_WORK=<KEEP_WORK of a make-h3.sh run> KEEP_BUILD=<dir> ./run-h3.sh <scratch dir>     # the unchanged report tools on H3 (labels copied to a scratch dir as `h2`, so the headings say H2)
+
+- **New material.** `h3_scenes.py` reads files and fixtures H2 did not use, at the pinned commit `5c25067` (every code line verified): `scripts/mas.sh`, `release.sh`, `setup-release-secrets.sh`, `stats.py`, `ExportOptions-MAS.plist`, `Config/MAS.xcconfig`,
+  three Core tests (none of the keep / translate ones), entries of `App/Resources/Localizable.xcstrings` (real ko / ja / zh-Hans values), `docs/settings-for-agents.md`, `CONTRIBUTING.md`, `README.zh-CN.md`, `tools/engine-bench`, `tools/mock-openai`; tool outputs captured once by
+  `h3/capture.sh` into `h3/src/*.txt` (git diff / show --stat / blame / grep of midagedev's commits that H2 did not show, a swift build, `ls -l`, the bench report); `nl -ba` rows (the number is its own unit, keep lineno, inside a block with letters); flag, hotkey (plain text keys), id, path and hash tables; url lists.
+- **Labels by construction** as H2 (units with the author's class; `truth.py` is not called). Frozen: `h3/MANIFEST.tsv` (written before any Vision read; `make-h3.sh` and `test_h3.sh` refuse a different one).
+- **Independence.** `h3_independence.py`: no k-case passage, no excluded source, no source or unit of H2 (units of 4+ words), none of the rule code or keep tests (InlineMath, Text, CodeRegion, TranslationFilter and their tests). `RESULTS-h3-build-2026-10-20.txt` has sizes and counts, no rule result; the rules are not measured on H3 here.
+- **Vision reads Latin runs of a CJK page as single characters** (the ja / zh-Hans document reads cut `https://...` into one word per character): word counts of the url slice are ja / zh-Hans dominated; read them by language.
+
 ## Files
 
-`truth.py` word truth rules | `label.py`, `code_labels.py` labellers | `h2.py`, `h2_scenes.py`, `h2_labels.py`, `h2_report.py` the H2 screens, their labels and report | `rules_report.py` the report | `Sources/keeprules` Core rules on
+`truth.py` word truth rules | `label.py`, `code_labels.py` labellers | `h2.py`, `h2_scenes.py`, `h2_labels.py`, `h2_report.py` the H2 screens, their labels and report | `h3.py`, `h3_scenes.py`, `h3_looks.py`, `h3_independence.py`, `h3_size.py`, `run-h3.sh` the H3 screens, looks, checks and report wrapper | `rules_report.py` the report | `Sources/keeprules` Core rules on
 every block | `Sources/ocrdump` both Vision reads of the app (`VisionExec.swift` linked from `Shared/`) | `Sources/snap` HTML -> picture.
 
 Record kinds (JSONL): `paper` header (schema 2, `word_fields`, counts, regions), `block` (id, read, rect, text, `keep` class, `reason`, stats, words

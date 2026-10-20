@@ -1,0 +1,8 @@
+total 64
+-rwxr-xr-x@ 1  dev  staff   757 Oct 20 08:49 cask.sh
+-rw-r--r--@ 1  dev  staff   689 Oct 20 08:49 ExportOptions-MAS.plist
+-rwxr-xr-x@ 1  dev  staff  4149 Oct 20 08:49 mas-env-scan.py
+-rwxr-xr-x@ 1  dev  staff  3748 Oct 20 08:49 mas.sh
+-rwxr-xr-x@ 1  dev  staff  4022 Oct 20 08:49 release.sh
+-rwxr-xr-x@ 1  dev  staff  2304 Oct 20 08:49 setup-release-secrets.sh
+-rw-r--r--@ 1  dev  staff  3977 Oct 20 08:49 stats.py

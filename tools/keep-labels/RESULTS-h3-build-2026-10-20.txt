@@ -1,0 +1,96 @@
+H3: a fresh keep hold-out, built and frozen before the rule fixes land (round h3, 2026-10-20)
+
+WHAT IT IS  A second hold-out for the keep boundary, built with the H2 machinery (h2.py draws, h2_labels.py --set h3 labels) from material H2 did not use. Round k3b fixes the
+  five rule defects H2 showed, with H2 as its dev set; H3 is the set those fixes have not seen. This file has sizes and counts only: no rule was measured on H3 in this round
+  (the report pipeline was run once on today's main as a sanity row of run-h3.sh into a scratch dir, not shown here).
+BUILT FROM  main 5c25067 (pinned: every repo excerpt is read with `git show 5c25067:<path>`). Labels = leg A of three Vision legs (see DETERMINISM).
+
+FROZEN MANIFEST  tools/keep-labels/h3/MANIFEST.tsv, sha256 4f5b716fb50acf0bbe78d9454b30ce7ca4e39f5bacd02c0d412840e90460956f (132 lines: every source with the sha256 of the text read or
+  the exact command, every scene, every screen with its look, monospace face and the language given to ocrdump). Written 2026-10-20 09:14:27; leg A (the first Vision read) started at ~09:15, after it;
+  make-h3.sh and test_h3.sh refuse a different manifest. h3_scenes.py (sha256 1d0e551157e5...) was not edited after the freeze;
+  h3_looks.py lost one unused import afterwards (generator output byte-identical, checked with diff -r) and has sha256 02a84b2d7b3c....
+  Tool-output fixtures (h3/src, captured once by h3/capture.sh): bench-report 23e013011ae7, git-blame f156d6a120c5, git-diff-perm cf214911d17f, git-diff-settings 734fc5e53d47,
+  git-grep 7eb410bb0d4c, git-show-stat 6d1c7a1673ed, ls-scripts 3828705cc94a, swift-build c30345f59e8b (sha256 prefixes; full values in the manifest).
+
+SOURCES (none in h2/MANIFEST.tsv, none of the k-cases, RESULTS-*, CODE-FEATURES-*, CodeRegion.swift, nor of the rule code and keep tests named in addendum A1.2)
+  repo files at the pin: scripts/mas.sh, release.sh, setup-release-secrets.sh, stats.py, ExportOptions-MAS.plist; Config/MAS.xcconfig; Core/Tests/MwoyeoCoreTests/HTTPTemplateTests.swift,
+  MenuBarIconTests.swift, PaceStatsTests.swift; App/Resources/Localizable.xcstrings (entries and the app's own ko / ja / zh-Hans / en strings); docs/settings-for-agents.md;
+  CONTRIBUTING.md; README.zh-CN.md (passages checked against the file); tools/engine-bench/README.md; tools/mock-openai/README.md.
+  tool outputs: git diff b459840~1 b459840, git diff 63d28f6~1 63d28f6 (first 44 lines), git show --stat 3871352, git blame -L 14,33 scripts/release.sh, git grep -n MWOYEO_FAKE_READER
+  -- Core/Tests, the bench report of tools/engine-bench, ls -l scripts, swift build of two products (only midagedev commits; none of the twelve commits H2's git log showed).
+  authored for the scene: the Korean / Japanese / Chinese / English prose, comments of the excerpts (ko / ja / zh), chats, review comments, commit-table summaries, flag / id / file
+  descriptions, hotkey tables (plain-text keys: Ctrl+C, Cmd+T ...), notification cards (two of the four cards of a screen are the app's own strings).
+  Labels by construction as H2: the class the author gives a unit (code line, command, log line, config line, path, hotkey, hash, flag, id, url chip = keep with its reason; every
+  unmarked token of a heading, paragraph, item, cell, window text = translate; names, times, numbers, CJK program output = either); truth.py's shape rules are not called.
+
+LOOKS  15, none of them one of H2's 11: term-solarized, term-green (terminal families); ide-solar, pane-dark, pane-light (editor; pane = a narrow editor in a side panel, lines wrap);
+  md-sepia, md-night (browser page), docs-light, docs-dark (docs site with a left nav, a contents list and a footer); chat-dark-plain (untinted inline code on a dark chat), chat-mint;
+  review-light, review-dark (code review page: old / new line-number gutters, sign column, commit panel with hashes, comment thread); card-light, card-dark (notification-sized cards,
+  440 px). Every H2 family is re-styled at least once (term: solarized, green; ide: solar; md: sepia, night; chat: dark-plain, mint). Monospace faces: Andale Mono, PT Mono, Courier,
+  Menlo, Monaco, SF Mono (H2: Menlo, SF Mono, Monaco, Courier New).
+LANGUAGES  ko 18, ja 16, en 16, zh-Hans 18 screens (the lang column of index.tsv is the language given to ocrdump).
+
+SIZE AND COUNTS (python3 -B -I h3_size.py labels-h3/h3.jsonl; "scored" = keep words in blocks that have a letter: a block with no letter, e.g. an IDE gutter, is left out of the rule
+  scores as for every source; thin = fewer than 40 scored keep words)
+screens 68 (scenes 38, looks 15, languages {'en': 16, 'ja': 16, 'ko': 18, 'zh-Hans': 18}), code regions 57
+looks: card-dark 2, card-light 2, chat-dark-plain 1, chat-mint 2, docs-dark 6, docs-light 8, ide-solar 4, md-night 8, md-sepia 8, pane-dark 3, pane-light 4, review-dark 4, review-light 4, term-green 5, term-solarized 7
+read doc: blocks 3064 {'either': 97, 'keep': 1677, 'mixed': 160, 'none': 277, 'translate': 853}; words {'either': 809, 'keep': 9882, 'none': 964, 'translate': 7302}; uncertain words 1900
+  keep words by reason (all blocks) {'code': 5194, 'url': 1841, 'config': 579, 'log': 500, 'cmd': 427, 'lineno': 369, 'path': 230, 'id': 212, 'diffmark': 193, 'flag': 121, 'hash': 115, 'hotkey': 101}
+  keep words by reason (blocks with a letter, the scored ones) {'code': 5190, 'url': 1841, 'config': 569, 'log': 472, 'cmd': 426, 'path': 230, 'id': 212, 'diffmark': 181, 'flag': 121, 'hotkey': 101, 'hash': 99, 'lineno': 5}
+  either words by reason {'punct': 377, 'number': 184, 'name': 159, 'cjk-output': 89}
+  reasons under 40 scored keep words (thin, no verdict): ['lineno']
+  keep words by lang: {'en': 1752, 'ja': 3827, 'ko': 1569, 'zh-Hans': 2734}
+  keep words by look: {'card-dark': 23, 'card-light': 17, 'chat-dark-plain': 11, 'chat-mint': 96, 'docs-dark': 720, 'docs-light': 645, 'ide-solar': 454, 'md-night': 1203, 'md-sepia': 972, 'pane-dark': 265, 'pane-light': 357, 'review-dark': 1703, 'review-light': 2153, 'term-green': 515, 'term-solarized': 748}
+read vn: blocks 2462 {'either': 95, 'keep': 1171, 'mixed': 209, 'none': 153, 'translate': 834}; words {'either': 868, 'keep': 13811, 'none': 605, 'translate': 7528}; uncertain words 1949
+  keep words by reason (all blocks) {'code': 8262, 'url': 2512, 'config': 725, 'log': 530, 'cmd': 388, 'lineno': 360, 'diffmark': 251, 'path': 234, 'id': 172, 'flag': 154, 'hash': 118, 'hotkey': 105}
+  keep words by reason (blocks with a letter, the scored ones) {'code': 8233, 'url': 2512, 'config': 722, 'log': 504, 'cmd': 388, 'path': 234, 'diffmark': 232, 'id': 172, 'flag': 154, 'hotkey': 105, 'hash': 103, 'lineno': 16}
+  either words by reason {'punct': 414, 'number': 198, 'name': 151, 'cjk-output': 105}
+  reasons under 40 scored keep words (thin, no verdict): ['lineno']
+  keep words by lang: {'en': 1779, 'ja': 5048, 'ko': 1560, 'zh-Hans': 5424}
+  keep words by look: {'card-dark': 14, 'card-light': 17, 'chat-dark-plain': 11, 'chat-mint': 100, 'docs-dark': 884, 'docs-light': 953, 'ide-solar': 822, 'md-night': 1547, 'md-sepia': 1240, 'pane-dark': 328, 'pane-light': 559, 'review-dark': 2845, 'review-light': 2879, 'term-green': 740, 'term-solarized': 872}
+
+KEEP WORDS BY REASON AND LANGUAGE (doc read, scored blocks)
+code      {'ko': 1153, 'ja': 1839, 'en': 979, 'zh-Hans': 1219}
+cmd       {'ko': 42, 'ja': 142, 'en': 52, 'zh-Hans': 190}
+log       {'ko': 1, 'ja': 50, 'en': 421, 'zh-Hans': 0}
+config    {'ko': 100, 'ja': 167, 'en': 72, 'zh-Hans': 230}
+path      {'ko': 37, 'ja': 60, 'en': 31, 'zh-Hans': 102}
+id        {'ko': 32, 'ja': 93, 'en': 23, 'zh-Hans': 64}
+flag      {'ko': 31, 'ja': 43, 'en': 19, 'zh-Hans': 28}
+url       {'ko': 28, 'ja': 1148, 'en': 31, 'zh-Hans': 634}
+hash      {'ko': 26, 'ja': 21, 'en': 26, 'zh-Hans': 26}
+hotkey    {'ko': 26, 'ja': 26, 'en': 22, 'zh-Hans': 27}
+diffmark  {'ko': 17, 'ja': 82, 'en': 17, 'zh-Hans': 65}
+lineno    {'ko': 1, 'ja': 3, 'en': 0, 'zh-Hans': 1}
+translate words (scored blocks) {'ko': 899, 'ja': 2935, 'en': 1311, 'zh-Hans': 2157}
+
+READ THIS BEFORE USING THE COUNTS
+  - url: the ja and zh-Hans document reads cut a Latin run into one word per character ("h" "t" "t" "p" "s" ":" "/" "/" ...), so the url slice by words is ja / zh-Hans dominated (above: ja 1148,
+    zh-Hans 634, ko 28, en 31 words). Every slice has more words on ja / zh-Hans pages than on ko / en pages (code: ja 1839, ko 1153), partly for the same reason: read each slice by language too.
+  - lineno is thin in the scored sense, as in H2: the document read puts the number column of an `nl -ba` listing and the gutters in blocks of their own, no letter (inferred from the counts). The units exist
+    (369 lineno words in all blocks); the scored ones are 5 (doc) / 16 (vn).
+  - unlabelled words ("none"): 964 of 18957 doc words (5.1 %): OCR garbage the construction does not list (garbled strings in the tall ja / zh-Hans pages: 86 words in cli-zh.docs-light, 60 in cli-ja.md-sepia, 52 in
+    review-ja.review-light); they are not scored. Words of `uncertain` units (comment lines of code regions, bare paths in sentences): 1900 doc / 1949 vn.
+  - hotkey: the hotkeys are written as plain text (Ctrl+C, Cmd+T), so Vision reads them: 101 hotkey words (doc), H2 had 0 (modifier glyphs are not read).
+
+DETERMINISM (test_h3.sh, full output in the round report; every check has its FAIL-first line)
+  generator twice: byte-identical files (138 files; diff -r), FAIL-first: H2_MUTATE=1 output differs.
+  manifest: the generator's MANIFEST.tsv equals h3/MANIFEST.tsv; FAIL-first: a changed fixture changes it.
+  label pass twice on the same reads: byte-identical (leg A 8841 lines, leg B 8845 lines); FAIL-first: one added byte differs under cmp.
+  three Vision legs (fresh KEEP_WORK each: fresh html, pictures, Vision reads; the same binary and pool id):
+      A vs B  2 of 68 screens differ (nl-ja.term-green: a command line cut in two blocks; secrets-zh.md-night: one letter read differently); doc keep words 9882 vs 9884
+      A vs C  1 of 68 screens differ; doc keep words 9882 vs 9881
+      B vs C  3 of 68 screens differ; doc keep words 9884 vs 9881
+      Against H2's tolerance (<= 2 screens, headline keep within 1 word): A vs B is at the screen bar and 1 word over the word bar (2 words); A vs C is within both; B vs C is over.
+      The labels in the repo are leg A, the first read, which is within the screen bar of both other legs. The doc read of Vision is not byte-stable on the same picture
+      (H2: 1, 1 and 2 screens of 46 between three legs; here 2, 1 and 3 of 68).
+  FAIL-first of the leg check: a leg with the blocks of 6 screens altered differs on 8 screens (more than 2).
+INDEPENDENCE (h3_independence.py): 847 0 0 602 0 0 0 (k-case units checked, overlaps, excluded sources, H2 units checked, overlaps, sources shared with H2, rule-code sources)
+  FAIL-first lines: a unit copied from a k-case, a unit copied from an H2 screen, CodeRegion.swift among the sources: each is reported (exit 1).
+H2 UNCHANGED  h2.py got a parameter for the scene module, zh-Hans words of the IDE chrome and a `boxed` key of a theme; h2_labels.py got --set (default h2). H2's generator output is
+  byte-identical to its pre-h3 digests (94 files, h3/h2-generator.sha256), and h2_labels.py without --set equals --set h2 (test_h3.sh); test_h2.sh: ALL PASS.
+
+FILES (tools/keep-labels): h3.py, h3_scenes.py, h3_looks.py, h3_independence.py, h3_size.py, make-h3.sh, run-h3.sh, test_h3.sh, test_h3_labels.py, h3/{MANIFEST.tsv,capture.sh,h2-generator.sha256,src/*.txt},
+  labels-h3/h3.jsonl (sha256 00e402958c1b1110374bd63df30ef98fef8db16ae9ae04c51b080cf4627b97b9, 4.7 MB), README.md (an H3 paragraph and the Files line), h2.py and h2_labels.py (the helpers above).
+HOW TO RUN THE RULES ON H3 (the lead, after both rounds land): H3_WORK=<KEEP_WORK of a make-h3.sh run> KEEP_BUILD=<dir> ./run-h3.sh <scratch dir>  (the unchanged rules_report.py / h2_report.py;
+  the headings say H2). Pictures and reads of this round's three legs: /tmp/h3/legA, legB, legC (h3/ inside; not in the repo).

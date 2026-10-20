@@ -1,0 +1,11 @@
+3871352 App previews: real takes of the demo chat (take.sh, takes.sh, drive.swift releases every modifier it presses), cut.sh trims and captions them to 1920x1080 30 fps H.264, motion.py fails a beat that stands still too long
+
+ tools/app-store/previews/.gitignore    |   1 +
+ tools/app-store/previews/caption.html  |  27 ++++++
+ tools/app-store/previews/captions.json |   4 +
+ tools/app-store/previews/cut.sh        |  98 ++++++++++++++++++++
+ tools/app-store/previews/drive.swift   | 267 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tools/app-store/previews/motion.py     |  74 +++++++++++++++
+ tools/app-store/previews/take.sh       | 135 +++++++++++++++++++++++++++
+ tools/app-store/previews/takes.sh      |  13 +++
+ 8 files changed, 619 insertions(+)

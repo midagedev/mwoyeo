@@ -1,0 +1,14 @@
+| engine | where | warm median s / 3-line batch | p90 s | cold s | quality 1-5 | failures / lines |
+|---|---|---|---|---|---|---|
+| apple-low-latency | this Mac | 0.15 | 0.41 | 4.30 | 3.4 | 0/108 |  (zh-Hans-ko: pack not installed)
+| apple-high-fidelity | this Mac | 3.61 | 4.27 | 6.90 | 3.4 | 0/108 |  (zh-Hans-ko: pack not installed)
+| gemini-3.1-flash-lite | cloud | 1.27 | 2.27 | 1.11 | 4.6 | 0/144 |
+| gemini-3.5-flash-lite | cloud | 0.91 | 3.31 | 1.25 | 4.3 | 3/144 |
+| gpt-4o-mini | cloud | 1.00 | 1.23 | 1.34 | 4.1 | 0/144 |
+| gpt-5.4-mini | cloud | 1.09 | 1.34 | 0.79 | 4.7 | 0/144 |
+| gpt-5.6-luna | cloud | 1.35 | 1.59 | 1.15 | 4.8 | 0/144 |
+| deepl | cloud | 0.88 | 0.93 | 0.94 | 4.6 | 0/144 |
+| claude-haiku-5-5 | cloud | 1.12 | 1.79 | 1.19 | 4.6 | 0/144 |
+| claude-sonnet-5-5 | cloud | 1.43 | 1.56 | 1.29 | 4.7 | 0/144 |
+| translategemma:4b | this Mac | 1.00 | 1.52 | 6.06 | 3.6 | 0/144 |
+| qwen3.5:2b | this Mac | 0.83 | 1.07 | 31.89 | 2.0 | 81/144 |

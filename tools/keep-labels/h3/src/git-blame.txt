@@ -1,0 +1,20 @@
+46899b01 (midagedev 2026-10-15 14) 
+46899b01 (midagedev 2026-10-15 15) VERSION=${1:?usage: scripts/release.sh <version> [--publish]}
+46899b01 (midagedev 2026-10-15 16) PUBLISH=${2:-}
+46899b01 (midagedev 2026-10-15 17) ROOT=${0:A:h:h}
+46899b01 (midagedev 2026-10-15 18) OUT=$ROOT/build/release
+4e56f2cb (midagedev 2026-10-15 19) APP=$OUT/dd/Build/Products/Release/Mwoyeo.app
+4e56f2cb (midagedev 2026-10-15 20) DMG=$OUT/Mwoyeo-$VERSION-arm64.dmg
+4e56f2cb (midagedev 2026-10-15 21) IDENTITY=${MWOYEO_RELEASE_IDENTITY:?set MWOYEO_RELEASE_IDENTITY to your Developer ID Application identity}
+46899b01 (midagedev 2026-10-15 22) TEAM=${IDENTITY##*\(}; TEAM=${TEAM%\)}
+46899b01 (midagedev 2026-10-15 23) 
+46899b01 (midagedev 2026-10-15 24) cd "$ROOT"
+46899b01 (midagedev 2026-10-15 25) [[ -d tools/inpaint/models/MIGAN_512.mlpackage ]] || { echo "missing tools/inpaint/models/MIGAN_512.mlpackage" >&2;
+4e56f2cb (midagedev 2026-10-15 26) if [[ -n "${MWOYEO_NOTARY_PROFILE:-}" ]]; then
+4e56f2cb (midagedev 2026-10-15 27)   NOTARY=(--keychain-profile "$MWOYEO_NOTARY_PROFILE")
+4e56f2cb (midagedev 2026-10-15 28) elif [[ -n "${MWOYEO_NOTARY_KEY:-}" && -n "${MWOYEO_NOTARY_KEY_ID:-}" && -n "${MWOYEO_NOTARY_ISSUER_ID:-}" ]]; then
+4e56f2cb (midagedev 2026-10-15 29)   NOTARY=(--key "$MWOYEO_NOTARY_KEY" --key-id "$MWOYEO_NOTARY_KEY_ID" --issuer "$MWOYEO_NOTARY_ISSUER_ID")
+46899b01 (midagedev 2026-10-15 30) else
+4e56f2cb (midagedev 2026-10-15 31)   echo "set MWOYEO_NOTARY_PROFILE, or MWOYEO_NOTARY_KEY + MWOYEO_NOTARY_KEY_ID + MWOYEO_NOTARY_ISSUER_ID" >&2; exit
+46899b01 (midagedev 2026-10-15 32) fi
+46899b01 (midagedev 2026-10-15 33) 

@@ -1,0 +1,132 @@
+# sources of the text (path or command, sha256 of the text read); authored = written for the scene, in h3_scenes.py
+id	kind	source	sha256	lang
+App/Resources/Localizable.xcstrings	repo-file	git show 5c25067:App/Resources/Localizable.xcstrings	51cf046d5957ff8ea71738a20c7ca74c9ba1a9e697849e03729cf53f55c1001f	
+CONTRIBUTING.md	repo-file	git show 5c25067:CONTRIBUTING.md	95a6e2cef587e96c547989d008ecf2f2f67d9ff300b28c8aa03104d763e3f82d	
+Config/MAS.xcconfig	repo-file	git show 5c25067:Config/MAS.xcconfig	182ba486c45d85134e1bba941f0852f3a4546d466fe3aa881418073133f44ac5	
+Core/Tests/MwoyeoCoreTests/HTTPTemplateTests.swift	repo-file	git show 5c25067:Core/Tests/MwoyeoCoreTests/HTTPTemplateTests.swift	4b25a128955bef3f93107aed54c9698d5a88d4070e5349dcda56bc99bbfc9247	
+Core/Tests/MwoyeoCoreTests/MenuBarIconTests.swift	repo-file	git show 5c25067:Core/Tests/MwoyeoCoreTests/MenuBarIconTests.swift	5f8f1f3f0cd6dfcb020b103ff87d1fd81e0bad84341c9f7d7f7ff6e109b41270	
+Core/Tests/MwoyeoCoreTests/PaceStatsTests.swift	repo-file	git show 5c25067:Core/Tests/MwoyeoCoreTests/PaceStatsTests.swift	2610933436e92ee7acd4406c90181dd0a59822793e3edea3452821b2f85af546	
+README.zh-CN.md	repo-file	git show 5c25067:README.zh-CN.md	a26753d26d51890875025386bf6833c6af9a8f190c7898a9ecb9dada1a0d9a5c	
+docs/settings-for-agents.md	repo-file	git show 5c25067:docs/settings-for-agents.md	48a1e876902ef2beedbc8e04efcb69b9e14e37151601e02ca9982eff0eee865c	
+h3/src/bench-report.txt	tool-output	cd tools/engine-bench && python3 -I report.py results | head -n 14	23e013011ae76b93c0a28d37879b36c2e5fe398c530df1f77fe4d69c1750c2d7	
+h3/src/git-blame.txt	tool-output	git blame -L 14,33 --date=short 5c25067 -- scripts/release.sh  (cut to 150 columns)	f156d6a120c5815700b5ad644958429acbe30350ddcc4e8913c97d1fdf3ed176	
+h3/src/git-diff-perm.txt	tool-output	git diff b459840~1 b459840	cf214911d17fcd2e72576b7bd5cad7af7c6c7641d39d1598e940bd9561987656	
+h3/src/git-diff-settings.txt	tool-output	git diff 63d28f6~1 63d28f6 | head -n 44	734fc5e53d47872967f8e890f277c9e82649d9a0afefcfadea80c50712177eab	
+h3/src/git-grep.txt	tool-output	git grep -n 'MWOYEO_FAKE_READER' 5c25067 -- Core/Tests | head -n 12  (cut to 150 columns)	7eb410bb0d4cd4a5735104b8e569e08b1b9b97d52f988756d1433fc8c269f82c	
+h3/src/git-show-stat.txt	tool-output	git show --stat=100 --format='%h %s' 3871352	6d1c7a1673edd3e710b03d78415bea30825155e6afd2235d98a65d80764c79ef	
+h3/src/ls-scripts.txt	tool-output	ls -l scripts  (owner name replaced)	3828705cc94afb3325b3975e624a7bbf62ea13e958624bc5c5ebb74164e7cf16	
+h3/src/swift-build.txt	tool-output	swift build -c release --scratch-path <scratch> --product snap|ocrdump  (the two SwiftPM products, 2026-10-20; bare progress lines dropped)	c30345f59e8ba3a8a3cbd7270f407a519ca7f1091d23294f9941c270b419cbeb	
+scripts/ExportOptions-MAS.plist	repo-file	git show 5c25067:scripts/ExportOptions-MAS.plist	8e85020874502342bfe9d7d13011f8e03c9f49a1ead4d0281baf254d770092e6	
+scripts/mas.sh	repo-file	git show 5c25067:scripts/mas.sh	b4e1709e149f75dbfc61050ae6d45365a2d6667492c9048417b7536f02f92fdf	
+scripts/release.sh	repo-file	git show 5c25067:scripts/release.sh	aaffeef6a3662416e6c921eb24eba528585eba300f7ee2f384ef466eca01956e	
+scripts/setup-release-secrets.sh	repo-file	git show 5c25067:scripts/setup-release-secrets.sh	446c6d744318de89f9627f4d034aa69e311657e5b52e7e6c845a59a53bcbd09a	
+scripts/stats.py	repo-file	git show 5c25067:scripts/stats.py	5095eff06d53f029dc2c30d6057952e3de8b70c374769fab360b59b41773b95e	
+tools/engine-bench/README.md	repo-file	git show 5c25067:tools/engine-bench/README.md	264aaae2b349a8e0b480f4e493a278eee129ecfec78bf0914bb4edad67790c09	
+tools/mock-openai/README.md	repo-file	git show 5c25067:tools/mock-openai/README.md	afa6447764a08f04c48c85762d515a92cbe5159e774904867e76c680330c246a	
+mas-ko	authored	h3_scenes.py scene mas-ko	-	ko
+strings-ko	authored	h3_scenes.py scene strings-ko	-	ko
+cli-ko	authored	h3_scenes.py scene cli-ko	-	ko
+review-ko	authored	h3_scenes.py scene review-ko	-	ko
+cards-ko	authored	h3_scenes.py scene cards-ko	-	ko
+chat-ko	authored	h3_scenes.py scene chat-ko	-	ko
+ref-ko	authored	h3_scenes.py scene ref-ko	-	ko
+nl-ko	authored	h3_scenes.py scene nl-ko	-	ko
+stats-ko	authored	h3_scenes.py scene stats-ko	-	ko
+release-ja	authored	h3_scenes.py scene release-ja	-	ja
+menu-ja	authored	h3_scenes.py scene menu-ja	-	ja
+strings-ja	authored	h3_scenes.py scene strings-ja	-	ja
+cli-ja	authored	h3_scenes.py scene cli-ja	-	ja
+review-ja	authored	h3_scenes.py scene review-ja	-	ja
+ref-ja	authored	h3_scenes.py scene ref-ja	-	ja
+stat-ja	authored	h3_scenes.py scene stat-ja	-	ja
+nl-ja	authored	h3_scenes.py scene nl-ja	-	ja
+chat-ja	authored	h3_scenes.py scene chat-ja	-	ja
+stats-en	authored	h3_scenes.py scene stats-en	-	en
+http-en	authored	h3_scenes.py scene http-en	-	en
+appprofile-en	authored	h3_scenes.py scene appprofile-en	-	en
+cli-en	authored	h3_scenes.py scene cli-en	-	en
+review-en	authored	h3_scenes.py scene review-en	-	en
+cards-en	authored	h3_scenes.py scene cards-en	-	en
+contrib-en	authored	h3_scenes.py scene contrib-en	-	en
+ref-en	authored	h3_scenes.py scene ref-en	-	en
+blame-en	authored	h3_scenes.py scene blame-en	-	en
+bench-en	authored	h3_scenes.py scene bench-en	-	en
+secrets-zh	authored	h3_scenes.py scene secrets-zh	-	zh-Hans
+pace-zh	authored	h3_scenes.py scene pace-zh	-	zh-Hans
+strings-zh	authored	h3_scenes.py scene strings-zh	-	zh-Hans
+cli-zh	authored	h3_scenes.py scene cli-zh	-	zh-Hans
+review-zh	authored	h3_scenes.py scene review-zh	-	zh-Hans
+readme-zh-a	authored	h3_scenes.py scene readme-zh-a	-	zh-Hans
+readme-zh-b	authored	h3_scenes.py scene readme-zh-b	-	zh-Hans
+ref-zh	authored	h3_scenes.py scene ref-zh	-	zh-Hans
+nl-zh	authored	h3_scenes.py scene nl-zh	-	zh-Hans
+cards-zh	authored	h3_scenes.py scene cards-zh	-	zh-Hans
+# screens: name, scene, look, language given to ocrdump, monospace face
+mas-ko.term-solarized	screen	mas-ko term-solarized	PT Mono	ko
+mas-ko.pane-dark	screen	mas-ko pane-dark	Menlo	ko
+mas-ko.md-sepia	screen	mas-ko md-sepia	Courier	ko
+strings-ko.ide-solar	screen	strings-ko ide-solar	Andale Mono	ko
+strings-ko.docs-light	screen	strings-ko docs-light	ui-monospace	ko
+cli-ko.docs-light	screen	cli-ko docs-light	ui-monospace	ko
+cli-ko.md-night	screen	cli-ko md-night	PT Mono	ko
+review-ko.review-light	screen	review-ko review-light	Andale Mono	ko
+review-ko.review-dark	screen	review-ko review-dark	PT Mono	ko
+cards-ko.card-light	screen	cards-ko card-light	PT Mono	ko
+cards-ko.card-dark	screen	cards-ko card-dark	Menlo	ko
+chat-ko.chat-dark-plain	screen	chat-ko chat-dark-plain	Courier	ko
+ref-ko.docs-dark	screen	ref-ko docs-dark	Monaco	ko
+ref-ko.md-sepia	screen	ref-ko md-sepia	Courier	ko
+nl-ko.term-green	screen	nl-ko term-green	Andale Mono	ko
+nl-ko.term-solarized	screen	nl-ko term-solarized	PT Mono	ko
+stats-ko.pane-light	screen	stats-ko pane-light	Monaco	ko
+stats-ko.md-night	screen	stats-ko md-night	PT Mono	ko
+release-ja.ide-solar	screen	release-ja ide-solar	Andale Mono	ja
+release-ja.docs-light	screen	release-ja docs-light	ui-monospace	ja
+menu-ja.pane-light	screen	menu-ja pane-light	Monaco	ja
+menu-ja.md-night	screen	menu-ja md-night	PT Mono	ja
+strings-ja.pane-dark	screen	strings-ja pane-dark	Menlo	ja
+strings-ja.md-sepia	screen	strings-ja md-sepia	Courier	ja
+cli-ja.docs-dark	screen	cli-ja docs-dark	Monaco	ja
+cli-ja.md-sepia	screen	cli-ja md-sepia	Courier	ja
+review-ja.review-dark	screen	review-ja review-dark	PT Mono	ja
+review-ja.review-light	screen	review-ja review-light	Andale Mono	ja
+ref-ja.md-night	screen	ref-ja md-night	PT Mono	ja
+ref-ja.docs-light	screen	ref-ja docs-light	ui-monospace	ja
+stat-ja.term-solarized	screen	stat-ja term-solarized	PT Mono	ja
+nl-ja.term-solarized	screen	nl-ja term-solarized	PT Mono	ja
+nl-ja.term-green	screen	nl-ja term-green	Andale Mono	ja
+chat-ja.chat-mint	screen	chat-ja chat-mint	Andale Mono	ja
+stats-en.ide-solar	screen	stats-en ide-solar	Andale Mono	en
+stats-en.pane-dark	screen	stats-en pane-dark	Menlo	en
+http-en.term-solarized	screen	http-en term-solarized	PT Mono	en
+http-en.md-sepia	screen	http-en md-sepia	Courier	en
+appprofile-en.pane-light	screen	appprofile-en pane-light	Monaco	en
+appprofile-en.docs-light	screen	appprofile-en docs-light	ui-monospace	en
+cli-en.docs-light	screen	cli-en docs-light	ui-monospace	en
+cli-en.md-night	screen	cli-en md-night	PT Mono	en
+review-en.review-light	screen	review-en review-light	Andale Mono	en
+review-en.review-dark	screen	review-en review-dark	PT Mono	en
+cards-en.card-light	screen	cards-en card-light	PT Mono	en
+contrib-en.docs-dark	screen	contrib-en docs-dark	Monaco	en
+ref-en.md-sepia	screen	ref-en md-sepia	Courier	en
+ref-en.docs-dark	screen	ref-en docs-dark	Monaco	en
+blame-en.term-green	screen	blame-en term-green	Andale Mono	en
+bench-en.term-solarized	screen	bench-en term-solarized	PT Mono	en
+secrets-zh.term-green	screen	secrets-zh term-green	Andale Mono	zh-Hans
+secrets-zh.md-night	screen	secrets-zh md-night	PT Mono	zh-Hans
+pace-zh.ide-solar	screen	pace-zh ide-solar	Andale Mono	zh-Hans
+pace-zh.chat-mint	screen	pace-zh chat-mint	Andale Mono	zh-Hans
+strings-zh.docs-dark	screen	strings-zh docs-dark	Monaco	zh-Hans
+strings-zh.pane-light	screen	strings-zh pane-light	Monaco	zh-Hans
+cli-zh.docs-light	screen	cli-zh docs-light	ui-monospace	zh-Hans
+cli-zh.md-sepia	screen	cli-zh md-sepia	Courier	zh-Hans
+review-zh.review-light	screen	review-zh review-light	Andale Mono	zh-Hans
+review-zh.review-dark	screen	review-zh review-dark	PT Mono	zh-Hans
+readme-zh-a.md-sepia	screen	readme-zh-a md-sepia	Courier	zh-Hans
+readme-zh-a.docs-light	screen	readme-zh-a docs-light	ui-monospace	zh-Hans
+readme-zh-b.md-night	screen	readme-zh-b md-night	PT Mono	zh-Hans
+ref-zh.docs-dark	screen	ref-zh docs-dark	Monaco	zh-Hans
+ref-zh.md-night	screen	ref-zh md-night	PT Mono	zh-Hans
+nl-zh.term-solarized	screen	nl-zh term-solarized	PT Mono	zh-Hans
+nl-zh.term-green	screen	nl-zh term-green	Andale Mono	zh-Hans
+cards-zh.card-dark	screen	cards-zh card-dark	Menlo	zh-Hans

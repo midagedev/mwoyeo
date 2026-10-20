@@ -1,0 +1,44 @@
+diff --git a/App/UI/SettingsView.swift b/App/UI/SettingsView.swift
+index 7748aec..c876732 100644
+--- a/App/UI/SettingsView.swift
++++ b/App/UI/SettingsView.swift
+@@ -83,6 +83,8 @@ struct GeneralSettings: View {
+                 Toggle("Save transcripts", isOn: savesTranscripts)
+                 Text("Each lens writes what it reads and its translation to Markdown and SRT files.")
+                     .font(.caption).foregroundStyle(.secondary)
++                Text("The names and terms an engine learns are written to the same folder.")
++                    .font(.caption).foregroundStyle(.secondary)
+                 LabeledContent("Folder") {
+                     Text(ExportFolder.shownPath(model.settings).map { ($0 as NSString).abbreviatingWithTildeInPath } ?? String(localized: "None chosen"))
+                         .lineLimit(1).truncationMode(.middle).foregroundStyle(.secondary)
+@@ -166,6 +168,8 @@ struct TranslationSettings: View {
+     @State private var cached = 0
+     @State private var sheet: EngineSheetTarget?
+     @State private var removing: EngineConfig?
++    /// The app whose Memory sheet is open.
++    @State private var memoryApp: MemoryTarget?
+     /// The active added engine's speed, polled; nil (no row at all) until it has enough batches.
+     @State private var speed: SpeedSummary?
+     private let intelligence = IntelligenceTranslator()
+@@ -192,6 +196,21 @@ struct TranslationSettings: View {
+         return "\(pair) · \(reader.title)"
+     }
+ 
++    /// An app profile's row: the app, its languages, and (once it has memory) what it remembers, which is the first to be cut short.
++    private func profileLabel(_ p: AppProfile) -> some View {
++        VStack(alignment: .leading) {
++            Text(p.appName)
++            HStack(spacing: 0) {
++                Text(profileDetail(p)).lineLimit(1).layoutPriority(1)
++                if let summary = AppMemorySummary.short(p) {
++                    Text(verbatim: " · \(summary)").lineLimit(1).truncationMode(.tail)
++                }
++            }
++            .font(.caption).foregroundStyle(.secondary)
++            .help(AppMemorySummary.full(p) ?? "")
++        }
++    }
++
+     /// Languages remembered per app (from a lens's menu); the group exists only once there is one.
+     private var appProfiles: some View {
+         Section {

@@ -31,6 +31,20 @@ enum CodeKeepChecks {
         check("a run cut out of a line has its own text, and its words' ranges index it",
               middle.text == "total = price" && middle.words.map { String(middle.text[$0.range]) } == ["total", "=", "price"])
 
+        // A Latin run inside a CJK word (a URL, a path, an identifier) is one word: only the CJK characters are split off. A ja / zh
+        // line used to cut the URL into single characters, so every rule that reads words (the keep rules, the fixed-pitch test) saw
+        // no URL at all (the keep recall for URLs on H3 was 0.04 of 1841 words).
+        let cjk = "詳細はhttps://example.com/aを参照"
+        let cjkWords = VisionExec.wordRanges(cjk).map { String(cjk[$0]) }
+        check("a Latin run inside a CJK word stays one word",
+              cjkWords == ["詳", "細", "は", "https://example.com/a", "を", "参", "照"], "\(cjkWords)")
+        let latin = "let total = 2"
+        let latinWords = VisionExec.wordRanges(latin).map { String(latin[$0]) }
+        check("a line without CJK keeps its words", latinWords == ["let", "total", "=", "2"], "\(latinWords)")
+        let onlyCJK = "日本語"
+        let onlyCJKWords = VisionExec.wordRanges(onlyCJK).map { String(onlyCJK[$0]) }
+        check("a CJK line is one character a word", onlyCJKWords == ["日", "本", "語"], "\(onlyCJKWords)")
+
         // The page colour of a frame.
         var flat = RGBAImage(width: 20, height: 10, color: RGBA(255, 255, 255))
         for x in 0..<5 { for y in 0..<10 { flat.set(x: x, y: y, RGBA(246, 248, 250)) } }

@@ -8,7 +8,7 @@ import Vision
 struct OCRLine: Sendable {
     var rect: CGRect
     var text: String
-    /// Its words (CJK: characters) with their boxes, where Vision could place them. Each range indexes `text`.
+    /// Its words (CJK: characters; a Latin run inside a CJK word is one word) with their boxes, where Vision could place them. Each range indexes `text`.
     var words: [OCRWord] = []
 
     /// The run of this line made of its words `r` alone, drawn in `rect`: its text is theirs, and their ranges index that text, not the line's.
@@ -150,7 +150,8 @@ enum VisionExec {
 
     // MARK: Geometry and text
 
-    /// Words split at spaces; CJK has none, so its words are single characters.
+    /// Words split at spaces; CJK has none, so its words are single characters. A Latin run inside a CJK word (a URL, a path, an
+    /// identifier) is one word: only the CJK characters are split off.
     static func wordRanges(_ s: String) -> [Range<String.Index>] {
         var ranges: [Range<String.Index>] = []
         var i = s.startIndex
@@ -158,12 +159,32 @@ enum VisionExec {
             guard !s[i].isWhitespace else { i = s.index(after: i); continue }
             let j = s[i...].firstIndex(where: \.isWhitespace) ?? s.endIndex
             if s[i..<j].contains(where: isCJK) {
-                ranges += s[i..<j].indices.map { $0..<s.index(after: $0) }
+                ranges += wordRuns(s[i..<j])
             } else {
                 ranges.append(i..<j)
             }
             i = j
         }
+        return ranges
+    }
+
+    /// The words of a word that holds a CJK character: each CJK character alone, each Latin run whole (a URL, a path, an identifier
+    /// is one word, not one letter).
+    private static func wordRuns(_ word: Substring) -> [Range<String.Index>] {
+        var ranges: [Range<String.Index>] = []
+        var run: Range<String.Index>?
+        for i in word.indices {
+            let end = word.index(after: i)
+            if isCJK(word[i]) {
+                if let r = run { ranges.append(r); run = nil }
+                ranges.append(i..<end)
+            } else if let r = run {
+                run = r.lowerBound..<end
+            } else {
+                run = i..<end
+            }
+        }
+        if let r = run { ranges.append(r) }
         return ranges
     }
 

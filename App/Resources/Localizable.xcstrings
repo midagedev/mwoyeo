@@ -35664,6 +35664,36 @@
           }
         }
       }
+    },
+    "Hide Lenses": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "렌즈 숨기기"
+          }
+        }
+      }
+    },
+    "Show Lenses": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "렌즈 다시 보기"
+          }
+        }
+      }
+    },
+    "Hide every lens until you press this again. A lens you add shows them again.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다시 누를 때까지 모든 렌즈를 숨겨요. 렌즈를 새로 추가하면 다시 보여요."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

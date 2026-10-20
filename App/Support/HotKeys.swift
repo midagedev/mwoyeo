@@ -42,7 +42,7 @@ struct KeyCombo: Codable, Equatable {
 }
 
 enum HotKeyAction: String, Codable, CaseIterable, Identifiable {
-    case addLens, toggleOriginal, pause, refresh
+    case addLens, toggleOriginal, hideLenses, pause, refresh
     /// Lens actions, no default combo; they act on the lens under the pointer, else the newest one.
     case saveLensImage, copyOriginal, readAloud
 
@@ -51,6 +51,7 @@ enum HotKeyAction: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .addLens: String(localized: "Add Lens")
         case .toggleOriginal: String(localized: "Show Original")
+        case .hideLenses: String(localized: "Hide Lenses")
         case .pause: String(localized: "Pause")
         case .refresh: String(localized: "Translate Again")
         case .saveLensImage: String(localized: "Save Lens Image")
@@ -60,7 +61,8 @@ enum HotKeyAction: String, Codable, CaseIterable, Identifiable {
     }
 
     /// ⌃⌥ plus a letter, avoiding the ⌃⌥ letters window managers such as Rectangle and Magnet take by default
-    /// (D F G E T for thirds, U I J K for corners, C for centre). Pause and refresh have none: the menu has them.
+    /// (D F G E T for thirds, U I J K for corners, C for centre). Only the two used all the time have one (the user, 2026-10-21: few
+    /// defaults, the fewest clashes with other apps); every other action is assigned by the person in Settings › Shortcuts.
     static let defaults: [String: KeyCombo] = [
         HotKeyAction.addLens.rawValue: KeyCombo(keyCode: kVK_ANSI_L, modifiers: controlKey | optionKey, display: "⌃⌥L"),
         HotKeyAction.toggleOriginal.rawValue: KeyCombo(keyCode: kVK_ANSI_O, modifiers: controlKey | optionKey, display: "⌃⌥O"),

@@ -190,6 +190,7 @@ final class AppModel {
         await Relaunch.waitForPredecessor()
         HotKeys.shared.setHandler(.addLens) { [weak self] in Task { await self?.addRegion() } }
         HotKeys.shared.setHandler(.toggleOriginal) { [weak self] in self?.toggleTranslations() }
+        HotKeys.shared.setHandler(.hideLenses) { [weak self] in self?.toggleLensesHidden() }
         HotKeys.shared.setHandler(.pause) { [weak self] in Task { await self?.togglePause() } }
         HotKeys.shared.setHandler(.refresh) { [weak self] in Task { await self?.refreshAll() } }
         HotKeys.shared.setHandler(.saveLensImage) { [weak self] in self?.lensForShortcut()?.saveLensImage() }
@@ -393,6 +394,7 @@ final class AppModel {
         picking = true
         defer { picking = false }
         guard let result = await picker.pick() else { return }
+        RegionSession.setHiding(false, in: sessions.values)   // a lens added while the others are hidden brings them back
         var config = RegionConfig(name: "", rect: result.rect)
         config.follow(result.window)
         regions.append(config)
@@ -579,6 +581,18 @@ final class AppModel {
     func toggleTranslations() {
         translationsVisible.toggle()
         sessions.values.forEach { $0.setTranslationsVisible(translationsVisible) }
+    }
+
+    /// Some lens is hidden by the Hide Lenses key; false with no lens up (Pause takes them down, and the lenses it brings back are new).
+    var lensesHidden: Bool {
+        _ = sessionTick   // the sessions are not observed: their changes bump this
+        return sessions.values.contains { $0.isHiddenByUser }
+    }
+
+    /// Hide Lenses: while any lens is hidden, every lens comes back with the lines it had; otherwise every lens goes off the screen and reads nothing.
+    func toggleLensesHidden() {
+        RegionSession.toggleHiding(sessions.values)
+        sessionTick += 1
     }
 
     func togglePause() async {

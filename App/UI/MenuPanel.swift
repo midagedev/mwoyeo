@@ -136,6 +136,16 @@ struct MenuPanel: View {
                       systemImage: model.translationsVisible ? "eye" : "eye.slash")
             }
             .help(withShortcut(String(localized: "Hide translations and show the original"), .toggleOriginal))
+            Button {
+                model.toggleLensesHidden()
+            } label: {
+                Label(model.lensesHidden ? String(localized: "Show Lenses") : String(localized: "Hide Lenses"),
+                      systemImage: model.lensesHidden ? "rectangle.slash" : "viewfinder")
+            }
+            .help(withShortcut(String(localized: "Hide every lens until you press this again. A lens you add shows them again."), .hideLenses))
+            .disabled(!model.lensesHidden && !model.regions.contains { model.isRunning($0.id) })
+            // 4 + 16 = 20 pt between the two labelled buttons, twice a label's icon-to-text gap, so each icon reads as its own button's.
+            .padding(.leading, 16)
             Spacer()
             Button { ImageTranslation.shared.chooseImage() } label: { Image(systemName: "photo") }
                 .help("Translate Image… — a file or the clipboard")

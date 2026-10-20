@@ -528,6 +528,16 @@ func texture(width: Int, height: Int, seed: Int = 1) -> GrayImage {
     #expect(TranslationCleanup.restoreSourceTokens("S/starfallvalley 내 검색", source: "s/starfallvalley 内を検索") == "s/starfallvalley 내 검색")
     #expect(TranslationCleanup.restoreSourceTokens("U/mayafox · 5시간 전", source: "u/mayafox · 5時間前") == "u/mayafox · 5시간 전")
     #expect(TranslationCleanup.restoreSourceTokens("RTA 멤버들은", source: "RTA勢は") == "RTA 멤버들은")
+    // A token is restored only where it stands as a word: the "A" of "A threshold" once turned "Man, and" into "MAn, And" (paper p12).
+    let reference = "7 Nobuyuki Otsu. A threshold selection method. IEEE Transactions on Systems, Man, and Cybernetics. O i"
+    #expect(TranslationCleanup.restoreSourceTokens("7 노부유키 오츠. 임계값 선택 방법. IEEE Transactions on Systems, Man, and Cybernetics. prosevorda", source: reference)
+            == "7 노부유키 오츠. 임계값 선택 방법. IEEE Transactions on Systems, Man, and Cybernetics. prosevorda")
+    #expect(TranslationCleanup.restoreSourceTokens("Ios 앱의 설정", source: "iOS app settings") == "iOS 앱의 설정")
+    #expect(TranslationCleanup.restoreSourceTokens("ios와 macOS", source: "iOS and macOS") == "iOS와 macOS")
+    // A word the source writes two ways is left as translated, whichever way: before, the last spelling in Set order won (paper p4, 2026-10-20).
+    let twoWays = "Let R be a region and A the count of all features"
+    #expect(TranslationCleanup.restoreSourceTokens("R을 영역, A를 모든 특징의 수라고 하자", source: twoWays) == "R을 영역, A를 모든 특징의 수라고 하자")
+    #expect(TranslationCleanup.restoreSourceTokens("R을 영역, a를 모든 특징의 수라고 하자", source: twoWays) == "R을 영역, a를 모든 특징의 수라고 하자")
 }
 
 @Test func lineSplitsIntoStyleRuns() {

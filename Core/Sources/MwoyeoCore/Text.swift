@@ -238,19 +238,29 @@ public enum TranslationCleanup {
     }
 
     /// Translators capitalise the first letter of a sentence, which turns "s/starfallvalley" into
-    /// "S/starfallvalley". Latin tokens copied from the source get their original spelling back.
+    /// "S/starfallvalley". Latin tokens copied from the source get their original spelling back, where they stand as a word: not
+    /// inside another one (the "A" of "A threshold" is not the "a" of "Man").
     public static func restoreSourceTokens(_ translated: String, source: String) -> String {
         let tokens = source.matches(of: /[A-Za-z][A-Za-z0-9_\/.\-]*/).map { String($0.output) }
         guard !tokens.isEmpty else { return translated }
         var out = translated
-        for token in Set(tokens) {
+        // One spelling per word: a word the source writes two ways ("a region", "let A be") has no original spelling to give back, and
+        // restoring both made the last one in Set order win, a different one on each run.
+        let spellings = Dictionary(grouping: Set(tokens), by: { $0.lowercased() })
+        for token in spellings.values.compactMap({ $0.count == 1 ? $0[0] : nil }).sorted() {
             var start = out.startIndex
             while let r = out.range(of: token, options: .caseInsensitive, range: start..<out.endIndex) {
-                if out[r] != token { out.replaceSubrange(r, with: token) }
+                if out[r] != token, standsAlone(r, in: out) { out.replaceSubrange(r, with: token) }
                 start = out.index(r.lowerBound, offsetBy: token.count)
             }
         }
         return out
+    }
+
+    /// No Latin letter, digit or underscore touches the range on either side (a particle in another script may: "iOS와").
+    private static func standsAlone(_ r: Range<String.Index>, in s: String) -> Bool {
+        let wordy: (Character) -> Bool = { $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "_") }
+        return !(r.lowerBound > s.startIndex && wordy(s[s.index(before: r.lowerBound)])) && !(r.upperBound < s.endIndex && wordy(s[r.upperBound]))
     }
 
     /// Models asked to translate a numbered list often echo the numbering ("3. 게임 종료"). Strip it,

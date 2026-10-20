@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""The H2 measurement: today's rules and CodeRegion on the screens of h2.py (round k3a, 2026-10-20).
-usage: h2_report.py <labels dir with h2.jsonl> <rules.jsonl> [--sheet <dir> --pics <KEEP_WORK/h2>]
-  rules.jsonl = keeprules on h2.jsonl with KEEP_FEED set (regionfeed on the H2 pictures): run-rules.sh does both and also prints rules_report.py's
-  report; this script adds what H2 needs: the size of the set, the two variants (today's rules; rules OR CodeRegion, the app's behaviour today),
+"""The own-screens measurement: today's rules and CodeRegion on the screens of one own-screens set (h2.py's H2, round k3a, 2026-10-20; h3.py's H3).
+usage: h2_report.py <labels dir with the set (h2.jsonl, h3.jsonl)> <rules.jsonl> [--sheet <dir> --pics <KEEP_WORK>/<set>]
+  the set is the one the labels name (their header's "cases" and their set), and the report says it: H2, H3.
+  rules.jsonl = keeprules on the set's jsonl with KEEP_FEED set (regionfeed on the set's pictures): run-rules.sh does both and also prints rules_report.py's
+  report; this script adds what the set needs: the size of the set, the two variants (today's rules; rules OR CodeRegion, the app's behaviour today),
   the verdict per reason slice against the stage-1 stop rule, the cuts by look and language, the clusters of the misses, and the disagreement sheet.
 
 Slices (truth.py's reason taxonomy): recall of a slice = its keep words the variant keeps. Precision of a slice = of the words the variant keeps
@@ -19,6 +20,16 @@ from truth import KEEP, TRANSLATE, EITHER, SCORED, keep_runs
 
 REASONS = ('code', 'cmd', 'log', 'config', 'path', 'id', 'flag', 'url', 'hash', 'hotkey', 'lineno', 'diffmark', 'math')
 THIN = 40
+
+
+def own_set(labels_dir):
+    """The own-screens set of a labels dir: the header of the file that names a set (h2.jsonl, h3.jsonl) and the set's name (h2, h3, ...)."""
+    found = RR.own_sets(labels_dir)
+    if not found: raise SystemExit(f'h2_report: no own-screens set in {labels_dir} (a labels dir with h2.jsonl or h3.jsonl)')
+    if len(found) > 1: raise SystemExit(f'h2_report: {labels_dir} holds {len(found)} own-screens sets; this report measures one')
+    fn, head, sets = found[0]
+    if len(sets) > 1: raise SystemExit(f'h2_report: {fn} holds the sets {sets}; this report measures one')
+    return head, sets[0]
 
 
 def variant_rules(rules, with_region):
@@ -114,12 +125,12 @@ def block_kind(b, pure):
     return {'log': 'log / tool-output line', 'config': 'config line', 'code': 'code line', 'cmd': 'command line', 'path': 'path / window chrome'}.get(b['reason'], 'other keep line')
 
 
-def clusters(blocks, rules, read, pics, out, limit=8):
+def clusters(blocks, rules, read, pics, setname, out, limit=8):
     """The keep words the rules OR region translate, clustered by what their block is (block_kind) and the look family: blocks, words, the scenes,
     two examples, and for the pure-keep blocks how many each cheap feature of code_features.py catches (thresholds of the code cases: held out here;
-    the false-fire rates of the features on H2's pure-translate blocks are printed after the table)."""
+    the false-fire rates of the features on the set's pure-translate blocks are printed after the table)."""
     if pics is None:
-        out.append(f'  clusters, read {read}: skipped (give --pics <KEEP_WORK>/h2)'); return
+        out.append(f'  clusters, read {read}: skipped (give --pics <KEEP_WORK>/{setname})'); return
     import code_features as CF
     from PIL import Image
     os.environ['FRAME'] = 'dominant'
@@ -160,7 +171,7 @@ def clusters(blocks, rules, read, pics, out, limit=8):
         out.append(f'         caught by (of {c["blocks"]}): {cat}   e.g. ' + ' | '.join(c['ex']))
     rest = rows[limit:]
     if rest: out.append(f'    (other {len(rest)} clusters: {sum(c["words"] for _, c in rest)} words in {sum(c["blocks"] for _, c in rest)} blocks)')
-    out.append(f'  false fires of each feature on the {npt} pure-translate blocks of H2, read {read}: ' + ', '.join(f'{n} {fires[n]}' for n in names) + '   (tint against the dominant colour)')
+    out.append(f'  false fires of each feature on the {npt} pure-translate blocks of {setname.upper()}, read {read}: ' + ', '.join(f'{n} {fires[n]}' for n in names) + '   (tint against the dominant colour)')
 
 
 def crop(png, rect, out_png, pad=14):
@@ -207,18 +218,18 @@ def main():
     args = sys.argv[1:]
     labels_dir, rules_path = args[0], args[1]
     blocks, _ = RR.load(labels_dir)
-    hdr = json.loads(open(os.path.join(labels_dir, 'h2.jsonl')).readline())
+    hdr, setname = own_set(labels_dir)
     rules = {}
     for l in open(rules_path):
         r = json.loads(l); rules[r['id']] = r
     rr = variant_rules(rules, True)
     out = []
-    out.append('H2 SIZE')
+    out.append(f'{setname.upper()} SIZE')
     size_section(blocks, hdr, out)
     nofeed = [b['id'] for b in blocks if rules[b['id']].get('region') == 'nofeed']
     if nofeed: out.append(f'WARNING: {len(nofeed)} labelled blocks have no picture in the feed; CodeRegion did not run on them')
     out.append('')
-    for name, rl in (('TODAY\'S RULES (InlineMath + TranslationFilter) ON H2', rules), ('RULES OR CodeRegion ON H2 (what the app does today)', rr)):
+    for name, rl in (('TODAY\'S RULES (InlineMath + TranslationFilter) ON ' + setname.upper(), rules), ('RULES OR CodeRegion ON ' + setname.upper() + ' (what the app does today)', rr)):
         out.append(name)
         RR.rule_tables(blocks, rl, out)
         out.append('')
@@ -231,7 +242,7 @@ def main():
     out.append('')
     out.append('CLUSTERS (rules OR CodeRegion)')
     pics = args[args.index('--pics') + 1] if '--pics' in args else None
-    for read in RR.READS: clusters(blocks, rr, read, pics, out)
+    for read in RR.READS: clusters(blocks, rr, read, pics, setname, out)
     out.append('')
     # false keeps: translate words the variant keeps, by block kind
     for read in RR.READS:

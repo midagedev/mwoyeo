@@ -3,6 +3,8 @@
 usage: rules_report.py <labels dir> <rules.jsonl> [--json out.json]
   <labels dir> holds <paper id>.jsonl (label.py) and code.jsonl (code_labels.py); papers.tsv names the dev / hold-out split of the papers,
   the code cases are split by their number (odd: dev, even: hold-out, as the use-case bench splits its pictures).
+  A labels dir may also hold an own-screens set (h2.jsonl, h3.jsonl: the screens of h2.py / h3.py, a labels dir of its own): the report names it
+  from the labels themselves and scores it as a source of its own.
   rules.jsonl is keeprules' output on those files.
 
 What the rules decide, as the app runs them on a block: `needs` false (TranslationFilter.needsTranslation) keeps the whole block as
@@ -24,7 +26,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from truth import keep_runs, SCORED, KEEP, TRANSLATE, EITHER
 
-SOURCES = ('papers dev', 'papers hold', 'cases dev', 'cases hold', 'h2')      # h2: the own screens of h2.py, a labels dir of its own (labels-h2/)
+FIXED_SOURCES = ('papers dev', 'papers hold', 'cases dev', 'cases hold')   # the papers and the code cases
+SOURCES = FIXED_SOURCES                                                   # the own-screens sets of the labels dir (h2, h3, ...) follow, in sorted order; load() sets them
 READS = ('doc', 'vn')
 
 
@@ -47,18 +50,33 @@ def rci(k, n):
     return f'{ratio(k, n):.2f} [{lo:.2f},{hi:.2f}]'
 
 
+def own_sets(labels_dir):
+    """The own-screens sets of a labels dir: the files whose header names a set (h2.jsonl, h3.jsonl), each with its header and its set name(s).
+    A header with "cases" is a case set; the code cases (id "code") are the ones the report calls "cases dev / cases hold"."""
+    out = []
+    for fn in sorted(os.listdir(labels_dir)):
+        if not fn.endswith('.jsonl'): continue
+        head = json.loads(open(os.path.join(labels_dir, fn)).readline())
+        if 'cases' in head and head.get('id') != 'code':
+            out.append((fn, head, sorted({c['set'] for c in head['cases']})))
+    return out
+
+
 def load(labels_dir):
+    """The labelled blocks and their regions. SOURCES gains the own-screens sets (h2, h3, ...) this labels dir holds."""
+    global SOURCES
     papers = {}
     for ln in open(os.path.join(HERE, 'papers.tsv')).read().splitlines()[1:]:
         f = ln.split('\t'); papers[f[0]] = f[2]
     blocks, regions = [], collections.defaultdict(set)
+    own = {fn: sets for fn, head, sets in own_sets(labels_dir)}
     for fn in sorted(os.listdir(labels_dir)):
         if not fn.endswith('.jsonl'): continue
         pid = fn[:-6]
         lines = [json.loads(l) for l in open(os.path.join(labels_dir, fn))]
         head = lines[0]
-        if pid in ('code', 'h2'):
-            pre = 'cases ' if pid == 'code' else ''
+        if 'cases' in head:                                       # a case set: the code cases, or an own-screens set (h2, h3, ...)
+            pre = '' if fn in own else 'cases '
             sets = {c['case']: c['set'] for c in head['cases']}
             for r in lines[1:]:
                 if r['kind'] == 'block': r['src'] = pre + sets[r['paper']]; blocks.append(r)
@@ -67,7 +85,13 @@ def load(labels_dir):
             for r in lines[1:]:
                 if r['kind'] == 'block': r['src'] = 'papers ' + papers[pid]; blocks.append(r)
             regions['papers ' + papers[pid]].update(head['regions'])
+    SOURCES = FIXED_SOURCES + tuple(sorted({s for sets in own.values() for s in sets}))
     return blocks, regions
+
+
+def own_sources():
+    """The own-screens sets of the labels dir (h2, h3, ...), in sorted order."""
+    return SOURCES[len(FIXED_SOURCES):]
 
 
 # ------------------------------------------------------------------------------------------------------------------ rule predictions
@@ -342,9 +366,10 @@ def group_table(blocks, rules, out):
 
 def decision(accs, out):
     out.append('DECISION (precision and recall both >= 0.95 on the hold-out -> defer the model for the slice; else train for the band; n < 20: thin)')
-    for src in ('papers hold', 'cases hold', 'h2'):
+    own = own_sources()
+    for src in ('papers hold', 'cases hold') + own:
         a = accs[(src, 'doc')]
-        if src == 'h2' and a.tp + a.fn == 0: continue                          # no H2 labels in this run
+        if src in own and a.tp + a.fn == 0: continue                              # no labels of this own-screens set in this run
         P = ratio(a.tp, a.tp + a.fp)
         out.append(f'  [{src}, read doc] word precision {P:.2f}; recall by reason (precision is of all kept words, one number for every slice):')
         for r, v in sorted(a.rec.items(), key=lambda kv: -kv[1][1]):

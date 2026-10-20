@@ -384,3 +384,49 @@ public struct ContextMemory: Equatable, Sendable {
         return (["note=\(note)"] + rows).joined(separator: "\u{1E}")
     }
 }
+
+// MARK: - Which rows a request sends, and the line that is only a name
+
+extension ContextMemory {
+    /// The rows a request may send, before it picks the ones its items hit (§8.2): an app entry outranks the global glossary, which
+    /// outranks a learned hint, so a learned row whose source is an app entry's or a glossary term is not sent. A row without a source
+    /// or a translation is not a row. `includeLearned` is the options' switch with Memory only already applied. `ContextLayout.prepare`
+    /// picks among these and `exactTranslation` serves from them: one rule for what the memory says on a request.
+    public static func sendable(_ rows: [MemoryEntry], glossary: [(String, String)], includeUser: Bool, includeLearned: Bool) -> [MemoryEntry] {
+        let userKeys = Set(rows.filter { $0.origin == .user }.map(\.id))
+        let glossaryKeys = Set(glossary.map { ContextText.foldedKey($0.0) })
+        return rows.filter { e in
+            guard !e.src.isEmpty, !e.dst.isEmpty else { return false }
+            switch e.origin {
+            case .user: return includeUser
+            case .learned: return includeLearned && !userKeys.contains(e.id) && !glossaryKeys.contains(e.id)
+            }
+        }
+    }
+
+    /// What a name plate puts around a name: 「九十九」, 【九十九】, 九十九: . Trimmed (with space) from both ends of a line before it is
+    /// compared with a row's source, and put back around the row's translation; never taken from the inside, where シュザンヌ・ド・リュミエール
+    /// keeps its dot.
+    static let plateMarks: Set<Character> = ["「", "」", "『", "』", "【", "】", "〈", "〉", "《", "》", "（", "）", "(", ")", "［", "］", "[", "]",
+                                             "<", ">", ":", "：", "\"", "“", "”", "'", "‘", "’"]
+
+    /// The translation of a line that is only a name or a term: the row of `rows` whose source is the whole line, trimmed of space and the
+    /// marks a name plate carries, written as the row's translation with those marks kept around it ("【九十九】" is "【츠쿠모】"). nil for any
+    /// other line, a line that holds the name among other words included. The sheet's own identity decides what is the same name (case,
+    /// accents and width are ignored: "ＭＩＡ" is "Mia"), a source that carries marks of its own ("（株）") is tried as written first, and
+    /// where two rows have one source the user's wins over a learned one. `rows` are what the request sends (`sendable`).
+    public static func exactTranslation(of line: String, in rows: [MemoryEntry]) -> String? {
+        let text = Array(ContextText.collapse(line))
+        var lo = 0, hi = text.count
+        while lo < hi, text[lo].isWhitespace || plateMarks.contains(text[lo]) { lo += 1 }
+        while hi > lo, text[hi - 1].isWhitespace || plateMarks.contains(text[hi - 1]) { hi -= 1 }
+        guard lo < hi else { return nil }
+        let keys = [ContextText.foldedKey(String(text)), ContextText.foldedKey(String(text[lo..<hi]))]
+        for (i, key) in keys.enumerated() {
+            let same = rows.filter { $0.id == key }
+            guard let row = same.first(where: { $0.origin == .user }) ?? same.first else { continue }
+            return i == 0 ? row.dst : String(text[..<lo]) + row.dst + String(text[hi...])
+        }
+        return nil
+    }
+}

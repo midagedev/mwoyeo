@@ -323,16 +323,9 @@ public enum RequestLayout {
 
         // Which rows are candidates, and which glossary pairs they replace.
         let userKeys = Set(request.memory.filter { $0.origin == .user }.map(\.id))
-        let glossaryKeys = Set(request.glossary.map { ContextText.foldedKey($0.0) })
         // Memory only is the user's own rows and nothing learned (design D1); the guards below keep it so whatever else is set.
         let memoryOnly = options.memoryOnly
-        var candidates = request.memory.filter { e in
-            switch e.origin {
-            case .user: options.includeUser
-            case .learned: options.includeLearned && !memoryOnly && !userKeys.contains(e.id) && !glossaryKeys.contains(e.id)
-            }
-        }
-        candidates = candidates.filter { !$0.src.isEmpty && !$0.dst.isEmpty }
+        let candidates = sendableRows(request, options)
         let glossary = options.includeUser ? request.glossary.filter { !userKeys.contains(ContextText.foldedKey($0.0)) } : request.glossary
 
         // Context lines. Earlier lines (the thread) when the options ask for some; with none (nearby) the lines right above the
@@ -553,6 +546,21 @@ public enum RequestLayout {
     public static func selectedRows(request: ContextRequest, options: ContextOptions, kind: LayoutKind) -> [MemoryEntry] {
         guard options.enabled, kind.tier != nil, kind.sendsMemory(options) else { return [] }
         return prepare(request, options, kind).rows
+    }
+
+    /// The rows a line may be served from without asking the engine (`ContextMemory.exactTranslation`): the rows this request sends, so
+    /// the same ones as `selectedRows` is picked from. Empty where the memory does not reach the request: Off, a kind without context,
+    /// DeepL without its opt-in.
+    public static func exactRows(request: ContextRequest, options: ContextOptions, kind: LayoutKind) -> [MemoryEntry] {
+        guard options.enabled, kind.tier != nil, kind.sendsMemory(options) else { return [] }
+        return sendableRows(request, options)
+    }
+
+    /// The rows the options let the request send, before its items pick among them: the user's rows, and the learned ones when they are on
+    /// (Memory only never has them), under the precedence of `ContextMemory.sendable`. The one place the options meet that rule.
+    private static func sendableRows(_ request: ContextRequest, _ options: ContextOptions) -> [MemoryEntry] {
+        ContextMemory.sendable(request.memory, glossary: request.glossary, includeUser: options.includeUser,
+                               includeLearned: options.includeLearned && !options.memoryOnly)
     }
 
     // MARK: sent preview

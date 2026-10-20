@@ -110,6 +110,18 @@ struct GeneralSettings: View {
                     Text(note).font(.caption).foregroundStyle(.secondary)
                 }
                 if Distribution.isAppStore { ImportSettingsRow() }
+                Toggle("Connect an agent (MCP)", isOn: $model.settings.agentConnection)
+                Text("Lets an agent such as Claude Code read the translation log, change settings and write each app’s memory.")
+                    .font(.caption).foregroundStyle(.secondary)
+                if model.settings.agentConnection {
+                    LabeledContent("Run in a terminal") {
+                        Button("Copy") { LensText.copy([MCPServer.addCommand()]) }
+                            .accessibilityLabel(Text(verbatim: "\(String(localized: "Copy")), \(String(localized: "Connect an agent (MCP)"))"))
+                    }
+                    .buttonStyle(.borderless)
+                    .foregroundStyle(.tint)
+                    Text(MCPServer.addCommand()).font(.caption.monospaced()).foregroundStyle(.secondary).textSelection(.enabled)
+                }
             }
         }
         .formStyle(.grouped)

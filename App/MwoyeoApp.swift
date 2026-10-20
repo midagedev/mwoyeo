@@ -8,6 +8,8 @@ import SwiftUI
 ///   `Mwoyeo --settings-path`                  prints where settings.json is (`MWOYEO_SETTINGS_FILE` names another).
 ///   `Mwoyeo --check-settings [path]`          prints `settings.json:<line>: <message>` per issue, or `ok`; exit 1 when
 ///                                             there are issues. Without a path it checks the real file.
+///   `Mwoyeo --mcp`                            an MCP server on stdin and stdout (see MCPServer): the translation log and each app's memory
+///                                             for an agent. No window; it ends when stdin does. In the App Store build too.
 @main
 enum Entry {
     static func main() {
@@ -28,6 +30,9 @@ enum Entry {
             UICapture.run(Array(CommandLine.arguments.dropFirst(2)))
         }
         #endif
+        if CommandLine.arguments.dropFirst().first == "--mcp" {
+            MCPServer.runStdio()
+        }
         if let first = CommandLine.arguments.dropFirst().first, first == "--settings-path" || first == "--settings-schema" || first == "--check-settings" {
             SettingsFileCommand.run(Array(CommandLine.arguments.dropFirst()))
         }

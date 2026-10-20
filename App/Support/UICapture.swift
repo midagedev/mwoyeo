@@ -134,6 +134,11 @@ enum UICapture {
             case "general-settings-file": await settingsFileShot(name, withIssues: false)
             case "general-settings-file-issue": await settingsFileShot(name, withIssues: true)
             case "general-saving": await shoot(name, GeneralSettings(), CGSize(width: 560, height: 800))
+            case "general-agent", "general-agent-on":
+                // The Connect an agent row: the switch alone, then with the command and its Copy button.
+                model.settings.agentConnection = name == "general-agent-on"
+                await shoot(name, GeneralSettings(), CGSize(width: 560, height: 1100))
+                model.settings.agentConnection = false
             case "menu-default": await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
             case "translation-engines":
                 await seedEngines()
@@ -198,6 +203,10 @@ enum UICapture {
                 // Only the drift meter's checks (the whole of check-logic takes minutes).
                 let failed = DriftChecks.run()
                 report("drift", failed)
+            case "mcp-checks":
+                // Only the MCP server's checks (the whole of check-logic takes minutes).
+                let failed = MCPChecks.run(model)
+                report("mcp", failed)
             case "inpaint-footprint": await LensRobustChecks.inpaintFootprint()
             case "menu-icon": LensRobustChecks.menuIcon(into: out.appendingPathComponent("menu-icon.png"))
             case "sheet-pick": await shoot(name, EngineSheet(), CGSize(width: 480, height: 560))
@@ -471,6 +480,7 @@ enum UICapture {
             failed += await MemorySheetChecks.run(model)
             failed += await AccessibilityChecks.run(model)
             failed += await PackChecks.run(model)
+            failed += MCPChecks.run(model)
             report("check-logic", failed)
         }
 

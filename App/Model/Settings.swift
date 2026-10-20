@@ -239,6 +239,10 @@ struct AppSettings: Codable, Equatable {
     /// Apple Translation follows the names and terms pinned in an app's memory by putting the user's translation into the
     /// source text (design §7a, §9). Off by default; settings.json holds the key only while it is true.
     var appleUsesPinnedTerms = false
+    /// An agent connected with `Mwoyeo --mcp` may use the app: read the translation log, read and write each app's memory, read and change
+    /// the settings (all but this one). Off by default; the person turns it on in Settings, and an agent cannot (settings.json holds the
+    /// key only while it is true).
+    var agentConnection = false
 
     /// The settings that translate while the app `frontmost` is in front: this app's profile over the base choice.
     func effective(frontmost: String?) -> AppSettings {
@@ -297,6 +301,7 @@ struct AppSettings: Codable, Equatable {
         appProfiles = ((try? c.decodeIfPresent([Lossy<AppProfile>].self, forKey: .appProfiles)) ?? nil)?.compactMap(\.value) ?? d.appProfiles
         paragraphReader = (try? c.decodeIfPresent(ParagraphReader.self, forKey: .paragraphReader)) ?? d.paragraphReader
         appleUsesPinnedTerms = (try? c.decodeIfPresent(Bool.self, forKey: .appleUsesPinnedTerms)) ?? d.appleUsesPinnedTerms
+        agentConnection = (try? c.decodeIfPresent(Bool.self, forKey: .agentConnection)) ?? d.agentConnection
     }
 }
 

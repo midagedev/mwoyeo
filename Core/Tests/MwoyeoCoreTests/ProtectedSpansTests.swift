@@ -160,6 +160,16 @@ import Testing
         }
     }
 
+    /// H2 (round k3b, 2026-10-20): a Japanese sentence has no spaces, so "TOKEN_ATに作った時刻を…" was one token and the `_` made it a
+    /// formula: one span covered the sentence around the identifier and the engine never saw it (gitdiff-ja md-light, yaml-ja md-dark). A CJK
+    /// letter ends a token, and a token of CJK letters is prose, not an operand ("설정 > 일반의" read as a < b).
+    @Test func aCJKLetterEndsAnIdentifierAndTheTextAroundItIsProse() {
+        #expect(found("トークンの有効期限は15分です。TOKEN_ATに作った時刻を残して、10分たったら作り直します。") == ["TOKEN_AT"])
+        #expect(found("バージョンは MARKETING_VERSION】の一か所だけで決めます。") == ["MARKETING_VERSION"])
+        #expect(found("파일 위치는 settings.json 이고, 설정 > 일반의 열기 버튼으로 열 수 있어요.").isEmpty)
+        #expect(found("行列 W_i^Q ∈ R^{dmodel×dk}は大きい") == ["W_i^Q ∈ R^{dmodel×dk}"])
+    }
+
     @Test func aCallNeedsVariablesAsArguments() {
         #expect(found("The result is Attention(Q, K, V) here") == ["Attention(Q, K, V)"])
         #expect(found("a call such as save(file, name) is not math") .isEmpty)

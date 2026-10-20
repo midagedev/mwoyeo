@@ -38,7 +38,8 @@ public enum InlineMath {
         var kind: Kind
     }
 
-    /// Whitespace separates tokens except inside matched brackets ("LayerNorm(x + Sublayer(x))" is one).
+    /// Whitespace separates tokens except inside matched brackets ("LayerNorm(x + Sublayer(x))" is one). Japanese has no spaces, so the
+    /// edge between CJK text and anything else separates them too: an identifier glued to a sentence is its own token ("TOKEN_ATに作った…").
     private static func tokenize(_ chars: [Character]) -> [Token] {
         var match = [Int: Int]()
         var stack: [Int] = []
@@ -54,7 +55,7 @@ public enum InlineMath {
             var closeAt = -1
             while end < chars.count {
                 if let close = match[end], close > closeAt { closeAt = close }
-                if chars[end].isWhitespace, end > closeAt { break }
+                if chars[end].isWhitespace || isCJKText(chars[end]) != isCJKText(chars[i]), end > closeAt { break }
                 end += 1
             }
             var trimmed = end
@@ -63,6 +64,11 @@ public enum InlineMath {
             i = end
         }
         return tokens
+    }
+
+    /// Kana, han, hangul and the punctuation block of CJK text: what a sentence in Japanese, Chinese or Korean is written in.
+    private static func isCJKText(_ c: Character) -> Bool {
+        c.unicodeScalars.contains { TranslationFilter.isCJK($0) || (0x3000...0x303F).contains($0.value) }
     }
 
     private static let strongOperators = Set("=<>+±×÷·⋅∘∈∉⊂⊆⊃⊇∪∩≈≠≤≥→←⇒⇔∝∼~")
@@ -74,7 +80,7 @@ public enum InlineMath {
         if t.allSatisfy({ strongOperators.contains($0) }) { return .op(strong: true) }
         if t.allSatisfy({ strongOperators.contains($0) || weakOperators.contains($0) }) { return .op(strong: false) }
         let s = String(t)
-        if s.contains("://") || s.contains("@") { return .prose }
+        if s.contains("://") || s.contains("@") || t.contains(where: isCJKText) { return .prose }
         // A bracket that opens the token and holds a word is a remark ("(where x = 1)"), not a formula.
         if let first = t.first, "([{".contains(first), t.count > 2, t.contains(where: \.isWhitespace),
            tokenize(Array(t.dropFirst().dropLast())).contains(where: { $0.kind == .prose }) { return .prose }

@@ -404,6 +404,23 @@ extension ContextMemory {
         }
     }
 
+    /// The rows Apple Translation pre-inserts into its source (design §1.3, G7): the app's own user rows first, then the global
+    /// glossary's pairs whose source the app's memory does not have. The app's row wins (§1.3: the narrowest user row wins), so a
+    /// glossary pair with a source the app already has is not sent twice. A glossary pair is a user row of kind `term`; a learned row
+    /// never goes in. The order is the app's rows, then the glossary's, as they are written.
+    public static func applePins(appRows: [MemoryEntry], glossary: [(String, String)]) -> [MemoryEntry] {
+        let app = appRows.filter { $0.origin == .user && !$0.src.isEmpty && !$0.dst.isEmpty }
+        var out = app
+        var seen = Set(app.map(\.id))
+        for (src, dst) in glossary {
+            let row = MemoryEntry(src: src, dst: dst, kind: .term, origin: .user)
+            guard !row.src.isEmpty, !row.dst.isEmpty else { continue }
+            guard seen.insert(row.id).inserted else { continue }
+            out.append(row)
+        }
+        return out
+    }
+
     /// What a name plate puts around a name: 「九十九」, 【九十九】, 九十九: . Trimmed (with space) from both ends of a line before it is
     /// compared with a row's source, and put back around the row's translation; never taken from the inside, where シュザンヌ・ド・リュミエール
     /// keeps its dot.

@@ -325,8 +325,8 @@ def look_ide(doc, sc, th, _boxed):
     lst, lang = sc['listing'], sc['lang']
     path = lst.path
     base = path.rsplit('/', 1)[-1]
-    head = {'en': 'EXPLORER', 'ko': '탐색기', 'ja': 'エクスプローラー'}[lang]
-    status = {'en': 'Ln %d, Col 9', 'ko': '줄 %d, 열 9', 'ja': '%d行、9列'}[lang] % (len(lst.lines) // 2 + 3)
+    head = {'en': 'EXPLORER', 'ko': '탐색기', 'ja': 'エクスプローラー', 'zh-Hans': '资源管理器'}[lang]
+    status = {'en': 'Ln %d, Col 9', 'ko': '줄 %d, 열 9', 'ja': '%d行、9列', 'zh-Hans': '第 %d 行，第 9 列'}[lang] % (len(lst.lines) // 2 + 3)
     side = f'<div style="width:210px;background:{th["side"]};padding:10px 0;border-right:1px solid {th["edge"]};font-size:13px">'
     side += f'<div style="padding:2px 16px 8px;color:{th["dim"]};font-size:11px;letter-spacing:.5px">{ui_text(doc, head, "sidebar")}</div>'
     for f in sc['siblings'] + [base]:
@@ -427,12 +427,11 @@ def build(scene, look_name):
     kind = look_name.split('-')[0]
     th = THEMES[look_name]
     doc = Doc(f'{scene["id"]}.{look_name}', scene['lang'], look_name, scene['id'])
-    return doc, LOOKS[kind](doc, scene, th, look_name == 'term-light')
+    return doc, LOOKS[kind](doc, scene, th, th.get('boxed', look_name == 'term-light'))
 
 
-def main():
-    import h2_scenes
-    SCENES = h2_scenes.SCENES
+def main(scenes_module='h2_scenes'):
+    SCENES = __import__(scenes_module).SCENES
     out = sys.argv[1]
     os.makedirs(out, exist_ok=True)
     rows = []
@@ -449,11 +448,11 @@ def main():
         f.write('name\tlook\tsrc\twidth\theight\n')
         for r in rows: f.write('\t'.join(map(str, r[:5])) + '\n')
     with open(f'{out}/MANIFEST.tsv', 'w') as f:
-        f.write('# sources of the text (path or command, sha256 of the text read); authored = written for the scene, in h2_scenes.py\n')
+        f.write(f'# sources of the text (path or command, sha256 of the text read); authored = written for the scene, in {scenes_module}.py\n')
         f.write('id\tkind\tsource\tsha256\tlang\n')
         for r in sorted(MANIFEST_SOURCES): f.write('\t'.join(r) + '\n')
         for sc in SCENES:
-            f.write(f'{sc["id"]}\tauthored\th2_scenes.py scene {sc["id"]}\t-\t{sc["lang"]}\n')
+            f.write(f'{sc["id"]}\tauthored\t{scenes_module}.py scene {sc["id"]}\t-\t{sc["lang"]}\n')
         f.write('# screens: name, scene, look, language given to ocrdump, monospace face\n')
         for r in rows: f.write(f'{r[0]}\tscreen\t{r[5]} {r[6]}\t{r[7]}\t{r[2]}\n')
     print(f'h2: {len(rows)} screens of {len(SCENES)} scenes in {out}')

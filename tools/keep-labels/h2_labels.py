@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Translate / keep / either labels of the OCR words of the H2 screens, from the units h2.py wrote (round k3a, 2026-10-20).
-usage: h2_labels.py <dir with <name>.units.json and <name>.ocr.jsonl> <out.jsonl>        (index.tsv of h2.py names the screens)
+usage: h2_labels.py <dir with <name>.units.json and <name>.ocr.jsonl> <out.jsonl> [--set h3]       (index.tsv of h2.py names the screens)
+--set names the set in the header (`id`, and `set` of every case); the default is `h2`, so H2's files do not change. H3 (h3.py) runs this file with --set h3.
 
 The OCR words of both Vision reads are aligned with the whole text of the screen's units (code_labels.align: difflib, runs of >= 3
 characters in order), as the labels of the code cases are, and a word takes the class the CONSTRUCTION gave the unit it falls in
@@ -77,6 +78,7 @@ def label_block(b, units, cat, owners, gutter_n=0, diff=False):
 
 def main():
     d, out_path = sys.argv[1:3]
+    sname = sys.argv[sys.argv.index('--set') + 1] if '--set' in sys.argv else 'h2'
     rows = [l.rstrip('\n').split('\t') for l in open(f'{d}/index.tsv')][1:]
     recs, header, regions = [], [], []
     for name, look, lang, *_ in rows:
@@ -91,7 +93,7 @@ def main():
         cat = ''.join(parts)
         gutter_n = max([len(u['text'].split()) for u in U if u['kind'] == 'gutter'] or [0])
         diff = any(u['reason'] == 'diffmark' for u in U)
-        header.append({'case': name, 'lang': lang, 'set': 'h2', 'look': meta['look'], 'scene': meta['scene'], 'regions': meta['regions']})
+        header.append({'case': name, 'lang': lang, 'set': sname, 'look': meta['look'], 'scene': meta['scene'], 'regions': meta['regions']})
         regions += meta['regions']
         for read in ('vn', 'doc'):
             seen = set()
@@ -103,12 +105,12 @@ def main():
             unread = [u['text'][:30] for u in U if u['i'] not in seen and not u['opt'] and len(norm_map(u['text'])[0]) >= 3]
             if unread: print(f'  {name} {read}: units with no aligned word: {len(unread)} {unread[:3]}', file=sys.stderr)
     with open(out_path, 'w') as f:
-        f.write(fmt({'kind': 'paper', 'schema': 2, 'word_fields': WORD_FIELDS, 'id': 'h2', 'cases': header, 'regions': regions}) + '\n')
+        f.write(fmt({'kind': 'paper', 'schema': 2, 'word_fields': WORD_FIELDS, 'id': sname, 'cases': header, 'regions': regions}) + '\n')
         for r in recs: f.write(fmt(r) + '\n')
     c = collections.Counter((r['read'], r['keep']) for r in recs if r['kind'] == 'block')
     s = collections.Counter((r['read'], r['reason']) for r in recs if r['kind'] == 'span')
-    print('h2 blocks', dict(sorted(c.items())))
-    print('h2 keep spans', dict(sorted(s.items())), 'regions', len(regions))
+    print(sname, 'blocks', dict(sorted(c.items())))
+    print(sname, 'keep spans', dict(sorted(s.items())), 'regions', len(regions))
 
 
 if __name__ == '__main__':

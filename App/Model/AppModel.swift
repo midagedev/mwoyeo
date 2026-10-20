@@ -336,6 +336,10 @@ final class AppModel {
         return true
     }
 
+    /// The app whose Memory sheet Settings (Translation) shows, if any: a lens's "Memory for <App>…" sets it (`openMemory`), the sheet's
+    /// Done clears it.
+    var memoryTarget: MemoryTarget?
+
     /// Opens the Settings window; set by the menu bar item's view (`SettingsOpener`), the only holder of SwiftUI's `openSettings`.
     @ObservationIgnored var openSettingsAction: (() -> Void)?
 

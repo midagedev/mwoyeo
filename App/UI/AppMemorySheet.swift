@@ -2,8 +2,8 @@ import AppKit
 import MwoyeoCore
 import SwiftUI
 
-/// The Memory sheet of one app's profile (design §3): what the translator is told about the app. Entered from the profile row's ⋯ menu
-/// and nowhere else. Edits go straight to settings.json through `AppModel`, as every other setting does; the file reloads live.
+/// The Memory sheet of one app (design §3): what the translator is told about the app. Entered from the profile row's ⋯ menu and from
+/// "Memory for <App>…" in a lens's menu; an app with no profile opens it empty, and its first edit makes the profile. Edits go straight to settings.json through `AppModel`, as every other setting does; the file reloads live.
 ///
 /// Order, top to bottom: the note, the names and terms (src and dst on the row, the rest behind the row's disclosure), the app's
 /// context choice with its one-line promise, the "Sent:" line, the learned rows (only when there are some), and the buttons.
@@ -15,15 +15,16 @@ struct AppMemorySheet: View {
 
     /// - `openDetails`, `askingToStartFresh`, `height`: for the capture harness: rows (by position) whose details start open, the sheet as
     ///   it is after Start Fresh was pressed, and a taller sheet that shows every section without scrolling.
-    init(bundleID: String, model: AppModel, openDetails: [Int] = [], askingToStartFresh: Bool = false, height: CGFloat = 640) {
+    /// - `appName`: what the app is called when it has no profile yet (the lens gave it); a profile has its own.
+    init(bundleID: String, model: AppModel, appName: String? = nil, openDetails: [Int] = [], askingToStartFresh: Bool = false, height: CGFloat = 640) {
         self.height = height
-        let e = AppMemoryEditor(bundleID: bundleID, model: model)
+        let e = AppMemoryEditor(bundleID: bundleID, model: model, appName: appName)
         for i in openDetails where e.rows.indices.contains(i) { e.expanded.insert(e.rows[i].id) }
         e.confirmingFresh = askingToStartFresh
         _editor = State(initialValue: e)
     }
 
-    private var appName: String { editor.profile?.appName ?? editor.bundleID }
+    private var appName: String { editor.appName }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -323,9 +324,11 @@ private struct NameRow: View {
     }
 }
 
-/// The app whose Memory sheet is open (`TranslationSettings`' `.sheet(item:)`).
+/// The app whose Memory sheet is open (`TranslationSettings`' `.sheet(item:)`, `AppModel.memoryTarget`). `name` is the lens's name for an
+/// app that has no profile yet.
 struct MemoryTarget: Identifiable {
     let id: String
+    var name: String? = nil
 }
 
 /// What the app profiles list says about an app's memory, and when it offers the one switch that belongs to all of them.

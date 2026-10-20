@@ -94,16 +94,24 @@ final class AppMemoryEditor {
     private(set) var learnedNotice: String?
     /// "Start fresh" waits for the person's yes inside the sheet.
     var confirmingFresh = false
-    /// The profile is gone (forgotten while the sheet was open): the sheet closes.
+    /// The profile is gone (forgotten while the sheet was open): the sheet closes. An app that never had one is not gone: the sheet shows an
+    /// empty memory, and the first edit makes the profile.
     private(set) var gone = false
+    /// The app has had a profile while this sheet was open.
+    private var hadProfile = false
+    /// What the app is called: its profile's name, else the one the lens gave (the name a profile made by this sheet takes).
+    private let givenName: String?
 
-    init(bundleID: String, model: AppModel) {
+    init(bundleID: String, model: AppModel, appName: String? = nil) {
         self.bundleID = bundleID
         self.model = model
+        self.givenName = appName
         reload()
     }
 
     var profile: AppProfile? { model.profile(for: bundleID) }
+
+    var appName: String { profile?.appName ?? givenName ?? bundleID }
 
     /// The translator's count of this app's learned rows; it changes when a row is learned, forgotten, removed or pinned.
     var learnedCounts: LearnedCounts? { model.learnedCounts[bundleID] }
@@ -112,7 +120,8 @@ final class AppMemoryEditor {
 
     /// Everything from the profile, drafts kept: the first read, and after a change of the file.
     private func reload() {
-        guard let p = profile else { gone = true; return }
+        guard let p = profile else { gone = hadProfile; return }
+        hadProfile = true
         if p.note != Self.cleaned(note) { note = p.note }
         let known = Dictionary(rows.compactMap { r in r.stored.map { ($0.id, r) } }, uniquingKeysWith: { a, _ in a })
         var next = p.entries.map { e in Row(e, id: known[e.id]?.id ?? UUID()) }
@@ -123,7 +132,8 @@ final class AppMemoryEditor {
 
     /// The model changed under the sheet (the file was edited, a pin landed): follow it unless it is only what this editor wrote.
     func reconcile() {
-        guard let p = profile else { gone = true; return }
+        guard let p = profile else { gone = hadProfile; return }
+        hadProfile = true
         // Order is the screen's (a draft that was stored joins the profile at its end), so compare as sets.
         let mine = rows.compactMap(\.stored).sorted { $0.id < $1.id }
         if mine != p.entries.sorted(by: { $0.id < $1.id }) || p.note != Self.cleaned(note) { reload() }
@@ -138,7 +148,7 @@ final class AppMemoryEditor {
 
     func setNote(_ text: String) {
         note = String(text.prefix(Self.maxNote))
-        _ = model.setMemoryNote(note, for: bundleID)
+        _ = model.setMemoryNote(note, for: bundleID, named: appName)
     }
 
     // MARK: names and terms
@@ -186,7 +196,7 @@ final class AppMemoryEditor {
             rows[i] = r
             return
         }
-        switch model.setMemoryEntry(entry, replacing: r.stored?.src, for: bundleID) {
+        switch model.setMemoryEntry(entry, replacing: r.stored?.src, for: bundleID, named: appName) {
         case .saved:
             r.stored = profile?.entries.first { $0.id == id }
             r.problem = nil
@@ -196,20 +206,18 @@ final class AppMemoryEditor {
         case .invalid:
             unstore(&r)
             r.problem = .incomplete
-        case .noProfile:
-            gone = true
         }
         rows[i] = r
     }
 
     private func unstore(_ r: inout Row) {
-        if let s = r.stored { model.removeMemoryEntry(src: s.src, for: bundleID) }
+        if let s = r.stored { model.removeMemoryEntry(src: s.src, for: bundleID, named: appName) }
         r.stored = nil
     }
 
     func removeRow(_ id: UUID) {
         guard let i = rows.firstIndex(where: { $0.id == id }) else { return }
-        if let s = rows[i].stored { model.removeMemoryEntry(src: s.src, for: bundleID) }
+        if let s = rows[i].stored { model.removeMemoryEntry(src: s.src, for: bundleID, named: appName) }
         rows.remove(at: i)
         expanded.remove(id)
     }
@@ -234,21 +242,21 @@ final class AppMemoryEditor {
     func setContext(_ choice: ContextChoice) {
         let lines = earlierLines
         switch choice {
-        case .follow: _ = model.setContextOverride(nil, for: bundleID)
-        case .off: _ = model.setContextOverride(AppContextOverride(mode: .off), for: bundleID)
-        case .nearby: _ = model.setContextOverride(AppContextOverride(mode: .nearby), for: bundleID)
-        case .conversation: _ = model.setContextOverride(AppContextOverride(mode: .conversation, previousLines: lines), for: bundleID)
+        case .follow: _ = model.setContextOverride(nil, for: bundleID, named: appName)
+        case .off: _ = model.setContextOverride(AppContextOverride(mode: .off), for: bundleID, named: appName)
+        case .nearby: _ = model.setContextOverride(AppContextOverride(mode: .nearby), for: bundleID, named: appName)
+        case .conversation: _ = model.setContextOverride(AppContextOverride(mode: .conversation, previousLines: lines), for: bundleID, named: appName)
         }
     }
 
     func setEarlierLines(_ n: Int) {
         guard contextChoice == .conversation else { return }
-        _ = model.setContextOverride(AppContextOverride(mode: .conversation, previousLines: n), for: bundleID)
+        _ = model.setContextOverride(AppContextOverride(mode: .conversation, previousLines: n), for: bundleID, named: appName)
     }
 
     // MARK: what is sent
 
-    var sent: SentSummary { model.sentPreview(for: bundleID) }
+    var sent: SentSummary { model.sentPreview(for: bundleID, named: appName) }
 
     /// The other added engines that get this app's memory when another app is in front.
     var otherReceivers: [EngineConfig] { model.otherReceivers(of: bundleID) }
@@ -263,9 +271,8 @@ final class AppMemoryEditor {
     /// Pin: the learned row becomes a row of the profile (a user row from then on, in settings.json).
     func pin(_ record: ContextMemory.LearnedRecord) async {
         learnedNotice = nil
-        let result = await model.pinLearned(src: record.entry.src, for: bundleID)
+        let result = await model.pinLearned(src: record.entry.src, for: bundleID, named: appName)
         if result == .full { learnedNotice = String(localized: "This app keeps \(Self.maxRows) names. Remove one to pin this.") }
-        if result == .noProfile { gone = true }
         reconcile()
         await refreshLearned()
     }

@@ -713,18 +713,38 @@ final class RegionSession {
         return menu
     }
 
-    /// "Remember Languages for <App>" / "Forget …" for a lens that follows a window: the app's profile (AppProfiles.swift).
+    /// The app under the lens: the window it follows, else the topmost window under its centre (`LensWatch.window(of:)`). The check harness
+    /// and the captures name one, because a window of this app is never in the list.
+    var appUnderLens: @MainActor (RegionConfig) -> LensWatch.Read? = { LensWatch.window(of: $0) }
+    /// "Forget <App>…" asks before it removes a memory (`LensMemoryMenu.askToForget`); the check harness answers for it.
+    var confirmsForgetting: @MainActor (_ app: String, _ names: Int) -> Bool = LensMemoryMenu.askToForget
+
+    /// The app's memory in the menu, for every lens whose app is known, anchored or not (design names-and-context §3.2): the names that
+    /// apply, "Memory for <App>…" (Settings with the app's Memory sheet), "Remember Languages" when the pair or engine differs from the
+    /// remembered ones (it keeps the memory), and "Forget" (with an alert when the app has a memory).
     private func addProfileItems(to menu: NSMenu) {
-        guard let anchor = config.anchor, let app = AppModel.app(ofWindow: anchor.windowID) else { return }
-        let model = AppModel.shared, existing = model.profile(for: app.bundleID)
-        let now = AppProfile(bundleID: app.bundleID, appName: app.name, source: settings.sourceLanguage, target: settings.targetLanguage,
-                             customEngineID: settings.customEngineID)
+        guard let app = appUnderLens(config) else { return }
+        let model = AppModel.shared, existing = model.profile(for: app.bundleID), name = LensMemoryMenu.cut(app.appName)
+        let here = LanguageChoice(source: settings.sourceLanguage, target: settings.targetLanguage, customEngineID: settings.customEngineID)
         menu.addItem(.separator())
-        if existing != now {
-            menu.addItem(ActionItem(String(localized: "Remember Languages for \(app.name)")) { model.remember(now) })
+        if let line = LensMemoryMenu.infoLine(app: app.appName, appNames: existing?.entries.count ?? 0, allApps: model.settings.glossaryPairs.count,
+                                              words: .current) {
+            let info = NSMenuItem(title: line, action: nil, keyEquivalent: "")
+            info.isEnabled = false
+            menu.addItem(info)
         }
-        if existing != nil {
-            menu.addItem(ActionItem(String(localized: "Forget Languages for \(app.name)")) { model.forgetProfile(app.bundleID) })
+        menu.addItem(ActionItem(String(localized: "Memory for \(name)…")) { model.openMemory(of: app.bundleID, named: app.appName) })
+        if existing?.languages != here {
+            menu.addItem(ActionItem(String(localized: "Remember Languages for \(name)")) { model.rememberLanguages(here, for: app.bundleID, named: app.appName) })
+        }
+        guard let existing else { return }
+        let confirm = confirmsForgetting
+        if existing.hasMemory {
+            menu.addItem(ActionItem(String(localized: "Forget \(name)…")) {
+                if confirm(app.appName, existing.entries.count) { model.forgetProfile(app.bundleID) }
+            })
+        } else {
+            menu.addItem(ActionItem(String(localized: "Forget Languages for \(name)")) { model.forgetProfile(app.bundleID) })
         }
     }
 

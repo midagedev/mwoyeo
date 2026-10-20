@@ -180,8 +180,6 @@ struct TranslationSettings: View {
     @State private var cached = 0
     @State private var sheet: EngineSheetTarget?
     @State private var removing: EngineConfig?
-    /// The app whose Memory sheet is open.
-    @State private var memoryApp: MemoryTarget?
     /// The active added engine's speed, polled; nil (no row at all) until it has enough batches.
     @State private var speed: SpeedSummary?
     private let intelligence = IntelligenceTranslator()
@@ -234,7 +232,7 @@ struct TranslationSettings: View {
                             Text("Automatic").tag(ParagraphReader?.none)
                             ForEach(ParagraphReader.allCases.filter { $0 != .automatic }, id: \.self) { Text($0.title).tag(ParagraphReader?.some($0)) }
                         }
-                        Button("Memory…") { memoryApp = MemoryTarget(id: p.bundleID) }
+                        Button("Memory…") { model.memoryTarget = MemoryTarget(id: p.bundleID, name: p.appName) }
                         Divider()
                         Button("Forget This App", role: .destructive) { model.forgetProfile(p.bundleID) }
                     } label: { Image(nsImage: .moreActions) }
@@ -258,9 +256,6 @@ struct TranslationSettings: View {
                 Text("Names and terms you wrote go to Apple Translation inside the text, only if you turn this on.")
             }
             .font(.caption).foregroundStyle(.secondary)
-        }
-        .sheet(item: $memoryApp) { target in
-            AppMemorySheet(bundleID: target.id, model: model)
         }
     }
 
@@ -389,6 +384,11 @@ struct TranslationSettings: View {
             }
         }
         .formStyle(.grouped)
+        // The sheet is the model's (a lens's "Memory for <App>…" sets it), so it comes up for an app without a profile too, where the
+        // "App profiles" section is not on screen.
+        .sheet(item: $model.memoryTarget) { target in
+            AppMemorySheet(bundleID: target.id, model: model, appName: target.name)
+        }
     }
 }
 

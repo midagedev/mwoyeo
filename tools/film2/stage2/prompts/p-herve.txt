@@ -1,0 +1,9 @@
+A character portrait for the dialogue scenes of a modern story-driven indie JRPG (2026), the companion portrait to the reference image. Match the reference image exactly in art style: the same clean confident line art and line weight, the same soft painterly cel shading, the same colour saturation, the same rendering of eyes and hair, the same lighting (cool blue rim light from the upper right, soft warm fill from the lower left), as if drawn by the same artist for the same game. The reference shows a different character; do not copy her face, hair or clothes.
+
+Character: Hervé, the princess's elderly tutor, about seventy. Neat white hair swept back, a short trimmed white beard and moustache, kind but stern pale grey eyes behind small round gold-rimmed spectacles, a few soft wrinkles, mouth slightly open as if speaking. He wears a dark forest-green scholar's long coat with a high collar, brass buttons and gold trim, a cream cravat, and holds an old leather-bound book against his chest with one hand.
+
+Framing: bust portrait from the top of the head to the lower chest, three-quarter view, body and face turned toward the viewer's right, eyes looking right, the same scale and position in the frame as the reference (head near the top with a small margin, centered horizontally).
+
+Background: a completely flat, uniform, pure chroma-key green (#00FF00) background with no gradient, no shadow, no texture, no floor. Nothing in the background at all.
+
+No text, no letters, no signature, no watermark, no border, no frame, no UI.

@@ -1,0 +1,9 @@
+A character portrait for the dialogue scenes of a modern story-driven indie JRPG (2026), the companion portrait to the reference image. Match the reference image exactly in art style: the same clean confident line art and line weight, the same soft painterly cel shading, the same colour saturation, the same rendering of eyes and hair, the same lighting (cool blue rim light from the upper right, soft warm fill from the lower left), as if drawn by the same artist for the same game. The reference shows a different character; do not copy her face, hair or clothes.
+
+Character: Haku, the ancient guardian spirit of a moonlit mountain shrine, in the form of a large white fox-like beast (not a human). Snow-white fur with soft pale-blue glowing markings on the brow and cheeks, wise golden eyes, a calm and slightly amused expression, mouth slightly open as if speaking. A thick braided red shrine rope with small folded white paper streamers is tied around its neck. Behind it, the tip of a long luminous pale-blue tail curls up at the side. The paper streamers are plain white zigzag paper with nothing written on them.
+
+Framing: bust portrait from the top of the head to the lower chest, three-quarter view, body and face turned toward the viewer's right, eyes looking right, the same scale and position in the frame as the reference (head near the top with a small margin, centered horizontally).
+
+Background: a completely flat, uniform, pure chroma-key green (#00FF00) background with no gradient, no shadow, no texture, no floor. Nothing in the background at all.
+
+No text, no letters, no signature, no watermark, no border, no frame, no UI.

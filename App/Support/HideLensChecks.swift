@@ -163,7 +163,7 @@ enum HideLensChecks {
 
         // The shortcut: its name, its default, and settings.json accepts it (`Mwoyeo --check-settings`).
         let action = HotKeyAction(rawValue: "hideLenses")
-        check("Hide Lenses is a shortcut action", action?.title == "Hide Lenses", "\(String(describing: action?.title))")
+        check("Hide Lenses is a shortcut action", action?.title == String(localized: "Hide Lenses"), "\(String(describing: action?.title))")
         // No default (the user, 2026-10-21: only Add Lens and Show Original have one, so few keys clash with other apps).
         check("it has no default shortcut", HotKeyAction.defaults["hideLenses"] == nil, "\(String(describing: HotKeyAction.defaults["hideLenses"]))")
         let all = HotKeyAction.defaults

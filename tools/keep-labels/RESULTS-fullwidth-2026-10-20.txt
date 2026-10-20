@@ -1,0 +1,237 @@
+InlineLiteral + full-width edge on the hold-out H3 (lead, 2026-10-20): keeprules of this tree (wordRanges Latin runs, InlineLiteral, TranslationFilter.isCJKText with U+FF00-FF65);
+fixed reads /tmp/h3/legA, run-h3.sh unchanged. Before = RESULTS-lit-spans-2026-10-20.txt (doc R 0.72, url 0.07).
+Cause: a URL glued to a full-width colon or bracket ('リリース：https://…', '详见（https://…）') was one token with the mark, so no url row matched.
+InlineMath keeps its old edge: with the full-width forms paper p12 changed (a reference came back 'MAn, And', 33 -> 34 blocks, x2); reverted, benches byte-identical.
+doc      (a) words      P 0.98 [0.98,0.99]  R 0.89 [0.89,0.90]  (tp 8435 fp 147 fn 1012)
+        recall by reason: code 0.97 [0.97,0.98] n=5190, url 0.89 [0.87,0.90] n=1841, config 0.83 [0.80,0.86] n=569, log 0.31 [0.27,0.35] n=472, cmd 0.60 [0.55,0.65] n=426, path 0.96 [0.93,0.98] n=230, id 0.93 [0.89,0.96] n=212, diffmark 0.86 [0.80,0.90] n=181, flag 0.94 [0.89,0.97] n=121, hotkey 0.84 [0.76,0.90] n=101, hash 1.00 [0.96,1.00] n=99, lineno 1.00 [0.57,1.00] n=5
+        recall by reason: code 0.95 [0.94,0.95] n=8233, url 1.00 [0.99,1.00] n=2512, config 0.53 [0.49,0.56] n=722, log 0.90 [0.87,0.92] n=504, cmd 0.61 [0.56,0.66] n=388, path 0.90 [0.86,0.93] n=234, diffmark 1.00 [0.98,1.00] n=232, id 0.92 [0.87,0.96] n=172, flag 0.94 [0.89,0.97] n=154, hotkey 0.81 [0.72,0.87] n=105, hash 0.98 [0.93,0.99] n=103, lineno 0.81 [0.57,0.93] n=16
+        translate->kept: 147 of 7302 translate words kept by: block 89, span 58; translate/mixed blocks kept whole: {'mixed': 34, 'translate': 9}; by shape: plain prose word 147
+        translate->kept: 109 of 7528 translate words kept by: block 68, span 41; translate/mixed blocks kept whole: {'mixed': 29, 'translate': 5}; by shape: plain prose word 109
+    lang en               P 0.96 R 0.77 (n 1693)   block P 0.89 R 0.68   fp words 53
+    lang ja               P 0.98 R 0.93 (n 3674)   block P 0.99 R 0.98   fp words 56
+    lang ko               P 0.99 R 0.98 (n 1494)   block P 0.99 R 0.99   fp words 13
+    lang zh-Hans          P 0.99 R 0.87 (n 2586)   block P 0.97 R 0.99   fp words 25
+    lang en               P 0.97 R 0.92 (n 1698)   block P 0.87 R 0.74   fp words 49
+    lang ja               P 1.00 R 0.96 (n 4902)   block P 1.00 R 0.96   fp words 14
+    lang ko               P 0.99 R 0.92 (n 1494)   block P 1.00 R 0.97   fp words 8
+    lang zh-Hans          P 0.99 R 0.88 (n 5281)   block P 0.98 R 0.95   fp words 38
+
+=== h2-report.txt (H3)
+H3 SIZE
+screens 68 (scenes 38, looks 15, languages {'ko': 18, 'ja': 16, 'en': 16, 'zh-Hans': 18}), code regions 57
+looks: card-dark 2, card-light 2, chat-dark-plain 1, chat-mint 2, docs-dark 6, docs-light 8, ide-solar 4, md-night 8, md-sepia 8, pane-dark 3, pane-light 4, review-dark 4, review-light 4, term-green 5, term-solarized 7
+  read doc: blocks 3064 {'either': 97, 'keep': 1677, 'mixed': 160, 'none': 277, 'translate': 853}; words {'keep': 9882, 'translate': 7302, 'none': 964, 'either': 809}; uncertain words 1900
+    keep words by reason {'code': 5194, 'url': 1841, 'config': 579, 'log': 500, 'cmd': 427, 'lineno': 369, 'path': 230, 'id': 212, 'diffmark': 193, 'flag': 121, 'hash': 115, 'hotkey': 101}
+    either words by reason {'punct': 377, 'number': 184, 'name': 159, 'cjk-output': 89}
+  read vn: blocks 2462 {'either': 95, 'keep': 1171, 'mixed': 209, 'none': 153, 'translate': 834}; words {'keep': 13811, 'none': 605, 'translate': 7528, 'either': 868}; uncertain words 1949
+    keep words by reason {'code': 8262, 'url': 2512, 'config': 725, 'log': 530, 'cmd': 388, 'lineno': 360, 'diffmark': 251, 'path': 234, 'id': 172, 'flag': 154, 'hash': 118, 'hotkey': 105}
+    either words by reason {'punct': 414, 'number': 198, 'name': 151, 'cjk-output': 105}
+
+TODAY'S RULES (InlineMath + TranslationFilter) ON H3
+  [h3, read doc]
+    (a) words      P 0.98 [0.98,0.98]  R 0.77 [0.76,0.78]  (tp 7299 fp 138 fn 2148)
+        precision by decider: block 0.98 [0.98,0.99] (tp 5195 fp 80), span 0.97 [0.97,0.98] (tp 2104 fp 58)
+        recall by reason: code 0.79 [0.78,0.80] n=5190, url 0.89 [0.87,0.90] n=1841, config 0.55 [0.51,0.59] n=569, log 0.25 [0.22,0.29] n=472, cmd 0.60 [0.55,0.65] n=426, path 0.96 [0.93,0.98] n=230, id 0.92 [0.88,0.95] n=212, diffmark 0.82 [0.76,0.87] n=181, flag 0.94 [0.89,0.97] n=121, hotkey 0.84 [0.76,0.90] n=101, hash 1.00 [0.96,1.00] n=99, lineno 1.00 [0.57,1.00] n=5
+    (b) spans      exact-boundary F1 0.81  (P 0.86 R 0.77; truth 1455, predicted 1300, exact 1117, overlapped 1245, missed 210)   edge error over overlapped spans: mean 0.52 words, exact 1117, <=1 1158, >=3 67
+        exact by reason: code 477/581, path 107/114, url 74/113, config 59/106, id 95/105, hotkey 84/100, hash 99/99, log 13/81, cmd 43/79, flag 53/61, diffmark 13/16
+    (c) block keep P 0.96 [0.95,0.97]  R 0.81 [0.78,0.83]  (tp 1012 fp 41 fn 242)   [truth keep = keep words and no translate word]
+        near-pure   P 0.96 [0.95,0.97]  R 0.79 [0.77,0.81]  (tp 1012 fp 41 fn 270)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 2148 of 9447 keep words; spans fully kept 1150, partly 95, lost 210
+        spans lost or partly by reason: code 76+28/581, path 5+2/114, url 3+5/113, config 40+7/106, id 9+0/105, hotkey 16+0/100, hash 0+0/99, log 39+29/81, cmd 21+15/79, flag 1+6/61, diffmark 0+3/16
+        translate->kept: 138 of 7302 translate words kept by: block 80, span 58; translate/mixed blocks kept whole: {'mixed': 33, 'translate': 8}; by shape: plain prose word 138
+  [h3, read vn]
+    (a) words      P 0.99 [0.99,0.99]  R 0.82 [0.81,0.83]  (tp 10953 fp 105 fn 2422)
+        precision by decider: block 0.99 [0.99,0.99] (tp 7581 fp 64), span 0.99 [0.98,0.99] (tp 3372 fp 41)
+        recall by reason: code 0.82 [0.81,0.82] n=8233, url 1.00 [0.99,1.00] n=2512, config 0.43 [0.40,0.47] n=722, log 0.48 [0.44,0.52] n=504, cmd 0.61 [0.56,0.65] n=388, path 0.90 [0.86,0.93] n=234, diffmark 0.97 [0.93,0.98] n=232, id 0.92 [0.87,0.96] n=172, flag 0.94 [0.89,0.97] n=154, hotkey 0.81 [0.72,0.87] n=105, hash 0.98 [0.93,0.99] n=103, lineno 0.81 [0.57,0.93] n=16
+    (b) spans      exact-boundary F1 0.79  (P 0.82 R 0.76; truth 1179, predicted 1099, exact 898, overlapped 1011, missed 168)   edge error over overlapped spans: mean 1.78 words, exact 898, <=1 935, >=3 67
+        exact by reason: code 293/394, path 108/116, url 85/114, id 96/105, hotkey 85/105, hash 100/103, cmd 34/70, flag 59/67, config 16/56, log 8/34, diffmark 11/12, lineno 3/3
+    (c) block keep P 0.96 [0.94,0.97]  R 0.79 [0.76,0.82]  (tp 723 fp 33 fn 191)   [truth keep = keep words and no translate word]
+        near-pure   P 0.96 [0.94,0.97]  R 0.76 [0.73,0.78]  (tp 724 fp 32 fn 231)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 2422 of 13375 keep words; spans fully kept 930, partly 81, lost 168
+        spans lost or partly by reason: code 58+42/394, path 5+1/116, url 2+1/114, id 8+0/105, hotkey 20+0/105, hash 2+0/103, cmd 24+12/70, flag 0+8/67, config 30+9/56, log 19+7/34, diffmark 0+1/12, lineno 0+0/3
+        translate->kept: 105 of 7528 translate words kept by: block 64, span 41; translate/mixed blocks kept whole: {'mixed': 29, 'translate': 4}; by shape: plain prose word 105
+
+RULES OR CodeRegion ON H3 (what the app does today)
+  [h3, read doc]
+    (a) words      P 0.98 [0.98,0.99]  R 0.89 [0.89,0.90]  (tp 8435 fp 147 fn 1012)
+        precision by decider: block 0.99 [0.98,0.99] (tp 6431 fp 89), span 0.97 [0.96,0.98] (tp 2004 fp 58)
+        recall by reason: code 0.97 [0.97,0.98] n=5190, url 0.89 [0.87,0.90] n=1841, config 0.83 [0.80,0.86] n=569, log 0.31 [0.27,0.35] n=472, cmd 0.60 [0.55,0.65] n=426, path 0.96 [0.93,0.98] n=230, id 0.93 [0.89,0.96] n=212, diffmark 0.86 [0.80,0.90] n=181, flag 0.94 [0.89,0.97] n=121, hotkey 0.84 [0.76,0.90] n=101, hash 1.00 [0.96,1.00] n=99, lineno 1.00 [0.57,1.00] n=5
+    (b) spans      exact-boundary F1 0.88  (P 0.90 R 0.85; truth 1455, predicted 1373, exact 1238, overlapped 1330, missed 125)   edge error over overlapped spans: mean 0.26 words, exact 1238, <=1 1279, >=3 36
+        exact by reason: code 573/581, path 107/114, url 74/113, config 79/106, id 95/105, hotkey 84/100, hash 98/99, log 18/81, cmd 43/79, flag 53/61, diffmark 14/16
+    (c) block keep P 0.96 [0.95,0.97]  R 0.91 [0.89,0.92]  (tp 1137 fp 43 fn 117)   [truth keep = keep words and no translate word]
+        near-pure   P 0.96 [0.95,0.97]  R 0.89 [0.87,0.90]  (tp 1137 fp 43 fn 145)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 1012 of 9447 keep words; spans fully kept 1273, partly 57, lost 125
+        spans lost or partly by reason: code 7+1/581, path 5+2/114, url 3+5/113, config 25+2/106, id 8+0/105, hotkey 16+0/100, hash 0+0/99, log 39+24/81, cmd 21+15/79, flag 1+6/61, diffmark 0+2/16
+        translate->kept: 147 of 7302 translate words kept by: block 89, span 58; translate/mixed blocks kept whole: {'mixed': 34, 'translate': 9}; by shape: plain prose word 147
+  [h3, read vn]
+    (a) words      P 0.99 [0.99,0.99]  R 0.92 [0.92,0.92]  (tp 12305 fp 109 fn 1070)
+        precision by decider: block 0.99 [0.99,0.99] (tp 9127 fp 68), span 0.99 [0.98,0.99] (tp 3178 fp 41)
+        recall by reason: code 0.95 [0.94,0.95] n=8233, url 1.00 [0.99,1.00] n=2512, config 0.53 [0.49,0.56] n=722, log 0.90 [0.87,0.92] n=504, cmd 0.61 [0.56,0.66] n=388, path 0.90 [0.86,0.93] n=234, diffmark 1.00 [0.98,1.00] n=232, id 0.92 [0.87,0.96] n=172, flag 0.94 [0.89,0.97] n=154, hotkey 0.81 [0.72,0.87] n=105, hash 0.98 [0.93,0.99] n=103, lineno 0.81 [0.57,0.93] n=16
+    (b) spans      exact-boundary F1 0.86  (P 0.88 R 0.85; truth 1179, predicted 1131, exact 997, overlapped 1076, missed 103)   edge error over overlapped spans: mean 0.91 words, exact 997, <=1 1034, >=3 34
+        exact by reason: code 372/394, path 108/116, url 85/114, id 96/105, hotkey 85/105, hash 100/103, cmd 34/70, flag 59/67, config 22/56, log 21/34, diffmark 12/12, lineno 3/3
+    (c) block keep P 0.96 [0.95,0.97]  R 0.90 [0.88,0.92]  (tp 823 fp 34 fn 91)   [truth keep = keep words and no translate word]
+        near-pure   P 0.96 [0.95,0.97]  R 0.86 [0.84,0.88]  (tp 824 fp 33 fn 131)   [truth keep = keep share of scored words >= 0.9]
+    (d) keep->translated: 1070 of 13375 keep words; spans fully kept 1029, partly 47, lost 103
+        spans lost or partly by reason: code 6+15/394, path 5+1/116, url 2+1/114, id 8+0/105, hotkey 20+0/105, hash 2+0/103, cmd 24+12/70, flag 0+8/67, config 27+6/56, log 9+4/34, diffmark 0+0/12, lineno 0+0/3
+        translate->kept: 109 of 7528 translate words kept by: block 68, span 41; translate/mixed blocks kept whole: {'mixed': 29, 'translate': 5}; by shape: plain prose word 109
+
+VERDICT PER REASON SLICE (stop rule: P and R >= 0.95; fewer than 40 keep words: thin)
+  rules only, read doc: slice  n keep words   R (kept/n)       false keeps charged   P            verdict
+    code          5190   R 0.79 [0.78,0.80] (4107/5190)   fp    0   P 1.00   MISS (R)
+    cmd            426   R 0.60 [0.55,0.65] (256/426)   fp    2   P 0.99   MISS (R)
+    log            472   R 0.25 [0.22,0.29] (119/472)   fp    1   P 0.99   MISS (R)
+    config         569   R 0.55 [0.51,0.59] (312/569)   fp    1   P 1.00   MISS (R)
+    path           230   R 0.96 [0.93,0.98] (221/230)   fp    0   P 1.00   rules enough
+    id             212   R 0.92 [0.88,0.95] (196/212)   fp    3   P 0.98   MISS (R)
+    flag           121   R 0.94 [0.89,0.97] (114/121)   fp    1   P 0.99   MISS (R)
+    url           1841   R 0.89 [0.87,0.90] (1636/1841)   fp   64   P 0.96   MISS (R)
+    hash            99   R 1.00 [0.96,1.00] (99/99)   fp    0   P 1.00   rules enough
+    hotkey         101   R 0.84 [0.76,0.90] (85/101)   fp    0   P 1.00   MISS (R)
+    lineno           5   R 1.00 [0.57,1.00] (5/5)   fp    0   P 1.00   thin - no verdict
+    diffmark       181   R 0.82 [0.76,0.87] (149/181)   fp    0   P 1.00   MISS (R)
+    prose block      0   R nan [0.00,1.00] (0/0)   fp   66   P 0.00   thin - no verdict
+    all words: kept keep words 7299, false keeps 138
+  rules only, read vn: slice  n keep words   R (kept/n)       false keeps charged   P            verdict
+    code          8233   R 0.82 [0.81,0.82] (6724/8233)   fp    1   P 1.00   MISS (R)
+    cmd            388   R 0.61 [0.56,0.65] (235/388)   fp    2   P 0.99   MISS (R)
+    log            504   R 0.48 [0.44,0.52] (242/504)   fp    1   P 1.00   MISS (R)
+    config         722   R 0.43 [0.40,0.47] (311/722)   fp    2   P 0.99   MISS (R)
+    path           234   R 0.90 [0.86,0.93] (211/234)   fp   14   P 0.94   MISS (R) (P)
+    id             172   R 0.92 [0.87,0.96] (159/172)   fp    0   P 1.00   MISS (R)
+    flag           154   R 0.94 [0.89,0.97] (145/154)   fp    0   P 1.00   MISS (R)
+    url           2512   R 1.00 [0.99,1.00] (2503/2512)   fp   34   P 0.99   rules enough
+    hash           103   R 0.98 [0.93,0.99] (101/103)   fp    2   P 0.98   rules enough
+    hotkey         105   R 0.81 [0.72,0.87] (85/105)   fp    0   P 1.00   MISS (R)
+    lineno          16   R 0.81 [0.57,0.93] (13/16)   fp    0   P 1.00   thin - no verdict
+    diffmark       232   R 0.97 [0.93,0.98] (224/232)   fp    0   P 1.00   rules enough
+    prose block      0   R nan [0.00,1.00] (0/0)   fp   49   P 0.00   thin - no verdict
+    all words: kept keep words 10953, false keeps 105
+  rules OR CodeRegion, read doc: slice  n keep words   R (kept/n)       false keeps charged   P            verdict
+    code          5190   R 0.97 [0.97,0.98] (5049/5190)   fp    0   P 1.00   rules enough
+    cmd            426   R 0.60 [0.55,0.65] (256/426)   fp    2   P 0.99   MISS (R)
+    log            472   R 0.31 [0.27,0.35] (144/472)   fp    1   P 0.99   MISS (R)
+    config         569   R 0.83 [0.80,0.86] (473/569)   fp    1   P 1.00   MISS (R)
+    path           230   R 0.96 [0.93,0.98] (221/230)   fp    0   P 1.00   rules enough
+    id             212   R 0.93 [0.89,0.96] (197/212)   fp    3   P 0.98   MISS (R)
+    flag           121   R 0.94 [0.89,0.97] (114/121)   fp    1   P 0.99   MISS (R)
+    url           1841   R 0.89 [0.87,0.90] (1636/1841)   fp   64   P 0.96   MISS (R)
+    hash            99   R 1.00 [0.96,1.00] (99/99)   fp    2   P 0.98   rules enough
+    hotkey         101   R 0.84 [0.76,0.90] (85/101)   fp    0   P 1.00   MISS (R)
+    lineno           5   R 1.00 [0.57,1.00] (5/5)   fp    0   P 1.00   thin - no verdict
+    diffmark       181   R 0.86 [0.80,0.90] (156/181)   fp    0   P 1.00   MISS (R)
+    prose block      0   R nan [0.00,1.00] (0/0)   fp   73   P 0.00   thin - no verdict
+    all words: kept keep words 8435, false keeps 147
+  rules OR CodeRegion, read vn: slice  n keep words   R (kept/n)       false keeps charged   P            verdict
+    code          8233   R 0.95 [0.94,0.95] (7785/8233)   fp    1   P 1.00   MISS (R)
+    cmd            388   R 0.61 [0.56,0.66] (237/388)   fp    2   P 0.99   MISS (R)
+    log            504   R 0.90 [0.87,0.92] (453/504)   fp    1   P 1.00   MISS (R)
+    config         722   R 0.53 [0.49,0.56] (381/722)   fp    2   P 0.99   MISS (R)
+    path           234   R 0.90 [0.86,0.93] (211/234)   fp   14   P 0.94   MISS (R) (P)
+    id             172   R 0.92 [0.87,0.96] (159/172)   fp    0   P 1.00   MISS (R)
+    flag           154   R 0.94 [0.89,0.97] (145/154)   fp    0   P 1.00   MISS (R)
+    url           2512   R 1.00 [0.99,1.00] (2503/2512)   fp   34   P 0.99   rules enough
+    hash           103   R 0.98 [0.93,0.99] (101/103)   fp    2   P 0.98   rules enough
+    hotkey         105   R 0.81 [0.72,0.87] (85/105)   fp    0   P 1.00   MISS (R)
+    lineno          16   R 0.81 [0.57,0.93] (13/16)   fp    0   P 1.00   thin - no verdict
+    diffmark       232   R 1.00 [0.98,1.00] (232/232)   fp    0   P 1.00   rules enough
+    prose block      0   R nan [0.00,1.00] (0/0)   fp   53   P 0.00   thin - no verdict
+    all words: kept keep words 12305, false keeps 109
+
+CUTS
+  by look and by language, rules OR CodeRegion, read doc: word P / R (keep words), block-keep P / R, keep words n
+    look card-dark        P 0.95 R 0.78 (n 23)   block P 1.00 R 1.00   fp words 1
+    look card-light       P 0.75 R 0.71 (n 17)   block P 0.67 R 0.67   fp words 4
+    look chat-dark-plain  P 0.83 R 0.91 (n 11)   block P 0.75 R 1.00   fp words 2
+    look chat-mint        P 0.98 R 0.96 (n 96)   block P 0.89 R 1.00   fp words 2
+    look docs-dark        P 0.97 R 0.92 (n 716)   block P 0.93 R 0.97   fp words 19
+    look docs-light       P 0.96 R 0.81 (n 641)   block P 0.88 R 0.88   fp words 21
+    look ide-solar        P 1.00 R 0.93 (n 396)   block P 1.00 R 0.96   fp words 1
+    look md-night         P 0.96 R 0.90 (n 1199)   block P 0.94 R 0.85   fp words 40
+    look md-sepia         P 0.95 R 0.79 (n 969)   block P 0.94 R 0.96   fp words 41
+    look pane-dark        P 1.00 R 0.98 (n 228)   block P 1.00 R 0.96   fp words 0
+    look pane-light       P 1.00 R 1.00 (n 312)   block P 1.00 R 1.00   fp words 0
+    look review-dark      P 1.00 R 0.97 (n 1614)   block P 0.99 R 0.99   fp words 7
+    look review-light     P 1.00 R 0.97 (n 2060)   block P 0.99 R 0.99   fp words 9
+    look term-green       P 1.00 R 0.80 (n 464)   block P 1.00 R 0.78   fp words 0
+    look term-solarized   P 1.00 R 0.62 (n 701)   block P 1.00 R 0.65   fp words 0
+    lang en               P 0.96 R 0.77 (n 1693)   block P 0.89 R 0.68   fp words 53
+    lang ja               P 0.98 R 0.93 (n 3674)   block P 0.99 R 0.98   fp words 56
+    lang ko               P 0.99 R 0.98 (n 1494)   block P 0.99 R 0.99   fp words 13
+    lang zh-Hans          P 0.99 R 0.87 (n 2586)   block P 0.97 R 0.99   fp words 25
+  by look and by language, rules OR CodeRegion, read vn: word P / R (keep words), block-keep P / R, keep words n
+    look card-dark        P 0.87 R 0.93 (n 14)   block P 1.00 R 1.00   fp words 2
+    look card-light       P 0.76 R 0.76 (n 17)   block P 0.00 R 0.00   fp words 4
+    look chat-dark-plain  P 1.00 R 0.91 (n 11)   block P 1.00 R 1.00   fp words 0
+    look chat-mint        P 0.98 R 0.96 (n 100)   block P 0.80 R 1.00   fp words 2
+    look docs-dark        P 0.97 R 0.83 (n 880)   block P 0.93 R 0.96   fp words 20
+    look docs-light       P 0.98 R 0.91 (n 949)   block P 0.90 R 0.79   fp words 21
+    look ide-solar        P 1.00 R 0.75 (n 761)   block P 1.00 R 0.92   fp words 1
+    look md-night         P 0.98 R 0.95 (n 1543)   block P 0.92 R 0.79   fp words 33
+    look md-sepia         P 0.98 R 0.89 (n 1236)   block P 0.93 R 0.94   fp words 20
+    look pane-dark        P 1.00 R 0.85 (n 305)   block P 1.00 R 0.74   fp words 0
+    look pane-light       P 1.00 R 0.78 (n 537)   block P 1.00 R 0.93   fp words 0
+    look review-dark      P 1.00 R 0.99 (n 2699)   block P 0.99 R 1.00   fp words 6
+    look review-light     P 1.00 R 0.95 (n 2750)   block P 1.00 R 0.96   fp words 0
+    look term-green       P 1.00 R 0.93 (n 718)   block P 1.00 R 0.87   fp words 0
+    look term-solarized   P 1.00 R 0.94 (n 855)   block P 1.00 R 0.89   fp words 0
+    lang en               P 0.97 R 0.92 (n 1698)   block P 0.87 R 0.74   fp words 49
+    lang ja               P 1.00 R 0.96 (n 4902)   block P 1.00 R 0.96   fp words 14
+    lang ko               P 0.99 R 0.92 (n 1494)   block P 1.00 R 0.97   fp words 8
+    lang zh-Hans          P 0.99 R 0.88 (n 5281)   block P 0.98 R 0.95   fp words 38
+
+CLUSTERS (rules OR CodeRegion)
+  clusters of the missed keep words, read doc: 8 (block kind), top 8
+     432 words in  58 blocks  inline piece in a prose block      scenes {'cli-ja': 4, 'ref-ja': 4, 'cards-ko': 3, 'cli-zh': 3}  looks {'md-sepia': 12, 'docs-light': 11, 'md-night': 11, 'docs-dark': 8}
+         caught by (of 58): no block feature applies   e.g. build/mas/export/Mwoyeo.pkg에 | 1ocalizations stringunit
+     326 words in  61 blocks  log / tool-output line             scenes {'bench-en': 38, 'blame-en': 20, 'appprofile-en': 2, 'cards-en': 1}  looks {'term-solarized': 38, 'term-green': 20, 'docs-light': 2, 'card-light': 1}
+         caught by (of 61): indent 40 mono 13 lineend 9 keyword 5 tint 3   e.g. settings.json: 7: unknown key apProfiles[0].paragraphReadr (did you me | settings.json: 14: appProfiles[0].entries[1]: missing "src"; dropped
+      78 words in   3 blocks  comment-only line of a code region scenes {'mas-ko': 1, 'release-ja': 1, 'secrets-zh': 1}  looks {'term-solarized': 1, 'ide-solar': 1, 'term-green': 1}
+         caught by (of 3): indent 1 mono 0 lineend 0 keyword 0 tint 0   e.g. # 인증 정보는 파일에 두지 않아요. 환경 변수로만 받고, 없으면 바로 멈춰요. | #ディスクイメージを作り、署名してから公証に出す。
+      63 words in   5 blocks  code line                          scenes {'stats-en': 2, 'release-ja': 1, 'review-ja': 1, 'review-en': 1}  looks {'docs-light': 1, 'review-light': 1, 'ide-solar': 1, 'pane-dark': 1}
+         caught by (of 5): indent 5 mono 0 lineend 0 keyword 2 tint 3   e.g. ditto " $APP" "$STAGE/Mwoyeo.app" 1n-s /Applications "$STAGE/Applicati | VStack（al1gnment：・leading）（
+      53 words in  28 blocks  other keep line                    scenes {'cli-en': 23, 'ref-en': 2, 'review-ja': 1, 'review-zh': 1}  looks {'md-night': 14, 'docs-light': 9, 'docs-dark': 2, 'review-light': 1}
+         caught by (of 28): indent 19 mono 0 lineend 2 keyword 3 tint 3   e.g. 色-166.6+168.8 @@ struct TranslationSettings: View （ | --check-settings [path]
+      37 words in   8 blocks  config line                        scenes {'cli-en': 5, 'strings-ja': 2, 'strings-zh': 1}  looks {'md-night': 3, 'md-sepia': 2, 'docs-light': 2, 'docs-dark': 1}
+         caught by (of 8): indent 6 mono 0 lineend 0 keyword 0 tint 3   e.g. "value"：“a外对 2号” | "value"：“未設定”
+      19 words in   3 blocks  command line                       scenes {'cli-en': 2, 'cli-ja': 1}  looks {'md-sepia': 1, 'docs-light': 1, 'md-night': 1}
+         caught by (of 3): indent 2 mono 0 lineend 0 keyword 0 tint 3   e.g. pytnons-benen.py --out gutiFak-htt・18o1） | puthon: -i soolexmock-ocenai/gorver.by ‹ports.
+       4 words in   2 blocks  path / window chrome               scenes {'stats-en': 2}  looks {'ide-solar': 1, 'pane-dark': 1}
+         caught by (of 2): indent 1 mono 0 lineend 0 keyword 0 tint 1   e.g. scripts › stats.py | stats. py
+  false fires of each feature on the 853 pure-translate blocks of H3, read doc: indent 603, mono 13, lineend 2, keyword 16, tint 144   (tint against the dominant colour)
+  clusters of the missed keep words, read vn: 8 (block kind), top 8
+     393 words in  18 blocks  code line                          scenes {'stats-en': 8, 'mas-ko': 4, 'review-ja': 2, 'review-zh': 2}  looks {'pane-dark': 8, 'review-light': 4, 'term-solarized': 2, 'ide-solar': 2}
+         caught by (of 18): indent 15 mono 1 lineend 2 keyword 7 tint 2   e.g. cat scripts/mas.sh #!/bin/zsh # 인증 정보는 파일에 두지 않아요. 환경 변수로만 받고, 없으면 바로  | cd "$ROOT" # 인페인팅 모델이 없으면 앱을 만들어도 소용없으니 먼저 확인해요. [[-d tools/inpaint/mo
+     300 words in  15 blocks  config line                        scenes {'cli-en': 6, 'strings-ja': 4, 'strings-zh': 4, 'strings-ko': 1}  looks {'docs-light': 3, 'md-night': 3, 'pane-dark': 2, 'md-sepia': 2}
+         caught by (of 15): indent 12 mono 1 lineend 0 keyword 0 tint 4   e.g. A }, "zh-Hans": { "stringunit": { "state" : "translated", "value":"fi표 | "value" ： " 踪号”
+     222 words in  54 blocks  inline piece in a prose block      scenes {'ref-ko': 3, 'review-en': 3, 'cli-zh': 3, 'review-zh': 3}  looks {'md-sepia': 12, 'docs-light': 11, 'docs-dark': 8, 'md-night': 7}
+         caught by (of 54): no block feature applies   e.g. build/mas/export/Mwoyeo.pkg에 | 1ocalizations stringunit
+      59 words in   3 blocks  comment-only line of a code region scenes {'secrets-zh': 2, 'mas-ko': 1}  looks {'md-sepia': 1, 'term-green': 1, 'md-night': 1}
+         caught by (of 3): indent 1 mono 0 lineend 0 keyword 0 tint 0   e.g. #!/bin/zsh # 인증 정보는 파일에 두지 않아요. 환경 변수로만 받고, 없으면 바로 멈춰요. | # 只在持有开发者证书的那台 Mac 上运行一次。set -euo pipefail
+      49 words in  11 blocks  log / tool-output line             scenes {'blame-en': 5, 'bench-en': 3, 'stat-ja': 1, 'appprofile-en': 1}  looks {'term-green': 5, 'term-solarized': 4, 'docs-light': 1, 'card-light': 1}
+         caught by (of 11): indent 8 mono 2 lineend 4 keyword 0 tint 2   e.g. +++++++++十十十+ | settings.json: 7: unknown key appProfiles[0].paragraphReadr (did you m
+      32 words in  31 blocks  other keep line                    scenes {'cli-en': 28, 'ref-en': 2, 'review-en': 1}  looks {'docs-light': 14, 'md-night': 14, 'review-light': 1, 'md-sepia': 1}
+         caught by (of 31): indent 29 mono 0 lineend 2 keyword 0 tint 0   e.g. --check-settings [path] | --engines < list>
+      13 words in   3 blocks  command line                       scenes {'cli-en': 2, 'cli-ja': 1}  looks {'md-sepia': 1, 'docs-light': 1, 'md-night': 1}
+         caught by (of 3): indent 3 mono 3 lineend 2 keyword 0 tint 3   e.g. python3 -I bench.py --out out/raw-http・jsonl python3 -I bench.py --eng | python3 -I tools/mock-openai/server.py ‹port> ‹mode> [native, stamp]
+       2 words in   1 blocks  path / window chrome               scenes {'stats-en': 1}  looks {'ide-solar': 1}
+         caught by (of 1): indent 1 mono 0 lineend 0 keyword 0 tint 0   e.g. scripts › stats.py
+  false fires of each feature on the 834 pure-translate blocks of H3, read vn: indent 583, mono 16, lineend 0, keyword 16, tint 155   (tint against the dominant colour)
+
+  translate words kept (rules OR CodeRegion), read doc: 147; by screen: {('cli-ja', 'md-sepia'): 27, ('ref-ja', 'md-night'): 19, ('cli-en', 'md-night'): 8, ('secrets-zh', 'md-night'): 7, ('cli-en', 'docs-light'): 6, ('review-en', 'review-light'): 6, ('review-en', 'review-dark'): 6, ('http-en', 'md-sepia'): 5}
+    cli-ko.docs-light-doc-21: 1 of 5 words kept (span): 설정 과일의 JSON 스키마를 슬력해요
+    cli-ko.docs-light-doc-33: 1 of 3 words kept (block): seriots/ralesse.sr 1.0.8 --uublish
+    cli-ko.docs-light-doc-66: 1 of 4 words kept (block): • MS QNE: https://github.com/midegedev/mwoyeo/blob/main/docs/settings-for-
+    cli-ko.docs-light-doc-67: 1 of 1 words kept (block): agents.md
+    cli-ko.md-night-doc-6: 1 of 5 words kept (span): 설정 파일의 JSON 스키마를 출력해요
+    review-ko.review-dark-doc-72: 1 of 18 words kept (span): memoryProtiLes(_:profiles:)는 이제 customEngineID 를 묻지 않아요. 앞에 올 수 있는 엔진은 어떤 것이든 될 수 있기
+    cards-ko.card-light-doc-12: 1 of 10 words kept (span): macOS 글자 인식이 응답하지 않아요. Mac을 재시동하면 대개 해 결돼요.
+    cards-ko.card-dark-doc-12: 1 of 10 words kept (span): macOS 글자 인식이 응답하지 않아요. Mac을 재시동하면 대개 해 결돼요.
+  translate words kept (rules OR CodeRegion), read vn: 109; by screen: {('secrets-zh', 'md-night'): 17, ('cli-en', 'docs-light'): 8, ('cli-en', 'md-night'): 8, ('review-en', 'review-dark'): 6, ('readme-zh-a', 'md-sepia'): 6, ('readme-zh-a', 'docs-light'): 6, ('ref-ja', 'md-night'): 5, ('http-en', 'md-sepia'): 5}
+    mas-ko.md-sepia-vn-9: 1 of 11 words kept (block): PROFIIE to the name of the Mac App Store provisioning profile}
+    cli-ko.docs-light-vn-21: 1 of 5 words kept (span): 설정 파일의 JSON 스키마를 출력해요
+    cli-ko.md-night-vn-8: 1 of 5 words kept (span): 설정 파일의 JSON 스키마를 출력해요
+    cards-ko.card-light-vn-10: 1 of 14 words kept (span): 글자 인식이 응답하지 않아요 macOS 글자 인식이 응답하지 않아요. Mac을 재시동하면 대개 해 결돼요.
+    cards-ko.card-dark-vn-9: 1 of 14 words kept (span): 글자 인식이 응답하지 않아요 macOS 글자 인식이 응답하지 않아요. Mac을 재시동하면 대개 해 결돼요.
+    ref-ko.docs-dark-vn-22: 1 of 6 words kept (span): 직접 만든 HTTP 엔진의 요청을 채워요
+    ref-ko.docs-dark-vn-39: 1 of 9 words kept (span): 맥 앱 스토어용 pkg를 내보내요 MAS 구성의 빌드 설정이에요
+    ref-ko.md-sepia-vn-10: 1 of 6 words kept (span): 직접 만든 HTTP 엔진의 요청을 채워요

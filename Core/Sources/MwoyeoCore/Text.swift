@@ -370,6 +370,14 @@ public enum TranslationFilter {
         return zip(scalars, scalars.dropFirst()).contains { CharacterSet.lowercaseLetters.contains($0) && CharacterSet.uppercaseLetters.contains($1) }
     }
 
+    /// Kana, han, hangul and the punctuation CJK text is set with (the CJK block and the full-width forms `：（），！？`): what a sentence in
+    /// Japanese, Chinese or Korean is written in. A Latin run glued to it ends at it (`リリース：https://…`).
+    /// InlineMath keeps its own edge without the full-width forms: with them its spans moved and a reference of paper p12 came back
+    /// from the translator as "MAn, And" (paper bench, 2026-10-20).
+    static func isCJKText(_ c: Character) -> Bool {
+        c.unicodeScalars.contains { isCJK($0) || (0x3000...0x303F).contains($0.value) || (0xFF00...0xFF65).contains($0.value) }
+    }
+
     static func isCJK(_ s: Unicode.Scalar) -> Bool {
         switch s.value {
         case 0x3040...0x30FF, 0x3400...0x4DBF, 0x4E00...0x9FFF, 0xF900...0xFAFF, 0xFF66...0xFF9D, // kana, han, half-width kana

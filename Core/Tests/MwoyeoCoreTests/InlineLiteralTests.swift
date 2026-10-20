@@ -24,6 +24,13 @@ import Testing
         #expect(!keeps("Visit the site for details.", "url"))
     }
 
+    /// Japanese and Chinese set a colon or a bracket full width and glue the URL to it: the full-width mark ends the CJK text,
+    /// not the URL (H3: 1841 url words, recall 0.07 before).
+    @Test func aURLAfterAFullWidthColonStaysAsWritten() {
+        #expect(found("• リリース：https://github.com/midagedev/mwoyeo/releases").map(\.text) == ["https://github.com/midagedev/mwoyeo/releases"])
+        #expect(keeps("详见（https://example.com/a）。", "url"))
+    }
+
     @Test func anEmailAddressStaysAsWritten() {
         #expect(keeps("Write to admin@example.org about it.", "email"))
         #expect(!keeps("Mr. Smith wrote to us.", "email"))

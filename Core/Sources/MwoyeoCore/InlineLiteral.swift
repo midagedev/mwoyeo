@@ -129,9 +129,9 @@ public enum InlineLiteral {
         var i = 0
         while i < chars.count {
             if chars[i].isWhitespace { i += 1; continue }
-            let cjk = isCJKText(chars[i])
+            let cjk = TranslationFilter.isCJKText(chars[i])
             var j = i
-            while j < chars.count, !chars[j].isWhitespace, isCJKText(chars[j]) == cjk { j += 1 }
+            while j < chars.count, !chars[j].isWhitespace, TranslationFilter.isCJKText(chars[j]) == cjk { j += 1 }
             var a = i, b = j
             while a < b, edgePunctuation.contains(chars[a]) { a += 1 }
             while b > a, edgePunctuation.contains(chars[b - 1]) { b -= 1 }
@@ -146,12 +146,6 @@ public enum InlineLiteral {
             i = j
         }
         return out
-    }
-
-    /// Kana, han, hangul and the punctuation block of CJK text. The composition of `TranslationFilter.isCJK` and
-    /// `InlineMath`'s private test, which is the same edge rule (a CJK letter ends a Latin token).
-    private static func isCJKText(_ c: Character) -> Bool {
-        c.unicodeScalars.contains { TranslationFilter.isCJK($0) || (0x3000...0x303F).contains($0.value) }
     }
 
     private struct Shape: OptionSet {

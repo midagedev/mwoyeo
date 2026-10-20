@@ -474,6 +474,7 @@ enum UICapture {
             failed += CodeKeepChecks.run()
             failed += await LensRobustChecks.run(model)
             failed += await ContextChecks.run()
+            failed += await AppleGlossaryChecks.run()
             failed += DriftChecks.run()
             failed += await EnginePermissionChecks.run(model)
             failed += await EngineContextChecks.run(model)

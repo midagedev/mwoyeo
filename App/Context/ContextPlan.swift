@@ -20,7 +20,10 @@ enum ContextPlan: Equatable {
                 && (ContextOptions.couldBeOn(engine: engine, profiles: s.appProfiles)
                     || ContextOptions.memoryOnlyCouldApply(engine: engine, profiles: s.appProfiles))
         }
-        return s.appleUsesPinnedTerms && s.engine != .customModel && s.appProfiles.contains { !$0.entries.isEmpty }
+        // The pinned terms are the app's own names and the global glossary's pairs: the lens is read for either of them, for the
+        // plan that carries them needs a lens.
+        return s.appleUsesPinnedTerms && s.engine != .customModel
+            && (s.appProfiles.contains { !$0.entries.isEmpty } || !s.glossaryPairs.isEmpty)
     }
 
     /// - `engine`: the added engine in use, nil for Apple.
@@ -35,8 +38,11 @@ enum ContextPlan: Equatable {
             return options.enabled ? .engine(engine, options, profile) : nil
         }
         // Apple Translation: the profile's override may say On (`nearby` alone turns it on), and that changes nothing here. Only
-        // the pinned names do, and only when the user turned them on and wrote some for this app.
-        guard settings.appleUsesPinnedTerms, settings.engine != .customModel, let profile, !profile.entries.isEmpty else { return nil }
-        return .applePins(profile.entries)
+        // the pinned names do, and only when the user turned them on and wrote some for this app or in the global glossary.
+        guard settings.appleUsesPinnedTerms, settings.engine != .customModel else { return nil }
+        // The app's own rows first, then the glossary's pairs the app's memory does not have (the app's row wins).
+        let rows = ContextMemory.applePins(appRows: profile?.entries ?? [], glossary: settings.glossaryPairs)
+        guard !rows.isEmpty else { return nil }
+        return .applePins(rows)
     }
 }

@@ -67,7 +67,7 @@ struct SettingSpec {
         .init(key: "paragraphReader", kind: .choice(ParagraphReader.allCases.map(\.rawValue)),
               doc: "How text is cut into paragraphs: automatic, documentLayout (the macOS document model) or lineGrouping (the app's own line rules)."),
         .init(key: "appleUsesPinnedTerms", kind: .bool,
-              doc: "Apple Translation follows the names and terms you pinned in an app's memory, by putting your translation into the source text. Off by default. Written to the file only when true; write false to turn it off."),
+              doc: "Apple Translation follows the names and terms you pinned in an app's memory and the pairs in the global glossary, by putting your translation into the source text. A name the app's memory has wins over the glossary's pair of the same name. Off by default. Written to the file only when true; write false to turn it off."),
         .init(key: "agentConnection", kind: .bool,
               doc: "Lets an agent connected with `Mwoyeo --mcp` use the app: read the translation log, read and write each app's memory, and read and change settings. Off by default, so a connected agent is refused until the person turns it on in Settings > General. An agent cannot change this key. Written to the file only when true; write false to turn it off."),
     ]

@@ -361,15 +361,30 @@ enum ContextChecks {
         func summary(_ e: EngineConfig?, _ p: AppProfile?, learned: Int = 0) -> SentSummary {
             ContextPreview.summary(engine: e, profile: p, appName: "Example Chat", category: social, learnedUsable: learned)
         }
+        // 2026-10-21 (round nameslens, design names-and-context §3.3, G15): the names part of the "Sent:" line says whose the names are. It
+        // used to be "up to 1 name"; it is "up to 1 name (1 this app)" now. Derivation: `written` holds one name of the app and no glossary
+        // pair goes (`summary` passes none), so the total is 1 and the one scope with names is "this app". The three rows below are re-pinned
+        // by the same rule. FAIL first: the old texts against this build, "Sent: … up to 1 name" ≠ "… up to 1 name (1 this app)".
         t.check("sent preview: memory only says the card, the note and the names, and no title or lines",
-                summary(plain, written).text == "Sent: Example Chat · social · note · up to 1 name" && summary(plain, written).mode == .memoryOnly)
+                summary(plain, written).text == "Sent: Example Chat · social · note · up to 1 name (1 this app)" && summary(plain, written).mode == .memoryOnly)
         t.check("sent preview: an override of off, no memory and Apple Translation are lines only",
                 summary(plain, profile(context: off, entries: entries, note: "x")).text == "Sent: lines only" && summary(plain, profile()).mode == .linesOnly
                 && summary(nil, written).mode == .linesOnly && summary(nil, written).engineName == nil)
         t.check("sent preview: an engine that is On says its lines, the window title on this Mac, and learned rows when they are on",
-                summary(on, written).text == "Sent: Example Chat · social · window title · note · up to 1 name · 2 lines before · 2 lines after"
+                summary(on, written).text == "Sent: Example Chat · social · window title · note · up to 1 name (1 this app) · 2 lines before · 2 lines after"
                 && summary(engine("openai", base: url, context: EngineContext(enabled: true, previousLines: 2, useLearned: true)), written, learned: 3).names == 4
                 && summary(on, written, learned: 3).names == 1)
+        // The glossary's pairs go whole on the context path and are the names "of all apps"; the app's own row of a source replaces the pair.
+        // Derivation: `written` has one row (the app's); two glossary pairs, one of them with the app row's source, leave one pair: 1 + 1.
+        let pairs = [(entries[0].src, "other"), ("勇者", "용사")]
+        func withGlossary(_ e: EngineConfig?, _ p: AppProfile?) -> SentSummary {
+            ContextPreview.summary(engine: e, profile: p, appName: "Example Chat", category: social, learnedUsable: 0, glossary: pairs)
+        }
+        t.check("sent preview: the glossary's pairs are the names of all apps, minus the pairs an app row replaces, and only where memory reaches the request",
+                withGlossary(plain, written).text == "Sent: Example Chat · social · note · up to 2 names (1 this app, 1 all apps)"
+                && withGlossary(plain, profile()).mode == .linesOnly && withGlossary(nil, written).mode == .linesOnly
+                && withGlossary(plain, written).names == 1 && withGlossary(plain, written).allApps == 1
+                && withGlossary(plain, profile(context: off, entries: entries, note: "x")).text == "Sent: lines only")
         t.check("sent preview: a cloud engine says the window title only with its opt-in",
                 !summary(engine("anthropic", base: url, context: EngineContext(enabled: true)), written).windowTitle
                 && summary(engine("anthropic", base: url, context: EngineContext(enabled: true, includeTitle: true)), written).windowTitle)
@@ -398,7 +413,7 @@ enum ContextChecks {
                 both.lines && !both.memoryOnly && both.memoryApps == [written.appName, other.appName])
         func engineLine(_ e: EngineConfig, _ p: [AppProfile]) -> SentSummary { ContextPreview.engineSummary(engine: e, profiles: p, category: { _ in "public.app-category.social-networking" }) }
         t.check("sent preview of an engine: Context off and an app with memory says what that app is sent, not \"lines only\"",
-                engineLine(plain, [written]).text == "Sent: com.example.chat · social · note · up to 1 name" && engineLine(plain, [written]).mode == .memoryOnly
+                engineLine(plain, [written]).text == "Sent: com.example.chat · social · note · up to 1 name (1 this app)" && engineLine(plain, [written]).mode == .memoryOnly
                 && engineLine(plain, []).text == "Sent: lines only" && engineLine(on, []).text == "Sent: Example Chat · social · window title · 2 lines before · 2 lines after")
     }
 
@@ -1002,7 +1017,8 @@ enum ContextChecks {
         _ = await send(mock, svc, [line("Alice sent the second photo")], lens(screen: b1))
         let row = await svc.learnedRows(for: chat).first { $0.entry.src == "Alice" }
         var profiles = s.appProfiles
-        let result = AppProfiles.pin(row?.entry, bundleID: chat, in: &profiles)
+        let result = AppProfiles.pin(row?.entry, bundleID: chat, appName: "Example Chat",
+                                     creatingWith: s.newProfilePair(for: chat), in: &profiles)
         s.appProfiles = profiles
         await svc.removeLearned(src: "alice", for: chat)
         let left = await svc.learnedRows(for: chat)

@@ -716,6 +716,22 @@
         }
       }
     },
+    "%lld all apps": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld all apps"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld all apps"
+          }
+        }
+      }
+    },
     "%lld by %lld points, %lld from the left, %lld from the top": {
       "localizations": {
         "de": {
@@ -2242,6 +2258,22 @@
         }
       }
     },
+    "%lld this app": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld this app"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "%lld this app"
+          }
+        }
+      }
+    },
     "A lens turning text into your language": {
       "localizations": {
         "ko": {
@@ -2938,6 +2970,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Вік, роль, манера мовлення"
+          }
+        }
+      }
+    },
+    "all apps %lld": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "all apps %lld"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "all apps %lld"
           }
         }
       }
@@ -11497,6 +11545,38 @@
         }
       }
     },
+    "Forget": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Forget"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Forget"
+          }
+        }
+      }
+    },
+    "Forget %@…": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Forget %@…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Forget %@…"
+          }
+        }
+      }
+    },
     "Forget Languages for %@": {
       "localizations": {
         "ko": {
@@ -11703,6 +11783,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Забуває діалог, збережений для цієї програми. Вивчені імена залишаються."
+          }
+        }
+      }
+    },
+    "Forget the languages and the memory for %@?": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Forget the languages and the memory for %@?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Forget the languages and the memory for %@?"
           }
         }
       }
@@ -13812,6 +13908,40 @@
         }
       }
     },
+    "Its note and %lld names are removed.": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Its note and %lld name are removed."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Its note and %lld names are removed."
+                }
+              }
+            }
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Its note and %lld names are removed."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Its note and %lld names are removed."
+          }
+        }
+      }
+    },
     "Its saved key is deleted from the Keychain.": {
       "localizations": {
         "ko": {
@@ -14438,6 +14568,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Вивчене"
+          }
+        }
+      }
+    },
+    "learned too": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "learned too"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "learned too"
           }
         }
       }
@@ -15492,6 +15638,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Пам’ять для %@"
+          }
+        }
+      }
+    },
+    "Memory for %@…": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Memory for %@…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Memory for %@…"
           }
         }
       }
@@ -17109,6 +17271,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Написані вами імена й терміни передаються в Переклад Apple всередині тексту, лише якщо ви це ввімкнете."
+          }
+        }
+      }
+    },
+    "Names: %lld": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Names: %lld"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Names: %lld"
           }
         }
       }

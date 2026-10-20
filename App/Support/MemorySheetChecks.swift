@@ -136,8 +136,12 @@ enum MemorySheetChecks {
         let forgotten = AppMemoryEditor(bundleID: app, model: model)
         model.forgetProfile(app)
         forgotten.reconcile()
-        check("forgetting the app while its sheet is open ends the sheet, and an edit never makes a profile",
-              forgotten.gone && model.setMemoryNote("x", for: app) == .noProfile && model.profile(for: app) == nil)
+        // 2026-10-21 (round nameslens, design names-and-context §3.2): this line used to add `&& model.setMemoryNote("x", for: app) == .noProfile`,
+        // "an edit never makes a profile". The first edit makes it now (`AppSettings.ensuringProfile`), so the clause is gone with `.noProfile`;
+        // the new rule is NamesLensChecks "a first edit creates a profile whose pair equals effective(frontmost:)". Derivation: the sheet
+        // ends when the profile it showed is gone, which is what this still asserts.
+        check("forgetting the app while its sheet is open ends the sheet",
+              forgotten.gone && model.profile(for: app) == nil)
 
         failed += await learnedChecks(model)
         return failed

@@ -22,7 +22,7 @@ import SwiftUI
 /// lens-hint-pack-notfinished and lens-hint-unsupported (the pill in the states a pack or a pair can be in), menu-pack-rows (the panel's lens
 /// rows with each of those lines), menu-pack-banner-ask|downloading|notfinished|unsupported (the panel's banner when no lens says it),
 /// translation-packs-states (Settings › Translation with a row in each state), image-window-pack-ask|downloading|notfinished|unsupported
-/// (the Translate Image window's status line), memory-profile-row, memory-menu, memory-sheet-empty, memory-sheet-filled, memory-sheet-tall (the filled sheet at 820 pt, every section in view), memory-sheet-fresh (the app profile's row with its memory, its ⋯ menu, and the Memory sheet empty, filled with learned rows, and asking whether to start fresh), check-logic (prints PASS/FAIL for the engine selection and the
+/// (the Translate Image window's status line), lens-menu-memory (the lens menu of an app with a memory: its info line, Memory for <App>…, Remember Languages and Forget <App>…), memory-forget-alert (the alert that Forget <App>… asks), memory-sheet-lens (Settings with no profile at all, a lens's "Memory for <App>…" set: the Memory sheet comes up empty; PASS/FAIL), names-lens-checks (only the lens menu's memory block and the first edit of a memory; PASS/FAIL lines), memory-profile-row, memory-menu, memory-sheet-empty, memory-sheet-filled, memory-sheet-tall (the filled sheet at 820 pt, every section in view), memory-sheet-fresh (the app profile's row with its memory, its ⋯ menu, and the Memory sheet empty, filled with learned rows, and asking whether to start fresh), check-logic (prints PASS/FAIL for the engine selection and the
 /// engine notice's dismissal; no window). Run it with `MWOYEO_MEMORY_SECRETS=1` so it does not touch the Keychain. It keeps its
 /// preferences in a scratch suite of its own (deleted at exit; `MWOYEO_DEFAULTS_SUITE` names one to keep), never the app's real
 /// ones; `CFFIXED_USER_HOME` does not move those. `--mock` is a tools/mock-openai server the sample translations go to.
@@ -220,6 +220,10 @@ enum UICapture {
                 var t = ContextChecks.Tally()
                 await ContextChecks.trustChecks(t)
                 report("trust", t.failures)
+            case "names-lens-checks":
+                // Only the lens menu's memory block and how an app's memory begins (the whole of check-logic takes minutes).
+                let failed = await NamesLensChecks.run(model)
+                report("names lens", failed)
             case "inpaint-footprint": await LensRobustChecks.inpaintFootprint()
             case "menu-icon": LensRobustChecks.menuIcon(into: out.appendingPathComponent("menu-icon.png"))
             case "sheet-pick": await shoot(name, EngineSheet(), CGSize(width: 480, height: 560))
@@ -257,6 +261,7 @@ enum UICapture {
             case "lens-badge": await lens(name, badge: "cloud", notice: nil)
             case "lens-notice": await lens(name, badge: "cloud", notice: "Gemini unavailable · using Apple")
             case "lens-menu": await lens(name, badge: nil, notice: nil, menu: true)
+            case "lens-menu-memory", "memory-forget-alert", "memory-sheet-lens": await lensMemory(name)
             case "lens-hint-allow", "lens-hint-restart", "lens-hint-pack", "lens-hint-preparing", "lens-hint-disk", "lens-hint-already", "lens-hint-notice",
                  "lens-hint-narrow", "lens-hint-pack-downloading", "lens-hint-pack-notfinished", "lens-hint-unsupported":
                 await lensHints(name)
@@ -495,6 +500,7 @@ enum UICapture {
             failed += await EnginePermissionChecks.run(model)
             failed += await EngineContextChecks.run(model)
             failed += await MemorySheetChecks.run(model)
+            failed += await NamesLensChecks.run(model)
             failed += await AccessibilityChecks.run(model)
             failed += await PackChecks.run(model)
             failed += MCPChecks.run(model)
@@ -723,6 +729,49 @@ enum UICapture {
 
         /// The ⋯ menu of the first profile row, open: the popup button is pressed in code (no pointer event), the window and the menu are
         /// captured while it tracks, and the order of its items is checked: Paragraphs, then Memory…, then Forget This App.
+        /// The lens menu of an app that has a memory (Messages: three names, a note, languages other than the lens's own, two glossary pairs),
+        /// and the alert its "Forget <App>…" asks.
+        private func lensMemory(_ name: String) async {
+            let messages = LensWatch.Read(bundleID: "com.apple.MobileSMS", appName: "Messages", title: "")
+            let saved = model.settings
+            defer { model.settings = saved }
+            model.settings.engines = []
+            model.settings.customEngineID = nil
+            model.settings.sourceLanguage = "ja"
+            model.settings.targetLanguage = "en"
+            model.settings.glossary = "勇者 = Hero\n魔王 = Demon King"
+            model.settings.appProfiles = [AppProfile(bundleID: messages.bundleID, appName: messages.appName, source: "en", target: "ko",
+                                                     note: "Friends in one class chatting after school; casual.",
+                                                     entries: [MemoryEntry(src: "Alice", dst: "앨리스", kind: .person), MemoryEntry(src: "Bob", dst: "밥", kind: .person),
+                                                               MemoryEntry(src: "Sakura High", dst: "사쿠라 고등학교", kind: .org)])]
+            if name == "lens-menu-memory" {
+                await lens(name, badge: nil, notice: nil, menu: true, app: messages)
+            } else if name == "memory-sheet-lens" {
+                // What the lens's "Memory for <App>…" leaves behind (`AppModel.openMemory`): Settings with the sheet of an app that has no profile.
+                model.settings.appProfiles = []
+                let w = NSWindow(contentRect: NSRect(origin: .zero, size: CGSize(width: 560, height: 700)), styleMask: [.titled], backing: .buffered, defer: false)
+                w.contentView = NSHostingView(rootView: TranslationSettings().environment(model))
+                w.setFrameTopLeftPoint(NSPoint(x: 80, y: (NSScreen.main?.frame.height ?? 900) - 60))
+                NSApp.activate(ignoringOtherApps: true)
+                w.makeKeyAndOrderFront(nil)
+                model.memoryTarget = MemoryTarget(id: messages.bundleID, name: messages.appName)
+                try? await Task.sleep(for: .seconds(delay))
+                let sheet = w.sheets.first
+                print("\(name): \(sheet != nil && model.settings.appProfiles.isEmpty ? "PASS" : "FAIL") the Memory sheet of an app with no profile comes up, and opening it made no profile")
+                if let sheet { await capture(window: sheet, as: name) }
+                model.memoryTarget = nil
+                w.orderOut(nil)
+            } else {
+                let alert = LensMemoryMenu.forgetAlert(app: messages.appName, names: 3)
+                alert.layout()
+                NSApp.activate(ignoringOtherApps: true)
+                alert.window.makeKeyAndOrderFront(nil)
+                try? await Task.sleep(for: .seconds(delay))
+                await capture(window: alert.window, as: name)
+                alert.window.orderOut(nil)
+            }
+        }
+
         private func memoryMenu(_ name: String) async {
             let w = NSWindow(contentRect: NSRect(origin: .zero, size: CGSize(width: 560, height: 700)), styleMask: [.titled], backing: .buffered, defer: false)
             let host = NSHostingView(rootView: TranslationSettings().environment(model))
@@ -808,10 +857,16 @@ enum UICapture {
         }
 
         /// A lens pill over a page-like backdrop; the screen area around it is captured.
-        private func lens(_ name: String, badge: String?, notice: String?, menu: Bool = false) async {
+        /// - `app`: the app the menu's memory block is about (`RegionSession.appUnderLens`); the page is taller then, for the longer menu.
+        private func lens(_ name: String, badge: String?, notice: String?, menu: Bool = false, app: LensWatch.Read? = nil) async {
             let screen = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1512, height: 982)
             let region = NSRect(x: 200, y: screen.height - 520, width: 400, height: 150)
-            let page = NSWindow(contentRect: region.insetBy(dx: -40, dy: -70).offsetBy(dx: 0, dy: -10), styleMask: [.borderless], backing: .buffered, defer: false)
+            var content = region.insetBy(dx: -40, dy: -70).offsetBy(dx: 0, dy: -10)
+            if app != nil {
+                content.origin.y -= 160
+                content.size.height += 160
+            }
+            let page = NSWindow(contentRect: content, styleMask: [.borderless], backing: .buffered, defer: false)
             page.backgroundColor = NSColor(white: 0.96, alpha: 1)
             page.level = .normal
             page.orderFrontRegardless()
@@ -828,7 +883,9 @@ enum UICapture {
             if menu {
                 var config = RegionConfig(name: "Safari", rect: region)
                 config.follow(nil)
-                let m = RegionSession(config: config, settings: model.settings, translator: model.translator, inpainter: nil).contextMenu()
+                let session = RegionSession(config: config, settings: model.settings, translator: model.translator, inpainter: nil)
+                if let app { session.appUnderLens = { _ in app } }
+                let m = session.contextMenu()
                 // Menu tracking runs the run loop in its own mode: the capture has to be timed in common modes.
                 nonisolated(unsafe) let menu = m   // the timer fires on the main run loop, during menu tracking
                 let t = Timer(timeInterval: 0.8, repeats: false) { _ in

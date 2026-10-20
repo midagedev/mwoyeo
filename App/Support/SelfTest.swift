@@ -57,6 +57,10 @@ import os
 ///   (one second per phase; `--then again` re-reads the same frame, a held subtitle);
 ///   `--save-lens out.png` writes the lens image (the app's "Save Lens Image");
 ///   `--copy` prints the original and translation lines the lens's copy actions would put on the pasteboard.
+/// `--profile-app <bundleID>` takes the app profiles (memory included) from the settings file `MWOYEO_SETTINGS_FILE` names when it is set
+/// (else from the preferences), and, with `--lens-app` (which wins when both are given) and `--lens-category`, tells the translator which app
+/// is under the lens (`lensContext`): the memory of that profile reaches an added engine's request, as it does in the app. The transcript's
+/// JSON lines carry that bundle ID as `app`.
 enum SelfTest {
     static func run(_ args: [String]) -> Never {
         setvbuf(stdout, nil, _IOLBF, 0)
@@ -104,6 +108,7 @@ enum SelfTest {
             }
             saveTo = option("--save-lens").map { URL(fileURLWithPath: $0) }
             copies = args.contains("--copy")
+            writer?.setApp(option("--lens-app") ?? option("--profile-app"))
         }
 
         func observe(_ snapshot: OverlaySnapshot?, lens: CGRect, time: TimeInterval) {
@@ -132,6 +137,22 @@ enum SelfTest {
                 print("copy translation: \(translations.count) lines")
                 translations.forEach { print("  \($0)") }
             }
+        }
+    }
+
+    /// The app profiles of the settings file `env["MWOYEO_SETTINGS_FILE"]` names, read the way the app reads settings.json (over the defaults,
+    /// bad rows dropped); nil when the variable is not set or the file is not there. Never the real file: only the variable names one.
+    fileprivate static func fileProfiles(_ env: [String: String]) -> [AppProfile]? {
+        env["MWOYEO_SETTINGS_FILE"].flatMap { FileManager.default.contents(atPath: ($0 as NSString).expandingTildeInPath) }
+            .map { SettingsFileCheck.read($0, over: AppSettings()).settings.appProfiles }
+    }
+
+    /// What `RegionSession` hands the pipeline for the app under a lens: the bundle ID, the profile's name for the app (the bundle ID when it has
+    /// none) and the category word. nil without an app: the render then runs as it did before it knew any.
+    fileprivate static func lensContext(app: String?, category: String?, settings: AppSettings) -> LensContext? {
+        app.map {
+            LensContext(bundleID: $0, appName: AppProfiles.profile(for: $0, in: settings.appProfiles)?.appName ?? $0,
+                        categoryWord: CategoryDomain.word(for: category), confirmedTitle: nil, lensID: "render")
         }
     }
 
@@ -181,9 +202,8 @@ enum SelfTest {
         // `--profile-app <bundleID>` renders as if that app were in front: its profile (from the app's saved settings, or
         // `--profile <bundleID>=<src>:<tgt>`) lays over the languages above, as in the app.
         if let app = option("--profile-app") {
-            if let saved = UserDefaults.standard.data(forKey: "settings").flatMap({ try? JSONDecoder().decode(AppSettings.self, from: $0) }) {
-                settings.appProfiles = saved.appProfiles
-            }
+            let saved = UserDefaults.standard.data(forKey: "settings").flatMap { try? JSONDecoder().decode(AppSettings.self, from: $0) }
+            settings.appProfiles = fileProfiles(ProcessInfo.processInfo.environment) ?? saved?.appProfiles ?? settings.appProfiles
             for (i, a) in args.enumerated() where a == "--profile" && i + 1 < args.count {
                 let kv = args[i + 1].split(separator: "=", maxSplits: 1).map(String.init), pair = (kv.last ?? "").split(separator: ":").map(String.init)
                 if kv.count == 2, pair.count == 2 {
@@ -235,6 +255,7 @@ enum SelfTest {
         }
         let still = StillTranslation(decoded, settings: settings, translator: translator, inpainter: inpainter, lensApp: lensApp)
         let pipeline = still.pipeline
+        await pipeline.setLensContext(lensContext(app: option("--lens-app") ?? option("--profile-app"), category: option("--lens-category"), settings: settings))
         let capture = CGRect(x: 0, y: 0, width: CGFloat(image.width) / scale, height: CGFloat(image.height) / scale)
         // The silence timeline runs from here (the start of the lens pass) to the exit.
         await pipeline.setReadHandler { tally in instruments.streak.read(tally); instruments.trouble.read(tally) }
@@ -770,6 +791,24 @@ extension SelfTest {
         check("the drain waits for the registered inFlight to reach 0 (\(drained.ms) ms)", drained.inFlight == 0 && drained.ms >= 200)
         register(readerReady: { false })
         check("a reader that never comes is reported after --max-wait", await bare.readerLine().hasPrefix("reader-ready: timeout "))
+        // The app a render stands in front of: its profile from the settings file, its lens context, its place in the transcript.
+        let scratch = FileManager.default.temporaryDirectory.appendingPathComponent("selftest-profiles-\(UUID().uuidString).json")
+        defer { try? FileManager.default.removeItem(at: scratch) }
+        let json = #"{"appProfiles":[{"bundleID":"com.example.rpg","appName":"月涙譚","source":"ja","target":"ko","note":"fantasy RPG","entries":[{"src":"九十九","dst":"츠쿠모","kind":"person"}]}]}"#
+        try? Data(json.utf8).write(to: scratch)
+        let fromFile = fileProfiles(["MWOYEO_SETTINGS_FILE": scratch.path])
+        check("--profile-app: the profiles come from the file MWOYEO_SETTINGS_FILE names, memory included",
+              fromFile?.first?.bundleID == "com.example.rpg" && fromFile?.first?.note == "fantasy RPG" && fromFile?.first?.entries.first?.dst == "츠쿠모")
+        check("--profile-app: no variable or no such file is no profiles (the preferences stay)",
+              fileProfiles([:]) == nil && fileProfiles(["MWOYEO_SETTINGS_FILE": scratch.path + ".none"]) == nil)
+        var withProfile = AppSettings()
+        withProfile.appProfiles = fromFile ?? []
+        let context = lensContext(app: "com.example.rpg", category: "public.app-category.role-playing-games", settings: withProfile)
+        check("lens context: the app, the profile's name for it and the category word",
+              context?.bundleID == "com.example.rpg" && context?.appName == "月涙譚" && context?.categoryWord == "games")
+        check("lens context: an app with no profile is named by its bundle ID, none given is no context",
+              lensContext(app: "com.example.other", category: nil, settings: withProfile)?.appName == "com.example.other"
+              && lensContext(app: nil, category: "public.app-category.games", settings: withProfile) == nil)
         print("check-instruments: \(failed == 0 ? "all PASS" : "\(failed) FAIL")")
         return failed == 0
     }

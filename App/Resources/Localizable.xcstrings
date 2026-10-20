@@ -720,8 +720,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "%lld all apps"
+            "state": "translated",
+            "value": "모든 앱 %lld"
           }
         },
         "ja": {
@@ -2262,8 +2262,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "%lld this app"
+            "state": "translated",
+            "value": "이 앱 %lld"
           }
         },
         "ja": {
@@ -2978,8 +2978,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "all apps %lld"
+            "state": "translated",
+            "value": "모든 앱 %lld"
           }
         },
         "ja": {
@@ -11549,8 +11549,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Forget"
+            "state": "translated",
+            "value": "지우기"
           }
         },
         "ja": {
@@ -11565,8 +11565,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Forget %@…"
+            "state": "translated",
+            "value": "%@ 지우기…"
           }
         },
         "ja": {
@@ -11791,8 +11791,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Forget the languages and the memory for %@?"
+            "state": "translated",
+            "value": "%@의 언어 설정과 메모리를 지울까요?"
           }
         },
         "ja": {
@@ -13930,8 +13930,8 @@
         },
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Its note and %lld names are removed."
+            "state": "translated",
+            "value": "메모와 이름 %lld개가 함께 지워집니다."
           }
         },
         "ja": {
@@ -14576,8 +14576,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "learned too"
+            "state": "translated",
+            "value": "배운 것 포함"
           }
         },
         "ja": {
@@ -15646,8 +15646,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Memory for %@…"
+            "state": "translated",
+            "value": "%@ 메모리…"
           }
         },
         "ja": {
@@ -17279,8 +17279,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Names: %lld"
+            "state": "translated",
+            "value": "이름: %lld"
           }
         },
         "ja": {
@@ -35878,8 +35878,8 @@
       "localizations": {
         "ko": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": "Free plan key from deepl.com/pro-api, ends in :fx"
+            "state": "translated",
+            "value": "deepl.com/pro-api의 무료 요금제 키(끝이 :fx)"
           }
         },
         "ja": {

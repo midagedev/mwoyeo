@@ -35,6 +35,7 @@ enum ContextChecks {
         await learnedFileRunChecks(t)
         await pinChecks(t)
         await appleChecks(t)
+        await memoryExactChecks(t)
         return t.failures
     }
 

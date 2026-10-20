@@ -350,7 +350,7 @@ actor TranslationService {
         var outcome = TranslationOutcome()
         var todo: [String] = []
         var seen = Set<String>()
-        let cjkSource = ["ja", "zh-Hans", "zh-Hant", "ko"].contains(pageLanguage ?? "")
+        let cjkSource = sourceIsCJK
         for t in texts where seen.insert(t).inserted {
             if !TranslationFilter.needsTranslation(t, cjkSource: cjkSource) {
                 // Not source-language text (a handle, a brand, a counter): kept as is, and the pipeline leaves it alone.
@@ -843,6 +843,9 @@ actor TranslationService {
         settings.sourceLanguage != "auto" ? settings.sourceLanguage : seenLanguages.max { $0.value < $1.value }?.key
     }
 
+    /// The page's source is Japanese, Chinese or Korean: what `TranslationFilter.needsTranslation` asks of every line.
+    private var sourceIsCJK: Bool { ["ja", "zh-Hans", "zh-Hant", "ko"].contains(pageLanguage ?? "") }
+
     /// The configured source language, or the language of `text` when set to auto ("und" if unsure).
     func sourceLanguage(for text: String) -> String {
         if settings.sourceLanguage != "auto" { return settings.sourceLanguage }
@@ -903,11 +906,21 @@ extension TranslationService {
 
         var todo: [String] = [], needing: [String] = []
         var seen = Set<String>()
-        let cjkSource = ["ja", "zh-Hans", "zh-Hant", "ko"].contains(pageLanguage ?? "")
+        let cjkSource = sourceIsCJK
+        // A line that is only a name or a term of the memory this call sends is that row's translation, the engine not asked (a name plate
+        // the engine renders its own way in a batch). The rows are the ones the request sends (`RequestLayout.exactRows`).
+        let named = RequestLayout.exactRows(request: contexts.request(lens, pass: pass, items: [], source: nil, target: target, glossary: settings.glossaryPairs),
+                                            options: options, kind: .engine(engine.kind))
         for t in texts where seen.insert(t).inserted {
             if !TranslationFilter.needsTranslation(t, cjkSource: cjkSource) {
                 outcome.translations[t] = t
                 onResult?(t, t)
+            } else if let row = ContextMemory.exactTranslation(of: t, in: named) {
+                Trace.count("translate.memory_exact")
+                pace.recordLookup(hit: true)
+                needing.append(t)
+                outcome.translations[t] = row
+                onResult?(t, row)
             } else if let hit = cache.value(for: t, in: scoped) {
                 pace.recordLookup(hit: true)
                 needing.append(t)
@@ -1067,7 +1080,17 @@ extension TranslationService {
         var sources: [String: [String]] = [:]
         var sent: [String] = []
         var seen = Set<String>()
+        // A line that is only a pinned name or term is its translation, Apple not asked; the rows are the ones the pre-insertion uses.
+        let pinned = entries.filter { $0.origin == .user }
+        var named = TranslationOutcome()
         for t in texts where seen.insert(t).inserted {
+            if TranslationFilter.needsTranslation(t, cjkSource: sourceIsCJK), let row = ContextMemory.exactTranslation(of: t, in: pinned) {
+                Trace.count("translate.memory_exact")
+                pace.recordLookup(hit: true)
+                named.translations[t] = row
+                onResult?(t, row)
+                continue
+            }
             let p = ApplePreinsertion.insert(into: t, entries: entries, appleUsesPinnedTerms: true)
             if !p.isEmpty { pre[t] = p }
             if sources[p.text] == nil { sent.append(p.text) }
@@ -1081,7 +1104,7 @@ extension TranslationService {
                 onResult?(s, translation)
             }
         }
-        var outcome = TranslationOutcome()
+        var outcome = named
         var rejected: [String] = []
         for (text, translation) in first.translations {
             for s in sources[text] ?? [text] {

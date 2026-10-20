@@ -93,6 +93,20 @@ and `card-*` (notification-sized cards); monospace faces Andale Mono, PT Mono, C
 - **Independence.** `h3_independence.py`: no k-case passage, no excluded source, no source or unit of H2 (units of 4+ words), none of the rule code or keep tests (InlineMath, Text, CodeRegion, TranslationFilter and their tests). `RESULTS-h3-build-2026-10-20.txt` has sizes and counts, no rule result; the rules are not measured on H3 here.
 - **Vision reads Latin runs of a CJK page as single characters** (the ja / zh-Hans document reads cut `https://...` into one word per character): word counts of the url slice are ja / zh-Hans dominated; read them by language.
 
+## mbench: the rules against light learned judges (round m-bench, 2026-10-20)
+
+`mbench/` scores today's rules (judge 1) and learned judges on the keep boundary, accuracy and speed, with H2 + the code cases + the two papers as the fit pool (grouped cross-validation by scene / case / paper) and H3 as test only.
+Results and the reading rules: `RESULTS-mbench-2026-10-20.txt`. Every judge is written as keeprules-format records and scored by `rules_report.accumulate`, the code behind the H2 / H3 reports (`mbench/score.py repro` must print MATCH first).
+
+    mbench/run.sh rules           # judge 1 on THIS tree (k3b): swift build, feeds, keeprules, the scored rows; needs python3 with numpy + PIL only (KEEP_WORK / H3_WORK / X_WORK point at the fixed pictures; Vision is not run)
+    mbench/run.sh train gbt ...   # train.py + evaluate.py for a learned judge (venv under MB_SCRATCH with scikit-learn lightgbm sentence-transformers model2vec torch pillow; weights in MB_SCRATCH/hf, none in the repo)
+    mbench/run.sh embed | time | table | check
+
+- **Inputs** are the block id / text / rect / read / lang, the word boxes of the OCR files, the picture pixels and the regionfeed record; never a label field or `units.json` (check C3). Word features and block features are in `features.py`.
+- **Tasks**: block (keep the whole block), inline (every scored word), both, hybrid (rules decide the block, a judge's word model protects spans). Operating points F1 and P98 come from the out-of-fold dev rows, never from H3.
+- **Speed** (`bench_time.py`) times every judge from the raw inputs on the same H3 blocks, single thread, judges interleaved per repetition with `uptime` recorded; judge 1 is timed in process by `rulestime.swift`.
+- `check_mbench.py` holds the checks (scorer reproduction, H3 never fitted on, forbidden inputs, negative control, one scorer through the unchanged `h2_report.py`), each with its FAIL-first line.
+
 ## Files
 
 `truth.py` word truth rules | `label.py`, `code_labels.py` labellers | `h2.py`, `h2_scenes.py`, `h2_labels.py`, `h2_report.py` the H2 screens, their labels and report | `h3.py`, `h3_scenes.py`, `h3_looks.py`, `h3_independence.py`, `h3_size.py`, `run-h3.sh` the H3 screens, looks, checks and report wrapper | `rules_report.py` the report | `Sources/keeprules` Core rules on

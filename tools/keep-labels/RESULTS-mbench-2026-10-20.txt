@@ -1,0 +1,671 @@
+Rules vs light learned judges on the translate / keep boundary: accuracy and speed, H2 train / H3 test (round m-bench, 2026-10-20)
+==============================================================================================================================
+Question  The user asked (2026-10-20) whether the keep decision is better made without a model (heuristics) or by a light model that may be faster and more accurate, and whether
+          EmbeddingGemma is usable. Judge 1 is today's rules (TranslationFilter + InlineMath, OR CodeRegion = what the app does); judges 2-6 are learned: layout trees (LightGBM),
+          a hashed char n-gram linear model, static embedding (potion-multilingual-128M), multilingual-e5-small and EmbeddingGemma 2 (text backbone) with a logistic regression,
+          each alone and with the layout features. Round k3b will change the rules: `mbench/run.sh rules` re-runs judge 1 on any tree (needs only python3 + numpy + PIL).
+Data      Pictures and Vision reads are fixed (H2 /tmp/k3a/wb, H3 /tmp/h3/legA, cases + papers /tmp/l0/g4b-work): no Vision was run. Scratch /tmp/m-bench; nothing but scripts and this file is in the repo.
+Split     Fit pool = H2 + the 12 code cases + the two CC BY papers; 6-fold GroupKFold, the group = scene (H2) / case (code) / paper (papers). Hyper-parameters (C, tree size) = lowest
+          out-of-fold log loss; thresholds = out-of-fold predictions of the dev-screen rows (H2 + code). H3 enters only as the final prediction (check C2). The H2 rows below are
+          out-of-fold; the thresholds were also read off them, so they are slightly optimistic.
+Inputs    Allowed only (addendum A1.4): block id / text / rect / read / lang, the word boxes of *.ocr.jsonl, the png pixels (tint, chip backgrounds), the regionfeed record. No units.json, no
+          label field (reason stats unc scene look region) as a feature; `look` and `scene` are never features (check C3). Training drops either / none words and no-letter blocks as the scorer does.
+Scorer    ONE scorer: every judge is written as keeprules-format records {id, needs, spans} and scored by rules_report.accumulate (the code behind RESULTS-h2 / RESULTS-code-region):
+          a word is kept when its block is kept whole or a span covers it (A1.1). The same records go through the unchanged h2_report.py (check C5; run-h3.sh's rename of H3 to `h2` is
+          why that tool's headings read "H2" for H3 numbers). Reproduction before anything else was scored:
+            REPRODUCTION (RESULTS-h2-2026-10-20.txt: rules OR CodeRegion, doc read, tp 3281 fp 65 fn 945, P 0.98 R 0.78): got tp 3281 fp 65 fn 945 -> MATCH
+          and run-h3.sh (unchanged, H3_WORK=/tmp/h3/legA) on the same H3 records: doc rules only tp 5255 fp 81 fn 4192, rules OR CodeRegion tp 6281 fp 90 fn 3166 (= the "BOTH" rows below).
+Tasks     block   keep the whole block (needs=false), binary; a labelled-mixed block kept whole counts as translate->kept for every judge (A1.2); `mixed kept` is in the table.
+          inline  every scored word of every block (needs=true everywhere, spans = the words the judge keeps): the universe is identical for all judges (A1.1); the right-hand
+                  columns repeat it for words of blocks that hold a translate word (the real "inline pieces in prose").
+          both    block judge + word judge in the translated blocks;  hybrid  the rules OR CodeRegion decide the block, the judge's word model protects spans in the rest.
+Points    F1 = threshold with the best out-of-fold F1; P98 = the most keeping threshold whose out-of-fold precision is >= 0.98 (block precision for the block judge, word precision for the
+          word judge). On H3 the P98 points land at block P 0.88-0.95 / word P 0.91-0.97: the precision does not carry over from H2 to the new looks.
+
+ANSWER (H3 = test; doc read unless said; word counts: 9447 keep words, 7302 translate words; 1254 keep blocks)
+  1. Block task (keep the whole block): no winner. Rules OR CodeRegion P 0.96 R 0.89 F1 0.92 (vn 0.92); best learned gbt-nopix @P98 P 0.94 R 0.92 F1 0.93 (vn 0.89), @F1 P 0.91 R 0.96 F1 0.94
+     (vn 0.89). Differences of +-0.03 on 1254 keep blocks are inside the noise, the learned judge keeps 228 translate words (rules: 89) and wrongly whole-keeps more mixed blocks (54 of 160 vs 34).
+     The learned judges win only in English looks (block F1 en: rules 0.74, gbt-nopix 0.82-0.87); they lose precision elsewhere. Text-only judges are weak here (recall at the P98 point:
+     n-gram 0.68, potion 0.25, e5 0.55, EG2 0.59); with the layout columns they reach 0.89-0.91 F1, below the trees.
+  2. Inline / word task: the learned word judges win by a wide margin. Rules' spans alone: word R 0.05 (span F1 0.07). gbt-nopix: word P 0.95 R 0.99 F1 0.97, span exact F1 0.88;
+     on the words of blocks that hold translate words R 0.99 (rules 0.00). As a pipeline (rules decide the block, the word model protects spans: HYBRID) gbt-nopix @P98 gives
+     word P 0.95 R 0.99 (fn 62 of 9447) against rules P 0.99 R 0.66 (fn 3166). The price: translate words kept 538 of 7302 (7.4 %) against 90 (1.2 %); 444 of the 538 (83 %) are in ja / zh-Hans reads
+     (where the doc read cuts Latin runs into single characters) and 336 (62 %) in mixed blocks. Even the cheapest learned word model helps in the hybrid: n-gram @P98 P 0.96 R 0.96, e5 @P98 P 0.96 R 0.97.
+  3. By reason (gbt BOTH @P98 vs rules OR CodeRegion, keep-word recall): log 1.00 vs 0.21, url 1.00 vs 0.04, id 1.00 vs 0.34, cmd 0.99 vs 0.34, path 1.00 vs 0.48, config 0.99 vs 0.71,
+     code 1.00 vs 0.95. Block-weighted url recall (1841 url words, ja / zh-Hans reads cut them per character): rules 0.59 overall = ko 0.79, ja 0.04, en 1.00, zh-Hans 0.52; the learned judges with layout 1.00. Per language (BOTH): rules ko word R 0.95 / ja 0.59 / en 0.69 / zh-Hans 0.59 against gbt-nopix 1.00 / 1.00 / 0.95 / 1.00 at P 0.98 / 0.93 / 0.97 / 0.93.
+  4. The winner is the smallest model: LightGBM on layout features, 400 + 400 trees = 2.1 MB of model text, 0.8 ms per block and 0.4 ms per word with batch=1 in Python (tint read off the pixels
+     included), 397 MB RSS of which 217 MB is the python + torch import; the Swift rules cost 0.03 ms (filter + spans) + 3.1 ms (CodeRegion, per block) + 1.2 ms (regionfeed tint, includes PNG decode) = 4.3 ms per block
+     (second pass at another load: CodeRegion 5.6, regionfeed 2.5). Every timing is under a load average of 50-300 on 10 cores (uptime recorded per judge) and is a Python upper bound for a Swift port.
+     `gbt-nopix` (OCR text + word boxes only, no pixel feature) is as good as `gbt`: the pixel features (tint, chip background) are not what carries H3 (check the importances: block tint
+     luminance was the top gain of `gbt` (29 % of the block model's gain), and leaving every pixel feature out costs nothing on H3).
+  5. Embeddings do not pay for themselves. e5-small + layout block F1 0.91 @P98, word P 0.95 R 0.96 (13-14 ms per block b=1, 4.9 batched, 7 ms per word, 1.07 GB RSS); EmbeddingGemma 2 + layout
+     0.90 / P 0.95 R 0.94 (80 ms per block b=1, 28 batched, 40 ms per word, 2.0 GB RSS, 1084 MB fp32 weights); potion + layout 0.89 / 0.94 / 0.94 (0.7 ms, 512 MB table). EG2 is not better than e5 or
+     potion here, and Matryoshka cuts lose recall at the P98 point (EG2 768 -> 256 -> 128 dims: block R 0.59 -> 0.38 -> 0.32). torch dynamic int8 is SLOWER than fp32 on this CPU (e5 14.5 vs 10.9 ms
+     per text b=1, batched 20 vs 4.3; EG2 109 vs 87, batched 165 vs 35) and its accuracy is unchanged for e5 (block F1 0.83 vs 0.82 @F1); the EG2 int8 judge was not trained (its embeddings ran at
+     ~3 strings/s, stopped at 2048 of 4278 block texts).
+  6. Caveat that decides how far to trust this: H3 is a hold-out in content, scenes and looks, but it is drawn by the same generator as H2 (h2.py machinery): every inline piece of code is a
+     monospaced chip, every code region has the generator's spacing. A learned judge can use the recipe; the rules cannot. The learned block judge falls from out-of-fold F1 0.97-0.99 (H2) to 0.93-0.94 (H3, new looks), the rules from 0.94 to 0.92.
+     Before any shipping decision a hold-out of REAL screens (not drawn by h2.py) is needed; the P98 points did not hold their precision on H3 either (point 'Points' above).
+  7. Core ML: LightGBM is not a coremltools source. An XGBoost classifier of the same size (400 trees, depth 5) on the same 111 block features converts (coremltools 9.0, 0.31 MB, 0.5 ms per call
+     from Python) and agrees with XGBoost on 399 of 400 H3 blocks at 0.5 (max |dp| 0.024); the LightGBM trees are plain arrays (a ~60-line Swift evaluator would do). No accuracy was scored for the XGBoost twin.
+
+EmbeddingGemma (addendum A-EG2): EmbeddingGemma 2 `google/embeddinggemma-2` (HF card license apache-2.0, ungated, config.json 200 without a login) was used in place of v1. Text-only load that worked:
+  SentenceTransformer(path, device='cpu', config_kwargs={'vision_config': None, 'audio_config': None}, model_kwargs={'torch_dtype': torch.float32}) with transformers 5.20.2 and sentence-transformers 6.1.0;
+  it needed torchvision installed (the processor imports it) and the repo's chat_template.jinja downloaded. Result: 271.0 M parameters (float32 1084 MB), 768-d, prompt "task: classification | query: ",
+  max_seq_length 128, mean pooling, Matryoshka cuts by slicing + re-normalising. v1 (google/embeddinggemma-300m) is gated (401, manual approval): not downloaded; the optional extra row was not made.
+  Acks: A-EG2 done. A1.1 done (records in MB_SCRATCH/records, one per judge x task x point x set). A1.2 done. A1.3 done: judge 1 timed in process (rulestime.swift against MwoyeoCore.o) and regionfeed on the
+  H3 pictures; models time features from the raw inputs; one loop per repetition with all judges, `uptime` per judge. A1.4 done (C3). A1.5 done. A1.6 done (run-h3.sh and C5).
+
+CHECKS (run.sh check; each has its FAIL-first line)
+PASS  C1 scorer reproduction: rules OR CodeRegion, H2 doc: tp 3281 fp 65 fn 945 (want (3281, 65, 945)), P 0.98 R 0.78
+FAIL-first ok  C1: rules only gives tp 2657 fp 65 fn 1569, not (3281, 65, 945)
+PASS  C2 H3 is test only: fit pool ('h2', 'code', 'p2401', 'p2310'), thresholds from ('h2', 'code')
+FAIL-first ok  C2: a pool with h3 is refused (h3 is in the fit pool)
+PASS  C2 no shared block id: 5526 H3 blocks, 3049 pool blocks, 0 in both
+PASS  C3 forbidden inputs: 5 files scanned: none read
+FAIL-first ok  C3: a snippet reading b['look'] and a units.json are flagged
+PASS  C3 note: dataset.py reads b['scene'] only to name the cross-validation group (train.group_of), never as a feature; seen: ['lang', 'read', 'scene']
+PASS  C4 negative control: shuffled-label gbt, H3 word AUC 0.539 (chance 0.5 +- 0.05); real gbt 0.992
+FAIL-first ok  C4: the same band refuses the real gbt (AUC 0.992)
+PASS  C5 one scorer: h2_report.py (unchanged) tp/fp/fn (9419, 518, 28) = score.py (9419, 518, 28) on gbt both@P98, H3 doc (headings of that tool read "H2")
+FAIL-first ok  C5: the block-only records of the same judge give (7731, 222, 1716), not (9419, 518, 28)
+ALL PASS
+
+BLOCK TASK (H3, test, doc read): keep the whole block (binary); tr->kept = translate words kept, keep->tr = keep words translated; "mixed kept" = labelled-mixed blocks kept whole / all mixed; "transl kept" = pure-translate blocks kept whole / all
+judge @operating point             blkP  blkR  blkF1  tr->kept keep->tr  mixed kept  transl kept  wordP wordR
+judge 1  rules only            0.96 0.81 0.88       80   4252     33/160      8/853    0.98 0.55
+judge 1  rules OR CodeRegion   0.96 0.89 0.92       89   3195     34/160      9/853    0.99 0.66
+gbt @F1                        0.88 0.97 0.93      531    839     73/160     86/853    0.94 0.91
+gbt @P98                       0.93 0.84 0.88      222   1716     51/160     28/853    0.97 0.82
+gbt-nopix @F1                  0.91 0.96 0.94      464    759     79/160     34/853    0.95 0.92
+gbt-nopix @P98                 0.94 0.92 0.93      228   1616     54/160     18/853    0.97 0.83
+ngram @F1                      0.67 0.90 0.77     3187   1614    116/160    431/853    0.71 0.83
+ngram @P98                     0.88 0.68 0.77      420   3683     75/160     37/853    0.93 0.61
+potion @F1                     0.67 0.92 0.77     3479   1225    118/160    459/853    0.70 0.87
+potion @P98                    0.85 0.25 0.39      176   6550     44/160     11/853    0.94 0.31
+potion+layout @F1              0.82 0.96 0.88     1270    752    104/160    169/853    0.87 0.92
+potion+layout @P98             0.89 0.89 0.89      555   1334     87/160     56/853    0.94 0.86
+e5 @F1                         0.76 0.89 0.82     2333   1952    104/160    246/853    0.76 0.79
+e5 @P98                        0.88 0.55 0.68      497   4289     59/160     38/853    0.91 0.55
+e5+layout @F1                  0.83 0.98 0.90     1211    852    100/160    148/853    0.88 0.91
+e5+layout @P98                 0.90 0.91 0.91      459   1455     79/160     44/853    0.95 0.85
+e5-int8 @F1                    0.76 0.91 0.83     2274   1799    104/160    257/853    0.77 0.81
+e5-int8 @P98                   0.90 0.52 0.66      254   5043     47/160     23/853    0.95 0.47
+eg2 @F1                        0.79 0.90 0.84     1687   2194     81/160    217/853    0.81 0.77
+eg2 @P98                       0.94 0.59 0.73      265   5477     23/160     22/853    0.94 0.42
+eg2+layout @F1                 0.83 0.96 0.89     1393   1072     93/160    154/853    0.86 0.89
+eg2+layout @P98                0.90 0.90 0.90      659   1947     68/160     59/853    0.92 0.79
+eg2-256 @F1                    0.73 0.93 0.81     2772   1451     97/160    344/853    0.74 0.85
+eg2-256 @P98                   0.95 0.38 0.54      105   7108     13/160     13/853    0.96 0.25
+eg2-128 @F1                    0.74 0.88 0.80     2751   1552    112/160    278/853    0.74 0.84
+eg2-128 @P98                   0.90 0.32 0.47      299   7383     20/160     25/853    0.87 0.22
+
+INLINE TASK (H3, test, doc read): per word over every scored word (needs=true everywhere, spans = the words the judge keeps); right: only words of blocks that hold a translate word
+judge @operating point             wordP wordR wordF1  spanF1 (exact/truth/pred)   prose-block words P R (tp/fp/fn)
+judge 1  rules only            1.00 0.05 0.09   0.07  (56/1455/155)   0.86 0.00  (6/1/2371)
+judge 1  rules OR CodeRegion   1.00 0.05 0.09   0.07  (56/1455/155)   0.86 0.00  (6/1/2371)
+gbt @F1                        0.95 1.00 0.97   0.89  (1348/1455/1558)   0.83 1.00  (2371/498/6)
+gbt @P98                       0.95 1.00 0.97   0.89  (1346/1455/1559)   0.82 1.00  (2371/506/6)
+gbt-nopix @F1                  0.94 0.99 0.96   0.87  (1307/1455/1540)   0.78 0.99  (2357/650/20)
+gbt-nopix @P98                 0.95 0.99 0.97   0.88  (1312/1455/1518)   0.82 0.99  (2354/525/23)
+ngram @F1                      0.76 0.86 0.80   0.51  (1072/1455/2764)   0.48 1.00  (2368/2591/9)
+ngram @P98                     0.96 0.74 0.84   0.47  (751/1455/1747)   0.87 0.95  (2263/327/114)
+potion @F1                     0.73 0.88 0.80   0.53  (1048/1455/2532)   0.43 0.98  (2332/3055/45)
+potion @P98                    0.94 0.71 0.81   0.46  (670/1455/1463)   0.83 0.86  (2045/405/332)
+potion+layout @F1              0.92 0.96 0.94   0.73  (1194/1455/1821)   0.73 0.97  (2310/833/67)
+potion+layout @P98             0.94 0.94 0.94   0.73  (1158/1455/1697)   0.80 0.95  (2270/569/107)
+e5 @F1                         0.86 0.90 0.88   0.61  (1127/1455/2216)   0.63 0.99  (2361/1367/16)
+e5 @P98                        0.96 0.81 0.88   0.62  (960/1455/1631)   0.87 0.98  (2323/344/54)
+e5+layout @F1                  0.92 0.98 0.95   0.76  (1264/1455/1885)   0.73 0.99  (2363/854/14)
+e5+layout @P98                 0.95 0.96 0.95   0.78  (1237/1455/1721)   0.83 0.99  (2342/493/35)
+e5-int8 @F1                    0.84 0.92 0.87   0.61  (1150/1455/2312)   0.58 0.99  (2365/1684/12)
+e5-int8 @P98                   0.96 0.79 0.87   0.62  (930/1455/1535)   0.89 0.97  (2306/294/71)
+eg2 @F1                        0.83 0.93 0.88   0.62  (1151/1455/2232)   0.57 0.99  (2360/1749/17)
+eg2 @P98                       0.95 0.82 0.88   0.62  (978/1455/1714)   0.85 0.97  (2298/408/79)
+eg2+layout @F1                 0.89 0.98 0.93   0.74  (1270/1455/1982)   0.67 0.99  (2360/1177/17)
+eg2+layout @P98                0.95 0.94 0.95   0.75  (1200/1455/1746)   0.83 0.98  (2340/496/37)
+eg2-256 @F1                    0.82 0.92 0.87   0.60  (1146/1455/2392)   0.55 1.00  (2368/1949/9)
+eg2-256 @P98                   0.95 0.80 0.87   0.61  (954/1455/1665)   0.85 0.97  (2307/410/70)
+eg2-128 @F1                    0.82 0.91 0.86   0.59  (1118/1455/2308)   0.55 0.99  (2348/1937/29)
+eg2-128 @P98                   0.95 0.76 0.84   0.53  (826/1455/1659)   0.85 0.93  (2214/401/163)
+
+HYBRID (H3, test, doc read): the rules OR CodeRegion decide the block, the judge's word model protects spans in the blocks the rules translate
+judge @operating point             wordP wordR wordF1  tr->kept keep->tr  spanF1
+gbt @F1                        0.95 1.00 0.97      510     22   0.90
+gbt @P98                       0.95 1.00 0.97      518     20   0.89
+gbt-nopix @F1                  0.93 0.99 0.96      661     51   0.88
+gbt-nopix @P98                 0.95 0.99 0.97      538     62   0.89
+ngram @F1                      0.78 0.99 0.87     2608    119   0.62
+ngram @P98                     0.96 0.96 0.96      357    366   0.80
+potion @F1                     0.75 0.99 0.85     3060    136   0.64
+potion @P98                    0.95 0.94 0.94      434    605   0.79
+potion+layout @F1              0.92 0.99 0.95      856    101   0.80
+potion+layout @P98             0.94 0.98 0.96      599    177   0.82
+e5 @F1                         0.87 0.99 0.93     1375    118   0.72
+e5 @P98                        0.96 0.97 0.97      365    269   0.84
+e5+layout @F1                  0.92 1.00 0.95      862     30   0.81
+e5+layout @P98                 0.95 0.99 0.97      510     85   0.85
+e5-int8 @F1                    0.85 0.99 0.91     1688     95   0.70
+e5-int8 @P98                   0.97 0.97 0.97      312    297   0.85
+eg2 @F1                        0.84 0.99 0.91     1757     94   0.72
+eg2 @P98                       0.96 0.97 0.96      427    264   0.85
+eg2+layout @F1                 0.89 1.00 0.94     1188     43   0.77
+eg2+layout @P98                0.95 0.99 0.97      511    120   0.85
+eg2-256 @F1                    0.83 0.99 0.90     1958     95   0.69
+eg2-256 @P98                   0.96 0.97 0.96      429    250   0.85
+eg2-128 @F1                    0.83 0.99 0.90     1940    131   0.71
+eg2-128 @P98                   0.96 0.96 0.96      420    391   0.82
+
+BOTH (H3, test, doc read): block judge decides, the word judge protects spans in the blocks that are translated (what a pipeline would do)
+judge @operating point             wordP wordR wordF1  tr->kept keep->tr  spanF1
+judge 1  rules only            0.98 0.56 0.71       81   4192   0.80
+judge 1  rules OR CodeRegion   0.99 0.66 0.79       90   3166   0.85
+gbt @F1                        0.93 1.00 0.96      754     25   0.88
+gbt @P98                       0.95 1.00 0.97      518     28   0.89
+gbt-nopix @F1                  0.93 0.99 0.96      711     63   0.87
+gbt-nopix @P98                 0.95 0.99 0.97      534     99   0.88
+ngram @F1                      0.68 0.89 0.77     4053   1021   0.60
+ngram @P98                     0.93 0.80 0.86      601   1917   0.63
+potion @F1                     0.67 0.92 0.78     4266    726   0.63
+potion @P98                    0.94 0.72 0.81      449   2659   0.48
+potion+layout @F1              0.86 0.98 0.92     1537    183   0.78
+potion+layout @P98             0.92 0.96 0.94      783    384   0.78
+e5 @F1                         0.75 0.92 0.83     2846    758   0.67
+e5 @P98                        0.92 0.83 0.87      655   1638   0.67
+e5+layout @F1                  0.86 0.99 0.92     1540     85   0.80
+e5+layout @P98                 0.93 0.97 0.95      654    272   0.82
+e5-int8 @F1                    0.75 0.94 0.84     2906    546   0.67
+e5-int8 @P98                   0.94 0.81 0.87      451   1771   0.66
+eg2 @F1                        0.79 0.94 0.86     2428    534   0.68
+eg2 @P98                       0.93 0.83 0.88      585   1621   0.66
+eg2+layout @F1                 0.83 0.99 0.91     1849    111   0.77
+eg2+layout @P98                0.91 0.96 0.94      869    369   0.80
+eg2-256 @F1                    0.73 0.95 0.82     3336    499   0.67
+eg2-256 @P98                   0.94 0.81 0.87      472   1778   0.63
+eg2-128 @F1                    0.73 0.94 0.82     3329    536   0.67
+eg2-128 @P98                   0.92 0.77 0.84      606   2216   0.55
+
+BLOCK TASK (H3, test, vn read): keep the whole block (binary); tr->kept = translate words kept, keep->tr = keep words translated; "mixed kept" = labelled-mixed blocks kept whole / all mixed; "transl kept" = pure-translate blocks kept whole / all
+judge @operating point             blkP  blkR  blkF1  tr->kept keep->tr  mixed kept  transl kept  wordP wordR
+judge 1  rules only            0.96 0.79 0.87       64   5794     29/209      4/834    0.99 0.57
+judge 1  rules OR CodeRegion   0.96 0.88 0.92       64   4678     29/209      4/834    0.99 0.65
+gbt @F1                        0.82 0.97 0.89      642    842    117/209     77/834    0.95 0.94
+gbt @P98                       0.87 0.78 0.82      277   2637     81/209     23/834    0.97 0.80
+gbt-nopix @F1                  0.85 0.94 0.89      677    954    124/209     29/834    0.95 0.93
+gbt-nopix @P98                 0.90 0.88 0.89      238   1956     82/209     10/834    0.98 0.85
+ngram @F1                      0.58 0.88 0.70     3321   1758    157/209    424/834    0.78 0.87
+ngram @P98                     0.81 0.65 0.72      494   4382    113/209     29/834    0.95 0.67
+potion @F1                     0.57 0.91 0.70     3694   1136    165/209    448/834    0.77 0.92
+potion @P98                    0.73 0.19 0.30      188   9285     59/209      5/834    0.96 0.31
+potion+layout @F1              0.75 0.94 0.83     1319   1213    137/209    157/834    0.90 0.91
+potion+layout @P98             0.82 0.83 0.83      578   2456    114/209     51/834    0.95 0.82
+e5 @F1                         0.67 0.87 0.76     2451   1949    141/209    248/834    0.82 0.85
+e5 @P98                        0.79 0.49 0.61      486   5444     93/209     24/834    0.94 0.59
+e5+layout @F1                  0.78 0.94 0.85      989   1238    124/209    119/834    0.92 0.91
+e5+layout @P98                 0.85 0.84 0.85      371   2182    104/209     30/834    0.97 0.84
+e5-int8 @F1                    0.67 0.89 0.77     2447   1657    144/209    251/834    0.83 0.88
+e5-int8 @P98                   0.83 0.49 0.61      425   6239     71/209     19/834    0.94 0.53
+eg2 @F1                        0.71 0.86 0.78     1912   2711    115/209    202/834    0.85 0.80
+eg2 @P98                       0.92 0.53 0.67      308   7591     29/209     15/834    0.95 0.43
+eg2+layout @F1                 0.78 0.93 0.85     1360   1547    121/209    117/834    0.90 0.88
+eg2+layout @P98                0.86 0.82 0.84      657   3372     76/209     47/834    0.94 0.75
+eg2-256 @F1                    0.65 0.93 0.77     2883   1333    134/209    318/834    0.81 0.90
+eg2-256 @P98                   0.92 0.33 0.48      182  10041     16/209     10/834    0.95 0.25
+eg2-128 @F1                    0.66 0.87 0.75     2862   1664    148/209    256/834    0.80 0.88
+eg2-128 @P98                   0.86 0.27 0.41      273  10364     22/209     19/834    0.92 0.23
+
+INLINE TASK (H3, test, vn read): per word over every scored word (needs=true everywhere, spans = the words the judge keeps); right: only words of blocks that hold a translate word
+judge @operating point             wordP wordR wordF1  spanF1 (exact/truth/pred)   prose-block words P R (tp/fp/fn)
+judge 1  rules only            0.93 0.06 0.11   0.02  (16/1179/136)   0.15 0.00  (11/62/3067)
+judge 1  rules OR CodeRegion   0.93 0.06 0.11   0.02  (16/1179/136)   0.15 0.00  (11/62/3067)
+gbt @F1                        0.96 1.00 0.98   0.83  (1032/1179/1295)   0.84 1.00  (3064/598/14)
+gbt @P98                       0.96 1.00 0.98   0.83  (1029/1179/1296)   0.83 1.00  (3064/608/14)
+gbt-nopix @F1                  0.93 0.99 0.96   0.79  (984/1179/1327)   0.75 0.99  (3058/1039/20)
+gbt-nopix @P98                 0.94 0.99 0.97   0.80  (991/1179/1289)   0.80 0.99  (3053/775/25)
+ngram @F1                      0.82 0.90 0.86   0.41  (755/1179/2532)   0.53 0.99  (3058/2704/20)
+ngram @P98                     0.98 0.82 0.89   0.41  (587/1179/1653)   0.91 0.95  (2930/281/148)
+potion @F1                     0.80 0.93 0.86   0.43  (728/1179/2206)   0.49 0.99  (3033/3170/45)
+potion @P98                    0.96 0.79 0.87   0.32  (415/1179/1410)   0.86 0.86  (2633/415/445)
+potion+layout @F1              0.94 0.97 0.95   0.63  (889/1179/1625)   0.77 0.97  (2974/883/104)
+potion+layout @P98             0.96 0.95 0.95   0.63  (837/1179/1477)   0.83 0.95  (2917/577/161)
+e5 @F1                         0.90 0.93 0.92   0.53  (810/1179/1889)   0.69 1.00  (3063/1370/15)
+e5 @P98                        0.97 0.88 0.92   0.53  (666/1179/1336)   0.90 0.98  (3012/325/66)
+e5+layout @F1                  0.94 0.98 0.96   0.68  (933/1179/1578)   0.79 0.99  (3061/805/17)
+e5+layout @P98                 0.97 0.96 0.96   0.68  (874/1179/1408)   0.87 0.98  (3025/447/53)
+e5-int8 @F1                    0.88 0.95 0.91   0.52  (840/1179/2074)   0.63 1.00  (3069/1790/9)
+e5-int8 @P98                   0.98 0.87 0.92   0.55  (680/1179/1281)   0.92 0.98  (3002/270/76)
+eg2 @F1                        0.88 0.96 0.92   0.55  (850/1179/1911)   0.63 0.99  (3056/1791/22)
+eg2 @P98                       0.97 0.88 0.92   0.55  (715/1179/1426)   0.88 0.96  (2960/393/118)
+eg2+layout @F1                 0.92 0.98 0.95   0.65  (936/1179/1717)   0.72 0.99  (3055/1189/23)
+eg2+layout @P98                0.96 0.95 0.96   0.64  (842/1179/1459)   0.86 0.98  (3027/492/51)
+eg2-256 @F1                    0.86 0.96 0.91   0.51  (840/1179/2115)   0.60 1.00  (3063/2011/15)
+eg2-256 @P98                   0.97 0.87 0.92   0.56  (723/1179/1416)   0.89 0.97  (2976/361/102)
+eg2-128 @F1                    0.86 0.95 0.91   0.50  (803/1179/2039)   0.60 0.98  (3029/1989/49)
+eg2-128 @P98                   0.97 0.83 0.89   0.43  (585/1179/1514)   0.88 0.92  (2830/392/248)
+
+HYBRID (H3, test, vn read): the rules OR CodeRegion decide the block, the judge's word model protects spans in the blocks the rules translate
+judge @operating point             wordP wordR wordF1  tr->kept keep->tr  spanF1
+gbt @F1                        0.96 1.00 0.98      604     19   0.84
+gbt @P98                       0.96 1.00 0.98      614     19   0.84
+gbt-nopix @F1                  0.93 1.00 0.96     1046     31   0.79
+gbt-nopix @P98                 0.94 1.00 0.97      783     44   0.82
+ngram @F1                      0.83 0.99 0.90     2711    129   0.53
+ngram @P98                     0.98 0.97 0.97      299    416   0.73
+potion @F1                     0.81 0.99 0.89     3172     81   0.55
+potion @P98                    0.97 0.95 0.96      428    711   0.67
+potion+layout @F1              0.94 0.99 0.96      897    123   0.72
+potion+layout @P98             0.96 0.99 0.97      598    193   0.75
+e5 @F1                         0.91 0.99 0.95     1373    113   0.65
+e5 @P98                        0.98 0.98 0.98      333    253   0.79
+e5+layout @F1                  0.94 1.00 0.97      809     31   0.75
+e5+layout @P98                 0.97 0.99 0.98      456     98   0.80
+e5-int8 @F1                    0.88 0.99 0.93     1792     76   0.61
+e5-int8 @P98                   0.98 0.98 0.98      278    271   0.80
+eg2 @F1                        0.88 0.99 0.93     1796     69   0.65
+eg2 @P98                       0.97 0.98 0.97      401    273   0.78
+eg2+layout @F1                 0.92 1.00 0.96     1195     43   0.70
+eg2+layout @P98                0.96 0.99 0.98      499     99   0.79
+eg2-256 @F1                    0.87 1.00 0.93     2016     53   0.61
+eg2-256 @P98                   0.97 0.98 0.98      369    241   0.80
+eg2-128 @F1                    0.87 0.99 0.93     1991     99   0.62
+eg2-128 @P98                   0.97 0.97 0.97      401    449   0.75
+
+BOTH (H3, test, vn read): block judge decides, the word judge protects spans in the blocks that are translated (what a pipeline would do)
+judge @operating point             wordP wordR wordF1  tr->kept keep->tr  spanF1
+judge 1  rules only            0.98 0.58 0.73      126   5578   0.74
+judge 1  rules OR CodeRegion   0.99 0.66 0.79      126   4486   0.79
+gbt @F1                        0.94 1.00 0.97      842     33   0.81
+gbt @P98                       0.96 1.00 0.98      622     48   0.83
+gbt-nopix @F1                  0.92 1.00 0.96     1140     65   0.78
+gbt-nopix @P98                 0.94 0.99 0.97      793    117   0.80
+ngram @F1                      0.75 0.93 0.83     4222    931   0.51
+ngram @P98                     0.95 0.87 0.90      674   1767   0.57
+potion @F1                     0.74 0.96 0.84     4445    584   0.54
+potion @P98                    0.96 0.80 0.87      481   2708   0.34
+potion+layout @F1              0.89 0.98 0.93     1613    334   0.68
+potion+layout @P98             0.94 0.95 0.95      830    609   0.67
+e5 @F1                         0.81 0.95 0.88     2987    633   0.59
+e5 @P98                        0.95 0.88 0.92      632   1547   0.57
+e5+layout @F1                  0.91 0.99 0.95     1326    194   0.71
+e5+layout @P98                 0.96 0.96 0.96      544    487   0.72
+e5-int8 @F1                    0.80 0.96 0.88     3140    478   0.58
+e5-int8 @P98                   0.95 0.88 0.92      559   1601   0.59
+eg2 @F1                        0.83 0.97 0.90     2561    429   0.61
+eg2 @P98                       0.95 0.89 0.92      570   1469   0.59
+eg2+layout @F1                 0.88 0.99 0.93     1817    161   0.68
+eg2+layout @P98                0.94 0.96 0.95      881    500   0.70
+eg2-256 @F1                    0.79 0.98 0.88     3459    275   0.60
+eg2-256 @P98                   0.96 0.88 0.92      466   1611   0.58
+eg2-128 @F1                    0.79 0.97 0.87     3483    398   0.59
+eg2-128 @P98                   0.95 0.84 0.89      585   2188   0.46
+
+BLOCK TASK (H2, out-of-fold, doc read): keep the whole block (binary); tr->kept = translate words kept, keep->tr = keep words translated; "mixed kept" = labelled-mixed blocks kept whole / all mixed; "transl kept" = pure-translate blocks kept whole / all
+judge @operating point             blkP  blkR  blkF1  tr->kept keep->tr  mixed kept  transl kept  wordP wordR
+judge 1  rules only            1.00 0.80 0.89       18   1650      2/46       0/146    0.99 0.61
+judge 1  rules OR CodeRegion   1.00 0.89 0.94       18    983      2/46       0/146    0.99 0.77
+gbt @F1                        0.98 0.99 0.99       31    374      1/46      11/146    0.99 0.91
+gbt @P98                       0.99 0.98 0.98       14    480      1/46       6/146    1.00 0.89
+gbt-nopix @F1                  0.98 0.99 0.98       37    388      2/46      11/146    0.99 0.91
+gbt-nopix @P98                 0.99 0.96 0.97       19    522      1/46       6/146    0.99 0.88
+ngram @F1                      0.92 0.91 0.92      385    889     19/46      29/146    0.90 0.79
+ngram @P98                     0.99 0.55 0.71       19   2845      3/46       1/146    0.99 0.33
+potion @F1                     0.87 0.94 0.90      667    559     23/46      60/146    0.85 0.87
+potion @P98                    0.98 0.18 0.30       42   3492      2/46       0/146    0.95 0.17
+potion+layout @F1              0.95 0.97 0.96      205    458      9/46      19/146    0.95 0.89
+potion+layout @P98             0.99 0.89 0.94       44    959      4/46       4/146    0.99 0.77
+e5 @F1                         0.93 0.89 0.91      410    843     16/46      22/146    0.89 0.80
+e5 @P98                        0.99 0.58 0.73       35   2467      3/46       2/146    0.98 0.42
+e5+layout @F1                  0.96 0.96 0.96      167    608      7/46      18/146    0.96 0.86
+e5+layout @P98                 0.99 0.90 0.94       35    971      3/46       4/146    0.99 0.77
+e5-int8 @F1                    0.92 0.92 0.92      427    773     13/46      33/146    0.89 0.82
+e5-int8 @P98                   0.99 0.51 0.68       19   2654      2/46       1/146    0.99 0.37
+eg2 @F1                        0.94 0.91 0.92      360    932     15/46      23/146    0.90 0.78
+eg2 @P98                       1.00 0.54 0.70        2   2400      1/46       0/146    1.00 0.43
+eg2+layout @F1                 0.97 0.94 0.96       61    770      4/46      14/146    0.98 0.82
+eg2+layout @P98                0.99 0.89 0.93       19   1100      2/46       5/146    0.99 0.74
+eg2-256 @F1                    0.92 0.93 0.92      516    607     18/46      30/146    0.88 0.86
+eg2-256 @P98                   0.99 0.31 0.47        2   3210      1/46       0/146    1.00 0.24
+eg2-128 @F1                    0.92 0.87 0.90      508    853     19/46      25/146    0.87 0.80
+eg2-128 @P98                   0.99 0.23 0.38        2   3428      1/46       0/146    1.00 0.19
+
+INLINE TASK (H2, out-of-fold, doc read): per word over every scored word (needs=true everywhere, spans = the words the judge keeps); right: only words of blocks that hold a translate word
+judge @operating point             wordP wordR wordF1  spanF1 (exact/truth/pred)   prose-block words P R (tp/fp/fn)
+judge 1  rules only            0.87 0.07 0.14   0.07  (27/695/105)   0.38 0.09  (29/47/279)
+judge 1  rules OR CodeRegion   0.87 0.07 0.14   0.07  (27/695/105)   0.38 0.09  (29/47/279)
+gbt @F1                        0.97 0.97 0.97   0.92  (652/695/723)   0.69 0.92  (282/128/26)
+gbt @P98                       0.97 0.97 0.97   0.92  (653/695/724)   0.67 0.92  (282/139/26)
+gbt-nopix @F1                  0.96 0.96 0.96   0.91  (641/695/712)   0.65 0.91  (279/150/29)
+gbt-nopix @P98                 0.97 0.95 0.96   0.90  (639/695/723)   0.68 0.89  (274/129/34)
+ngram @F1                      0.86 0.77 0.81   0.45  (441/695/1246)   0.35 0.96  (295/553/13)
+ngram @P98                     0.97 0.53 0.68   0.32  (265/695/942)   0.81 0.82  (253/60/55)
+potion @F1                     0.86 0.89 0.87   0.61  (511/695/984)   0.31 0.89  (274/605/34)
+potion @P98                    0.97 0.58 0.73   0.40  (284/695/741)   0.74 0.60  (185/66/123)
+potion+layout @F1              0.97 0.93 0.95   0.76  (581/695/825)   0.65 0.82  (253/136/55)
+potion+layout @P98             0.98 0.90 0.94   0.75  (566/695/808)   0.75 0.78  (239/80/69)
+e5 @F1                         0.91 0.86 0.88   0.62  (518/695/987)   0.44 0.95  (292/367/16)
+e5 @P98                        0.98 0.67 0.79   0.46  (363/695/896)   0.79 0.78  (240/64/68)
+e5+layout @F1                  0.95 0.94 0.94   0.76  (594/695/864)   0.57 0.91  (279/211/29)
+e5+layout @P98                 0.98 0.89 0.93   0.75  (572/695/840)   0.75 0.82  (252/86/56)
+e5-int8 @F1                    0.87 0.87 0.87   0.61  (525/695/1019)   0.35 0.94  (291/538/17)
+e5-int8 @P98                   0.98 0.60 0.75   0.40  (314/695/860)   0.80 0.76  (233/58/75)
+eg2 @F1                        0.91 0.90 0.90   0.66  (533/695/928)   0.44 0.96  (295/370/13)
+eg2 @P98                       0.98 0.71 0.82   0.50  (391/695/884)   0.81 0.81  (251/60/57)
+eg2+layout @F1                 0.95 0.93 0.94   0.75  (585/695/867)   0.58 0.94  (288/209/20)
+eg2+layout @P98                0.98 0.85 0.91   0.67  (522/695/874)   0.78 0.82  (252/73/56)
+eg2-256 @F1                    0.90 0.89 0.90   0.66  (539/695/932)   0.42 0.94  (290/404/18)
+eg2-256 @P98                   0.98 0.68 0.80   0.45  (344/695/836)   0.79 0.74  (227/62/81)
+eg2-128 @F1                    0.90 0.86 0.88   0.65  (524/695/924)   0.42 0.95  (294/411/14)
+eg2-128 @P98                   0.98 0.62 0.76   0.42  (318/695/813)   0.77 0.72  (223/67/85)
+
+HYBRID (H2, out-of-fold, doc read): the rules OR CodeRegion decide the block, the judge's word model protects spans in the blocks the rules translate
+judge @operating point             wordP wordR wordF1  tr->kept keep->tr  spanF1
+gbt @F1                        0.97 0.99 0.98      144     45   0.94
+gbt @P98                       0.96 0.99 0.98      155     45   0.94
+gbt-nopix @F1                  0.96 0.99 0.97      166     54   0.92
+gbt-nopix @P98                 0.97 0.98 0.97      145     87   0.92
+ngram @F1                      0.88 0.95 0.91      564    219   0.70
+ngram @P98                     0.98 0.89 0.93       74    477   0.80
+potion @F1                     0.87 0.97 0.92      605    138   0.77
+potion @P98                    0.98 0.90 0.94       74    435   0.82
+potion+layout @F1              0.97 0.97 0.97      148    106   0.87
+potion+layout @P98             0.98 0.96 0.97       94    152   0.88
+e5 @F1                         0.92 0.96 0.94      374    164   0.78
+e5 @P98                        0.98 0.91 0.94       78    378   0.84
+e5+layout @F1                  0.95 0.98 0.97      225     71   0.84
+e5+layout @P98                 0.98 0.96 0.97      101    160   0.87
+e5-int8 @F1                    0.88 0.96 0.92      538    164   0.75
+e5-int8 @P98                   0.98 0.90 0.94       70    430   0.83
+eg2 @F1                        0.92 0.96 0.94      370    176   0.79
+eg2 @P98                       0.98 0.91 0.94       70    384   0.82
+eg2+layout @F1                 0.95 0.97 0.96      216    130   0.84
+eg2+layout @P98                0.98 0.94 0.96       86    247   0.83
+eg2-256 @F1                    0.91 0.95 0.93      405    191   0.79
+eg2-256 @P98                   0.98 0.90 0.94       75    402   0.82
+eg2-128 @F1                    0.91 0.96 0.93      412    176   0.81
+eg2-128 @P98                   0.98 0.91 0.94       77    381   0.82
+
+BOTH (H2, out-of-fold, doc read): block judge decides, the word judge protects spans in the blocks that are translated (what a pipeline would do)
+judge @operating point             wordP wordR wordF1  tr->kept keep->tr  spanF1
+judge 1  rules only            0.98 0.63 0.76       65   1569   0.81
+judge 1  rules OR CodeRegion   0.98 0.78 0.87       65    945   0.87
+gbt @F1                        0.97 0.98 0.97      148     74   0.94
+gbt @P98                       0.97 0.98 0.97      145     74   0.94
+gbt-nopix @F1                  0.96 0.98 0.97      164     80   0.93
+gbt-nopix @P98                 0.97 0.97 0.97      132    130   0.92
+ngram @F1                      0.83 0.90 0.86      778    424   0.68
+ngram @P98                     0.97 0.61 0.75       75   1650   0.52
+potion @F1                     0.82 0.93 0.87      835    304   0.75
+potion @P98                    0.97 0.60 0.74       90   1696   0.43
+potion+layout @F1              0.94 0.95 0.94      269    205   0.85
+potion+layout @P98             0.98 0.92 0.95       90    350   0.81
+e5 @F1                         0.87 0.92 0.89      591    341   0.74
+e5 @P98                        0.97 0.72 0.83       91   1194   0.57
+e5+layout @F1                  0.93 0.95 0.94      308    194   0.82
+e5+layout @P98                 0.97 0.91 0.94      105    370   0.82
+e5-int8 @F1                    0.84 0.93 0.88      735    299   0.72
+e5-int8 @P98                   0.98 0.66 0.79       71   1419   0.53
+eg2 @F1                        0.88 0.92 0.90      525    323   0.77
+eg2 @P98                       0.98 0.74 0.85       60   1086   0.59
+eg2+layout @F1                 0.94 0.95 0.95      234    217   0.82
+eg2+layout @P98                0.98 0.89 0.93       82    457   0.78
+eg2-256 @F1                    0.86 0.94 0.89      671    261   0.80
+eg2-256 @P98                   0.98 0.70 0.82       62   1271   0.50
+eg2-128 @F1                    0.85 0.92 0.88      702    349   0.77
+eg2-128 @P98                   0.98 0.64 0.78       67   1504   0.47
+
+BLOCK TASK (H2, out-of-fold, vn read): keep the whole block (binary); tr->kept = translate words kept, keep->tr = keep words translated; "mixed kept" = labelled-mixed blocks kept whole / all mixed; "transl kept" = pure-translate blocks kept whole / all
+judge @operating point             blkP  blkR  blkF1  tr->kept keep->tr  mixed kept  transl kept  wordP wordR
+judge 1  rules only            1.00 0.73 0.85        0   2308      0/48       0/144    1.00 0.62
+judge 1  rules OR CodeRegion   1.00 0.84 0.91        0   1440      0/48       0/144    1.00 0.76
+gbt @F1                        0.95 0.99 0.97       73    358      5/48      11/144    0.99 0.94
+gbt @P98                       0.97 0.97 0.97       46    501      4/48       6/144    0.99 0.92
+gbt-nopix @F1                  0.94 0.98 0.96       70    313      5/48      13/144    0.99 0.95
+gbt-nopix @P98                 0.97 0.94 0.95       23    730      1/48       9/144    1.00 0.88
+ngram @F1                      0.85 0.92 0.89      355   1068     19/48      29/144    0.93 0.82
+ngram @P98                     0.98 0.50 0.66       16   3683      2/48       1/144    0.99 0.39
+potion @F1                     0.77 0.94 0.85      636    288     25/48      60/144    0.90 0.95
+potion @P98                    0.98 0.20 0.33        8   4678      1/48       0/144    0.99 0.22
+potion+layout @F1              0.90 0.97 0.93      162    346      8/48      24/144    0.97 0.94
+potion+layout @P98             0.97 0.89 0.93       42   1031      3/48       6/144    0.99 0.83
+e5 @F1                         0.87 0.91 0.89      469    703     15/48      27/144    0.92 0.88
+e5 @P98                        0.98 0.58 0.72       29   2641      2/48       2/144    0.99 0.56
+e5+layout @F1                  0.91 0.97 0.94      176    342      8/48      22/144    0.97 0.94
+e5+layout @P98                 0.97 0.88 0.92       42   1327      3/48       5/144    0.99 0.78
+e5-int8 @F1                    0.84 0.92 0.88      542    605     15/48      37/144    0.91 0.90
+e5-int8 @P98                   0.98 0.53 0.68       29   3596      2/48       1/144    0.99 0.40
+eg2 @F1                        0.89 0.93 0.91      308   1016     12/48      21/144    0.94 0.83
+eg2 @P98                       1.00 0.57 0.72        0   2704      0/48       0/144    1.00 0.55
+eg2+layout @F1                 0.94 0.97 0.96       70    346      3/48      15/144    0.99 0.94
+eg2+layout @P98                0.99 0.89 0.94        8    868      0/48       3/144    1.00 0.86
+eg2-256 @F1                    0.86 0.94 0.90      497    786     17/48      29/144    0.91 0.87
+eg2-256 @P98                   1.00 0.33 0.50        0   3808      0/48       0/144    1.00 0.37
+eg2-128 @F1                    0.87 0.90 0.88      466    959     17/48      24/144    0.92 0.84
+eg2-128 @P98                   1.00 0.28 0.44        0   3935      0/48       0/144    1.00 0.35
+
+INLINE TASK (H2, out-of-fold, vn read): per word over every scored word (needs=true everywhere, spans = the words the judge keeps); right: only words of blocks that hold a translate word
+judge @operating point             wordP wordR wordF1  spanF1 (exact/truth/pred)   prose-block words P R (tp/fp/fn)
+judge 1  rules only            0.94 0.13 0.22   0.01  (3/396/101)   0.39 0.10  (29/45/271)
+judge 1  rules OR CodeRegion   0.94 0.13 0.22   0.01  (3/396/101)   0.39 0.10  (29/45/271)
+gbt @F1                        0.99 0.98 0.98   0.90  (371/396/426)   0.77 0.90  (270/81/30)
+gbt @P98                       0.99 0.98 0.98   0.90  (371/396/429)   0.76 0.90  (270/83/30)
+gbt-nopix @F1                  0.98 0.99 0.99   0.88  (362/396/423)   0.70 0.88  (263/112/37)
+gbt-nopix @P98                 0.99 0.98 0.98   0.87  (357/396/422)   0.75 0.87  (262/89/38)
+ngram @F1                      0.90 0.84 0.87   0.31  (214/396/988)   0.34 0.95  (285/542/15)
+ngram @P98                     0.99 0.66 0.79   0.20  (123/396/818)   0.80 0.76  (227/56/73)
+potion @F1                     0.90 0.95 0.93   0.47  (248/396/665)   0.30 0.88  (263/604/37)
+potion @P98                    0.99 0.73 0.84   0.23  (124/396/694)   0.71 0.48  (145/60/155)
+potion+layout @F1              0.97 0.97 0.97   0.68  (316/396/538)   0.59 0.81  (243/168/57)
+potion+layout @P98             0.98 0.95 0.97   0.64  (296/396/532)   0.69 0.73  (219/97/81)
+e5 @F1                         0.94 0.93 0.93   0.47  (256/396/692)   0.42 0.92  (276/380/24)
+e5 @P98                        0.99 0.81 0.89   0.36  (193/396/666)   0.79 0.73  (220/59/80)
+e5+layout @F1                  0.96 0.98 0.97   0.65  (308/396/552)   0.53 0.89  (266/234/34)
+e5+layout @P98                 0.98 0.94 0.96   0.61  (296/396/573)   0.73 0.77  (232/87/68)
+e5-int8 @F1                    0.91 0.94 0.92   0.44  (249/396/729)   0.33 0.91  (273/562/27)
+e5-int8 @P98                   0.99 0.75 0.86   0.31  (164/396/668)   0.81 0.69  (208/49/92)
+eg2 @F1                        0.94 0.94 0.94   0.55  (277/396/617)   0.44 0.94  (282/366/18)
+eg2 @P98                       0.99 0.83 0.90   0.39  (200/396/639)   0.82 0.73  (220/48/80)
+eg2+layout @F1                 0.97 0.97 0.97   0.66  (312/396/548)   0.56 0.88  (265/207/35)
+eg2+layout @P98                0.99 0.92 0.95   0.56  (276/396/589)   0.78 0.78  (235/67/65)
+eg2-256 @F1                    0.94 0.93 0.93   0.52  (267/396/631)   0.41 0.92  (277/391/23)
+eg2-256 @P98                   0.99 0.81 0.89   0.33  (162/396/589)   0.78 0.66  (198/55/102)
+eg2-128 @F1                    0.93 0.93 0.93   0.50  (262/396/651)   0.41 0.92  (277/402/23)
+eg2-128 @P98                   0.99 0.78 0.87   0.28  (144/396/634)   0.76 0.61  (183/58/117)
+
+HYBRID (H2, out-of-fold, vn read): the rules OR CodeRegion decide the block, the judge's word model protects spans in the blocks the rules translate
+judge @operating point             wordP wordR wordF1  tr->kept keep->tr  spanF1
+gbt @F1                        0.99 0.98 0.99       81     97   0.92
+gbt @P98                       0.99 0.98 0.99       83     92   0.91
+gbt-nopix @F1                  0.98 0.99 0.99      112     52   0.89
+gbt-nopix @P98                 0.99 0.98 0.98       89    104   0.88
+ngram @F1                      0.91 0.95 0.93      542    277   0.55
+ngram @P98                     0.99 0.90 0.94       56    597   0.65
+potion @F1                     0.91 0.99 0.95      604     80   0.63
+potion @P98                    0.99 0.92 0.96       60    461   0.65
+potion+layout @F1              0.97 0.98 0.98      168    107   0.76
+potion+layout @P98             0.98 0.97 0.98       97    160   0.79
+e5 @F1                         0.94 0.98 0.96      380    130   0.64
+e5 @P98                        0.99 0.94 0.96       59    355   0.71
+e5+layout @F1                  0.96 0.99 0.98      234     66   0.73
+e5+layout @P98                 0.99 0.97 0.98       87    152   0.77
+e5-int8 @F1                    0.91 0.98 0.94      562    130   0.58
+e5-int8 @P98                   0.99 0.92 0.96       49    460   0.67
+eg2 @F1                        0.94 0.98 0.96      366    139   0.68
+eg2 @P98                       0.99 0.93 0.96       48    400   0.71
+eg2+layout @F1                 0.97 0.98 0.97      207    104   0.75
+eg2+layout @P98                0.99 0.96 0.97       67    234   0.76
+eg2-256 @F1                    0.94 0.97 0.95      391    165   0.66
+eg2-256 @P98                   0.99 0.93 0.96       55    424   0.69
+eg2-128 @F1                    0.94 0.97 0.95      402    165   0.66
+eg2-128 @P98                   0.99 0.93 0.96       58    437   0.68
+
+BOTH (H2, out-of-fold, vn read): block judge decides, the word judge protects spans in the blocks that are translated (what a pipeline would do)
+judge @operating point             wordP wordR wordF1  tr->kept keep->tr  spanF1
+judge 1  rules only            0.99 0.66 0.79       45   2026   0.68
+judge 1  rules OR CodeRegion   0.99 0.79 0.88       45   1254   0.75
+gbt @F1                        0.98 0.98 0.98      116     95   0.91
+gbt @P98                       0.98 0.98 0.98      110     93   0.90
+gbt-nopix @F1                  0.98 0.99 0.98      149     52   0.88
+gbt-nopix @P98                 0.98 0.98 0.98       97    105   0.88
+ngram @F1                      0.88 0.95 0.91      752    328   0.55
+ngram @P98                     0.98 0.72 0.83       71   1659   0.39
+potion @F1                     0.88 0.98 0.92      829    130   0.64
+potion @P98                    0.99 0.74 0.84       67   1574   0.26
+potion+layout @F1              0.96 0.98 0.97      247     94   0.77
+potion+layout @P98             0.98 0.96 0.97      114    218   0.72
+e5 @F1                         0.90 0.97 0.93      650    174   0.63
+e5 @P98                        0.98 0.87 0.92       84    805   0.51
+e5+layout @F1                  0.95 0.99 0.97      320     56   0.75
+e5+layout @P98                 0.98 0.95 0.97      116    273   0.69
+e5-int8 @F1                    0.88 0.98 0.93      819    116   0.60
+e5-int8 @P98                   0.98 0.81 0.89       77   1168   0.44
+eg2 @F1                        0.92 0.97 0.94      490    197   0.68
+eg2 @P98                       0.99 0.87 0.93       48    788   0.54
+eg2+layout @F1                 0.96 0.99 0.98      242     61   0.79
+eg2+layout @P98                0.99 0.96 0.98       74    218   0.76
+eg2-256 @F1                    0.90 0.97 0.93      665    192   0.69
+eg2-256 @P98                   0.99 0.83 0.90       55   1018   0.41
+eg2-128 @F1                    0.90 0.96 0.93      667    220   0.67
+eg2-128 @P98                   0.99 0.81 0.89       58   1173   0.36
+
+PER LANGUAGE (h3, doc read, BOTH): block keep F1, word P/R (ja / zh-Hans doc reads split Latin runs into one word per character: weigh by block)
+judge @operating point                                 ko                       ja                       en                  zh-Hans
+judge 1  rules only            blkF1 0.97 w 1.00/0.86   blkF1 0.98 w 0.99/0.58   blkF1 0.51 w 0.91/0.23   blkF1 0.97 w 0.99/0.56
+judge 1  rules OR CodeRegion   blkF1 0.99 w 1.00/0.95   blkF1 0.98 w 0.99/0.59   blkF1 0.74 w 0.97/0.69   blkF1 0.98 w 0.99/0.59
+gbt @F1                        blkF1 0.98 w 0.98/1.00   blkF1 0.95 w 0.94/1.00   blkF1 0.84 w 0.88/0.99   blkF1 0.95 w 0.91/1.00
+gbt @P98                       blkF1 0.92 w 0.98/1.00   blkF1 0.88 w 0.94/1.00   blkF1 0.82 w 0.94/0.99   blkF1 0.92 w 0.94/1.00
+gbt-nopix @F1                  blkF1 0.98 w 0.97/1.00   blkF1 0.95 w 0.92/1.00   blkF1 0.87 w 0.95/0.97   blkF1 0.94 w 0.91/1.00
+gbt-nopix @P98                 blkF1 0.98 w 0.98/1.00   blkF1 0.96 w 0.93/1.00   blkF1 0.82 w 0.97/0.95   blkF1 0.96 w 0.93/1.00
+ngram @F1                      blkF1 0.83 w 0.78/0.74   blkF1 0.82 w 0.77/0.96   blkF1 0.78 w 0.71/0.78   blkF1 0.68 w 0.54/0.96
+ngram @P98                     blkF1 0.76 w 0.95/0.55   blkF1 0.80 w 0.94/0.91   blkF1 0.71 w 0.89/0.63   blkF1 0.79 w 0.92/0.89
+potion @F1                     blkF1 0.82 w 0.78/0.83   blkF1 0.79 w 0.67/0.96   blkF1 0.71 w 0.61/0.90   blkF1 0.78 w 0.68/0.94
+potion @P98                    blkF1 0.42 w 0.95/0.48   blkF1 0.37 w 0.93/0.85   blkF1 0.44 w 0.91/0.59   blkF1 0.32 w 0.95/0.76
+potion+layout @F1              blkF1 0.95 w 0.95/0.98   blkF1 0.90 w 0.89/0.98   blkF1 0.80 w 0.77/0.97   blkF1 0.89 w 0.83/0.98
+potion+layout @P98             blkF1 0.93 w 0.98/0.96   blkF1 0.88 w 0.93/0.97   blkF1 0.84 w 0.86/0.93   blkF1 0.91 w 0.92/0.96
+e5 @F1                         blkF1 0.90 w 0.85/0.81   blkF1 0.83 w 0.79/0.97   blkF1 0.77 w 0.70/0.85   blkF1 0.79 w 0.70/0.96
+e5 @P98                        blkF1 0.71 w 0.97/0.62   blkF1 0.71 w 0.93/0.93   blkF1 0.65 w 0.89/0.70   blkF1 0.64 w 0.91/0.88
+e5+layout @F1                  blkF1 0.97 w 0.94/1.00   blkF1 0.92 w 0.90/0.99   blkF1 0.83 w 0.80/0.98   blkF1 0.89 w 0.81/1.00
+e5+layout @P98                 blkF1 0.94 w 0.97/0.97   blkF1 0.90 w 0.94/0.98   blkF1 0.86 w 0.90/0.93   blkF1 0.93 w 0.93/0.99
+e5-int8 @F1                    blkF1 0.90 w 0.82/0.88   blkF1 0.83 w 0.78/0.97   blkF1 0.77 w 0.69/0.90   blkF1 0.82 w 0.73/0.96
+e5-int8 @P98                   blkF1 0.67 w 0.97/0.59   blkF1 0.71 w 0.95/0.92   blkF1 0.64 w 0.91/0.67   blkF1 0.64 w 0.94/0.88
+eg2 @F1                        blkF1 0.90 w 0.86/0.87   blkF1 0.90 w 0.85/0.97   blkF1 0.77 w 0.68/0.91   blkF1 0.81 w 0.75/0.97
+eg2 @P98                       blkF1 0.73 w 0.97/0.62   blkF1 0.75 w 0.96/0.92   blkF1 0.72 w 0.86/0.71   blkF1 0.73 w 0.92/0.89
+eg2+layout @F1                 blkF1 0.95 w 0.92/0.97   blkF1 0.93 w 0.88/1.00   blkF1 0.84 w 0.76/0.97   blkF1 0.86 w 0.78/1.00
+eg2+layout @P98                blkF1 0.94 w 0.97/0.94   blkF1 0.91 w 0.95/0.97   blkF1 0.86 w 0.86/0.91   blkF1 0.90 w 0.87/0.98
+eg2-256 @F1                    blkF1 0.88 w 0.83/0.88   blkF1 0.87 w 0.79/0.97   blkF1 0.76 w 0.67/0.92   blkF1 0.76 w 0.65/0.97
+eg2-256 @P98                   blkF1 0.52 w 0.96/0.59   blkF1 0.53 w 0.96/0.91   blkF1 0.56 w 0.87/0.69   blkF1 0.55 w 0.95/0.88
+eg2-128 @F1                    blkF1 0.86 w 0.84/0.88   blkF1 0.82 w 0.77/0.96   blkF1 0.79 w 0.70/0.92   blkF1 0.75 w 0.65/0.97
+eg2-128 @P98                   blkF1 0.47 w 0.97/0.56   blkF1 0.47 w 0.94/0.86   blkF1 0.47 w 0.85/0.64   blkF1 0.49 w 0.91/0.84
+
+PER LANGUAGE (h3, vn read, BOTH): block keep F1, word P/R (ja / zh-Hans doc reads split Latin runs into one word per character: weigh by block)
+judge @operating point                                 ko                       ja                       en                  zh-Hans
+judge 1  rules only            blkF1 0.97 w 1.00/0.79   blkF1 0.97 w 0.99/0.64   blkF1 0.53 w 0.93/0.28   blkF1 0.96 w 0.98/0.57
+judge 1  rules OR CodeRegion   blkF1 0.98 w 1.00/0.86   blkF1 0.98 w 0.99/0.68   blkF1 0.75 w 0.97/0.73   blkF1 0.96 w 0.98/0.57
+gbt @F1                        blkF1 0.93 w 0.95/1.00   blkF1 0.93 w 0.95/1.00   blkF1 0.81 w 0.87/0.99   blkF1 0.90 w 0.95/1.00
+gbt @P98                       blkF1 0.88 w 0.96/0.99   blkF1 0.82 w 0.95/1.00   blkF1 0.75 w 0.93/0.99   blkF1 0.85 w 0.96/1.00
+gbt-nopix @F1                  blkF1 0.92 w 0.93/1.00   blkF1 0.93 w 0.91/1.00   blkF1 0.83 w 0.94/0.96   blkF1 0.90 w 0.92/1.00
+gbt-nopix @P98                 blkF1 0.95 w 0.96/1.00   blkF1 0.96 w 0.93/1.00   blkF1 0.70 w 0.96/0.94   blkF1 0.93 w 0.94/1.00
+ngram @F1                      blkF1 0.74 w 0.76/0.74   blkF1 0.78 w 0.82/0.98   blkF1 0.72 w 0.70/0.78   blkF1 0.59 w 0.70/0.99
+ngram @P98                     blkF1 0.67 w 0.93/0.55   blkF1 0.75 w 0.96/0.94   blkF1 0.72 w 0.89/0.66   blkF1 0.74 w 0.95/0.96
+potion @F1                     blkF1 0.75 w 0.76/0.87   blkF1 0.73 w 0.73/0.98   blkF1 0.65 w 0.60/0.89   blkF1 0.70 w 0.80/0.98
+potion @P98                    blkF1 0.29 w 0.95/0.51   blkF1 0.31 w 0.96/0.88   blkF1 0.34 w 0.90/0.62   blkF1 0.23 w 0.97/0.86
+potion+layout @F1              blkF1 0.88 w 0.92/0.96   blkF1 0.87 w 0.92/0.99   blkF1 0.76 w 0.75/0.92   blkF1 0.84 w 0.91/0.98
+potion+layout @P98             blkF1 0.85 w 0.95/0.91   blkF1 0.82 w 0.95/0.98   blkF1 0.80 w 0.86/0.87   blkF1 0.85 w 0.95/0.97
+e5 @F1                         blkF1 0.81 w 0.81/0.80   blkF1 0.80 w 0.85/0.99   blkF1 0.71 w 0.69/0.85   blkF1 0.72 w 0.81/0.99
+e5 @P98                        blkF1 0.56 w 0.95/0.62   blkF1 0.66 w 0.96/0.95   blkF1 0.61 w 0.88/0.72   blkF1 0.60 w 0.95/0.95
+e5+layout @F1                  blkF1 0.89 w 0.92/0.96   blkF1 0.90 w 0.95/1.00   blkF1 0.80 w 0.80/0.93   blkF1 0.84 w 0.90/1.00
+e5+layout @P98                 blkF1 0.84 w 0.95/0.90   blkF1 0.84 w 0.97/0.98   blkF1 0.83 w 0.92/0.89   blkF1 0.87 w 0.97/0.99
+e5-int8 @F1                    blkF1 0.81 w 0.78/0.85   blkF1 0.80 w 0.84/0.99   blkF1 0.72 w 0.68/0.90   blkF1 0.76 w 0.82/0.99
+e5-int8 @P98                   blkF1 0.57 w 0.95/0.61   blkF1 0.65 w 0.96/0.95   blkF1 0.62 w 0.91/0.71   blkF1 0.62 w 0.96/0.95
+eg2 @F1                        blkF1 0.85 w 0.84/0.90   blkF1 0.86 w 0.89/0.99   blkF1 0.72 w 0.68/0.91   blkF1 0.73 w 0.84/0.99
+eg2 @P98                       blkF1 0.67 w 0.96/0.66   blkF1 0.67 w 0.97/0.95   blkF1 0.68 w 0.85/0.73   blkF1 0.66 w 0.96/0.95
+eg2+layout @F1                 blkF1 0.91 w 0.92/0.97   blkF1 0.90 w 0.92/1.00   blkF1 0.81 w 0.76/0.96   blkF1 0.81 w 0.87/0.99
+eg2+layout @P98                blkF1 0.88 w 0.96/0.89   blkF1 0.86 w 0.96/0.99   blkF1 0.80 w 0.85/0.89   blkF1 0.81 w 0.93/0.99
+eg2-256 @F1                    blkF1 0.85 w 0.81/0.93   blkF1 0.85 w 0.84/0.99   blkF1 0.71 w 0.67/0.94   blkF1 0.70 w 0.79/1.00
+eg2-256 @P98                   blkF1 0.48 w 0.96/0.61   blkF1 0.48 w 0.98/0.94   blkF1 0.47 w 0.88/0.70   blkF1 0.50 w 0.97/0.95
+eg2-128 @F1                    blkF1 0.82 w 0.83/0.91   blkF1 0.80 w 0.82/0.99   blkF1 0.74 w 0.68/0.93   blkF1 0.68 w 0.79/0.98
+eg2-128 @P98                   blkF1 0.39 w 0.95/0.58   blkF1 0.41 w 0.97/0.91   blkF1 0.42 w 0.86/0.65   blkF1 0.40 w 0.95/0.90
+
+KEEP-WORD RECALL BY REASON (h3, doc read; recall/n)
+judge (BOTH)                       code       log    config       cmd      path        id       url      flag      hash    hotkey  diffmark
+judge 1  rules OR CodeRegion    0.95/5190   0.21/472   0.71/569   0.34/426   0.48/230   0.34/212   0.04/1841   0.76/121   0.97/99    0.84/101   0.85/181
+gbt @P98                        1.00/5190   1.00/472   0.99/569   0.99/426   1.00/230   1.00/212   1.00/1841   0.96/121   0.96/99    0.95/101   1.00/181
+e5+layout @P98                  0.96/5190   0.99/472   0.97/569   0.98/426   0.96/230   0.93/212   1.00/1841   0.98/121   1.00/99    0.96/101   1.00/181
+eg2+layout @P98                 0.94/5190   1.00/472   0.97/569   0.96/426   0.93/230   0.95/212   1.00/1841   0.98/121   1.00/99    0.93/101   1.00/181
+
+URL KEEP WORDS, BLOCK-WEIGHTED (h3, doc read, BOTH): mean over blocks of the share of the block's url words kept
+judge
+judge 1  rules OR CodeRegion   all: 0.59 (113 blocks)   ko: 0.79 (28 blocks)   ja: 0.04 (27 blocks)   en: 1.00 (29 blocks)   zh-Hans: 0.52 (29 blocks)
+gbt @P98                       all: 1.00 (113 blocks)   ko: 1.00 (28 blocks)   ja: 1.00 (27 blocks)   en: 1.00 (29 blocks)   zh-Hans: 1.00 (29 blocks)
+gbt-nopix @P98                 all: 1.00 (113 blocks)   ko: 1.00 (28 blocks)   ja: 1.00 (27 blocks)   en: 1.00 (29 blocks)   zh-Hans: 1.00 (29 blocks)
+ngram @P98                     all: 1.00 (113 blocks)   ko: 1.00 (28 blocks)   ja: 1.00 (27 blocks)   en: 1.00 (29 blocks)   zh-Hans: 1.00 (29 blocks)
+potion @P98                    all: 0.92 (113 blocks)   ko: 0.93 (28 blocks)   ja: 0.94 (27 blocks)   en: 0.86 (29 blocks)   zh-Hans: 0.96 (29 blocks)
+potion+layout @P98             all: 1.00 (113 blocks)   ko: 1.00 (28 blocks)   ja: 1.00 (27 blocks)   en: 1.00 (29 blocks)   zh-Hans: 1.00 (29 blocks)
+e5 @P98                        all: 1.00 (113 blocks)   ko: 1.00 (28 blocks)   ja: 1.00 (27 blocks)   en: 1.00 (29 blocks)   zh-Hans: 1.00 (29 blocks)
+e5+layout @P98                 all: 1.00 (113 blocks)   ko: 1.00 (28 blocks)   ja: 1.00 (27 blocks)   en: 1.00 (29 blocks)   zh-Hans: 1.00 (29 blocks)
+e5-int8 @P98                   all: 1.00 (113 blocks)   ko: 1.00 (28 blocks)   ja: 1.00 (27 blocks)   en: 1.00 (29 blocks)   zh-Hans: 1.00 (29 blocks)
+eg2 @P98                       all: 0.74 (113 blocks)   ko: 0.68 (28 blocks)   ja: 0.96 (27 blocks)   en: 0.53 (29 blocks)   zh-Hans: 0.78 (29 blocks)
+eg2+layout @P98                all: 1.00 (113 blocks)   ko: 1.00 (28 blocks)   ja: 1.00 (27 blocks)   en: 1.00 (29 blocks)   zh-Hans: 1.00 (29 blocks)
+eg2-256 @P98                   all: 0.79 (113 blocks)   ko: 0.71 (28 blocks)   ja: 0.96 (27 blocks)   en: 0.67 (29 blocks)   zh-Hans: 0.82 (29 blocks)
+eg2-128 @P98                   all: 0.69 (113 blocks)   ko: 0.57 (28 blocks)   ja: 0.96 (27 blocks)   en: 0.50 (29 blocks)   zh-Hans: 0.76 (29 blocks)
+
+PER LOOK (H3, doc read, BLOCK TASK; analysis only): block keep P / R / F1
+look                 blocks  rules OR CodeRegion       gbt-nopix @P98       e5+layout @P98      eg2+layout @P98
+card-dark               40  P 1.00 R 1.00 F1 1.00 P 1.00 R 1.00 F1 1.00 P 0.50 R 1.00 F1 0.67 P 0.29 R 1.00 F1 0.44
+card-light              40  P 0.67 R 0.67 F1 0.67 P 1.00 R 1.00 F1 1.00 P 0.50 R 1.00 F1 0.67 P 0.43 R 1.00 F1 0.60
+chat-dark-plain         10  P 0.75 R 1.00 F1 0.86 P 0.75 R 1.00 F1 0.86 P 0.60 R 1.00 F1 0.75 P 0.75 R 1.00 F1 0.86
+chat-mint               24  P 0.89 R 1.00 F1 0.94 P 0.80 R 1.00 F1 0.89 P 0.89 R 1.00 F1 0.94 P 0.78 R 0.88 F1 0.82
+docs-dark              360  P 0.93 R 0.97 F1 0.95 P 0.79 R 0.86 F1 0.82 P 0.76 R 0.99 F1 0.86 P 0.75 R 0.91 F1 0.82
+docs-light             443  P 0.88 R 0.82 F1 0.85 P 0.83 R 0.87 F1 0.85 P 0.82 R 0.89 F1 0.85 P 0.82 R 0.92 F1 0.87
+ide-solar              157  P 1.00 R 0.96 F1 0.98 P 1.00 R 1.00 F1 1.00 P 1.00 R 0.98 F1 0.99 P 0.99 R 0.95 F1 0.97
+md-night               325  P 0.94 R 0.84 F1 0.89 P 0.91 R 0.80 F1 0.85 P 0.83 R 0.93 F1 0.88 P 0.80 R 0.89 F1 0.84
+md-sepia               321  P 0.94 R 0.96 F1 0.95 P 0.92 R 0.80 F1 0.85 P 0.83 R 0.77 F1 0.80 P 0.92 R 0.90 F1 0.91
+pane-dark               98  P 1.00 R 0.96 F1 0.98 P 1.00 R 0.98 F1 0.99 P 1.00 R 0.94 F1 0.97 P 1.00 R 0.90 F1 0.95
+pane-light             106  P 1.00 R 0.85 F1 0.92 P 1.00 R 0.98 F1 0.99 P 1.00 R 0.96 F1 0.98 P 1.00 R 0.89 F1 0.94
+review-dark            401  P 0.99 R 0.99 F1 0.99 P 1.00 R 0.98 F1 0.99 P 0.94 R 0.92 F1 0.93 P 0.93 R 0.90 F1 0.92
+review-light           404  P 0.99 R 0.99 F1 0.99 P 0.99 R 0.95 F1 0.97 P 0.99 R 0.82 F1 0.89 P 0.96 R 0.80 F1 0.87
+term-green             163  P 1.00 R 0.74 F1 0.85 P 1.00 R 0.99 F1 1.00 P 1.00 R 0.99 F1 1.00 P 1.00 R 0.98 F1 0.99
+term-solarized         172  P 1.00 R 0.65 F1 0.78 P 1.00 R 1.00 F1 1.00 P 1.00 R 0.98 F1 0.99 P 1.00 R 0.94 F1 0.97
+
+SPEED (CPU, single thread, Python; 3 repetitions x 6 H3 doc pages with 280 blocks; judges interleaved per repetition; uptime at start: 10:41  up 20 days, 21:55, 12 users, load averages: 252.74 260.30 251.03)
+  every number includes the feature extraction from the raw inputs (word boxes, tint read from the pixels, chip backgrounds); PNG decode excluded; Python = upper bound for Swift
+  judge             block b=1 ms (med / p95)   block batched ms/blk (med / p95)   word b=1 ms/word (med / p95)   word batched ms/word (med / p95)   load s    RSS MB
+  gbt                   0.76 /     5.12            0.987 /    2.120               0.381 /    2.628              0.236 /    0.496            1.36      397
+  gbt-nopix             0.80 /     4.88            0.961 /    2.808               0.416 /    2.680              0.242 /    0.401            1.17      398
+  ngram                 0.20 /     0.92            0.033 /    0.077               0.251 /    0.850              0.130 /    0.274            1.27      407
+  potion                0.16 /     0.61            0.036 /    0.118               0.082 /    0.312              0.021 /    0.064            6.63     1651
+  potion+layout         0.67 /     5.32            0.929 /    1.758               0.322 /    1.952              0.244 /    0.388            5.41     2382
+  e5                   13.08 /    22.31            4.004 /    9.435               6.301 /   16.851              1.918 /    4.240            9.58     1070
+  e5+layout            14.01 /    23.97            4.895 /    9.052               7.036 /   17.729              2.105 /    3.972            7.11     1071
+  e5-int8              21.18 /    46.45           25.741 /   54.771              17.845 /   41.750             12.153 /   23.289            9.32     2256
+  eg2                  79.44 /   113.10           26.985 /   56.424              40.488 /   87.315             16.001 /   21.532            9.62     2006
+  eg2+layout           80.27 /   101.43           27.975 /   53.640              40.301 /   87.802             15.948 /   21.200            9.42     2084
+  judge 1 (Swift, in process, 5526 H3 blocks of both reads): TranslationFilter.needsTranslation + InlineMath.spans per block alone (batch=1): median 29.7 us, p95 114.0 us (filter 18.0 us, spans 8.1 us)
+                   CodeRegion.keep per read: 3.09 ms/block median, p95 7.47; regionfeed over the pictures (tint, line rects; includes PNG decode): 1.21 ms/block
+  second pass at another load (2 repetitions x 4 pages, uptime at start: 181.61 173.32 202.57, end: 178.84 172.88 202.24): block b=1 / block batched / word b=1 / word batched (median ms)
+    gbt-nopix          0.71     0.868     0.400     0.212
+    ngram              0.20     0.041     0.252     0.118
+    e5                13.34     7.570     6.519     2.367
+    eg2               84.20    47.016    52.901    20.929
+    judge 1 (Swift): filter+spans 29.5 us/block, CodeRegion 5.60 ms/block, regionfeed 2.51 ms/block
+  embedding forward pass only, fp32 vs torch dynamic int8, same H3 block texts, 1 thread (int8_latency.py): model, batch=1 median / p95 ms per text, batched ms per text
+    e5             10.9 /     13.0   batched      4.3   (40 texts; 51.63 183.39 239.88)
+    e5-int8        14.5 /     28.6   batched     20.2   (40 texts; 51.63 183.39 239.88)
+    eg2            87.0 /    140.7   batched     35.3   (40 texts; 63.16 175.34 235.34)
+    eg2-int8      109.3 /    228.9   batched    164.7   (40 texts; 63.16 175.34 235.34)
+  python + torch import baseline RSS 217 MB (subtract for the model's own footprint)
+  uptime per judge (first repetition): gbt: 284.66 239.73 207.92; gbt-nopix: 284.66 239.73 207.92; ngram: 288.86 241.34 208.67; potion: 288.86 241.34 208.67; potion+layout: 288.86 241.34 208.67; e5: 288.86 241.34 208.67; e5+layout: 293.42 244.71 210.45; e5-int8: 291.12 246.59 211.71; eg2: 268.06 247.60 214.27; eg2+layout: 267.36 251.12 219.05
+
+BUNDLE SIZE ESTIMATE (MB): what the judge would ship; embedding weights as held at run time (fp32), the int8 twin where measured (torch dynamic quantisation: Linear layers int8, token table fp32),
+classifier = pickle of the fitted object (LightGBM: its text model; logistic regression: coefficients + scaler). Core ML could hold the embedding model in fp16 (half of fp32) or lower; not measured here.
+judge             embedding fp32   embedding int8   block clf   word clf   note
+  gbt                      0                0           1.42       0.72   400 + 400 trees
+  gbt-nopix                0                0           1.42       0.72   400 + 400 trees
+  ngram                    0                0           4.20      12.58   2^19 hashed char n-grams
+  potion                 512              128           0.00       0.01   128M params
+  potion+layout          512              128           0.01       0.02   128M params
+  e5                     471              407           0.01       0.02   118M params
+  e5+layout              471              407           0.01       0.02   118M params
+  e5-int8                471              407           0.01       0.02   118M params
+  eg2                   1084              675           0.01       0.04   271M params
+  eg2+layout            1084              675           0.01       0.04   271M params
+

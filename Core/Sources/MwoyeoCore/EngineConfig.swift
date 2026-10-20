@@ -36,6 +36,39 @@ public enum EngineKind: Equatable, Sendable {
     }
 }
 
+/// What an engine may be sent besides the lines to translate (design §4.1): the screen lines may go to it, the window
+/// title may, and DeepL may take the memory as its instructions.
+///
+/// The defaults are the ones of the table: the lines are on (the person allowed this engine to receive the text the
+/// lens reads, per host), the title is off (it can hold text from elsewhere) and DeepL's instructions are off. The
+/// value is written only when it is not the default, so an engine that says nothing is saved as before.
+public struct EngineAllow: Codable, Equatable, Sendable {
+    /// The lines around the text may go to this engine.
+    public var lines: Bool
+    /// The window title may go to this engine (off this Mac it stays off unless the user says otherwise).
+    public var title: Bool
+    /// DeepL only: the memory goes to it as `custom_instructions`.
+    public var deepLInstructions: Bool
+
+    /// The default (design §4.1): lines on, title off, DeepL instructions off.
+    public static let `default` = EngineAllow(lines: true, title: false, deepLInstructions: false)
+
+    public init(lines: Bool = true, title: Bool = false, deepLInstructions: Bool = false) {
+        self.lines = lines
+        self.title = title
+        self.deepLInstructions = deepLInstructions
+    }
+
+    // Every field is optional and one that is missing or of the wrong type is its default (the rule of `EngineContext`).
+    enum CodingKeys: String, CodingKey, CaseIterable { case lines, title, deepLInstructions }
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(lines: (try? c.decodeIfPresent(Bool.self, forKey: .lines)) ?? true,
+                  title: (try? c.decodeIfPresent(Bool.self, forKey: .title)) ?? false,
+                  deepLInstructions: (try? c.decodeIfPresent(Bool.self, forKey: .deepLInstructions)) ?? false)
+    }
+}
+
 /// One translation engine the user attached. Secrets are never part of it: the app keeps the key in the Keychain under `id`.
 /// Encoding is flat (`id`, `name`, `kind`, then the kind's fields) with sorted keys. Decoding ignores unknown fields,
 /// defaults a missing optional field, and throws `EngineConfigError.unknownKind` for a kind it does not know.
@@ -45,16 +78,20 @@ public struct EngineConfig: Codable, Equatable, Identifiable, Sendable {
     public var kind: EngineKind
     /// What this engine may be sent besides the lines (design §3). nil is Off: the engine is saved and sent exactly as before.
     public var context: EngineContext?
+    /// What this engine may be sent (design §4.1). The default lets the lines go and nothing else; it is written only
+    /// when it is not the default, so an engine that says nothing is saved as before.
+    public var allow: EngineAllow
 
-    public init(id: UUID = UUID(), name: String, kind: EngineKind, context: EngineContext? = nil) {
+    public init(id: UUID = UUID(), name: String, kind: EngineKind, context: EngineContext? = nil, allow: EngineAllow = .default) {
         self.id = id
         self.name = name
         self.kind = kind
         self.context = context
+        self.allow = allow
     }
 
     private enum Key: String, CodingKey {
-        case id, name, kind, baseURL, model, thinking, extraHeaders, formality, template, command, context
+        case id, name, kind, baseURL, model, thinking, extraHeaders, formality, template, command, context, allow
     }
 
     public init(from decoder: Decoder) throws {
@@ -86,6 +123,8 @@ public struct EngineConfig: Codable, Equatable, Identifiable, Sendable {
         }
         // A context this build cannot read is no context, never a lost engine.
         context = (try? c.decodeIfPresent(EngineContext.self, forKey: .context)) ?? nil
+        // The permissions this build does not know are the default: the lines go, nothing else does.
+        allow = (try? c.decodeIfPresent(EngineAllow.self, forKey: .allow)) ?? .default
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -95,6 +134,8 @@ public struct EngineConfig: Codable, Equatable, Identifiable, Sendable {
         try c.encode(kind.tag, forKey: .kind)
         // Written only when set, so an engine without one is saved exactly as before.
         try c.encodeIfPresent(context, forKey: .context)
+        // Written only when it is not the default, so an engine that allows nothing new is saved exactly as before.
+        if allow != .default { try c.encode(allow, forKey: .allow) }
         switch kind {
         case let .openAICompatible(baseURL, model, thinking, extraHeaders):
             try c.encode(baseURL, forKey: .baseURL)

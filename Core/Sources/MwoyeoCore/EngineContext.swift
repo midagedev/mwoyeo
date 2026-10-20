@@ -99,4 +99,58 @@ extension ContextOptions {
         if explicit.enabled { return explicit }
         return memoryOnlyOptions(engine: engine, profile: profile) ?? explicit
     }
+
+    // MARK: the request table (design §4.2)
+
+    /// What one request to `engine` is built with for the chain (design §4.2): the table, one owner.
+    ///
+    /// The request is what the chain wants ∩ what the engine allows ∩ what its kind takes (design §1.4). The table:
+    ///
+    /// | Amount of the chain | Kind takes context, lines allowed | Lines denied | DeepL without instructions |
+    /// |---|---|---|---|
+    /// | `off` | Off (today's bytes) | Off | Off |
+    /// | `memory` | memory only if the chain has hint rows or a note, else Off (DeepL with instructions: as instructions) | same | Off |
+    /// | `nearby` | lines around, 0 earlier; title per §4.1; learned if learn ∧ the kind learns | as `memory` | `context` lines only |
+    /// | `conversation n` | as `nearby` + n earlier lines (n > 4 sets `longTranscript`) | as `memory` | `context` lines only |
+    ///
+    /// Apple Translation, a template and a command are outside the table: they take only replacement rows (design §10).
+    /// A template or a command owns its body, so its options are today's (the layout sends them nothing either way);
+    /// Apple Translation is Off.
+    public static func requestOptions(engine: EngineConfig?, chain: MergedChain) -> ContextOptions {
+        guard let engine else { return .off }                                  // Apple Translation
+        let kind = LayoutKind.engine(engine.kind)
+        guard kind.tier != nil else { return .from(engine: engine.context) }    // a template or a command owns its body
+        let allow = engine.allow
+        switch chain.amount {
+        case .off:
+            return .off
+        case .memory:
+            return memoryOptions(chain: chain, allow: allow, kind: kind)
+        case .nearby:
+            return linesOptions(chain: chain, allow: allow, count: 0, kind: kind)
+        case .conversation(let n):
+            return linesOptions(chain: chain, allow: allow, count: n, kind: kind)
+        }
+    }
+
+    /// The memory case of the table (design §4.2): the card, the note and the user's rows, and nothing else — but only
+    /// when the chain has something to send, else Off.
+    private static func memoryOptions(chain: MergedChain, allow: EngineAllow, kind: LayoutKind) -> ContextOptions {
+        guard chain.hasMemory else { return .off }
+        if case .engine(.deepL) = kind {
+            // DeepL takes the memory as its instructions, and only with the opt-in (design §4.1).
+            guard allow.deepLInstructions else { return .off }
+            return ContextOptions(enabled: true, transcriptCount: 0, includeTitle: allow.title, deepLInstructions: true)
+        }
+        return ContextOptions(enabled: true, transcriptCount: 0, memoryOnly: true)
+    }
+
+    /// The lines case of the table (design §4.2): the lines around, `count` earlier lines, the title and the learned rows
+    /// as the engine allows them. When the engine denies the lines, the request is the memory case.
+    private static func linesOptions(chain: MergedChain, allow: EngineAllow, count: Int, kind: LayoutKind) -> ContextOptions {
+        guard allow.lines else { return memoryOptions(chain: chain, allow: allow, kind: kind) }
+        return ContextOptions(enabled: true, transcriptCount: count, includeLearned: chain.learn,
+                              includeTitle: allow.title, deepLInstructions: allow.deepLInstructions,
+                              longTranscript: count > shortTranscript)
+    }
 }

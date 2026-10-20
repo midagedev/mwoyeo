@@ -1,5 +1,111 @@
 import Foundation
 
+/// One condition of a profile's "Used when" (design §1.1, §1.2, §5.1, §5.3): the app (a bundle ID), the window title (a
+/// phrase the confirmed title must contain), or both. A condition with neither is invalid (§5.3) and matches nothing.
+public struct ProfileCondition: Codable, Equatable, Sendable {
+    /// The cap on the title phrase (§5.3).
+    public static let maxTitleLength = 60
+
+    /// The bundle ID of the app whose window the profile is for.
+    public var app: String?
+    /// The phrase the confirmed window title must contain (`ContextText.occurs`, folded: case, accents and width ignored).
+    public var titleContains: String?
+
+    public init(app: String? = nil, titleContains: String? = nil) {
+        self.app = app
+        self.titleContains = titleContains
+    }
+
+    /// A condition with neither an app nor a phrase: invalid (§5.3), and it matches nothing.
+    public var isEmpty: Bool { (app ?? "").isEmpty && (titleContains ?? "").isEmpty }
+
+    /// How narrow the condition is (design §1.3): app and title 3, title 2, app 1, none 0.
+    public var narrowness: Int {
+        let hasApp = !(app ?? "").isEmpty
+        let hasTitle = !(titleContains ?? "").isEmpty
+        if hasApp && hasTitle { return 3 }
+        if hasTitle { return 2 }
+        if hasApp { return 1 }
+        return 0
+    }
+
+    /// The length of the title phrase: the tie-break between two conditions of the same narrowness (design §1.3, "a tie
+    /// goes to the longer phrase").
+    public var phraseLength: Int { titleContains?.count ?? 0 }
+
+    /// Whether the condition matches the window under the lens.
+    ///
+    /// The app matches when the window's owner has this bundle ID. The title matches when the *confirmed* title contains
+    /// the phrase; until a new window's title is confirmed (≈ 1 s) only app conditions match (design §1.2).
+    public func matches(app bundleID: String?, title: String?) -> Bool {
+        if isEmpty { return false }
+        if let app, !app.isEmpty, app != bundleID { return false }
+        if let phrase = titleContains, !phrase.isEmpty {
+            guard let title, !title.isEmpty, ContextText.occurs(phrase, in: title) else { return false }
+        }
+        return true
+    }
+
+    // One flat object, `app` and `titleContains` left out when they are not there (§5.1's `when`).
+    enum CodingKeys: String, CodingKey, CaseIterable { case app, titleContains }
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(app: (try? c.decodeIfPresent(String.self, forKey: .app)) ?? nil,
+                  titleContains: (try? c.decodeIfPresent(String.self, forKey: .titleContains)) ?? nil)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encodeIfPresent(app, forKey: .app)
+        try c.encodeIfPresent(titleContains, forKey: .titleContains)
+    }
+}
+
+/// The engine a profile uses (design §5.1): an added engine's id, or `"apple"` (Apple's own translation, a new value of
+/// this field). Absent keeps All apps' choice.
+public enum ProfileEngine: Equatable, Sendable {
+    /// An added engine (one of the user's own).
+    case added(UUID)
+    /// Apple's translation ("apple" in the file).
+    case apple
+
+    /// The added engine's id; nil for Apple.
+    public var id: UUID? {
+        if case .added(let uuid) = self { return uuid }
+        return nil
+    }
+
+    /// What the file holds: the engine's id, or "apple".
+    public var fileValue: String {
+        switch self {
+        case .added(let id): return id.uuidString
+        case .apple: return "apple"
+        }
+    }
+
+    /// The engine a file value names, or nil when it names none (a value this build does not know).
+    public static func named(_ s: String) -> ProfileEngine? {
+        if s == "apple" { return .apple }
+        return UUID(uuidString: s).map { .added($0) }
+    }
+}
+
+extension ProfileEngine: Codable {
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.singleValueContainer()
+        let s = try c.decode(String.self)
+        guard let engine = ProfileEngine.named(s) else {
+            throw DecodingError.dataCorruptedError(in: c, debugDescription: "not an engine id or \"apple\"")
+        }
+        self = engine
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.singleValueContainer()
+        try c.encode(fileValue)
+    }
+}
+
 /// How much surrounding text one app's translations carry (design §3, §9). Written in `settings.json` as
 /// `{"mode": …, "previousLines": 0-8}`; `ContextOptions.resolved(base:override:)` lays it over the global choice.
 public struct AppContextOverride: Codable, Equatable, Sendable {
@@ -40,44 +146,82 @@ public struct AppContextOverride: Codable, Equatable, Sendable {
     }
 }
 
-/// Languages (and the added engine) remembered for one app. While that app is in front they replace the base choice.
+/// A profile: a name, a language pair, and what else it sets (design §1.1). Today's app profile is one app condition
+/// (`when` = [{app: bundleID}]); a profile without conditions is a preset, used only when it is picked.
 public struct AppProfile: Codable, Equatable, Identifiable, Sendable {
-    /// The caps of what an app profile keeps (design §10): `settings.json` and its validator use the same numbers.
+    /// The caps of what a profile keeps (design §10, §5.3): `settings.json` and its validator use the same numbers.
     public static let maxEntries = 40
     public static let maxNoteLength = 500
+    /// The cap on a profile's name (§5.3).
+    public static let maxNameLength = 40
+    /// The cap on a profile's conditions (§1.1, §5.3).
+    public static let maxConditions = 8
+    /// The id All apps has (§5.1): a profile may not take it.
+    public static let allAppsID = "all"
 
-    public var bundleID: String
-    public var appName: String
+    /// Whether an id is one a profile may take (design §5.1): 1 to 255 of letters, digits, `.`, `-` and `_`, and
+    /// never `all` (the base's id). An app's profile uses the bundle ID; the others a slug of the name.
+    public static func isValidID(_ id: String) -> Bool {
+        guard !id.isEmpty, id.count <= 255, id != allAppsID else { return false }
+        return id.allSatisfy { $0.isLetter || $0.isNumber || $0 == "." || $0 == "-" || $0 == "_" }
+    }
+
+    /// The profile's id (design §5.1): unique, and an app's profile uses the bundle ID, so the learned rows and
+    /// `Memory/<id>.json` keep their names.
+    public var id: String
+    /// The profile's name, for display.
+    public var name: String { didSet { name = ContextText.truncated(name, toCharacters: Self.maxNameLength) } }
+    /// The profile's "Used when" (design §1.1): up to `maxConditions` conditions. Empty = a preset.
+    public var when: [ProfileCondition] { didSet { when = Array(when.prefix(Self.maxConditions)) } }
     public var source: String
     public var target: String
-    /// The added engine to use; nil keeps the base choice.
-    public var customEngineID: UUID?
+    /// The engine this profile uses; nil keeps All apps' choice (§5.1: an engine id or `"apple"`).
+    public var engine: ProfileEngine?
     /// How this app's text is cut into paragraphs; nil inherits the global default.
     public var paragraphReader: ParagraphReader?
     /// The note for the translator (register, setting, audience), at most `maxNoteLength` characters. Empty for none.
     public var note: String { didSet { note = ContextMemory.cleanNote(note) } }
     /// The names and terms the user wrote or pinned, at most `maxEntries`, all `origin == .user`. Learned entries stay in RAM.
     public var entries: [MemoryEntry] { didSet { entries = Self.cleanEntries(entries) } }
-    /// How much context this app's translations carry; nil inherits the global choice, which is Off.
+    /// How much context this profile's translations carry; nil inherits All apps' amount (§2.1: the narrowest that sets it).
     public var context: AppContextOverride?
+    /// Whether the names this profile sees are learned and kept (design §1.4, §2.1: the narrowest that sets it); nil
+    /// inherits All apps' switch.
+    public var useLearned: Bool?
 
-    public var id: String { bundleID }
+    /// The app the profile is keyed by (design §1.1): the first app condition's bundle ID, or the id when it has no app
+    /// condition. Today's app profile keeps its bundle ID here, so the App's call sites read the same.
+    public var bundleID: String { when.compactMap(\.app).first ?? id }
+    /// The profile's name (design §1.1): today's app profile keeps its app name here. Setting it sets the name.
+    public var appName: String {
+        get { name }
+        set { name = newValue }
+    }
+    /// The added engine's id; nil for Apple and for "All apps' choice" (today's field, kept for the App's call sites).
+    public var customEngineID: UUID? {
+        get { engine?.id }
+        set { engine = newValue.map { ProfileEngine.added($0) } }
+    }
 
     /// The part of the profile that "Remember Languages" is about: the pair and the added engine.
     public var languages: LanguageChoice { LanguageChoice(source: source, target: target, customEngineID: customEngineID) }
 
     public init(bundleID: String, appName: String, source: String, target: String, customEngineID: UUID? = nil,
                 paragraphReader: ParagraphReader? = nil, note: String = "", entries: [MemoryEntry] = [],
-                context: AppContextOverride? = nil) {
-        self.bundleID = bundleID
-        self.appName = appName
+                context: AppContextOverride? = nil, id: String? = nil, name: String? = nil,
+                when conditions: [ProfileCondition]? = nil, engine: ProfileEngine? = nil, useLearned: Bool? = nil) {
+        self.id = id ?? bundleID
+        self.name = ContextText.truncated(name ?? appName, toCharacters: Self.maxNameLength)
+        // `didSet` does not run in an initializer, so the cap is applied here too.
+        self.when = Array((conditions ?? [ProfileCondition(app: bundleID)]).prefix(Self.maxConditions))
         self.source = source
         self.target = target
-        self.customEngineID = customEngineID
+        self.engine = engine ?? customEngineID.map { ProfileEngine.added($0) }
         self.paragraphReader = paragraphReader
         self.note = ContextMemory.cleanNote(note)
         self.entries = Self.cleanEntries(entries)
         self.context = context
+        self.useLearned = useLearned
     }
 
     /// User entries only, one per `src` (the first wins), at most `maxEntries`.
@@ -128,15 +272,39 @@ public struct AppProfile: Codable, Equatable, Identifiable, Sendable {
         entries.removeAll { $0.id == key }
     }
 
-    // Decode leniently so a profile saved by another version never takes the others with it.
+    // Decode leniently so a profile saved by another version never takes the others with it. The keys of today's
+    // `appProfiles` items and the new ones (design §5.1: `id`, `name`, `when`, `useLearned`) are both read.
     enum CodingKeys: String, CodingKey, CaseIterable { case bundleID, appName, source, target, customEngineID, paragraphReader, note, entries, context }
+    /// The new keys (design §5.1). They are read from every profile and written only when the old keys cannot say it, so
+    /// today's `appProfiles` items are written byte for byte as before.
+    enum NewKeys: String, CodingKey, CaseIterable { case id, name, when, useLearned }
+
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        bundleID = try c.decode(String.self, forKey: .bundleID)
-        appName = try c.decodeIfPresent(String.self, forKey: .appName) ?? bundleID
-        source = try c.decodeIfPresent(String.self, forKey: .source) ?? "auto"
-        target = try c.decodeIfPresent(String.self, forKey: .target) ?? "en"
-        customEngineID = try? c.decodeIfPresent(UUID.self, forKey: .customEngineID)
+        let n = try decoder.container(keyedBy: NewKeys.self)
+        // A profile is keyed by its id (the new shape) or its bundle ID (today's shape); one without either is not a profile.
+        let newID = (try? n.decodeIfPresent(String.self, forKey: .id)) ?? nil
+        let bundle = (try? c.decodeIfPresent(String.self, forKey: .bundleID)) ?? nil
+        guard let key = newID ?? bundle, !key.isEmpty else {
+            throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "a profile needs an id or a bundle ID"))
+        }
+        id = key
+        let legacyName = (try? c.decodeIfPresent(String.self, forKey: .appName)) ?? nil
+        name = ContextText.truncated((try? n.decodeIfPresent(String.self, forKey: .name)) ?? nil ?? legacyName ?? key,
+                                     toCharacters: Self.maxNameLength)
+        // The new shape's `when` wins; today's profile without one is the app profile it always was.
+        if let conditions = (try? n.decodeIfPresent([ProfileCondition].self, forKey: .when)) ?? nil {
+            when = Array(conditions.prefix(Self.maxConditions))
+        } else if let bundle, !bundle.isEmpty {
+            when = [ProfileCondition(app: bundle)]
+        } else {
+            when = []
+        }
+        source = (try? c.decodeIfPresent(String.self, forKey: .source)) ?? "auto"
+        target = (try? c.decodeIfPresent(String.self, forKey: .target)) ?? "en"
+        // The engine this profile uses: an id, or "apple" (design §5.1). A value this build does not know keeps the base choice.
+        let raw = (try? c.decodeIfPresent(String.self, forKey: .customEngineID)) ?? nil
+        engine = raw.flatMap { ProfileEngine.named($0) }
         // A reader this build does not know (saved by a newer version) inherits, like a profile without one.
         paragraphReader = (try? c.decodeIfPresent(ParagraphReader.self, forKey: .paragraphReader)) ?? nil
         // A profile without them (every profile saved before the memory) decodes with an empty note and no entries;
@@ -145,20 +313,26 @@ public struct AppProfile: Codable, Equatable, Identifiable, Sendable {
         entries = Self.cleanEntries(((try? c.decodeIfPresent(LossyArray<MemoryEntry>.self, forKey: .entries)) ?? nil)?.elements ?? [])
         // A context this build cannot read (no mode, a mode it does not know) inherits, like a profile without one.
         context = (try? c.decodeIfPresent(AppContextOverride.self, forKey: .context)) ?? nil
+        useLearned = (try? n.decodeIfPresent(Bool.self, forKey: .useLearned)) ?? nil
     }
 
-    // Written only when set, so a profile without a memory is saved exactly as before.
+    // Written only when set, so a profile without a memory is saved exactly as before. The new keys are written only when
+    // the old ones cannot say it: today's app profile (id = bundle ID, one app condition) is written as it always was.
     public func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(bundleID, forKey: .bundleID)
         try c.encode(appName, forKey: .appName)
         try c.encode(source, forKey: .source)
         try c.encode(target, forKey: .target)
-        try c.encodeIfPresent(customEngineID, forKey: .customEngineID)
+        try c.encodeIfPresent(engine, forKey: .customEngineID)
         try c.encodeIfPresent(paragraphReader, forKey: .paragraphReader)
         if !note.isEmpty { try c.encode(note, forKey: .note) }
         if !entries.isEmpty { try c.encode(entries, forKey: .entries) }
         try c.encodeIfPresent(context, forKey: .context)
+        var n = encoder.container(keyedBy: NewKeys.self)
+        if id != bundleID { try n.encode(id, forKey: .id) }
+        if when != [ProfileCondition(app: bundleID)] { try n.encode(when, forKey: .when) }
+        if useLearned == true { try n.encode(true, forKey: .useLearned) }
     }
 }
 

@@ -1,24 +1,13 @@
 import Foundation
 
-/// How a row is used (design §10): sent to the engine as a row, written into the text before the translation, or both.
-/// The file's value; the model's copy of it is the `apply` of a `MemoryEntry`.
-public enum RowApply: String, Codable, CaseIterable, Sendable {
-    /// Sent to the engine as a row (the default when the file says nothing).
-    case hint
-    /// Written into the text before the translation (0 tokens).
-    case replace
-    /// Both.
-    case both
-}
-
 /// One row of a profile in the new file shape (design §5.1, §5.3): the row of the sheet plus the mode it is used in.
 public struct ProfileFileEntry: Codable, Equatable, Sendable {
     /// The row itself (the model's `MemoryEntry`).
     public var entry: MemoryEntry
     /// How the row is used (design §10). nil = hint: what a file without the key means.
-    public var apply: RowApply?
+    public var apply: EntryApply?
 
-    public init(_ entry: MemoryEntry, apply: RowApply? = nil) {
+    public init(_ entry: MemoryEntry, apply: EntryApply? = nil) {
         self.entry = entry
         self.apply = apply
     }
@@ -34,7 +23,7 @@ public struct ProfileFileEntry: Codable, Equatable, Sendable {
                             note: (try? c.decodeIfPresent(String.self, forKey: .note)) ?? "",
                             reading: (try? c.decodeIfPresent(String.self, forKey: .reading)) ?? nil,
                             addressing: ((try? c.decodeIfPresent(LossyArray<Addressing>.self, forKey: .addressing)) ?? nil)?.elements ?? [])
-        apply = (try? c.decodeIfPresent(RowApply.self, forKey: .apply)) ?? nil
+        apply = (try? c.decodeIfPresent(EntryApply.self, forKey: .apply)) ?? nil
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -154,13 +143,13 @@ public struct LegacySettings: Codable, Equatable, Sendable {
     public var context: AppContextOverride?
     public var useLearned: Bool?
     public var profilePin: String?
-    public var glossaryApply: RowApply?
+    public var glossaryApply: EntryApply?
 
     public init(sourceLanguage: String? = nil, targetLanguage: String? = nil, engine: String? = nil,
                 customEngineID: UUID? = nil, glossary: String? = nil, paragraphReader: ParagraphReader? = nil,
                 appleUsesPinnedTerms: Bool? = nil, appProfiles: [AppProfile]? = nil, engines: [EngineConfig]? = nil,
                 profiles: [ProfileFile]? = nil, context: AppContextOverride? = nil, useLearned: Bool? = nil,
-                profilePin: String? = nil, glossaryApply: RowApply? = nil) {
+                profilePin: String? = nil, glossaryApply: EntryApply? = nil) {
         self.sourceLanguage = sourceLanguage
         self.targetLanguage = targetLanguage
         self.engine = engine
@@ -199,7 +188,7 @@ public struct LegacySettings: Codable, Equatable, Sendable {
         context = (try? c.decodeIfPresent(AppContextOverride.self, forKey: .context)) ?? nil
         useLearned = (try? c.decodeIfPresent(Bool.self, forKey: .useLearned)) ?? nil
         profilePin = (try? c.decodeIfPresent(String.self, forKey: .profilePin)) ?? nil
-        glossaryApply = (try? c.decodeIfPresent(RowApply.self, forKey: .glossaryApply)) ?? nil
+        glossaryApply = (try? c.decodeIfPresent(EntryApply.self, forKey: .glossaryApply)) ?? nil
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -238,7 +227,7 @@ public struct MigratedSettings: Codable, Equatable, Sendable {
     /// The pin of every lens (absent = Auto).
     public var profilePin: String?
     /// How the glossary's rows are used (written only when not hint).
-    public var glossaryApply: RowApply?
+    public var glossaryApply: EntryApply?
     /// The profiles.
     public var profiles: [ProfileFile]
     /// The engines, with their permissions and without the old `context` (read, never written).
@@ -247,7 +236,7 @@ public struct MigratedSettings: Codable, Equatable, Sendable {
     public init(sourceLanguage: String? = nil, targetLanguage: String? = nil, engine: String? = nil,
                 customEngineID: UUID? = nil, glossary: String? = nil, paragraphReader: ParagraphReader? = nil,
                 context: AppContextOverride? = nil, useLearned: Bool? = nil, profilePin: String? = nil,
-                glossaryApply: RowApply? = nil, profiles: [ProfileFile] = [], engines: [EngineConfig]? = nil) {
+                glossaryApply: EntryApply? = nil, profiles: [ProfileFile] = [], engines: [EngineConfig]? = nil) {
         self.sourceLanguage = sourceLanguage
         self.targetLanguage = targetLanguage
         self.engine = engine
@@ -278,7 +267,7 @@ public struct MigratedSettings: Codable, Equatable, Sendable {
         context = (try? c.decodeIfPresent(AppContextOverride.self, forKey: .context)) ?? nil
         useLearned = (try? c.decodeIfPresent(Bool.self, forKey: .useLearned)) ?? nil
         profilePin = (try? c.decodeIfPresent(String.self, forKey: .profilePin)) ?? nil
-        glossaryApply = (try? c.decodeIfPresent(RowApply.self, forKey: .glossaryApply)) ?? nil
+        glossaryApply = (try? c.decodeIfPresent(EntryApply.self, forKey: .glossaryApply)) ?? nil
         profiles = (try? c.decodeIfPresent([ProfileFile].self, forKey: .profiles)) ?? []
         engines = (try? c.decodeIfPresent([EngineConfig].self, forKey: .engines)) ?? nil
     }

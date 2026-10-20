@@ -108,23 +108,31 @@ import Testing
         #expect(Set(last.keys) == ["translate"])
     }
 
+    /// 2026-10-21 (round names-core, design names-and-context §3 "Apart"): the glossary's pairs leave the stable rules and join
+    /// `memory` as hits. Derivation: the pair "アリス" is the app row's source and is not offered; "田中" occurs in the items, so it
+    /// is a row of kind `term` in the last message and no rule text names it. With user rows switched off no source is replaced, so
+    /// both pairs are rows; a learned row never shadows the glossary pair it would have been dropped for.
     @Test func glossaryPrecedence() {
-        // A user row replaces the global glossary pair of the same src (§8.2); other pairs stay.
         let request = CtxFix.rich(items: ["アリスと田中"], memory: [CtxFix.alice],
                                   glossary: [("アリス", "엘리스"), ("田中", "다나카")])
-        let system = CtxFix.systemText(RequestLayout.body(kind: CtxFix.local, request: request, options: on))
-        #expect(!system.contains("アリス → 엘리스") && system.contains("田中 → 다나카"))
-        let last = CtxFix.lastMessage(RequestLayout.body(kind: CtxFix.local, request: request, options: on))
-        #expect((last["memory"] as? [String])?.first?.hasPrefix("アリス -> 앨리스") == true)
-        // With user rows switched off the pair stays.
+        let body = RequestLayout.body(kind: CtxFix.local, request: request, options: on)
+        let system = CtxFix.systemText(body)
+        #expect(!system.contains("アリス → 엘리스") && !system.contains("田中 → 다나카"))
+        let memory = CtxFix.lastMessage(body)["memory"] as? [String]
+        #expect(memory?.first?.hasPrefix("アリス -> 앨리스") == true)
+        #expect(memory?.contains("田中 -> 다나카 (term)") == true && memory?.contains("アリス -> 엘리스 (term)") == false)
+        // With user rows switched off no row replaces a pair, so both pairs are offered (and only the one the text has goes).
         var noUser = CtxFix.on
         noUser.includeUser = false
-        #expect(CtxFix.systemText(RequestLayout.body(kind: CtxFix.local, request: request, options: noUser)).contains("アリス → 엘리스"))
-        // A learned row that shadows a glossary pair is not offered.
+        let noUserBody = RequestLayout.body(kind: CtxFix.local, request: request, options: noUser)
+        #expect(!CtxFix.systemText(noUserBody).contains("アリス → 엘리스"))
+        #expect(CtxFix.lastMessage(noUserBody)["memory"] as? [String] == ["アリス -> 엘리스 (term)", "田中 -> 다나카 (term)"])
+        // A learned row that shadows a glossary pair is not offered; the pair is, as a row.
         var learned = CtxFix.bob
         learned.origin = .learned
         let r2 = CtxFix.rich(items: ["ボブ"], memory: [learned], glossary: [("ボブ", "봅")])
-        #expect(CtxFix.lastMessage(RequestLayout.body(kind: CtxFix.local, request: r2, options: on))["memory"] == nil)
+        #expect(CtxFix.lastMessage(RequestLayout.body(kind: CtxFix.local, request: r2, options: on))["memory"] as? [String]
+                == ["ボブ -> 봅 (term)"])
     }
 
     /// Decode time is most of a request's wall, so `terms` is asked for only while learning is on.

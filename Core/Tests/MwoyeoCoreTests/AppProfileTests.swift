@@ -171,15 +171,17 @@ import Testing
 
     /// Round S1's validator rejects any other key, so what this type encodes is exactly this list.
     @Test func theEncodedKeysAreTheOnesTheSettingsFileSpecs() throws {
+        // 2026-10-21 (round names-core, design names-and-context §10): `apply` is a field of a row. Set it to a non-hint
+        // value here, or the fully populated value omits it while `CodingKeys` has it and this schema comparison cannot see it.
         let entry = MemoryEntry(src: "アリス", dst: "앨리스", kind: .person, gender: .f, note: "20s, shy", reading: "ありす",
                                 origin: .user, uses: 7, lastSeen: Date(timeIntervalSince1970: 1_700_000_000),
-                                addressing: [Addressing(to: "ボブ", register: .casual)])
+                                addressing: [Addressing(to: "ボブ", register: .casual)], apply: .both)
         let full = AppProfile(bundleID: "a.b", appName: "A", source: "ja", target: "ko", customEngineID: UUID(), paragraphReader: .lineGrouping,
                               note: "Close friends.", entries: [entry], context: AppContextOverride(mode: .conversation, previousLines: 5))
         let root = try JSONSerialization.jsonObject(with: JSONEncoder().encode(full)) as! [String: Any]
         #expect(Set(root.keys) == ["bundleID", "appName", "source", "target", "customEngineID", "paragraphReader", "note", "entries", "context"])
         let e = try #require((root["entries"] as? [[String: Any]])?.first)
-        #expect(Set(e.keys) == ["src", "dst", "kind", "gender", "note", "reading", "addressing"])
+        #expect(Set(e.keys) == ["src", "dst", "kind", "gender", "note", "reading", "addressing", "apply"])
         let a = try #require((e["addressing"] as? [[String: Any]])?.first)
         #expect(Set(a.keys) == ["to", "register"])
         let c = try #require(root["context"] as? [String: Any])
@@ -191,7 +193,8 @@ import Testing
         #expect(Set(a.keys) == Set(Addressing.CodingKeys.allCases.map(\.rawValue)))
         #expect(Set(c.keys) == Set(AppContextOverride.CodingKeys.allCases.map(\.rawValue)))
         // The enums are strings.
-        #expect(e["kind"] as? String == "person" && e["gender"] as? String == "f" && a["register"] as? String == "casual")
+        #expect(e["kind"] as? String == "person" && e["gender"] as? String == "f" && e["apply"] as? String == "both"
+                && a["register"] as? String == "casual")
         #expect(root["paragraphReader"] is String && root["customEngineID"] is String)
         // Nil and empty are omitted, not written as null or "".
         let bare = AppProfile(bundleID: "a.b", appName: "A", source: "ja", target: "ko", entries: [MemoryEntry(src: "x", dst: "y")])

@@ -8,6 +8,12 @@ public enum EntryKind: String, Codable, CaseIterable, Sendable {
     case person, place, term, org
 }
 
+/// What a row does with a request (design §10): `hint` is sent as a memory row and costs tokens; `replace` is written into the
+/// source before translation and costs none; `both` does both. Absent is `hint`, and only a value other than `hint` is written.
+public enum EntryApply: String, Codable, CaseIterable, Sendable {
+    case hint, replace, both
+}
+
 public enum Gender: String, Codable, CaseIterable, Sendable {
     case f, m, n
 }
@@ -58,6 +64,8 @@ public struct MemoryEntry: Codable, Equatable, Hashable, Identifiable, Sendable 
     public var uses: Int
     public var lastSeen: Date?
     public var addressing: [Addressing]
+    /// Hint, replace or both (design §10). `hint` is the default and is left out of the file.
+    public var apply: EntryApply
 
     public var id: String { ContextText.foldedKey(src) }
 
@@ -66,7 +74,7 @@ public struct MemoryEntry: Codable, Equatable, Hashable, Identifiable, Sendable 
 
     public init(src: String, dst: String, kind: EntryKind = .term, gender: Gender? = nil, note: String = "",
                 reading: String? = nil, origin: EntryOrigin = .user, uses: Int = 0, lastSeen: Date? = nil,
-                addressing: [Addressing] = []) {
+                addressing: [Addressing] = [], apply: EntryApply = .hint) {
         self.src = ContextText.truncated(ContextText.collapse(src), toCharacters: Self.maxName)
         self.dst = ContextText.truncated(ContextText.collapse(dst), toCharacters: Self.maxName)
         self.kind = kind
@@ -78,13 +86,14 @@ public struct MemoryEntry: Codable, Equatable, Hashable, Identifiable, Sendable 
         self.uses = max(0, uses)
         self.lastSeen = lastSeen
         self.addressing = Array(addressing.prefix(Self.maxAddressing))
+        self.apply = apply
     }
 
     // The Codable shape is the settings-file shape (design §10): src, dst, kind, gender, note, reading, addressing
-    // (to, register). Nothing else is written or read; `origin`, `uses` and `lastSeen` live in RAM only, and an entry read
-    // from a file is a user entry. Lenient: a bad enum value, a missing field or a bad addressing row never loses the
-    // entry; an entry without `src` or `dst` throws, and `LossyArray` drops just that one.
-    enum CodingKeys: String, CodingKey, CaseIterable { case src, dst, kind, gender, note, reading, addressing }
+    // (to, register) and, only when it is not `hint`, apply. Nothing else is written or read; `origin`, `uses` and `lastSeen`
+    // live in RAM only, and an entry read from a file is a user entry. Lenient: a bad enum value, a missing field or a bad
+    // addressing row never loses the entry; an entry without `src` or `dst` throws, and `LossyArray` drops just that one.
+    enum CodingKeys: String, CodingKey, CaseIterable { case src, dst, kind, gender, note, reading, addressing, apply }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let src = try c.decode(String.self, forKey: .src)
@@ -95,7 +104,8 @@ public struct MemoryEntry: Codable, Equatable, Hashable, Identifiable, Sendable 
             gender: (try? c.decodeIfPresent(Gender.self, forKey: .gender)) ?? nil,
             note: (try? c.decodeIfPresent(String.self, forKey: .note)) ?? "",
             reading: (try? c.decodeIfPresent(String.self, forKey: .reading)) ?? nil,
-            addressing: ((try? c.decodeIfPresent(LossyArray<Addressing>.self, forKey: .addressing)) ?? nil)?.elements ?? [])
+            addressing: ((try? c.decodeIfPresent(LossyArray<Addressing>.self, forKey: .addressing)) ?? nil)?.elements ?? [],
+            apply: (try? c.decodeIfPresent(EntryApply.self, forKey: .apply)) ?? .hint)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -107,6 +117,7 @@ public struct MemoryEntry: Codable, Equatable, Hashable, Identifiable, Sendable 
         if !note.isEmpty { try c.encode(note, forKey: .note) }
         try c.encodeIfPresent(reading, forKey: .reading)
         if !addressing.isEmpty { try c.encode(addressing, forKey: .addressing) }
+        if apply != .hint { try c.encode(apply, forKey: .apply) }
     }
 }
 
@@ -374,12 +385,14 @@ public struct ContextMemory: Equatable, Sendable {
     // MARK: fingerprint
 
     /// A canonical string of the app note and the user entries, for the translation-memory namespace (§8.1).
-    /// Learned entries, `uses` and `lastSeen` are left out on purpose: they change without changing what the user wrote.
+    /// Learned entries, `uses` and `lastSeen` are left out on purpose: they change without changing what the user wrote. A row's `apply`
+    /// is in only when it is not hint, so the fingerprint of a memory without replace rows is what it was before `apply` existed.
     /// Stable across runs; the caller may hash it (`Hasher` is process-local, which is fine for RAM-only use).
     public var memoryFingerprint: String {
         let rows = user.map { e in
             [e.src, e.dst, e.kind.rawValue, e.gender?.rawValue ?? "", e.note, e.reading ?? "",
              e.addressing.map { "\($0.to)>\($0.register.rawValue)" }.joined(separator: ",")].joined(separator: "\u{1F}")
+                + (e.apply == .hint ? "" : "\u{1F}apply=\(e.apply.rawValue)")
         }.sorted()
         return (["note=\(note)"] + rows).joined(separator: "\u{1E}")
     }
@@ -404,21 +417,47 @@ extension ContextMemory {
         }
     }
 
-    /// The rows Apple Translation pre-inserts into its source (design §1.3, G7): the app's own user rows first, then the global
-    /// glossary's pairs whose source the app's memory does not have. The app's row wins (§1.3: the narrowest user row wins), so a
-    /// glossary pair with a source the app already has is not sent twice. A glossary pair is a user row of kind `term`; a learned row
-    /// never goes in. The order is the app's rows, then the glossary's, as they are written.
-    public static func applePins(appRows: [MemoryEntry], glossary: [(String, String)]) -> [MemoryEntry] {
-        let app = appRows.filter { $0.origin == .user && !$0.src.isEmpty && !$0.dst.isEmpty }
-        var out = app
-        var seen = Set(app.map(\.id))
+    /// The rows written into the source before translation (design §3 "Hint and replace", §10): the chain's merged user rows whose
+    /// `apply` is `.replace` or `.both` (narrow → broad, as given), then the global glossary's pairs whose folded source none of
+    /// `rows` has, when `glossaryApply` is not `.hint`. Replace rows cost no tokens, so the row cap never touches them. A learned row
+    /// is a hint and never goes in; a row without a source or a translation is not a row.
+    public static func replaceRows(rows: [MemoryEntry], glossary: [(String, String)], glossaryApply: EntryApply) -> [MemoryEntry] {
+        mergedReplaceRows(rows, glossary: glossary, newPairApply: glossaryApply == .hint ? nil : glossaryApply) {
+            $0.origin == .user && $0.apply != .hint && !$0.src.isEmpty && !$0.dst.isEmpty
+        }
+    }
+
+    /// The one merge behind `replaceRows` and `applePins`: the rows `include` keeps, then (when `newPairApply` is not nil) the
+    /// glossary pairs with a source none of `rows` has, as user rows of kind `term` with that mode. The order is the rows, then
+    /// the glossary's, as they are written.
+    private static func mergedReplaceRows(_ rows: [MemoryEntry], glossary: [(String, String)], newPairApply: EntryApply?,
+                                          include: (MemoryEntry) -> Bool) -> [MemoryEntry] {
+        var out = rows.filter(include)
+        guard let newPairApply else { return out }
+        var seen = Set(rows.filter { $0.origin == .user }.map(\.id))
         for (src, dst) in glossary {
-            let row = MemoryEntry(src: src, dst: dst, kind: .term, origin: .user)
-            guard !row.src.isEmpty, !row.dst.isEmpty else { continue }
-            guard seen.insert(row.id).inserted else { continue }
+            let row = MemoryEntry(src: src, dst: dst, kind: .term, origin: .user, apply: newPairApply)
+            guard !row.src.isEmpty, !row.dst.isEmpty, seen.insert(row.id).inserted else { continue }
             out.append(row)
         }
         return out
+    }
+
+    /// The rows Apple Translation pre-inserts into its source (design §1.3, G7, §10): the app's own user rows first, then the global
+    /// glossary's pairs whose source the app's memory does not have. The app's row wins (§1.3: the narrowest user row wins), so a
+    /// glossary pair with a source the app already has is not sent twice. Apple takes no hints, so every user row is a replacement
+    /// row whatever its stored `apply` says; the rows keep that stored value (today's output, byte for byte). A learned row never
+    /// goes in. The order is the app's rows, then the glossary's, as they are written.
+    public static func applePins(appRows: [MemoryEntry], glossary: [(String, String)]) -> [MemoryEntry] {
+        // The pairs keep the default mode: Apple reads `origin`, and today's callers compare the whole row (App/Support/ContextChecks).
+        mergedReplaceRows(appRows, glossary: glossary, newPairApply: .hint) {
+            $0.origin == .user && !$0.src.isEmpty && !$0.dst.isEmpty
+        }
+    }
+
+    /// One hint row's cost, the budget's own count (design §10, §3): `approxTokens(renderRow(e)) + 1`.
+    public static func hintCost(_ e: MemoryEntry) -> Int {
+        approxTokens(RequestLayout.renderRow(e, format: .line)) + 1
     }
 
     /// What a name plate puts around a name: 「九十九」, 【九十九】, 九十九: . Trimmed (with space) from both ends of a line before it is

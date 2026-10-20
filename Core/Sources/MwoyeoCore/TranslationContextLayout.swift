@@ -183,6 +183,9 @@ public struct ContextBudget: Equatable, Sendable {
     public var afterLines: Int
     public var defaultTranscript: Int
     public var maxTranscript: Int
+    /// The most hint rows one request sends (design §3 "The cap, measured"): 8 cloud and local, 4 Apple FM. Replace rows are not
+    /// hint rows and never count against it.
+    public var maxRows: Int
     /// Persons named in the surrounding lines come along with the hits; false = hits only.
     public var includesSpeakers: Bool
 
@@ -190,14 +193,14 @@ public struct ContextBudget: Equatable, Sendable {
         switch tier {
         case .cloud:
             ContextBudget(cardTokens: 45, rowTokens: 400, noteTokens: 500, lineTokens: 160, afterLines: 2,
-                          defaultTranscript: 4, maxTranscript: 8, includesSpeakers: true)
+                          defaultTranscript: 4, maxTranscript: 8, maxRows: 8, includesSpeakers: true)
         case .local:
             ContextBudget(cardTokens: 45, rowTokens: 250, noteTokens: 250, lineTokens: 120, afterLines: 2,
-                          defaultTranscript: 3, maxTranscript: 8, includesSpeakers: true)
+                          defaultTranscript: 3, maxTranscript: 8, maxRows: 8, includesSpeakers: true)
         case .appleFM:
             // 4,096 tokens hold the instructions, the prompt and the output (TN3193).
             ContextBudget(cardTokens: 20, rowTokens: 100, noteTokens: 60, lineTokens: 50, afterLines: 1,
-                          defaultTranscript: 2, maxTranscript: 2, includesSpeakers: false)
+                          defaultTranscript: 2, maxTranscript: 2, maxRows: 4, includesSpeakers: false)
         }
     }
 }
@@ -302,7 +305,8 @@ public enum RequestLayout {
         var before: [ContextLine]
         var after: [String]
         var referents: [Referent]
-        /// The global glossary without the pairs an included user entry replaces (design §8.2).
+        /// The global glossary after the move to hits: empty on the context path (design §3 "Apart"); the pairs that occur in the
+        /// text are rows of `rows` instead. Kept for callers that build a request without the layout.
         var glossary: [(String, String)]
         var format: ContextOptions.Format
         /// Ask for `terms` in the reply (only when learned entries are on).
@@ -321,12 +325,10 @@ public enum RequestLayout {
         let tier = kind.tier ?? .cloud
         let budget = ContextBudget.for(tier)
 
-        // Which rows are candidates, and which glossary pairs they replace.
-        let userKeys = Set(request.memory.filter { $0.origin == .user }.map(\.id))
-        // Memory only is the user's own rows and nothing learned (design D1); the guards below keep it so whatever else is set.
+        // Which rows a hint request may pick from (design §3): the memory's sendable rows, a `.replace` row left out, and the
+        // glossary pairs that user rows do not replace, as hint rows of kind `term`. `ContextMemory.replaceRows` owns the other side.
         let memoryOnly = options.memoryOnly
-        let candidates = sendableRows(request, options)
-        let glossary = options.includeUser ? request.glossary.filter { !userKeys.contains(ContextText.foldedKey($0.0)) } : request.glossary
+        let candidates = hintRows(request, options)
 
         // Context lines. Earlier lines (the thread) when the options ask for some; with none (nearby) the lines right above the
         // items on screen, as many as the lines below. Memory only has neither.
@@ -362,18 +364,27 @@ public enum RequestLayout {
 
         return Prepared(rows: rows, card: card, note: trimmedNote, before: before, after: after,
                         referents: memoryOnly ? [] : Array(request.referents.filter { !$0.isEmpty }.prefix(Referent.maxCount)),
-                        glossary: glossary, format: options.format, wantsTerms: options.includeLearned && !memoryOnly)
+                        glossary: [], format: options.format, wantsTerms: options.includeLearned && !memoryOnly)
     }
 
-    /// Rows whose `src` occurs in an item, plus (unless the tier is hits-only) persons named in the surrounding lines;
-    /// within the token budget, user rows first, then by uses (then most recently seen, then `src`).
+    /// Rows whose `src` or `reading` occurs in an item (design §3), plus (unless the tier is hits-only) persons named in the
+    /// surrounding lines. A `.replace` row is never a hint and is not selected here (`ContextMemory.replaceRows` owns those).
+    /// Within the token budget and `budget.maxRows`, item hits first, then speaker-only hits, user rows first, then by uses
+    /// (then most recently seen, then `src`).
     static func selectRows(_ rows: [MemoryEntry], items: [String], surrounding: [String], budget: ContextBudget,
                            format: ContextOptions.Format) -> [MemoryEntry] {
-        let hits = rows.filter { e in
-            items.contains { ContextText.occurs(e.src, in: $0) }
-                || (budget.includesSpeakers && e.kind == .person && surrounding.contains { ContextText.occurs(e.src, in: $0) })
+        func matches(_ e: MemoryEntry, _ text: String) -> Bool {
+            ContextText.occurs(e.src, in: text) || (e.reading.map { ContextText.occurs($0, in: text) } ?? false)
         }
+        let hits = rows.filter { e in
+            guard e.apply != .replace else { return false }
+            return items.contains { matches(e, $0) }
+                || (budget.includesSpeakers && e.kind == .person && surrounding.contains { matches(e, $0) })
+        }
+        let itemHits = Set(hits.filter { e in items.contains { matches(e, $0) } }.map(\.id))
         let ordered = hits.sorted { a, b in
+            let aItem = itemHits.contains(a.id), bItem = itemHits.contains(b.id)
+            if aItem != bItem { return aItem }
             if (a.origin == .user) != (b.origin == .user) { return a.origin == .user }
             if a.uses != b.uses { return a.uses > b.uses }
             if (a.lastSeen ?? .distantPast) != (b.lastSeen ?? .distantPast) { return (a.lastSeen ?? .distantPast) > (b.lastSeen ?? .distantPast) }
@@ -383,6 +394,7 @@ public enum RequestLayout {
         var out: [MemoryEntry] = []
         var seen = Set<String>()
         for e in ordered where seen.insert(e.id).inserted {
+            guard out.count < budget.maxRows else { break }
             let cost = approxTokens(renderRow(e, format: format)) + 1
             if used + cost <= budget.rowTokens {
                 out.append(e)
@@ -548,12 +560,22 @@ public enum RequestLayout {
         return prepare(request, options, kind).rows
     }
 
-    /// The rows a line may be served from without asking the engine (`ContextMemory.exactTranslation`): the rows this request sends, so
-    /// the same ones as `selectedRows` is picked from. Empty where the memory does not reach the request: Off, a kind without context,
-    /// DeepL without its opt-in.
+    /// The rows a line may be served from without asking the engine (`ContextMemory.exactTranslation`): every hint row this request
+    /// may pick from (including the glossary hits), so the same ones as `selectedRows` is picked from. Empty where the memory does
+    /// not reach the request: Off, a kind without context, DeepL without its opt-in.
     public static func exactRows(request: ContextRequest, options: ContextOptions, kind: LayoutKind) -> [MemoryEntry] {
         guard options.enabled, kind.tier != nil, kind.sendsMemory(options) else { return [] }
-        return sendableRows(request, options)
+        return hintRows(request, options)
+    }
+
+    /// The rows a hint request may pick from (design §3): the sendable rows without the `.replace` ones, then the global glossary's
+    /// pairs a user row does not replace, as hint rows of kind `term`. The one place the options meet the precedence rule and the
+    /// move of the glossary from the stable rules to `memory`.
+    private static func hintRows(_ request: ContextRequest, _ options: ContextOptions) -> [MemoryEntry] {
+        let userKeys = Set(request.memory.filter { $0.origin == .user }.map(\.id))
+        let glossary = options.includeUser ? request.glossary.filter { !userKeys.contains(ContextText.foldedKey($0.0)) } : request.glossary
+        return sendableRows(request, options).filter { $0.apply != .replace }
+            + glossary.map { MemoryEntry(src: $0.0, dst: $0.1, kind: .term, origin: .user) }
     }
 
     /// The rows the options let the request send, before its items pick among them: the user's rows, and the learned ones when they are on

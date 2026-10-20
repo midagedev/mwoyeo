@@ -1,20 +1,25 @@
 #if !MAS
 import Foundation
 import MwoyeoCore
+import MwoyeoEngines
 
 /// The checks of `Mwoyeo --mcp`, run by `--capture-ui … check-logic` and alone by `mcp-checks` (PASS/FAIL lines). The server is driven in
 /// process with JSON-RPC lines, over a scratch settings.json and a scratch Transcripts folder written by the app's own `TranscriptWriter`,
 /// so a change to the log's line or to the file's checks shows here. The process itself (stdout, the end at EOF) is `tools/mcp/smoke.sh`.
 @MainActor
 enum MCPChecks {
-    /// A tool's answer: whether it is an error, its text and its structured content.
+    /// A tool's answer: whether it is an error, its text (the one copy of the payload) and that text read as JSON.
     private struct Answer {
         var isError: Bool
         var text: String
         var data: [String: Any]
+        /// The reply carried a `structuredContent` beside the text, or more than one content block.
+        var doubled = false
 
-        var lines: [[String: Any]] { data["lines"] as? [[String: Any]] ?? [] }
-        var originals: [String] { lines.compactMap { $0["original"] as? String } }
+        var columns: [String] { data["columns"] as? [String] ?? [] }
+        var rows: [[Any]] { data["rows"] as? [[Any]] ?? [] }
+        func column(_ name: String) -> [Any] { columns.firstIndex(of: name).map { i in rows.map { $0[i] } } ?? [] }
+        var originals: [String] { column("original").compactMap { $0 as? String } }
         func list(_ key: String) -> [String] { data[key] as? [String] ?? [] }
     }
 
@@ -43,15 +48,25 @@ enum MCPChecks {
 
         func call(_ tool: String, _ arguments: [String: Any] = [:]) -> Answer {
             let result = send("tools/call", ["name": tool, "arguments": arguments])?["result"] as? [String: Any] ?? [:]
-            let text = ((result["content"] as? [[String: Any]])?.first?["text"] as? String) ?? ""
-            return Answer(isError: result["isError"] as? Bool ?? false, text: text, data: result["structuredContent"] as? [String: Any] ?? [:])
+            let blocks = result["content"] as? [[String: Any]] ?? []
+            let text = (blocks.first?["text"] as? String) ?? ""
+            let isError = result["isError"] as? Bool ?? false
+            return Answer(isError: isError, text: text, data: isError ? [:] : (try? JSONSerialization.jsonObject(with: Data(text.utf8))) as? [String: Any] ?? [:],
+                          doubled: result["structuredContent"] != nil || blocks.count != 1)
         }
+    }
+
+    /// Keys that cannot be reached, as the Keychain is not from a process that has no access to it.
+    private struct Unreachable: SecretStore {
+        struct Denied: Error, CustomStringConvertible { var description: String { "access denied" } }
+        func secret(for engine: UUID) throws -> String? { throw Denied() }
+        func setSecret(_ secret: String?, for engine: UUID) throws { throw Denied() }
     }
 
     static func run(_ model: AppModel) -> Int {
         var failed = 0
-        func check(_ what: String, _ ok: Bool) {
-            print("check-logic: \(ok ? "PASS" : "FAIL") mcp: \(what)")
+        func check(_ what: String, _ ok: Bool, _ detail: @autoclosure () -> String = "") {
+            print("check-logic: \(ok ? "PASS" : "FAIL") mcp: \(what)" + (ok || detail().isEmpty ? "" : " [\(detail())]"))
             if !ok { failed += 1 }
         }
         let dir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("mwoyeo-mcp-checks-\(getpid())")
@@ -109,13 +124,19 @@ enum MCPChecks {
         check("initialize answers protocol 2025-06-18 with the tools capability, a server name and instructions",
               hello?["protocolVersion"] as? String == "2025-06-18" && (hello?["capabilities"] as? [String: Any])?["tools"] != nil
               && (hello?["serverInfo"] as? [String: Any])?["name"] as? String == "mwoyeo" && (hello?["instructions"] as? String)?.contains("glossary") == true)
+        let steps = (hello?["instructions"] as? String) ?? ""
+        let named = ["list_apps", "read_translation_log", "term_renderings", "set_memory", "translate_text"].map { steps.range(of: $0)?.lowerBound }
+        check("the instructions are a workflow of at most 8 lines that names list_apps, read_translation_log, term_renderings, set_memory and translate_text in that order",
+              steps.split(separator: "\n").count <= 8 && !named.contains { $0 == nil } && named.compactMap { $0 } == named.compactMap { $0 }.sorted())
         let initialized = client.send("notifications/initialized", notification: true)
         let ping = client.send("ping")?["result"] as? [String: Any]
         check("notifications/initialized has no reply and ping an empty result", initialized == nil && ping?.isEmpty == true)
         let listed = (client.send("tools/list")?["result"] as? [String: Any])?["tools"] as? [[String: Any]] ?? []
-        check("tools/list: the seven tools, each with a description and an object schema",
-              listed.compactMap { $0["name"] as? String } == ["list_apps", "read_translation_log", "get_memory", "set_memory", "get_settings", "set_settings", "get_settings_schema"]
-              && listed.allSatisfy { ($0["description"] as? String)?.isEmpty == false && ($0["inputSchema"] as? [String: Any])?["type"] as? String == "object" })
+        func sentences(_ text: String?) -> Int { (text ?? "").components(separatedBy: ". ").count }
+        check("tools/list: the nine tools, each with a description of at most two sentences and an object schema",
+              listed.compactMap { $0["name"] as? String } == ["list_apps", "read_translation_log", "term_renderings", "get_memory", "set_memory", "translate_text", "get_settings", "set_settings", "get_settings_schema"]
+              && listed.allSatisfy { sentences($0["description"] as? String) <= 2 && ($0["description"] as? String)?.isEmpty == false && ($0["inputSchema"] as? [String: Any])?["type"] as? String == "object" },
+              "\(listed.map { "\($0["name"] as? String ?? "?"): \(sentences($0["description"] as? String))" })")
         let setter = listed.first { $0["name"] as? String == "set_memory" }
         let entriesSchema = ((setter?["inputSchema"] as? [String: Any])?["properties"] as? [String: Any])?["entries"] as? [String: Any]
         let entryKind = (((entriesSchema?["items"] as? [String: Any])?["properties"] as? [String: Any])?["kind"] as? [String: Any])?["enum"] as? [String]
@@ -139,13 +160,14 @@ enum MCPChecks {
         let switchBefore = bytes(switchURL)
         let refusedCalls = [switched.call("list_apps"), switched.call("read_translation_log"), switched.call("get_memory", ["app": "com.example.game"]),
                             switched.call("set_memory", ["app": "com.example.game", "note": "x"]), switched.call("get_settings"),
-                            switched.call("set_settings", ["values": ["lensStyle": "subtle"]]), switched.call("get_settings_schema")]
+                            switched.call("set_settings", ["values": ["lensStyle": "subtle"]]), switched.call("get_settings_schema"),
+                            switched.call("term_renderings", ["app": "com.example.game", "terms": ["九十九"]]), switched.call("translate_text", ["lines": ["x"]])]
         let offText = "Agent connection is off. Turn it on in Mwoyeo Settings → \(String(localized: "Connect an agent (MCP)"))."
-        check("switch off: all seven tools are refused with the name of the row to turn on, and nothing is written",
-              refusedCalls.count == 7 && refusedCalls.allSatisfy { $0.isError && $0.text == offText } && bytes(switchURL) == switchBefore)
+        check("switch off: all nine tools are refused with the name of the row to turn on, and nothing is written",
+              refusedCalls.count == 9 && refusedCalls.allSatisfy { $0.isError && $0.text == offText } && bytes(switchURL) == switchBefore)
         let handshake = switched.send("initialize")?["result"] as? [String: Any]
         let toolsOff = ((switched.send("tools/list")?["result"] as? [String: Any])?["tools"] as? [Any])?.count
-        check("switch off: initialize and tools/list still answer", handshake?["protocolVersion"] as? String == "2025-06-18" && toolsOff == 7)
+        check("switch off: initialize and tools/list still answer", handshake?["protocolVersion"] as? String == "2025-06-18" && toolsOff == 9)
         write(base, to: switchURL)
         let nowOn = switched.call("list_apps")
         check("switch on: the same server works at the next call, without a restart (the setting is read at each call)", !nowOn.isError && (nowOn.data["loggedApps"] as? [Any])?.count == 2)
@@ -155,29 +177,109 @@ enum MCPChecks {
               && !String(decoding: SettingsFileFormat.render(AppSettings()), as: UTF8.self).contains("agentConnection")
               && String(decoding: SettingsFileFormat.render(base), as: UTF8.self).contains("\"agentConnection\": true"))
 
-        // read_translation_log
+        // read_translation_log: a table under a header
         let all = client.call("read_translation_log")
-        check("read_translation_log: the five lines of the writer's files, oldest first, with the agreed fields",
+        let timeCells = all.column("time").compactMap { $0 as? String }
+        check("read_translation_log: the five lines of the writer's files, oldest first, as rows named by columns; what varies (app, engine) is a column, what does not (languages) is in the header",
               !all.isError && all.originals == ["こんにちは", "田中さんは来ましたか", "ありがとう", "勇者アレンは魔王城へ向かった", "九十九の剣"]
-              && all.lines.first.map { Set($0.keys) == ["time", "app", "source", "target", "engine", "original", "translation"] } == true
-              && all.lines.first?["app"] as? String == "com.example.chat" && all.lines.first?["engine"] as? String == "Ollama"
-              && all.lines.last?["translation"] as? String == "쓰쿠모의 검" && all.data["matching"] as? Int == 5)
+              && all.columns == ["id", "time", "app", "engine", "original", "translation"] && all.data["source"] as? String == "ja" && all.data["target"] as? String == "ko"
+              && all.data["app"] == nil && all.data["engine"] == nil && all.column("id").compactMap { $0 as? Int } == [1, 2, 3, 4, 5]
+              && all.column("app").first as? String == "com.example.chat" && all.column("engine").first as? String == "Ollama"
+              && all.column("translation").last as? String == "쓰쿠모의 검" && all.data["returned"] as? Int == 5 && all.data["older"] == nil)
+        // The day and the zone are in the header when every row has them; else a time says them (MM-DD before the clock, the zone after).
+        check("read_translation_log: a time is the clock to the second, and the day and the zone are in the header when they never vary",
+              timeCells.count == 5 && (all.data["day"] != nil ? timeCells.allSatisfy { $0.count == 8 } : timeCells.allSatisfy { $0.count == 14 })
+              && (all.data["zone"] as? String)?.isEmpty == false)
         let chat = client.call("read_translation_log", ["app": "com.example.chat"])
-        check("read_translation_log filters by app", chat.originals == ["こんにちは", "田中さんは来ましたか", "ありがとう"] && chat.data["matching"] as? Int == 3)
+        check("read_translation_log filters by app, and the header then holds the app, the languages and the engine once",
+              chat.originals == ["こんにちは", "田中さんは来ましたか", "ありがとう"] && chat.columns == ["id", "time", "original", "translation"]
+              && chat.data["app"] as? String == "com.example.chat" && chat.data["engine"] as? String == "Ollama" && chat.data["source"] as? String == "ja"
+              && chat.data["day"] as? String != nil && chat.column("time").compactMap { $0 as? String }.allSatisfy { $0.count == 8 })
         let newest = client.call("read_translation_log", ["app": "com.example.chat", "limit": 2])
-        check("read_translation_log limit gives the newest lines, still oldest first",
-              newest.originals == ["田中さんは来ましたか", "ありがとう"] && newest.data["returned"] as? Int == 2 && newest.data["matching"] as? Int == 3)
+        check("read_translation_log limit gives the newest rows, still oldest first, and says how many older ones there are",
+              newest.originals == ["田中さんは来ましたか", "ありがとう"] && newest.data["returned"] as? Int == 2 && newest.data["older"] as? Int == 1)
         let since = ISO8601DateFormatter().string(from: t0.addingTimeInterval(3600))
         let late = client.call("read_translation_log", ["since": since])
         check("read_translation_log since keeps the lines from that time on", late.originals == ["勇者アレンは魔王城へ向かった", "九十九の剣"])
-        let badLimit = client.call("read_translation_log", ["limit": 0]), bigLimit = client.call("read_translation_log", ["limit": 2001])
+        let sought = client.call("read_translation_log", ["contains": "九十九"]), soughtTranslation = client.call("read_translation_log", ["contains": "알렌"])
+        check("read_translation_log contains keeps the rows with the text in the original or in the translation",
+              sought.originals == ["九十九の剣"] && soughtTranslation.originals == ["勇者アレンは魔王城へ向かった"]
+              && client.call("read_translation_log", ["contains": "no such text"]).rows.isEmpty)
+        let badLimit = client.call("read_translation_log", ["limit": 0]), bigLimit = client.call("read_translation_log", ["limit": 501])
         let badSince = client.call("read_translation_log", ["since": "yesterday"]), badType = client.call("read_translation_log", ["limit": "ten"])
-        check("a limit of 0 or 2001, a limit that is not a number and a since that is not a time are tool errors naming the argument",
-              badLimit.isError && badLimit.text.contains("limit:") && bigLimit.isError && bigLimit.text.contains("2000")
+        check("a limit of 0 or 501, a limit that is not a number and a since that is not a time are tool errors naming the argument",
+              badLimit.isError && badLimit.text.contains("limit:") && bigLimit.isError && bigLimit.text.contains("500")
               && badSince.isError && badSince.text.contains("since") && badType.isError && badType.text.contains("limit:"))
         let extra = client.call("read_translation_log", ["lines": 3])
         check("an argument the tool does not take is a tool error that names the ones it takes",
-              extra.isError && extra.text.contains("unknown key lines") && extra.text.contains("limit"))
+              extra.isError && extra.text.contains("unknown key lines") && extra.text.contains("limit") && extra.text.contains("distinct"))
+
+        // distinct: the pieces of a line being read are folded into the fullest read, an exact repeat is counted, and a drifting name stays
+        let readerDir = dir.appendingPathComponent("reader")
+        let readerLog = LensExport.transcriptsFolder(readerDir)
+        try? FileManager.default.createDirectory(at: readerLog, withIntermediateDirectories: true)
+        func entry(_ lens: String, _ app: String, _ at: Double, _ original: String, _ translation: String) -> String {
+            TranscriptFormat.jsonlLine(time: t0.addingTimeInterval(at), timeZone: TimeZone(secondsFromGMT: 9 * 3600) ?? .current, lens: lens, app: app,
+                                       source: "ja", target: "ko", engine: "Ollama", original: original, translation: translation)
+        }
+        // Lens "A": a line read three times as it is drawn; a name and its dialogue in one batch (the dialogue opens with the name); the name
+        // read again with the same translation, then with another; a name and a longer line 3.5 s later. Lens "B": a read of the same
+        // text as A's fragment, which is no piece of A's line; and a title with the name's translation (the name and the title share one).
+        let readerRows = [entry("A", "com.example.reader", 0.0, "九十九、こ", "구십구, 여"), entry("A", "com.example.reader", 0.6, "九十九、ここが", "구십구, 여기가"),
+                          entry("B", "com.example.reader", 0.8, "九十九", "구십구"),
+                          entry("A", "com.example.reader", 1.2, "九十九、ここが月影のよ。間違いないわ", "쓰쿠모, 여기가 달그림자야. 틀림없어"),
+                          entry("A", "com.example.reader", 5.0, "シュザンヌ", "수잔"), entry("A", "com.example.reader", 5.0, "シュザンヌ様、ありました", "수잔 님, 찾았습니다"),
+                          entry("A", "com.example.reader", 20.0, "シュザンヌ", "수잔"), entry("A", "com.example.reader", 40.0, "シュザンヌ", "슈잔느"),
+                          entry("A", "com.example.reader", 60.0, "ハク", "하쿠"), entry("A", "com.example.reader", 63.5, "ハクと言ったわね", "하쿠라고 했지"),
+                          entry("A", "com.example.reader", 80.0, "シュザンヌ嬢", "수잔")]
+        try? Data(readerRows.joined().utf8).write(to: readerLog.appendingPathComponent("Reader 2026-10-20 10-00.jsonl"))
+        var readerBase = base
+        readerBase.exportFolder = readerDir.path
+        readerBase.appProfiles = []
+        let readerFile = dir.appendingPathComponent("reader-settings.json")
+        write(readerBase, to: readerFile)
+        let reader = Client(MCPServer(world: world(readerFile), trace: { _ in }))
+        let distinct = reader.call("read_translation_log", ["app": "com.example.reader"])
+        check("distinct: the two pieces of a line are folded into the fullest read, and a read of another lens that opens the same way is no piece",
+              distinct.originals.first(where: { $0.hasPrefix("九十九、") }) == "九十九、ここが月影のよ。間違いないわ" && !distinct.originals.contains("九十九、こ") && !distinct.originals.contains("九十九、ここが")
+              && distinct.originals.contains("九十九") && distinct.data["folded"] as? Int == 2)
+        check("distinct: a name and the dialogue that opens with it, read in one batch, stay two rows; a longer line more than 3 s later is no fuller read",
+              distinct.originals.contains("シュザンヌ様、ありました") && distinct.originals.contains("ハク") && distinct.originals.contains("ハクと言ったわね"))
+        let nameRows = zip(distinct.originals, distinct.column("translation")).filter { $0.0 == "シュザンヌ" }.map { $0.1 as? String }
+        check("distinct: an exact repeat is one row with its count, and the same original with another translation is another row (a drifting name)",
+              nameRows == ["수잔", "슈잔느"] && distinct.columns.last == "count" && distinct.rows.first(where: { ($0[distinct.columns.firstIndex(of: "original") ?? 0] as? String) == "シュザンヌ" && ($0[distinct.columns.firstIndex(of: "translation") ?? 0] as? String) == "수잔" })?.last as? Int == 2
+              && distinct.data["repeats"] as? Int == 1)
+        let raw = reader.call("read_translation_log", ["app": "com.example.reader", "distinct": false])
+        check("distinct false returns every logged line, no count column and no folded or repeats", raw.rows.count == 11 && raw.columns.last == "translation" && raw.data["folded"] == nil && raw.data["repeats"] == nil)
+        check("a row's id is the line's place in the whole log, the same in every view",
+              raw.column("id").compactMap { $0 as? Int } == Array(1...11) && distinct.column("id").compactMap { $0 as? Int }.allSatisfy { (1...11).contains($0) }
+              && reader.call("read_translation_log", ["app": "com.example.reader", "contains": "ハク"]).column("id").compactMap { $0 as? Int } == [9, 10])
+
+        // term_renderings
+        let terms = reader.call("term_renderings", ["app": "com.example.reader", "terms": ["シュザンヌ", "九十九", "存在しない"]])
+        let termList = terms.data["terms"] as? [[String: Any]] ?? []
+        func renderings(_ i: Int) -> [[Any]] { termList.count > i ? termList[i]["renderings"] as? [[Any]] ?? [] : [] }
+        check("term_renderings: for a name, every distinct translation of the rows that contain it, grouped by exact text, with counts and example ids, the most used first",
+              !terms.isError && termList.count == 3 && termList[0]["term"] as? String == "シュザンヌ" && termList[0]["lines"] as? Int == 5
+              && renderings(0).map { $0[1] as? String } == ["수잔", "슈잔느", "수잔 님, 찾았습니다"] && renderings(0).map { $0[0] as? Int } == [3, 1, 1]
+              && renderings(0).map { $0[2] as? [Int] } == [[7, 11], [8], [6]] && termList[0]["more"] == nil)
+        check("term_renderings: a piece of a line being read is not a rendering of the name, a term that is nowhere has no renderings, and the answer says how its entries read",
+              renderings(1).map { $0[1] as? String } == ["쓰쿠모, 여기가 달그림자야. 틀림없어", "구십구"] && renderings(2).isEmpty && termList[2]["lines"] as? Int == 0
+              && (terms.data["each"] as? String)?.contains("count") == true && terms.data["rows"] as? Int == 8)
+        let oneExample = reader.call("term_renderings", ["app": "com.example.reader", "terms": ["シュザンヌ"], "limit_examples": 1])
+        check("term_renderings limit_examples limits the example ids of each translation, the newest first kept",
+              ((oneExample.data["terms"] as? [[String: Any]])?.first?["renderings"] as? [[Any]])?.first?[2] as? [Int] == [11])
+        let noApp = reader.call("term_renderings", ["app": "com.example.nothing", "terms": ["x"]])
+        let noTerms = reader.call("term_renderings", ["app": "com.example.reader", "terms": [String]()])
+        let manyTerms = reader.call("term_renderings", ["app": "com.example.reader", "terms": (0..<51).map { "t\($0)" }])
+        check("term_renderings: an app that is not in the log says so, and no term, or more than 50, is a tool error",
+              !noApp.isError && (noApp.data["note"] as? String)?.contains("list_apps") == true && noTerms.isError && noTerms.text.contains("no term") && manyTerms.isError)
+        let wide = (0..<40).map { entry("W", "com.example.wide", Double($0) * 10, "名前\($0)", "이름\($0)") + entry("W", "com.example.wide", Double($0) * 10 + 5, "名前", "별\($0)") }
+        try? Data(wide.joined().utf8).write(to: readerLog.appendingPathComponent("Wide 2026-10-20 11-00.jsonl"))
+        let capped = reader.call("term_renderings", ["app": "com.example.wide", "terms": ["名前"]])
+        let cappedEntry = (capped.data["terms"] as? [[String: Any]])?.first
+        check("term_renderings lists at most 30 translations of a term and says how many more there are",
+              (cappedEntry?["renderings"] as? [Any])?.count == MCPLog.maxRenderings && cappedEntry?["more"] as? Int == 80 - MCPLog.maxRenderings && cappedEntry?["lines"] as? Int == 80)
 
         // list_apps
         let apps = client.call("list_apps")
@@ -185,7 +287,7 @@ enum MCPChecks {
         let profiles = apps.data["profiles"] as? [[String: Any]] ?? []
         check("list_apps: the apps of the log with their names, line counts and last time, newest first",
               logged.map { $0["bundleID"] as? String } == ["com.example.game", "com.example.chat"] && logged.map { $0["lines"] as? Int } == [2, 3]
-              && logged.map { $0["appName"] as? String } == ["Example Game", "Example Chat"] && logged.first?["last"] as? String == late.lines.last?["time"] as? String
+              && logged.map { $0["appName"] as? String } == ["Example Game", "Example Chat"] && logged.first?["last"] as? String == MCPLog.lines(in: transcripts).lines.last?.timeText
               && (apps.data["log"] as? [String: Any])?["available"] as? Bool == true)
         check("list_apps: the apps with a profile, whether each has a memory and how many names",
               profiles.count == 1 && profiles[0]["bundleID"] as? String == "com.example.game" && profiles[0]["hasMemory"] as? Bool == true && profiles[0]["entries"] as? Int == 2)
@@ -217,7 +319,7 @@ enum MCPChecks {
         let offURL = dir.appendingPathComponent("off-with-lines.json")
         write(offWithLines, to: offURL)
         let old = Client(MCPServer(world: world(offURL), trace: { _ in })).call("read_translation_log")
-        check("lines written earlier are still read while the log is off, with a note", !old.isError && old.lines.count == 5 && (old.data["note"] as? String)?.contains("off") == true)
+        check("lines written earlier are still read while the log is off, with a note", !old.isError && old.rows.count == 5 && (old.data["note"] as? String)?.contains("off") == true)
 
         // The App Store build has no folder path: the folder is a security-scoped bookmark in the preferences, never in the file
         var bookmarked = base
@@ -229,7 +331,7 @@ enum MCPChecks {
         let viaBookmark = Client(MCPServer(world: world(bookmarkURL, saved: bookmarked), trace: { _ in })).call("read_translation_log")
         let noBookmark = Client(MCPServer(world: world(bookmarkURL, saved: base), trace: { _ in })).call("read_translation_log")
         check("the log opens through the folder bookmark of the preferences when the file names no folder, and says to choose one when there is none",
-              bookmarked.exportBookmark != nil && !viaBookmark.isError && viaBookmark.lines.count == 5 && noBookmark.isError && noBookmark.text.contains("choose the folder"))
+              bookmarked.exportBookmark != nil && !viaBookmark.isError && viaBookmark.rows.count == 5 && noBookmark.isError && noBookmark.text.contains("choose the folder"))
 
         // get_memory
         let game = client.call("get_memory", ["app": "com.example.game"])
@@ -250,9 +352,10 @@ enum MCPChecks {
               !merged.isError && merged.list("added") == ["アレン"] && merged.list("updated") == ["魔王城"] && merged.list("removed").isEmpty && merged.data["created"] as? Bool == false
               && afterMerge?.entries.map(\.src) == ["九十九", "魔王城", "アレン"] && afterMerge?.entries[1].dst == "the Demon Castle" && afterMerge?.entries[2].gender == .m
               && afterMerge?.note == "Fantasy RPG. Keep it formal." && afterMerge?.appName == "Example Game" && afterMerge?.source == "en")
-        let echoed = (merged.data["entries"] as? [[String: Any]])?.map { $0["src"] as? String }
-        check("set_memory returns the stored memory, which is what the file holds",
-              echoed == ["九十九", "魔王城", "アレン"] && afterMerge.map { client.call("get_memory", ["app": "com.example.game"]).text == MCPServer.json(MCPMemory.json($0)) } == true)
+        check("set_memory answers with what changed by name and the count of names, not with the memory it was given",
+              merged.data["entries"] as? Int == 3 && merged.data["note"] == nil && merged.data["issues"] == nil && merged.text.utf8.count < 300, "\(merged.text.utf8.count) bytes")
+        check("get_memory returns the stored memory, which is what the file holds",
+              afterMerge.map { client.call("get_memory", ["app": "com.example.game"]).text == MCPServer.json(MCPMemory.json($0)) } == true)
         let noted = client.call("set_memory", ["app": "com.example.game", "note": "Dark fantasy."])
         check("set_memory merge with a note replaces the note and leaves the names", !noted.isError && stored("com.example.game")?.note == "Dark fantasy." && stored("com.example.game")?.entries.count == 3)
 
@@ -379,6 +482,13 @@ enum MCPChecks {
         check("get_settings_schema is the schema the app writes beside settings.json, with the switch in it and off by default",
               !schema.isError && NSDictionary(dictionary: schema.data).isEqual(to: (try? JSONSerialization.jsonObject(with: SettingsSchema.data())) as? [String: Any] ?? [:])
               && (schemaProps["agentConnection"] as? [String: Any])?["default"] as? Bool == false)
+        let one = client.call("get_settings_schema", ["key": "glossary"])
+        let wholeProperties = (try? JSONSerialization.jsonObject(with: SettingsSchema.data()) as? [String: Any])?["properties"] as? [String: Any] ?? [:]
+        let unknownKey = client.call("get_settings_schema", ["key": "glossery"])
+        check("get_settings_schema with a key returns that setting's schema alone (a fraction of the whole), and a key that is not a setting names the ones that are",
+              !one.isError && one.data["key"] as? String == "glossary" && NSDictionary(dictionary: one.data["schema"] as? [String: Any] ?? [:]).isEqual(to: wholeProperties["glossary"] as? [String: Any] ?? [:])
+              && one.text.utf8.count * 20 < schema.text.utf8.count && unknownKey.isError && unknownKey.text.contains("glossary"),
+              "key \(one.text.utf8.count) bytes, whole \(schema.text.utf8.count)")
         let settingsTools = listed.filter { ["get_settings", "set_settings"].contains($0["name"] as? String ?? "") }
         let valuesInList = (((listed.first { $0["name"] as? String == "set_settings" })?["inputSchema"] as? [String: Any])?["properties"] as? [String: Any])?["values"] as? [String: Any]
         check("tools/list gives set_settings' values in short (the key names, not the schema of each), and says API keys stay in the Keychain",
@@ -421,6 +531,104 @@ enum MCPChecks {
         let onKey = switchKey()
         model.settings.agentConnection = false
         check("the switch in Settings writes agentConnection: true to settings.json and takes the key out when it is turned off", onKey == true && switchKey() == nil)
+
+        // One copy of each result
+        let single: [(String, [String: Any])] = [("list_apps", [:]), ("read_translation_log", ["app": "com.example.chat"]), ("term_renderings", ["app": "com.example.chat", "terms": ["田中"]]),
+                                                 ("get_memory", ["app": "com.example.game"]), ("set_memory", ["app": "com.example.game", "note": "One copy."]),
+                                                 ("get_settings", ["keys": ["lensStyle"]]), ("get_settings_schema", ["key": "glossary"]), ("set_settings", ["values": ["lensStyle": "glow"]])]
+        let answers = single.map { client.call($0.0, $0.1) }
+        let recompacted = answers.map { (try? JSONSerialization.jsonObject(with: Data($0.text.utf8))).map { MCPServer.json($0) } }
+        check("each result is one text block of compact JSON and no structuredContent, so the payload is read once, by a client that reads either",
+              answers.count == 8 && answers.allSatisfy { !$0.isError && !$0.doubled } && zip(answers, recompacted).allSatisfy { $0.0.text == $0.1 },
+              "\(zip(single, answers).map { "\($0.0.0) \($0.1.isError ? "error" : $0.1.doubled ? "doubled" : "ok")" })")
+
+        // What the take's calls cost an agent (round mcp2, 2026-10-21; tools/mcp/budget.py measures the same on a binary, with the wire bytes)
+        let fixtures = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("tools/mcp/fixtures")
+        let takeCalls = (try? JSONSerialization.jsonObject(with: Data(contentsOf: fixtures.appendingPathComponent("take-calls.json")))) as? [[String: Any]] ?? []
+        let takeLog = LensExport.transcriptsFolder(dir.appendingPathComponent("take"))
+        try? FileManager.default.createDirectory(at: takeLog, withIntermediateDirectories: true)
+        try? FileManager.default.copyItem(at: fixtures.appendingPathComponent("take-log.jsonl"), to: takeLog.appendingPathComponent("Lens 2026-10-20 19-14.jsonl"))
+        var takeSettings = base
+        takeSettings.exportFolder = dir.appendingPathComponent("take").path
+        takeSettings.appProfiles = []
+        let takeFile = dir.appendingPathComponent("take-settings.json")
+        write(takeSettings, to: takeFile)
+        let taker = Client(MCPServer(world: world(takeFile), trace: { _ in }))
+        let takeBytes = takeCalls.map { call -> Int in
+            taker.call(call["tool"] as? String ?? "", call["arguments"] as? [String: Any] ?? [:]).text.utf8.count
+        }
+        // BEFORE (base 4d08e42, 2026-10-21, the agent's copy): list_apps 188 + read_translation_log (limit 65, 65 rows) 15,765 + set_memory 1,630
+        // = 17,583 bytes; the round's target is 40 % of that, 7,033. AFTER (this code, same fixture, 2026-10-21): 188 + 6,093 + 247 = 6,528 bytes, 37 %.
+        // A ceiling is the measured value + 10 %, rounded up: 207, 6,703, 272.
+        let ceilings = [207, 6703, 272]
+        check("the take's three calls (list_apps, read_translation_log of 65 rows, set_memory of 8 names) cost an agent at most \(ceilings.reduce(0, +)) bytes, 40 % of the 17,583 they did",
+              takeCalls.count == 3 && zip(takeBytes, ceilings).allSatisfy { $0 <= $1 } && takeBytes.reduce(0, +) * 100 <= 17_583 * 40, "bytes \(takeBytes), ceilings \(ceilings)")
+
+        // translate_text: the lens's own path, with the app's memory
+        let alice = MemoryEntry(src: "Alice", dst: "앨리스", kind: .person, gender: .f)
+        if let mock = ContextChecks.Mock(mode: "ok", flags: "native") {
+            defer { mock.stop() }
+            let engine = ContextChecks.engine("openai", base: mock.base)
+            var translating = ContextChecks.settings(engine, profiles: [ContextChecks.profile(ContextChecks.chat, entries: [alice], note: "casual chat between friends")])
+            translating.agentConnection = true
+            let translateFile = dir.appendingPathComponent("translate/settings.json")
+            try? FileManager.default.createDirectory(at: translateFile.deletingLastPathComponent(), withIntermediateDirectories: true)
+            write(translating, to: translateFile)
+            func translator(_ s: AppSettings = translating, at url: URL? = nil, secrets: any SecretStore = MemorySecrets([engine.id: "dummy"])) -> Client {
+                let file = url ?? translateFile
+                write(s, to: file)
+                return Client(MCPServer(world: MCPWorld(settingsURL: file, saved: { s }, appName: { _ in nil }, secrets: secrets), trace: { _ in }))
+            }
+            let t = translator()
+            let sent = mock.bodies.count
+            let withMemory = t.call("translate_text", ["lines": ["Alice sent a photo"], "app": ContextChecks.chat])
+            let body = mock.bodies.dropFirst(sent).last ?? ""
+            check("translate_text through the lens's path: the translation, the engine that made it, and the app's memory in what the engine was sent",
+                  !withMemory.isError && withMemory.columns == ["translation", "engine"] && withMemory.rows.count == 1 && (withMemory.rows.first?[0] as? String)?.contains("Alice sent a photo") == true
+                  && withMemory.rows.first?[1] as? String == "O" && withMemory.data["memory"] as? String == "used" && body.contains("앨리스") && body.contains("casual chat between friends"),
+                  "\(withMemory.text) body \(body.prefix(200))")
+            let before = mock.bodies.count
+            let withoutApp = t.call("translate_text", ["lines": ["Alice sent another photo"]])
+            check("translate_text without an app sends the lines alone: no memory, no note",
+                  !withoutApp.isError && withoutApp.data["memory"] == nil && mock.bodies.count == before + 1 && !(mock.bodies.last ?? "").contains("앨리스") && withoutApp.rows.first?[1] as? String == "O")
+            // Apple Translation answers on the main queue, which this run holds (a job of the main actor, waiting on the call): its answer is
+            // `tools/mcp/smoke.sh`'s, in a process that waits on the run loop alone. Here the choice of the engine is checked: "apple" is no
+            // added engine, and an id is that engine.
+            var chosen = translating
+            try? MCPTranslate.choose("apple", in: &chosen)
+            let second = EngineConfig(id: UUID(uuidString: "00000000-0000-0000-0000-0000000000B2") ?? UUID(), name: "P",
+                                      kind: .openAICompatible(baseURL: mock.base.appendingPathComponent("v1"), model: "m2", thinking: .off, extraHeaders: [:]))
+            var twoEngines = translating
+            twoEngines.engines.append(second)
+            var byID = twoEngines
+            try? MCPTranslate.choose(second.id.uuidString.lowercased(), in: &byID)
+            let refused: Bool = { var s = twoEngines; return (try? MCPTranslate.choose("deepl", in: &s)) == nil }()
+            check("translate_text's engine argument: apple is no added engine, an id (in any case) is that engine, and a name that is neither is refused",
+                  chosen.customEngineID == nil && byID.customEngineID == second.id && twoEngines.customEngineID == engine.id && refused)
+            let other = translator(twoEngines, at: dir.appendingPathComponent("translate-two/settings.json"), secrets: MemorySecrets([engine.id: "dummy", second.id: "dummy"]))
+            let sentBefore = mock.bodies.count
+            let viaOther = other.call("translate_text", ["lines": ["Alice sent a third photo"], "engine": second.id.uuidString])
+            let otherBody = mock.bodies.dropFirst(sentBefore).last ?? ""
+            check("translate_text with the id of another engine sends the line to that engine and names it",
+                  !viaOther.isError && viaOther.rows.first?[1] as? String == second.name && otherBody.contains("\"m2\"") && mock.bodies.count == sentBefore + 1,
+                  viaOther.text)
+            let unknownEngine = t.call("translate_text", ["lines": ["x"], "engine": "00000000-0000-0000-0000-000000000000"])
+            check("translate_text with an engine that is not one names apple and the engines there are",
+                  unknownEngine.isError && unknownEngine.text.contains("apple") && unknownEngine.text.contains(engine.id.uuidString))
+            check("translate_text with no line, or more than 20, or a line over the limit is a tool error",
+                  t.call("translate_text", ["lines": [String]()]).isError && t.call("translate_text", ["lines": (0..<21).map { "line \($0)" }]).isError
+                  && t.call("translate_text", ["lines": [String(repeating: "a", count: 2001)]]).isError && t.call("translate_text").isError)
+            var commanding = translating
+            let program = EngineConfig(name: "Mine", kind: .command(CommandSpec(executable: "/usr/bin/true")))
+            commanding.engines.append(program)
+            commanding.customEngineID = program.id
+            let command = translator(commanding, at: dir.appendingPathComponent("translate-command/settings.json")).call("translate_text", ["lines": ["x"]])
+            check("translate_text does not run a command engine, and says so", command.isError && command.text.contains("command engines"))
+            let locked = translator(secrets: Unreachable()).call("translate_text", ["lines": ["x"]])
+            check("translate_text says so when the engine's key is in a Keychain this process cannot read", locked.isError && locked.text.contains("Keychain") && locked.text.contains(engine.name))
+        } else {
+            check("translate_text: the mock server starts", false)
+        }
 
         // The trace and the command
         check("each message leaves one trace line, with the tool and the app, and never the text of a note or a name",

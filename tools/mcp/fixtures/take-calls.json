@@ -1,0 +1,82 @@
+[
+ {
+  "tool": "list_apps",
+  "arguments": {}
+ },
+ {
+  "tool": "read_translation_log",
+  "arguments": {
+   "app": "dev.midagedev.film.lumiere",
+   "limit": 65
+  }
+ },
+ {
+  "tool": "set_memory",
+  "arguments": {
+   "app": "dev.midagedev.film.lumiere",
+   "appName": "Lumiere",
+   "note": "일본풍 오리지널 판타지 게임. 귀족 아가씨와 그 수행원들이 달그림자 사당을 찾아가는 이야기. 등장인물 이름이 줄마다 다르게 음역되는 문제가 있어 고정 표기 필요.",
+   "entries": [
+    {
+     "src": "シュザンヌ",
+     "dst": "슈잔느",
+     "reading": "しゅざんぬ",
+     "kind": "person",
+     "gender": "f",
+     "note": "귀족 아가씨, 일행의 주인"
+    },
+    {
+     "src": "九十九",
+     "dst": "츠쿠모",
+     "reading": "つくも",
+     "kind": "person",
+     "gender": "n",
+     "note": "슈잔느의 수행 검사. 숫자 99 아님"
+    },
+    {
+     "src": "エルヴェ",
+     "dst": "엘베",
+     "reading": "えるう゛ぇ",
+     "kind": "person",
+     "gender": "m",
+     "note": "나이 든 수행원, 집사 격"
+    },
+    {
+     "src": "ハク",
+     "dst": "하쿠",
+     "reading": "はく",
+     "kind": "person",
+     "gender": "n",
+     "note": "달그림자 사당의 수호 짐승신"
+    },
+    {
+     "src": "月涙石",
+     "dst": "월루석",
+     "reading": "げつるいせき",
+     "kind": "term",
+     "note": "달의 눈물이 맺힌 신비한 돌"
+    },
+    {
+     "src": "月影の",
+     "dst": "츠키카게",
+     "reading": "つきかげの",
+     "kind": "place",
+     "note": "사당/신사 이름 추정, 원문 뒷부분 잘려 음역으로만 저장"
+    },
+    {
+     "src": "夜明けの守り手",
+     "dst": "새벽의 수호자",
+     "kind": "term",
+     "note": "월루석으로 깨어나는 존재"
+    },
+    {
+     "src": "水鏡",
+     "dst": "물거울",
+     "reading": "みずかがみ",
+     "kind": "term",
+     "note": "달그림자 사당 안의 연못/거울"
+    }
+   ]
+  }
+ }
+]

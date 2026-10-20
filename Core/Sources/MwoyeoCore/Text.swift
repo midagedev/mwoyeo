@@ -278,10 +278,18 @@ public enum TranslationFilter {
         if cjkSource { return scalars.contains(where: isCJK) }
         guard scalars.contains(where: { CharacterSet.letters.contains($0) }) else { return false }
         let t = text.trimmingCharacters(in: .whitespaces)
-        if t.contains("://") || t.hasPrefix("@") || t.range(of: #"^[a-z]{1,2}/\S+$"#, options: .regularExpression) != nil { return false }
+        if isMostlyLink(t) || t.hasPrefix("@") || t.range(of: #"^[a-z]{1,2}/\S+$"#, options: .regularExpression) != nil { return false }
         // One token mixing letters with digits or code punctuation ("2.4k", "user_42", "v1.4.2").
         if !t.contains(" "), t.range(of: #"[0-9_./]"#, options: .regularExpression) != nil { return false }
         return true
+    }
+
+    /// A line that is mostly a link ("Source: https://arxiv.org/abs/1706.03762", "https://example.com/a  12 min"): the words of the link make up at
+    /// least half of the characters of the words. A sentence that holds a link is a sentence (H2, round k3b: 14 words of prose around one link
+    /// stood at 0.35, the label lines above at 0.8 and more).
+    static func isMostlyLink(_ text: String) -> Bool {
+        let words = text.split(whereSeparator: \.isWhitespace)
+        return 2 * words.filter { $0.contains("://") }.reduce(0) { $0 + $1.count } >= words.reduce(0) { $0 + $1.count }
     }
 
     /// Text that is read as written in any language and must stay on screen as it is: a shell prompt with its command

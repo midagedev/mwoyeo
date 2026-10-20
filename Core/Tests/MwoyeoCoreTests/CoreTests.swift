@@ -513,6 +513,17 @@ func texture(width: Int, height: Int, seed: Int = 1) -> GrayImage {
     #expect(!TranslationFilter.needsTranslation("— 12 —", cjkSource: false))
 }
 
+/// H2 (round k3b, 2026-10-20): any block with "://" in it was kept as written, so a sentence with a link in it (issue-en md-light-plain:
+/// 14 words of prose, a path and a URL) stayed English. A line that is mostly a link stays; a sentence that holds one is a sentence.
+@Test func aSentenceWithALinkInItIsStillTranslated() {
+    let prose = "Expected: the pill clears at once. The state is in Core/Sources/MwoyeoCore/ReadWait. swift; a build to try is at"
+    #expect(TranslationFilter.needsTranslation(prose, cjkSource: false))                                  // the same words, no link: translated today
+    #expect(TranslationFilter.needsTranslation(prose + " https://github.com/midagedev/mwoyeo/releases/latest.", cjkSource: false))
+    #expect(TranslationFilter.needsTranslation("Download the latest build from https://example.com/releases today", cjkSource: false))
+    #expect(!TranslationFilter.needsTranslation("Source: https://arxiv.org/abs/1706.03762", cjkSource: false))
+    #expect(!TranslationFilter.needsTranslation("https://example.com/a  12 min", cjkSource: false))
+}
+
 @Test func restoresSourceTokenCase() {
     #expect(TranslationCleanup.restoreSourceTokens("S/starfallvalley 내 검색", source: "s/starfallvalley 内を検索") == "s/starfallvalley 내 검색")
     #expect(TranslationCleanup.restoreSourceTokens("U/mayafox · 5시간 전", source: "u/mayafox · 5時間前") == "u/mayafox · 5시간 전")

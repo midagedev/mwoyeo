@@ -1,6 +1,6 @@
 # Names, terms and context: profiles
 
-Status: design, 2026-10-21, round profiles1; revises names1's version (4715d5b, 86d1fb2) on top of `docs/design/context-translation.md`.
+Status: design, 2026-10-21, round profiles1 (§6 by uiux1: three levels); revises names1's version (4715d5b, 86d1fb2) on top of `docs/design/context-translation.md`.
 Kept from names1: entries, row choice per request (§3), engine paths, provenance, D1, D2. New: profiles replace the scopes (§1), engine
 permissions (§4), restore per tab (§9), hint vs replacement (§10), rewrites and scripts (§11, `rewrite-rules.md`). Inputs: the code at a39a0c8 and main
 ca15dbf (`path:line`); the research report (glossary-2026-10, outside the repo); nameslens, trust1, hidelens in flight; applegloss landed.
@@ -213,44 +213,79 @@ Apple Translation, templates and commands are outside the table: they take only 
 - Errors, each FAIL-first in `SettingsFileChecks`: a 9th condition, an empty condition, a duplicate id, the id `all`, a pin to no
   profile, a 33rd rewrite, a pattern that does not compile, a script over 8,000 characters.
 
-## 6. UI contract (numbers; implementable without captures)
+## 6. UI contract: simple by default, detailed when sought (numbers; implementable without captures)
 
-**Settings › Translation › Profiles** (replaces "App profiles", `App/UI/SettingsView.swift:227-265`; shown when a profile or an
-added engine that takes context exists, so zero-setup Settings is unchanged):
-- Row 1 "All apps": subtitle "<pair> · <amount words> · Glossary: n", ⋯ → "Edit…"; not removable. A row per profile, list order: name
-  (cut in the middle at 32); one subtitle line = conditions (priority 2: "月涙譚 in Emulator", "Emulator", "Title contains “Preprint”",
-  "Chosen by hand") · pair (1) · memory summary (0, cut first); trailing caption "Pinned". ⋯: "Edit…", "Paragraphs ▸", "Duplicate",
-  "Pin for Every Lens" / "Use Auto", divider, "Remove…" (alert "Remove <name>? Its note and <n> names are removed.").
-- "New Profile…" (borderless) under the rows. Footer, 2 lines: "Each lens picks the narrowest match: a window title, then an app, then
-  All apps. Pin one from a lens's menu or the menu bar." The Apple switch goes (A3; `:250-252`, `AppMemorySheet.swift:351-356`).
+The user, 2026-10-21: "ui 잘 만들어줘. 직관적이어야 하고, 기본은 간단하게 보여야 하고 별다른 설정 없이 쓸 수 있어야 하지만, 사용자가
+커스터마이징 하려고 보면 상세한 옵션이 잘 드러나도록." The HIG lines this follows, the four "first five minutes" walkthroughs (the
+capture scripts) and the vision checklist of R4 and R9 are in `profiles-ui-checklist.md`.
 
-**The profile sheet** (`AppMemorySheet`, 520 × 640, Form scrolls), sections in order:
-- Header: the name field (≤ 40, headline, layout priority 1; plain "All apps" for the base). **Used when** (not for All apps): ≤ 8
-  rows (14 pt symbol, words, trailing minus); "Add Condition" menu: "<App of the opening lens>", "This Window's Title: “<title, cut at
-  40>”" (confirmed title only), "Other App…", "Title Contains…" (≤ 60, caption "Used while the window title contains this."). Empty:
-  "No conditions: used only when you pick it." **Languages** (not for All apps): source → target; Engine: "Same as All apps
-  (<name>)", "Apple Translation", each engine.
-- **Note** (not for All apps) and **Names and terms** ("Names: n of 40"). Each row gets a 22 pt mode button before its minus (§10).
-  All apps shows "Glossary: n pairs" with "Edit Glossary…". A row that hides a broader one: caption "Replaces “ハク → Haku” from
-  Emulator". With Apple Translation in effect: caption "Apple Translation uses only rows set to Replace or Both."
-- **Rewrites** and **Script** (`rewrite-rules.md` §7). **Context**: "Same as All apps (<words>)" (not for All apps), "Off — only the line", "Names and
-  note", "Nearby lines", "Conversation" + "Earlier lines: n" (0-8); "Learn names and terms" only when the engine can learn; caption
-  "Applies only to engines you added." When the engine denies lines and the amount asks for them: orange "<Engine> gets only the
-  line." + "Change…". "Also sent to …" goes. **Learned** (when not empty), then the "Sent:" line.
+### 6.1 Three levels, on every screen
+- **L0, nothing set up** (no profile, no added engine, every preference default): each screen is today's, item for item (below).
+- **L1, after the one natural thing** (write a name from a lens, add an engine, write a glossary line): only what that act made
+  appears, in its words: the names, the profile they made and its picker, the engine's rows. Both sheets are L1: reached only by an act.
+- **L2, sought**: every other option sits behind one explicit control where it takes effect (a disclosure row whose label says what
+  it holds, "Customize · …", "Context · …", "Script · Off"; a ⋯ menu; one submenu), ≤ 2 clicks away, never drawn unopened. A sheet
+  opens on L2 only for a profile that already uses it or is being made by hand.
+- **Words**: L0-L1 say what happens ("Tell the translator", "Swap into the text", "Picked by hand"); "hint", "replace", "apply",
+  "chain", "head", "regex", "mode" stay in settings.json, MCP and this file. A menu item that cannot act is dimmed, a Settings row
+  that cannot act is not drawn; no popovers (a warning is a caption on its row); no sheet over a sheet (a link out closes it first).
 
-**Lens menu** (after nameslens' items; only when a profile exists): "Profile: Auto (<head>)" / "<name> (pinned)" / "<name> (every
-lens)" / "All Apps Only", cut in the middle at 40 → a disabled line "Auto picks <head>: <why>" (cut at 48; "title contains “…”",
-"<App>", "nothing matches"); "Auto" ✓; separator; "All Apps Only"; each profile ✓ (cut at 32); separator; "Edit <head>…"; "New Profile
-for This Window…" (confirmed title only: app + title, the pair in effect, name = title cut at 40); "New Profile…". nameslens' "Memory
-for <App>…" becomes "Memory for <head>…"; with All apps as head it keeps its meaning (`AppProfiles.ensuring` on the first edit).
+| Screen | L0 (= today) |
+|---|---|
+| Menu bar panel | header, language bar (no engine menu), lens rows or "No lenses yet", Add Lens, footer; no profile caption |
+| Lens menu | Show Original … Save Lens Image; nameslens' names line, "Memory for <App>…", "Remember Languages for <App>" |
+| Settings › Translation | Translation engine, Apple Translation language packs, Translation memory, Glossary; no Profiles section |
+| Other tabs | today's, but no Restore button while a tab is all defaults (§9): Shortcuts' no-op button goes, the one L0 change |
 
-**Menu bar** (`MenuPanel.swift:44-47`): with a profile, the caption is a borderless menu "Profile: Auto" / "Profile: <name>" (caption2,
-secondary, centred, -6 pt top) → "Auto — each lens picks", "All Apps Only", the profiles, "Profiles in Settings…". The language bar
-edits the pinned profile; on Auto, the head for the front app's window, else All apps. A lens row appends " · <head>" (cut at the tail).
+### 6.2 Settings › Translation › Profiles (replaces "App profiles", `App/UI/SettingsView.swift:227-265`)
+- **L1**, shown while a profile exists. Row 1 "All apps", subtitle "Everywhere else · <pair> · glossary n"; then the profiles in list
+  order, ≤ 6, then a borderless "Show All n Profiles" (expands in place; ≤ 50). A row: the name (cut in the middle at 32), one subtitle
+  line (caption, secondary, tail cut; priority where 2, pair 1, memory 0): where = "In Emulator", "“月涙譚” in Emulator", "Title has
+  “Preprint”", "In Safari +2", "Picked by hand"; memory = "note · 12 names · 2 rewrites · script"; trailing "Pinned" (caption) while
+  every lens is pinned to it, then ⋯ (≥ 20 pt). A click on the row opens its sheet. ⋯: "Edit…", "Duplicate", "Use for Every Lens" /
+  "Back to Auto", divider, "Remove…" ("Remove <name>? Its note and n names go with it."); All apps: "Edit…". "Paragraphs" moves into
+  the sheet. "New Profile…" (borderless, plus) under the rows. Footer: "Each lens uses the closest match: a window title, then an app,
+  then All apps. To choose by hand, use a lens’s menu or the menu bar." The Apple switch goes (A3; `:250-252`, `AppMemorySheet.swift:351-356`).
+- **Glossary**, L1 once it holds a pair: a "Use them" pop-up under the editor (§10's items, cost per pair).
 
-**Engine sheet** (`EngineContextSection`): "Context · <words>"; "How much goes along is set per profile: All apps sends <words>." +
-"Profiles…"; "Send lines around and before" (off this Mac; on); "Include window title" (off this Mac; off); "Use my notes with DeepL"
-(DeepL); the Sent line. "Use context", "Previous lines" and "Learn names and terms" leave it.
+### 6.3 The profile sheet (`AppMemorySheet`, 520 × 640, the Form scrolls)
+- **Header**: "Memory for <name>" (headline, one line, tail cut) over one caption line, "<used> · <pair> · <engine>": "Used in Safari ·
+  Japanese → Korean · Apple Translation"; used = "Used when the title has “月涙譚” in Emulator", "Used when you pick it", "Used everywhere else".
+- **L1**, in order: (1) **Names and terms** first, as the reason people come: today's rows (name → translation, minus, the details
+  disclosure), "Add Name", "Names: n of 40"; empty: "Type a name as the screen shows it, then how it should read."; All apps:
+  "Glossary: n pairs" + "Edit Glossary…". Rows on Tell while the engine in effect takes no hints: one callout "<Engine> uses only
+  names swapped into the text; n here are not." + "Swap Them In" (sets Both). (2) **Note** (not All apps). (3) **Learned**, only
+  when not empty, "Forget All" in its footer. (4) With an added engine in effect, today's "Sent: …" line (wraps); with Apple none.
+  (5) **Customize**: a disclosure triangle, "Customize" and, trailing in secondary (one line, tail cut), what differs from All apps
+  ("Local Qwen · conversation 3 · 2 rewrites · script"), else what it holds ("When, languages, context, rewrites"); one accessibility
+  element whose value is that summary. Bottom bar: "Start Fresh" only while the profile keeps a conversation; "Done".
+- **L2, a row's details**: the Use pop-up first (§10), then today's kind, gender, note, pronunciation, speaks to.
+- **L2, Customize open**, in order: (a) **When it’s used** (not All apps): "Name" (≤ 40); ≤ 8 conditions (14 pt app icon or
+  `textformat`, words, minus); "Add Condition": "<App of the opening lens>", "This Window’s Title" (dimmed until confirmed), "Other
+  App…", "Title Contains…" (≤ 60; "Keep the part that stays the same, like a game’s name."); none: "No conditions: used only when you
+  pick it." (b) **Languages** (not All apps): From, To; Engine "Same as All apps (<name>)", "Apple Translation", each engine;
+  Paragraphs. (c) **Context**, if the engine in effect takes it (else "<Engine> gets only the line."): "Same as All apps (<words>)",
+  "Only the line", "Names and note", "Nearby lines", "Conversation" + "Earlier lines: n" (0-8); "Learn names and terms" if it learns;
+  lines asked but denied: orange "<Engine> gets only the line." + "Change…" (its engine sheet, Context open). (d) **Rewrites**, (e)
+  **Script**: `rewrite-rules.md` §7. Customize starts open (scrolled to) when the profile uses (a)-(e) beyond one app condition, or is
+  new by hand ("New Profile…": Name focused; "… for This Window…": the phrase focused and selected); the state is not kept.
+
+### 6.4 Lens menu (`RegionSession.swift` `addProfileItems`; names cut in the middle at 24, lines at 48, as `LensMemoryMenu`)
+- **L0** as nameslens. **L1** (a profile exists): one item after "Memory for …": "Profile: <head>" / "Profile: <name> (pinned)" /
+  "… (every lens)" / "Profile: All Apps Only", with one submenu: dimmed "Auto picks <head>: <why>" ("the app", "title has “…”",
+  "nothing matches"); "Auto" ✓; separator; "All Apps Only"; the profiles ✓ (≤ 8, then "More in Settings…"); separator; "New Profile
+  for This Window…" (dimmed until the title is confirmed; app + title cut at 40, the lens's pair, named by it); "New Profile…".
+  "Memory for" and "Forget" name the head; with All apps as head, the app, as today (`AppProfiles.ensuring` on the first edit).
+
+### 6.5 Menu bar (`MenuPanel.swift:44-47`) and engine sheet (`EngineContextSection`)
+- **Menu bar**, L1 (a profile exists): today's "<App> profile" caption becomes a borderless menu (caption2, secondary, centred, -6 pt, 8 pt chevron):
+  "Profile: Auto" (head All apps) / "Profile: <head>" / "Profile: <name> (every lens)", cut in the middle at 24 → "Auto — each lens
+  picks" ✓, "All Apps Only", the profiles (≤ 8), separator, "Profiles in Settings…". A choice pins every lens (§1.3); the language bar
+  edits that profile, on Auto the front window's head. A lens row appends " · <head>" only when it differs from the caption's.
+- **Engine sheet**, L1 as today (key, "Send the text the lens reads to <host>", test). L2 "Context · <All apps' words>": "For all
+  apps" pop-up (§6.3 c's items, top-level `context`) + "Earlier lines"; "Learn names and terms" (if it learns); "A profile can ask for
+  more or less." + "Profiles…" (if one exists); off this Mac: "Send the lines around the text" (on; off: "<Engine> gets only the line,
+  whatever a profile asks."), "Send the window title" (off); "Use my notes with DeepL"; the Sent line. "Use context", "Previous lines" go.
 
 ## 7. Agents (MCP; one compact text block per result, `docs/settings-for-agents.md:14`)
 - `list_apps` adds `"profiles": {"columns": ["id","name","when","pair","engine","names","context"], "rows": [["profile-1","月涙譚",
@@ -317,7 +352,8 @@ touched; deleted per item with its own confirmation. Each `SettingSpec` gets `ta
 | not in the file | consent, data | `enginePermissions`; `exportBookmark`, `engineRejections`, `hasCompletedOnboarding`, learned rows, lens pins: never reset |
 
 - **Button** "Restore Defaults…" at the foot of General, Translation, Appearance and Shortcuts (today's Shortcuts button,
-  `SettingsView.swift:604-605`, becomes it), disabled when no preference of the tab differs from its default. About has none.
+  `SettingsView.swift:604-605`, becomes it), shown only while a preference of the tab differs from its default: hidden, not
+  disabled, so a tab at its defaults is today's (§6.1). About has none.
 - **Sheet** (420 pt): "Changes" rows "<title>: <now> → <default>"; "Kept" rows for the tab's consent and data ("Connect an agent (MCP):
   on — kept; turn it off by hand"); Cancel, Restore (default). settings.json is first copied to `settings.json.before-restore`; then
   "Restored n settings." with Undo (writes back only those keys) and Done.
@@ -339,15 +375,17 @@ The user: "ai 번역시에 토큰을 소모하는 문맥주입과 소모하지 �
   (longest match, plural, capital) inserts for every kind; the answer check and plain retry stay Apple's (`TranslationService.swift:1103-1120`).
 - **Default path, byte for byte**: absent `apply` is hint, so with no replace or both row Apple gets today's request, and the glossary
   keeps today's survived-term output patch (`:825-832`). The switch's migration is §5.2; its toggles go (§6).
-- **A new row is hint**, its mode one click away: no source changes unless asked; a one-character Han `src` replaced breaks a word (王
-  in 王様) where a hint costs one row. **Both is better for names** (person or place, 2+ characters) where Apple translates, and
-  likely on LLMs (final form plus gender; R7 measures it): with Apple in effect the menu marks Both "recommended for names".
+- **A new row's mode** (the sheet sets it when the row is first stored): **both** when the profile's engine takes no hints (Apple
+  Translation, FM, a template, a command) and the name has 2+ characters, so a name written for Apple works at once (§6.3); else
+  **hint**: no source change unless asked; a one-character Han `src` replaced breaks a word (王 in 王様) where a hint costs one row. A
+  row without `apply` (an older file, an agent) is hint. **Both is better for names** (person or place) where Apple translates, and
+  likely on LLMs (final form plus gender; R7 measures it): with Apple in effect the pop-up marks Both "recommended for names".
 - **Replacing in the OUTPUT** breaks Korean particles (은/는, 이/가 after a different final consonant): only as an explicit
   after-rewrite (`rewrite-rules.md`), with that warning beside it.
-- **Cost on the row**: a 22 pt mode button (`text.bubble` hint, `arrow.left.arrow.right` replace, `plus.bubble` both) opens "Hint — told
-  to AI engines · ≈ n tokens where it occurs", "Replace — written into the text first · 0 tokens · Apple Translation too", "Both · ≈ n
-  tokens"; n = `approxTokens(renderRow(e)) + 1`, the budget's own count (`TranslationContextLayout.swift:386`). The Glossary gets "Use
-  these as: Hints · Replace in the text · Both" with the same costs per pair.
+- **Cost, in the row's details** (§6.3, L2): a "Use" pop-up, "Tell the translator · ≈ n tokens", "Swap into the text · free", "Both
+  · ≈ n tokens", and one caption for the chosen item ("Told to AI engines where it appears." · "Written into the text before
+  translating; Apple Translation uses it too." · "Both of these."); n = `approxTokens(renderRow(e)) + 1`, the budget's own count
+  (`TranslationContextLayout.swift:386`). The Glossary's "Use them" pop-up (§6.2) offers the same three with the cost per pair.
 
 ## 11. Rewrites and scripts (A2, A4, A5) → `docs/design/rewrite-rules.md`
 Every profile (All apps included) also gets a rules table (`rewrites`: ≤ 32 rows {before | after, find, replace, regex}) and a script
@@ -355,18 +393,9 @@ Every profile (All apps included) also gets a rules table (`rewrites`: ≤ 32 ro
 an XPC service without entitlements, cut at 50 ms a line; with none in the chain the service never starts. Agents write and dry-run
 them (`set_memory`, `test_rules`). The model, limits, App Store reading (2.5.2, 4.7, 2.5.1), UI and gates are in that file.
 
-## 12. Open questions for the user
-1. **Per lens, everything**: languages and engine follow the window under each lens, not the app in front (a lens over app B while A
-   is in front uses B's languages). Recommended: yes (title conditions and pinned presets need it; "Also sent to …" goes).
-2. **Cloud engines and screen lines**: when a profile asks for lines, a cloud engine gets them unless its sheet says "only the line".
-   Recommended: the profile's choice is enough, as an app's override is today.
-3. **Window memory becomes a profile with a title condition**, made from the lens menu ("New Profile for This Window…"), not a "This
-   window" tab. Recommended: yes (one concept less, the same read and matching).
-4. **"Learn names and terms" moves from each engine to the profile.** Recommended: yes; what is read decides it.
-
-**Decided 2026-10-21 (the user):** window memory (Q3: its form); only glossary hits go; Apple uses every scope's names (as replace rows);
-"Memory for <App>…" in every lens menu; DeepL glossaries deferred; profiles, restore per tab, §10 and the rules and scripts all in 1.1.5.
-"Memory for <App>…" in every lens menu; DeepL glossaries deferred; profiles, restore per tab, §10 and §11 all in 1.1.5.
-
-**Decided 2026-10-21 (the user):** Q1 languages and engine follow each lens's profile; Q2 a cloud engine gets earlier lines when a profile
-asks (the engine's allow switch can still say no); Q3 the window memory is a profile with a title rule; Q4 "learn names" moves to the profile.
+## 12. Decisions (the user, 2026-10-21)
+- **Q1** per lens, everything: languages and engine follow each lens's chain, not the app in front ("Also sent to …" goes). **Q2** a
+  cloud engine gets the lines a profile asks for (its `allow.lines` switch can still say no). **Q3** window memory is a profile with a
+  title condition, made from the lens menu. **Q4** "Learn names and terms" moves from the engine to the profile.
+- Also: only glossary hits go; Apple uses every scope's names (as replace rows); "Memory for <App>…" in every lens menu; DeepL
+  glossaries deferred; profiles, restore per tab, §10 and §11 all in 1.1.5.

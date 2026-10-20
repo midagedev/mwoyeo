@@ -78,15 +78,27 @@ mechanical replacement apart from context; a table in the UI and scripts, both; 
   (`docs/app-store/audit-2026-10-17.md:59`). If review objects, the App Store build hides Script (one `Distribution` row) and keeps
   the table.
 
-## 7. UI (the profile sheet, after Names and terms; numbers for R9)
-- **Rewrites**: one borderless "Add Rewrite" button until a row exists. A row: stage pop-up (Before / After, 72 pt), find field
-  (flexible, priority 1), "→", replace field (flexible), ".*" toggle (regex, 24 pt), minus. ≤ 32; at 32 the button is disabled.
-- With an After row, an orange caption under the table: "Changing the translation can leave a wrong particle (은/는, 이/가) after a
-  replaced word. Prefer Replace on the name's row."
-- **Script**: a collapsed row "Script · Off / On / Error". Open: a monospaced editor (min height 120 pt, counter "n / 8,000"), "Run this
-  script" switch, a sample field filled with the lens's last line, and "Test": "before → …" and "after → …" (on the sample and its last
-  shown translation; nothing is sent). Errors in red with line and column; the same errors go to the log (category `script`).
-- Empty and zero-setup: a profile without rewrites shows only the button and the collapsed Script row (R9's gate).
+## 7. UI (inside the profile sheet's Customize: level L2 of names-and-context §6.1, §6.3; numbers for R9)
+- **Level.** Both sections are drawn only with Customize open, after Context; at L0-L1 nothing of them shows, and Customize's summary
+  names them once set ("2 rewrites · script"). The sheet stays one scroll: no sheet, tab or popover of their own. Words: the stages are
+  "Original" (before) and "Translation" (after); "regex" appears only in help, never as a label.
+- **Rewrites**: caption under the header, "Change the text on this Mac, free: the original before it is translated, or the
+  translation after." Empty: one borderless "Add Rewrite". A row, left to right: stage pop-up (96 pt: "Original", "Translation"), Find
+  (flexible, layout priority 1, prompt "Find"), "→" (tertiary), Replace with (flexible, prompt "Replace with"), ".*" toggle (24 pt; help
+  "Treat Find as a pattern (a JavaScript regular expression)"), minus (≥ 20 pt). New rows go last; ≤ 32, at 32 "Add Rewrite" is dimmed
+  with the caption "That is the most: 32." Under its row, in red: a pattern that does not compile ("Pattern error at column n: …"); a row
+  turned off by the time limit shows dimmed with "Turned off: took longer than 50 ms on a line." and "Turn On".
+- With a Translation row, an orange caption under the table: "Changing the translation can leave a wrong particle (은/는, 이/가) after a
+  replaced word. Prefer “Swap into the text” on the name’s row."
+- **Script**: one collapsed row "Script · Off / On / Error" (a disclosure; one click). Open: a monospaced editor (min 120 pt, max 240
+  pt, then it scrolls) whose empty state shows §3's two examples in tertiary as a starting point; counter "n / 8,000" (orange at the
+  cap); "Run this script" switch (off until turned on); a sample field filled with the opening lens's last line (else any lens of this
+  profile; empty: prompt "A line to test"); "Test" → "Before → …" and "After → …" (callout, monospaced, selectable; on the sample and
+  its last shown translation, else on the sample; nothing is sent). Errors in red with line and column; the same errors go to the log
+  (category `script`). Every new help tag starts with a verb and stays ≤ 75 characters.
+- Empty and zero setup: a profile without rewrites shows, inside Customize, only "Add Rewrite" and the collapsed Script row (R9's gate);
+  with Customize closed, neither. The App Store build hides Script if review objects (§6); the table stays.
+- The power user's walkthrough and R9's capture items are in `profiles-ui-checklist.md` (§3 walkthrough 3; checklist items 7-9).
 
 ## 8. Agents (MCP; one compact text block, `docs/settings-for-agents.md:14`)
 - `set_memory(profile | app, rewrites?, script?)` writes them with the same checks; the result carries `issues` with line and column.

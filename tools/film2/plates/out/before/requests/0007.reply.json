@@ -1,0 +1,1 @@
+{"id":"chatcmpl-474","object":"chat.completion","created":1792491329,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"엘르베\", \"큐뱌뉘, 온마께 코센을 낙토산요\"]}"},"finish_reason":"stop"}],"usage":{"prompt_tokens":83,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":27,"total_tokens":110}}

@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=43625 gui pid=43609
+reader: docs pid=43647 gui pid=43609
+warm-up: 1077 ms
+pipeline: 6526 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=1476 max=1476 n=1] lens_wait_ms[p50=1517 max=1517 last=1517 n=1] settle=n/a parked=0
+pace: ja>ko|ext:4F1999F9:82f244193fe605ba samples=1 first=1.48s perLine=1.48s batch[p50=1.48s p90=1.48s n=1] cancelled=0 lines[cached=0 translated=1]
+  はい、シュザンヌ様。足元にお気をつけください
+    → 네, 쉬잔님. 발밑에 유의해 주세요.
+issues=0
+engine_ms[p50=1476 max=1476 n=1]
+learned=[]
+cache[ja>ko|ext:4F1999F9:82f244193fe605ba|597743659109801749|ctx:mwoyeo-4a6e440a12770f9e.d10f51c8b39e5584] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=174,1792,1762,97 text=174,1790,1132,101 size=89.8 lines=1 chars=22 clipped=0 ellipsis=0 "はい、シュザンヌ様。足元にお気をつけください"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand-tag/L3.png
+silence: longest=5810 total=5810
+drain: 0 in-flight=0
+reader: docs state=idle pid=43647 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=28802 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=91 MB gui=90 MB last-ms=487 ms=487
+reader: lines state=idle pid=43625 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=28802 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=148 MB gui=90 MB last-ms=303 ms=492,303
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

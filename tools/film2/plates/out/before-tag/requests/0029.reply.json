@@ -1,0 +1,1 @@
+{"id":"chatcmpl-277","object":"chat.completion","created":1792493031,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"고마워, 큐나요. 가볼게.\"]}\n"},"finish_reason":"stop"}],"usage":{"prompt_tokens":75,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":19,"total_tokens":94}}

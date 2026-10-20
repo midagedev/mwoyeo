@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=95775 gui pid=95760
+reader: docs pid=95836 gui pid=95760
+warm-up: 1232 ms
+pipeline: 5800 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=809 max=809 n=1] lens_wait_ms[p50=848 max=848 last=848 n=1] settle=n/a parked=0
+pace: ja>ko|ext:6D8134C5:88b5be59f811231e samples=1 first=0.81s perLine=0.81s batch[p50=0.81s p90=0.81s n=1] cancelled=0 lines[cached=0 translated=1]
+  エルヴェ、大丈夫よ。ゆっくり行きましょう
+    → 엘베, 괜찮아. 천천히 가자.
+issues=0
+engine_ms[p50=809 max=809 n=1]
+learned=[]
+cache[ja>ko|ext:6D8134C5:88b5be59f811231e|8225035042990561574] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=171,1792,1595,97 text=171,1791,858,99 size=87.5 lines=1 chars=20 clipped=0 ellipsis=0 "エルヴェ、大丈夫よ。ゆっくり行きましょう"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before-tag/L5.png
+silence: longest=5210 total=5210
+drain: 0 in-flight=0
+reader: docs state=idle pid=95836 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=12955 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=94 MB gui=89 MB last-ms=615 ms=615
+reader: lines state=idle pid=95775 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=12955 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=147 MB gui=89 MB last-ms=307 ms=483,307
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

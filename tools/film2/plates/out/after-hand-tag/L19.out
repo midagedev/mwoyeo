@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=97274 gui pid=96194
+reader: docs pid=97793 gui pid=96194
+warm-up: 2211 ms
+pipeline: 16567 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=3264 max=3264 n=1] lens_wait_ms[p50=3329 max=3329 last=3329 n=1] settle=n/a parked=0
+pace: ja>ko|ext:BB019515:82f244193fe605ba samples=1 first=3.27s perLine=3.27s batch[p50=3.27s p90=3.27s n=1] cancelled=0 lines[cached=0 translated=1]
+  月涙石は月影のの奥、水鏡の底に沈んでおる。取ってこられるかな
+    → 월루석은 달 그림자의 깊숙한 곳, 물 거울의 바닥에 잠겨 있네. 가져올 수 있을까
+issues=0
+engine_ms[p50=3264 max=3264 n=1]
+learned=[]
+cache[ja>ko|ext:BB019515:82f244193fe605ba|-5601303516432481401|ctx:mwoyeo-e8c4b0df4f818d71.d10f51c8b39e5584] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=167,1789,1741,207 text=167,1793,1652,200 size=87.5 lines=2 chars=30 clipped=0 ellipsis=0 "月涙石は月影のの奥、水鏡の底に沈んでおる。取ってこられるかな"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand-tag/L19.png
+silence: longest=15900 total=15900
+drain: 0 in-flight=0
+reader: docs state=idle pid=97793 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=30089 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=93 MB gui=71 MB last-ms=613 ms=613
+reader: lines state=idle pid=97274 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=30089 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=140 MB gui=71 MB last-ms=347 ms=552,347
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

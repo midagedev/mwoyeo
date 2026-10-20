@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=28495 gui pid=28480
+reader: docs pid=28537 gui pid=28480
+warm-up: 1065 ms
+pipeline: 8385 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=1695 max=1695 n=1] lens_wait_ms[p50=1736 max=1736 last=1736 n=1] settle=n/a parked=0
+pace: ja>ko|ext:41ADDE1D:ae3d37596076c83b samples=1 first=1.70s perLine=1.70s batch[p50=1.70s p90=1.70s n=1] cancelled=0 lines[cached=0 translated=1]
+  夕暮れの山道を抜けると、苔むした石段が現れた。
+    → 석양이 낀 산길을 지나니, 이끼 낀 돌계단이 나타났다.
+issues=0
+engine_ms[p50=1695 max=1695 n=1]
+learned=[]
+cache[ja>ko|ext:41ADDE1D:ae3d37596076c83b|4112511536115824396|ctx:mwoyeo-ed866e5f72def7ac.d10f51c8b39e5584] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=171,1789,1689,220 text=171,1797,1426,203 size=88.6 lines=2 chars=23 clipped=0 ellipsis=0 "夕暮れの山道を抜けると、苔むした石段が現れた。"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand/L1.png
+silence: longest=7710 total=7710
+drain: 0 in-flight=0
+reader: docs state=idle pid=28537 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=13780 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=89 MB gui=108 MB last-ms=466 ms=466
+reader: lines state=idle pid=28495 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=13780 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=147 MB gui=108 MB last-ms=306 ms=481,306
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

@@ -1,0 +1,1 @@
+{"id":"chatcmpl-687","object":"chat.completion","created":1792492823,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"돌 계단 끝에, 녹슨 문이 달빛에 떠 있었다.\"]}\n"},"finish_reason":"stop"}],"usage":{"prompt_tokens":84,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":23,"total_tokens":107}}

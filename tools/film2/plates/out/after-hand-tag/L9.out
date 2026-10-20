@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=48633 gui pid=48613
+reader: docs pid=48678 gui pid=48613
+warm-up: 1192 ms
+pipeline: 6452 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=1545 max=1545 n=1] lens_wait_ms[p50=1585 max=1585 last=1585 n=1] settle=n/a parked=0
+pace: ja>ko|ext:3F27B11D:82f244193fe605ba samples=1 first=1.55s perLine=1.55s batch[p50=1.55s p90=1.55s n=1] cancelled=0 lines[cached=0 translated=1]
+  見て、九十九。門の奥で何かが光ってる
+    → 見て、츠쿠모。門の奥で何かが光ってる
+issues=0
+engine_ms[p50=1545 max=1545 n=1]
+learned=[]
+cache[ja>ko|ext:3F27B11D:82f244193fe605ba|-5288427181435404119|ctx:mwoyeo-8ecbb8134b16e943.d10f51c8b39e5584] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=168,1785,1438,108 text=168,1792,1362,94 size=88.6 lines=1 chars=18 clipped=0 ellipsis=0 "見て、九十九。門の奥で何かが光ってる"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand-tag/L9.png
+silence: longest=5706 total=5706
+drain: 0 in-flight=0
+reader: docs state=idle pid=48678 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=30220 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=92 MB gui=92 MB last-ms=525 ms=525
+reader: lines state=idle pid=48633 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=30220 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=148 MB gui=92 MB last-ms=328 ms=496,328
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

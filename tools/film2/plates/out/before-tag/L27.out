@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=31545 gui pid=31465
+reader: docs pid=31574 gui pid=31465
+warm-up: 1200 ms
+pipeline: 5433 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=879 max=879 n=1] lens_wait_ms[p50=920 max=920 last=920 n=1] settle=n/a parked=0
+pace: ja>ko|ext:81ADFB28:88b5be59f811231e samples=1 first=0.88s perLine=0.88s batch[p50=0.88s p90=0.88s n=1] cancelled=0 lines[cached=0 translated=1]
+  シュザンヌ様、私の手をお取りください
+    → 슈자뉴 님, 제 손을 맡아주세요.
+issues=0
+engine_ms[p50=879 max=879 n=1]
+learned=[]
+cache[ja>ko|ext:81ADFB28:88b5be59f811231e|8521493889569015942] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=175,1792,1437,94 text=175,1789,1039,101 size=89.8 lines=1 chars=18 clipped=0 ellipsis=0 "シュザンヌ様、私の手をお取りください"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before-tag/L27.png
+silence: longest=4710 total=4710
+drain: 0 in-flight=0
+reader: docs state=idle pid=31574 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=12963 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=90 MB gui=89 MB last-ms=504 ms=504
+reader: lines state=idle pid=31545 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=12963 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=145 MB gui=89 MB last-ms=298 ms=516,298
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

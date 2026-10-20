@@ -1,0 +1,29 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=75753 gui pid=75718
+reader: docs pid=75838 gui pid=75718
+warm-up: 1081 ms
+pipeline: 6892 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=2 translate.wasted=0 engine_ms[p50=1015 max=1015 n=1] lens_wait_ms[p50=1076 max=1076 last=1076 n=2] settle=n/a parked=0
+pace: ja>ko|ext:4D9066BD:e26f6b607c32ed84 samples=1 first=1.02s perLine=0.00s batch[p50=1.02s p90=1.02s n=1] cancelled=0 lines[cached=0 translated=2]
+  エルヴェ
+    → 엘베
+  九十九、よく無事でいたな。シュザンヌ様を頼んだぞ
+    → 구十九, 잘 지냈구나. 슈자누 님을 부탁했어
+issues=0
+engine_ms[p50=1015 max=1015 n=1]
+learned=[]
+cache[ja>ko|ext:4D9066BD:e26f6b607c32ed84|97072742878046121] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=216,1610,269,72 text=216,1606,131,81 size=76.0 lines=1 chars=4 clipped=0 ellipsis=0 "エルヴェ"
+block: core=167,1792,1769,200 text=167,1842,1441,101 size=89.8 lines=2 chars=24 clipped=0 ellipsis=0 "九十九、よく無事でいたな。シュザンヌ様を頼んだぞ"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before/L34.png
+silence: longest=6306 total=6306
+drain: 0 in-flight=0
+reader: docs state=idle pid=75838 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=13958 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=92 MB gui=104 MB last-ms=497 ms=497
+reader: lines state=idle pid=75753 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=13958 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=150 MB gui=104 MB last-ms=306 ms=493,306
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

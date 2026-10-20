@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=78200 gui pid=78180
+reader: docs pid=78241 gui pid=78180
+warm-up: 1068 ms
+pipeline: 6441 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=1 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=925 max=925 n=1] lens_wait_ms[p50=965 max=965 last=965 n=1] settle=n/a parked=0
+pace: ja>ko|ext:4FB88E29:e26f6b607c32ed84 samples=1 first=0.93s perLine=0.93s batch[p50=0.93s p90=0.93s n=1] cancelled=0 lines[cached=0 translated=1]
+  夜明けの守り手が、ゆっくりと目を開いた。
+    → 새벽의 수호자가 천천히 눈을 떴다.
+issues=0
+engine_ms[p50=925 max=925 n=1]
+learned=[]
+cache[ja>ko|ext:4FB88E29:e26f6b607c32ed84|6785652658498306378] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=166,1785,1566,111 text=166,1791,1150,99 size=87.5 lines=1 chars=20 clipped=0 ellipsis=0 "夜明けの守り手が、ゆっくりと目を開いた。"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before/L36.png
+silence: longest=5710 total=5710
+drain: 0 in-flight=0
+reader: docs state=idle pid=78241 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=13956 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=89 MB gui=93 MB last-ms=480 ms=480
+reader: lines state=idle pid=78200 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=13956 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=147 MB gui=93 MB last-ms=323 ms=444,323
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

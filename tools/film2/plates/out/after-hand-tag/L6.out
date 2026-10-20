@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=46094 gui pid=46060
+reader: docs pid=46114 gui pid=46060
+warm-up: 1089 ms
+pipeline: 5314 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=1384 max=1384 n=1] lens_wait_ms[p50=1424 max=1424 last=1424 n=1] settle=n/a parked=0
+pace: ja>ko|ext:D879240F:82f244193fe605ba samples=1 first=1.38s perLine=1.38s batch[p50=1.39s p90=1.39s n=1] cancelled=0 lines[cached=0 translated=1]
+  エルヴェさん、肩をお貸ししますよ
+    → 에르베 씨, 어깨 좀 빌려 드릴까요.
+issues=0
+engine_ms[p50=1384 max=1384 n=1]
+learned=[]
+cache[ja>ko|ext:D879240F:82f244193fe605ba|-7856491262979446987|ctx:mwoyeo-d0dcbe7244bad93c.d10f51c8b39e5584] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=171,1792,1267,97 text=171,1791,1121,100 size=88.6 lines=1 chars=16 clipped=0 ellipsis=0 "エルヴェさん、肩をお貸ししますよ"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand-tag/L6.png
+silence: longest=4701 total=4701
+drain: 0 in-flight=0
+reader: docs state=idle pid=46114 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=30281 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=91 MB gui=89 MB last-ms=500 ms=500
+reader: lines state=idle pid=46094 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=30281 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=144 MB gui=89 MB last-ms=300 ms=481,300
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

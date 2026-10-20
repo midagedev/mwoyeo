@@ -1,0 +1,55 @@
+{
+ "file": "/private/tmp/film2/music/raw/synthwave-s1001.mp3",
+ "calls": [
+  {
+   "heard": "An upbeat retro synthwave track featuring pulsing synthesizer arpeggios, driving electronic drums, and a melodic build-up and drop.",
+   "voice": false,
+   "glitches": "none",
+   "energy": 3,
+   "sparse_open": false,
+   "break": true,
+   "break_s": "0:33",
+   "drop": true,
+   "drop_s": "0:41",
+   "ending": "hit"
+  },
+  {
+   "ending": "hit",
+   "drop_s": "0:16",
+   "drop": true,
+   "break_s": "0:14",
+   "break": true,
+   "sparse_open": false,
+   "energy": 4,
+   "glitches": "none",
+   "voice": false,
+   "heard": "An upbeat retro synthwave track with driving arpeggiated synths, electronic drums, and a mid-track breakdown leading into a melodic drop."
+  }
+ ],
+ "orders": [
+  "fields in order",
+  "fields reversed"
+ ],
+ "agreed": {
+  "voice": false,
+  "sparse_open": false,
+  "break": true,
+  "drop": true,
+  "glitches": "none",
+  "hard_end": true
+ },
+ "trusted": {
+  "voice": true,
+  "glitches": true,
+  "sparse_open": true,
+  "break": true,
+  "break_s": true,
+  "drop": true,
+  "drop_s": true,
+  "hard_end": false,
+  "energy": false
+ },
+ "screen_only": [
+  "hard_end"
+ ]
+}

@@ -1,0 +1,1 @@
+{"id":"chatcmpl-680","object":"chat.completion","created":1792492804,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"에르베 씨, 어깨를 빌려 드릴게요.\"]}\n"},"finish_reason":"stop"}],"usage":{"prompt_tokens":77,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":20,"total_tokens":97}}

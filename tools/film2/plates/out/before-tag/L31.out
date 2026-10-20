@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=34919 gui pid=34894
+reader: docs pid=35003 gui pid=34894
+warm-up: 1156 ms
+pipeline: 5026 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=852 max=852 n=1] lens_wait_ms[p50=892 max=892 last=892 n=1] settle=n/a parked=0
+pace: ja>ko|ext:0EF61D3D:88b5be59f811231e samples=1 first=0.85s perLine=0.85s batch[p50=0.85s p90=0.85s n=1] cancelled=0 lines[cached=0 translated=1]
+  持ち上げて、九十九。ゆっくりよ
+    → 들어 올리고, 아홉 십 구. 천천히 움직여
+issues=0
+engine_ms[p50=852 max=852 n=1]
+learned=[]
+cache[ja>ko|ext:0EF61D3D:88b5be59f811231e|-5855228188365465826] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=168,1787,1196,108 text=168,1791,1288,100 size=88.6 lines=1 chars=15 clipped=0 ellipsis=0 "持ち上げて、九十九。ゆっくりよ"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before-tag/L31.png
+silence: longest=4110 total=4110
+drain: 0 in-flight=0
+reader: docs state=idle pid=35003 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=28799 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=90 MB gui=93 MB last-ms=495 ms=495
+reader: lines state=idle pid=34919 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=28799 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=144 MB gui=93 MB last-ms=305 ms=497,305
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

@@ -1,0 +1,1 @@
+{"id":"chatcmpl-434","object":"chat.completion","created":1792492770,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"네, 슈자누 님. 발밑에 주의해 주세요.\"]}\n"},"finish_reason":"stop"}],"usage":{"prompt_tokens":81,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":22,"total_tokens":103}}

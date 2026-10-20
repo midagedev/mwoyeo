@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=99252 gui pid=99233
+reader: docs pid=99276 gui pid=99233
+warm-up: 1072 ms
+pipeline: 5755 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=949 max=949 n=1] lens_wait_ms[p50=987 max=987 last=987 n=1] settle=n/a parked=0
+pace: ja>ko|ext:8351CCD8:88b5be59f811231e samples=1 first=0.95s perLine=0.95s batch[p50=0.95s p90=0.95s n=1] cancelled=0 lines[cached=0 translated=1]
+  見て、九十九。門の奥で何かが光ってる
+    → 봐, 99. 문 밖에서 무언가가 빛나고 있어.
+issues=0
+engine_ms[p50=949 max=949 n=1]
+learned=[]
+cache[ja>ko|ext:8351CCD8:88b5be59f811231e|-8036564133880115438] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=168,1785,1438,108 text=168,1789,1338,100 size=88.6 lines=1 chars=18 clipped=0 ellipsis=0 "見て、九十九。門の奥で何かが光ってる"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before-tag/L9.png
+silence: longest=5110 total=5110
+drain: 0 in-flight=0
+reader: docs state=idle pid=99276 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=12929 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=89 MB gui=92 MB last-ms=497 ms=497
+reader: lines state=idle pid=99252 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=12929 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=146 MB gui=92 MB last-ms=300 ms=491,300
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

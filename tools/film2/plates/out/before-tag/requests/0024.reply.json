@@ -1,0 +1,1 @@
+{"id":"chatcmpl-681","object":"chat.completion","created":1792492985,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"슈자뉴 님, 안 돼요. 수경에는 제가 갑니다.\"]}\n"},"finish_reason":"stop"}],"usage":{"prompt_tokens":83,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":23,"total_tokens":106}}

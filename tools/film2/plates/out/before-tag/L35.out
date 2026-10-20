@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=39360 gui pid=39338
+reader: docs pid=39437 gui pid=39338
+warm-up: 1081 ms
+pipeline: 4842 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=661 max=661 n=1] lens_wait_ms[p50=701 max=701 last=701 n=1] settle=n/a parked=0
+pace: ja>ko|ext:A6F583CC:88b5be59f811231e samples=1 first=0.66s perLine=0.66s batch[p50=0.66s p90=0.66s n=1] cancelled=0 lines[cached=0 translated=1]
+  はい、エルヴェさんのおかげです
+    → 네, 엘베 씨 덕분입니다
+issues=0
+engine_ms[p50=661 max=661 n=1]
+learned=[]
+cache[ja>ko|ext:A6F583CC:88b5be59f811231e|4337494944545548822] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=174,1786,1195,104 text=174,1790,739,97 size=86.4 lines=1 chars=15 clipped=0 ellipsis=0 "はい、エルヴェさんのおかげです"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before-tag/L35.png
+silence: longest=4110 total=4110
+drain: 0 in-flight=0
+reader: docs state=idle pid=39437 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=28818 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=90 MB gui=91 MB last-ms=486 ms=486
+reader: lines state=idle pid=39360 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=28818 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=144 MB gui=91 MB last-ms=301 ms=492,301
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

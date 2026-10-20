@@ -1,0 +1,1 @@
+{"id":"chatcmpl-657","object":"chat.completion","created":1792493023,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"슈자뉴 님, 제 손을 맡아주세요.\"]}\n"},"finish_reason":"stop"}],"usage":{"prompt_tokens":78,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":21,"total_tokens":99}}

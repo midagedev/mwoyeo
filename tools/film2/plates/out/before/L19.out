@@ -1,0 +1,29 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=54931 gui pid=54901
+reader: docs pid=55036 gui pid=54901
+warm-up: 1051 ms
+pipeline: 9945 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=2 translate.wasted=0 engine_ms[p50=1416 max=1416 n=1] lens_wait_ms[p50=1462 max=1462 last=1462 n=2] settle=n/a parked=0
+pace: ja>ko|ext:54B9CA50:e26f6b607c32ed84 samples=1 first=1.42s perLine=0.00s batch[p50=1.42s p90=1.42s n=1] cancelled=0 lines[cached=0 translated=2]
+  ハク
+    → 학
+  月涙石は月影のの奥、水鏡の底に沈んでおる。取ってこられるかな
+    → 월물석은 월계의 오두막, 수경의 바닥에 잠겨 있네. 가져올 수 있을까?
+issues=0
+engine_ms[p50=1416 max=1416 n=1]
+learned=[]
+cache[ja>ko|ext:54B9CA50:e26f6b607c32ed84|1395778760867991374] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=214,1608,129,76 text=214,1608,62,76 size=72.7 lines=1 chars=2 clipped=0 ellipsis=0 "ハク"
+block: core=167,1789,1741,207 text=167,1793,1650,200 size=87.5 lines=2 chars=30 clipped=0 ellipsis=0 "月涙石は月影のの奥、水鏡の底に沈んでおる。取ってこられるかな"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before/L19.png
+silence: longest=9310 total=9310
+drain: 0 in-flight=0
+reader: docs state=idle pid=55036 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=13990 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=93 MB gui=105 MB last-ms=496 ms=496
+reader: lines state=idle pid=54931 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=13990 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=148 MB gui=105 MB last-ms=336 ms=441,336
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

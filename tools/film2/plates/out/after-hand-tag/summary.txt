@@ -1,0 +1,7 @@
+render after-hand-tag: 36 of 36 rc 0; settings /tmp/film2/plates/settings/after-hand.json; model gemma3:4b; app dev.midagedev.film.lumiere
+requests kept: 38; log.jsonl lines: 37
+log lines with app=dev.midagedev.film.lumiere: 37
+verify: 36 renders, rc 0 in 36
+verify: log.jsonl 37 lines, app=dev.midagedev.film.lumiere on 37
+verify: 38 requests; note in 38, memory in 31; memory rows found 38 of 38 expected
+verify: OK

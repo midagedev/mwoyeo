@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=31390 gui pid=30851
+reader: docs pid=31695 gui pid=30851
+warm-up: 1654 ms
+pipeline: 11061 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=1995 max=1995 n=1] lens_wait_ms[p50=2074 max=2074 last=2074 n=1] settle=n/a parked=0
+pace: ja>ko|ext:89A593D4:82f244193fe605ba samples=1 first=2.00s perLine=2.00s batch[p50=2.00s p90=2.00s n=1] cancelled=0 lines[cached=0 translated=1]
+  シュザンヌ様、いけません。水鏡には私が参ります
+    → 쉬잔님, 안 돼요. 수경에는 제가 갑니다
+issues=0
+engine_ms[p50=1995 max=1995 n=1]
+learned=[]
+cache[ja>ko|ext:89A593D4:82f244193fe605ba|1100509984552390710|ctx:mwoyeo-249cfd48ceb46808.d10f51c8b39e5584] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=170,1788,1762,207 text=170,1842,1286,101 size=89.8 lines=2 chars=23 clipped=0 ellipsis=0 "シュザンヌ様、いけません。水鏡には私が参ります"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand-tag/L23.png
+silence: longest=10410 total=10410
+drain: 0 in-flight=0
+reader: docs state=idle pid=31695 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=30092 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=93 MB gui=91 MB last-ms=582 ms=582
+reader: lines state=idle pid=31390 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=30092 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=141 MB gui=91 MB last-ms=387 ms=582,387
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

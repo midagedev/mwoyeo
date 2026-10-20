@@ -1,0 +1,29 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=41784 gui pid=41770
+reader: docs pid=41822 gui pid=41770
+warm-up: 1079 ms
+pipeline: 8251 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=2 translate.wasted=0 engine_ms[p50=1989 max=1989 n=1] lens_wait_ms[p50=2046 max=2046 last=2046 n=2] settle=n/a parked=0
+pace: ja>ko|ext:0EC21214:ae3d37596076c83b samples=1 first=1.99s perLine=0.00s batch[p50=1.99s p90=1.99s n=1] cancelled=0 lines[cached=0 translated=2]
+  シュザンヌ
+    → 쉬잔
+  それなら話が早いわ。エルヴェ、続きを聞かせて
+    → 그렇다면 이야기가 빨리 진행될 거야. 에르베, 계속해서 이야기해 줘.
+issues=0
+engine_ms[p50=1989 max=1989 n=1]
+learned=[]
+cache[ja>ko|ext:0EC21214:ae3d37596076c83b|991649916052904026|ctx:mwoyeo-5eee35b3efcd7916.d10f51c8b39e5584] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=220,1609,337,73 text=220,1605,133,82 size=77.3 lines=1 chars=5 clipped=0 ellipsis=0 "シュザンヌ"
+block: core=170,1792,1763,100 text=170,1804,1756,77 size=68.7 lines=1 chars=22 clipped=0 ellipsis=0 "それなら話が早いわ。エルヴェ、続きを聞かせて"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand/L16.png
+silence: longest=7608 total=7608
+drain: 0 in-flight=0
+reader: docs state=idle pid=41822 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=13149 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=90 MB gui=91 MB last-ms=507 ms=507
+reader: lines state=idle pid=41784 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=13149 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=147 MB gui=91 MB last-ms=291 ms=472,291
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

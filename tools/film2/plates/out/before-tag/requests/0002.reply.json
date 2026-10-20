@@ -1,0 +1,1 @@
+{"id":"chatcmpl-19","object":"chat.completion","created":1792492758,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"큐큐부, 여기가 츠요츠키노 요. 마찰이 아나와.\"]}\n"},"finish_reason":"stop"}],"usage":{"prompt_tokens":80,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":27,"total_tokens":107}}

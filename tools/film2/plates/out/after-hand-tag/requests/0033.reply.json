@@ -1,0 +1,1 @@
+{"id":"chatcmpl-206","object":"chat.completion","created":1792493550,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"t\": [{\"id\": 0, \"text\": \"持ち上げて、츠쿠모。ゆっくりよ\"}]}"},"finish_reason":"stop"}],"usage":{"prompt_tokens":299,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":25,"total_tokens":324}}

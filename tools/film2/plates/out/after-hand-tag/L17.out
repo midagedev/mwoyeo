@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (1 ms)
+reader: lines pid=80609 gui pid=78942
+reader: docs pid=81098 gui pid=78942
+warm-up: 2759 ms
+pipeline: 15320 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=2919 max=2919 n=1] lens_wait_ms[p50=2992 max=2992 last=2992 n=1] settle=n/a parked=0
+pace: ja>ko|ext:5729FF74:82f244193fe605ba samples=1 first=2.92s perLine=2.92s batch[p50=2.92s p90=2.92s n=1] cancelled=0 lines[cached=0 translated=1]
+  はい。夜明けの守り手は、月石に宿る光で眠りから覚めると申します
+    → 네. 새벽지기는 달의 돌에 깃든 빛으로 잠에서 깨어난다고 합니다.
+issues=0
+engine_ms[p50=2919 max=2919 n=1]
+learned=[]
+cache[ja>ko|ext:5729FF74:82f244193fe605ba|-2124742166948371276|ctx:mwoyeo-49781daf63a07573.d10f51c8b39e5584] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=171,1792,1762,204 text=171,1798,1445,193 size=85.2 lines=2 chars=31 clipped=0 ellipsis=0 "はい。夜明けの守り手は、月石に宿る光で眠りから覚めると申します"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand-tag/L17.png
+silence: longest=14705 total=14705
+drain: 0 in-flight=0
+reader: docs state=idle pid=81098 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=30086 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=92 MB gui=73 MB last-ms=565 ms=565
+reader: lines state=idle pid=80609 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=30086 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=149 MB gui=73 MB last-ms=435 ms=604,435
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

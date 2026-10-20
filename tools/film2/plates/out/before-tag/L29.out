@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=33425 gui pid=33402
+reader: docs pid=33475 gui pid=33402
+warm-up: 1163 ms
+pipeline: 5955 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=1 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=920 max=920 n=1] lens_wait_ms[p50=962 max=962 last=962 n=1] settle=n/a parked=0
+pace: ja>ko|ext:BC010C3B:88b5be59f811231e samples=1 first=0.92s perLine=0.92s batch[p50=0.93s p90=0.93s n=1] cancelled=0 lines[cached=0 translated=1]
+  水の底で、月涙石が青く脈打っていた。
+    → 물 속에서, 달 눈물 돌기가 파랗게 맥 뛰고 있었다.
+issues=0
+engine_ms[p50=920 max=920 n=1]
+learned=[]
+cache[ja>ko|ext:BC010C3B:88b5be59f811231e|7699537496737747939] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=167,1789,1397,100 text=167,1790,1614,99 size=87.5 lines=1 chars=18 clipped=0 ellipsis=0 "水の底で、月涙石が青く脈打っていた。"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before-tag/L29.png
+silence: longest=5304 total=5304
+drain: 0 in-flight=0
+reader: docs state=idle pid=33475 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=24682 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=92 MB gui=90 MB last-ms=598 ms=598
+reader: lines state=idle pid=33425 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=24682 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=144 MB gui=90 MB last-ms=304 ms=469,304
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

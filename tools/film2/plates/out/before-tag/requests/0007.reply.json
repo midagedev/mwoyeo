@@ -1,0 +1,1 @@
+{"id":"chatcmpl-98","object":"chat.completion","created":1792492812,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"큐 99, 네 녀석은 칼을 떨어뜨리지 마.\"]}\n"},"finish_reason":"stop"}],"usage":{"prompt_tokens":80,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":24,"total_tokens":104}}

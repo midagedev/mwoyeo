@@ -1,0 +1,7 @@
+render before-tag: 36 of 36 rc 0; settings /tmp/film2/plates/settings/before.json; model gemma3:4b; app dev.midagedev.film.lumiere
+requests kept: 37; log.jsonl lines: 38
+log lines with app=dev.midagedev.film.lumiere: 38
+verify: 36 renders, rc 0 in 36
+verify: log.jsonl 38 lines, app=dev.midagedev.film.lumiere on 38
+verify: 37 requests; note in 0, memory in 0; memory rows found 0 of 0 expected
+verify: OK

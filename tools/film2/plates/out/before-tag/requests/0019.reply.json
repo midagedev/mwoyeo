@@ -1,0 +1,1 @@
+{"id":"chatcmpl-722","object":"chat.completion","created":1792492928,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"하쿠의 꼬리가, 푸르고 하얗게 흔들렸다.\"]}\n"},"finish_reason":"stop"}],"usage":{"prompt_tokens":80,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":24,"total_tokens":104}}

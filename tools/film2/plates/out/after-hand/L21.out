@@ -1,0 +1,29 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=46209 gui pid=46195
+reader: docs pid=46232 gui pid=46195
+warm-up: 1096 ms
+pipeline: 9772 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=2 translate.wasted=0 engine_ms[p50=2133 max=2133 n=1] lens_wait_ms[p50=2179 max=2179 last=2179 n=2] settle=n/a parked=0
+pace: ja>ko|ext:A794F2A0:ae3d37596076c83b samples=1 first=2.13s perLine=0.00s batch[p50=2.13s p90=2.13s n=1] cancelled=0 lines[cached=0 translated=2]
+  エルヴェ
+    → 에르베
+  冷たいだけならよいがな。底は、触れた者の迷いを映すのじゃ
+    → 차가울 뿐이라면 좋겠네. 바닥은, 만지는 사람의 망상을 비추는 것이야.
+issues=0
+engine_ms[p50=2133 max=2133 n=1]
+learned=[]
+cache[ja>ko|ext:A794F2A0:ae3d37596076c83b|1439481564160364411|ctx:mwoyeo-6a96352615b73185.d10f51c8b39e5584] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=216,1610,269,72 text=216,1606,197,81 size=76.0 lines=1 chars=4 clipped=0 ellipsis=0 "エルヴェ"
+block: core=167,1789,1773,207 text=167,1793,1556,200 size=87.5 lines=2 chars=28 clipped=0 ellipsis=0 "冷たいだけならよいがな。底は、触れた者の迷いを映すのじゃ"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand/L21.png
+silence: longest=9110 total=9110
+drain: 0 in-flight=0
+reader: docs state=idle pid=46232 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=13136 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=90 MB gui=107 MB last-ms=471 ms=471
+reader: lines state=idle pid=46209 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=13136 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=147 MB gui=107 MB last-ms=307 ms=472,307
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

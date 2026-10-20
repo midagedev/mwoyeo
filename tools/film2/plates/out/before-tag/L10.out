@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=130 gui pid=115
+reader: docs pid=226 gui pid=115
+warm-up: 1058 ms
+pipeline: 8076 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=1066 max=1066 n=1] lens_wait_ms[p50=1106 max=1106 last=1106 n=1] settle=n/a parked=0
+pace: ja>ko|ext:61B7B554:88b5be59f811231e samples=1 first=1.07s perLine=1.07s batch[p50=1.07s p90=1.07s n=1] cancelled=0 lines[cached=0 translated=1]
+  待っておったぞ、旅の者たち。我はこの月影の祠の番人、ハクじゃ
+    → 기다리고 있었다, 여행자들. 나는 이 달빛의 신전에 수호자, 학이야
+issues=0
+engine_ms[p50=1066 max=1066 n=1]
+learned=[]
+cache[ja>ko|ext:61B7B554:88b5be59f811231e|-9200049532867624828] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=166,1792,1767,219 text=166,1806,1607,193 size=85.2 lines=2 chars=30 clipped=0 ellipsis=0 "待っておったぞ、旅の者たち。我はこの月影の祠の番人、ハクじゃ"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before-tag/L10.png
+silence: longest=7310 total=7310
+drain: 0 in-flight=0
+reader: docs state=idle pid=226 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=12923 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=92 MB gui=109 MB last-ms=491 ms=491
+reader: lines state=idle pid=130 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=12923 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=151 MB gui=109 MB last-ms=301 ms=478,301
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

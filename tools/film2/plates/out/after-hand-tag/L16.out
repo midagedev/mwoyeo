@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (5 ms)
+reader: lines pid=70707 gui pid=69582
+reader: docs pid=71511 gui pid=69582
+warm-up: 2604 ms
+pipeline: 11819 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=2735 max=2735 n=1] lens_wait_ms[p50=2808 max=2808 last=2808 n=1] settle=n/a parked=0
+pace: ja>ko|ext:ED4B75CB:82f244193fe605ba samples=1 first=2.74s perLine=2.74s batch[p50=2.74s p90=2.74s n=1] cancelled=0 lines[cached=0 translated=1]
+  それなら話が早いわ。エルヴェ、続きを聞かせて
+    → 그렇다면 이야기가 빨리 진행될 거야. 에르베, 계속해서 이야기해.
+issues=0
+engine_ms[p50=2735 max=2735 n=1]
+learned=[]
+cache[ja>ko|ext:ED4B75CB:82f244193fe605ba|-7813222083798902691|ctx:mwoyeo-d6665505e03bad3a.d10f51c8b39e5584] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=170,1787,1763,109 text=170,1799,1841,85 size=75.2 lines=1 chars=22 clipped=0 ellipsis=0 "それなら話が早いわ。エルヴェ、続きを聞かせて"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand-tag/L16.png
+silence: longest=11107 total=11107
+drain: 0 in-flight=0
+reader: docs state=idle pid=71511 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=30058 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=91 MB gui=60 MB last-ms=618 ms=618
+reader: lines state=idle pid=70707 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=30058 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=148 MB gui=60 MB last-ms=386 ms=591,386
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

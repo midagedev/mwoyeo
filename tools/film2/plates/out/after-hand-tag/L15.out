@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=59571 gui pid=58443
+reader: docs pid=60019 gui pid=58443
+warm-up: 2443 ms
+pipeline: 14808 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=2870 max=2870 n=1] lens_wait_ms[p50=2925 max=2925 last=2925 n=1] settle=n/a parked=0
+pace: ja>ko|ext:68358F2C:82f244193fe605ba samples=1 first=2.87s perLine=2.87s batch[p50=2.87s p90=2.87s n=1] cancelled=0 lines[cached=0 translated=1]
+  夜明けの守り手の話は、古い書物で読んだ覚えがございます
+    → 새벽지기의 이야기는, 오래된 책에서 읽은 기억이 있습니다.
+issues=0
+engine_ms[p50=2870 max=2870 n=1]
+learned=[]
+cache[ja>ko|ext:68358F2C:82f244193fe605ba|-2974393242776544162|ctx:mwoyeo-b0114c1d11922014.d10f51c8b39e5584] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=166,1789,1780,206 text=166,1790,1638,203 size=88.6 lines=2 chars=27 clipped=0 ellipsis=0 "夜明けの守り手の話は、古い書物で読んだ覚えがございます"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand-tag/L15.png
+silence: longest=14210 total=14210
+drain: 0 in-flight=0
+reader: docs state=idle pid=60019 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=30148 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=93 MB gui=71 MB last-ms=592 ms=592
+reader: lines state=idle pid=59571 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=30148 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=150 MB gui=71 MB last-ms=383 ms=603,383
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

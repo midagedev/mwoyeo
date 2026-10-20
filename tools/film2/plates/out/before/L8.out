@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=30847 gui pid=30829
+reader: docs pid=30880 gui pid=30829
+warm-up: 1085 ms
+pipeline: 7830 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=985 max=985 n=1] lens_wait_ms[p50=1025 max=1025 last=1025 n=1] settle=n/a parked=0
+pace: ja>ko|ext:F285F13F:e26f6b607c32ed84 samples=1 first=0.99s perLine=0.99s batch[p50=0.99s p90=0.99s n=1] cancelled=0 lines[cached=0 translated=1]
+  石段の先に、錆びた門が月明かりに浮かんでいた。
+    → 돌 계단 끝에, 녹슨 문이 달빛에 떠 있었다.
+issues=0
+engine_ms[p50=985 max=985 n=1]
+learned=[]
+cache[ja>ko|ext:F285F13F:e26f6b607c32ed84|7387148215859587558] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=166,1782,1687,240 text=166,1852,1387,100 size=88.6 lines=2 chars=23 clipped=0 ellipsis=0 "石段の先に、錆びた門が月明かりに浮かんでいた。"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before/L8.png
+silence: longest=7205 total=7205
+drain: 0 in-flight=0
+reader: docs state=idle pid=30880 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=14240 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=91 MB gui=112 MB last-ms=493 ms=493
+reader: lines state=idle pid=30847 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=14240 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=146 MB gui=112 MB last-ms=305 ms=466,305
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

@@ -1,0 +1,1 @@
+{"id":"chatcmpl-216","object":"chat.completion","created":1792491571,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"슈자누\", \"고마워, 구토오. 가겠어\"]}\n"},"finish_reason":"stop"}],"usage":{"prompt_tokens":80,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":24,"total_tokens":104}}

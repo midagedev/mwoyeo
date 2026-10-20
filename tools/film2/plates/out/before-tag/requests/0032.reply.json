@@ -1,0 +1,1 @@
+{"id":"chatcmpl-459","object":"chat.completion","created":1792493057,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"들어 올리고, 아홉 십 구. 천천히 움직여\"]}"},"finish_reason":"stop"}],"usage":{"prompt_tokens":75,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":21,"total_tokens":96}}

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Stage: the moon shrine</title>
+<meta name="viewport" content="width=960">
+<!--
+  The film2 stage: one line of tools/translation-bench/sequences/film-ja-ko-1.json as an RPG dialogue box on a night scene of our own.
+  `scene.html?line=<id>` shows that line (its speaker on the name plate, its text in the box); the look is the same on every line.
+  Self-contained: CSS and inline SVG only, no network, no image or font file (the Japanese is the system Hiragino).
+  LINES below is a copy of the sequence's id/speaker/text; `shoot.sh` fails when the copy differs from the sequence.
+  Look contract (CSS px; the page is 960x960 and is shot at device scale 2.25 = 2160 px):
+    scene: top 62 % (y 0..595), no text in it. Box: inset 36 left/right/bottom, radius 18, 1 px border, height 168 (two lines of
+    36 px x 1.5 = 108 plus 30 padding top and bottom), dialogue 36 px (81 px rendered), plate on the box's top-left edge, 32 px,
+    its text in the dialogue's ink (the gold is its border only).
+-->
+<style>
+  :root {
+    --panel: rgba(8, 12, 26, 0.90);
+    --edge: rgba(226, 234, 255, 0.60);
+    --ink: #f7f4ec;
+    --gold: #f1cf8e;
+    --plate-ink: var(--ink);   /* the plate's text colour: the SAME as the dialogue's, so the app reads the plate as a line to translate; a
+                                  different colour makes it a name tag that the app keeps as written (Core/Sources/MwoyeoCore/Runs.swift LabelRule.isNameTag) */
+  }
+  html, body { margin: 0; width: 960px; height: 960px; overflow: hidden; background: #05070f; }
+  body { font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Hiragino Maru Gothic ProN", sans-serif; }
+  svg#scene { position: absolute; left: 0; top: 0; width: 960px; height: 960px; display: block; }
+  #box {
+    position: absolute; left: 36px; right: 36px; bottom: 36px; height: 168px; box-sizing: border-box;
+    padding: 30px 36px; background: var(--panel); border: 1px solid var(--edge); border-radius: 18px;
+    box-shadow: 0 10px 34px rgba(0, 0, 0, 0.55);
+    color: var(--ink); font-size: 36px; line-height: 1.5; font-weight: 400; letter-spacing: 0;
+  }
+  #text { margin: 0; height: 108px; overflow: hidden; line-break: strict; }
+  #plate {
+    position: absolute; left: 30px; bottom: 100%; margin-bottom: 0; box-sizing: border-box; height: 52px; padding: 0 26px;
+    display: flex; align-items: center; background: var(--panel); border: 1px solid var(--gold); border-bottom: 0;
+    border-radius: 14px 14px 0 0; color: var(--plate-ink); font-size: 32px; line-height: 1; font-weight: 600; white-space: nowrap;
+  }
+  #plate:empty { visibility: hidden; }
+</style>
+</head>
+<body>
+<svg id="scene" viewBox="0 0 960 960" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#070c24"/><stop offset="0.45" stop-color="#14204a"/><stop offset="0.72" stop-color="#26356a"/>
+      <stop offset="1" stop-color="#3a4a82"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b2347" stop-opacity="0"/><stop offset="0.12" stop-color="#171f40" stop-opacity="0.4"/>
+      <stop offset="0.24" stop-color="#121935" stop-opacity="0.78"/><stop offset="0.36" stop-color="#0c1127" stop-opacity="0.95"/>
+      <stop offset="0.5" stop-color="#080c1c"/><stop offset="1" stop-color="#04060d"/>
+    </linearGradient>
+    <radialGradient id="moonGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#dfe8ff" stop-opacity="0.65"/><stop offset="0.35" stop-color="#9db4ff" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#6f86e8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lampGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd98a" stop-opacity="0.95"/><stop offset="0.4" stop-color="#ffb457" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#ff9a3a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="doorGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#9fdcff" stop-opacity="0.85"/><stop offset="0.5" stop-color="#5fa8ff" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#3c78ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a3d78"/><stop offset="1" stop-color="#0c1430"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation="14"/></filter>
+    <filter id="softer" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="26"/></filter>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="960" fill="url(#sky)"/>
+  <g id="stars" fill="#fff"></g>
+  <circle cx="742" cy="148" r="190" fill="url(#moonGlow)"/>
+  <circle cx="742" cy="148" r="58" fill="#eef2ff"/>
+  <circle cx="722" cy="136" r="9" fill="#d3dbf5"/><circle cx="760" cy="168" r="13" fill="#d9e0f7"/><circle cx="750" cy="124" r="6" fill="#d3dbf5"/>
+
+  <path d="M0 360 L70 300 L130 340 L210 262 L290 330 L360 286 L430 346 L520 300 L610 352 L700 292 L790 340 L860 286 L960 340 L960 720 L0 720Z" fill="#17214d"/>
+  <path d="M0 430 L90 372 L170 410 L260 350 L350 408 L430 372 L520 420 L640 366 L740 414 L830 360 L960 424 L960 720 L0 720Z" fill="#0f1738"/>
+
+  <g id="pines" fill="#050918"></g>
+
+  <!-- the shrine: stone terrace, hall with a curved roof, the rusted gate in front of it -->
+  <ellipse cx="480" cy="438" rx="290" ry="30" fill="#2a3566" opacity="0.7"/>
+  <rect x="318" y="396" width="324" height="52" fill="#1d2653"/>
+  <rect x="318" y="396" width="324" height="6" fill="#3b4a86"/>
+  <g fill="#16204a">
+    <rect x="352" y="300" width="256" height="96"/>
+  </g>
+  <g fill="#0e1536">
+    <rect x="368" y="318" width="22" height="78"/><rect x="570" y="318" width="22" height="78"/>
+    <rect x="432" y="330" width="96" height="66"/>
+  </g>
+  <rect x="440" y="338" width="80" height="58" fill="#071030"/>
+  <ellipse cx="480" cy="366" rx="52" ry="48" fill="url(#doorGlow)"/>
+  <path d="M286 334 Q382 330 424 292 L536 292 Q578 330 674 334 L654 346 L306 346Z" fill="#0c1334"/>
+  <path d="M352 304 Q438 296 456 246 L504 246 Q522 296 608 304 L594 314 L366 314Z" fill="#101839"/>
+  <rect x="468" y="232" width="24" height="16" fill="#101839"/>
+  <path d="M286 334 Q382 330 424 292 L536 292 Q578 330 674 334 M352 304 Q438 296 456 246 L504 246 Q522 296 608 304" fill="none" stroke="#5368b4" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- the rusted gate -->
+  <g>
+    <rect x="404" y="326" width="16" height="122" fill="#4a2e2a"/><rect x="540" y="326" width="16" height="122" fill="#4a2e2a"/>
+    <rect x="392" y="332" width="176" height="14" fill="#5b3a30"/><rect x="398" y="360" width="164" height="9" fill="#4a2e2a"/>
+    <path d="M384 330 Q480 316 576 330 L572 322 Q480 306 388 322Z" fill="#62402f"/>
+    <rect x="404" y="326" width="5" height="122" fill="#7a4a36" opacity="0.7"/><rect x="540" y="326" width="5" height="122" fill="#7a4a36" opacity="0.7"/>
+  </g>
+  <!-- stone steps -->
+  <path d="M428 448 L532 448 L560 470 L400 470Z" fill="#26316a"/>
+  <path d="M400 470 L560 470 L596 502 L364 502Z" fill="#202a5b"/>
+  <path d="M364 502 L596 502 L640 540 L320 540Z" fill="#1a2350"/>
+  <path d="M320 540 L640 540 L690 584 L270 584Z" fill="#141c43"/>
+  <g stroke="#41539a" stroke-width="2" opacity="0.8" fill="none">
+    <path d="M428 448 L532 448"/><path d="M400 470 L560 470"/><path d="M364 502 L596 502"/><path d="M320 540 L640 540"/>
+  </g>
+  <!-- stone lanterns -->
+  <g>
+    <circle cx="300" cy="404" r="62" fill="url(#lampGlow)"/><circle cx="660" cy="404" r="62" fill="url(#lampGlow)"/>
+    <rect x="292" y="414" width="16" height="34" fill="#1a2350"/><rect x="652" y="414" width="16" height="34" fill="#1a2350"/>
+    <rect x="284" y="394" width="32" height="22" fill="#2a3566"/><rect x="644" y="394" width="32" height="22" fill="#2a3566"/>
+    <rect x="290" y="399" width="20" height="12" fill="#ffd98a"/><rect x="650" y="399" width="20" height="12" fill="#ffd98a"/>
+    <path d="M278 394 L300 380 L322 394Z" fill="#1a2350"/><path d="M638 394 L660 380 L682 394Z" fill="#1a2350"/>
+  </g>
+  <!-- mist -->
+  <g fill="#cfd9ff">
+    <ellipse cx="250" cy="472" rx="250" ry="22" opacity="0.16" filter="url(#soft)"/>
+    <ellipse cx="720" cy="486" rx="280" ry="24" opacity="0.15" filter="url(#soft)"/>
+    <ellipse cx="480" cy="548" rx="420" ry="30" opacity="0.14" filter="url(#softer)"/>
+    <ellipse cx="160" cy="568" rx="220" ry="22" opacity="0.12" filter="url(#softer)"/>
+  </g>
+  <!-- the mirror pool and the ground under the dialogue -->
+  <rect x="0" y="520" width="960" height="440" fill="url(#ground)"/>
+  <ellipse cx="480" cy="610" rx="330" ry="46" fill="url(#water)" opacity="0.9"/>
+  <g stroke="#cfdcff" stroke-linecap="round" opacity="0.55">
+    <path d="M360 596 H600" stroke-width="3"/><path d="M400 610 H560" stroke-width="2.5"/><path d="M430 624 H530" stroke-width="2"/>
+  </g>
+  <ellipse cx="480" cy="640" rx="480" ry="40" fill="#cfd9ff" opacity="0.07" filter="url(#softer)"/>
+</svg>
+
+<div id="box"><div id="plate"></div><p id="text"></p></div>
+
+<script type="application/json" id="lines">[{"id":1,"speaker":null,"text":"夕暮れの山道を抜けると、苔むした石段が現れた。"},{"id":2,"speaker":"シュザンヌ","text":"九十九、ここが月影の祠よ。間違いないわ"},{"id":3,"speaker":"九十九","text":"はい、シュザンヌ様。足元にお気をつけください"},{"id":4,"speaker":"エルヴェ","text":"シュザンヌ様、お急ぎになりませぬよう。年寄りの足には堪えますので"},{"id":5,"speaker":"シュザンヌ","text":"エルヴェ、大丈夫よ。ゆっくり行きましょう"},{"id":6,"speaker":"九十九","text":"エルヴェさん、肩をお貸ししますよ"},{"id":7,"speaker":"エルヴェ","text":"九十九、お前こそ剣を落とすなよ"},{"id":8,"speaker":null,"text":"石段の先に、錆びた門が月明かりに浮かんでいた。"},{"id":9,"speaker":"シュザンヌ","text":"見て、九十九。門の奥で何かが光ってる"},{"id":10,"speaker":"ハク","text":"待っておったぞ、旅の者たち。我はこの月影の祠の番人、ハクじゃ"},{"id":11,"speaker":"エルヴェ","text":"シュザンヌ様、あれが祠の番人ですか。獣の姿をしておりますな"},{"id":12,"speaker":"シュザンヌ","text":"ハクと言ったわね。九十九、剣から手を離しなさい"},{"id":13,"speaker":"九十九","text":"はい、ですがシュザンヌ様、ハクという者から月涙石の気配がします"},{"id":14,"speaker":"ハク","text":"月涙石を持つ者だけが、夜明けの守り手に会える。それが祠の掟じゃ"},{"id":15,"speaker":"エルヴェ","text":"夜明けの守り手の話は、古い書物で読んだ覚えがございます"},{"id":16,"speaker":"シュザンヌ","text":"それなら話が早いわ。エルヴェ、続きを聞かせて"},{"id":17,"speaker":"エルヴェ","text":"はい。夜明けの守り手は、月涙石に宿る光で眠りから覚めると申します"},{"id":18,"speaker":null,"text":"ハクの尻尾が、青白く揺れた。"},{"id":19,"speaker":"ハク","text":"月涙石は月影の祠の奥、水鏡の底に沈んでおる。取ってこられるかな"},{"id":20,"speaker":"九十九","text":"エルヴェさん、水鏡って冷たいんですか"},{"id":21,"speaker":"エルヴェ","text":"冷たいだけならよいがな。底は、触れた者の迷いを映すのじゃ"},{"id":22,"speaker":"シュザンヌ","text":"九十九、私が行くわ。この月影の祠は私の家の先祖が建てたのよ"},{"id":23,"speaker":"九十九","text":"シュザンヌ様、いけません。水鏡には私が参ります"},{"id":24,"speaker":"シュザンヌ","text":"頑固ね。じゃあ、二人で行きましょう"},{"id":25,"speaker":"エルヴェ","text":"お供できず申し訳ございません。ここで月影の祠をお守りいたします"},{"id":26,"speaker":null,"text":"二人は水鏡の縁に立った。月の光が、静かに揺れてい"},{"id":27,"speaker":"九十九","text":"シュザンヌ様、私の手をお取りください"},{"id":28,"speaker":"シュザンヌ","text":"ありがとう、九十九。行くわよ"},{"id":29,"speaker":null,"text":"水の底で、月涙石が青く脈打っていた。"},{"id":30,"speaker":"九十九","text":"シュザンヌ様、ありました。これが月涙石です"},{"id":31,"speaker":"シュザンヌ","text":"持ち上げて、九十九。ゆっくりよ"},{"id":32,"speaker":null,"text":"石が光を放ち、月影の祠全体が低く震え出した。"},{"id":33,"speaker":"ハク","text":"よくやった。目覚めの時じゃ、夜明けの守り手よ"},{"id":34,"speaker":"エルヴェ","text":"九十九、よく無事でいたな。シュザンヌ様を頼んだぞ"},{"id":35,"speaker":"九十九","text":"はい、エルヴェさんのおかげです"},{"id":36,"speaker":null,"text":"夜明けの守り手が、ゆっくりと目を開いた。"}]</script>
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  // Deterministic stars and pines (a seeded generator): the scene is the same in every shot.
+  var seed = 20261020;
+  function rnd() { seed = (seed + 0x6D2B79F5) | 0; var t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }
+  function add(parent, tag, attrs) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; }
+  var stars = document.getElementById("stars");
+  for (var i = 0; i < 70; i++) {
+    var x = rnd() * 960, y = rnd() * rnd() * 330 + 10;
+    if (Math.hypot(x - 742, y - 148) < 90) continue;
+    add(stars, "circle", { cx: x.toFixed(1), cy: y.toFixed(1), r: (0.6 + rnd() * 1.5).toFixed(2), opacity: (0.35 + rnd() * 0.65).toFixed(2) });
+  }
+  var pines = document.getElementById("pines");
+  function pine(cx, base, h) {
+    var w = h * 0.34;
+    for (var k = 0; k < 4; k++) {
+      var top = base - h + k * h * 0.2, half = w * (0.35 + k * 0.22), bot = top + h * 0.34;
+      add(pines, "path", { d: "M" + (cx - half) + " " + bot + " L" + cx + " " + top + " L" + (cx + half) + " " + bot + "Z" });
+    }
+    add(pines, "rect", { x: cx - 3, y: base - h * 0.12, width: 6, height: h * 0.14 });
+  }
+  [[40, 470, 190], [96, 486, 150], [150, 478, 214], [214, 490, 138], [770, 482, 158], [832, 470, 216], [896, 486, 168], [940, 474, 196]]
+    .forEach(function (p) { pine(p[0], p[1], p[2]); });
+
+  var lines = JSON.parse(document.getElementById("lines").textContent);
+  var params = new URLSearchParams(location.search);
+  // `&plate=tag`: the plate text in the gold, a different colour from the dialogue, which the app keeps as written (a name tag).
+  if (params.get("plate") === "tag") document.documentElement.style.setProperty("--plate-ink", "var(--gold)");
+  var id = params.get("line");
+  var line = lines.filter(function (l) { return String(l.id) === id; })[0];
+  document.getElementById("plate").textContent = line && line.speaker ? line.speaker : "";
+  var text = document.getElementById("text");
+  text.textContent = line ? line.text : "";
+  // How many 54 px lines the text needs (the box holds two); `shoot.sh` reads it from the dumped DOM.
+  text.style.height = "auto";
+  document.documentElement.setAttribute("data-lines", String(Math.round(text.offsetHeight / 54)));
+  text.style.height = "";
+})();
+</script>
+</body>
+</html>

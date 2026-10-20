@@ -1,0 +1,1 @@
+{"id":"chatcmpl-764","object":"chat.completion","created":1792492796,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"엘베, 괜찮아. 천천히 가자.\"]}\n"},"finish_reason":"stop"}],"usage":{"prompt_tokens":76,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":19,"total_tokens":95}}

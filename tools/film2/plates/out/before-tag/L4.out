@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=94216 gui pid=94184
+reader: docs pid=94267 gui pid=94184
+warm-up: 1366 ms
+pipeline: 12379 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=1288 max=1288 n=1] lens_wait_ms[p50=1347 max=1347 last=1347 n=1] settle=n/a parked=0
+pace: ja>ko|ext:3FAC892F:88b5be59f811231e samples=1 first=1.29s perLine=1.29s batch[p50=1.29s p90=1.29s n=1] cancelled=0 lines[cached=0 translated=1]
+  シュザンヌ様、お急ぎになりませぬよう。年寄りの足には堪えますので
+    → 슈자누 님, 서두르지 않으셔도 됩니다. 어르신의 발에는 좀 힘들어서.
+issues=0
+engine_ms[p50=1288 max=1288 n=1]
+learned=[]
+cache[ja>ko|ext:3FAC892F:88b5be59f811231e|2654656461805078311] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=172,1789,1753,208 text=172,1790,1597,205 size=89.8 lines=2 chars=32 clipped=0 ellipsis=0 "シュザンヌ様、お急ぎになりませぬよう。年寄りの足には堪えますので"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before-tag/L4.png
+silence: longest=11604 total=11604
+drain: 0 in-flight=0
+reader: docs state=idle pid=94267 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=12902 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=92 MB gui=107 MB last-ms=631 ms=631
+reader: lines state=idle pid=94216 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=12902 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=150 MB gui=107 MB last-ms=323 ms=491,323
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

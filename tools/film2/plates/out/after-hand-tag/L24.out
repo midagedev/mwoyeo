@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=38185 gui pid=38072
+reader: docs pid=38537 gui pid=38072
+warm-up: 1687 ms
+pipeline: 9079 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=2017 max=2017 n=1] lens_wait_ms[p50=2074 max=2074 last=2074 n=1] settle=n/a parked=0
+pace: ja>ko|ext:5B08E565:82f244193fe605ba samples=1 first=2.02s perLine=2.02s batch[p50=2.02s p90=2.02s n=1] cancelled=0 lines[cached=0 translated=1]
+  頑固ね。じゃあ、二人で行きましょう
+    → 고집이 세네. 그럼, 둘이서 가죠.
+issues=0
+engine_ms[p50=2017 max=2017 n=1]
+learned=[]
+cache[ja>ko|ext:5B08E565:82f244193fe605ba|3392336692420898483|ctx:mwoyeo-0c3667495e07b3ff.d10f51c8b39e5584] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=166,1792,1361,97 text=166,1793,1001,95 size=85.2 lines=1 chars=17 clipped=0 ellipsis=0 "頑固ね。じゃあ、二人で行きましょう"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand-tag/L24.png
+silence: longest=8504 total=8504
+drain: 0 in-flight=0
+reader: docs state=idle pid=38537 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=30099 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=91 MB gui=87 MB last-ms=591 ms=591
+reader: lines state=idle pid=38185 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=30099 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=141 MB gui=87 MB last-ms=330 ms=622,330
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

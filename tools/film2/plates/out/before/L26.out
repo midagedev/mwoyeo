@@ -1,0 +1,29 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=65869 gui pid=65833
+reader: docs pid=65907 gui pid=65833
+warm-up: 1055 ms
+pipeline: 7379 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=2 translate.wasted=0 engine_ms[p50=902 max=902 n=1] lens_wait_ms[p50=952 max=952 last=952 n=2] settle=n/a parked=0
+pace: ja>ko|ext:36BA452B:e26f6b607c32ed84 samples=1 first=0.90s perLine=0.00s batch[p50=0.90s p90=0.90s n=1] cancelled=0 lines[cached=0 translated=2]
+  二人は水鏡の緑に立った。月の光が、静かに揺れ
+    → 두 사람은 물거울의 초록빛에 섰다.
+  てい
+    → 정
+issues=0
+engine_ms[p50=902 max=902 n=1]
+learned=[]
+cache[ja>ko|ext:36BA452B:e26f6b607c32ed84|962100115638302237] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=169,1788,1775,107 text=169,1791,1165,100 size=88.6 lines=1 chars=22 clipped=0 ellipsis=0 "二人は水鏡の緑に立った。月の光が、静かに揺れ"
+block: core=172,1919,148,70 text=172,1921,57,71 size=67.0 lines=1 chars=2 clipped=0 ellipsis=0 "てい"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before/L26.png
+silence: longest=6709 total=6709
+drain: 0 in-flight=0
+reader: docs state=idle pid=65907 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=13982 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=92 MB gui=91 MB last-ms=508 ms=508
+reader: lines state=idle pid=65869 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=13982 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=149 MB gui=91 MB last-ms=303 ms=484,303
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

@@ -1,0 +1,1 @@
+{"id":"chatcmpl-845","object":"chat.completion","created":1792493015,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"두 사람은 물거울의 초록빛에 섰다.\", \"정\"]}"},"finish_reason":"stop"}],"usage":{"prompt_tokens":87,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":22,"total_tokens":109}}

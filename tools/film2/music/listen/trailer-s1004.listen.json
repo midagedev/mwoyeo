@@ -1,0 +1,54 @@
+{
+ "file": "/private/tmp/film2/music/raw/trailer-s1004.mp3",
+ "calls": [
+  {
+   "heard": "A suspenseful electronic trailer track that begins with an eerie atmospheric intro and builds into a driving beat with pulsating synths and punchy drums.",
+   "voice": false,
+   "glitches": "none",
+   "energy": 3,
+   "sparse_open": true,
+   "break": true,
+   "break_s": "0:30",
+   "drop": true,
+   "drop_s": "0:33",
+   "ending": "hit"
+  },
+  {
+   "ending": "hit",
+   "drop_s": null,
+   "drop": false,
+   "break_s": null,
+   "break": false,
+   "sparse_open": false,
+   "energy": 3,
+   "glitches": "none",
+   "voice": false,
+   "heard": "A driving electronic synth track with a punchy beat and pulsing bassline that maintains a steady groove throughout before ending cleanly."
+  }
+ ],
+ "orders": [
+  "fields in order",
+  "fields reversed"
+ ],
+ "agreed": {
+  "voice": false,
+  "glitches": "none",
+  "energy": 3,
+  "hard_end": true
+ },
+ "trusted": {
+  "voice": true,
+  "glitches": true,
+  "sparse_open": true,
+  "break": true,
+  "break_s": true,
+  "drop": true,
+  "drop_s": true,
+  "hard_end": false,
+  "energy": false
+ },
+ "screen_only": [
+  "energy",
+  "hard_end"
+ ]
+}

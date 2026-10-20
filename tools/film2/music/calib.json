@@ -1,0 +1,39 @@
+{
+ "cal-pos.mp3": {
+  "voice": false,
+  "sparse_open": true,
+  "break": true,
+  "break_s": 30.0,
+  "drop": true,
+  "drop_s": 32.0,
+  "hard_end": true,
+  "glitches": [
+   "none"
+  ]
+ },
+ "cal-neg.mp3": {
+  "voice": true,
+  "sparse_open": false,
+  "break": false,
+  "break_s": null,
+  "drop": false,
+  "drop_s": null,
+  "hard_end": false,
+  "glitches": [
+   "none"
+  ]
+ },
+ "cal-glitch.mp3": {
+  "voice": false,
+  "sparse_open": false,
+  "break": false,
+  "break_s": null,
+  "drop": false,
+  "drop_s": null,
+  "hard_end": false,
+  "glitches": [
+   "minor",
+   "major"
+  ]
+ }
+}

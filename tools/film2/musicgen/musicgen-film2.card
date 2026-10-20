@@ -1,0 +1,16 @@
+# Round film2-music: music candidates for Mwoyeo film 2 (the memory film for X: inconsistent game-dialogue translation, Claude
+# writes the app's memory, every name locks in). ACE-Step 1.5 (MIT), the XL-sft DiT with the 4B 5 Hz LM, on the RTX A6000 only:
+# three prompts (a cinematic electronic trailer, dark synthwave, electronic with a koto pluck; all 120 BPM, each with a sparse
+# uneasy intro, a build, a one bar stop-time break, a drop and a hard final hit) x 8 seeds of 64 s (the film is 96 beats + a
+# short tail, ~48-52 s at 120 BPM, and the fit chooses where it opens inside the clip), one process, weights loaded once from
+# /root/musicgen. Settings are release-034's and film 1's: 50 steps, shift 1.0, guidance 7.0, batch 4, backend pt. Nothing is
+# timed; the files are the output.
+# Minutes [derived] from film 1's measured run of the same shape (24 clips x 64 s, same settings, run mwoyeo-film-1 on
+# 2026-10-19; derived there from release-034's run: 24 clips x 48 s, lease held 446 s, load 43 s, a batch of 4 took 67 s,
+# 16.8 s a clip): 16.8 s x 64/48 x 1.02 = 22.8 s a clip, x 24 = 548 s; + load 43 s + imports and CUDA init ~10 s = ~600 s =
+# 10 min. A cold page cache would add the 38 GB read, +1..2 min. Peak card memory ~23 GB of the A6000's 48 GB.
+kind: exclusive
+reason: generation fills the A6000 (weights ~19 GB, peak ~23 GB) and reads ~38 GB of weights through the page
+  cache, so it holds the lease instead of running beside a timed run or a gate batch; why now: the user asked for
+  Mwoyeo film 2's music to be generated on the box (2026-10-20), and film 2's build is cut to its beat grid
+minutes: 9..14

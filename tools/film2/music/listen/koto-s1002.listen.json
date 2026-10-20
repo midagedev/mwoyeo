@@ -1,0 +1,55 @@
+{
+ "file": "/private/tmp/film2/music/raw/koto-s1002.mp3",
+ "calls": [
+  {
+   "heard": "A steady trap-style hip-hop beat blended with traditional Japanese koto and bamboo flute melodies.",
+   "voice": false,
+   "glitches": "none",
+   "energy": 3,
+   "sparse_open": false,
+   "break": false,
+   "break_s": null,
+   "drop": false,
+   "drop_s": null,
+   "ending": "fade"
+  },
+  {
+   "ending": "fade",
+   "drop_s": "0:16",
+   "drop": true,
+   "break_s": null,
+   "break": false,
+   "sparse_open": true,
+   "energy": 3,
+   "glitches": "none",
+   "voice": false,
+   "heard": "A traditional Japanese koto melody layered over a modern trap beat featuring 808 bass and rolling hi-hats."
+  }
+ ],
+ "orders": [
+  "fields in order",
+  "fields reversed"
+ ],
+ "agreed": {
+  "voice": false,
+  "break": false,
+  "glitches": "none",
+  "energy": 3,
+  "hard_end": false
+ },
+ "trusted": {
+  "voice": true,
+  "glitches": true,
+  "sparse_open": true,
+  "break": true,
+  "break_s": true,
+  "drop": true,
+  "drop_s": true,
+  "hard_end": false,
+  "energy": false
+ },
+ "screen_only": [
+  "energy",
+  "hard_end"
+ ]
+}

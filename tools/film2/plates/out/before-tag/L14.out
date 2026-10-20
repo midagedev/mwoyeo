@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=5135 gui pid=5119
+reader: docs pid=5181 gui pid=5119
+warm-up: 1089 ms
+pipeline: 9485 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=1272 max=1272 n=1] lens_wait_ms[p50=1313 max=1313 last=1313 n=1] settle=n/a parked=0
+pace: ja>ko|ext:FDC90E14:88b5be59f811231e samples=1 first=1.27s perLine=1.27s batch[p50=1.27s p90=1.27s n=1] cancelled=0 lines[cached=0 translated=1]
+  月涙石を持つ者だけが、夜明けの守り手に会える。それが祠の掟じゃ
+    → 달 눈물 돌을 가진 자만이, 새벽의 수호자에게 만날 수 있다. 그것이 사제의 규칙이다.
+issues=0
+engine_ms[p50=1272 max=1272 n=1]
+learned=[]
+cache[ja>ko|ext:FDC90E14:88b5be59f811231e|-2921040122047884436] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=169,1792,1691,221 text=169,1802,1674,203 size=88.6 lines=2 chars=31 clipped=0 ellipsis=0 "月涙石を持つ者だけが、夜明けの守り手に会える。それが祠の掟じゃ"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before-tag/L14.png
+silence: longest=8710 total=8710
+drain: 0 in-flight=0
+reader: docs state=idle pid=5181 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=12910 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=90 MB gui=111 MB last-ms=487 ms=487
+reader: lines state=idle pid=5135 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=12910 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=146 MB gui=111 MB last-ms=297 ms=501,297
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

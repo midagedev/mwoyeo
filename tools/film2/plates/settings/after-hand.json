@@ -1,0 +1,85 @@
+{
+  "appProfiles": [
+    {
+      "bundleID": "dev.midagedev.film.lumiere",
+      "appName": "月涙譚",
+      "source": "ja",
+      "target": "ko",
+      "note": "fantasy RPG; shrine quest",
+      "entries": [
+        {
+          "src": "九十九",
+          "dst": "츠쿠모",
+          "kind": "person",
+          "gender": "m",
+          "note": "swordsman",
+          "addressing": [
+            {
+              "to": "エルヴェ",
+              "register": "polite"
+            },
+            {
+              "to": "シュザンヌ",
+              "register": "formal"
+            }
+          ]
+        },
+        {
+          "src": "シュザンヌ",
+          "dst": "쉬잔",
+          "kind": "person",
+          "gender": "f",
+          "note": "princess",
+          "addressing": [
+            {
+              "to": "エルヴェ",
+              "register": "polite"
+            },
+            {
+              "to": "九十九",
+              "register": "casual"
+            }
+          ]
+        },
+        {
+          "src": "エルヴェ",
+          "dst": "에르베",
+          "kind": "person",
+          "gender": "m",
+          "note": "old tutor",
+          "addressing": [
+            {
+              "to": "シュザンヌ",
+              "register": "formal"
+            },
+            {
+              "to": "九十九",
+              "register": "casual"
+            }
+          ]
+        },
+        {
+          "src": "ハク",
+          "dst": "하쿠",
+          "kind": "person",
+          "note": "shrine keeper"
+        },
+        {
+          "src": "月影の祠",
+          "dst": "월영 사당",
+          "kind": "term"
+        },
+        {
+          "src": "月涙石",
+          "dst": "월루석",
+          "kind": "term"
+        },
+        {
+          "src": "夜明けの守り手",
+          "dst": "새벽지기",
+          "kind": "term"
+        }
+      ]
+    }
+  ]
+}

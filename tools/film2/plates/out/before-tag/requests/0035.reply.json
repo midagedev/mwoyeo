@@ -1,0 +1,1 @@
+{"id":"chatcmpl-366","object":"chat.completion","created":1792493086,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"큐큐부, 잘 지냈구나. 슈자누 님을 부탁했어.\"]"},"finish_reason":"stop"}],"usage":{"prompt_tokens":85,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":24,"total_tokens":109}}

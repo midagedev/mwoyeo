@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=32376 gui pid=32362
+reader: docs pid=32537 gui pid=32362
+warm-up: 1062 ms
+pipeline: 4585 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=815 max=815 n=1] lens_wait_ms[p50=856 max=856 last=856 n=1] settle=n/a parked=0
+pace: ja>ko|ext:9388DAF3:88b5be59f811231e samples=1 first=0.82s perLine=0.82s batch[p50=0.82s p90=0.82s n=1] cancelled=0 lines[cached=0 translated=1]
+  ありがとう、九十九。行くわよ
+    → 고마워, 큐나요. 가볼게.
+issues=0
+engine_ms[p50=815 max=815 n=1]
+learned=[]
+cache[ja>ko|ext:9388DAF3:88b5be59f811231e|9133135191872305349] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=172,1788,1112,105 text=172,1791,774,100 size=88.6 lines=1 chars=14 clipped=0 ellipsis=0 "ありがとう、九十九。行くわよ"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before-tag/L28.png
+silence: longest=4009 total=4009
+drain: 0 in-flight=0
+reader: docs state=idle pid=32537 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=12973 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=91 MB gui=90 MB last-ms=482 ms=482
+reader: lines state=idle pid=32376 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=12973 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=145 MB gui=90 MB last-ms=286 ms=478,286
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

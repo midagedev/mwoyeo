@@ -1,0 +1,1 @@
+{"mwoyeoEngine": 1, "engine": {"name": "Ollama gemma3:4b", "kind": "openAICompatible", "baseURL": "http://127.0.0.1:52560/v1", "model": "gemma3:4b", "thinking": "off"}}

@@ -1,0 +1,54 @@
+{
+ "file": "/private/tmp/film2/music/calib/cal-pos.mp3",
+ "calls": [
+  {
+   "heard": "The track begins with a sparse and quiet bell pattern, gradually builds in tension with synths and percussion, pauses for a brief silence at thirty seconds, and drops into a full electronic groove that ends on a single hard hit.",
+   "voice": false,
+   "glitches": "none",
+   "energy": 3,
+   "sparse_open": true,
+   "break": true,
+   "break_s": "0:30",
+   "drop": true,
+   "drop_s": "0:32",
+   "ending": "hit"
+  },
+  {
+   "ending": "hit",
+   "drop_s": "0:32",
+   "drop": true,
+   "break_s": "0:30",
+   "break": true,
+   "sparse_open": true,
+   "energy": 3,
+   "glitches": "none",
+   "voice": false,
+   "heard": "A synthesized electronic track with a sparse, uneasy opening that builds into a silent break, followed by a full synth drop and concluding on a hard hit."
+  }
+ ],
+ "orders": [
+  "fields in order",
+  "fields reversed"
+ ],
+ "agreed": {
+  "voice": false,
+  "sparse_open": true,
+  "break": true,
+  "drop": true,
+  "glitches": "none",
+  "energy": 3,
+  "hard_end": true,
+  "break_s": 30.0,
+  "drop_s": 32.0
+ },
+ "right": {
+  "voice": true,
+  "sparse_open": true,
+  "break": true,
+  "drop": true,
+  "hard_end": true,
+  "break_s": true,
+  "drop_s": true,
+  "glitches": true
+ }
+}

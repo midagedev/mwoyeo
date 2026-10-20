@@ -1,0 +1,1 @@
+{"id":"chatcmpl-685","object":"chat.completion","created":1792493103,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"새벽의 수호자가 천천히 눈을 떴다.\"]}\n"},"finish_reason":"stop"}],"usage":{"prompt_tokens":80,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":22,"total_tokens":102}}

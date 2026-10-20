@@ -1,0 +1,1 @@
+{"id":"chatcmpl-615","object":"chat.completion","created":1792492949,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"에르베 씨, 수경은 차가운가요?\"]}\n"},"finish_reason":"stop"}],"usage":{"prompt_tokens":78,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":21,"total_tokens":99}}

@@ -1,0 +1,29 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=35632 gui pid=35558
+reader: docs pid=35705 gui pid=35558
+warm-up: 1089 ms
+pipeline: 9429 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=2 translate.wasted=0 engine_ms[p50=1421 max=1421 n=1] lens_wait_ms[p50=1475 max=1475 last=1475 n=2] settle=n/a parked=0
+pace: ja>ko|ext:4C2BA9B8:e26f6b607c32ed84 samples=1 first=1.42s perLine=0.00s batch[p50=1.42s p90=1.42s n=1] cancelled=0 lines[cached=0 translated=2]
+  エルヴェ
+    → 엘베
+  シュザンヌ様、あれが祠の番人ですか。獣の姿をしておりますな
+    → 슈자누 님, 저기가 신전의 수호자입니까? 짐승의 모습으로 있네
+issues=0
+engine_ms[p50=1421 max=1421 n=1]
+learned=[]
+cache[ja>ko|ext:4C2BA9B8:e26f6b607c32ed84|7961132539344032572] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=216,1610,269,72 text=216,1606,131,81 size=76.0 lines=1 chars=4 clipped=0 ellipsis=0 "エルヴェ"
+block: core=175,1789,1757,206 text=175,1790,1626,205 size=89.8 lines=2 chars=29 clipped=0 ellipsis=0 "シュザンヌ様、あれが祠の番人ですか。獣の姿をしておりますな"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before/L11.png
+silence: longest=8803 total=8803
+drain: 0 in-flight=0
+reader: docs state=idle pid=35705 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=14237 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=90 MB gui=106 MB last-ms=475 ms=475
+reader: lines state=idle pid=35632 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=14237 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=148 MB gui=106 MB last-ms=333 ms=494,333
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

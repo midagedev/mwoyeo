@@ -1,0 +1,57 @@
+{
+ "file": "/private/tmp/film2/music/raw/koto-s1001.mp3",
+ "calls": [
+  {
+   "heard": "A traditional Japanese koto melody plays over a steady electronic hip-hop beat with crisp percussion and bass.",
+   "voice": false,
+   "glitches": "none",
+   "energy": 3,
+   "sparse_open": false,
+   "break": false,
+   "break_s": null,
+   "drop": false,
+   "drop_s": null,
+   "ending": "hit"
+  },
+  {
+   "ending": "hit",
+   "drop_s": null,
+   "drop": false,
+   "break_s": null,
+   "break": false,
+   "sparse_open": false,
+   "energy": 3,
+   "glitches": "none",
+   "voice": false,
+   "heard": "A traditional koto melody plays over a steady hip-hop beat with synth bass and crisp drums."
+  }
+ ],
+ "orders": [
+  "fields in order",
+  "fields reversed"
+ ],
+ "agreed": {
+  "voice": false,
+  "sparse_open": false,
+  "break": false,
+  "drop": false,
+  "glitches": "none",
+  "energy": 3,
+  "hard_end": true
+ },
+ "trusted": {
+  "voice": true,
+  "glitches": true,
+  "sparse_open": true,
+  "break": true,
+  "break_s": true,
+  "drop": true,
+  "drop_s": true,
+  "hard_end": false,
+  "energy": false
+ },
+ "screen_only": [
+  "energy",
+  "hard_end"
+ ]
+}

@@ -1,0 +1,29 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=50927 gui pid=50893
+reader: docs pid=50939 gui pid=50893
+warm-up: 1058 ms
+pipeline: 8404 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=2 translate.wasted=0 engine_ms[p50=2050 max=2050 n=1] lens_wait_ms[p50=2120 max=2120 last=2120 n=2] settle=n/a parked=0
+pace: ja>ko|ext:4272CAE1:ae3d37596076c83b samples=1 first=2.05s perLine=0.00s batch[p50=2.05s p90=2.05s n=1] cancelled=0 lines[cached=0 translated=2]
+  二人は水鏡の緑に立った。月の光が、静かに揺れ
+    → 두 사람은 물결 거울의 녹색에 서 있었다. 달빛이 조용히 흔들렸다.
+  てい
+    → 테이
+issues=0
+engine_ms[p50=2050 max=2050 n=1]
+learned=[]
+cache[ja>ko|ext:4272CAE1:ae3d37596076c83b|-7662078367049926004|ctx:mwoyeo-8dd6762b6bc52f6e.d10f51c8b39e5584] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=169,1788,1775,107 text=169,1801,1768,80 size=71.5 lines=1 chars=22 clipped=0 ellipsis=0 "二人は水鏡の緑に立った。月の光が、静かに揺れ"
+block: core=172,1919,148,70 text=172,1921,115,71 size=67.0 lines=1 chars=2 clipped=0 ellipsis=0 "てい"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand/L26.png
+silence: longest=7810 total=7810
+drain: 0 in-flight=0
+reader: docs state=idle pid=50939 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=13158 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=90 MB gui=94 MB last-ms=486 ms=486
+reader: lines state=idle pid=50927 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=13158 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=148 MB gui=94 MB last-ms=319 ms=482,319
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

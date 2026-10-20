@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=89875 gui pid=89461
+reader: docs pid=90355 gui pid=89461
+warm-up: 2131 ms
+pipeline: 8679 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=1 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=2207 max=2207 n=1] lens_wait_ms[p50=2358 max=2358 last=2358 n=1] settle=n/a parked=0
+pace: ja>ko|ext:AD9C8269:82f244193fe605ba samples=1 first=2.21s perLine=2.21s batch[p50=2.21s p90=2.21s n=1] cancelled=0 lines[cached=0 translated=1]
+  ハクの尻尾が、青白く揺れた。
+    → 하쿠의 꼬리가 푸르스름하게 흔들렸다.
+issues=0
+engine_ms[p50=2207 max=2207 n=1]
+learned=[]
+cache[ja>ko|ext:AD9C8269:82f244193fe605ba|-577928459402452741|ctx:mwoyeo-0d5672d4c586d6d8.d10f51c8b39e5584] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=168,1786,1078,106 text=168,1790,1283,99 size=87.5 lines=1 chars=14 clipped=0 ellipsis=0 "ハクの尻尾が、青白く揺れた。"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand-tag/L18.png
+silence: longest=8001 total=8001
+drain: 0 in-flight=0
+reader: docs state=idle pid=90355 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=30071 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=94 MB gui=90 MB last-ms=562 ms=562
+reader: lines state=idle pid=89875 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=30071 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=140 MB gui=90 MB last-ms=348 ms=566,348
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

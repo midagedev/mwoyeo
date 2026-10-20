@@ -1,0 +1,3 @@
+# Plates are remade by plates/render.sh and stage/shoot.sh (README); the logs and .out texts stay.
+plates/out/**/*.png
+plates/out/**/*.err

@@ -1,0 +1,56 @@
+{
+ "file": "/private/tmp/film2/music/raw/synthwave-s1008.mp3",
+ "calls": [
+  {
+   "heard": "An energetic synthwave track driven by punchy retro drums, a pulsating synth bassline, and bright electronic lead melodies.",
+   "voice": false,
+   "glitches": "none",
+   "energy": 4,
+   "sparse_open": false,
+   "break": true,
+   "break_s": "0:31",
+   "drop": true,
+   "drop_s": "0:39",
+   "ending": "hit"
+  },
+  {
+   "ending": "hit",
+   "drop_s": "0:07",
+   "drop": true,
+   "break_s": null,
+   "break": false,
+   "sparse_open": false,
+   "energy": 4,
+   "glitches": "none",
+   "voice": false,
+   "heard": "An upbeat retro synthwave track featuring driving arpeggiated bass, punchy 80s electronic drums, and bright melodic synthesizers."
+  }
+ ],
+ "orders": [
+  "fields in order",
+  "fields reversed"
+ ],
+ "agreed": {
+  "voice": false,
+  "sparse_open": false,
+  "drop": true,
+  "glitches": "none",
+  "energy": 4,
+  "hard_end": true
+ },
+ "trusted": {
+  "voice": true,
+  "glitches": true,
+  "sparse_open": true,
+  "break": true,
+  "break_s": true,
+  "drop": true,
+  "drop_s": true,
+  "hard_end": false,
+  "energy": false
+ },
+ "screen_only": [
+  "energy",
+  "hard_end"
+ ]
+}

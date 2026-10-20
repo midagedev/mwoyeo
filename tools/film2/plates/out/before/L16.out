@@ -1,0 +1,29 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=47357 gui pid=47324
+reader: docs pid=47378 gui pid=47324
+warm-up: 1057 ms
+pipeline: 7606 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=2 translate.wasted=0 engine_ms[p50=1194 max=1194 n=1] lens_wait_ms[p50=1243 max=1243 last=1243 n=2] settle=n/a parked=0
+pace: ja>ko|ext:F01E3A9E:e26f6b607c32ed84 samples=1 first=1.19s perLine=0.00s batch[p50=1.19s p90=1.19s n=1] cancelled=0 lines[cached=0 translated=2]
+  シュザンヌ
+    → 슈자누
+  それなら話が早いわ。エルヴェ、続きを聞かせて
+    → 그렇다면 이야기가 빨리 끝날 거야. 엘베, 계속해서 들려줘.
+issues=0
+engine_ms[p50=1194 max=1194 n=1]
+learned=[]
+cache[ja>ko|ext:F01E3A9E:e26f6b607c32ed84|3587186209761585723] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=220,1609,337,73 text=220,1605,200,82 size=77.3 lines=1 chars=5 clipped=0 ellipsis=0 "シュザンヌ"
+block: core=170,1792,1763,100 text=170,1797,1761,91 size=80.5 lines=1 chars=22 clipped=0 ellipsis=0 "それなら話が早いわ。エルヴェ、続きを聞かせて"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/before/L16.png
+silence: longest=7010 total=7010
+drain: 0 in-flight=0
+reader: docs state=idle pid=47378 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=14029 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=91 MB gui=93 MB last-ms=471 ms=471
+reader: lines state=idle pid=47357 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=14029 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=148 MB gui=93 MB last-ms=311 ms=498,311
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

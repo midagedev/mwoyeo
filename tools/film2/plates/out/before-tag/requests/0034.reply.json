@@ -1,0 +1,1 @@
+{"id":"chatcmpl-285","object":"chat.completion","created":1792493077,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"잘했어. 눈뜨는 순간이야, 새벽의 수호자.\"] }"},"finish_reason":"stop"}],"usage":{"prompt_tokens":83,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":22,"total_tokens":105}}

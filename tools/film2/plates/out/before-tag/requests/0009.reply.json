@@ -1,0 +1,1 @@
+{"id":"chatcmpl-629","object":"chat.completion","created":1792492831,"model":"gemma3:4b","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"{\"translations\": [\"봐, 99. 문 밖에서 무언가가 빛나고 있어.\"]}\n"},"finish_reason":"stop"}],"usage":{"prompt_tokens":80,"prompt_tokens_details":{"cached_tokens":0},"completion_tokens":25,"total_tokens":105}}

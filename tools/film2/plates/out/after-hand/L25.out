@@ -1,0 +1,29 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=49818 gui pid=49804
+reader: docs pid=49862 gui pid=49804
+warm-up: 1069 ms
+pipeline: 11257 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.context=2 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.struck=1 translate.texts=3 translate.untranslated=1 translate.wasted=0 engine_ms[p50=1894 max=1894 n=2] lens_wait_ms[p50=3422 max=3422 last=3422 n=2] settle=n/a parked=0
+pace: ja>ko|ext:5FB3DC34:ae3d37596076c83b samples=2 first=1.68s perLine=1.68s batch[p50=1.90s p90=1.90s n=2] cancelled=0 lines[cached=0 translated=2]
+  エルヴェ
+    → 에르베
+  お供できず申し訳ございません。ここで月影のをお守りいたします
+    → 함께 할 수 없어 정말 죄송합니다. 여기서 월영의 오보를 하겠습니다.
+issues=0
+engine_ms[p50=1894 max=1894 n=2]
+learned=[]
+cache[ja>ko|ext:5FB3DC34:ae3d37596076c83b|3310931593115725714|ctx:mwoyeo-81c37ef405c8c0a5.d10f51c8b39e5584] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=216,1610,269,72 text=216,1606,197,81 size=76.0 lines=1 chars=4 clipped=0 ellipsis=0 "エルヴェ"
+block: core=172,1788,1768,211 text=172,1792,1598,203 size=88.6 lines=2 chars=30 clipped=0 ellipsis=0 "お供できず申し訳ございません。ここで月影のをお守りいたします"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand/L25.png
+silence: longest=9006 total=9006
+drain: 0 in-flight=0
+reader: docs state=idle pid=49862 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=13178 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=91 MB gui=108 MB last-ms=469 ms=469
+reader: lines state=idle pid=49818 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=13178 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=147 MB gui=108 MB last-ms=305 ms=478,305
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

@@ -1,0 +1,26 @@
+profile: dev.midagedev.film.lumiere applied ja>ko → ja>ko
+engine: Ollama gemma3:4b openAICompatible
+inpainter: MI-GAN loaded (1 ms)
+reader: lines pid=43538 gui pid=43250
+reader: docs pid=43780 gui pid=43250
+warm-up: 1656 ms
+pipeline: 13968 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.context=1 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=1 translate.texts=1 translate.wasted=0 engine_ms[p50=1754 max=1754 n=1] lens_wait_ms[p50=1812 max=1812 last=1812 n=1] settle=n/a parked=0
+pace: ja>ko|ext:FB5A5D90:82f244193fe605ba samples=1 first=1.76s perLine=1.76s batch[p50=1.76s p90=1.76s n=1] cancelled=0 lines[cached=0 translated=1]
+  お供できず申し訳ございません。ここで月影のをお守りいたします
+    → 함께 할 수 없어 정말 죄송합니다. 여기서 월영의 오보를 하겠습니다.
+issues=0
+engine_ms[p50=1754 max=1754 n=1]
+learned=[]
+cache[ja>ko|ext:FB5A5D90:82f244193fe605ba|-1445885891667767580|ctx:mwoyeo-56281d37f380c64b.d10f51c8b39e5584] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=172,1788,1768,211 text=172,1792,1598,203 size=88.6 lines=2 chars=30 clipped=0 ellipsis=0 "お供できず申し訳ございません。ここで月影のをお守りいたします"
+wrote /Users/hckim/repo/mwoyeo-wt-film2/tools/film2/plates/out/after-hand-tag/L25.png
+silence: longest=13301 total=13301
+drain: 0 in-flight=0
+reader: docs state=idle pid=43780 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=30105 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=93 MB gui=84 MB last-ms=625 ms=625
+reader: lines state=idle pid=43538 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=30105 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=147 MB gui=84 MB last-ms=372 ms=626,372
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

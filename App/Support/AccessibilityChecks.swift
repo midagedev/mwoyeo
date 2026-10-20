@@ -86,33 +86,32 @@ enum AccessibilityChecks {
     static var canAsk: Bool { AXIsProcessTrusted() }
 
     /// The tree of the window titled `title` in this process, read through the accessibility API an assistive app uses: the real tree, SwiftUI's
-    /// included, which a call on the hosting view does not give. The asking runs off the main thread, since the answers come from it.
+    /// included, which a call on the hosting view does not give. The asking runs ON the main thread: for its own process the API answers in
+    /// process, on the calling thread, so a walk from another thread ran SwiftUI's graph there and deadlocked with a layout pass on main (each
+    /// held the lock the other waited for; check-logic hung 53 min under load, 2026-10-21).
+    @MainActor
     static func tree(ofWindowTitled title: String) async -> [Item] {
-        await withCheckedContinuation { continuation in
-            DispatchQueue.global(qos: .userInitiated).async {
-                let app = AXUIElementCreateApplication(getpid())
-                AXUIElementSetMessagingTimeout(app, 10)
-                var items: [Item] = []
-                func walk(_ element: AXUIElement, _ depth: Int) {
-                    guard depth < 40, items.count < 4000 else { return }
-                    var names: CFArray?
-                    AXUIElementCopyActionNames(element, &names)
-                    items.append(Item(depth: depth, role: string(element, kAXRoleAttribute), subrole: string(element, kAXSubroleAttribute),
-                                      label: name(of: element), value: string(element, kAXValueAttribute), help: string(element, kAXHelpAttribute),
-                                      enabled: (attribute(element, kAXEnabledAttribute) as? Bool) ?? true,
-                                      actions: ((names as? [String]) ?? []).map { raw in
-                                          // A custom action comes as "Name:<name>\nTarget:…\nSelector:…".
-                                          let first = raw.split(separator: "\n").first.map(String.init) ?? raw
-                                          return first.hasPrefix("Name:") ? String(first.dropFirst(5)) : first
-                                      }))
-                    for child in (attribute(element, kAXChildrenAttribute) as? [AXUIElement]) ?? [] { walk(child, depth + 1) }
-                }
-                for window in (attribute(app, kAXWindowsAttribute) as? [AXUIElement]) ?? [] where string(window, kAXTitleAttribute) == title {
-                    walk(window, 0)
-                }
-                continuation.resume(returning: items)
-            }
+        let app = AXUIElementCreateApplication(getpid())
+        AXUIElementSetMessagingTimeout(app, 10)
+        var items: [Item] = []
+        func walk(_ element: AXUIElement, _ depth: Int) {
+            guard depth < 40, items.count < 4000 else { return }
+            var names: CFArray?
+            AXUIElementCopyActionNames(element, &names)
+            items.append(Item(depth: depth, role: string(element, kAXRoleAttribute), subrole: string(element, kAXSubroleAttribute),
+                              label: name(of: element), value: string(element, kAXValueAttribute), help: string(element, kAXHelpAttribute),
+                              enabled: (attribute(element, kAXEnabledAttribute) as? Bool) ?? true,
+                              actions: ((names as? [String]) ?? []).map { raw in
+                                  // A custom action comes as "Name:<name>\nTarget:…\nSelector:…".
+                                  let first = raw.split(separator: "\n").first.map(String.init) ?? raw
+                                  return first.hasPrefix("Name:") ? String(first.dropFirst(5)) : first
+                              }))
+            for child in (attribute(element, kAXChildrenAttribute) as? [AXUIElement]) ?? [] { walk(child, depth + 1) }
         }
+        for window in (attribute(app, kAXWindowsAttribute) as? [AXUIElement]) ?? [] where string(window, kAXTitleAttribute) == title {
+            walk(window, 0)
+        }
+        return items
     }
 
     /// The controls and images of `items` that a screen reader could not name.

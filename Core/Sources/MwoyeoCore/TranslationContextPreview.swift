@@ -25,8 +25,11 @@ public struct SentSummary: Equatable, Sendable {
     /// The window title may go (the engine runs on this Mac, or the user opted in) and the mode sends the window at all.
     public var windowTitle: Bool
     public var hasNote: Bool
-    /// At most this many name rows go; only those whose source stands in the text do.
+    /// At most this many name rows of the app go; only those whose source stands in the text do.
     public var names: Int
+    /// The pairs of the global glossary that go along with every request (the app's own rows replace theirs). With `names` they are the
+    /// names of the line, and the line says which scope each count is of (design names-and-context §3.3).
+    public var allApps: Int
     /// At most this many lines before / after the text go.
     public var linesBefore: Int
     public var linesAfter: Int
@@ -34,7 +37,7 @@ public struct SentSummary: Equatable, Sendable {
     public var learned: Bool
 
     public init(mode: Mode, engineName: String? = nil, appName: String? = nil, domain: String? = nil, windowTitle: Bool = false,
-                hasNote: Bool = false, names: Int = 0, linesBefore: Int = 0, linesAfter: Int = 0, learned: Bool = false) {
+                hasNote: Bool = false, names: Int = 0, allApps: Int = 0, linesBefore: Int = 0, linesAfter: Int = 0, learned: Bool = false) {
         self.mode = mode
         self.engineName = engineName
         self.appName = appName
@@ -42,12 +45,24 @@ public struct SentSummary: Equatable, Sendable {
         self.windowTitle = windowTitle
         self.hasNote = hasNote
         self.names = names
+        self.allApps = allApps
         self.linesBefore = linesBefore
         self.linesAfter = linesAfter
         self.learned = learned
     }
 
-    /// `Sent: Example Chat · social · window title · note · up to 2 names · 2 lines before · 2 lines after`, or `Sent: lines only`.
+    /// `Sent: Example Chat · social · window title · note · up to 3 names (2 this app, 1 all apps) · 2 lines before · 2 lines after`, or
+    /// `Sent: lines only`. A scope with no names is left out; the rows the engine learned count with the app's (`learned too`).
+    public var namesText: String? {
+        let total = names + allApps
+        guard total > 0 else { return nil }
+        var scopes: [String] = []
+        if names > 0 { scopes.append("\(names) this app" + (learned ? ", learned too" : "")) }
+        if allApps > 0 { scopes.append("\(allApps) all apps") }
+        return "up to \(total) \(total == 1 ? "name" : "names") (\(scopes.joined(separator: ", ")))"
+    }
+
+    /// The English line (see `namesText`).
     public var text: String {
         var parts: [String] = []
         if let appName {
@@ -55,7 +70,7 @@ public struct SentSummary: Equatable, Sendable {
         }
         if windowTitle { parts.append("window title") }
         if hasNote { parts.append("note") }
-        if names > 0 { parts.append("up to \(names) \(names == 1 ? "name" : "names")\(learned ? " (learned too)" : "")") }
+        if let namesText { parts.append(namesText) }
         if linesBefore > 0 { parts.append("\(linesBefore) \(linesBefore == 1 ? "line" : "lines") before") }
         if linesAfter > 0 { parts.append("\(linesAfter) \(linesAfter == 1 ? "line" : "lines") after") }
         return "Sent: " + (parts.isEmpty ? "lines only" : parts.joined(separator: " · "))
@@ -67,10 +82,13 @@ extension RequestLayout {
     ///
     /// - `rows`: the sheet's rows (the user's, and the usable learned ones when `options.includeLearned`); the count is how many
     ///   of them fit the engine's row budget if every one of them occurred in the text.
+    /// - `glossary`: the global glossary's pairs. They go whole on the context path, minus those an included user row replaces
+    ///   (`prepare`), and count as the names "of all apps".
     /// - An engine that takes no context (`kind.tier == nil`), or options that are Off, are `linesOnly`: the card, the note and
     ///   the rows do not go either.
     public static func sentSummary(options: ContextOptions, kind: LayoutKind, engineName: String? = nil, appName: String?,
-                                   domain: String? = nil, note: String = "", rows: [MemoryEntry] = []) -> SentSummary {
+                                   domain: String? = nil, note: String = "", rows: [MemoryEntry] = [],
+                                   glossary: [(String, String)] = []) -> SentSummary {
         guard options.enabled, let tier = kind.tier else { return SentSummary(mode: .linesOnly, engineName: engineName) }
         let budget = ContextBudget.for(tier)
         let memoryOnly = options.memoryOnly
@@ -90,6 +108,8 @@ extension RequestLayout {
             }.filter { !$0.src.isEmpty && !$0.dst.isEmpty }
             s.names = selectRows(candidates, items: candidates.map(\.src), surrounding: [], budget: budget, format: options.format).count
             s.learned = options.includeLearned && !memoryOnly && candidates.contains { $0.origin == .learned }
+            let replaced = options.includeUser ? Set(rows.filter { $0.origin == .user }.map(\.id)) : []
+            s.allApps = glossary.filter { !replaced.contains(ContextText.foldedKey($0.0)) }.count
         }
         if !memoryOnly {
             let cap = options.longTranscript ? budget.maxTranscript : min(ContextOptions.shortTranscript, budget.maxTranscript)

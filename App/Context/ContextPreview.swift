@@ -7,7 +7,9 @@ enum ContextPreview {
     /// - `category`: the app's `LSApplicationCategoryType`, for the card's domain word.
     /// - `learnedUsable`: how many learned rows the app has that a request may use (`LearnedCounts.usable`); they count only while
     ///   the engine's `useLearned` is on.
-    static func summary(engine: EngineConfig?, profile: AppProfile?, appName: String, category: String?, learnedUsable: Int) -> SentSummary {
+    /// - `glossary`: the global glossary's pairs, which go along with every request and count as the names of all apps.
+    static func summary(engine: EngineConfig?, profile: AppProfile?, appName: String, category: String?, learnedUsable: Int,
+                        glossary: [(String, String)] = []) -> SentSummary {
         guard let engine else { return SentSummary(mode: .linesOnly) }
         let options = ContextOptions.requestOptions(engine: engine, profile: profile)
         // Learned rows are in the translator; each counts as an average-sized row against the engine's row budget.
@@ -16,18 +18,18 @@ enum ContextPreview {
         } : []
         return RequestLayout.sentSummary(options: options, kind: .engine(engine.kind), engineName: engine.name, appName: appName,
                                          domain: CategoryDomain.word(for: category), note: profile?.note ?? "",
-                                         rows: (profile?.entries ?? []) + learned)
+                                         rows: (profile?.entries ?? []) + learned, glossary: glossary)
     }
 
     /// The engine sheet's "Sent:" line, true for the settings as they stand (design §3, D1). An app that wrote a note or names puts
     /// the engine on the memory it sends (`EnginePermissions.memoryProfiles`): the line describes the first such app, as the request
     /// path would send it. With none, it describes a sample app under the engine's own switches.
     /// - `category`: the category of an app by its bundle id (`AppModel.category(ofApp:)`).
-    static func engineSummary(engine: EngineConfig, profiles: [AppProfile], category: (String) -> String?,
+    static func engineSummary(engine: EngineConfig, profiles: [AppProfile], category: (String) -> String?, glossary: [(String, String)] = [],
                               sampleApp: String = "Example Chat", sampleCategory: String? = "public.app-category.social-networking") -> SentSummary {
         if let p = EnginePermissions.memoryProfiles(engine, profiles: profiles).first {
-            return summary(engine: engine, profile: p, appName: p.appName, category: category(p.bundleID), learnedUsable: 0)
+            return summary(engine: engine, profile: p, appName: p.appName, category: category(p.bundleID), learnedUsable: 0, glossary: glossary)
         }
-        return summary(engine: engine, profile: nil, appName: sampleApp, category: sampleCategory, learnedUsable: 0)
+        return summary(engine: engine, profile: nil, appName: sampleApp, category: sampleCategory, learnedUsable: 0, glossary: glossary)
     }
 }

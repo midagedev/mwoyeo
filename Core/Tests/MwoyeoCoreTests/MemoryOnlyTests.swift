@@ -217,7 +217,7 @@ import Testing
     @Test func aPinnedRowIsAUserRowOfTheProfileAndSurvivesTheFile() throws {
         let learned = MemoryEntry(src: "Alice", dst: "앨리스", kind: .person, gender: .f, origin: .learned, uses: 3, lastSeen: Date())
         var profiles = [profile(note: "casual", entries: [name])]
-        #expect(AppProfiles.pin(learned, bundleID: "com.example.chat", in: &profiles) == .pinned)
+        #expect(AppProfiles.pin(learned, bundleID: "com.example.chat", appName: "Chat", creatingWith: pair, in: &profiles) == .pinned)
         #expect(profiles[0].entries.map(\.src) == ["田中", "Alice"] && profiles[0].entries.allSatisfy { $0.origin == .user })
         // Through the file's text and back: a user row with the pair fields.
         let data = try JSONEncoder().encode(profiles)
@@ -231,18 +231,26 @@ import Testing
         memory.forgetLearned()
     }
 
+    private let pair = LanguageChoice(source: "en", target: "ko", customEngineID: nil)
+
     @Test func pinSaysWhatItDid() {
         let learned = MemoryEntry(src: "Alice", dst: "앨리스", origin: .learned)
+        // 2026-10-21 (round nameslens, design names-and-context §3.2): an app without a profile used to answer `.noProfile` and stay without
+        // one. A pin is an edit of the memory, and the first edit makes the profile (`AppProfiles.ensuring`), with the pair it is given.
+        // Derivation: `.pinned` plus one new profile that holds the row and takes `pair`; a row that is gone makes no profile.
         var none: [AppProfile] = []
-        #expect(AppProfiles.pin(learned, bundleID: "com.example.chat", in: &none) == .noProfile && none.isEmpty)
+        #expect(AppProfiles.pin(learned, bundleID: "com.example.chat", appName: "Chat", creatingWith: pair, in: &none) == .pinned)
+        #expect(none == [AppProfile(bundleID: "com.example.chat", appName: "Chat", source: "en", target: "ko", entries: [MemoryEntry(src: "Alice", dst: "앨리스")])])
+        var gone: [AppProfile] = []
+        #expect(AppProfiles.pin(nil, bundleID: "com.example.chat", appName: "Chat", creatingWith: pair, in: &gone) == .gone && gone.isEmpty)
         var profiles = [profile()]
-        #expect(AppProfiles.pin(nil, bundleID: "com.example.chat", in: &profiles) == .gone)
+        #expect(AppProfiles.pin(nil, bundleID: "com.example.chat", appName: "Chat", creatingWith: pair, in: &profiles) == .gone)
         // The user's own row for the source stays as it is.
         profiles = [profile(entries: [MemoryEntry(src: "alice", dst: "앨리")])]
-        #expect(AppProfiles.pin(learned, bundleID: "com.example.chat", in: &profiles) == .alreadyYours && profiles[0].entries[0].dst == "앨리")
+        #expect(AppProfiles.pin(learned, bundleID: "com.example.chat", appName: "Chat", creatingWith: pair, in: &profiles) == .alreadyYours && profiles[0].entries[0].dst == "앨리")
         // A full sheet pins nothing.
         profiles = [profile(entries: (0..<AppProfile.maxEntries).map { MemoryEntry(src: "n\($0)", dst: "이름\($0)") })]
-        #expect(AppProfiles.pin(learned, bundleID: "com.example.chat", in: &profiles) == .full && profiles[0].entries.count == AppProfile.maxEntries)
+        #expect(AppProfiles.pin(learned, bundleID: "com.example.chat", appName: "Chat", creatingWith: pair, in: &profiles) == .full && profiles[0].entries.count == AppProfile.maxEntries)
         // The id a view derives from a source is the row's.
         #expect(MemoryEntry.id(forSource: " ＡＬＩＣＥ ") == learned.id && MemoryEntry.id(forSource: "Alice") == learned.id)
     }
@@ -255,14 +263,39 @@ import Testing
                                           note: "casual", rows: rows)
         #expect(s.mode == .memoryOnly && s.appName == "Chat" && s.domain == "social" && s.hasNote && s.names == 2)
         #expect(!s.windowTitle && s.linesBefore == 0 && s.linesAfter == 0 && !s.learned)
-        #expect(s.text == "Sent: Chat · social · note · up to 2 names")
+        // 2026-10-21 (round nameslens, design names-and-context §3.3, G15): the names of the line say whose they are. Derivation: two rows
+        // of the app and no glossary pair are "2 this app" and no "all apps" part; the total stays 2, so "up to 2 names" is as it was.
+        #expect(s.text == "Sent: Chat · social · note · up to 2 names (2 this app)")
+    }
+
+    /// 2026-10-21 (round nameslens, G15): the glossary's pairs are the names of all apps, whole on the context path, minus the pairs an
+    /// included row of the app replaces. Derivation: 2 rows of the app + 3 pairs of which 田中 is replaced by the app's row = 2 + 2.
+    @Test func theSummaryNamesTheScopesOfItsNames() {
+        let glossary = [("田中", "다나카씨"), ("勇者", "용사"), ("魔王", "마왕")]
+        let s = RequestLayout.sentSummary(options: memoryOnly, kind: LayoutKind.engine(CtxFix.local), appName: "Chat", rows: [name, MemoryEntry(src: "山田", dst: "야마다")],
+                                          glossary: glossary)
+        #expect(s.names == 2 && s.allApps == 2)
+        #expect(s.text == "Sent: Chat · up to 4 names (2 this app, 2 all apps)")
+        // The glossary alone, one pair: the singular, and no "this app" part.
+        let alone = RequestLayout.sentSummary(options: memoryOnly, kind: LayoutKind.engine(CtxFix.local), appName: "Chat", glossary: [("勇者", "용사")])
+        #expect(alone.text == "Sent: Chat · up to 1 name (1 all apps)")
+        // Learned rows are of the app.
+        var on = ContextOptions(enabled: true, transcriptCount: 0)
+        on.includeLearned = true
+        let learned = RequestLayout.sentSummary(options: on, kind: LayoutKind.engine(CtxFix.local), appName: "Chat",
+                                                rows: [name, MemoryEntry(src: "Alice", dst: "앨리스", origin: .learned)], glossary: glossary)
+        #expect(learned.text.contains("up to 4 names (2 this app, learned too, 2 all apps)"), "\(learned.text)")
+        // Where the memory does not reach the request, neither does the glossary count: DeepL without its opt-in, Off.
+        let deepL = LayoutKind.engine(.deepL(baseURL: URL(string: "https://api.deepl.com")!, formality: nil))
+        #expect(RequestLayout.sentSummary(options: ContextOptions(enabled: true), kind: deepL, appName: "Chat", rows: [name], glossary: glossary).allApps == 0)
+        #expect(RequestLayout.sentSummary(options: .off, kind: LayoutKind.engine(CtxFix.local), appName: "Chat", glossary: glossary).text == "Sent: lines only")
     }
 
     @Test func theSummaryOfContextAndOfOff() {
         let on = ContextOptions(enabled: true, transcriptCount: 3)
         let local = RequestLayout.sentSummary(options: on, kind: LayoutKind.engine(CtxFix.local), appName: "Chat", domain: nil, rows: [name])
         #expect(local.mode == .context && local.windowTitle && local.linesBefore == 3 && local.linesAfter == 2 && !local.hasNote)
-        #expect(local.text == "Sent: Chat · window title · up to 1 name · 3 lines before · 2 lines after")
+        #expect(local.text == "Sent: Chat · window title · up to 1 name (1 this app) · 3 lines before · 2 lines after")
         // A cloud engine gets the title only with the opt-in.
         let cloud = RequestLayout.sentSummary(options: on, kind: LayoutKind.engine(CtxFix.anthropic), appName: "Chat", domain: nil)
         #expect(!cloud.windowTitle)
@@ -283,7 +316,7 @@ import Testing
         #expect(RequestLayout.sentSummary(options: on, kind: LayoutKind.engine(CtxFix.local), appName: "Chat", rows: [name, learned]).names == 1)
         on.includeLearned = true
         let with = RequestLayout.sentSummary(options: on, kind: LayoutKind.engine(CtxFix.local), appName: "Chat", rows: [name, learned])
-        #expect(with.names == 2 && with.learned && with.text.contains("(learned too)"))
+        #expect(with.names == 2 && with.learned && with.text.contains("up to 2 names (2 this app, learned too)"))
     }
 
     @Test func theSummaryNeverHoldsText() {

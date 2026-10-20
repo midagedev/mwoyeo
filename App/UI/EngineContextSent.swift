@@ -22,14 +22,19 @@ enum EngineContextSent {
         var windowTitle: String
         var note: String
         var names: (Int) -> String
-        var namesLearned: (Int) -> String
+        /// The scopes of the names, in the parentheses after the count: the app's (with `learnedToo` after it when the engine's learned
+        /// rows are counted) and the glossary's (design names-and-context §3.3).
+        var thisApp: (Int) -> String
+        var learnedToo: String
+        var allApps: (Int) -> String
         var before: (Int) -> String
         var after: (Int) -> String
 
         @MainActor static var current: Words {
             Words(sent: { String(localized: "Sent: \($0)") }, category: { EngineContextSent.categoryWord($0) }, linesOnly: String(localized: "lines only"),
                   windowTitle: String(localized: "window title"), note: String(localized: "note"),
-                  names: { String(localized: "up to \($0) names") }, namesLearned: { String(localized: "up to \($0) names (learned too)") },
+                  names: { String(localized: "up to \($0) names") }, thisApp: { String(localized: "\($0) this app") },
+                  learnedToo: String(localized: "learned too"), allApps: { String(localized: "\($0) all apps") },
                   before: { String(localized: "\($0) lines before") }, after: { String(localized: "\($0) lines after") })
         }
     }
@@ -41,7 +46,12 @@ enum EngineContextSent {
         if let app = summary.appName { parts.append(summary.domain.map { "\(app) · \(words.category($0))" } ?? app) }
         if summary.windowTitle { parts.append(words.windowTitle) }
         if summary.hasNote { parts.append(words.note) }
-        if summary.names > 0 { parts.append(summary.learned ? words.namesLearned(summary.names) : words.names(summary.names)) }
+        if summary.names + summary.allApps > 0 {
+            var scopes: [String] = []
+            if summary.names > 0 { scopes.append(words.thisApp(summary.names) + (summary.learned ? ", " + words.learnedToo : "")) }
+            if summary.allApps > 0 { scopes.append(words.allApps(summary.allApps)) }
+            parts.append(words.names(summary.names + summary.allApps) + " (" + scopes.joined(separator: ", ") + ")")
+        }
         if summary.linesBefore > 0 { parts.append(words.before(summary.linesBefore)) }
         if summary.linesAfter > 0 { parts.append(words.after(summary.linesAfter)) }
         return words.sent(parts.isEmpty ? words.linesOnly : parts.joined(separator: " · "))
@@ -118,7 +128,7 @@ enum EngineContextSent {
         let on3 = EngineContext(enabled: true, previousLines: 3)
         let offKept = EngineContext(enabled: false, previousLines: 5, includeTitle: true, useLearned: true, deepLInstructions: true)
         let words = Words(sent: { "S[\($0)]" }, category: { "C(\($0))" }, linesOnly: "LO", windowTitle: "WT", note: "NOTE", names: { "N\($0)" },
-                          namesLearned: { "L\($0)" }, before: { "B\($0)" }, after: { "A\($0)" })
+                          thisApp: { "T\($0)" }, learnedToo: "LT", allApps: { "G\($0)" }, before: { "B\($0)" }, after: { "A\($0)" })
         func engine(_ kind: EngineKind, _ context: EngineContext?) -> EngineConfig {
             var e = EngineConfig(name: "Sent check", kind: kind)
             e.context = context
@@ -141,13 +151,20 @@ enum EngineContextSent {
               marked(local, on3).contains("WT") && !marked(cloud, on3).contains("WT") && !marked(deepL, on3).contains("WT")
               && marked(cloud, EngineContext(enabled: true, previousLines: 3, includeTitle: true)).contains("WT"),
               "\(marked(local, on3)) | \(marked(cloud, on3))")
-        let full = SentSummary(mode: .context, appName: "Mail", domain: "email", windowTitle: true, hasNote: true, names: 3, linesBefore: 4, linesAfter: 2)
+        let full = SentSummary(mode: .context, appName: "Mail", domain: "email", windowTitle: true, hasNote: true, names: 3, allApps: 2, linesBefore: 4, linesAfter: 2)
         var learned = full
         learned.learned = true
+        // 2026-10-21 (round nameslens, G15): the names part of the line is the total with the scopes of its names in parentheses (design
+        // names-and-context §3.3); it used to be the total alone, with "(learned too)" after it. Derivation: 3 of the app + 2 of the glossary
+        // = N5; the app's part takes the learned marker.
         check("every field of a summary has its word, in the order of Core's English line, and the line says only the fields that are set",
-              said(full, in: words) == "S[Mail · C(email) · WT · NOTE · N3 · B4 · A2]" && said(learned, in: words) == "S[Mail · C(email) · WT · NOTE · L3 · B4 · A2]"
+              said(full, in: words) == "S[Mail · C(email) · WT · NOTE · N5 (T3, G2) · B4 · A2]" && said(learned, in: words) == "S[Mail · C(email) · WT · NOTE · N5 (T3, LT, G2) · B4 · A2]"
               && said(SentSummary(mode: .memoryOnly, appName: "Mail", hasNote: true), in: words) == "S[Mail · NOTE]"
               && said(SentSummary(mode: .linesOnly), in: words) == "S[LO]")
+        check("a scope with no names is left out of the parentheses, and the line is Core's English line in the same order",
+              said(SentSummary(mode: .memoryOnly, appName: "Mail", names: 2), in: words) == "S[Mail · N2 (T2)]"
+              && said(SentSummary(mode: .memoryOnly, appName: "Mail", allApps: 4), in: words) == "S[Mail · N4 (G4)]"
+              && SentSummary(mode: .memoryOnly, appName: "Mail", names: 2, allApps: 1).text == "Sent: Mail · up to 3 names (2 this app, 1 all apps)")
 
         // The category word: Core's ids go through the app's language, in every language the app ships.
         let ids = Set(CategoryDomain.words.values)

@@ -174,6 +174,34 @@ are in [tools/engine-bench/RESULTS.md](tools/engine-bench/RESULTS.md)):
 Apple's translation is the fastest. Cloud engines take about a second longer, and in return give translations that
 follow the context.
 
+## When a name changes from line to line: context and memory per app
+
+In a game or a chat, the same name can come out differently on each line, because the engine sees one line at a time.
+Mwoyeo has three ways to stop that.
+
+| | For | Where |
+|---|---|---|
+| **Glossary** | Names that are the same in every app (your username, names you see everywhere) | Settings › Translation › Glossary |
+| **Memory per app** | Names and terms of one app, and a note for the translator (a game's cast, its places, how people speak) | Settings › Translation › App profiles, the app's ⋯ › **Memory…** |
+| **Context** | The lines before and the window title go along with each line, so the engine knows who is speaking to whom | An added engine's sheet › **Context** |
+
+- **Memory per app** appears once you remember the app with *Remember Languages for (app name)* in the lens menu.
+  Each name has its original, its translation and a kind (person, place, term). Names an engine learned show faintly;
+  click one to pin it. *Forget Learned* and *Start Fresh* clear them.
+- **Each engine takes it its own way.** Chat servers (Ollama, OpenAI-compatible) and Anthropic get the memory even with
+  Context off. DeepL gets the note and names as DeepL instructions when *Use my notes with DeepL* is on in its sheet.
+  Apple Translation uses your pinned names only when *Use my names and terms with Apple Translation* is on: they are
+  put into the original before it is translated.
+- **The engine sheet's "Sent:" line shows exactly what goes along.** Context and the window title are off by default.
+  With a cloud engine, those lines go to the engine's company too.
+- **Which engines keep the memory?** In our game-scene run, DeepL Free kept every name from the memory on every line
+  (九十九 → 츠쿠모, 8 lines of 8). A small local model (about 4B) can still vary from line to line with the memory.
+  Claude 5 engines have a known issue in 1.1.4 ([release notes](https://github.com/midagedev/mwoyeo/releases/tag/v1.1.4)).
+
+If filling in the memory by hand is tedious, an agent such as Claude Code can do it: see
+[Connect an agent (MCP)](#connect-an-agent-mcp). It reads the translation log, finds the names that changed from line to
+line and writes them into that app's memory.
+
 ## Settings
 
 | Tab | What you can change |
@@ -236,7 +264,9 @@ claude mcp add mwoyeo -- "/Applications/Mwoyeo.app/Contents/MacOS/Mwoyeo" --mcp
 
 - **Stuck on "Translating…"?** Usually the language pack is missing; download it in Settings › Translation. The very
   first lens after installing also takes a while, because macOS loads its text recognition models once.
-- **Names come out wrong** (characters, places, usernames)? Add them to the glossary and choose *Glossary first*.
+- **Names come out wrong** (characters, places, usernames)? Put names used in every app in the glossary, and names of
+  one game or app in that app's memory ([see above](#when-a-name-changes-from-line-to-line-context-and-memory-per-app)).
+  With Apple Translation alone, turn on *Use my names and terms with Apple Translation* or choose *Glossary first*.
 - **Nothing shows up after an update?** macOS sometimes asks for Screen Recording again. Check it in System Settings,
   then reopen Mwoyeo.
 - **Want to compare with the original?** Press ⌃⌥O to see the original, and again to go back.

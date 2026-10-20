@@ -301,3 +301,7 @@ R1 and R2 can run in parallel (no shared file). R4 waits for R2 (the scoped `sen
    DE/EN/ES/FR/IT/JA/KO/ZH is asked for? Recommended: park. A glossary also needs a fixed source language.
 5. **"Memory for <App>…" in every lens's menu**, unanchored lenses included, creating nothing until the first edit?
    Recommended: yes. The lens is where the person is when a name comes out wrong.
+
+**Decided 2026-10-21 (the user):** window scope yes; only the glossary pairs that occur go with a request; the Apple switch
+pre-inserts pinned names of every scope, the glossary included; "Memory for <App>…" goes in every lens menu. DeepL's
+glossaries API stays deferred (it cannot be used with automatic source detection).

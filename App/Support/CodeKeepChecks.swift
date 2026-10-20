@@ -22,6 +22,15 @@ enum CodeKeepChecks {
         let page = Picture(page: RGBA(255, 255, 255), size: CGSize(width: 900, height: 560))
         let box = RGBA(246, 248, 250)                                           // a code box on a white page: 9 levels
 
+        // A run cut out of a line (the lines of a syntax-coloured listing are cut at the colour changes) keeps the ranges of its words in its own
+        // text: CodeKeep reads them (the first build of the pitch crashed on 20 of the 52 use-case pictures, "String index range is out of bounds").
+        let source = "let total = price * 2"
+        let coloured = OCRLine(rect: CGRect(x: 0, y: 0, width: 400, height: 30), text: source,
+                               words: ["let", "total", "=", "price", "*", "2"].map { w in OCRWord(rect: .zero, range: source.range(of: w)!) })
+        let middle = coloured.run(1..<4, in: coloured.rect)
+        check("a run cut out of a line has its own text, and its words' ranges index it",
+              middle.text == "total = price" && middle.words.map { String(middle.text[$0.range]) } == ["total", "=", "price"])
+
         // The page colour of a frame.
         var flat = RGBAImage(width: 20, height: 10, color: RGBA(255, 255, 255))
         for x in 0..<5 { for y in 0..<10 { flat.set(x: x, y: y, RGBA(246, 248, 250)) } }

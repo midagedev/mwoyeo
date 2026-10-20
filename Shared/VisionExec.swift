@@ -8,8 +8,16 @@ import Vision
 struct OCRLine: Sendable {
     var rect: CGRect
     var text: String
-    /// Its words (CJK: characters) with their boxes, where Vision could place them.
+    /// Its words (CJK: characters) with their boxes, where Vision could place them. Each range indexes `text`.
     var words: [OCRWord] = []
+
+    /// The run of this line made of its words `r` alone, drawn in `rect`: its text is theirs, and their ranges index that text, not the line's.
+    func run(_ r: Range<Int>, in rect: CGRect) -> OCRLine {
+        let cut = String(text[words[r.lowerBound].range.lowerBound..<words[r.upperBound - 1].range.upperBound])
+        let origin = text.utf8.distance(from: text.utf8.startIndex, to: words[r.lowerBound].range.lowerBound)
+        func own(_ i: String.Index) -> String.Index { cut.utf8.index(cut.utf8.startIndex, offsetBy: text.utf8.distance(from: text.utf8.startIndex, to: i) - origin) }
+        return OCRLine(rect: rect, text: cut, words: words[r].map { OCRWord(rect: $0.rect, range: own($0.range.lowerBound)..<own($0.range.upperBound)) })
+    }
 }
 
 struct OCRWord: Sendable {

@@ -1246,9 +1246,8 @@ actor RegionPipeline {
                 .joined(separator: " "), since: Trace.now)
         }
         return StyleRuns.runs(tokens, lineHeight: h).map { r in
-            let words = Array(line.words[r]), minX = tokens[r].map(\.minX).min()!, maxX = tokens[r].map(\.maxX).max()!
-            return OCRLine(rect: CGRect(x: minX, y: line.rect.minY, width: maxX - minX, height: h),
-                           text: String(line.text[words[0].range.lowerBound..<words[words.count - 1].range.upperBound]), words: words)
+            let minX = tokens[r].map(\.minX).min()!, maxX = tokens[r].map(\.maxX).max()!
+            return line.run(r, in: CGRect(x: minX, y: line.rect.minY, width: maxX - minX, height: h))
         }
     }
 

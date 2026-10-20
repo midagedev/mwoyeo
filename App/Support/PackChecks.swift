@@ -127,6 +127,16 @@ enum PackChecks {
         check("and its end frees it, saying not finished", download.image == nil && download.ledger.phase(of: ja) == .notFinished)
         download.packsChanged()
 
+        // 8b. The host's configuration for a second ask of the same pair: `translationTask` runs only on a change, and a fresh one equals the
+        // last, so the sheet never came again after "Cancel" (hand test, 2026-10-20). Each ask is a new version of the last.
+        let first = TranslationSession.Configuration.asking(ja, engine: .auto, after: nil)
+        let again = TranslationSession.Configuration.asking(ja, engine: .auto, after: first)
+        check("a second ask for the same pair changes the sheet's configuration", again != first, "version \(first.version) → \(again.version)")
+        check("and still asks for that pair", again.source == first.source && again.target == first.target)
+        let other = TranslationSession.Configuration.asking(ko, engine: .auto, after: again)
+        check("an ask for another pair asks for that pair", other.source?.minimalIdentifier == ko.source && other.target?.minimalIdentifier == ko.target,
+              "\(other.source?.minimalIdentifier ?? "nil") → \(other.target?.minimalIdentifier ?? "nil")")
+
         // 9. A pair with no translation: said on a lens whose source is chosen, and what to do about it.
         let same = PackPair(source: "ko", target: "ko")
         model.received(.unsupportedPair(source: "ko", target: "ko"))

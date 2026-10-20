@@ -81,6 +81,11 @@ final class PackDownload {
     /// Packs were installed or removed somewhere: unfinished downloads are not news any more.
     func packsChanged() { ledger.packsChanged() }
 
+    /// The sheet's task asked the system for `pair`: the log says asked and ended for every sheet, so an ask that brought no sheet shows.
+    func sheetAsked(_ pair: PackPair, in host: PackHost) {
+        log.notice("pack sheet asked: \(pair.source, privacy: .public) → \(pair.target, privacy: .public) in \(String(describing: host), privacy: .public)")
+    }
+
     /// The sheet could not be hosted (no window to show it over): the ask ends as a download that did not finish.
     func abandon(_ pair: PackPair, in host: PackHost) async {
         guard self.pair(for: host) == pair else { return }
@@ -98,6 +103,19 @@ extension TranslationSession.Configuration {
         guard #available(macOS 26.4, *) else { self.init(source: source, target: target); return }
         self.init(source: source, target: target, preferredStrategy: engine == .highFidelity ? .highFidelity : .lowLatency)
     }
+
+    /// The ask for `pair` after the host's last one (`last`, kept when its sheet ended): that configuration set to the pair, with a new
+    /// version. `translationTask` runs only when its configuration changes, and a fresh one for the same pair equals the last (both
+    /// version 0): asked again after "Cancel", no sheet came and the row said "Downloading…" until a relaunch (hand test, 2026-10-20).
+    static func asking(_ pair: PackPair, engine: TranslationEngineChoice, after last: Self?) -> Self {
+        let fresh = Self(pair, engine: engine)
+        var next = last ?? fresh
+        next.source = fresh.source
+        next.target = fresh.target
+        if #available(macOS 26.4, *) { next.preferredStrategy = fresh.preferredStrategy }
+        next.invalidate()
+        return next
+    }
 }
 
 private struct PackDownloadHost: ViewModifier {
@@ -109,17 +127,18 @@ private struct PackDownloadHost: ViewModifier {
     func body(content: Content) -> some View {
         content
             .onChange(of: PackDownload.shared.pair(for: host), initial: true) { _, pair in
-                configuration = pair.map { TranslationSession.Configuration($0, engine: AppModel.shared.settings.engine) }
+                if let pair { configuration = .asking(pair, engine: AppModel.shared.settings.engine, after: configuration) }
             }
             .translationTask(configuration) { session in
                 // The pair this sheet is for: set when the configuration was, and not the host's later one if it is replaced meanwhile.
+                // None when the window comes back with the last configuration and nothing asked.
                 guard let pair = await MainActor.run(body: { PackDownload.shared.pair(for: host) }) else { return }
+                PackDownload.shared.sheetAsked(pair, in: host)
                 // Shows the system's download sheet over this window; returns once the pack is installed or the user declines.
                 var failure: (any Error)?
                 do { try await session.prepareTranslation() } catch { failure = error }
-                await MainActor.run { configuration = nil }
-                // Clearing the configuration cancels this task; the ending (the ledger, then every lens's re-read) runs in its own task so
-                // a cancelled one cannot skip it.
+                // The ending (the ledger, then every lens's re-read) runs in its own task so a task cancelled by another pair's ask
+                // cannot skip it.
                 Task { @MainActor in
                     let installed = await PackDownload.shared.end(pair, in: host, error: failure)
                     ended(installed)

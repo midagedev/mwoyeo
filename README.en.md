@@ -217,6 +217,21 @@ tail -f ~/Documents/Mwoyeo/Transcripts/*.jsonl
 To change a setting, ask Claude Code: *"Make the lens frame subtle and translate into Japanese."* It reads the schema,
 edits the two keys and runs `--check-settings`.
 
+### Connect an agent (MCP)
+
+`Mwoyeo --mcp` is an MCP server on stdin and stdout, the app's own executable, so the App Store version serves it from its own container
+too. Turn on *Connect an agent (MCP)* in Settings › General (off, every call is refused), then add it to Claude Code. Settings shows the
+exact command for your install, with a Copy button:
+
+```sh
+claude mcp add mwoyeo -- "/Applications/Mwoyeo.app/Contents/MacOS/Mwoyeo" --mcp
+```
+
+- `list_apps` and `read_translation_log`: the apps in the translation log and their newest lines (needs *Save transcripts* with `jsonl`).
+- `get_memory` and `set_memory`: an app's note and its names and terms, checked by the same rules as `settings.json`.
+- `get_settings`, `set_settings` and `get_settings_schema`: every setting of the file, read and changed (not the switch itself, and a command engine is added only by you).
+- A wrong value is refused with its path, and nothing is written. The running app applies a change within a second.
+
 ## Tips and troubleshooting
 
 - **Stuck on "Translating…"?** Usually the language pack is missing; download it in Settings › Translation. The very

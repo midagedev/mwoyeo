@@ -2,6 +2,14 @@
 
 Every setting is one JSON file. You can read it, edit it and check it without starting the app.
 
+## Prefer the MCP server
+
+If Mwoyeo is connected as an MCP server (`claude mcp add mwoyeo -- "<app>/Contents/MacOS/Mwoyeo" --mcp`, and *Connect an agent (MCP)* on in
+Settings › General, key `agentConnection`), use its tools instead of editing the file: `list_apps` and `read_translation_log` for the log,
+`get_memory` and `set_memory` for one app's note, names and terms, `get_settings`, `set_settings` and `get_settings_schema` for everything
+else. The tools apply the same checks as this file and write nothing when a value is wrong. They also work in the App Store version, whose files
+an agent cannot reach. `agentConnection` and command engines are changed only by the person.
+
 ## Where the file is
 
 ```

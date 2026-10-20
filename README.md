@@ -198,6 +198,21 @@ tail -f ~/Documents/Mwoyeo/Transcripts/*.jsonl
 
 설정을 바꾸고 싶으면 Claude Code에게 *"렌즈 테두리를 은은하게 하고 일본어로 번역하게 해 줘"*처럼 말하면 돼요. 스키마를 읽고 키 두 개를 고친 뒤 `--check-settings`로 확인해요.
 
+### 에이전트 연결 (MCP)
+
+`Mwoyeo --mcp`는 앱 실행 파일이 그대로 MCP 서버가 되는 모드예요(표준 입출력). 앱 자신의 실행 파일이라 App Store 버전에서도 앱의 컨테이너 안에서 똑같이 동작해요. 설정 › 일반에서 *에이전트 연결 (MCP)* 을 켠 뒤 Claude Code에 추가하면 돼요. 꺼져 있으면 모든 호출을 거절해요. 설치된 위치에 맞는 명령은 설정에 *복사* 버튼과 함께 나와요.
+
+```sh
+claude mcp add mwoyeo -- "/Applications/Mwoyeo.app/Contents/MacOS/Mwoyeo" --mcp
+```
+
+- `list_apps`, `read_translation_log`: 번역 로그에 있는 앱 목록과 그 앱의 최근 줄을 읽어요. 로그 저장(`savesTranscripts`)을 켜고 형식에 `jsonl`이 있어야 해요.
+- `get_memory`, `set_memory`: 앱마다의 메모(번역 지침)와 이름·용어를 읽고 써요. `settings.json`과 같은 규칙으로 검사해요.
+- `get_settings`, `set_settings`, `get_settings_schema`: 설정 파일의 모든 설정을 읽고 바꿔요. 연결 스위치 자체와 command 엔진은 직접 설정에서만 바꿀 수 있어요.
+- 잘못된 값은 경로와 함께 거절하고 아무것도 쓰지 않아요. 실행 중인 앱은 바뀐 내용을 1초 안에 적용해요.
+
+예를 들어 Claude Code에게 *"번역 로그 보고 이 게임의 이름이랑 용어를 정리해 줘"* 라고 하면, 로그에서 줄마다 달라진 이름을 찾아 그 게임의 메모리에 써요.
+
 ## 자주 겪는 문제
 
 - **"번역 중…"에서 넘어가지 않아요.** 대부분 언어 팩이 없어서 그래요. 설정 › 번역에서 받아 주세요. 설치하고 처음

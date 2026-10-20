@@ -232,9 +232,11 @@ tail -f ~/Documents/Mwoyeo/Transcripts/*.jsonl
 claude mcp add mwoyeo -- "/Applications/Mwoyeo.app/Contents/MacOS/Mwoyeo" --mcp
 ```
 
-- `list_apps`, `read_translation_log`: 번역 로그에 있는 앱 목록과 그 앱의 최근 줄을 읽어요. 로그 저장(`savesTranscripts`)을 켜고 형식에 `jsonl`이 있어야 해요.
+- `list_apps`, `read_translation_log`, `term_renderings`: 번역 로그에 있는 앱 목록, 그 앱의 최근 줄, 물어본 이름이 어떻게 번역됐는지를 읽어요. 로그 저장(`savesTranscripts`)을 켜고 형식에 `jsonl`이 있어야 해요.
+  에이전트의 컨텍스트를 적게 쓰도록 답을 만들어요. 로그는 표 하나로 오고 늘 같은 값(앱, 언어, 엔진)은 한 번만 적어요. OCR이 조각조각 읽은 줄은 가장 긴 줄 하나로 접고, 다시 읽힌 줄은 반복하지 않고 횟수로 세요.
+- `translate_text`: 몇 줄을 렌즈와 같은 경로로, 그 앱의 엔진·언어·메모리로 번역해서 고친 결과를 에이전트가 직접 확인해요. 줄마다 어느 엔진이 번역했는지 알려 줘요. 글은 그 엔진으로 가요(클라우드 엔진이면 그쪽이 봐요). command 엔진은 실행하지 않아요.
 - `get_memory`, `set_memory`: 앱마다의 메모(번역 지침)와 이름·용어를 읽고 써요. `settings.json`과 같은 규칙으로 검사해요.
-- `get_settings`, `set_settings`, `get_settings_schema`: 설정 파일의 모든 설정을 읽고 바꿔요. 연결 스위치 자체와 command 엔진은 직접 설정에서만 바꿀 수 있어요.
+- `get_settings`, `set_settings`, `get_settings_schema`: 설정 파일의 모든 설정을 읽고 바꿔요. 연결 스위치 자체와 command 엔진은 직접 설정에서만 바꿀 수 있어요. 스키마는 키 하나만 따로 받을 수 있어요.
 - 잘못된 값은 경로와 함께 거절하고 아무것도 쓰지 않아요. 실행 중인 앱은 바뀐 내용을 1초 안에 적용해요.
 
 예를 들어 Claude Code에게 *"번역 로그 보고 이 게임의 이름이랑 용어를 정리해 줘"* 라고 하면, 로그에서 줄마다 달라진 이름을 찾아 그 게임의 메모리에 써요.

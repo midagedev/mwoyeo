@@ -5,10 +5,16 @@ Every setting is one JSON file. You can read it, edit it and check it without st
 ## Prefer the MCP server
 
 If Mwoyeo is connected as an MCP server (`claude mcp add mwoyeo -- "<app>/Contents/MacOS/Mwoyeo" --mcp`, and *Connect an agent (MCP)* on in
-Settings › General, key `agentConnection`), use its tools instead of editing the file: `list_apps` and `read_translation_log` for the log,
-`get_memory` and `set_memory` for one app's note, names and terms, `get_settings`, `set_settings` and `get_settings_schema` for everything
-else. The tools apply the same checks as this file and write nothing when a value is wrong. They also work in the App Store version, whose files
-an agent cannot reach. `agentConnection` and command engines are changed only by the person.
+Settings › General, key `agentConnection`), use its tools instead of editing the file: `list_apps`, `read_translation_log` and `term_renderings` for the log,
+`get_memory` and `set_memory` for one app's note, names and terms, `translate_text` to check a memory by translating a few lines the way the lens does,
+`get_settings`, `set_settings` and `get_settings_schema` (give it a `key`: the whole schema is about 30 KB) for everything else. The tools apply the same
+checks as this file and write nothing when a value is wrong. They also work in the App Store version, whose files an agent cannot reach.
+`agentConnection` and command engines are changed only by the person.
+
+Results are compact JSON, one copy (a text block, no `structuredContent`). A log is `{columns, rows, ...}`: what never varies (app, languages, engine, day)
+sits once in the header, a row is an array in the order of `columns`, and a row id is the line's place in the whole log, the same in every tool.
+`read_translation_log` returns the newest 50 rows (`limit`, up to 500); with `distinct` (the default) the pieces of a line an OCR read again and again are
+folded into the fullest read and exact repeats are counted. To check a few names, `term_renderings` is smaller than reading the log.
 
 ## Where the file is
 

@@ -255,9 +255,10 @@ exact command for your install, with a Copy button:
 claude mcp add mwoyeo -- "/Applications/Mwoyeo.app/Contents/MacOS/Mwoyeo" --mcp
 ```
 
-- `list_apps` and `read_translation_log`: the apps in the translation log and their newest lines (needs *Save transcripts* with `jsonl`).
+- `list_apps`, `read_translation_log` and `term_renderings`: the apps in the translation log, their newest lines, and how each name you ask about was translated (needs *Save transcripts* with `jsonl`). The answers are built to cost an agent little context: a log is a table whose constant fields (app, languages, engine) are said once, a line an OCR read in pieces is folded into its fullest read, and a line read again is counted, not repeated.
 - `get_memory` and `set_memory`: an app's note and its names and terms, checked by the same rules as `settings.json`.
-- `get_settings`, `set_settings` and `get_settings_schema`: every setting of the file, read and changed (not the switch itself, and a command engine is added only by you).
+- `translate_text`: a few lines through the lens's own path, with the app's engine, languages and memory, so the agent can check a fix. It says which engine made each line. Text goes to that engine (a cloud engine sees it); a command engine is not run.
+- `get_settings`, `set_settings` and `get_settings_schema`: every setting of the file, read and changed (not the switch itself, and a command engine is added only by you). The schema of one key is one call.
 - A wrong value is refused with its path, and nothing is written. The running app applies a change within a second.
 
 ## Tips and troubleshooting

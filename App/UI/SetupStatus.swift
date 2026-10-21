@@ -55,9 +55,13 @@ struct StatusLine: View {
             let (gate, now) = VisionSetupDisplay.current
             // A status line goes back the moment the steps are done (the gate's linger is for a card that should not blink away).
             let preparing = gate.shouldShowProgress(now: now) && !VisionSetupDisplay.failed(gate) && !VisionSetupDisplay.allDone(gate)
-            Text(preparing ? String(localized: "Preparing text recognition…") : base)
-                .font(.caption).foregroundStyle(.secondary).contentTransition(.opacity)
-                .help(preparing ? VisionSetupDisplay.details(gate, now: now) : "")
+            // An empty line takes no room, so the title centres on the glyph beside it (the panel with no lens; ui-audit-1-1-5 1.4).
+            let text = preparing ? String(localized: "Preparing text recognition…") : base
+            if !text.isEmpty {
+                Text(text)
+                    .font(.caption).foregroundStyle(.secondary).contentTransition(.opacity)
+                    .help(preparing ? VisionSetupDisplay.details(gate, now: now) : "")
+            }
         }
     }
 }

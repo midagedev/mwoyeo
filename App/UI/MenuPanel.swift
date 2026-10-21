@@ -78,8 +78,10 @@ struct MenuPanel: View {
         }
     }
 
+    /// Empty with no lens at all: the body says "No lenses yet" (ui-audit-1-1-5 1.4). "No lenses on" is for lenses that exist and are off.
     private var statusLine: String {
         let active = model.regions.filter(\.isEnabled).count
+        if model.regions.isEmpty { return "" }
         if model.isPaused { return String(localized: "Paused") }
         if active == 0 { return String(localized: "No lenses on") }
         if model.isBusy { return String(localized: "\(active) lenses · reading…") }
@@ -136,6 +138,9 @@ struct MenuPanel: View {
                       systemImage: model.translationsVisible ? "eye" : "eye.slash")
             }
             .help(withShortcut(String(localized: "Hide translations and show the original"), .toggleOriginal))
+            .disabled(!canToggleOriginal)
+            .foregroundStyle(canToggleOriginal ? HierarchicalShapeStyle.secondary : .tertiary)
+            .layoutPriority(1)
             Button {
                 model.toggleLensesHidden()
             } label: {
@@ -143,25 +148,42 @@ struct MenuPanel: View {
                       systemImage: model.lensesHidden ? "rectangle.slash" : "viewfinder")
             }
             .help(withShortcut(String(localized: "Hide every lens until you press this again. A lens you add shows them again."), .hideLenses))
-            .disabled(!model.lensesHidden && !model.regions.contains { model.isRunning($0.id) })
+            .disabled(!canToggleLenses)
+            .foregroundStyle(canToggleLenses ? HierarchicalShapeStyle.secondary : .tertiary)
             // 4 + 16 = 20 pt between the two labelled buttons, twice a label's icon-to-text gap, so each icon reads as its own button's.
             .padding(.leading, 16)
-            Spacer()
-            Button { ImageTranslation.shared.chooseImage() } label: { Image(systemName: "photo") }
+            .layoutPriority(1)
+            Spacer(minLength: 0)
+            // 22 × 22 pt hit areas, the glyphs as they were (ui-audit-1-1-5 X1); ⌘, and ⌘Q as every Mac app has them (1.2). The icons keep
+            // their room first and the labels next, so a long label is cut before an icon is pushed out.
+            Button { ImageTranslation.shared.chooseImage() } label: { Image(systemName: "photo").frame(width: 22, height: 22).contentShape(Rectangle()) }
                 .help("Translate Image… — a file or the clipboard")
                 .accessibilityLabel("Translate Image…")
-            Button { open() } label: { Image(systemName: "gearshape") }
-                .help("Settings")
+                .layoutPriority(2)
+            Button { open() } label: { Image(systemName: "gearshape").frame(width: 22, height: 22).contentShape(Rectangle()) }
+                .keyboardShortcut(",", modifiers: .command)
+                .help(String(localized: "Settings") + " (⌘,)")
                 .accessibilityLabel("Settings")
-            Button { NSApp.terminate(nil) } label: { Image(systemName: "power") }
-                .help("Quit Mwoyeo")
+                .layoutPriority(2)
+            Button { NSApp.terminate(nil) } label: { Image(systemName: "power").frame(width: 22, height: 22).contentShape(Rectangle()) }
+                .keyboardShortcut("q", modifiers: .command)
+                .help(String(localized: "Quit Mwoyeo") + " (⌘Q)")
                 .accessibilityLabel("Quit Mwoyeo")
+                .layoutPriority(2)
         }
         .buttonStyle(.borderless)
         .labelStyle(.titleAndIcon)
         .font(.callout)
         .foregroundStyle(.secondary)
     }
+
+    // The footer is drawn secondary, which a disabled button keeps; a disabled one is drawn tertiary so it reads as off (vision ui-fixes 1.1).
+    private var canToggleOriginal: Bool { Self.canToggleOriginal(lenses: model.regions.count, translationsVisible: model.translationsVisible) }
+    private var canToggleLenses: Bool { model.lensesHidden || model.regions.contains { model.isRunning($0.id) } }
+
+    /// Show Original flips `translationsVisible`, which a lens added later inherits (`AppModel.addRegion`): with no lens it only makes the next one
+    /// open showing the original. So it acts with a lens, or while the translations are hidden (the way back). ui-audit-1-1-5 1.1.
+    static func canToggleOriginal(lenses: Int, translationsVisible: Bool) -> Bool { lenses > 0 || !translationsVisible }
 
     private func withShortcut(_ help: String, _ action: HotKeyAction) -> String {
         model.shortcut(action).map { "\(help) (\($0))" } ?? help
@@ -176,7 +198,13 @@ struct MenuPanel: View {
 struct RegionRow: View {
     @Environment(AppModel.self) private var model
     let region: RegionConfig
-    @State private var hovering = false
+    @State private var hovering: Bool
+
+    /// `hovering`: the row as it is with the pointer on it (the accessibility audit hosts it so; the pointer sets it in the panel).
+    init(region: RegionConfig, hovering: Bool = false) {
+        self.region = region
+        _hovering = State(initialValue: hovering)
+    }
 
     var body: some View {
         HStack(spacing: 10) {
@@ -199,7 +227,7 @@ struct RegionRow: View {
             if hovering {
                 Button {
                     Task { await model.remove(region.id) }
-                } label: { Image(systemName: "trash") }
+                } label: { Image(systemName: "trash").frame(width: 22, height: 22).contentShape(Rectangle()) }
                     .buttonStyle(.borderless)
                     .foregroundStyle(.secondary)
                     .help("Remove Lens")
@@ -465,7 +493,7 @@ struct IssueBanner: View {
 }
 
 /// An added engine gave way to Apple: a quiet line the user can close, not a warning.
-private struct EngineNotice: View {
+struct EngineNotice: View {
     let headline: String
     let reason: String?
     let useApple: () -> Void
@@ -479,8 +507,8 @@ private struct EngineNotice: View {
                 if let reason { Text(reason).font(.caption2).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
             }
             Spacer(minLength: 0)
-            Button("Use Apple", action: useApple).controlSize(.small)
-            Button(action: dismiss) { Image(systemName: "xmark") }
+            Button("Switch to Apple", action: useApple).controlSize(.small)
+            Button(action: dismiss) { Image(systemName: "xmark").frame(width: 22, height: 22).contentShape(Rectangle()) }
                 .buttonStyle(.borderless)
                 .foregroundStyle(.secondary)
                 .help("Dismiss")

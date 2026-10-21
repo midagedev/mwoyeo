@@ -252,14 +252,26 @@ struct RewriteTable: View {
         }
     }
 
+    private func stagePicker(_ stage: Binding<RewriteStage>) -> some View {
+        Picker("Applies to", selection: stage) {
+            Text("Original").tag(RewriteStage.before)
+            Text("Translation").tag(RewriteStage.after)
+        }
+        .labelsHidden()
+    }
+
     private func rowLine(_ i: Int, _ row: RewriteRow) -> some View {
         HStack(spacing: 6) {
-            Picker("Applies to", selection: Binding(get: { row.stage }, set: { v in editor.updateRewrite(at: i) { $0.stage = v } })) {
-                Text("Original").tag(RewriteStage.before)
-                Text("Translation").tag(RewriteStage.after)
+            // Every row's pop-up is as wide as the wider stage name in this language: a fixed 96 pt cut "Translation" to
+            // "Transl…" (ui-all A4 recapture), and sizing to the shown name made rows uneven (vision-final FIX-1).
+            ZStack {
+                ForEach([RewriteStage.before, .after], id: \.self) { stage in
+                    stagePicker(.constant(stage)).fixedSize().hidden().accessibilityHidden(true)
+                }
+                stagePicker(Binding(get: { row.stage }, set: { v in editor.updateRewrite(at: i) { $0.stage = v } }))
+                    .frame(maxWidth: .infinity)
             }
-            .labelsHidden()
-            .fixedSize()   // as wide as "Translation" needs (a fixed 96 pt cut it to "Transl…", found in the ui-all A4 recapture)
+            .fixedSize()
             TextField("Find", text: Binding(get: { editor.rewriteRows.indices.contains(i) ? editor.rewriteRows[i].find : "" },
                                             set: { v in editor.updateRewrite(at: i) { $0.find = v } }), prompt: Text("Find"))
                 .labelsHidden()

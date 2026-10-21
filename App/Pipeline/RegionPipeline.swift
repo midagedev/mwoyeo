@@ -1023,11 +1023,27 @@ actor RegionPipeline {
     }
 
     /// The one chain from the recognizer's blocks to the blocks the pipeline lays out, for the lens and the seamless pass alike (design:
-    /// docs/design/recognition.md section 11): lines worth reading, a paragraph that goes on in the next column cut into one block per
-    /// column, split lines joined, style splits. The cut comes before the joins so that their rules see columns, not the union of two.
-    /// `flowed` last: it needs to know which pieces came through the chain whole.
+    /// docs/design/recognition.md section 11): lines worth reading, the rows of a display the reader took into a paragraph cut out of
+    /// it, a paragraph that goes on in the next column cut into one block per column, split lines joined, style splits. The cuts come
+    /// before the joins so that their rules see columns and rows, not the union of two. `flowed` last: it needs to know which pieces
+    /// came through the chain whole.
     private func readBlocks(_ found: [OCRBlock], in image: CGImage) -> [OCRBlock] {
-        flowed(splitByStyle(joinSplitLines(columnBreak(readableLines(found, in: image))), in: image))
+        flowed(splitByStyle(joinSplitLines(columnBreak(displayRows(readableLines(found, in: image)))), in: image))
+    }
+
+    /// A row of a displayed equation that the reader put into the paragraph beside it is a block of its own (`DisplayRow`, D14): the
+    /// rules that keep a row as written (`TranslationFilter.isLiteral`, `CodeRegion.Reason.equation`) judge blocks, and the row glued to a
+    /// sentence was translated with it and drawn as text over the typeset equation. The pieces are blocks of their own, not a flow.
+    private func displayRows(_ blocks: [OCRBlock]) -> [OCRBlock] {
+        guard Self.layoutRules else { return blocks }
+        return blocks.flatMap { block -> [OCRBlock] in
+            guard block.lines.count > 1 else { return [block] }
+            let pieces = DisplayRow.pieces(block.lines.map { ($0.text, $0.rect) })
+            guard pieces.count > 1 else { return [block] }
+            Trace.count("ocr.display_row")
+            Trace.mark("display row: block '\(block.text.prefix(24))' → pieces \(pieces.map(\.count))", since: Trace.now)
+            return pieces.map { TextRecognizer.makeBlock($0.map { block.lines[$0] }) }
+        }
     }
 
     /// A paragraph that goes on at the top of the next column comes back as one block of lines in two columns, whose rect holds the

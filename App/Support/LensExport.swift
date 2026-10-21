@@ -129,6 +129,13 @@ final class TranscriptWriter: @unchecked Sendable {
     private let formats: Set<TranscriptFileFormat>
     /// The name the JSON lines give the translator of a source text (`TranslationService.translatedBy`; a constant for a writer made by a check).
     private let engineOf: @Sendable (String) -> String
+    /// What the lens's memory had for a source text of an app, for the JSON lines (design names-and-context §2.2, §7: `profile` and `names`); nil
+    /// is a writer that knows no chain (a check, the harness, a Mac with no profile and no glossary), whose lines carry neither key.
+    private let memoryOf: (@Sendable (_ app: String?, _ original: String) -> TranscriptMemory?)?
+    /// What the engine was sent for a source text when a `before` rewrite changed it (`TranslationService.sentText`), for the JSON lines' `sent`.
+    private let sentOf: @Sendable (String) -> String?
+    /// Whether a source text's rules were skipped (`TranslationService.rulesSkipped`), for the JSON lines' `rules`.
+    private let skippedOf: @Sendable (String) -> Bool
     /// The languages as set ("auto" stays "auto"), for the JSON lines.
     private let sourceSetting: String
     private var app: String?
@@ -147,11 +154,16 @@ final class TranscriptWriter: @unchecked Sendable {
     /// `directory` is where the files go; `sourceCode` names the source SRT ("auto" becomes "source").
     /// `formats` are the files written; `engine` says, for a source text, who translated it ("apple" or the added engine's name), for the JSON lines.
     init(directory: URL, access: ExportFolder.Access? = nil, lens: String, sourceCode: String, targetCode: String, formats: [TranscriptFileFormat] = [.markdown, .srt],
-         engine: @escaping @Sendable (String) -> String, started: Date = Date(), onError: @escaping @Sendable () -> Void) {
+         engine: @escaping @Sendable (String) -> String, memory: (@Sendable (_ app: String?, _ original: String) -> TranscriptMemory?)? = nil,
+         sent: @escaping @Sendable (String) -> String? = { _ in nil }, rulesSkipped: @escaping @Sendable (String) -> Bool = { _ in false },
+         started: Date = Date(), onError: @escaping @Sendable () -> Void) {
         self.directory = directory
         self.access = access
         self.formats = Set(formats)
         self.engineOf = engine
+        self.memoryOf = memory
+        self.sentOf = sent
+        self.skippedOf = rulesSkipped
         self.sourceSetting = sourceCode
         self.lens = lens
         self.sourceCode = sourceCode == "auto" ? "source" : sourceCode
@@ -166,6 +178,15 @@ final class TranscriptWriter: @unchecked Sendable {
                      onError: @escaping @Sendable () -> Void) {
         self.init(directory: directory, access: access, lens: lens, sourceCode: sourceCode, targetCode: targetCode, formats: formats,
                   engine: { _ in engine }, started: started, onError: onError)
+    }
+
+    /// The `memory` of a writer for a lens that translates under `settings` (design §2.2, §7): the chain of the window the lens is over (its app
+    /// is the writer's own `setApp`; `title` is the lens's confirmed title, nil until it is) merged as a request merges it (`ContextRoute.merged`),
+    /// and what it had for the line. nil when there is no profile and no glossary: such a Mac's lines are what they always were.
+    static func memory(settings: AppSettings, title: @escaping @Sendable () -> String? = { nil })
+        -> (@Sendable (_ app: String?, _ original: String) -> TranscriptMemory?)? {
+        guard !settings.appProfiles.isEmpty || !settings.glossaryPairs.isEmpty else { return nil }
+        return { app, original in TranscriptMemory(original: original, chain: ContextRoute.merged(settings: settings, lens: app, title: title())) }
     }
 
     /// The bundle ID of the app in the lens, for the JSON lines that follow.
@@ -208,7 +229,7 @@ final class TranscriptWriter: @unchecked Sendable {
                     // Appended and closed per line, so `tail -f` follows it.
                     try append(TranscriptFormat.jsonlLine(time: started.addingTimeInterval(e.time), timeZone: .current, lens: lens, app: app,
                                                           source: sourceSetting, target: targetCode, engine: engineOf(e.source),
-                                                          original: e.source, translation: e.translation), to: file("jsonl"))
+                                                          original: e.source, translation: e.translation, memory: memoryOf?(app, e.source), sent: sentOf(e.source), rulesSkipped: skippedOf(e.source)), to: file("jsonl"))
                 }
             }
             if cuesChanged, formats.contains(.srt) {

@@ -72,12 +72,13 @@ enum MCPLogRows {
 
 // MARK: - the table
 
-/// Rows as a table: what never varies among them (the app, the languages, the engine, the day and its zone) once in the header, the rest
-/// as columns, each row an array in the order of `columns`.
+/// Rows as a table: what never varies among them (the app, the profile, the languages, the engine, the day and its zone) once in the header,
+/// the rest as columns, each row an array in the order of `columns`. A `names` column (design names-and-context §7: `[src, dst, from]` of each
+/// row of the memory that occurs in the line) is there only when some row has names, so a log of a Mac with none is the table it was.
 enum MCPLogTable {
     /// The fields of a line that are a header when they are the same on every row and a column when they are not.
     private static let fields: [(name: String, value: (MCPLogLine) -> String)] = [
-        ("app", { $0.app ?? "" }), ("source", { $0.source }), ("target", { $0.target }), ("engine", { $0.engine }),
+        ("app", { $0.app ?? "" }), ("profile", { $0.profile ?? "" }), ("source", { $0.source }), ("target", { $0.target }), ("engine", { $0.engine }),
     ]
 
     static func render(_ rows: ArraySlice<MCPLogRows.Row>) -> [String: Any] {
@@ -91,6 +92,8 @@ enum MCPLogTable {
         }
         columns += varying.map(\.name)
         columns += ["original", "translation"]
+        let named = lines.contains { !$0.names.isEmpty }
+        if named { columns.append("names") }
         let parts = lines.map { timeParts($0.timeText) }
         let days = Set(parts.map(\.day)), zones = Set(parts.map(\.zone))
         if days.count == 1, let day = days.first, !day.isEmpty { table["day"] = day }
@@ -105,6 +108,7 @@ enum MCPLogTable {
             var cells: [Any] = [row.line.id, time]
             for field in varying { cells.append(field.value(row.line).isEmpty ? NSNull() : field.value(row.line)) }
             cells += [row.line.original, row.line.translation]
+            if named { cells.append(row.line.names) }
             if counted { cells.append(row.count) }
             return cells
         }

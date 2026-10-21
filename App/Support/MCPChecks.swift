@@ -111,6 +111,10 @@ enum MCPChecks {
         func world(_ url: URL? = nil, saved: AppSettings = AppSettings()) -> MCPWorld {
             MCPWorld(settingsURL: url ?? file, saved: { saved }, appName: { $0 == "com.example.chat" ? "Example Chat" : nil })
         }
+        /// A profile of the file by its id (`stored` finds the profile of an app, by its first app condition).
+        func profileOnDisk(_ id: String, at url: URL? = nil) -> AppProfile? {
+            SettingsFileCheck.read((try? Data(contentsOf: url ?? file)) ?? Data(), over: AppSettings()).settings.appProfiles.first { $0.id == id }
+        }
         func stored(_ id: String, at url: URL? = nil) -> AppProfile? {
             AppProfiles.profile(for: id, in: SettingsFileCheck.read((try? Data(contentsOf: url ?? file)) ?? Data(), over: AppSettings()).settings.appProfiles)
         }
@@ -133,10 +137,15 @@ enum MCPChecks {
         check("notifications/initialized has no reply and ping an empty result", initialized == nil && ping?.isEmpty == true)
         let listed = (client.send("tools/list")?["result"] as? [String: Any])?["tools"] as? [[String: Any]] ?? []
         func sentences(_ text: String?) -> Int { (text ?? "").components(separatedBy: ". ").count }
-        check("tools/list: the nine tools, each with a description of at most two sentences and an object schema",
-              listed.compactMap { $0["name"] as? String } == ["list_apps", "read_translation_log", "term_renderings", "get_memory", "set_memory", "translate_text", "get_settings", "set_settings", "get_settings_schema"]
+        check("tools/list: the eleven tools, each with a description of at most two sentences and an object schema",
+              listed.compactMap { $0["name"] as? String } == ["list_apps", "read_translation_log", "term_renderings", "get_memory", "set_memory", "translate_text", "get_settings", "set_settings", "get_settings_schema", "reset_settings", "test_rules"]
               && listed.allSatisfy { sentences($0["description"] as? String) <= 2 && ($0["description"] as? String)?.isEmpty == false && ($0["inputSchema"] as? [String: Any])?["type"] as? String == "object" },
               "\(listed.map { "\($0["name"] as? String ?? "?"): \(sentences($0["description"] as? String))" })")
+        // What the tool list costs an agent, read at the start of every session (round agents, 2026-10-21; tools/mcp/budget.py measures the same on a binary): 1.1.4's
+        // nine tools were 11,016 bytes; the eleven of 1.1.5 (profiles, Restore by tab, test_rules) are 17,880. `set_memory`'s `when`, `context`, `rewrites` and `script`
+        // are listed by their keys, the way `set_settings`' values are. The ceiling is the measured value + 10 %, rounded up to the hundred.
+        let listBytes = MCPServer.json(["tools": listed]).utf8.count
+        check("tools/list costs an agent at most 19,700 bytes (the eleven tools are 17,880; 1.1.4's nine were 11,016)", listBytes <= 19_700, "\(listBytes) bytes")
         let setter = listed.first { $0["name"] as? String == "set_memory" }
         let entriesSchema = ((setter?["inputSchema"] as? [String: Any])?["properties"] as? [String: Any])?["entries"] as? [String: Any]
         let entryKind = (((entriesSchema?["items"] as? [String: Any])?["properties"] as? [String: Any])?["kind"] as? [String: Any])?["enum"] as? [String]
@@ -161,13 +170,14 @@ enum MCPChecks {
         let refusedCalls = [switched.call("list_apps"), switched.call("read_translation_log"), switched.call("get_memory", ["app": "com.example.game"]),
                             switched.call("set_memory", ["app": "com.example.game", "note": "x"]), switched.call("get_settings"),
                             switched.call("set_settings", ["values": ["lensStyle": "subtle"]]), switched.call("get_settings_schema"),
-                            switched.call("term_renderings", ["app": "com.example.game", "terms": ["九十九"]]), switched.call("translate_text", ["lines": ["x"]])]
+                            switched.call("term_renderings", ["app": "com.example.game", "terms": ["九十九"]]), switched.call("translate_text", ["lines": ["x"]]),
+                            switched.call("reset_settings", ["tab": "general"]), switched.call("test_rules", ["lines": ["x"]])]
         let offText = "Agent connection is off. Turn it on in Mwoyeo Settings → \(String(localized: "Connect an agent (MCP)"))."
-        check("switch off: all nine tools are refused with the name of the row to turn on, and nothing is written",
-              refusedCalls.count == 9 && refusedCalls.allSatisfy { $0.isError && $0.text == offText } && bytes(switchURL) == switchBefore)
+        check("switch off: all eleven tools are refused with the name of the row to turn on, and nothing is written",
+              refusedCalls.count == 11 && refusedCalls.allSatisfy { $0.isError && $0.text == offText } && bytes(switchURL) == switchBefore)
         let handshake = switched.send("initialize")?["result"] as? [String: Any]
         let toolsOff = ((switched.send("tools/list")?["result"] as? [String: Any])?["tools"] as? [Any])?.count
-        check("switch off: initialize and tools/list still answer", handshake?["protocolVersion"] as? String == "2025-06-18" && toolsOff == 9)
+        check("switch off: initialize and tools/list still answer", handshake?["protocolVersion"] as? String == "2025-06-18" && toolsOff == 11)
         write(base, to: switchURL)
         let nowOn = switched.call("list_apps")
         check("switch on: the same server works at the next call, without a restart (the setting is read at each call)", !nowOn.isError && (nowOn.data["loggedApps"] as? [Any])?.count == 2)
@@ -284,13 +294,17 @@ enum MCPChecks {
         // list_apps
         let apps = client.call("list_apps")
         let logged = apps.data["loggedApps"] as? [[String: Any]] ?? []
-        let profiles = apps.data["profiles"] as? [[String: Any]] ?? []
+        let profiles = (apps.data["profiles"] as? [String: Any])?["rows"] as? [[Any]] ?? []
         check("list_apps: the apps of the log with their names, line counts and last time, newest first",
               logged.map { $0["bundleID"] as? String } == ["com.example.game", "com.example.chat"] && logged.map { $0["lines"] as? Int } == [2, 3]
               && logged.map { $0["appName"] as? String } == ["Example Game", "Example Chat"] && logged.first?["last"] as? String == MCPLog.lines(in: transcripts).lines.last?.timeText
               && (apps.data["log"] as? [String: Any])?["available"] as? Bool == true)
-        check("list_apps: the apps with a profile, whether each has a memory and how many names",
-              profiles.count == 1 && profiles[0]["bundleID"] as? String == "com.example.game" && profiles[0]["hasMemory"] as? Bool == true && profiles[0]["entries"] as? Int == 2)
+        // 2026-10-21 (round agents, design §7): the profiles are a table of id, name, where used, pair, engine, names and context, as the profile
+        // model has them; 1.1.4's array (bundleID, appName, hasMemory, entries, source, target) is that table's id, name, names and pair.
+        check("list_apps: the profiles as a table (id, name, when, pair, engine, names, context) and no pin while every lens is on Auto",
+              (apps.data["profiles"] as? [String: Any])?["columns"] as? [String] == MCPProfiles.columns && profiles.count == 1
+              && profiles[0][0] as? String == "com.example.game" && profiles[0][1] as? String == "Example Game" && profiles[0][2] as? [String] == ["app com.example.game"]
+              && profiles[0][3] as? String == "en>ja" && profiles[0][4] is NSNull && profiles[0][5] as? Int == 2 && profiles[0][6] is NSNull && apps.data["pin"] == nil)
 
         // No log to read: each reason says how to turn it on
         func gap(_ edit: (inout AppSettings) -> Void, _ name: String) -> (Answer, Answer) {
@@ -313,7 +327,7 @@ enum MCPChecks {
         check("no folder says where to choose one", noFolder.0.isError && noFolder.0.text.contains("choose the folder"))
         check("list_apps still lists the profiles when there is no log, and says why",
               (off.1.data["log"] as? [String: Any])?["available"] as? Bool == false && ((off.1.data["log"] as? [String: Any])?["reason"] as? String)?.contains("Save transcripts") == true
-              && (off.1.data["profiles"] as? [[String: Any]])?.count == 1)
+              && ((off.1.data["profiles"] as? [String: Any])?["rows"] as? [[Any]])?.count == 1)
         var offWithLines = base
         offWithLines.savesTranscripts = false
         let offURL = dir.appendingPathComponent("off-with-lines.json")
@@ -353,7 +367,8 @@ enum MCPChecks {
               && afterMerge?.entries.map(\.src) == ["九十九", "魔王城", "アレン"] && afterMerge?.entries[1].dst == "the Demon Castle" && afterMerge?.entries[2].gender == .m
               && afterMerge?.note == "Fantasy RPG. Keep it formal." && afterMerge?.appName == "Example Game" && afterMerge?.source == "en")
         check("set_memory answers with what changed by name and the count of names, not with the memory it was given",
-              merged.data["entries"] as? Int == 3 && merged.data["note"] == nil && merged.data["issues"] == nil && merged.text.utf8.count < 300, "\(merged.text.utf8.count) bytes")
+              merged.data["profile"] as? String == "com.example.game" && merged.data["names"] as? Int == 3 && merged.data["note"] == nil && merged.data["issues"] == nil
+              && merged.text.utf8.count < 300, "\(merged.text.utf8.count) bytes")
         check("get_memory returns the stored memory, which is what the file holds",
               afterMerge.map { client.call("get_memory", ["app": "com.example.game"]).text == MCPServer.json(MCPMemory.json($0)) } == true)
         let noted = client.call("set_memory", ["app": "com.example.game", "note": "Dark fantasy."])
@@ -366,7 +381,7 @@ enum MCPChecks {
         let cleared = client.call("set_memory", ["app": "com.example.game", "mode": "replace"])
         check("set_memory replace with nothing clears the memory", !cleared.isError && stored("com.example.game")?.hasMemory == false)
         let nothing = client.call("set_memory", ["app": "com.example.game"])
-        check("set_memory merge with nothing to set is a tool error", nothing.isError && nothing.text.contains("give a note, entries or an appName"))
+        check("set_memory merge with nothing to set is a tool error", nothing.isError && nothing.text.contains("give a note, entries, a name or another field"))
 
         // set_memory: rejected, nothing written
         let before = bytes()
@@ -561,9 +576,19 @@ enum MCPChecks {
         // BEFORE (base 4d08e42, 2026-10-21, the agent's copy): list_apps 188 + read_translation_log (limit 65, 65 rows) 15,765 + set_memory 1,630
         // = 17,583 bytes; the round's target is 40 % of that, 7,033. AFTER (this code, same fixture, 2026-10-21): 188 + 6,093 + 247 = 6,528 bytes, 37 %.
         // A ceiling is the measured value + 10 %, rounded up: 207, 6,703, 272.
-        let ceilings = [207, 6703, 272]
+        // 2026-10-21 (round agents, design §7): list_apps leaves out the empty `profiles` key (174 bytes) and set_memory answers {profile, created,
+        // names, ...} (201): 174 + 6,093 + 201 = 6,468 bytes, 37 %. The ceilings are tightened to that + 10 %, rounded up: 192, 6,703, 222.
+        let ceilings = [192, 6703, 222]
         check("the take's three calls (list_apps, read_translation_log of 65 rows, set_memory of 8 names) cost an agent at most \(ceilings.reduce(0, +)) bytes, 40 % of the 17,583 they did",
               takeCalls.count == 3 && zip(takeBytes, ceilings).allSatisfy { $0 <= $1 } && takeBytes.reduce(0, +) * 100 <= 17_583 * 40, "bytes \(takeBytes), ceilings \(ceilings)")
+
+        // A profile with rewrite rows and a script (rewrite-rules; the checks of test_rules and set_memory below, and test_rules with translate in the mock block)
+        func ruled(_ id: String, rows: [RewriteRow] = [], script: String? = nil, when: [ProfileCondition] = []) -> AppProfile {
+            var p = AppProfile(bundleID: id, appName: id, source: "ja", target: "ko", id: id, when: when)
+            p.rewrites = rows
+            p.script = script.map { RewriteScript(source: $0) }
+            return p
+        }
 
         // translate_text: the lens's own path, with the app's memory
         let alice = MemoryEntry(src: "Alice", dst: "앨리스", kind: .person, gender: .f)
@@ -627,9 +652,357 @@ enum MCPChecks {
             check("translate_text does not run a command engine, and says so", command.isError && command.text.contains("command engines"))
             let locked = translator(secrets: Unreachable()).call("translate_text", ["lines": ["x"]])
             check("translate_text says so when the engine's key is in a Keychain this process cannot read", locked.isError && locked.text.contains("Keychain") && locked.text.contains(engine.name))
+            // A window's chain, and a profile picked by hand (design §7: translate_text takes profile and title)
+            let dungeon = AppProfile(bundleID: ContextChecks.chat, appName: "Dungeon", source: "en", target: "ko", note: "A dungeon crawler.", entries: [MemoryEntry(src: "Bob", dst: "밥", kind: .person)],
+                                     id: "dungeon", when: [ProfileCondition(app: ContextChecks.chat, titleContains: "Dungeon")])
+            let cast = AppProfile(bundleID: "cast", appName: "Cast", source: "en", target: "ko", note: "Formal cast.", entries: [MemoryEntry(src: "Carol", dst: "캐롤", kind: .person)], id: "cast", when: [])
+            var chained = translating
+            chained.appProfiles += [dungeon, cast]
+            let tc = translator(chained, at: dir.appendingPathComponent("translate-chain/settings.json"))
+            func sentBody(_ call: () -> Answer) -> (Answer, String) {
+                let seen = mock.bodies.count
+                let answer = call()
+                return (answer, mock.bodies.dropFirst(seen).last ?? "")
+            }
+            let (inDungeon, dungeonBody) = sentBody { tc.call("translate_text", ["lines": ["Bob and Alice arrived"], "app": ContextChecks.chat, "title": "Dungeon Run"]) }
+            let (inLobby, lobbyBody) = sentBody { tc.call("translate_text", ["lines": ["Bob and Alice arrived"], "app": ContextChecks.chat, "title": "Lobby"]) }
+            check("translate_text(app, title): the title picks the profile, whose names and note go to the engine with the app's own, the title itself does not, and the answer names the profile",
+                  !inDungeon.isError && inDungeon.data["profile"] as? String == "dungeon" && inDungeon.data["memory"] as? String == "used"
+                  && dungeonBody.contains("밥") && dungeonBody.contains("앨리스") && dungeonBody.contains("A dungeon crawler.") && !dungeonBody.contains("Dungeon Run")
+                  && !inLobby.isError && inLobby.data["profile"] as? String == ContextChecks.chat && lobbyBody.contains("앨리스") && !lobbyBody.contains("밥") && !lobbyBody.contains("A dungeon crawler."),
+                  "\(inDungeon.text) \(inLobby.text) \(dungeonBody.prefix(300))")
+            let (viaCast, castBody) = sentBody { tc.call("translate_text", ["lines": ["Carol waved"], "profile": "cast"]) }
+            check("translate_text(profile) is a lens pinned to it: that profile's note and names go, the app's own (Alice) do not, and the answer names it",
+                  !viaCast.isError && viaCast.data["profile"] as? String == "cast" && viaCast.data["memory"] as? String == "used"
+                  && castBody.contains("캐롤") && castBody.contains("Formal cast.") && !castBody.contains("앨리스"), "\(viaCast.text) \(castBody.prefix(300))")
+            let noSuch = tc.call("translate_text", ["lines": ["x"], "profile": "nobody"])
+            check("translate_text(profile) of an id nothing has is a tool error that names list_apps", noSuch.isError && noSuch.text.contains("list_apps"))
+            // test_rules with translate: the engine is sent what `before` left; the answer is the engine's; `shown` is `after` over it, head first and All apps last
+            var cast2 = ruled("cast2", rows: [RewriteRow(.before, "waved", "waved hello"), RewriteRow(.after, "번역", "(ko)")])
+            cast2.source = "en"
+            var ruling = chained
+            ruling.appProfiles += [cast2]
+            ruling.appProfiles[0].rewrites = [RewriteRow(.after, "[A]", "[Z]")]
+            ruling.appProfiles[1].rewrites = [RewriteRow(.after, "번역", "[A]")]
+            let tr = translator(ruling, at: dir.appendingPathComponent("translate-rules/settings.json"))
+            let (viaRules, rulesBody) = sentBody { tr.call("test_rules", ["profile": "cast2", "lines": ["Carol waved"], "translate": true]) }
+            let ruleRow = viaRules.rows.first ?? []
+            check("test_rules translate: the engine is sent the line `before` left, `translation` is its answer, and `shown` is `after` over it",
+                  !viaRules.isError && viaRules.columns == ["line", "source", "translation", "shown"] && ruleRow.count == 4 && ruleRow[1] as? String == "Carol waved hello"
+                  && (ruleRow[2] as? String)?.contains("Carol waved hello") == true && (ruleRow[2] as? String)?.contains("번역") == true
+                  && (ruleRow[3] as? String)?.contains("(ko)") == true && (ruleRow[3] as? String)?.contains("번역") == false && rulesBody.contains("Carol waved hello"), "\(viaRules.text) \(rulesBody.prefix(200))")
+            let layeredRow = tr.call("test_rules", ["app": ContextChecks.chat, "title": "Dungeon Run", "lines": ["Carol waved"], "translate": true]).rows.first ?? []
+            check("test_rules over a chain: `after` runs the head's row first (the title profile's: 번역 → [A]) and the app profile's last ([A] → [Z])",
+                  layeredRow.count == 4 && (layeredRow[3] as? String)?.contains("[Z]") == true && (layeredRow[3] as? String)?.contains("[A]") == false, "\(layeredRow)")
+            let withoutTranslate = mock.bodies.count
+            _ = tr.call("test_rules", ["profile": "cast2", "lines": ["Carol waved"]])
+            check("test_rules without translate asks no engine: nothing is sent", mock.bodies.count == withoutTranslate)
         } else {
             check("translate_text: the mock server starts", false)
         }
+
+        // Profiles over MCP (design names-and-context §7, §9; round agents): a window's profile, a preset, a pin, the log's memory, Restore by tab
+        func scratch(_ s: AppSettings, _ name: String) -> (client: Client, file: URL) {
+            let url = dir.appendingPathComponent("\(name)/settings.json")
+            try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            write(s, to: url)
+            return (Client(MCPServer(world: world(url), trace: { _ in })), url)
+        }
+        let hakuBoth = MemoryEntry(src: "ハク", dst: "하쿠", kind: .person, apply: .both)
+        let emulator = AppProfile(bundleID: "com.example.emu", appName: "Emulator", source: "ja", target: "ko",
+                                  entries: [MemoryEntry(src: "ハク", dst: "Hak"), MemoryEntry(src: "帝都", dst: "Teito")])
+        let tale = AppProfile(bundleID: "com.example.emu", appName: "月涙譚", source: "ja", target: "en", note: "A tale.", entries: [hakuBoth], id: "tale",
+                              when: [ProfileCondition(app: "com.example.emu", titleContains: "月涙譚")], useLearned: true)
+        let star = AppProfile(bundleID: "com.example.emu", appName: "Star Tale", source: "ja", target: "ko", entries: [MemoryEntry(src: "ハク", dst: "Haku")], id: "star",
+                              when: [ProfileCondition(app: "com.example.emu", titleContains: "スターテイル")])
+        let anime = AppProfile(bundleID: "anime", appName: "Anime", source: "ja", target: "ko", context: AppContextOverride(mode: .conversation, previousLines: 3), id: "anime",
+                               when: [], engine: .apple)
+        var multi = base
+        multi.appProfiles = [emulator, tale, star, anime]
+        let (profiled, profiledFile) = scratch(multi, "profiles")
+        let table = profiled.call("list_apps")
+        let tableRows = (table.data["profiles"] as? [String: Any])?["rows"] as? [[Any]] ?? []
+        check("list_apps: each profile is a row in the order of the file, with where it is used, its pair, engine (apple, or null for All apps' own), names and context",
+              tableRows.count == 4 && tableRows.map { $0[0] as? String } == ["com.example.emu", "tale", "star", "anime"]
+              && tableRows[1][2] as? [String] == ["app com.example.emu title 月涙譚"] && tableRows[1][3] as? String == "ja>en" && tableRows[1][4] is NSNull && tableRows[1][5] as? Int == 1
+              && tableRows[3][2] as? [String] == [] && tableRows[3][4] as? String == "apple" && tableRows[3][6] as? String == "conversation 3" && table.data["pin"] == nil, table.text)
+        var pinned = multi
+        pinned.profilePin = "anime"
+        var pinnedAll = multi
+        pinnedAll.profilePin = AppProfile.allAppsID
+        var strayPin = multi
+        strayPin.profilePin = "gone"
+        let pinClient = scratch(pinned, "pin-anime").client
+        check("list_apps names the profile every lens is pinned to, `all` for All apps only, and nothing for a pin to a profile that is gone",
+              pinClient.call("list_apps").data["pin"] as? String == "anime" && scratch(pinnedAll, "pin-all").client.call("list_apps").data["pin"] as? String == "all"
+              && scratch(strayPin, "pin-gone").client.call("list_apps").data["pin"] == nil)
+        var bare = base
+        bare.appProfiles = []
+        let bareApps = scratch(bare, "bare").client.call("list_apps")
+        check("list_apps with no profile has neither a profiles nor a pin key: a Mac with nothing set up gets the answer it got",
+              !bareApps.isError && bareApps.data["profiles"] == nil && bareApps.data["pin"] == nil && Set(bareApps.data.keys) == ["log", "loggedApps"])
+
+        // get_memory: an app gives 1.1.4's keys and the profile's id; a profile gives the file's shape; an app and a title give the chain
+        let appMemory = profiled.call("get_memory", ["app": "com.example.emu"])
+        check("get_memory(app) is what it was and the id of the profile: today's keys + profile, nothing else",
+              Set(appMemory.data.keys) == ["app", "profile", "exists", "appName", "source", "target", "note", "entries"] && appMemory.data["profile"] as? String == "com.example.emu"
+              && (appMemory.data["entries"] as? [[String: Any]])?.map({ $0["src"] as? String }) == ["ハク", "帝都"], appMemory.text)
+        let byProfile = profiled.call("get_memory", ["profile": "tale"])
+        check("get_memory(profile) is the profile as the file holds it: id, name, when, pair, note, names, learning",
+              !byProfile.isError && byProfile.data["id"] as? String == "tale" && byProfile.data["name"] as? String == "月涙譚" && byProfile.data["target"] as? String == "en"
+              && (byProfile.data["when"] as? [[String: String]]) == [["app": "com.example.emu", "titleContains": "月涙譚"]] && byProfile.data["useLearned"] as? Bool == true
+              && (byProfile.data["entries"] as? [[String: Any]])?.first?["apply"] as? String == "both" && byProfile.data["exists"] as? Bool == true, byProfile.text)
+        let nobody = profiled.call("get_memory", ["profile": "nobody"])
+        check("get_memory(profile) of an id nothing has says so and that set_memory creates it; app with profile, profile with title, or neither is a tool error",
+              !nobody.isError && nobody.data["exists"] as? Bool == false && (nobody.data["note"] as? String)?.contains("set_memory") == true
+              && profiled.call("get_memory", ["app": "com.example.emu", "profile": "tale"]).isError && profiled.call("get_memory", ["profile": "tale", "title": "x"]).isError
+              && profiled.call("get_memory").isError)
+        // The learned names of the head are in `Memory/<id>.json` beside the transcripts: one of them a user row hides.
+        let learnedDir = LearnedMemoryFile.folder(export)
+        try? FileManager.default.createDirectory(at: learnedDir, withIntermediateDirectories: true)
+        try? LearnedMemoryFile.render(bundleID: "tale", appName: "月涙譚", rows: [MemoryEntry(src: "ハク", dst: "Learned Haku", kind: .person), MemoryEntry(src: "月涙", dst: "Tsukinamida", kind: .place)],
+                                      updated: t0).write(to: learnedDir.appendingPathComponent(LearnedMemoryFile.fileName(for: "tale")))
+        func changedKeys(_ a: Answer) -> [String] { (a.data["changed"] as? [[Any]] ?? []).compactMap { $0.first as? String } }
+        func change(_ a: Answer, _ key: String) -> [Any]? { (a.data["changed"] as? [[Any]])?.first { $0.first as? String == key } }
+        func rows(_ a: Answer, _ key: String) -> [[Any]] { (a.data[key] as? [String: Any])?["rows"] as? [[Any]] ?? [] }
+        let inTale = profiled.call("get_memory", ["app": "com.example.emu", "title": "月涙譚 — 第二章"])
+        check("get_memory(app, title): the chain narrowest first then all, why the profile was picked, each name with where it comes from, the one a narrower row hid, and the learned names",
+              !inTale.isError && inTale.data["selected"] as? String == "tale" && inTale.data["chain"] as? [String] == ["tale", "com.example.emu", "all"]
+              && (inTale.data["why"] as? String)?.contains("title 月涙譚") == true && inTale.data["pair"] as? String == "ja>en" && inTale.data["note"] as? String == "A tale."
+              && (inTale.data["rows"] as? [String: Any])?["columns"] as? [String] == ["src", "dst", "kind", "apply", "from"]
+              && rows(inTale, "rows").map({ [$0[0] as? String, $0[1] as? String, $0[4] as? String] }) == [["ハク", "하쿠", "tale"], ["帝都", "Teito", "com.example.emu"]]
+              && rows(inTale, "shadowed").map({ [$0[0] as? String, $0[1] as? String, $0[2] as? String] }) == [["ハク", "Hak", "com.example.emu"]]
+              && rows(inTale, "learned").map({ [$0[0] as? String, $0[1] as? String] }) == [["月涙", "Tsukinamida"]], inTale.text)
+        let inStar = profiled.call("get_memory", ["app": "com.example.emu", "title": "スターテイル"])
+        let elsewhere = profiled.call("get_memory", ["app": "com.example.emu", "title": "Settings"])
+        let noMatch = profiled.call("get_memory", ["app": "com.example.nothing", "title": "x"])
+        check("get_memory(app, title): another title picks another profile (Star Tale's ハク is its own), a title no profile wants leaves the app's own, an app with none is All apps",
+              inStar.data["selected"] as? String == "star" && rows(inStar, "rows").first?[1] as? String == "Haku"
+              && elsewhere.data["selected"] as? String == "com.example.emu" && elsewhere.data["shadowed"] == nil && elsewhere.data["learned"] == nil
+              && noMatch.data["selected"] as? String == "all" && noMatch.data["chain"] as? [String] == ["all"] && (noMatch.data["why"] as? String)?.contains("no profile") == true)
+        let underPin = pinClient.call("get_memory", ["app": "com.example.emu", "title": "月涙譚"])
+        check("get_memory(app, title) under a pin: the pin decides, and says so", underPin.data["selected"] as? String == "anime" && underPin.data["why"] as? String == "pinned to anime", underPin.text)
+
+        // set_memory with a profile: a new id is a preset on the base languages; the profile's own fields; remove
+        let preset = profiled.call("set_memory", ["profile": "work", "name": "Work", "note": "Formal.", "entries": [["src": "Acme", "dst": "애크미", "apply": "both"]]])
+        let work = profileOnDisk("work", at: profiledFile)
+        check("set_memory(profile) with a new id makes a preset (no conditions) on the base languages, and answers profile, created, names and the pair",
+              !preset.isError && preset.data["profile"] as? String == "work" && preset.data["created"] as? Bool == true && preset.data["names"] as? Int == 1 && preset.data["pair"] as? String == "ja>ko"
+              && work?.when.isEmpty == true && work?.name == "Work" && work?.note == "Formal." && work?.entries.first?.apply == .both && work?.source == "ja", preset.text)
+        let fields = profiled.call("set_memory", ["profile": "work", "source": "en", "target": "ko", "customEngineID": "apple", "context": ["mode": "nearby"], "useLearned": true,
+                                                  "when": [["app": "com.example.mail"], ["titleContains": "Invoice"]]])
+        let worked = profileOnDisk("work", at: profiledFile)
+        check("set_memory(profile) sets its languages, engine (apple), context, learning and where it is used, and keeps its note and names",
+              !fields.isError && fields.data["created"] as? Bool == false && worked?.source == "en" && worked?.engine == .apple && worked?.context?.mode == .nearby && worked?.useLearned == true
+              && worked?.when == [ProfileCondition(app: "com.example.mail"), ProfileCondition(titleContains: "Invoice")] && worked?.note == "Formal." && worked?.entries.count == 1, fields.text)
+        let toFollow = profiled.call("set_memory", ["profile": "work", "customEngineID": NSNull(), "when": [[String: String]]()])
+        let followed = profileOnDisk("work", at: profiledFile)
+        check("set_memory(profile) with customEngineID null follows All apps' engine again, and with an empty when is a preset again",
+              !toFollow.isError && followed?.engine == nil && followed?.when.isEmpty == true, toFollow.text)
+        let kept = bytes(profiledFile)
+        let refusals = [profiled.call("set_memory", ["profile": "all", "note": "x"]), profiled.call("set_memory", ["profile": "has space", "note": "x"]),
+                        profiled.call("set_memory", ["app": "com.example.emu", "profile": "work", "note": "x"]), profiled.call("set_memory", ["app": "com.example.emu", "when": [["app": "a"]]]),
+                        profiled.call("set_memory", ["profile": "work", "customEngineID": "00000000-0000-0000-0000-0000000000FF"]),
+                        profiled.call("set_memory", ["profile": "work", "when": (0..<9).map { ["titleContains": "t\($0)"] }]),
+                        profiled.call("set_memory", ["profile": "work", "context": ["mode": "lots"]]), profiled.call("set_memory", ["profile": "work", "source": "xx-XX"])]
+        check("set_memory with the id all, an id with a space, an app and a profile, when with an app, an engine that is not one, a 9th condition, a context mode or a language that is not one: each a tool error, nothing written",
+              refusals.allSatisfy(\.isError) && bytes(profiledFile) == kept, "\(refusals.map { $0.isError })")
+        var crowded = base
+        crowded.appProfiles = (0..<AppProfile.maxProfiles).map { AppProfile(bundleID: "p\($0)", appName: "P\($0)", source: "ja", target: "ko", id: "p\($0)", when: []) }
+        let (packed, packedFile) = scratch(crowded, "crowded")
+        let packedBytes = bytes(packedFile)
+        let oneMore = packed.call("set_memory", ["profile": "one-more", "note": "x"])
+        check("set_memory that would make the 51st profile is a tool error that says how to make room, and writes nothing",
+              oneMore.isError && oneMore.text.contains("remove one") && bytes(packedFile) == packedBytes, oneMore.text)
+        var pinWork = multi
+        pinWork.appProfiles.append(AppProfile(bundleID: "work", appName: "Work", source: "ja", target: "ko", id: "work", when: []))
+        pinWork.profilePin = "work"
+        let (removing, removingFile) = scratch(pinWork, "remove")
+        let withNote = removing.call("set_memory", ["profile": "work", "remove": true, "note": "x"])
+        let removed = removing.call("set_memory", ["profile": "work", "remove": true])
+        let afterRemove = SettingsFileCheck.read(bytes(removingFile) ?? Data(), over: AppSettings())
+        check("set_memory remove takes the profile out and its pin with it, so the file still passes; remove with anything else, or of a profile there is not, is a tool error",
+              withNote.isError && withNote.text.contains("note") && !removed.isError && removed.data["deleted"] as? Bool == true && !afterRemove.settings.appProfiles.contains { $0.id == "work" }
+              && afterRemove.settings.profilePin == nil && afterRemove.issues.isEmpty && removing.call("set_memory", ["profile": "work", "remove": true]).isError
+              && removing.call("set_memory", ["app": "com.example.nothing", "remove": true]).isError, removed.text)
+        let removedApp = removing.call("set_memory", ["app": "com.example.emu", "remove": true])
+        check("set_memory(app) remove takes the app's own profile out and leaves the others", !removedApp.isError && profileOnDisk("com.example.emu", at: removingFile) == nil
+              && profileOnDisk("anime", at: removingFile) != nil && profileOnDisk("tale", at: removingFile) != nil, removedApp.text)
+        let pinning = scratch(multi, "pinning")
+        let pinOne = pinning.client.call("set_settings", ["values": ["profilePin": "anime"]])
+        let pinSeen = pinning.client.call("list_apps").data["pin"] as? String
+        let pinAll = pinning.client.call("set_settings", ["values": ["profilePin": "all"]])
+        // Back to Auto is the Translation tab's Restore (`profilePin` is one of its preferences); a null in set_settings is the settings rows' to take.
+        let pinNone = pinning.client.call("reset_settings", ["tab": "translation"])
+        let pinCleared = pinning.client.call("list_apps").data["pin"] == nil && change(pinNone, "profilePin")?[1] as? String == "all"
+        let beforeStray = bytes(pinning.file)
+        let pinStray = pinning.client.call("set_settings", ["values": ["profilePin": "nobody"]])
+        check("set_settings profilePin pins every lens to a profile or to all, reset_settings of the Translation tab takes it back to Auto, and a pin to a profile there is not is refused",
+              !pinOne.isError && pinSeen == "anime" && !pinAll.isError && !pinNone.isError && pinCleared && pinStray.isError && bytes(pinning.file) == beforeStray,
+              "\(pinOne.text) \(pinAll.text) \(pinNone.text) \(pinStray.text)")
+
+        // The log's lines carry the profile and the names of the memory they had (design §2.2, §7), and read_translation_log shows them
+        let memoryLog = LensExport.transcriptsFolder(dir.appendingPathComponent("memory-log"))
+        let memoryWriter = TranscriptWriter(directory: memoryLog, lens: "Emu", sourceCode: "ja", targetCode: "ko", formats: [.jsonl], engine: { _ in "apple" },
+                                            memory: TranscriptWriter.memory(settings: multi), started: t0, onError: {})
+        memoryWriter.setApp("com.example.emu")
+        memoryWriter.observe(time: 1, lines: [.init(source: "ハクは帝都へ", translation: "하쿠는 제도로", inLens: true), .init(source: "こんにちは", translation: "안녕", inLens: true)])
+        memoryWriter.finishAndWait(time: 3)
+        let memoryLines = MCPLog.lines(in: memoryLog).lines
+        let rawLog = ((try? FileManager.default.contentsOfDirectory(at: memoryLog, includingPropertiesForKeys: nil)) ?? []).first.flatMap { try? String(contentsOf: $0, encoding: .utf8) } ?? ""
+        let rawLines = rawLog.split(separator: "\n").map(String.init)
+        check("the log's lines (the writer's own) carry the profile that decided them after the app, and names [src, dst, from] only when a row of the memory occurs in the line",
+              memoryLines.map(\.profile) == ["com.example.emu", "com.example.emu"] && memoryLines.first?.names == [["ハク", "Hak", "com.example.emu"], ["帝都", "Teito", "com.example.emu"]]
+              && memoryLines.last?.names.isEmpty == true && rawLines.count == 2 && rawLines[0].contains("\"app\":\"com.example.emu\",\"profile\":\"com.example.emu\",\"source\"")
+              && rawLines[1].contains("\"profile\":") && !rawLines[1].contains("\"names\""), rawLog)
+        var memoryWorld = multi
+        memoryWorld.exportFolder = dir.appendingPathComponent("memory-log").path
+        let readMemory = scratch(memoryWorld, "memory-log-settings").client.call("read_translation_log")
+        check("read_translation_log gives the profile once in the header, and a names column when some row has names ([] for a line with none)",
+              !readMemory.isError && readMemory.data["profile"] as? String == "com.example.emu" && readMemory.columns.last == "names"
+              && (readMemory.column("names").first as? [[String]]) == [["ハク", "Hak", "com.example.emu"], ["帝都", "Teito", "com.example.emu"]] && (readMemory.column("names").last as? [Any])?.isEmpty == true, readMemory.text)
+        var glossed = AppSettings()
+        glossed.glossary = "ハク = Haku"
+        check("a writer made for no profile and no glossary has no memory, so its lines are the lines of 1.1.4 byte for byte (no profile key); a glossary makes the pair a name from all",
+              TranscriptWriter.memory(settings: AppSettings()) == nil && TranscriptWriter.memory(settings: multi) != nil
+              && TranscriptWriter.memory(settings: glossed)?("a", "ハクが")?.names == [["ハク", "Haku", "all"]])
+
+        // reset_settings (design §9): the preferences of a tab go back, the consent and data of it are named and never touched
+        var messy = multi
+        messy.sourceLanguage = "en"
+        messy.targetLanguage = "ja"
+        messy.settleDelay = 1.5
+        messy.lensStyle = .subtle
+        messy.cacheSize = 100
+        messy.profilePin = "anime"
+        messy.glossary = "ハク = Haku"
+        messy.useLearned = true
+        messy.context = AppContextOverride(mode: .nearby)
+        messy.engines = [EngineConfig(name: "Mine", kind: .openAICompatible(baseURL: URL(string: "http://localhost:1/v1") ?? dir, model: "m", thinking: .off, extraHeaders: [:]))]
+        let (resetter, resetFile) = scratch(messy, "reset")
+        let beforeReset = bytes(resetFile)
+        let dry = resetter.call("reset_settings", ["tab": "translation", "dryRun": true])
+        check("reset_settings dryRun reports [key, now, default] of the preferences of the tab that differ and the keys it keeps, and writes nothing",
+              !dry.isError && dry.data["dryRun"] as? Bool == true && changedKeys(dry).sorted() == ["cacheSize", "profilePin"]
+              && change(dry, "cacheSize")?[1] as? Int == 100 && change(dry, "cacheSize")?[2] as? Int == 5000 && change(dry, "profilePin")?[1] as? String == "anime" && change(dry, "profilePin")?[2] is NSNull
+              && Set(dry.data["kept"] as? [String] ?? []) == ["context", "useLearned", "engines", "glossary", "glossaryApply", "profiles"] && bytes(resetFile) == beforeReset && dry.data["backup"] == nil, dry.text)
+        let restored = resetter.call("reset_settings", ["tab": "translation"])
+        let afterTab = SettingsFileCheck.read(bytes(resetFile) ?? Data(), over: AppSettings()).settings
+        let backup = SettingsFileCheck.read((try? Data(contentsOf: RestorePlan.backupURL(for: resetFile))) ?? Data(), over: AppSettings()).settings
+        check("reset_settings sets the tab's preferences to their defaults, keeps the old file as settings.json.before-restore, and leaves the other tabs and the tab's consent and data as they were",
+              !restored.isError && changedKeys(restored).sorted() == ["cacheSize", "profilePin"] && restored.data["backup"] as? String == "settings.json.before-restore"
+              && afterTab.cacheSize == 5000 && afterTab.profilePin == nil && afterTab.sourceLanguage == "en" && afterTab.lensStyle == .subtle
+              && afterTab.glossary == "ハク = Haku" && afterTab.useLearned && afterTab.context?.mode == .nearby && afterTab.engines.count == 1 && afterTab.appProfiles.count == 4
+              && backup.cacheSize == 100 && backup.profilePin == "anime", restored.text)
+        let afterRestore = bytes(resetFile)
+        let nothingToDo = resetter.call("reset_settings", ["tab": "translation"])
+        check("reset_settings on a tab at its defaults changes nothing: no change listed, the file not rewritten", !nothingToDo.isError && changedKeys(nothingToDo).isEmpty && bytes(resetFile) == afterRestore && nothingToDo.data["backup"] == nil)
+        // Every tab with a preference, over a file in which every key that can be changed is: no consent and no data key is ever written
+        var allChanged = messy
+        allChanged.savesTranscripts = true
+        allChanged.checksForUpdates = false
+        allChanged.glossaryApply = .both
+        let (everyTab, everyFile) = scratch(allChanged, "reset-all")
+        let consentOrData = SettingSpec.all.filter { $0.nature == .consent || $0.nature == .data }.map(\.key)
+        let beforeValues = SettingsFileCheck.fileValues(SettingsFileCheck.read(bytes(everyFile) ?? Data(), over: AppSettings()).settings, omittingUnset: false)
+        let walks = MCPSettings.resetTabs.map { everyTab.call("reset_settings", ["tab": $0.rawValue]) }
+        let afterValues = SettingsFileCheck.fileValues(SettingsFileCheck.read(bytes(everyFile) ?? Data(), over: AppSettings()).settings, omittingUnset: false)
+        let defaultValues = SettingsFileCheck.fileValues(AppSettings(), omittingUnset: false)
+        let preferences = SettingSpec.all.filter { $0.nature == .preference }.map(\.key)
+        check("reset_settings on every tab with preferences: no consent or data key is in a change or written (\(consentOrData.count) of them), each is in kept, and the preferences are the defaults",
+              walks.count == 4 && walks.allSatisfy { !$0.isError } && walks.allSatisfy { w in changedKeys(w).allSatisfy { !consentOrData.contains($0) } }
+              && walks.allSatisfy { w in (w.data["kept"] as? [String] ?? []).allSatisfy { consentOrData.contains($0) } }
+              && consentOrData.allSatisfy { key in (beforeValues[key] as? NSObject) == (afterValues[key] as? NSObject) }
+              && preferences.allSatisfy { key in (afterValues[key] as? NSObject) == (defaultValues[key] as? NSObject) }
+              && (walks.first { $0.data["tab"] as? String == "general" }?.data["kept"] as? [String]).map { Set($0) == ["savesTranscripts", "exportFolder", "agentConnection"] } == true,
+              "\(walks.map { $0.data["tab"] as? String ?? $0.text })")
+        let aboutTab = resetter.call("reset_settings", ["tab": "about"])
+        check("reset_settings has no About tab (it has only consent), and a tab that is not one names the tabs there are",
+              aboutTab.isError && aboutTab.text.contains("general, translation, appearance, shortcuts") && resetter.call("reset_settings").isError
+              && !MCPSettings.resetTabs.contains(.about) && !MCPSettings.resetTabs.contains(.none))
+
+        // Rewrite rules over MCP (rewrite-rules §8, §9 R10; round agents): test_rules, and set_memory's rewrites and script with their line and column
+        let dropFurigana = RewriteRow(.before, "（[ぁ-ゖ]+）", "", regex: true)
+        let furiganaScript = "function before(line, ctx) { return line.replace(/（[ぁ-ゖ]+）/gu, \"\") }\nfunction after(src, dst, ctx) { return ctx.target === \"ko\" ? dst.replace(/\\.\\.\\./g, \"…\") : dst }"
+        var ruledSettings = base
+        ruledSettings.appProfiles = [ruled("norules"), ruled("marks", rows: [RewriteRow(.before, "▼", ""), RewriteRow(.after, "...", "…")]), ruled("patterns", rows: [dropFurigana]),
+                                     ruled("scripted", script: furiganaScript), ruled("thrower", script: "function before(line, ctx) { throw new Error(\"boom\") }"),
+                                     ruled("looper", script: "function before(line, ctx) { while (true) {} }"),
+                                     ruled("tale-rules", rows: [RewriteRow(.before, "B", "C")], when: [ProfileCondition(app: "com.example.rules", titleContains: "Tale")])]
+        let (ruler, rulerFile) = scratch(ruledSettings, "rules")
+        /// What the script service has been asked: connections made and jobs handed to it. A call that needs nothing of it leaves both as they were.
+        func serviceUse() -> (connections: Int, jobs: Int) { (ScriptConnection.shared.connectionsMade, ScriptConnection.shared.jobsSent) }
+        let used = serviceUse()
+        let lineWithMark = "▼漢字（かんじ）を読む"
+        let noRules = ruler.call("test_rules", ["profile": "norules", "lines": ["漢字（かんじ）", "▼ plain"]])
+        check("test_rules on a profile without rewrites returns each line unchanged and starts no service",
+              !noRules.isError && noRules.columns == ["line", "source"] && noRules.rows.map({ $0[1] as? String }) == ["漢字（かんじ）", "▼ plain"] && noRules.rows.map({ $0[0] as? Int }) == [0, 1]
+              && noRules.data["errors"] == nil && noRules.data["profile"] as? String == "norules" && serviceUse() == used, noRules.text)
+        let marks = ruler.call("test_rules", ["profile": "marks", "lines": [lineWithMark]])
+        check("test_rules runs a plain table in the app: the page mark goes from the source line, and still no service starts",
+              !marks.isError && marks.rows.first?[1] as? String == "漢字（かんじ）を読む" && serviceUse() == used, marks.text)
+        let patterns = ruler.call("test_rules", ["profile": "patterns", "lines": [lineWithMark, "no furigana"]])
+        check("test_rules runs a regex row in the script service: the furigana goes, a line without any stays, and the service was asked",
+              !patterns.isError && patterns.rows.map({ $0[1] as? String }) == ["▼漢字を読む", "no furigana"] && ScriptConnection.shared.jobsSent > used.jobs, patterns.text)
+        let scripted = ruler.call("test_rules", ["profile": "scripted", "lines": [lineWithMark]])
+        check("test_rules runs the script's before with ctx: the furigana example of the docs", !scripted.isError && scripted.rows.first?[1] as? String == "▼漢字を読む" && scripted.data["errors"] == nil, scripted.text)
+        let thrower = ruler.call("test_rules", ["profile": "thrower", "lines": ["abc"]])
+        let thrown = (thrower.data["errors"] as? [[String: Any]]) ?? []
+        check("test_rules leaves a line as it was when the script throws, and says where: stage, item -1 (the script), and the message",
+              !thrower.isError && thrower.rows.first?[1] as? String == "abc" && thrown.count == 1 && thrown.first?["stage"] as? String == "before" && thrown.first?["item"] as? Int == -1
+              && (thrown.first?["message"] as? String)?.contains("boom") == true, thrower.text)
+        check("test_rules with a profile that is not one, no lines, or more than 20 is a tool error; the first names list_apps",
+              ruler.call("test_rules", ["profile": "nobody", "lines": ["x"]]).text.contains("list_apps") && ruler.call("test_rules", ["profile": "marks", "lines": [String]()]).isError
+              && ruler.call("test_rules", ["profile": "marks", "lines": (0..<21).map { "line \($0)" }]).isError && ruler.call("test_rules", ["profile": "marks"]).isError)
+        // The order of §4 over a chain: the broad profile's before runs first (the app's), so the narrow one's (the title's) sees its result; the title picks it.
+        var layered = ruledSettings
+        layered.appProfiles.append(ruled("rules-app", rows: [RewriteRow(.before, "A", "B")], when: [ProfileCondition(app: "com.example.rules")]))
+        let layers = scratch(layered, "rules-layered").client
+        let taleRules = layers.call("test_rules", ["app": "com.example.rules", "title": "A Tale", "lines": ["A"]])
+        let outsideTale = layers.call("test_rules", ["app": "com.example.rules", "title": "Settings", "lines": ["A"]])
+        check("test_rules over a chain: the app profile's before row runs first and the title profile's sees its result (A → B → C); a title that profile does not want leaves A → B",
+              taleRules.rows.first?[1] as? String == "C" && taleRules.data["profile"] as? String == "tale-rules" && outsideTale.rows.first?[1] as? String == "B" && outsideTale.data["profile"] as? String == "rules-app",
+              "\(taleRules.text) \(outsideTale.text)")
+
+        // set_memory: rewrites and script, checked by the service; a syntax error has its line and no made-up column; nothing is written when any is wrong
+        let writing = scratch(ruledSettings, "rules-writing")
+        let goodRows: [[String: Any]] = [["stage": "before", "find": "（[ぁ-ゖ]+）", "replace": "", "regex": true], ["stage": "after", "find": "...", "replace": "…"]]
+        let wrote = writing.client.call("set_memory", ["profile": "norules", "rewrites": goodRows, "script": ["source": "function before(line, ctx) { return line }"]])
+        let norules = profileOnDisk("norules", at: writing.file)
+        check("set_memory takes rewrites and a script for a profile: the rows and the script are in the file, and get_memory shows them in the file's shape",
+              !wrote.isError && norules?.rewrites == [dropFurigana, RewriteRow(.after, "...", "…")] && norules?.script?.source == "function before(line, ctx) { return line }" && norules?.script?.on == true
+              && ((writing.client.call("get_memory", ["profile": "norules"]).data["rewrites"] as? [[String: Any]])?.count == 2)
+              && (writing.client.call("get_memory", ["profile": "norules"]).data["script"] as? [String: Any])?["source"] as? String == "function before(line, ctx) { return line }", wrote.text)
+        let plainOnly = serviceUse()
+        let plainWrite = writing.client.call("set_memory", ["profile": "marks", "rewrites": [["stage": "after", "find": "!", "replace": "."]]])
+        check("set_memory with a plain table asks no service, and the rows replace the old list", !plainWrite.isError && serviceUse() == plainOnly
+              && profileOnDisk("marks", at: writing.file)?.rewrites == [RewriteRow(.after, "!", ".")], plainWrite.text)
+        let keptBytes = bytes(writing.file)
+        let syntax = writing.client.call("set_memory", ["profile": "norules", "script": ["source": "function before(line, ctx) {\n  return line.replace(\n}"]])
+        let pattern = writing.client.call("set_memory", ["profile": "norules", "rewrites": [["stage": "before", "find": "(", "regex": true]]])
+        let neither = writing.client.call("set_memory", ["profile": "norules", "script": ["source": "var x = 1"]])
+        check("set_memory with a script that does not parse says so with the line (the line of JavaScriptCore, and no column), and writes nothing",
+              syntax.isError && syntax.text.contains("script, line ") && !syntax.text.contains("column") && bytes(writing.file) == keptBytes, syntax.text)
+        check("set_memory with a regex row that does not compile names the row (rewrites[0]), has no position, and writes nothing",
+              pattern.isError && pattern.text.contains("rewrites[0]") && !pattern.text.contains("line ") && !pattern.text.contains("column") && bytes(writing.file) == keptBytes, pattern.text)
+        check("set_memory with a script that defines neither function is a tool error that says so, and writes nothing", neither.isError && neither.text.contains("script") && bytes(writing.file) == keptBytes, neither.text)
+        let overLimits = [writing.client.call("set_memory", ["profile": "norules", "rewrites": (0...RewriteLimits.maxRows).map { ["stage": "before", "find": "f\($0)"] }]),
+                          writing.client.call("set_memory", ["profile": "norules", "rewrites": [["stage": "before", "find": ""]]]),
+                          writing.client.call("set_memory", ["profile": "norules", "rewrites": [["stage": "during", "find": "x"]]]),
+                          writing.client.call("set_memory", ["profile": "norules", "rewrites": [["stage": "before", "find": String(repeating: "x", count: 201)]]]),
+                          writing.client.call("set_memory", ["profile": "norules", "script": ["source": String(repeating: "x", count: RewriteLimits.maxScript + 1)]])]
+        check("set_memory with a 33rd row, an empty find, a stage that is not one, a find over 200 characters or a script over 8,000 is rejected, and writes nothing",
+              overLimits.allSatisfy(\.isError) && bytes(writing.file) == keptBytes, "\(overLimits.map(\.isError))")
+        let rulesCleared = writing.client.call("set_memory", ["profile": "norules", "rewrites": [[String: Any]](), "script": ["source": "", "on": false]])
+        check("set_memory with rewrites [] and a script with no source clears both", !rulesCleared.isError && profileOnDisk("norules", at: writing.file)?.rewrites.isEmpty == true && profileOnDisk("norules", at: writing.file)?.script == nil, rulesCleared.text)
+
+        // A script that never returns is cut at the limit and killed with its service: last of the checks that ask the service, as the next call after a kill may find the service not up yet
+        let beforeLoop = bytes(rulerFile)
+        let looper = ruler.call("test_rules", ["profile": "looper", "lines": ["abc", "def"]])
+        let looped = (looper.data["errors"] as? [[String: Any]]) ?? []
+        check("test_rules cuts a script that never returns at its time limit, leaves the lines as they were, says it was turned off, and writes nothing (a dry run)",
+              !looper.isError && looper.rows.map({ $0[1] as? String }) == ["abc", "def"] && looped.contains { ($0["message"] as? String)?.contains("Turned off") == true && $0["item"] as? Int == -1 }
+              && bytes(rulerFile) == beforeLoop, looper.text)
 
         // The trace and the command
         check("each message leaves one trace line, with the tool and the app, and never the text of a note or a name",
@@ -640,6 +1013,7 @@ enum MCPChecks {
         check("the command that adds the server quotes the path of this install",
               MCPServer.addCommand(executablePath: "/Applications/Mwoyeo.app/Contents/MacOS/Mwoyeo") == "claude mcp add mwoyeo -- \"/Applications/Mwoyeo.app/Contents/MacOS/Mwoyeo\" --mcp"
               && MCPServer.addCommand(executablePath: "/tmp/a b/\"x\"$y") == "claude mcp add mwoyeo -- \"/tmp/a b/\\\"x\\\"\\$y\" --mcp")
+        failed += RestorePlanChecks.run()
         return failed
     }
 }

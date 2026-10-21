@@ -141,8 +141,8 @@ if ran is not None:
     check('initialize: protocol 2025-06-18, tools capability, name mwoyeo',
           init.get('protocolVersion') == '2025-06-18' and 'tools' in init.get('capabilities', {}) and init.get('serverInfo', {}).get('name') == 'mwoyeo')
     names = [t['name'] for t in result(replies, 2).get('tools', [])]
-    check('tools/list: the nine tools', names == ['list_apps', 'read_translation_log', 'term_renderings', 'get_memory', 'set_memory', 'translate_text',
-                                                   'get_settings', 'set_settings', 'get_settings_schema'])
+    check('tools/list: the eleven tools', names == ['list_apps', 'read_translation_log', 'term_renderings', 'get_memory', 'set_memory', 'translate_text',
+                                                    'get_settings', 'set_settings', 'get_settings_schema', 'reset_settings', 'test_rules'])
     apps = payload(replies, 3)
     check('list_apps reads the scratch log', [a.get('bundleID') for a in apps.get('loggedApps', [])] == ['com.example.smoke'])
     log = payload(replies, 4)
@@ -151,7 +151,7 @@ if ran is not None:
           and column(log, 'time') == ['09:00:01'])
     stored = payload(replies, 5)
     check('set_memory creates the profile on the base languages', result(replies, 5).get('isError') is None and stored.get('created') is True
-          and stored.get('source') == 'ja' and stored.get('target') == 'ko')
+          and stored.get('profile') == 'com.example.smoke' and stored.get('pair') == 'ja>ko' and stored.get('names') == 2)
     got = payload(replies, 6)
     check('get_memory returns what set_memory stored', got.get('note') == 'Fantasy RPG.' and [e.get('src') for e in got.get('entries', [])] == ['九十九', '魔王城'])
     shown = payload(replies, 7).get('settings', {})
@@ -241,6 +241,100 @@ try:
             check('and the memory was in what the engine was sent, for the call with the app only',
                   len(bodies) == 2 and '앨리스' in bodies[0] and 'casual chat between friends' in bodies[0] and '앨리스' not in bodies[1])
             check('translate_text without an app: no memory is claimed', column(second, 'engine') == ['Mock'] and 'memory' not in second)
+
+        # Profiles (design names-and-context §7, §9; round agents): a window's chain by its title, a preset picked by hand, a pin, a new preset, Restore by tab
+        body['cacheSize'] = 100
+        del body['appProfiles']
+        body['profiles'] = [
+            {'id': 'com.example.chat', 'name': 'Example Chat', 'when': [{'app': 'com.example.chat'}], 'source': 'en', 'target': 'ko', 'note': 'casual chat between friends',
+             'entries': [{'src': 'Alice', 'dst': '앨리스', 'kind': 'person'}]},
+            {'id': 'dungeon', 'name': 'Dungeon', 'when': [{'app': 'com.example.chat', 'titleContains': 'Dungeon'}], 'source': 'en', 'target': 'ko',
+             'note': 'A dungeon crawler.', 'entries': [{'src': 'Bob', 'dst': '밥', 'kind': 'person'}]},
+            {'id': 'cast', 'name': 'Cast', 'source': 'en', 'target': 'ko', 'note': 'Formal cast.', 'entries': [{'src': 'Carol', 'dst': '캐롤', 'kind': 'person'}]}]
+        with open(settings, 'w', encoding='utf-8') as f:
+            json.dump(body, f, indent=2)
+            f.write('\n')
+        before_files = set(os.listdir(dump)) if os.path.isdir(dump) else set()
+        chat = serve([call(1, 'list_apps'), call(2, 'get_memory', app='com.example.chat', title='Dungeon Run'),
+                      call(3, 'translate_text', lines=['Bob and Alice arrived'], app='com.example.chat', title='Dungeon Run'),
+                      call(4, 'translate_text', lines=['Carol waved'], profile='cast'),
+                      call(5, 'set_memory', profile='work', name='Work', note='Formal.'),
+                      call(6, 'set_settings', values={'profilePin': 'cast'}), call(7, 'list_apps'),
+                      call(8, 'reset_settings', tab='translation', dryRun=True)])
+        check('profiles: the server answers the calls of the profile tools', chat is not None)
+        if chat is not None:
+            r = chat[1]
+            table = payload(r, 1).get('profiles', {})
+            check('list_apps: the profiles as a table, and no pin on Auto', column(table, 'id') == ['com.example.chat', 'dungeon', 'cast'] and 'pin' not in payload(r, 1)
+                  and column(table, 'when')[1] == ['app com.example.chat title Dungeon'] and column(table, 'pair') == ['en>ko'] * 3)
+            window = payload(r, 2)
+            check('get_memory(app, title): the chain of the window and the profile selected', window.get('selected') == 'dungeon'
+                  and window.get('chain') == ['dungeon', 'com.example.chat', 'all'] and column(window.get('rows', {}), 'from') == ['dungeon', 'com.example.chat'])
+            sent = sorted(set(os.listdir(dump)) - before_files) if os.path.isdir(dump) else []
+            bodies = [open(os.path.join(dump, n), encoding='utf-8').read() for n in sent]
+            check('translate_text(app, title) sends the title profile\'s names and the app\'s own, and names the profile',
+                  payload(r, 3).get('profile') == 'dungeon' and len(bodies) == 2 and '밥' in bodies[0] and '앨리스' in bodies[0] and 'Dungeon Run' not in bodies[0])
+            check('translate_text(profile) sends that preset\'s names and not the app\'s', payload(r, 4).get('profile') == 'cast' and '캐롤' in bodies[1] and '앨리스' not in bodies[1])
+            made = payload(r, 5)
+            check('set_memory(profile) makes a preset on the base languages', made.get('created') is True and made.get('profile') == 'work' and made.get('pair') == 'en>ko')
+            check('set_settings profilePin pins every lens, and list_apps says so', payload(r, 6).get('applied') == {'profilePin': 'cast'} and payload(r, 7).get('pin') == 'cast')
+            dry = payload(r, 8)
+            check('reset_settings dryRun lists the Translation tab\'s preferences that differ and keeps its consent and data',
+                  sorted(c[0] for c in dry.get('changed', [])) == ['cacheSize', 'customEngineID', 'profilePin'] and 'engines' in dry.get('kept', [])
+                  and 'profiles' in dry.get('kept', []) and dry.get('dryRun') is True)
+        pinned_bytes = open(settings, 'rb').read()
+        restore = serve([call(1, 'reset_settings', tab='translation'), call(2, 'set_memory', profile='work', remove=True), call(3, 'reset_settings', tab='about')])
+        check('reset_settings restores the tab, keeps the old file beside the file, and leaves the profiles', restore is not None and payload(restore[1], 1).get('backup') == 'settings.json.before-restore'
+              and open(settings + '.before-restore', 'rb').read() == pinned_bytes and 'profilePin' not in json.load(open(settings)) and json.load(open(settings)).get('cacheSize', 5000) == 5000
+              and len(json.load(open(settings))['profiles']) == 3)
+        check('set_memory remove takes a profile out, and About has no Restore', restore is not None and payload(restore[1], 2).get('deleted') is True and result(restore[1], 3).get('isError') is True)
+        checked = subprocess.run([binary, '--check-settings', settings], capture_output=True, encoding='utf-8')
+        check('--check-settings says ok on the file of the profile tools', checked.returncode == 0 and checked.stdout == 'ok\n')
+
+        # Rewrite rules (rewrite-rules §8; round agents): test_rules and set_memory's rewrites and script, in the process (the script service is the app's XPC
+        # service: a plain table and a profile without rules ask nothing of it)
+        body['profiles'] = [
+            {'id': 'rules', 'name': 'Rules', 'source': 'ja', 'target': 'ko',
+             'rewrites': [{'stage': 'before', 'find': '▼', 'replace': ''}, {'stage': 'before', 'find': '（[ぁ-ゖ]+）', 'replace': '', 'regex': True}]},
+            {'id': 'plain', 'name': 'Plain', 'source': 'ja', 'target': 'ko'},
+            {'id': 'thrower', 'name': 'Thrower', 'source': 'ja', 'target': 'ko', 'script': {'source': 'function before(line, ctx) { throw new Error("boom") }'}},
+            {'id': 'cast2', 'name': 'Cast 2', 'source': 'en', 'target': 'ko',
+             'rewrites': [{'stage': 'before', 'find': 'waved', 'replace': 'waved hello'}, {'stage': 'after', 'find': '번역', 'replace': '(ko)'}]}]
+        body['cacheSize'] = 5000
+        with open(settings, 'w', encoding='utf-8') as f:
+            json.dump(body, f, indent=2)
+            f.write('\n')
+        before_files = set(os.listdir(dump)) if os.path.isdir(dump) else set()
+        rules_before = open(settings, 'rb').read()
+        ruled = serve([call(1, 'test_rules', profile='rules', lines=['▼漢字（かんじ）を読む']), call(2, 'test_rules', profile='plain', lines=['漢字（かんじ）']),
+                       call(3, 'test_rules', profile='thrower', lines=['abc']),
+                       call(4, 'set_memory', profile='rules', script={'source': 'function before(line, ctx) {\n  return line.replace(\n}'}),
+                       call(5, 'set_memory', profile='rules', rewrites=[{'stage': 'before', 'find': '(', 'regex': True}]),
+                       call(6, 'test_rules', profile='cast2', lines=['Carol waved'], translate=True),
+                       call(7, 'set_memory', profile='plain', script={'source': 'function after(src, dst, ctx) { return ctx.target === "ko" ? dst.replace(/\\.\\.\\./g, "…") : dst }'})])
+        check('rules: the server answers the calls of the rule tools', ruled is not None)
+        if ruled is not None:
+            r = ruled[1]
+            check('test_rules: a plain row and a regex row run, the page mark and the furigana go from the source line', column(payload(r, 1), 'source') == ['漢字を読む'] and 'errors' not in payload(r, 1))
+            check('test_rules on a profile without rewrites returns the line unchanged', column(payload(r, 2), 'source') == ['漢字（かんじ）'] and 'errors' not in payload(r, 2))
+            thrown = payload(r, 3)
+            check('test_rules: a script that throws leaves the line and says where', column(thrown, 'source') == ['abc'] and [e.get('item') for e in thrown.get('errors', [])] == [-1]
+                  and 'boom' in thrown.get('errors', [{}])[0].get('message', ''))
+            check('set_memory: a script that does not parse is refused with its line and no column', result(r, 4).get('isError') is True and 'script, line ' in text(r, 4) and 'column' not in text(r, 4))
+            check('set_memory: a pattern that does not compile is refused with its row and no position', result(r, 5).get('isError') is True and 'rewrites[0]' in text(r, 5)
+                  and 'column' not in text(r, 5) and 'line ' not in text(r, 5))
+            translated = payload(r, 6)
+            sent = sorted(set(os.listdir(dump)) - before_files) if os.path.isdir(dump) else []
+            bodies = [open(os.path.join(dump, n), encoding='utf-8').read() for n in sent]
+            row = (translated.get('rows') or [[]])[0]
+            check('test_rules translate: the engine is sent the line before left, and shown is after over the answer',
+                  len(row) == 4 and row[1] == 'Carol waved hello' and '(ko)' in row[3] and '번역' not in row[3] and len(bodies) == 1 and 'waved hello' in bodies[0])
+            check('set_memory: a script that defines after is written', result(r, 7).get('isError') is None and payload(r, 7).get('profile') == 'plain'
+                  and json.load(open(settings))['profiles'][1]['script']['source'].startswith('function after'))
+        check('the refused calls wrote nothing (the file differs from before only by the script written last)',
+              ruled is not None and [p for p in json.load(open(settings))['profiles'] if p['id'] == 'rules'] == [p for p in json.loads(rules_before)['profiles'] if p['id'] == 'rules'])
+        checked = subprocess.run([binary, '--check-settings', settings], capture_output=True, encoding='utf-8')
+        check('--check-settings says ok on the file with rewrites and scripts', checked.returncode == 0 and checked.stdout == 'ok\n')
 finally:
     mock.terminate()
     mock.wait()
@@ -250,7 +344,7 @@ write_settings(False)
 before = open(settings, 'rb').read()
 off = serve([request(1, 'initialize', {}), request(2, 'tools/list'), call(3, 'list_apps'), call(4, 'set_memory', app='com.example.smoke', note='x'),
              call(5, 'set_settings', values={'lensStyle': 'glow'})])
-check('switch off: initialize and tools/list answer', off is not None and 'protocolVersion' in result(off[1], 1) and len(result(off[1], 2).get('tools', [])) == 9)
+check('switch off: initialize and tools/list answer', off is not None and 'protocolVersion' in result(off[1], 1) and len(result(off[1], 2).get('tools', [])) == 11)
 check('switch off: every tool call is refused', off is not None and all(result(off[1], i).get('isError') is True and text(off[1], i).startswith('Agent connection is off.') for i in (3, 4, 5)))
 check('switch off: nothing is written', open(settings, 'rb').read() == before)
 

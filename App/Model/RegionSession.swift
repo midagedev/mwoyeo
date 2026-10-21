@@ -44,6 +44,8 @@ final class RegionSession {
     /// It also reads the app under the lens while any app profile exists, for the lens's route (`noteOwner`), though no context is wanted.
     private let sampleGate = OSAllocatedUnfairLock(initialState: SampleGate())
     private let lensWatch = LensWatch()
+    /// The lens's confirmed window title as the pipeline last had it, for the translation log's `profile` (`TranscriptWriter.memory`).
+    private let titleState = OSAllocatedUnfairLock<String?>(initialState: nil)
     private var contextWanted = false
     /// Why the capture failed, if it did (`CaptureFailure`); the hint says what to do about a refused one.
     private var captureFailure: CaptureFailure?
@@ -213,8 +215,10 @@ final class RegionSession {
         guard contextWanted else { return }
         let read = lensWatch.ingest(window, lensID: config.id.uuidString, now: ProcessInfo.processInfo.systemUptime)
         if let context = read.context {
+            titleState.withLock { $0 = context.confirmedTitle }
             Task { [pipeline] in await pipeline.setLensContext(context) }
         } else if read.gone {
+            titleState.withLock { $0 = nil }
             Task { [pipeline] in await pipeline.setLensContext(nil) }
         }
     }
@@ -755,6 +759,9 @@ final class RegionSession {
                                           formats: settings.transcriptFormats,
                                           engine: { [translator, routeState, chosen = settings.activeEngineConfig?.name ?? "apple"] in
                                               translator.translatedBy($0, route: routeState.withLock { $0 }) ?? chosen },
+                                          memory: TranscriptWriter.memory(settings: settings, title: { [titleState] in titleState.withLock { $0 } }),
+                                          sent: { [translator, routeState] in translator.sentText(for: $0, route: routeState.withLock { $0 }) },
+                                          rulesSkipped: { [translator, routeState] in translator.rulesSkipped(for: $0, route: routeState.withLock { $0 }) },
                                           onError: { [weak self] in Task { @MainActor in self?.chrome.flash(String(localized: "Couldn’t save transcript"), seconds: 4) } })
             // A line that stays put makes no snapshots; looking again keeps it one line instead of many.
             let t = Timer(timeInterval: 1, repeats: true) { [weak self] _ in Task { @MainActor in self?.observeTranscript() } }
@@ -803,36 +810,121 @@ final class RegionSession {
     /// The app under the lens: the window it follows, else the topmost window under its centre (`LensWatch.window(of:)`). The check harness
     /// and the captures name one, because a window of this app is never in the list.
     var appUnderLens: @MainActor (RegionConfig) -> LensWatch.Read?
-    /// "Forget <App>…" asks before it removes a memory (`LensMemoryMenu.askToForget`); the check harness answers for it.
-    var confirmsForgetting: @MainActor (_ app: String, _ names: Int) -> Bool = LensMemoryMenu.askToForget
+    /// "Forget <App>…" asks before it removes a memory (`LensMemoryMenu.forgetAlert`, which says the note only when the profile has one); the check
+    /// harness answers for it (addendum A3).
+    var confirmsForgetting: @MainActor (_ app: String, _ names: Int, _ hasNote: Bool) -> Bool = { app, names, hasNote in
+        NSApp.activate(ignoringOtherApps: true)
+        return LensMemoryMenu.forgetAlert(app: app, names: names, hasNote: hasNote).runModal() == .alertFirstButtonReturn
+    }
 
-    /// The app's memory in the menu, for every lens whose app is known, anchored or not (design names-and-context §3.2): the names that
-    /// apply, "Memory for <App>…" (Settings with the app's Memory sheet), "Remember Languages" when the pair or engine differs from the
-    /// remembered ones (it keeps the memory), and "Forget" (with an alert when the app has a memory).
+    /// The profile's memory in the menu, for every lens whose app is known, anchored or not (design names-and-context §3.2, §6.4): the names that
+    /// apply, "Memory for <name>…" (Settings with the sheet of the profile the lens uses: its head, else the app), "Remember Languages" when the
+    /// pair or engine differs from the remembered ones (it keeps the memory), and "Forget" (with an alert when the profile has a memory). With a
+    /// profile in the file (L1) one more item, "Profile: …", holds the one submenu: what Auto picks, the choice for every lens, and the two
+    /// ways to make a profile.
     private func addProfileItems(to menu: NSMenu) {
         guard let app = appUnderLens(config) else { return }
-        let model = AppModel.shared, existing = model.profile(for: app.bundleID), name = LensMemoryMenu.cut(app.appName)
+        let model = AppModel.shared, name = LensMemoryMenu.cut(app.appName)
         let here = LanguageChoice(source: settings.sourceLanguage, target: settings.targetLanguage, customEngineID: settings.customEngineID)
+        // The profile the lens is using: the head of its chain while that is a profile, else the app's own (made by the first edit).
+        let head = ProfileWords.head(model.settings, bundleID: app.bundleID, title: app.title, lensPin: config.profilePin)
+        let existing = head.profile ?? model.profile(for: app.bundleID)
+        let shownName = head.profile.map { LensMemoryMenu.cut($0.name) } ?? name
         menu.addItem(.separator())
-        if let line = LensMemoryMenu.infoLine(app: app.appName, appNames: existing?.entries.count ?? 0, allApps: model.settings.glossaryPairs.count,
-                                              words: .current) {
+        if let line = LensMemoryMenu.infoLine(app: head.profile?.name ?? app.appName, appNames: existing?.entries.count ?? 0,
+                                              allApps: model.settings.glossaryPairs.count, words: .current) {
             let info = NSMenuItem(title: line, action: nil, keyEquivalent: "")
             info.isEnabled = false
             menu.addItem(info)
         }
-        menu.addItem(ActionItem(String(localized: "Memory for \(name)…")) { model.openMemory(of: app.bundleID, named: app.appName) })
+        var target = head.profile.map { MemoryTarget(id: $0.id, name: $0.name, kind: .profile) } ?? MemoryTarget(id: app.bundleID, name: app.appName)
+        // The lens's opening: its app, window title and last line, for "Add Condition" and the Script's Test sample (design §6.3, rewrite-rules §7).
+        let last = lensBlocks().last
+        (target.lensBundleID, target.lensAppName, target.lensTitle, target.lensSource, target.lensTranslation) =
+            (app.bundleID, app.appName, app.title.isEmpty ? nil : app.title, last?.source, last?.translation)
+        menu.addItem(ActionItem(String(localized: "Memory for \(shownName)…")) { model.openProfile(target) })
+        if !model.settings.appProfiles.isEmpty { menu.addItem(profileItem(app: app, head: head, here: here, model: model)) }
         if existing?.languages != here {
-            menu.addItem(ActionItem(String(localized: "Remember Languages for \(name)")) { model.rememberLanguages(here, for: app.bundleID, named: app.appName) })
+            menu.addItem(ActionItem(String(localized: "Remember Languages for \(shownName)")) { model.rememberLanguages(here, for: app.bundleID, named: app.appName) })
         }
         guard let existing else { return }
         let confirm = confirmsForgetting
         if existing.hasMemory {
-            menu.addItem(ActionItem(String(localized: "Forget \(name)…")) {
-                if confirm(app.appName, existing.entries.count) { model.forgetProfile(app.bundleID) }
+            menu.addItem(ActionItem(String(localized: "Forget \(shownName)…")) {
+                if confirm(existing.name, existing.entries.count, !existing.note.isEmpty) { model.removeProfile(id: existing.id) }
             })
         } else {
-            menu.addItem(ActionItem(String(localized: "Forget Languages for \(name)")) { model.forgetProfile(app.bundleID) })
+            menu.addItem(ActionItem(String(localized: "Forget Languages for \(shownName)")) { model.removeProfile(id: existing.id) })
         }
+    }
+
+    /// "Profile: <head>" with its one submenu (design §6.4): what Auto picks (dimmed), "Auto", "All Apps Only", the profiles (≤ 8, then "More in
+    /// Settings…"), and "New Profile for This Window…" / "New Profile…". A choice pins this lens alone (`RegionConfig.profilePin`, §1.3, addendum A1);
+    /// the checkmark follows the pin in effect, the lens's own over the menu bar's. While the menu bar pins every lens and this lens has no pin of its
+    /// own, "Auto" is dimmed (it would change nothing): the bar's own "Auto" returns every lens.
+    private func profileItem(app: LensWatch.Read, head: ChainLink, here: LanguageChoice, model: AppModel) -> NSMenuItem {
+        let settings = model.settings, profiles = settings.appProfiles
+        let pin = settings.pin(lens: config.profilePin)
+        let item = NSMenuItem(title: ProfileWords.caption(head: head, pin: pin, owner: config.profilePin == nil ? .menuBar : .lens, limit: LensMemoryMenu.nameLimit),
+                              action: nil, keyEquivalent: "")
+        let sub = NSMenu()
+        sub.autoenablesItems = false
+        let auto = ProfileWords.head(settings.withoutPin, bundleID: app.bundleID, title: app.title)
+        // At most 48 characters, cut at the tail, as the info line is (design §6.4).
+        let pick = String(localized: "Auto picks \(auto.profile.map { LensMemoryMenu.cut($0.name) } ?? String(localized: "All Apps")): \(ProfileWords.why(head: auto.profile, bundleID: app.bundleID, title: app.title))")
+        let picks = NSMenuItem(title: pick.count > LensMemoryMenu.lineLimit ? String(pick.prefix(LensMemoryMenu.lineLimit - 1)) + "…" : pick,
+                               action: nil, keyEquivalent: "")
+        picks.isEnabled = false
+        sub.addItem(picks)
+        let autoItem = ActionItem(String(localized: "Auto"), enabled: config.profilePin != nil || settings.profilePin == nil) { [weak self] in self?.setProfilePin(nil) }
+        autoItem.state = pin == .auto ? .on : .off
+        sub.addItem(autoItem)
+        sub.addItem(.separator())
+        let all = ActionItem(String(localized: "All Apps Only")) { [weak self] in self?.setProfilePin(AppProfile.allAppsID) }
+        all.state = pin == .allAppsOnly ? .on : .off
+        sub.addItem(all)
+        for p in profiles.prefix(8) {
+            let row = ActionItem(LensMemoryMenu.cut(p.name)) { [weak self] in self?.setProfilePin(p.id) }
+            row.state = pin == .profile(p.id) ? .on : .off
+            sub.addItem(row)
+        }
+        if profiles.count > 8 {
+            sub.addItem(ActionItem(String(localized: "More in Settings…")) { _ = model.openSettings(on: .translation) })
+        }
+        sub.addItem(.separator())
+        let pair = here
+        let title = app.title
+        let last = lensBlocks().last
+        let newWindow = ActionItem(String(localized: "New Profile for This Window…"), enabled: !title.isEmpty) {
+            let phrase = ContextText.truncated(title, toCharacters: ProfileCondition.maxTitleLength)
+            let profileName = ContextText.truncated(title, toCharacters: AppProfile.maxNameLength)
+            let draft = AppProfile(bundleID: "", appName: profileName, source: pair.source, target: pair.target,
+                                   id: ProfileIDs.fresh(named: profileName, in: model.settings.appProfiles), name: profileName,
+                                   when: [ProfileCondition(app: app.bundleID, titleContains: phrase)])
+            model.openProfile(MemoryTarget(id: draft.id, name: profileName, kind: .new, draft: draft, focusesPhrase: true,
+                                           lensBundleID: app.bundleID, lensAppName: app.appName, lensTitle: title,
+                                           lensSource: last?.source, lensTranslation: last?.translation))
+        }
+        sub.addItem(newWindow)
+        sub.addItem(ActionItem(String(localized: "New Profile…")) {
+            let profileName = String(localized: "New Profile")
+            let draft = AppProfile(bundleID: "", appName: profileName, source: pair.source, target: pair.target,
+                                   id: ProfileIDs.fresh(named: profileName, in: model.settings.appProfiles), name: profileName, when: [])
+            model.openProfile(MemoryTarget(id: draft.id, name: profileName, kind: .new, draft: draft,
+                                           lensBundleID: app.bundleID, lensAppName: app.appName, lensTitle: title,
+                                           lensSource: last?.source, lensTranslation: last?.translation))
+        })
+        item.submenu = sub
+        return item
+    }
+
+    /// This lens's own pin (design §1.3, addendum A1): nil is Auto, `all` All apps only, an id a profile. It is kept with the lens (`onConfigChange`
+    /// writes it to `regions`) and the lens takes the route of it at once (`update(settings:)` lays the pin over the profile it reads).
+    func setProfilePin(_ pin: String?) {
+        guard config.profilePin != pin else { return }
+        config.profilePin = pin
+        onConfigChange?(config)
+        Task { await update(settings: base) }
     }
 
     // MARK: - Lens (drag / resize)

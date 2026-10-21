@@ -243,10 +243,36 @@ struct AppSettings: Codable, Equatable {
     /// What every lens is pinned to (design §1.3, §5.1: `profilePin`): a profile's id, or `all`; nil is Auto. A lens's own pin stays with
     /// the lens, not here.
     var profilePin: String?
+    /// All apps' rules table and script (rewrite-rules §1-§3: `rewrites`, `script`; a profile has its own, `AppProfile.rewrites`/`.script`). Written only
+    /// when set. They are the last link of every chain: `before` runs on them first, `after` last (§4).
+    var rewrites: [RewriteRow] = []
+    var script: RewriteScript?
     /// How the glossary's pairs are used, one mode for all (design §10, §5.1: `glossaryApply`). Written only when not `hint`.
     var glossaryApply = EntryApply.hint
     /// How text is cut into paragraphs, unless an app's profile says otherwise.
     var paragraphReader = ParagraphReader.automatic
+    /// Whether any profile, or All apps, has a rewrite row or a script that is on (rewrite-rules §1). Nothing set is today's path: no chain is asked,
+    /// no connection is made, no byte of a request or a cache key moves (`TranslationService.translate`).
+    var hasRewrites: Bool {
+        func set(_ rows: [RewriteRow], _ script: RewriteScript?) -> Bool { rows.contains(where: \.isActive) || script?.isActive == true }
+        return set(rewrites, script) || appProfiles.contains { set($0.rewrites, $0.script) }
+    }
+
+    /// Writes `on: false` on the row or the script the time limit turned off (rewrite-rules §5). A unit that is not there any more (the file changed while
+    /// the call ran) is left alone.
+    mutating func turnOff(_ unit: RewriteUnit) {
+        func off(_ rows: inout [RewriteRow], _ script: inout RewriteScript?) {
+            if unit.item == RewriteIssue.script { script?.on = false } else if rows.indices.contains(unit.item) { rows[unit.item].on = false }
+        }
+        if unit.profile == AppProfile.allAppsID {
+            off(&rewrites, &script)
+        } else if let i = appProfiles.firstIndex(where: { $0.id == unit.profile }) {
+            var profile = appProfiles[i]
+            off(&profile.rewrites, &profile.script)
+            appProfiles[i] = profile
+        }
+    }
+
     /// 1.1.4's Apple switch, as a view of the new model (design §5.2 case (d), §10): on means the user rows of each profile whose engine in
     /// effect is Apple, and the glossary when All apps' is, are used in both ways, hint and replace (the rule of the migration, per engine in
     /// effect: `ProfileMigration.engineInEffectIsApple`); the rows of a profile on an added engine keep their mode. Off sets every row and the
@@ -325,6 +351,7 @@ struct AppSettings: Codable, Equatable {
         case checksForUpdates, hasCompletedOnboarding, savesTranscripts, exportFolder, exportBookmark, enginePermissions, transcriptFormats
         case paragraphReader, agentConnection
         case profiles, context, useLearned, profilePin, glossaryApply
+        case rewrites, script
     }
 
     func encode(to encoder: Encoder) throws {
@@ -362,6 +389,8 @@ struct AppSettings: Codable, Equatable {
         try c.encode(useLearned, forKey: .useLearned)
         try c.encodeIfPresent(profilePin, forKey: .profilePin)
         try c.encode(glossaryApply, forKey: .glossaryApply)
+        try c.encode(rewrites, forKey: .rewrites)
+        try c.encodeIfPresent(script, forKey: .script)
     }
 
     /// An engine as the file keeps it: its old `context` is not written (the amount is All apps' now, `engines[].allow` is the engine's).
@@ -410,6 +439,9 @@ struct AppSettings: Codable, Equatable {
         useLearned = converted.useLearned ?? false
         profilePin = converted.profilePin
         glossaryApply = converted.glossaryApply ?? .hint
+        // A row this build cannot read is left out and the others kept (rewrite-rules §2); a script that cannot be read is none.
+        rewrites = ((try? c.decodeIfPresent([Lossy<RewriteRow>].self, forKey: .rewrites)) ?? nil)?.compactMap(\.value) ?? d.rewrites
+        script = (try? c.decodeIfPresent(RewriteScript.self, forKey: .script)) ?? nil
         paragraphReader = (try? c.decodeIfPresent(ParagraphReader.self, forKey: .paragraphReader)) ?? d.paragraphReader
         agentConnection = (try? c.decodeIfPresent(Bool.self, forKey: .agentConnection)) ?? d.agentConnection
     }

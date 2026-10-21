@@ -225,6 +225,7 @@ final class AppModel {
         TextRecognizer.setNoticeHandler { issue in Task { @MainActor in AppModel.shared.recognitionNotice(issue) } }
         VisionSetup.shared.onChange = { [weak self] in self?.visionSetupChanged() }
         await translator.setRejectionHandler { id, fields in Task { @MainActor in AppModel.shared.learned(fields, for: id) } }
+        await translator.setRewriteHandler { units in Task { @MainActor in AppModel.shared.rewritesTurnedOff(units) } }
         learnedFile = LearnedMemoryWriter.live(settings: { AppModel.shared.settings },
                                                store: { AppModel.shared.chooseExportFolder($1, bookmark: $0) },
                                                records: { await AppModel.shared.translator.learnedRows(for: $0) })
@@ -423,6 +424,14 @@ final class AppModel {
         refreshHints()
     }
 
+    /// The menu bar's choice (design names-and-context §1.3, addendum A1): every lens takes it and their own pins are cleared; nil is Auto for all.
+    func pinEveryLens(_ pin: String?) {
+        for s in sessions.values { s.setProfilePin(nil) }
+        // A lens that is switched off has no session to say so.
+        for i in regions.indices where sessions[regions[i].id] == nil && regions[i].profilePin != nil { regions[i].profilePin = nil }
+        settings.profilePin = pin
+    }
+
     func setEnabled(_ id: UUID, _ enabled: Bool) async {
         guard let i = regions.firstIndex(where: { $0.id == id }) else { return }
         regions[i].isEnabled = enabled
@@ -486,6 +495,7 @@ final class AppModel {
             regions[i].rect = updated.rect
             regions[i].anchor = updated.anchor
             regions[i].name = updated.name
+            regions[i].profilePin = updated.profilePin
         }
         s.onCloseRequest = { [weak self] in Task { await self?.remove(config.id) } }
         s.onToggleOriginal = { [weak self] in self?.toggleTranslations() }
@@ -552,6 +562,13 @@ final class AppModel {
         case let .added(id):
             selectEngine(id)
         }
+    }
+
+    /// The time limit turned these rewrite rows or scripts off (rewrite-rules §5): the file says so, `on: false`, and an agent reads it there.
+    private func rewritesTurnedOff(_ units: [RewriteUnit]) {
+        var next = settings
+        for unit in units { next.turnOff(unit) }
+        if next != settings { settings = next }
     }
 
     private func learned(_ fields: [String], for id: UUID) {

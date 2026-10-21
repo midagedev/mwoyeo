@@ -58,6 +58,8 @@ indirect enum FieldKind {
     case string
     /// A string with limits; the length counts Unicode scalars, as JSON Schema's maxLength does.
     case text(maxLength: Int? = nil, minLength: Int = 0)
+    /// A string with limits, or null, which clears the setting (`profilePin`: null is Auto).
+    case textOrNull(maxLength: Int? = nil, minLength: Int = 0)
     case bool
     case number(ClosedRange<Double>)
     case integer(ClosedRange<Int>)
@@ -95,15 +97,20 @@ struct FieldSpec {
     let kind: FieldKind
     let doc: String
     var required: Bool
+    /// A bad value of this optional property fails the whole object (an item of a list that `dropsBad` is then dropped), where the other optional
+    /// properties are reported and left out. For a property that changes what the item means: a rewrite row whose `replace` is too long is not the row
+    /// that deletes its text.
+    var dropsItem: Bool
     /// A realistic value, shown by editors (`examples` in the schema); it must pass the check.
     var example: Any?
     var defaultValue: Any?
 
-    init(_ name: String, _ kind: FieldKind, _ doc: String, required: Bool = false, example: Any? = nil, default defaultValue: Any? = nil) {
+    init(_ name: String, _ kind: FieldKind, _ doc: String, required: Bool = false, dropsItem: Bool = false, example: Any? = nil, default defaultValue: Any? = nil) {
         self.name = name
         self.kind = kind
         self.doc = doc
         self.required = required
+        self.dropsItem = dropsItem
         self.example = example
         self.defaultValue = defaultValue
     }
@@ -129,6 +136,8 @@ extension FieldKind {
             if let maxLength, n > maxLength { return "\(n) characters; the limit is \(maxLength)" }
             if n < minLength { return minLength == 1 ? "must not be empty" : "\(n) characters; at least \(minLength) needed" }
             return nil
+        case let .textOrNull(maxLength, minLength):
+            return value is NSNull ? nil : Self.text(maxLength: maxLength, minLength: minLength).scalarProblem(with: value)
         case .bool:
             return SettingSpec.isBool(value) ? nil : "expected true or false, got \(SettingSpec.name(of: value))"
         case let .number(range):
@@ -273,9 +282,9 @@ extension FieldKind {
         for (key, entry) in object.sorted(by: { $0.key < $1.key }) {
             let child = path.appending(.key(key))
             if let field = known[key] {
-                if let ok = field.kind.read(entry, at: child, fallout: field.required ? fallout : .ignore, problems: &problems) {
+                if let ok = field.kind.read(entry, at: child, fallout: field.required || field.dropsItem ? fallout : .ignore, problems: &problems) {
                     result[key] = ok
-                } else if field.required {
+                } else if field.required || field.dropsItem {
                     failed = true
                 }
             } else if let owners = foreign[key], let tagged {
@@ -336,6 +345,10 @@ extension FieldKind {
             var s: [String: Any] = ["type": "string"]
             if let maxLength { s["maxLength"] = maxLength }
             if minLength > 0 { s["minLength"] = minLength }
+            return s
+        case let .textOrNull(maxLength, minLength):
+            var s = Self.text(maxLength: maxLength, minLength: minLength).schema()
+            s["type"] = ["string", "null"]
             return s
         case .bool:
             return ["type": "boolean"]

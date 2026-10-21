@@ -45,6 +45,7 @@ struct SettingSpec {
         "paragraphReader": (.translation, .preference), "profilePin": (.translation, .preference),
         "context": (.translation, .consent), "useLearned": (.translation, .consent),
         "engines": (.translation, .data), "glossary": (.translation, .data), "glossaryApply": (.translation, .data), "profiles": (.translation, .data),
+        "rewrites": (.translation, .preference), "script": (.translation, .preference),
         "useInpaintingModel": (.appearance, .preference), "fontStyle": (.appearance, .preference), "boxOpacity": (.appearance, .preference),
         "lensStyle": (.appearance, .preference), "lensTint": (.appearance, .preference), "lensTabVisibility": (.appearance, .preference),
         "lensTabPosition": (.appearance, .preference),
@@ -111,10 +112,16 @@ struct SettingSpec {
               doc: "How much goes with each line for every profile that sets no amount of its own (All apps' amount): off (only the line), memory (the app's name and category, the note and the names that occur in the text; this is what a missing key means), nearby (also the lines around the text on screen) or conversation (also the lines read before, previousLines of them). What an engine may be sent of that is its allow."),
         .init(key: "useLearned", kind: .bool,
               doc: "Also send the names and terms picked up while translating, and record the terms the engine's reply names, for every profile that does not say otherwise. Learned terms stay in memory and are saved only as the learned-memory file (savesTranscripts). Written to the file only when true; write false to turn it off."),
-        .init(key: "profilePin", kind: .text(maxLength: 255, minLength: 1),
-              doc: "Pins every lens to one profile: its id, or all for All apps only. Left out, each lens picks by its window (Auto). It must name a profile in profiles. A lens's own choice stays with the lens."),
+        .init(key: "profilePin", kind: .textOrNull(maxLength: 255, minLength: 1),
+              doc: "Pins every lens to one profile: its id, or all for All apps only. Left out or null, each lens picks by its window (Auto). It must name a profile in profiles. A lens's own choice stays with the lens."),
         .init(key: "glossaryApply", kind: .choice(EntryApply.allCases.map(\.rawValue)),
               doc: "How the glossary's pairs are used, one mode for all: hint (told to the translator when a pair occurs in the text), replace (the translation is written into the text before translating, free; Apple Translation uses it too) or both. A pair a profile's names have a row for is not used. Written to the file only when not hint."),
+        .init(key: "rewrites", kind: .rewrites,
+              doc: "All apps' rules table: changes to the text on this Mac at no token cost, applied in order. A row has a stage (before: the source line the engine is sent; after: the engine's answer), a find text (1 to 200 characters), a replace text (up to 200; left out, the text is deleted), regex (find is a JavaScript regular expression with flags gu, and $1 in replace works; left out, false) and on (left out, true). Up to \(RewriteLimits.maxRows) rows; a bad row is reported and dropped. A regex row runs in a service of the app with no network or files and has \(Int(RewriteLimits.lineBudgetMs)) ms a line together with the rest of its profile's regex rows; over that it is turned off (on: false). A profile has its own rewrites; before rows run from All apps to the narrowest profile and after rows the other way. Written only when there are rows.",
+              examples: SettingExamples.rewrites),
+        .init(key: "script", kind: .script,
+              doc: "All apps' script: JavaScript that defines before(line, ctx) and/or after(src, dst, ctx) and returns the new text, run on this Mac in a service with no network or files, \(Int(RewriteLimits.lineBudgetMs)) ms a line (over that the script is turned off: on: false). ctx has app, profile, source and target. A fresh global object per call: nothing is kept between lines, and there is no Date and no Math.random. A throw, or a return that is not text, leaves that line as it was. Up to \(RewriteLimits.maxScript) characters. A profile has its own script. Written only when set.",
+              examples: SettingExamples.scripts),
         .init(key: "appProfiles", kind: .appProfiles,
               doc: "Read, never written: the per-app profiles of Mwoyeo 1.1.4. A file that has this key and no profiles is converted to profiles on the next save, and the old file is kept beside it as settings-1.1.4.json.",
               deprecated: true),
@@ -313,7 +320,29 @@ extension FieldKind {
                   "Names and terms with their translations, up to \(AppProfile.maxEntries) rows. A bad row is reported and dropped; the rest apply. A second row with the same src is left out; of two profiles in use, the narrower one's row wins."),
         FieldSpec("context", amount, "The amount of context for this profile; left out follows the top-level context."),
         FieldSpec("useLearned", .bool, "Learn names and terms for this profile (they are kept under the first profile in use); left out follows the top-level useLearned.", example: true),
+        FieldSpec("rewrites", rewrites,
+                  "Changes to the text on this Mac at no token cost, applied in order: a row changes the source line before the engine (before) or its answer after it (after). Up to \(RewriteLimits.maxRows) rows; a bad row is reported and dropped. Of two profiles in use, the broader one's before rows run first and its after rows last."),
+        FieldSpec("script", script,
+                  "A JavaScript that defines before(line, ctx) and/or after(src, dst, ctx), run on this Mac in a service with no network or files; it has \(Int(RewriteLimits.lineBudgetMs)) ms a line. A script that takes longer is turned off (on: false)."),
     ]), maxItems: AppProfile.maxProfiles, dropsBad: true, uniqueBy: "id")
+
+    /// The rules table, top level and in a profile (rewrite-rules §2): at most `RewriteLimits.maxRows` rows, a bad row dropped.
+    static let rewrites: FieldKind = .list(rewriteRow, maxItems: RewriteLimits.maxRows, dropsBad: true)
+
+    /// One row of `rewrites` (rewrite-rules §2).
+    private static let rewriteRow: FieldKind = .object([
+        FieldSpec("stage", .choice(RewriteStage.allCases.map(\.rawValue)), "before changes the source line the engine is sent; after changes the engine's answer.", required: true, example: "before"),
+        FieldSpec("find", .text(maxLength: RewriteLimits.findLength.upperBound, minLength: 1), "The text to find: every occurrence, case-sensitive; with regex, a JavaScript regular expression (flags gu).", required: true, example: "▼"),
+        FieldSpec("replace", .text(maxLength: RewriteLimits.maxReplace), "What to put there; left out, nothing (the text is deleted). With regex, $1 and the like work.", dropsItem: true, example: ""),
+        FieldSpec("regex", .bool, "Treat find as a regular expression. Left out, false.", dropsItem: true, default: false),
+        FieldSpec("on", .bool, "Left out, true. The app writes false when a row took longer than \(Int(RewriteLimits.lineBudgetMs)) ms on a line.", dropsItem: true, default: true),
+    ])
+
+    /// The script, top level and in a profile (rewrite-rules §3).
+    static let script: FieldKind = .object([
+        FieldSpec("source", .text(maxLength: RewriteLimits.maxScript), "The JavaScript source, up to \(RewriteLimits.maxScript) characters.", required: true),
+        FieldSpec("on", .bool, "Left out, true. The app writes false when the script took longer than \(Int(RewriteLimits.lineBudgetMs)) ms on a line.", dropsItem: true, default: true),
+    ])
 
     /// What the app remembers per app, as 1.1.4 wrote it (read and converted to `profiles`). The memory fields (note, entries, context) are
     /// all optional; their limits are the constants of the Core types that keep them, never a second copy.
@@ -357,6 +386,17 @@ enum SettingExamples {
         ] as [String: Any],
         ["id": "anime", "name": "Anime", "source": "ja", "target": "ko", "customEngineID": "apple"] as [String: Any],
         ["id": "game-1", "name": "月涙譚", "when": [["app": "com.example.emu", "titleContains": "月涙譚"]], "source": "ja", "target": "ko"] as [String: Any]],
+    ]
+
+    /// A page mark taken out before translating, and the three dots made one character after (rewrite-rules §2).
+    static let rewrites: [Any] = [
+        [["stage": "before", "find": "▼", "replace": ""] as [String: Any], ["stage": "before", "find": "（[ぁ-ゖ]+）", "regex": true] as [String: Any],
+         ["stage": "after", "find": "...", "replace": "…"] as [String: Any]],
+    ]
+
+    /// The two examples of rewrite-rules §3.
+    static let scripts: [Any] = [
+        ["source": "function before(line, ctx) { return line.replace(/（[ぁ-ゖ]+）/gu, \"\") }\nfunction after(src, dst, ctx) { return ctx.target === \"ko\" ? dst.replace(/\\.\\.\\./g, \"…\") : dst }"] as [String: Any],
     ]
 
     /// The 1.1.4 shape of one profile, for the key that is read and never written.
@@ -405,12 +445,12 @@ enum SettingsFileCheck {
 
     /// Keys that hold nothing while unset and are not written then (`encodeIfPresent`): a read of every setting (`get_settings`) shows them
     /// as null, the way it shows `customEngineID`, so the list of keys is the table's.
-    static let nullWhenUnset = ["context", "profilePin"]
+    static let nullWhenUnset = ["context", "profilePin", "script"]
 
     /// Keys added after 1.1.2 whose default is not written: the file holds one only while it differs, so a file from before the key
     /// re-saves byte for byte. The schema still lists it, with its default. A switch is written only while it is true, `glossaryApply`
     /// only while it is not hint.
-    static let writtenOnlyWhenSet: [String: NSObject] = ["useLearned": false as NSNumber, "agentConnection": false as NSNumber, "glossaryApply": "hint" as NSString]
+    static let writtenOnlyWhenSet: [String: NSObject] = ["useLearned": false as NSNumber, "agentConnection": false as NSNumber, "glossaryApply": "hint" as NSString, "rewrites": [] as NSArray]
 
     /// Keys AppSettings writes to the file that `SettingSpec.all` does not describe (the schema would lack them). Every
     /// switch counts, also one the file leaves out while it is off.

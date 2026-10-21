@@ -69,6 +69,16 @@ struct TranslationOutcome: Sendable {
     var cancelled = false
 }
 
+/// A lock-guarded switch a nonisolated reader may ask.
+private final class Flag: @unchecked Sendable {
+    private let lock = NSLock()
+    private var on = false
+    var value: Bool {
+        get { lock.withLock { on } }
+        set { lock.withLock { on = newValue } }
+    }
+}
+
 /// Streamed results, kept even if the call is abandoned at its deadline.
 private final class Streamed: @unchecked Sendable {
     private let lock = NSLock()
@@ -92,6 +102,15 @@ actor TranslationService {
     private var defaultRoute: LensRoute
     private var settings: AppSettings { defaultRoute.settings }
     private let cache = Memory()
+    /// Whether the service's own route has rewrites on (what `cached` asks when it is given no route); kept by `init` and `update(settings:)`.
+    private nonisolated let defaultHasRewrites = Flag()
+    /// What each source was sent as, when `before` changed it (`translateRewritten`, read by `sentText`): the log's `sent`. Also, in its own space, which
+    /// sources had their rules skipped while the script service restarted (`rulesSkipped`). Memory only, per namespace like `ledger`.
+    private let sentLedger = Memory()
+    /// Where the regex rows and the scripts run (`ScriptConnection.shared`; a gate hands in its own).
+    private var rewriteRunner: any RewriteRunner = ScriptConnection.shared
+    /// Told which rewrite units the time limit turned off, so the app writes `on: false` on them (rewrite-rules §5).
+    private var rewriteHandler: (@Sendable ([RewriteUnit]) -> Void)?
     /// Who produced each source's translation (`credit`, read by `translatedBy`): the transcript names the translator that really answered,
     /// not the engine the lens is set to, which Apple stands in for while it rests. One entry per source text; memory only.
     private let ledger = Memory()
@@ -131,6 +150,8 @@ actor TranslationService {
         cache.use(defaultRoute.namespace)
         cache.capacity = settings.cacheSize
         ledger.capacity = settings.cacheSize
+        sentLedger.capacity = settings.cacheSize
+        defaultHasRewrites.value = settings.hasRewrites
         pace.use(defaultRoute.slot)
     }
 
@@ -144,6 +165,8 @@ actor TranslationService {
         enginesSynced = false
         cache.capacity = new.cacheSize
         ledger.capacity = new.cacheSize
+        sentLedger.capacity = new.cacheSize
+        defaultHasRewrites.value = new.hasRewrites
         let space = defaultRoute.namespace
         pace.use(defaultRoute.slot)
         if space != cache.namespace {
@@ -158,6 +181,12 @@ actor TranslationService {
     private var activeEngine: EngineConfig? { settings.activeEngineConfig }
 
     func setIssueHandler(_ h: @escaping @Sendable (TranslationIssue?) -> Void) { issueHandler = h }
+
+    /// Calls `h` with the rewrite units a call's time limit turned off (rewrite-rules §5: the caller writes `on: false` on each).
+    func setRewriteHandler(_ h: @escaping @Sendable ([RewriteUnit]) -> Void) { rewriteHandler = h }
+
+    /// The runner of the regex rows and scripts, for a gate that counts or fakes the service. The default is `ScriptConnection.shared`.
+    func useRewriteRunner(_ runner: any RewriteRunner) { rewriteRunner = runner }
 
     /// Calls `h` for every group's end from now on, until `stopObserving`.
     func observe(_ h: @escaping @Sendable (TranslationEvent) -> Void) -> UUID {
@@ -294,7 +323,23 @@ actor TranslationService {
 
     /// Cached translation under `route`'s namespace (the one in use now when none is named), without doing any work.
     /// Never waits, even while a translation is in progress.
-    nonisolated func cached(_ text: String, route: LensRoute? = nil) -> String? { cache[text, in: route?.namespace ?? cache.namespace] }
+    /// With rewrites on there is none: the entries under this namespace are the engine's own answers, and what a lens shows is what `after` made of them,
+    /// kept by `translateRewritten` under the chain's own namespace (rewrite-rules §4), which only a call that knows the window's chain can name.
+    nonisolated func cached(_ text: String, route: LensRoute? = nil) -> String? {
+        if route?.settings.hasRewrites ?? defaultHasRewrites.value { return nil }
+        return cache[text, in: route?.namespace ?? cache.namespace]
+    }
+
+    /// What `source` was sent as for `route` (the one in use now when none is named) when `before` changed it; nil when it was sent as it was.
+    nonisolated func sentText(for source: String, route: LensRoute? = nil) -> String? {
+        sentLedger.value(for: source, in: Self.ledgerSpace(route?.namespace ?? cache.namespace))
+    }
+
+    /// Whether the last translation of `source` for `route` was made with its rules skipped, because the script service was restarting after a kill and a lens
+    /// line does not wait for it (rewrite-rules §5): the line is as the engine gave it, and it was not kept for the next call. The log says so.
+    nonisolated func rulesSkipped(for source: String, route: LensRoute? = nil) -> Bool {
+        sentLedger.value(for: source, in: Self.skippedSpace(route?.namespace ?? cache.namespace)) == "1"
+    }
 
     /// The translator that last answered `source` for `route` (the one in use now when none is named): an added engine's name, or "apple"
     /// (Apple Translation and the on-device model, also when one stands in for an engine that rests); nil for a text no translator was
@@ -305,6 +350,7 @@ actor TranslationService {
 
     /// Who answered is kept per namespace, as the translation is: two lenses of different pairs may show one source.
     private static func ledgerSpace(_ namespace: String) -> String { "translated-by|" + namespace }
+    private static func skippedSpace(_ namespace: String) -> String { "rules-skipped|" + namespace }
 
     /// Writes down who answered each of `sources` for `route`, once the group is over.
     private func credit(_ sources: some Sequence<String>, to name: String, route: LensRoute) {
@@ -325,9 +371,21 @@ actor TranslationService {
     /// `context` is the document the lens covers. With none, or when the settings leave context Off for its app and engine, and no name
     /// is to be written into the text, the code below runs as it always did. Where context is On the call takes `translateWithContext`;
     /// a kind that takes no context, or an engine with nothing to be sent, with replace rows takes `translateWithPins` (see `ContextPlan`).
+    ///
+    /// A chain with a rewrite row or a script that is on (rewrite-rules §4) goes through `translateRewritten`, which runs `before` on the lines, this
+    /// function on what is left, and `after` on the answers. Nothing set is this function and no more (`AppSettings.hasRewrites`).
     func translate(_ texts: [String], route given: LensRoute? = nil, context: LensContext? = nil,
                    onResult: (@Sendable (String, String) -> Void)? = nil) async -> TranslationOutcome {
         let lens = given ?? defaultRoute
+        if lens.settings.hasRewrites, let rewrite = rewritePlan(for: lens, context: context) {
+            return await translateRewritten(texts, plan: rewrite.plan, app: rewrite.app, route: lens, context: context, onResult: onResult)
+        }
+        return await translateWithoutRewrites(texts, route: lens, context: context, onResult: onResult)
+    }
+
+    /// The translation of `translate` as it was before rewrites: the lens's cache, the context paths and the engine.
+    private func translateWithoutRewrites(_ texts: [String], route lens: LensRoute, context: LensContext?,
+                                          onResult: (@Sendable (String, String) -> Void)?) async -> TranslationOutcome {
         if let context, let plan = contextPlan(for: context, route: lens) {
             switch plan {
             case let .engine(engine, options, chain, replace):
@@ -985,7 +1043,7 @@ extension TranslationService {
             if !run.isOK && !run.isCancelled {
                 let rest = items.filter { translated[$0] == nil }
                 if !rest.isEmpty {
-                    let again = await translate(rest, route: route, onResult: onResult)
+                    let again = await translateWithoutRewrites(rest, route: route, context: nil, onResult: onResult)
                     outcome.translations.merge(again.translations) { $1 }
                     outcome.failed.formUnion(again.failed)
                     outcome.timedOut = outcome.timedOut || again.timedOut
@@ -1112,7 +1170,7 @@ extension TranslationService {
         }
         // An answer that lacks a target is not shown: the retry below shows the plain one.
         let held = HeldSources()
-        let first = await translate(sent, route: lens) { [pre, sources] text, translation in
+        let first = await translateWithoutRewrites(sent, route: lens, context: nil) { [pre, sources] text, translation in
             for s in sources[text] ?? [text] {
                 if let p = pre[s], !p.answerHoldsTargets(translation) { held.put(s); continue }
                 onResult?(s, translation)
@@ -1131,7 +1189,7 @@ extension TranslationService {
         outcome.cancelled = first.cancelled
         guard !rejected.isEmpty, !first.cancelled else { return outcome }
         Trace.count("translate.pins_rejected", rejected.count)
-        let again = await translate(texts.filter(Set(rejected).contains), route: lens, onResult: onResult)
+        let again = await translateWithoutRewrites(texts.filter(Set(rejected).contains), route: lens, context: nil, onResult: onResult)
         outcome.translations.merge(again.translations) { $1 }
         outcome.failed.formUnion(again.failed)
         outcome.timedOut = outcome.timedOut || again.timedOut
@@ -1190,6 +1248,94 @@ private final class MathPlacements: @unchecked Sendable {
     }
     func math(_ source: String, _ translated: String) -> [ProtectedSpans.Resolved] {
         lock.withLock { lru[source].flatMap { $0.translated == translated ? $0.math : nil } ?? [] }
+    }
+}
+
+// MARK: - Rewrites (rewrite-rules §4)
+
+/// The call's stages around the translation: `before` on the lines the engine is to be sent, the translation of what is left (`translateWithoutRewrites`:
+/// the names written into the source, the engine, Apple's answer check), then `after` on the answers. Regex rows and scripts run in the script service
+/// (`ScriptConnection`); plain rows run here. Only a chain with a row or a script that is on comes here (`translate`).
+extension TranslationService {
+    /// The plan of the chain of the window under `lens`, and the app it is for; nil when nothing in it is on. The document counts only when it is of the app
+    /// the route was made for (`LensRoute.serves`, as `contextPlan`), so the chain is the one the names are chosen from.
+    private func rewritePlan(for lens: LensRoute, context: LensContext?) -> (plan: RewritePlan, app: String?)? {
+        let document = context.flatMap { lens.serves($0.bundleID) ? $0 : nil }
+        let app = document?.bundleID ?? lens.app
+        let chain = ContextRoute.merged(settings: lens.settings, lens: app, title: document?.confirmedTitle)
+        let plan = RewritePlan(links: chain.links, allAppsRows: lens.settings.rewrites, allAppsScript: lens.settings.script)
+        return plan.isEmpty ? nil : (plan, app)
+    }
+
+    /// `texts` through the chain's rewrites. What a lens shows is kept under the route's namespace and the plan's fingerprint (`RewritePlan.namespaceSuffix`),
+    /// keyed by the text as read, so a hit costs no service call; the engine's own answers stay where they were, keyed by what was sent (the same translation
+    /// the line would get without the rewrite). A call in which any step failed or was turned off keeps nothing of its own: the line was not what the rows say.
+    fileprivate func translateRewritten(_ texts: [String], plan: RewritePlan, app: String?, route lens: LensRoute, context: LensContext?,
+                                        onResult: (@Sendable (String, String) -> Void)?) async -> TranslationOutcome {
+        let suffix = plan.namespaceSuffix(app: app)
+        let space = lens.namespace + suffix
+        var outcome = TranslationOutcome()
+        var todo: [String] = []
+        var seen = Set<String>()
+        for t in texts where seen.insert(t).inserted {
+            if let hit = cache.value(for: t, in: space) {
+                outcome.translations[t] = hit
+                onResult?(t, hit)
+            } else {
+                todo.append(t)
+            }
+        }
+        guard !todo.isEmpty else { return outcome }
+
+        var session = RewriteSession(plan: plan, context: RewriteContext(app: app ?? "", source: lens.settings.sourceLanguage, target: lens.settings.targetLanguage),
+                                     runner: rewriteRunner, waitsForService: false)
+        // A lens line never waits for a restarting service (§5): a call that is held passes the line as it was, and the line is not kept below.
+        var sent: [String: String] = [:]
+        var held = Set<String>()
+        for t in todo {
+            let before = session.held.count
+            sent[t] = await session.before(t)
+            if session.held.count > before { held.insert(t) }
+        }
+        var toEngine: [String] = []
+        var queued = Set<String>()
+        for t in todo where queued.insert(sent[t]!).inserted { toEngine.append(sent[t]!) }
+        let inner = await translateWithoutRewrites(toEngine, route: lens, context: context, onResult: nil)
+        outcome.timedOut = inner.timedOut
+        outcome.batchFailed = inner.batchFailed
+        outcome.cancelled = inner.cancelled
+
+        var shown: [String: String] = [:]
+        var heldAfter = Set<String>()
+        var kept: [String: String] = [:]
+        for t in todo {
+            let line = sent[t]!
+            guard let answer = inner.translations[line] else {
+                if inner.failed.contains(line) { outcome.failed.insert(t) }
+                continue
+            }
+            if shown[line] == nil {
+                let before = session.held.count
+                shown[line] = await session.after(src: line, dst: answer)
+                if session.held.count > before { heldAfter.insert(line) }
+            }
+            let text = shown[line]!
+            outcome.translations[t] = text
+            onResult?(t, text)
+            let skipped = held.contains(t) || heldAfter.contains(line)
+            if skipped || rulesSkipped(for: t, route: lens) { sentLedger.store(skipped ? "1" : "", for: t, in: Self.skippedSpace(lens.namespace)) }
+            // Apple standing in for a resting engine answered: that is not this namespace's to keep. Nor is a line whose rules were skipped.
+            if !skipped, lens.engine == nil || translatedBy(line, route: lens) != "apple" { kept[t] = text }
+            if line != t {
+                sentLedger.store(line, for: t, in: Self.ledgerSpace(lens.namespace))
+                if let by = translatedBy(line, route: lens) { ledger.store(by, for: t, in: Self.ledgerSpace(lens.namespace)) }
+            }
+        }
+        if session.issues.isEmpty { for (t, text) in kept { cache.store(text, for: t, in: space) } }
+        if !session.issues.isEmpty { Trace.count("rewrite.issues", session.issues.count) }
+        if !session.held.isEmpty { Trace.count("rewrite.held", session.held.count) }
+        if !session.turnedOff.isEmpty { rewriteHandler?(session.turnedOff) }
+        return outcome
     }
 }
 

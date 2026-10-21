@@ -247,14 +247,18 @@ struct AppSettings: Codable, Equatable {
     var glossaryApply = EntryApply.hint
     /// How text is cut into paragraphs, unless an app's profile says otherwise.
     var paragraphReader = ParagraphReader.automatic
-    /// 1.1.4's Apple switch, as a view of the new model (design §5.2 case (d), §10): on means every user row and the glossary are used
-    /// in both ways, hint and replace. It is never written: the file holds each row's `apply` and `glossaryApply`, and a 1.1.4 file that
-    /// had it on is read into those. It stays only while the Memory sheet has the switch (R4 removes both).
+    /// 1.1.4's Apple switch, as a view of the new model (design §5.2 case (d), §10): on means the user rows of each profile whose engine in
+    /// effect is Apple, and the glossary when All apps' is, are used in both ways, hint and replace (the rule of the migration, per engine in
+    /// effect: `ProfileMigration.engineInEffectIsApple`); the rows of a profile on an added engine keep their mode. Off sets every row and the
+    /// glossary back to hint. It is never written: the file holds each row's `apply` and `glossaryApply`, and a 1.1.4 file that had it on is
+    /// read into those. It stays only while the Memory sheet has the switch (R4 removes both).
     var appleUsesPinnedTerms: Bool {
         get { glossaryApply != .hint || appProfiles.contains { $0.entries.contains { $0.apply != .hint } } }
         set {
-            glossaryApply = newValue ? .both : .hint
-            for i in appProfiles.indices {
+            let known = Set(engines.map(\.id))
+            func isApple(_ own: ProfileEngine?) -> Bool { ProfileMigration.engineInEffectIsApple(own: own, allApps: customEngineID, engines: known) }
+            if !newValue || isApple(nil) { glossaryApply = newValue ? .both : .hint }
+            for i in appProfiles.indices where !newValue || isApple(appProfiles[i].engine) {
                 appProfiles[i].entries = appProfiles[i].entries.map { row in var r = row; r.apply = newValue ? .both : .hint; return r }
             }
         }

@@ -270,8 +270,9 @@ enum ProfileFileChecks {
 
     // MARK: the file of 1.1.4
 
-    /// A file of 1.1.4: two engines with their own context, an app profile with an override and names, the Apple switch on.
-    private static func oldFile(applePins: Bool = true) -> Data {
+    /// A file of 1.1.4: two engines with their own context, an app profile with an override and names, the Apple switch on. All apps is on
+    /// the added engine X, unless `allAppsOnApple` (then it names no engine: Apple Translation is in effect).
+    private static func oldFile(applePins: Bool = true, allAppsOnApple: Bool = false) -> Data {
         let x = EngineConfig(id: UUID(uuidString: "00000000-0000-0000-0000-0000000000A1")!, name: "X",
                              kind: .openAICompatible(baseURL: URL(string: "http://localhost:1/v1")!, model: "m", thinking: .off, extraHeaders: [:]),
                              context: EngineContext(enabled: true, previousLines: 3, includeTitle: false, useLearned: true))
@@ -281,7 +282,8 @@ enum ProfileFileChecks {
                               entries: [MemoryEntry(src: "ハク", dst: "하쿠", kind: .person)], context: AppContextOverride(mode: .off))
         guard let engines = try? JSONSerialization.jsonObject(with: JSONEncoder().encode([x, y])),
               let profiles = try? JSONSerialization.jsonObject(with: JSONEncoder().encode([chat])) else { return Data() }
-        var object: [String: Any] = ["engines": engines, "customEngineID": x.id.uuidString, "appProfiles": profiles, "targetLanguage": "ko"]
+        var object: [String: Any] = ["engines": engines, "appProfiles": profiles, "targetLanguage": "ko"]
+        if !allAppsOnApple { object["customEngineID"] = x.id.uuidString }
         if applePins { object["appleUsesPinnedTerms"] = true }
         return json(object)
     }
@@ -291,11 +293,18 @@ enum ProfileFileChecks {
         let read = SettingsFileCheck.read(data, over: AppSettings())
         let s = read.settings
         check("a file of 1.1.4 is converted on read: no issue, and it says so", read.issues.isEmpty && read.convertedFromOldShape, "\(read.issues.map(\.message))")
-        check("the conversion follows §5.2: profiles (id = bundle id, one app condition), the amount from the engine in use, learning, the engines' allow, the Apple switch as both",
+        // 2026-10-21, user decision after bench R7 (names: the judge preferred `hint` over `both` 76:41): the Apple switch migrates per engine in effect.
+        // Derivation: All apps is on the added engine X, so X is in effect for the Chat profile (no engine of its own), not Apple: its rows and
+        // the glossary stay `hint`. The Apple case follows (All apps names no engine).
+        check("the conversion follows §5.2: profiles (id = bundle id, one app condition), the amount from the engine in use, learning, the engines' allow, the Apple switch per engine in effect (X, not Apple: hint)",
               s.appProfiles.map(\.id) == ["com.example.chat"] && s.appProfiles[0].when == [ProfileCondition(app: "com.example.chat")]
               && s.context == AppContextOverride(mode: .conversation, previousLines: 3) && s.useLearned
-              && s.engines.allSatisfy { $0.context == nil } && s.glossaryApply == .both && s.appProfiles[0].entries.map(\.apply) == [.both],
+              && s.engines.allSatisfy { $0.context == nil } && s.glossaryApply == .hint && s.appProfiles[0].entries.map(\.apply) == [.hint],
               "context \(String(describing: s.context)) learned \(s.useLearned) apply \(s.glossaryApply)")
+        let onApple = SettingsFileCheck.read(oldFile(allAppsOnApple: true), over: AppSettings()).settings
+        check("the Apple switch with All apps on Apple Translation: the rows of a profile with no engine of its own and the glossary become both",
+              onApple.glossaryApply == .both && onApple.appProfiles[0].entries.map(\.apply) == [.both],
+              "apply \(onApple.glossaryApply) \(onApple.appProfiles[0].entries.map(\.apply))")
         let rendered = String(decoding: SettingsFileFormat.render(s), as: UTF8.self)
         check("what it writes back has none of the old keys", !rendered.contains("appProfiles") && !rendered.contains("appleUsesPinnedTerms") && !rendered.contains("\"enabled\""))
         check("a file in the new shape is not converted, and a file with no old key at all is not either",
@@ -376,9 +385,9 @@ enum ProfileFileChecks {
     }
 
     /// The file of 1.1.4 as the app reads it, and 1.1.4's own answer to "what is this (engine, app) request built with".
-    private static func oldAndNew(engines: [EngineConfig], profiles: [AppProfile], inUse: EngineConfig, applePins: Bool) -> (old: (EngineConfig, AppProfile?) -> ContextOptions,
-                                                                                                                             new: AppSettings, exceptions: [MigrationException]) {
-        var object: [String: Any] = ["customEngineID": inUse.id.uuidString]
+    private static func oldAndNew(engines: [EngineConfig], profiles: [AppProfile], inUse: EngineConfig?, applePins: Bool) -> (old: (EngineConfig, AppProfile?) -> ContextOptions,
+                                                                                                                              new: AppSettings, exceptions: [MigrationException]) {
+        var object: [String: Any] = inUse.map { ["customEngineID": $0.id.uuidString] } ?? [:]   // nil: All apps is on Apple Translation
         object["engines"] = (try? JSONSerialization.jsonObject(with: JSONEncoder().encode(engines))) ?? []
         object["appProfiles"] = (try? JSONSerialization.jsonObject(with: JSONEncoder().encode(profiles))) ?? []
         if applePins { object["appleUsesPinnedTerms"] = true }
@@ -456,14 +465,25 @@ enum ProfileFileChecks {
         }
         check("exception (b), a spare engine's own previousLines follows the amount: listed, and the spare DeepL's request is the one that changes",
               spareExceptions.contains(.spareEnginePreviousLines) && spareDiffers)
+        // 2026-10-21, user decision after bench R7: the switch migrates per engine in effect. Derivation: with All apps on the added engine
+        // `all[0]`, the Notes profile (no engine of its own) has that engine in effect, not Apple, so its row stays `hint` and Apple's plan is nothing.
         let (_, switchNew, switchExceptions) = oldAndNew(engines: all, profiles: profiles, inUse: all[0], applePins: true)
         let aRow = switchNew.appProfiles.first { $0.bundleID == "com.example.notes" }?.entries.map(\.apply)
         let planned = ContextPlan.decide(settings: switchNew, engine: nil, engineRests: false,
                                          chain: ContextRoute.pair(settings: switchNew, lens: "com.example.notes").chain)
-        check("exception (d), the Apple switch on: listed, every row is both, and Apple's plan carries the row as the 1.1.4 plan did (its source and translation)",
-              switchExceptions.contains(.applePinsBecomeBoth) && aRow == [.both]
-              && { if case let .replaceOnly(rows)? = planned { rows.map(\.src) == ["ハク"] && rows.map(\.dst) == ["하쿠"] } else { false } }(),
-              "\(String(describing: planned))")
+        check("exception (d), the Apple switch on with All apps on an added engine: listed, the row stays hint (that engine is in effect), and Apple's plan is nothing",
+              switchExceptions.contains(.applePinsBecomeBoth) && aRow == [.hint] && planned == nil, "\(String(describing: planned))")
+        // The Apple case: All apps names no engine, so the Notes row is both and the plan carries it as the 1.1.4 plan did (its source and translation);
+        // the Own profile (an added engine of its own) keeps its row.
+        let (_, appleNew, _) = oldAndNew(engines: all, profiles: profiles, inUse: nil, applePins: true)
+        let appleRow = appleNew.appProfiles.first { $0.bundleID == "com.example.notes" }?.entries.map(\.apply)
+        let ownRow = appleNew.appProfiles.first { $0.bundleID == "com.example.own" }?.entries.map(\.apply)
+        let applePlan = ContextPlan.decide(settings: appleNew, engine: nil, engineRests: false,
+                                           chain: ContextRoute.pair(settings: appleNew, lens: "com.example.notes").chain)
+        check("exception (d), the Apple switch on with All apps on Apple Translation: the row is both, and Apple's plan carries it as the 1.1.4 plan did; a profile on an added engine keeps hint",
+              appleRow == [.both] && ownRow == [.hint] && appleNew.glossaryApply == .both
+              && { if case let .replaceOnly(rows)? = applePlan { rows.map(\.src) == ["ハク"] && rows.map(\.dst) == ["하쿠"] } else { false } }(),
+              "\(String(describing: applePlan)) \(String(describing: appleRow)) \(String(describing: ownRow))")
         // 1.1.4 with the switch OFF: a plan of nothing for Apple, whatever the profiles hold (and a hint row is no replace row).
         let offPlan = ContextPlan.decide(settings: new, engine: nil, engineRests: false, chain: ContextRoute.pair(settings: new, lens: "com.example.notes").chain)
         check("1.1.4 with the switch off: Apple's plan is nothing, so its request is today's", offPlan == nil)

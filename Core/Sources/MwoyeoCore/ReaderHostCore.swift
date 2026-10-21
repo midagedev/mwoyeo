@@ -117,6 +117,8 @@ public struct ReaderHostCore: Sendable {
         public var rereads = 0
         public var superseded = 0
         public var docsFallbacks = 0
+        /// Lines the services left out of their answers for a confidence under the least they keep (`ReadReply.lowConfidence`).
+        public var lowConfidence = 0
     }
 
     private struct Pending {
@@ -321,7 +323,7 @@ public struct ReaderHostCore: Sendable {
     /// reads again with what is left. Returns the error, for a warm-up.
     @discardableResult
     public mutating func replied(_ role: WorkerRole, _ job: ReadScheduler.Job, error: ReadFailure?, ms: Int, pid: Int32 = 0,
-                                 now: TimeInterval) -> ReadFailure? {
+                                 lowConfidence: Int = 0, now: TimeInterval) -> ReadFailure? {
         // A request that took S or longer is suspect by now, whether or not the timer ran yet: its answer is what recovers it.
         sampleDisk(now)
         var events = health[role]!.tick(now: now, wanted: wantsWorker(role))
@@ -338,9 +340,12 @@ public struct ReaderHostCore: Sendable {
         if let named {
             out.append(.log("reader failed role=\(role.rawValue) via=\(job.target.via.rawValue) why=\(named)"))
         } else {
-            out.append(.log("reader answered role=\(role.rawValue) via=\(job.target.via.rawValue) ms=\(ms) pid=\(pid)"))
+            out.append(.log("reader answered role=\(role.rawValue) via=\(job.target.via.rawValue) ms=\(ms) pid=\(pid)"
+                            + (lowConfidence > 0 ? " low=\(lowConfidence)" : "")))
         }
-        note("reply \(role.rawValue)/\(job.target.via.rawValue) client=\(job.client) frame=\(job.frame) \(named ?? "ok") ms=\(ms)", now)
+        counts.lowConfidence += lowConfidence
+        note("reply \(role.rawValue)/\(job.target.via.rawValue) client=\(job.client) frame=\(job.frame) \(named ?? "ok") ms=\(ms)"
+             + (lowConfidence > 0 ? " low=\(lowConfidence)" : ""), now)
         let delivery = scheduler.complete(role, id: job.id)
         if case .drop = delivery { out.append(.count("reader.dropped")) }
         if let p = jobs.removeValue(forKey: job.id) {

@@ -212,11 +212,14 @@ public struct ReadReply: Codable, Sendable, Equatable {
     /// `phys_footprint` of the service after the job, in bytes.
     public var footprint: UInt64
     public var error: ReadFailure?
+    /// Lines Vision found that the read left out for a confidence under the least it keeps (`VisionExec.minConfidence`): the service's
+    /// own count, told to the host's stats.
+    public var lowConfidence: Int
 
     public init(id: UInt64, role: ReaderRole, pid: Int32, lines: [ReadLine] = [], paragraphs: [[ReadLine]] = [], ms: Double = 0,
-                footprint: UInt64 = 0, error: ReadFailure? = nil) {
+                footprint: UInt64 = 0, error: ReadFailure? = nil, lowConfidence: Int = 0) {
         self.id = id; self.role = role; self.pid = pid; self.lines = lines; self.paragraphs = paragraphs
-        self.ms = ms; self.footprint = footprint; self.error = error
+        self.ms = ms; self.footprint = footprint; self.error = error; self.lowConfidence = lowConfidence
     }
 }
 

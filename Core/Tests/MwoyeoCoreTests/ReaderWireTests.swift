@@ -37,6 +37,12 @@ import Testing
         #expect(String(back.lines[0].text.utf8.prefix(back.lines[0].words[1].end))!.hasSuffix("世"))
     }
 
+    @Test func aReplyCarriesItsLowConfidenceCount() throws {
+        let reply = ReadReply(id: 8, role: .lines, pid: 4242, lines: [line], ms: 1, lowConfidence: 4)
+        #expect(try roundTrip(reply).lowConfidence == 4)
+        #expect(ReadReply(id: 9, role: .lines, pid: 1).lowConfidence == 0, "none unless the service says so")
+    }
+
     @Test func aLineWithManyWordsAndOddNumbersKeepsEveryBit() throws {
         // The numbers travel as raw Doubles: negative zero, tiny and huge values, and a line with no words, all come back to the bit.
         let odd = [CGRect(x: -0.0, y: 5e-324, width: 1.7976931348623157e308, height: 0.1 + 0.2),

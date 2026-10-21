@@ -379,10 +379,10 @@ actor RecognitionHost {
         guard Self.inProcess, role == .lines else { return await Self.connection(role).perform(job, surface: surface) }
         let began = Trace.now
         do {
-            let out = try await VisionExec.run(job.kind, image: image, roi: job.roi, languages: job.languages,
-                                               documentLanguages: job.documentLanguages, customWords: job.customWords)
+            let (out, lowConfidence) = try await VisionExec.runCounting(job.kind, image: image, roi: job.roi, languages: job.languages,
+                                                                        documentLanguages: job.documentLanguages, customWords: job.customWords)
             return ReadReply(id: job.id, role: .lines, pid: 0, lines: out.lines.map(VisionExec.wire),
-                             paragraphs: out.paragraphs.map { $0.map(VisionExec.wire) }, ms: (Trace.now - began) * 1000)
+                             paragraphs: out.paragraphs.map { $0.map(VisionExec.wire) }, ms: (Trace.now - began) * 1000, lowConfidence: lowConfidence)
         } catch {
             return ReadReply(id: job.id, role: .lines, pid: 0, error: ReadFailure.from(error))
         }
@@ -400,7 +400,7 @@ actor RecognitionHost {
 
     private func replied(_ role: WorkerRole, _ job: ReadScheduler.Job, _ reply: ReadReply) {
         record(role, reply)
-        core.replied(role, job, error: reply.error, ms: Int(reply.ms.rounded()), pid: reply.pid, now: Trace.now)
+        core.replied(role, job, error: reply.error, ms: Int(reply.ms.rounded()), pid: reply.pid, lowConfidence: reply.lowConfidence, now: Trace.now)
         apply(reply: reply)
     }
 
@@ -456,6 +456,7 @@ actor RecognitionHost {
             if TextRecognizer.traceReads {
                 let out: VisionExec.Output = doc ? .paragraphs(reply.paragraphs.map { $0.map(VisionExec.unwire) }) : .lines(reply.lines.map(VisionExec.unwire))
                 TextRecognizer.printRead(Self.kind(of: via), size: ask.size, roi: ask.roi, out)
+                TextRecognizer.dumpRead(ask.image, kind: Self.kind(of: via), roi: ask.roi)
             }
             ticket.finish(result)
         case let .unavailable(why): ticket.finish(.unavailable(why))
@@ -590,6 +591,7 @@ actor RecognitionHost {
         let c = core.counts
         out.append("reader: host reads=\(c.reads) unavailable=\(c.unavailable) rerouted=\(c.rerouted) retried=\(c.retried) "
             + "late=\(c.late) rereads=\(c.rereads) superseded=\(c.superseded) docs-fallbacks=\(c.docsFallbacks) "
+            + "low-confidence=\(c.lowConfidence) "
             + "dropped=\(core.scheduler.dropped.map { "\($0.key.rawValue):\($0.value)" }.sorted().joined(separator: ","))")
         if Self.showsRing { out += core.ring.map { "reader: ring \($0)" } }
         return out

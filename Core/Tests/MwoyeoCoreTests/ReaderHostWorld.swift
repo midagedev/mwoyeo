@@ -55,6 +55,8 @@ final class HostWorld {
     }
 
     var core: ReaderHostCore
+    /// What the fake services tell the core about every answer they give (`ReadReply.lowConfidence`).
+    var lowConfidence = 0
     let disk = Disk()
     private(set) var now: TimeInterval = 0
     let fakes: ReaderFakePlan
@@ -163,7 +165,7 @@ final class HostWorld {
                 apply()
                 warmAction(action)
             } else {
-                core.replied(order.role, order.job, error: error, ms: ms, now: now)
+                core.replied(order.role, order.job, error: error, ms: ms, lowConfidence: lowConfidence, now: now)
                 apply()
             }
         case let .timer(role):

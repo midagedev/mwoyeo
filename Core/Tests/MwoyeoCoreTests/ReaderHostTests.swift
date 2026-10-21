@@ -222,4 +222,19 @@ import Testing
         #expect(coldDocsWaits, "Docs is cold for the key: the mutated pass waits")
         #expect(!linesWaits, "only a layout read waits")
     }
+
+    // MARK: What the stats and the ring show of the reads
+
+    @Test func lowConfidenceLinesAreCountedAndTheRingSaysSo() {
+        let world = warmWorld(fakes: "")
+        world.lowConfidence = 3
+        world.ask(layoutLens(world))
+        world.settle()
+        #expect(world.core.counts.lowConfidence == 3, "the answer's count is the host's")
+        #expect(world.core.ring.contains { $0.contains(" ok ") && $0.hasSuffix(" low=3") }, "\(world.core.ring)")
+        world.lowConfidence = 0
+        world.ask(layoutLens(world))
+        world.settle()
+        #expect(world.core.counts.lowConfidence == 3, "an answer with none adds none")
+    }
 }

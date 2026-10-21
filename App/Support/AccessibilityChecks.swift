@@ -38,6 +38,8 @@ enum AccessibilityChecks {
         var help: String
         var enabled: Bool
         var actions: [String] = []
+        /// The element's hit area, as an assistive app reads it (zero when it says none).
+        var size = CGSize.zero
 
         var line: String {
             let text = [label.isEmpty ? "" : "label=\"\(label)\"", value.isEmpty ? "" : "value=\"\(value.prefix(60))\"",
@@ -53,6 +55,11 @@ enum AccessibilityChecks {
     ]
     /// The scroll bar's own parts: the system names them.
     private static let systemSubroles: Set<String> = ["AXIncrementArrow", "AXDecrementArrow", "AXIncrementPage", "AXDecrementPage"]
+    /// The roles that are one button (the probe writes their sizes), and the window's own buttons (the system draws those, at its own size).
+    private static let buttonRoles: Set<String> = ["AXButton", "AXMenuButton", "AXPopUpButton"]
+    private static let windowButtonSubroles: Set<String> = ["AXCloseButton", "AXMinimizeButton", "AXZoomButton", "AXFullScreenButton"]
+    /// The smallest hit area of a control on macOS (HIG, Accessibility: "macOS | 28x28 pt | 20x20 pt"; ui-audit-1-1-5 X1).
+    static let minimumHit: CGFloat = 20
 
     // MARK: - Walking the tree
 
@@ -67,6 +74,12 @@ enum AccessibilityChecks {
         if let s = value as? String { return s }
         if let n = value as? NSNumber { return n.stringValue }
         return ""
+    }
+
+    private nonisolated static func size(of element: AXUIElement) -> CGSize {
+        var size = CGSize.zero
+        if let v = attribute(element, kAXSizeAttribute), CFGetTypeID(v) == AXValueGetTypeID() { AXValueGetValue(v as! AXValue, .cgSize, &size) }
+        return size
     }
 
     /// The name a screen reader says for `element`: its description, else its title, else the text of the element that titles it.
@@ -105,7 +118,8 @@ enum AccessibilityChecks {
                                   // A custom action comes as "Name:<name>\nTarget:…\nSelector:…".
                                   let first = raw.split(separator: "\n").first.map(String.init) ?? raw
                                   return first.hasPrefix("Name:") ? String(first.dropFirst(5)) : first
-                              }))
+                              },
+                              size: size(of: element)))
             for child in (attribute(element, kAXChildrenAttribute) as? [AXUIElement]) ?? [] { walk(child, depth + 1) }
         }
         for window in (attribute(app, kAXWindowsAttribute) as? [AXUIElement]) ?? [] where string(window, kAXTitleAttribute) == title {
@@ -128,6 +142,30 @@ enum AccessibilityChecks {
             seen["\(item.role) \"\(item.label)\"", default: 0] += 1
         }
         return seen.filter { $0.value > 1 }.map { "\($0.key) ×\($0.value)" }.sorted()
+    }
+
+    /// The icon buttons of `items` (ui-audit-1-1-5 X1). The tree does not say what a button draws (SwiftUI gives a text button its words as
+    /// the description, as it gives an icon one), so an icon is told by what it leaves out: a button no wider than 1.3 times its height (text
+    /// is wider; the borderless text buttons are 16 pt high by design and are not this audit's), and a menu with no value (a picker says its
+    /// choice; a menu with only a glyph, the ⋯, says nothing).
+    static func iconButtons(_ items: [Item]) -> [Item] {
+        items.filter { item in
+            guard item.size != .zero, !windowButtonSubroles.contains(item.subrole), !systemSubroles.contains(item.subrole) else { return false }
+            switch item.role {
+            case "AXButton": return item.size.width <= 1.3 * item.size.height
+            case "AXMenuButton", "AXPopUpButton": return item.value.isEmpty
+            default: return false
+            }
+        }
+    }
+
+    /// Those under the macOS minimum hit area (20 × 20 pt) in either direction.
+    static func smallIconButtons(_ items: [Item]) -> [Item] {
+        iconButtons(items).filter { $0.size.width < minimumHit || $0.size.height < minimumHit }
+    }
+
+    private static func sizes(_ items: [Item]) -> String {
+        items.map { "\($0.label.isEmpty ? $0.role : $0.label) \(Int($0.size.width.rounded()))×\(Int($0.size.height.rounded()))" }.joined(separator: ", ")
     }
 
     // MARK: - Hosting
@@ -173,6 +211,19 @@ enum AccessibilityChecks {
         var lens = RegionConfig(name: "Safari", rect: CGRect(x: 100, y: 100, width: 400, height: 200))
         lens.follow(nil)
         out.append(("menu-lens-row", await hostedTree(RegionRow(region: lens), size: CGSize(width: 340, height: 80), model: model, name: "menu-lens-row")))
+        // The row's trash button is drawn under the pointer only; this is the row with the pointer on it.
+        out.append(("menu-lens-row-hover", await hostedTree(RegionRow(region: lens, hovering: true), size: CGSize(width: 340, height: 80), model: model, name: "menu-lens-row-hover")))
+        out.append(("menu-engine-notice", await hostedTree(EngineNotice(headline: "Gemini unavailable · using Apple", reason: "The engine did not accept the key.",
+                                                                        useApple: {}, dismiss: {}),
+                                                           size: CGSize(width: 340, height: 80), model: model, name: "menu-engine-notice")))
+        // Settings › Translation with an added engine and an app profile: their ⋯ menus are on screen only then.
+        let savedEngines = model.settings.engines, savedApps = model.settings.appProfiles
+        model.settings.engines = [EngineConfig(name: "Gemini", kind: .openAICompatible(baseURL: URL(string: "https://gemini.example.invalid/v1beta/openai/")!,
+                                                                                       model: "gemini-3.1-flash-lite", thinking: .off, extraHeaders: [:]))]
+        model.settings.appProfiles = [AppProfile(bundleID: "com.example.a11y", appName: "Example Chat", source: "en", target: "ko")]
+        out.append(("settings-translation-rows", await hostedTree(TranslationSettings(), size: CGSize(width: 560, height: 900), model: model, name: "settings-translation-rows", settle: 2)))
+        model.settings.engines = savedEngines
+        model.settings.appProfiles = savedApps
         out.append(("engine-sheet", await hostedTree(EngineSheet(), size: CGSize(width: 480, height: 560), model: model, name: "engine-sheet")))
         let form = EngineConfig(name: "Gemini", kind: .openAICompatible(baseURL: URL(string: "https://gemini.example.invalid/v1beta/openai/")!,
                                                                          model: "gemini-3.1-flash-lite", thinking: .off, extraHeaders: [:]))
@@ -199,9 +250,8 @@ enum AccessibilityChecks {
                 AXUIElementSetMessagingTimeout(app, 10)
                 let windows = (attribute(app, kAXWindowsAttribute) as? [AXUIElement]) ?? []
                 continuation.resume(returning: windows.map { w in
-                    var size = CGSize.zero
-                    if let v = attribute(w, kAXSizeAttribute), CFGetTypeID(v) == AXValueGetTypeID() { AXValueGetValue(v as! AXValue, .cgSize, &size) }
-                    return "\(string(w, kAXRoleAttribute))/\(string(w, kAXSubroleAttribute)) title=\"\(string(w, kAXTitleAttribute))\" \(Int(size.width))×\(Int(size.height))"
+                    let extent = size(of: w)
+                    return "\(string(w, kAXRoleAttribute))/\(string(w, kAXSubroleAttribute)) title=\"\(string(w, kAXTitleAttribute))\" \(Int(extent.width))×\(Int(extent.height))"
                 })
             }
         }
@@ -227,7 +277,9 @@ enum AccessibilityChecks {
         print("a11y windows:\n  " + listed.joined(separator: "\n  "))
         for (name, items) in await audited(model) {
             let path = dir.appendingPathComponent("a11y-\(name).txt")
-            try? items.map(\.line).joined(separator: "\n").write(to: path, atomically: true, encoding: .utf8)
+            // A button's hit area is on its line here (not in `Item.line`, which the settle loop compares): the probe is what shows a size.
+            try? items.map { $0.line + (buttonRoles.contains($0.role) ? "  [\(Int($0.size.width.rounded()))×\(Int($0.size.height.rounded()))]" : "") }
+                .joined(separator: "\n").write(to: path, atomically: true, encoding: .utf8)
             let bad = unlabeled(items), same = ambiguous(items)
             print("a11y \(name): \(items.count) elements, \(bad.count) unlabeled, \(same.count) ambiguous -> \(path.path)")
             for b in bad { print("  unlabeled \(b.role)/\(b.subrole) at depth \(b.depth)") }
@@ -249,12 +301,47 @@ enum AccessibilityChecks {
             print("check-logic: SKIP accessibility: audit of Settings, Onboarding, the menu and the engine sheet (this process may not ask the accessibility server)")
             return report.failed
         }
-        for (name, items) in await audited(model) {
+        let views = await audited(model)
+        for (name, items) in views {
             let bad = unlabeled(items), same = ambiguous(items)
             report.check("\(name): \(items.count) elements, \(bad.count) unlabeled controls or images, \(same.count) indistinguishable controls"
                          + (same.isEmpty ? "" : " (\(same.joined(separator: ", ")))"), items.count > 2 && bad.isEmpty && same.isEmpty)
+            // ui-audit-1-1-5 X1. The Memory sheet is the profile-UI round's (its minus buttons are in X1 too): its check joins when that sheet is rebuilt.
+            guard name != "memory-sheet" else { continue }
+            let small = smallIconButtons(items)
+            report.check("\(name): \(iconButtons(items).count) icon buttons, \(small.count) under \(Int(minimumHit)) × \(Int(minimumHit)) pt"
+                         + (small.isEmpty ? "" : " (\(sizes(small)))"), small.isEmpty, detail: "every icon button needs a hit area of at least 20 × 20 pt (HIG, Accessibility)")
         }
+        // The instrument must see the buttons it is about: a tree with no sizes would pass the check above for nothing.
+        let seen = views.filter { $0.name != "memory-sheet" }.reduce(0) { $0 + iconButtons($1.items).count }
+        report.check("the audit read the hit area of \(seen) icon buttons across the views (the menu footer, the ⋯ menu, the shortcut ✕, the notice ✕, the trash)", seen >= 8)
+        await menuChecks(model, views.first { $0.name == "menu" }?.items ?? [], report)
         return report.failed
+    }
+
+    // MARK: The menu panel
+
+    /// The panel's footer: Show Original only where it can act (ui-audit-1-1-5 1.1: with no lens it flips a switch the first lens would
+    /// inherit, so the lens would open showing the original), and the shortcuts the Settings and Quit buttons answer to (1.2).
+    private static func menuChecks(_ model: AppModel, _ menu: [Item], _ r: Report) async {
+        func button(_ items: [Item], _ label: String) -> Item? { items.first { $0.role == "AXButton" && $0.label == label } }
+        if model.regions.isEmpty, model.translationsVisible {
+            let original = button(menu, String(localized: "Show Original"))
+            r.check("the menu panel with no lens shows Show Original dimmed", original?.enabled == false,
+                    detail: original == nil ? "there is no Show Original button in the panel" : "Show Original is enabled with 0 lenses")
+            model.toggleTranslations()
+            let hidden = await hostedTree(MenuPanel(), size: CGSize(width: 340, height: 400), model: model, name: "menu-hidden")
+            model.toggleTranslations()
+            let back = button(hidden, String(localized: "Show Translation"))
+            r.check("with no lens and the translations hidden, Show Translation is enabled (the way back is never dimmed)", back?.enabled == true,
+                    detail: back == nil ? "there is no Show Translation button in the panel" : "Show Translation is dimmed")
+        }
+        r.check("the table: Show Original acts with a lens, or while the translations are hidden",
+                MenuPanel.canToggleOriginal(lenses: 0, translationsVisible: true) == false && MenuPanel.canToggleOriginal(lenses: 0, translationsVisible: false)
+                && MenuPanel.canToggleOriginal(lenses: 1, translationsVisible: true) && MenuPanel.canToggleOriginal(lenses: 1, translationsVisible: false))
+        let settings = button(menu, String(localized: "Settings")), quit = button(menu, String(localized: "Quit Mwoyeo"))
+        r.check("the panel's Settings button names ⌘, and its Quit button ⌘Q in their help", settings?.help.hasSuffix("(⌘,)") == true && quit?.help.hasSuffix("(⌘Q)") == true,
+                detail: "Settings help \"\(settings?.help ?? "—")\", Quit help \"\(quit?.help ?? "—")\"")
     }
 
     // MARK: Reduce Motion
@@ -442,6 +529,11 @@ enum AccessibilityChecks {
         r.check("the translation text is complete", (children.first?.accessibilityValue() as? String) == "ok who stayed up for the patch notes last night\nguilty.")
         r.check("the pill's buttons are named and sit inside the lens window",
                 children.dropFirst().allSatisfy { ($0.accessibilityLabel() ?? "").isEmpty == false && window.frame.intersects($0.accessibilityFrame()) })
+        // ui-audit-1-1-5 2.1: the glyphs are 16 × 16 and 18 × 16 pt, the hit areas the HIG's 20 × 20 pt at least.
+        let pill = children.dropFirst().map { (label: $0.accessibilityLabel() ?? "", frame: $0.accessibilityFrame()) }
+        r.check("the pill's two buttons have a hit area of at least 20 × 20 pt",
+                pill.count == 2 && pill.allSatisfy { $0.frame.width >= minimumHit && $0.frame.height >= minimumHit },
+                detail: pill.map { "\($0.label) \(Int($0.frame.width.rounded()))×\(Int($0.frame.height.rounded()))" }.joined(separator: ", "))
         _ = children.last?.accessibilityPerformPress()
         r.check("pressing the close button asks the app to close the lens", closed)
         closed = false
@@ -504,6 +596,8 @@ enum AccessibilityChecks {
         r.check("and the four actions on it", wanted.allSatisfy { group?.actions.contains($0) == true })
         let inside = items.filter { $0.depth == (group?.depth ?? -2) + 1 }
         r.check("and inside it the translation and the two buttons of the pill", inside.map(\.role) == ["AXStaticText", "AXButton", "AXButton"] && inside.first?.value == "Hello there.")
+        let small = inside.dropFirst().filter { $0.size.width < minimumHit || $0.size.height < minimumHit }
+        r.check("and the assistive app reads each button's hit area as 20 × 20 pt at least (\(sizes(Array(inside.dropFirst()))))", inside.count == 3 && small.isEmpty)
     }
 
     // MARK: The keyboard

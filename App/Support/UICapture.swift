@@ -260,7 +260,7 @@ enum UICapture {
                 // Only the Context section's checks (the whole of check-logic takes minutes).
                 let failed = await EngineContextChecks.run(model, dump: args.contains("--dump") ? out : nil)
                 report("engine context", failed)
-            case "appearance": await shoot(name, AppearanceSettings(), CGSize(width: 560, height: 520))
+            case "appearance": await shoot(name, AppearanceSettings(), CGSize(width: 560, height: SettingsTab.appearance.height))   // the pane as the window shows it
             case "lens-gallery": await lensGallery()
             case "lens-tab-positions": await lensTabPositions()
             case "lens-reading":

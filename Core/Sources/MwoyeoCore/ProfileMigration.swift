@@ -300,7 +300,7 @@ public enum ProfileMigration {
     /// | `engines[j].context.enabled == false` | `engines[j].allow.lines = false` | only when the top-level amount sends lines and no profile does |
     /// | `engines[j].context.useLearned` | `useLearned` (top-level, profile) | from the same engine as the amount; a profile whose own engine differs gets its own |
     /// | `.includeTitle`, `.deepLInstructions` | `allow.title`, `allow.deepLInstructions` | copied when `enabled` was on, else false (they did nothing) |
-    /// | `appleUsesPinnedTerms: true` | `entries[].apply = "both"` on every user row; `glossaryApply: "both"` | false or absent → nothing written (`hint`) |
+    /// | `appleUsesPinnedTerms: true` | `entries[].apply = "both"` on the user rows of each profile whose engine in effect is Apple; `glossaryApply: "both"` when All apps' is | per engine in effect (a profile's own, else All apps', else Apple), because the switch only ever changed Apple and `both` costs LLM engines (bench R7: `hint` over `both` 76:41); other rows and the glossary keep their mode; false or absent → nothing written (`hint`) |
     /// | `glossary`, `sourceLanguage`, `targetLanguage`, `customEngineID`, `engine`, `paragraphReader` | unchanged | All apps' fields |
     ///
     /// With both `profiles` and `appProfiles`, the latter is ignored: the file is already in the new shape.
@@ -366,19 +366,23 @@ public enum ProfileMigration {
             migratedEngines.append(out)
         }
 
-        // The Apple switch (design §5.2's seventh row): every user row is used in both ways, and so is the glossary.
-        let appleBoth = old.appleUsesPinnedTerms == true
-        if appleBoth {
-            for i in profiles.indices {
+        // The Apple switch (design §5.2's seventh row): it only ever changed Apple Translation, so it migrates per engine in effect. The rows of a
+        // profile whose engine is Apple are used in both ways, and so is the glossary when All apps' engine is Apple; the rest keep their mode.
+        var glossaryApply = old.glossaryApply
+        if old.appleUsesPinnedTerms == true {
+            let known = Set(engines.map(\.id))
+            func isApple(_ own: ProfileEngine?) -> Bool { engineInEffectIsApple(own: own, allApps: old.customEngineID, engines: known) }
+            for i in profiles.indices where isApple(profiles[i].customEngineID) {
                 profiles[i].entries = profiles[i].entries.map { row in var both = row; both.apply = .both; return both }
             }
+            if isApple(nil) { glossaryApply = .both }
         }
 
         var value = MigratedSettings(sourceLanguage: old.sourceLanguage, targetLanguage: old.targetLanguage,
                                      engine: old.engine, customEngineID: old.customEngineID, glossary: old.glossary,
                                      paragraphReader: old.paragraphReader, context: topContext,
                                      useLearned: topUseLearned ? true : nil, profilePin: old.profilePin,
-                                     glossaryApply: appleBoth ? .both : old.glossaryApply,
+                                     glossaryApply: glossaryApply,
                                      profiles: profiles, engines: migratedEngines.isEmpty ? nil : migratedEngines)
 
         // The file is already in the new shape: its own keys are kept.
@@ -390,6 +394,15 @@ public enum ProfileMigration {
         }
 
         return ProfileMigrationResult(value: value, exceptions: exceptions(for: old, profiles: profiles, engines: engines))
+    }
+
+    /// Whether the engine in effect is Apple Translation (the rule of `AppProfiles.effective`): a profile's own engine while it is Apple or an
+    /// added engine that is among `engines`, else All apps' (`allApps`, an added engine's id), and Apple when that names none. `own` nil asks about
+    /// All apps itself. The one owner of the question, for the migration of the Apple switch and the sheet's switch alike.
+    public static func engineInEffectIsApple(own: ProfileEngine?, allApps: UUID?, engines: Set<UUID>) -> Bool {
+        if own == .apple { return true }
+        if let id = own?.id, engines.contains(id) { return false }
+        return !(allApps.map(engines.contains) ?? false)
     }
 
     /// The amount an engine's old context meant (design §5.2's second row): off or absent is `memory` (no key), on
@@ -406,7 +419,8 @@ public enum ProfileMigration {
     /// - (b) an engine other than the one the amount comes from was on with an amount of its own: its `previousLines`
     ///   has no new home and follows the profile amount.
     /// - (c) an engine was off, an app's override sent lines, and another engine was on: the new rules apply.
-    /// - (d) the Apple switch was on: the names go into the source for the other engines too.
+    /// - (d) the Apple switch was on: the names go into the source (`both`) for the profiles whose engine in effect is Apple (Foundation Models
+    ///   takes them now), and for no profile on an added engine.
     static func exceptions(for old: LegacySettings, profiles: [ProfileFile], engines: [EngineConfig]) -> [MigrationException] {
         var out: [MigrationException] = []
         if profiles.contains(where: { p in p.when.contains { !($0.app ?? "").isEmpty } }) {

@@ -124,6 +124,60 @@ import Testing
         #expect(!offResult.exceptions.contains(.applePinsBecomeBoth))
     }
 
+    // 2026-10-21, user decision after bench R7 (names, judge: `hint` over `both` 76:41, p = 0.002, on Haiku): the switch of 1.1.4 only ever changed
+    // Apple Translation, so it migrates per engine in effect. Derivation: a profile's engine in effect is its own, else All apps'
+    // (`customEngineID` naming an engine in `engines`), else Apple; only an Apple profile's rows become `both`, and the glossary does when All apps is Apple.
+
+    @Test func theAppleSwitchOnAnAddedEngineLeavesThatProfileAsItWas() {
+        let hint = MemoryEntry(src: "ハク", dst: "하쿠"), replace = MemoryEntry(src: "タロウ", dst: "타로", apply: .replace)
+        let a = AppProfile(bundleID: "com.example.a", appName: "A", source: "ja", target: "ko", entries: [hint, replace])
+        let b = AppProfile(bundleID: "com.example.b", appName: "B", source: "ja", target: "ko", entries: [hint, replace], engine: .apple)
+        let old = LegacySettings(customEngineID: engineA, appleUsesPinnedTerms: true, appProfiles: [a, b],
+                                 engines: [engine(engineA, nil)])
+        let result = ProfileMigration.convert(old)
+        // A has no engine of its own, so All apps' (the added one) is in effect: its rows keep their modes. B is on Apple: both.
+        #expect(result.value.profiles[0].entries.map(\.apply) == [.hint, .replace])
+        #expect(result.value.profiles[1].entries.map(\.apply) == [.both, .both])
+        // The glossary follows All apps' engine, which is not Apple: it stays `hint` (nothing written).
+        #expect(result.value.glossaryApply == nil)
+        #expect(result.exceptions.contains(.applePinsBecomeBoth))
+    }
+
+    @Test func theAppleSwitchWithNoAddedEngineMakesEveryRowBoth() {
+        let row = MemoryEntry(src: "ハク", dst: "하쿠")
+        let old = LegacySettings(appleUsesPinnedTerms: true,
+                                 appProfiles: [AppProfile(bundleID: "com.example.a", appName: "A", source: "ja", target: "ko", entries: [row]),
+                                               AppProfile(bundleID: "com.example.b", appName: "B", source: "ja", target: "ko", entries: [row], engine: .apple)])
+        let value = ProfileMigration.convert(old).value
+        #expect(value.profiles.map { $0.entries.map(\.apply) } == [[.both], [.both]])
+        #expect(value.glossaryApply == .both)
+    }
+
+    @Test func theAppleSwitchOnAnAppleAllAppsStillSparesAProfileOnAnAddedEngine() {
+        let row = MemoryEntry(src: "ハク", dst: "하쿠")
+        let c = AppProfile(bundleID: "com.example.c", appName: "C", source: "ja", target: "ko", entries: [row], engine: .added(engineA))
+        let d = AppProfile(bundleID: "com.example.d", appName: "D", source: "ja", target: "ko", entries: [row])
+        let old = LegacySettings(appleUsesPinnedTerms: true, appProfiles: [c, d], engines: [engine(engineA, nil)])
+        let value = ProfileMigration.convert(old).value
+        #expect(value.profiles[0].entries.map(\.apply) == [.hint])
+        #expect(value.profiles[1].entries.map(\.apply) == [.both])
+        #expect(value.glossaryApply == .both)
+    }
+
+    /// An engine id that names no engine is no engine: the profile follows All apps (the rule of `AppProfiles.effective`), and All apps with
+    /// such an id is Apple. Without this the rows of a profile whose engine was deleted would be left as hints on an Apple setup.
+    @Test func anEngineThatIsNotThereIsNotAnEngineInEffect() {
+        let row = MemoryEntry(src: "ハク", dst: "하쿠")
+        let gone = AppProfile(bundleID: "com.example.g", appName: "G", source: "ja", target: "ko", entries: [row], engine: .added(engineB))
+        let old = LegacySettings(customEngineID: engineB, appleUsesPinnedTerms: true, appProfiles: [gone], engines: [engine(engineA, nil)])
+        let value = ProfileMigration.convert(old).value
+        #expect(value.profiles[0].entries.map(\.apply) == [.both])
+        #expect(value.glossaryApply == .both)
+        // A glossary mode the file already had is kept when All apps is not Apple.
+        let kept = LegacySettings(customEngineID: engineA, appleUsesPinnedTerms: true, engines: [engine(engineA, nil)], glossaryApply: .replace)
+        #expect(ProfileMigration.convert(kept).value.glossaryApply == .replace)
+    }
+
     @Test func theKeysOfAllAppsAreUnchanged() {
         let old = LegacySettings(sourceLanguage: "ja", targetLanguage: "ko", engine: "auto", customEngineID: engineA,
                                  glossary: "Tarou = タロウ", paragraphReader: .documentLayout)

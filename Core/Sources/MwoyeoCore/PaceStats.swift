@@ -76,19 +76,21 @@ public final class PaceStats: @unchecked Sendable {
     private let lock = NSLock()
     private var entries: [String: Entry] = [:]
     private var current = Slot(key: "", engine: nil)
-    /// While an added engine rests after a failure: Apple's slot, whose pace applies to the groups that run until `until`.
-    private var stand: (slot: Slot, until: TimeInterval)?
+    /// While an added engine rests after a failure: Apple's slot, whose pace applies to the groups that run until `until`. One per slot of
+    /// the engine that rests (a lens of its own pair has its own, `LensRoute`), keyed by that slot's key.
+    private var stands: [String: (slot: Slot, until: TimeInterval)] = [:]
     private static let ringSize = 200
 
-    /// The engine and pair in use now. A change of namespace ends a fallback.
-    public func use(_ slot: Slot) {
-        lock.withLock {
-            if slot.key != current.key { stand = nil }
-            current = slot
-        }
-    }
-    public func useFallback(_ slot: Slot, until: TimeInterval) { lock.withLock { stand = (slot, until) } }
-    public func clearFallback() { lock.withLock { stand = nil } }
+    /// The engine and pair in use now (what a call that names no slot of its own uses). A stand-in belongs to the slot it was made for,
+    /// so a change of the slot in use leaves it where it is: a lens of that slot still has it.
+    public func use(_ slot: Slot) { lock.withLock { current = slot } }
+    /// The slot a call that names none takes (`use`): what a lens of its own, which carries its slot, is read against.
+    public var inUse: Slot { lock.withLock { current } }
+    public func useFallback(_ slot: Slot, until: TimeInterval) { lock.withLock { stands[current.key] = (slot, until) } }
+    /// The engine answered: no slot is lent Apple's pace any more. A slot whose engine still rests is lent it again by the next `useFallback`.
+    public func clearFallback() { lock.withLock { stands.removeAll() } }
+    /// `slot` (a lens's, which may not be the one in use) has Apple's `standIn` for its pace until `until`.
+    public func useFallback(_ standIn: Slot, for slot: Slot, until: TimeInterval) { lock.withLock { stands[slot.key] = (standIn, until) } }
 
     private func entry(_ slot: Slot) -> Entry { entries[slot.key] ?? Entry(engine: slot.engine) }
 
@@ -128,28 +130,37 @@ public final class PaceStats: @unchecked Sendable {
     }
 
     /// A lookup in the cache for the engine and pair in use (one line of text).
-    public func recordLookup(hit: Bool) {
+    public func recordLookup(hit: Bool) { recordLookup(hit: hit, slot: inUse) }
+
+    /// A lookup in the cache for `slot` (a lens's own engine and pair).
+    public func recordLookup(hit: Bool, slot: Slot) {
         lock.withLock {
-            var e = entry(current)
+            var e = entry(slot)
             e.lookups += 1
             if hit { e.hits += 1 }
-            entries[current.key] = e
+            entries[slot.key] = e
         }
     }
 
-    public func expectedSeconds(lines: Int) -> Double? {
-        lock.withLock {
-            let slot = stand.flatMap { ProcessInfo.processInfo.systemUptime < $0.until ? $0.slot : nil } ?? current
-            return entries[slot.key]?.pace.expectedSeconds(lines: lines)
-        }
+    public func expectedSeconds(lines: Int) -> Double? { expectedSeconds(lines: lines, slot: inUse) }
+
+    /// What a call of `lines` lines costs on `slot`, or on Apple's while that slot's engine rests.
+    public func expectedSeconds(lines: Int, slot: Slot) -> Double? {
+        lock.withLock { entries[standing(for: slot).key]?.pace.expectedSeconds(lines: lines) }
     }
 
     /// What a running call still needs on the engine and pair in use (see `TranslationPace.remainingSeconds`).
     public func remainingSeconds(lines: Int, delivered: Int, elapsed: Double) -> Double? {
-        lock.withLock {
-            let slot = stand.flatMap { ProcessInfo.processInfo.systemUptime < $0.until ? $0.slot : nil } ?? current
-            return entries[slot.key]?.pace.remainingSeconds(lines: lines, delivered: delivered, elapsed: elapsed)
-        }
+        remainingSeconds(lines: lines, delivered: delivered, elapsed: elapsed, slot: inUse)
+    }
+
+    public func remainingSeconds(lines: Int, delivered: Int, elapsed: Double, slot: Slot) -> Double? {
+        lock.withLock { entries[standing(for: slot).key]?.pace.remainingSeconds(lines: lines, delivered: delivered, elapsed: elapsed) }
+    }
+
+    /// The slot whose pace stands for `slot` now: Apple's while its engine rests, else itself. Under the lock.
+    private func standing(for slot: Slot) -> Slot {
+        stands[slot.key].flatMap { ProcessInfo.processInfo.systemUptime < $0.until ? $0.slot : nil } ?? slot
     }
 
     /// Median seconds of an engine's batches over all its pairs.

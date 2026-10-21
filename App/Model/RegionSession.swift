@@ -41,6 +41,7 @@ final class RegionSession {
     private let offScreenGate = OSAllocatedUnfairLock(initialState: OffScreen())
     /// The window under the lens is read a few times a second (`SampleGate`), and only while the settings could put context on:
     /// its app, category and confirmed title go to the pipeline for the translator (`LensWatch`, `LensContext`).
+    /// It also reads the app under the lens while any app profile exists, for the lens's route (`noteOwner`), though no context is wanted.
     private let sampleGate = OSAllocatedUnfairLock(initialState: SampleGate())
     private let lensWatch = LensWatch()
     private var contextWanted = false
@@ -110,7 +111,17 @@ final class RegionSession {
     private var scrollWindow: CGWindowID?
     private var lastWheel: TimeInterval = 0
     private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "session")
+    /// What the lens translates with: `base` with the profile of the app under the lens over it (`route.settings`). The pill, the menu, the
+    /// transcript and the hints read this; the app in front is not part of it.
     private var settings: AppSettings
+    /// What the app pushed (`AppModel.pushSettings`): the base settings, All apps.
+    private var base: AppSettings
+    /// The app under the lens as the reads saw it (nil: none known, or no read while no app profile exists).
+    private var owner: OwnerTracker
+    /// The lens's languages, engine, cache namespace and pace slot (`LensRoute`, design names-and-context §1.3, §8 P1 and P2). The
+    /// transcript's writer asks it from its own queue, so it sits behind a lock.
+    private let routeState: OSAllocatedUnfairLock<LensRoute>
+    var route: LensRoute { routeState.withLock { $0 } }
     /// The newest snapshot: what the lens's own actions (copy, save, transcripts) work from.
     private var lastSnapshot: OverlaySnapshot?
     private var transcript: TranscriptWriter?
@@ -123,14 +134,26 @@ final class RegionSession {
     /// Hands the pipeline's snapshots to the session once it exists (the pipeline is built inside `init`).
     @MainActor private final class SnapshotTap { var handler: ((OverlaySnapshot) -> Void)? }
 
-    init(config: RegionConfig, settings: AppSettings, translator: TranslationService, inpainter: Inpainter?,
-         capturer: any ScreenCapturing = RegionCapturer(), recovery: CaptureRecoveryPolicy = .standard) {
+    /// - `base`: the base settings (All apps); the lens puts the profile of the app under it over them (`LensRoute`).
+    /// - `appUnderLens`: how the window under the lens is read (`appUnderLens`); the checks give a fake one.
+    init(config: RegionConfig, settings base: AppSettings, translator: TranslationService, inpainter: Inpainter?,
+         capturer: any ScreenCapturing = RegionCapturer(), recovery: CaptureRecoveryPolicy = .standard,
+         appUnderLens: @escaping @MainActor (RegionConfig) -> LensWatch.Read? = { LensWatch.window(of: $0) }) {
+        // One look at the window under the lens: its app is the reader's context, and with an app profile it is the owner of the route too.
+        let window = appUnderLens(config)
+        let owner = OwnerTracker(base.appProfiles.isEmpty ? nil : window?.bundleID)
+        let route = LensRoute(base: base, over: owner.app)
+        let settings = route.settings
         self.capturer = capturer
         self.translator = translator
         self.policy = recovery
         self.config = config
         self.fps = settings.framesPerSecond
         self.settings = settings
+        self.base = base
+        self.owner = owner
+        self.appUnderLens = appUnderLens
+        self.routeState = OSAllocatedUnfairLock(initialState: route)
         let frame = ScreenGeometry.appKitRect(fromQuartz: config.rect)
         let panel = OverlayPanel(frame: frame)
         self.panel = panel
@@ -141,8 +164,8 @@ final class RegionSession {
         let capture = Self.overscan(config.rect, wide: false)
         self.capture = capture
         let tap = SnapshotTap()
-        pipeline = RegionPipeline(options: PipelineOptions(settings, lensApp: AppModel.readerContext(for: config)), capture: capture, translator: translator,
-                                  inpainter: inpainter, onSnapshot: { snapshot in Task { @MainActor in panel.apply(snapshot); tap.handler?(snapshot) } })
+        pipeline = RegionPipeline(options: PipelineOptions(settings, lensApp: Self.readerContext(of: window)), route: route, capture: capture,
+                                  translator: translator, inpainter: inpainter, onSnapshot: { snapshot in Task { @MainActor in panel.apply(snapshot); tap.handler?(snapshot) } })
         let gate = offScreenGate, sampling = sampleGate
         capturer.onFrame = { [pipeline, weak self] frame in
             // Covered: the capture shows the window above, whose text is not the user's to have translated (or sent away). Hidden by
@@ -159,6 +182,7 @@ final class RegionSession {
         // The lens's wait for a reader (`ReadWait`) changes outside the model: the pill is told when it does.
         ReaderClients.shared.onHint(pipeline.readerClient) { [weak self] in Task { @MainActor in self?.refreshHint() } }
         setContextWanted(ContextPlan.needsWindow(settings))
+        setSampling()
     }
 
     /// Whether the window under the lens is read at all (`ContextPlan.needsWindow`). Off reads nothing and hands the pipeline nothing,
@@ -166,18 +190,28 @@ final class RegionSession {
     private func setContextWanted(_ wanted: Bool) {
         guard wanted != contextWanted else { return }
         contextWanted = wanted
-        sampleGate.withLock { $0.enabled = wanted }
         if !wanted {
             lensWatch.reset()
             Task { [pipeline] in await pipeline.setLensContext(nil) }
         }
+        setSampling()
     }
 
-    /// A capture pass that is due: reads the window the lens covers and hands the pipeline the document it shows.
-    private func sampleWindow() {
+    /// The window is read while its document could be used (`contextWanted`) or an app profile could give the app under the lens other
+    /// languages or another engine. With neither, nothing is read.
+    private func setSampling() {
+        let reading = contextWanted || !base.appProfiles.isEmpty
+        sampleGate.withLock { $0.enabled = reading }
+    }
+
+    /// A capture pass that is due: reads the window the lens covers, takes the route of its app, and hands the pipeline the document it shows.
+    func sampleWindow() {
         defer { sampleGate.withLock { $0.finish() } }
+        let window = appUnderLens(config)
+        Trace.count("lens.window.read")
+        if !base.appProfiles.isEmpty { noteOwner(of: window) }
         guard contextWanted else { return }
-        let read = lensWatch.sample(config: config, now: ProcessInfo.processInfo.systemUptime)
+        let read = lensWatch.ingest(window, lensID: config.id.uuidString, now: ProcessInfo.processInfo.systemUptime)
         if let context = read.context {
             Task { [pipeline] in await pipeline.setLensContext(context) }
         } else if read.gone {
@@ -258,26 +292,74 @@ final class RegionSession {
         chrome.flash(text, seconds: seconds)
     }
 
+    /// The second line of the pill: the lens's own pair.
+    var pillDetail: String { Self.languagePair(settings) }
+
+    /// The app the pipeline was last told this lens covers.
+    var lensApp: ReaderContext { get async { await pipeline.lensApp } }
+
     private static func languagePair(_ s: AppSettings) -> String {
         "\(s.sourceLanguage == "auto" ? String(localized: "Auto") : Languages.name(s.sourceLanguage)) → \(Languages.name(s.targetLanguage))"
     }
 
-    func update(settings: AppSettings) async {
-        let before = self.settings
-        self.settings = settings
+    /// The base settings changed (or the lens is told them again): the lens takes the profile of the app it covers over them. The app in
+    /// front is not an input: a lens over another app's window does not follow it. The push reads the window once.
+    func update(settings new: AppSettings) async {
+        base = new
+        let window = appUnderLens(config)
+        // With no app profile no owner is known, and none is read for.
+        if new.appProfiles.isEmpty { owner = OwnerTracker(nil) } else { _ = takeOwner(of: window) }
+        adopt(LensRoute(base: new, over: owner.app))
+        await pushRoute(lensApp: Self.readerContext(of: window))
+    }
+
+    /// What the paragraph reader knows of the app a window read found (`AppModel.readerContext(for:)` without its own window read).
+    private static func readerContext(of window: LensWatch.Read?) -> ReaderContext {
+        window.map { ReaderContext(bundleID: $0.bundleID, category: AppModel.category(ofApp: $0.bundleID)) } ?? ReaderContext()
+    }
+
+    /// A window read for the owner of the route (the one place it is counted); true when the owner changed.
+    private func takeOwner(of window: LensWatch.Read?, settled: Bool = false) -> Bool {
+        Trace.count("lens.owner.read")
+        return settled ? owner.settle(window?.bundleID) : owner.note(window?.bundleID)
+    }
+
+    /// The app under the lens, from one window read. Another app may have another pair and engine (its profile over the base), so the lens
+    /// takes the route of that app and the pipeline is told after; true when it did. `settled`: the lens was dropped somewhere new, and
+    /// the read is the answer (`OwnerTracker`).
+    @discardableResult
+    private func noteOwner(of window: LensWatch.Read?, settled: Bool = false) -> Bool {
+        guard takeOwner(of: window, settled: settled) else { return false }
+        adopt(LensRoute(base: base, over: owner.app))
+        let context = Self.readerContext(of: window)
+        Task { await pushRoute(lensApp: context) }
+        return true
+    }
+
+    /// The lens's side of a new route: what it shows and keeps follows its settings now. The pipeline is told by `pushRoute`.
+    private func adopt(_ new: LensRoute) {
+        let before = settings
+        routeState.withLock { $0 = new }
+        settings = new.settings
         setContextWanted(ContextPlan.needsWindow(settings))
+        setSampling()
         if !settings.savesTranscripts || settings.exportFolder != before.exportFolder
             || settings.sourceLanguage != before.sourceLanguage || settings.targetLanguage != before.targetLanguage
             || settings.transcriptFormats != before.transcriptFormats || settings.activeEngineConfig?.id != before.activeEngineConfig?.id {
             finishTranscript()
         }
-        chrome.setDetail(Self.languagePair(settings), badge: settings.activeEngineConfig?.badgeSymbol)
+        chrome.setDetail(pillDetail, badge: settings.activeEngineConfig?.badgeSymbol)
         chrome.setAppearance(settings)
         if settings.sourceLanguage != before.sourceLanguage || settings.targetLanguage != before.targetLanguage { targetStreak.reset() }
         // What failed before says nothing about another engine or pair.
         if lensPair(before) != lensPair(settings) || settings.engine != before.engine { translationWait.reset() }
         refreshHint()
-        await pipeline.update(options: PipelineOptions(settings, lensApp: AppModel.readerContext(for: config)))
+    }
+
+    /// The pipeline takes the lens's settings and route as they stand now, and the app the window read found.
+    private func pushRoute(lensApp: ReaderContext) async {
+        await pipeline.setRoute(route)
+        await pipeline.update(options: PipelineOptions(settings, lensApp: lensApp))
         if settings.framesPerSecond != fps {
             fps = settings.framesPerSecond
             try? await capturer.update(rect: capture, fps: fps)
@@ -334,9 +416,12 @@ final class RegionSession {
         onConfigChange?(config)
     }
 
-    /// The app under the lens changed (dropped on another window, followed another): the pipeline's options carry it.
+    /// The app under the lens changed (dropped on another window, followed another): the pipeline's options carry it, and the lens takes the
+    /// route of the app now (with an app profile there may be another), not at the next read. One window read serves both.
     private func refreshReaderContext() {
-        let options = PipelineOptions(settings, lensApp: AppModel.readerContext(for: config))
+        let window = appUnderLens(config)
+        if !base.appProfiles.isEmpty, noteOwner(of: window, settled: true) { return }
+        let options = PipelineOptions(settings, lensApp: Self.readerContext(of: window))
         Task { [pipeline] in await pipeline.update(options: options) }
     }
 
@@ -667,7 +752,9 @@ final class RegionSession {
             transcriptAppChecked = 0
             transcript = TranscriptWriter(directory: LensExport.transcriptsFolder(access.url), access: access, lens: config.name,
                                           sourceCode: settings.sourceLanguage, targetCode: settings.targetLanguage,
-                                          formats: settings.transcriptFormats, engine: { [translator, chosen = settings.activeEngineConfig?.name ?? "apple"] in translator.translatedBy($0) ?? chosen },
+                                          formats: settings.transcriptFormats,
+                                          engine: { [translator, routeState, chosen = settings.activeEngineConfig?.name ?? "apple"] in
+                                              translator.translatedBy($0, route: routeState.withLock { $0 }) ?? chosen },
                                           onError: { [weak self] in Task { @MainActor in self?.chrome.flash(String(localized: "Couldn’t save transcript"), seconds: 4) } })
             // A line that stays put makes no snapshots; looking again keeps it one line instead of many.
             let t = Timer(timeInterval: 1, repeats: true) { [weak self] _ in Task { @MainActor in self?.observeTranscript() } }
@@ -715,7 +802,7 @@ final class RegionSession {
 
     /// The app under the lens: the window it follows, else the topmost window under its centre (`LensWatch.window(of:)`). The check harness
     /// and the captures name one, because a window of this app is never in the list.
-    var appUnderLens: @MainActor (RegionConfig) -> LensWatch.Read? = { LensWatch.window(of: $0) }
+    var appUnderLens: @MainActor (RegionConfig) -> LensWatch.Read?
     /// "Forget <App>…" asks before it removes a memory (`LensMemoryMenu.askToForget`); the check harness answers for it.
     var confirmsForgetting: @MainActor (_ app: String, _ names: Int) -> Bool = LensMemoryMenu.askToForget
 
@@ -803,7 +890,8 @@ final class RegionSession {
         fitCapture(allowResize: false)
     }
 
-    private func lensDropped() {
+    /// The lens was dropped (the checks drop one without a drag).
+    func lensDropped() {
         dragging = false
         lastLens = nil
         setLead(.zero)

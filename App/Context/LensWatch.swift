@@ -2,7 +2,8 @@ import AppKit
 import MwoyeoCore
 
 /// When a lens may read the window it covers: at most every `interval` seconds while a capture pass runs, and only while the
-/// settings could put context on (`ContextOptions.couldBeOn`). A pure value, so the rule is tested without a clock or a window.
+/// settings could put context on (`ContextOptions.couldBeOn`) or an app profile could give the app under it other languages or another
+/// engine (`RegionSession.setSampling`). A pure value, so the rule is tested without a clock or a window.
 /// The title needs 3 reads over at least 1 s to be confirmed (`TitleConfirmer`), so 0.5 s apart confirms it on the third.
 struct SampleGate: Equatable {
     static let interval: TimeInterval = 0.5
@@ -31,14 +32,10 @@ final class LensWatch {
     private var categories: [String: String?] = [:]
     private var sent: LensContext?
 
-    /// Reads the lens's window now. `context` is the document when it differs from the one last returned (nil for "nothing new");
-    /// `gone` says the lens covers no readable window any more (the caller stops handing a context to the pipeline).
-    func sample(config: RegionConfig, now: TimeInterval) -> (context: LensContext?, gone: Bool) {
-        ingest(Self.window(of: config), lensID: config.id.uuidString, now: now)
-    }
-
-    /// One read of the window (nil: none), fed through the title confirmation. `sample` without the window list, so the rules are
-    /// tested with a title sequence.
+    /// One read of the window (nil: none, `window(of:)`), fed through the title confirmation. `context` is the document when it differs
+    /// from the one last returned (nil for "nothing new"); `gone` says the lens covers no readable window any more (the caller stops
+    /// handing a context to the pipeline). The session reads the window once per pass and gives it here and to the lens's route
+    /// (`RegionSession.sampleWindow`).
     func ingest(_ w: Read?, lensID: String, now: TimeInterval) -> (context: LensContext?, gone: Bool) {
         guard let w else {
             if sent == nil { return (nil, false) }

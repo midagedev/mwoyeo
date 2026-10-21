@@ -79,4 +79,38 @@ import Testing
         #expect(s.first { $0.key == a.key }?.first == 1)
         #expect(s.first { $0.key == apple.key }?.first == 0.3)
     }
+
+    // MARK: a lens of its own slot (prof-lens, 2026-10-21: design names-and-context §8 P2)
+
+    @Test func aSlotNamedByTheCallIsReadWhateverIsInUse() {
+        let p = PaceStats()
+        let ko = slot("en>ko", engine: engine), ja = slot("en>ja", engine: engine)
+        p.use(ko)
+        p.record(1.5, isFirst: true, slot: ko)
+        p.record(0.2, isFirst: true, slot: ja)
+        #expect(p.expectedSeconds(lines: 1) == 1.5)
+        #expect(p.expectedSeconds(lines: 1, slot: ja) == 0.2, "the lens of another pair reads its own pace, not the one in use")
+        #expect(p.expectedSeconds(lines: 1, slot: ko) == p.expectedSeconds(lines: 1), "a call that names the slot in use is the call that names none")
+        #expect(p.remainingSeconds(lines: 1, delivered: 0, elapsed: 0, slot: slot("en>de", engine: engine)) == nil, "a slot nothing was measured on has no estimate")
+        p.recordLookup(hit: true, slot: ja)
+        p.recordLookup(hit: false)
+        let s = p.stats()
+        #expect(s.first { $0.key == ja.key }?.cachedLines == 1 && s.first { $0.key == ko.key }?.cachedLines == 0)
+    }
+
+    @Test func aFallbackIsPerSlotSoOneLensesRestingEngineLendsNothingToAnother() {
+        let p = PaceStats()
+        let ko = slot("en>ko", engine: engine), ja = slot("en>ja", engine: engine), appleKo = slot("en>ko"), appleJa = slot("en>ja")
+        p.record(2, isFirst: true, slot: ko)
+        p.record(3, isFirst: true, slot: ja)
+        p.record(0.2, isFirst: true, slot: appleKo)
+        p.record(0.3, isFirst: true, slot: appleJa)
+        p.useFallback(appleKo, for: ko, until: ProcessInfo.processInfo.systemUptime + 60)
+        #expect(p.expectedSeconds(lines: 1, slot: ko) == 0.2)
+        #expect(p.expectedSeconds(lines: 1, slot: ja) == 3, "the other lens's slot has no stand-in")
+        p.useFallback(appleJa, for: ja, until: ProcessInfo.processInfo.systemUptime + 60)
+        #expect(p.expectedSeconds(lines: 1, slot: ko) == 0.2 && p.expectedSeconds(lines: 1, slot: ja) == 0.3)
+        p.clearFallback()
+        #expect(p.expectedSeconds(lines: 1, slot: ko) == 2 && p.expectedSeconds(lines: 1, slot: ja) == 3, "the engine answered: every lens is its own again")
+    }
 }

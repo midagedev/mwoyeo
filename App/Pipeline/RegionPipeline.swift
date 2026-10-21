@@ -143,6 +143,9 @@ actor RegionPipeline {
     private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "pipeline")
 
     private var options: PipelineOptions
+    /// What this lens translates with: its languages, engine, cache namespace and pace slot (`LensRoute`). nil: the service's own (a pipeline
+    /// of the self-test, the image window, which have no lens of their own).
+    private var route: LensRoute?
     /// Which paragraph reader the lens uses now (set from `options`, kept calm by the plan).
     private let readerPlan = ReaderPlan()
     private var latest: CapturedFrame?
@@ -251,12 +254,13 @@ actor RegionPipeline {
     private var captureSize: CGSize
     private var visible: CGRect
 
-    init(options: PipelineOptions, capture: CGRect, translator: TranslationService, inpainter: Inpainter?,
+    init(options: PipelineOptions, route: LensRoute? = nil, capture: CGRect, translator: TranslationService, inpainter: Inpainter?,
          onSnapshot: @escaping @Sendable (OverlaySnapshot) -> Void) {
         self.origin = capture.origin
         self.captureSize = capture.size
         self.visible = capture
         self.options = options
+        self.route = route
         readerPlan.configure(setting: options.paragraphReader, context: options.lensApp)
         self.translator = translator
         self.inpainter = inpainter
@@ -297,6 +301,13 @@ actor RegionPipeline {
         startQueue()
     }
 
+    /// What this lens translates with from now on (`RegionSession.pushRoute`). Called before `update(options:)`: a pair that changed with the
+    /// route resets the queue there, and the next batch is for the new route.
+    func setRoute(_ new: LensRoute?) { route = new }
+
+    /// The app this lens was last told it covers (for the checks and the debug ring).
+    var lensApp: ReaderContext { options.lensApp }
+
     func update(options new: PipelineOptions) {
         guard new != options else { return }
         var restyled = options
@@ -316,6 +327,7 @@ actor RegionPipeline {
 
     /// Forget everything (region moved/resized, settings changed). The next frame is read from scratch.
     func reset() {
+        Trace.count("pipeline.reset")
         settleTask?.cancel()
         stillTask?.cancel()
         wasMoving = false
@@ -369,7 +381,7 @@ actor RegionPipeline {
          blocks.filter(\.startsParagraph).map { ($0.source, $0.translation) }, (flight?.batch ?? []).map { source in
              let s = blocks.filter { $0.source == source }.map { TranslationScheduling.standing(of: $0.rect, lens: lensRect, lead: lead) }
              return s.contains(.lens) ? "lens" : s.contains(.leading) ? "lead" : s.isEmpty ? "gone" : "other"
-         }, (isMoving(at: ProcessInfo.processInfo.systemUptime), velocity, translator.expectedSeconds(lines: 3)),
+         }, (isMoving(at: ProcessInfo.processInfo.systemUptime), velocity, translator.expectedSeconds(lines: 3, route: route)),
          (blocks.filter { $0.rect.intersects(lensRect) }.count, blocks.filter { $0.translation == nil && $0.rect.intersects(lensRect) }.count))
     }
 
@@ -1400,7 +1412,7 @@ actor RegionPipeline {
     /// Fills translations from the cache right away and queues the rest.
     private func fillTranslations() {
         for i in blocks.indices where blocks[i].translation == nil {
-            if let hit = translator.cached(blocks[i].source) {
+            if let hit = translator.cached(blocks[i].source, route: route) {
                 blocks[i].translation = hit
                 blocks[i].image = nil
             } else if !strikes.isParked(blocks[i].source) {
@@ -1438,11 +1450,11 @@ actor RegionPipeline {
         while let batch = nextBatch() {
             let t = Trace.now
             flightID += 1
-            let id = flightID, service = translator
+            let id = flightID, service = translator, lens = route
             let context = documentContext(around: batch)
             // A task of its own, so a batch the lens no longer needs can be cancelled while this one awaits it.
             let task = Task {
-                await service.translate(batch, context: context) { source, translated in
+                await service.translate(batch, route: lens, context: context) { source, translated in
                     Task { await self.streamed(source, translated, epoch: epoch, flight: id) }
                 }
             }
@@ -1510,10 +1522,10 @@ actor RegionPipeline {
         guard let f = flight, f.cut == nil else { return }
         let lens = lensRect, now = ProcessInfo.processInfo.systemUptime
         let moving = isMoving(at: now)
-        let planned = translator.expectedSeconds(lines: 1) == nil ? nil : motionVelocity(at: now)
+        let planned = translator.expectedSeconds(lines: 1, route: route) == nil ? nil : motionVelocity(at: now)
         // Once content is still, `lead` only ranks the overscan: text on the leading side is no longer on its way in.
         let lead = moving ? lead : .zero
-        let unfinished = f.batch.filter { !f.done.contains($0) && translator.cached($0) == nil }
+        let unfinished = f.batch.filter { !f.done.contains($0) && translator.cached($0, route: route) == nil }
         let standings = unfinished.map { source -> TranslationScheduling.Standing in
             let s = blocks.filter { $0.source == source && $0.translation == nil }
                 .map { TranslationScheduling.standing(of: $0.rect, lens: lens, lead: lead) }
@@ -1535,7 +1547,7 @@ actor RegionPipeline {
                 Trace.count("translate.outside_scroll_kept")
             }
             let remaining = translator.remainingSeconds(lines: unfinished.count + f.done.count, delivered: f.done.count,
-                                                        elapsed: now - f.started) ?? 0
+                                                        elapsed: now - f.started, route: route) ?? 0
             if TranslationScheduling.tooLate(dwells: dwells, remaining: remaining) { why = .tooLate }
         }
         guard let why else { return }
@@ -1592,11 +1604,11 @@ actor RegionPipeline {
         // While content moves at a known speed, start only what will still be in the lens when the engine is done; the
         // rest waits (every pass looks again) until the motion slows or stops.
         // Rules that need the engine's pace stay off until its first result has been seen.
-        if let v = motionVelocity(at: now), translator.expectedSeconds(lines: 1) != nil {
+        if let v = motionVelocity(at: now), translator.expectedSeconds(lines: 1, route: route) != nil {
             let candidates = blocks.filter { $0.translation == nil && pending.contains($0.source) }
                 .map { TranslationScheduling.Candidate(source: $0.source, rect: $0.rect) }
             let batch = TranslationScheduling.batch(from: candidates, lens: lens, velocity: v, scrollRegion: velocityRegion, limit: 3,
-                                                    expectedSeconds: { [translator] in translator.expectedSeconds(lines: $0) ?? 0 })
+                                                    expectedSeconds: { [translator, route] in translator.expectedSeconds(lines: $0, route: route) ?? 0 })
             if let region = velocityRegion,
                batch.contains(where: { s in candidates.contains { $0.source == s && !$0.rect.intersects(region) } }) {
                 Trace.count("translate.outside_scroll_admitted")

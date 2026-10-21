@@ -24,21 +24,35 @@ final class AppModel {
         }
     }
 
-    /// The app in front, other than Mwoyeo (see AppProfiles.swift); its profile, if any, lays over the base settings.
+    /// The app in front, other than Mwoyeo (see AppProfiles.swift); its profile, if any, lays over the base settings for what has no lens of
+    /// its own: the menu bar's language bar, the image window, the service's own route. A lens translates with the profile of the app UNDER
+    /// it (`RegionSession`, `LensRoute`), so the app in front does not reach it.
     var frontmostBundleID: String? {
-        didSet { if frontmostBundleID != oldValue { pushSettings() } }
+        didSet { if frontmostBundleID != oldValue { pushFront() } }
     }
 
-    /// What translates now: the base settings with the frontmost app's profile over them.
+    /// What translates now where no lens decides: the base settings with the frontmost app's profile over them.
     var effectiveSettings: AppSettings { settings.effective(frontmost: frontmostBundleID) }
 
+    /// The service gets the settings in effect for the app in front (its own route), and every lens the base settings, which each lays
+    /// the profile of its own app over (`RegionSession.update`).
     private func pushSettings() {
-        let s = effectiveSettings
-        Task {
-            await translator.update(settings: s)
-            for session in sessions.values { await session.update(settings: s) }
+        let front = effectiveSettings, base = settings
+        lastPush = Task {
+            await translator.update(settings: front)
+            for session in sessions.values { await session.update(settings: base) }
         }
     }
+
+    /// The app in front changed: only what has no lens of its own follows it.
+    private func pushFront() {
+        let front = effectiveSettings
+        lastPush = Task { await translator.update(settings: front) }
+    }
+
+    /// The last push (the check harness waits for it).
+    @ObservationIgnored private var lastPush: Task<Void, Never>?
+    func pushed() async { await lastPush?.value }
 
     private(set) var regions: [RegionConfig] = [] {
         didSet { saveRegions() }
@@ -440,6 +454,10 @@ final class AppModel {
     }
     func isRunning(_ id: UUID) -> Bool { sessions[id] != nil }
 
+    /// A lens the check harness made (a `RegionSession` with a capturer of its own): it hears every push as the ones `startSession` makes do.
+    func attach(_ session: RegionSession, id: UUID) { sessions[id] = session }
+    func detach(_ id: UUID) { sessions[id] = nil }
+
     var isBusy: Bool { sessions.values.contains { $0.activity != .idle } }
 
     /// The lens a lens shortcut acts on: the one under the pointer, else the newest.
@@ -461,7 +479,7 @@ final class AppModel {
             moved = true
             if let i = regions.firstIndex(where: { $0.id == config.id }) { regions[i].rect = to }
         }
-        let s = RegionSession(config: config, settings: effectiveSettings, translator: translator, inpainter: inpainter)
+        let s = RegionSession(config: config, settings: settings, translator: translator, inpainter: inpainter)
         s.onChange = { [weak self] in self?.sessionTick += 1 }
         s.onConfigChange = { [weak self] updated in
             guard let self, let i = regions.firstIndex(where: { $0.id == updated.id }) else { return }

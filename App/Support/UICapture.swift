@@ -22,7 +22,7 @@ import SwiftUI
 /// lens-hint-pack-notfinished and lens-hint-unsupported (the pill in the states a pack or a pair can be in), menu-pack-rows (the panel's lens
 /// rows with each of those lines), menu-pack-banner-ask|downloading|notfinished|unsupported (the panel's banner when no lens says it),
 /// translation-packs-states (Settings › Translation with a row in each state), image-window-pack-ask|downloading|notfinished|unsupported
-/// (the Translate Image window's status line), lens-menu-memory (the lens menu of an app with a memory: its info line, Memory for <App>…, Remember Languages and Forget <App>…), memory-forget-alert (the alert that Forget <App>… asks), memory-sheet-lens (Settings with no profile at all, a lens's "Memory for <App>…" set: the Memory sheet comes up empty; PASS/FAIL), names-lens-checks (only the lens menu's memory block and the first edit of a memory; PASS/FAIL lines), memory-profile-row, memory-menu, memory-sheet-empty, memory-sheet-filled, memory-sheet-tall (the filled sheet at 820 pt, every section in view), memory-sheet-fresh (the app profile's row with its memory, its ⋯ menu, and the Memory sheet empty, filled with learned rows, and asking whether to start fresh), check-logic (prints PASS/FAIL for the engine selection and the
+/// (the Translate Image window's status line), lens-menu-memory (the lens menu of an app with a memory: its info line, Memory for <App>…, Remember Languages and Forget <App>…), memory-forget-alert (the alert that Forget <App>… asks), memory-sheet-lens (Settings with no profile at all, a lens's "Memory for <App>…" set: the Memory sheet comes up empty; PASS/FAIL), names-lens-checks (only the lens menu's memory block and the first edit of a memory; PASS/FAIL lines), lens-route-checks (only the lens's own route: its app's languages and engine, its own cache and pace; PASS/FAIL lines), memory-profile-row, memory-menu, memory-sheet-empty, memory-sheet-filled, memory-sheet-tall (the filled sheet at 820 pt, every section in view), memory-sheet-fresh (the app profile's row with its memory, its ⋯ menu, and the Memory sheet empty, filled with learned rows, and asking whether to start fresh), check-logic (prints PASS/FAIL for the engine selection and the
 /// engine notice's dismissal; no window). Run it with `MWOYEO_MEMORY_SECRETS=1` so it does not touch the Keychain. It keeps its
 /// preferences in a scratch suite of its own (deleted at exit; `MWOYEO_DEFAULTS_SUITE` names one to keep), never the app's real
 /// ones; `CFFIXED_USER_HOME` does not move those. `--mock` is a tools/mock-openai server the sample translations go to.
@@ -224,6 +224,14 @@ enum UICapture {
                 // Only the lens menu's memory block and how an app's memory begins (the whole of check-logic takes minutes).
                 let failed = await NamesLensChecks.run(model)
                 report("names lens", failed)
+            case "lens-route-checks":
+                // Only the lens's own route: its app's languages and engine, its own cache and pace (the whole of check-logic takes minutes).
+                // Beside them, the default path: Off sends the bytes main sent, end to end through the service (round R2's gate).
+                var t = ContextChecks.Tally()
+                await ContextChecks.offChecks(t)
+                await ContextChecks.routeChecks(t)
+                let failed = await LensRouteChecks.run(model) + t.failures
+                report("lens route", failed)
             case "inpaint-footprint": await LensRobustChecks.inpaintFootprint()
             case "menu-icon": LensRobustChecks.menuIcon(into: out.appendingPathComponent("menu-icon.png"))
             case "sheet-pick": await shoot(name, EngineSheet(), CGSize(width: 480, height: 560))
@@ -501,6 +509,7 @@ enum UICapture {
             failed += await EngineContextChecks.run(model)
             failed += await MemorySheetChecks.run(model)
             failed += await NamesLensChecks.run(model)
+            failed += await LensRouteChecks.run(model)
             failed += await AccessibilityChecks.run(model)
             failed += await PackChecks.run(model)
             failed += MCPChecks.run(model)

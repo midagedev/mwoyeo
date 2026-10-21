@@ -291,6 +291,17 @@ private final class FrameChromeView: NSView {
         NSRect(x: tabRect.maxX - (strong ? 44 : 25), y: tabRect.midY - 8, width: 18, height: 16)
     }
 
+    /// What a click, the pointer, the tooltip and a screen reader treat as each button: 22 × 22 and 22 × 20 pt around the 16 × 16 and 18 × 16 pt
+    /// glyphs, which `closeRect` and `modeRect` still draw (HIG, Accessibility: 20 × 20 pt at least; ui-audit-1-1-5 2.1). Both sit inside the
+    /// 26 pt tab, and the title's room (`limit` in `draw`) already clears them.
+    private var closeHit: NSRect {
+        NSRect(x: tabRect.maxX - 26, y: tabRect.midY - 11, width: 22, height: 22)
+    }
+
+    private var modeHit: NSRect {
+        NSRect(x: tabRect.maxX - (strong ? 48 : 26), y: tabRect.midY - 10, width: 22, height: 20)
+    }
+
     private var resizeRect: NSRect {
         NSRect(x: regionRect.maxX - corner + band / 2, y: regionRect.minY - band / 2, width: corner, height: corner)
     }
@@ -425,7 +436,7 @@ private final class FrameChromeView: NSView {
 
     private func updateToolTip() {
         removeAllToolTips()
-        addToolTip(modeRect, owner: self, userData: nil)
+        addToolTip(modeHit, owner: self, userData: nil)
     }
 
     override func updateTrackingAreas() {
@@ -443,7 +454,7 @@ private final class FrameChromeView: NSView {
         if let hit = clickableHint, hit.contains(p) { return NSCursor.pointingHand.set() }
         switch zone(at: p) {
         case .resize?: NSCursor.frameResize(position: .bottomRight, directions: .all).set()
-        case .move?: ((strong && closeRect.contains(p)) || (showsTab && modeRect.contains(p)) ? NSCursor.arrow : NSCursor.openHand).set()
+        case .move?: ((strong && closeHit.contains(p)) || (showsTab && modeHit.contains(p)) ? NSCursor.arrow : NSCursor.openHand).set()
         case nil: NSCursor.arrow.set()
         }
     }
@@ -459,8 +470,8 @@ private final class FrameChromeView: NSView {
 
     override func mouseDown(with event: NSEvent) {
         let p = convert(event.locationInWindow, from: nil)
-        if strong, closeRect.contains(p) { window_?.onClose?(); return }
-        if showsTab, modeRect.contains(p) { window_?.onToggleFollowing?(); return }
+        if strong, closeHit.contains(p) { window_?.onClose?(); return }
+        if showsTab, modeHit.contains(p) { window_?.onToggleFollowing?(); return }
         if let hit = clickableHint, hit.contains(p) { window_?.onHintAction?(); return }
         drag = zone(at: p)
         startMouse = NSEvent.mouseLocation
@@ -711,8 +722,8 @@ extension FrameChromeView {
     fileprivate func accessFrame(_ kind: LensAccessElement.Kind) -> NSRect {
         let r: NSRect = switch kind {
         case .translation: regionRect
-        case .mode: modeRect
-        case .close: closeRect
+        case .mode: modeHit
+        case .close: closeHit
         case .hint: hintHit ?? tabRect
         }
         guard let w = window else { return .zero }

@@ -8,6 +8,7 @@
 MWOYEO_APP_ID = dev.midagedev.mwoyeo.appstore
 MWOYEO_APP_ENTITLEMENTS = App/Mwoyeo-MAS.entitlements
 MWOYEO_READER_ENTITLEMENTS = Reader/Reader-MAS.entitlements
+MWOYEO_SCRIPT_ENTITLEMENTS = Script/Script-MAS.entitlements
 MWOYEO_SIGN_IDENTITY = Apple Distribution
 
 SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) MAS

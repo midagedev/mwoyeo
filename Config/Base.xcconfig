@@ -12,6 +12,7 @@ MWOYEO_PROFILE =
 MWOYEO_APP_ID = dev.midagedev.mwoyeo
 MWOYEO_APP_ENTITLEMENTS = App/Mwoyeo.entitlements
 MWOYEO_READER_ENTITLEMENTS = Reader/Reader.entitlements
+MWOYEO_SCRIPT_ENTITLEMENTS = Script/Script.entitlements
 #include? "Local.xcconfig"
 
 // Extract localizable strings for the string catalog (xcstringstool sync).

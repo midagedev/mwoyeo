@@ -71,6 +71,44 @@ targetTemplates:
         # The document read (`RecognizeDocumentsRequest`) is compiled into the services only: the app cannot run one (`VisionExec`).
         SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) READER_SERVICE"
 targets:
+  # The service that runs the regex rows and the scripts of the rewrite rules (docs/design/rewrite-rules.md §5), in JavaScriptCore with nothing but the
+  # language: no network, no files. Same shape as the reader services; hardened runtime, no entitlements in a Developer ID build, only the App Sandbox in
+  # the Mac App Store one (Script/Script-MAS.entitlements). Script/PrivacyInfo.xcprivacy is its privacy manifest.
+  MwoyeoScript:
+    type: xpc-service
+    platform: macOS
+    sources:
+      - path: Script
+        excludes:
+          - "*.plist"
+          - "*.entitlements"
+    dependencies:
+      - package: MwoyeoCore
+        product: MwoyeoCore
+    info:
+      path: Script/Info.plist
+      properties:
+        CFBundleDisplayName: Mwoyeo Script
+        CFBundleName: MwoyeoScript
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSMinimumSystemVersion: "26.0"
+        XPCService:
+          ServiceType: Application
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(MWOYEO_APP_ID).script
+        PRODUCT_NAME: MwoyeoScript
+        SWIFT_VERSION: "5.0"
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: $(MWOYEO_SIGN_IDENTITY)
+        DEVELOPMENT_TEAM: $(MWOYEO_TEAM)
+        PROVISIONING_PROFILE_SPECIFIER: ""
+        OTHER_CODE_SIGN_FLAGS: --timestamp=none
+        CODE_SIGN_ENTITLEMENTS: $(MWOYEO_SCRIPT_ENTITLEMENTS)
+        GENERATE_INFOPLIST_FILE: NO
+        DEAD_CODE_STRIPPING: YES
   MwoyeoReaderLines:
     templates: [ReaderService]
     templateAttributes:
@@ -103,6 +141,8 @@ targets:
       - target: MwoyeoReaderLines
         embed: true
       - target: MwoyeoReaderDocs
+        embed: true
+      - target: MwoyeoScript
         embed: true
     info:
       path: App/Info.plist

@@ -118,6 +118,8 @@ public struct Prompt: Sendable, Equatable {
     public var contextLines: [String] = []
     /// The speaker of each item (nil entries and an empty array when the lens cannot tell).
     public var itemSpeakers: [String?] = []
+    /// `--apply both|both-names`: the item lines the rows were written into, as the body carries them (empty otherwise).
+    public var rewrites: [ItemRewrite] = []
     public init() {}
 }
 
@@ -171,8 +173,14 @@ public enum SeamError: Error, CustomStringConvertible {
 public struct T2Layout: ContextLayout {
     /// The engine's kind: `RequestLayout.body` lays the request out by it (the budgets by tier, the title by where the engine runs).
     public var kind: LayoutKind
+    /// `--apply`: how the memory's rows are applied. `hint` (default) is today's request; `both` and `both-names` also write the rows' targets
+    /// into the item lines (`SourceRewrite`), while the rows still go out as hints, selected on the lines as the screen showed them.
+    public var apply: ApplyMode
 
-    public init(kind: LayoutKind) { self.kind = kind }
+    public init(kind: LayoutKind, apply: ApplyMode = .hint) {
+        self.kind = kind
+        self.apply = apply
+    }
 
     public func build(_ spec: ConditionSpec, step: Step, thread: ThreadState) throws -> Prompt {
         if spec.isOff { return Prompt() }
@@ -190,13 +198,24 @@ public struct T2Layout: ContextLayout {
         let below = spec.below > 0 ? Array(step.batch.below.prefix(spec.below)) : []
         let request = ContextRequest(
             items: step.batch.items.map(\.text), before: before, after: below.map(\.text),
-            memory: spec.memory ? Self.rows(mem, speech: seq.speakerVisible) : [],
+            memory: spec.memory ? Self.rows(mem, speech: seq.speakerVisible, apply: apply) : [],
             card: Self.card(mem), note: spec.memory ? Self.note(mem) : "",
             source: coreLanguage(seq.source), target: coreLanguage(seq.target), glossary: [], threadKey: seq.id)
         let options = ContextOptions.from(engine: EngineContext(enabled: true, previousLines: n))
-        let body = RequestLayout.body(kind: kind, request: request, options: options)
+        var body = RequestLayout.body(kind: kind, request: request, options: options)
 
         var prompt = Prompt()
+        if apply.rewrites, spec.memory {
+            // The rows were selected on the lines as the screen showed them (above); the engine reads the lines with the rows written in.
+            prompt.rewrites = SourceRewrite.rewrites(items: step.batch.items, rows: request.memory)
+            if !prompt.rewrites.isEmpty {
+                let written = Dictionary(uniqueKeysWithValues: prompt.rewrites.map { ($0.id, $0.text) })
+                guard let rewritten = SourceRewrite.substituting(items: step.batch.items.map { written[$0.id] ?? $0.text }, intoBody: body) else {
+                    throw SeamError.notConnected("--apply \(apply.rawValue): the request body has no translate array to write into")
+                }
+                body = rewritten
+            }
+        }
         prompt.bodyOverride = body
         // What the model was shown, read back from the body: the context lines (the layout took the last N of `before` and the
         // first few of `after`), the rows and the note.
@@ -231,7 +250,8 @@ public struct T2Layout: ContextLayout {
 
     /// The profile's rows: each entity is a person row (gender, role as the note, reading, who it speaks to and how), each term a term row.
     /// `speech` false (subtitles: the lens cannot tell who speaks) leaves the addressing out, as the reference layout leaves `speaks to` out.
-    static func rows(_ m: Memory, speech: Bool) -> [MemoryEntry] {
+    /// `apply` is the mode of every row by kind (`ApplyMode.entityApply`, `.termApply`): the memory file holds no mode of its own.
+    static func rows(_ m: Memory, speech: Bool, apply: ApplyMode = .hint) -> [MemoryEntry] {
         let registers: [String: Register] = ["반말": .casual, "해요체": .polite, "합쇼체": .formal]
         let genders: [String: Gender] = ["male": .m, "female": .f, "nonbinary": .n]
         var out: [MemoryEntry] = []
@@ -240,9 +260,10 @@ public struct T2Layout: ContextLayout {
                 Array($0.key.unicodeScalars.map(\.value)).lexicographicallyPrecedes($1.key.unicodeScalars.map(\.value))
             }.compactMap { pair in registers[pair.value].map { Addressing(to: pair.key, register: $0) } }
             out.append(MemoryEntry(src: e.name, dst: (e.dst?.isEmpty == false ? e.dst : nil) ?? e.name, kind: .person,
-                                   gender: e.gender.flatMap { genders[$0] }, note: e.role ?? "", reading: e.reading, addressing: to))
+                                   gender: e.gender.flatMap { genders[$0] }, note: e.role ?? "", reading: e.reading, addressing: to,
+                                   apply: apply.entityApply))
         }
-        for t in m.terms { out.append(MemoryEntry(src: t.src, dst: t.dst, kind: .term)) }
+        for t in m.terms { out.append(MemoryEntry(src: t.src, dst: t.dst, kind: .term, apply: apply.termApply)) }
         return out
     }
 }

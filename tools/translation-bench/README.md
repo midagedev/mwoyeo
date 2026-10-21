@@ -13,6 +13,7 @@ The corpus is written for the bench (no third-party text). The runner replays ea
 |---|---|
 | `sequences/<id>.json` | one sequence: lines, screens, probes |
 | `memory/<id>.json` | the user memory for that sequence, hand-written as a user would fill it in |
+| `memory-named/<id>.json` | `memory/` with a target form (`dst`) authored for every entity that had none, for `--apply` runs (`--memory-dir memory-named`) |
 | `validate.py` | format and corpus gates (`python3 -I validate.py`) |
 | `runner/` | SwiftPM executable `bench-run`, depends on `../../../Core` (path dependency) |
 | `engines/*.json` | engine configs (kind, base URL, model; keys come from env only) |
@@ -25,6 +26,8 @@ The corpus is written for the bench (no third-party text). The runner replays ea
 | `matrix.sh` | one condition on one Ollama model, then `runs.py add` with the machine state (load, pageouts, swap, `ollama ps`) in the note |
 | `cloud.sh` | one condition on one cloud engine, then `runs.py add` (the key comes from the engine file's `keyEnv` variable in the environment) |
 | `summary.py` | regenerates `runs/SUMMARY.md` from the preserved runs (`--check` fails when it is stale) |
+| `particles.py` | the Korean particle check of a source-rewriting run (`--apply both` or `both-names`) and the one-character-row check (`python3 -I particles.py <run dir>...`) |
+| `both_bench.py` | the both-bench analysis: a run's lines split into rewritten / untouched, names kept, probes, echoes, particle breaks per arm, and the judge tally by line class (`python3 -I both_bench.py table ...`, `judge ...`) |
 | `latency.py` | the latency verdict with an A/A self-check: a condition's per-request delta against repeats of condition A, and the repeats' own spread (`python3 -I latency.py --aa <A run>... -- <run>...`) |
 | `runs/<run-name>/` | the preserved experiment data: every run worth a number, with its `MANIFEST.json` |
 | `runs/SUMMARY.md` | the tables of every model run; generated, never hand-edited |
@@ -208,6 +211,19 @@ python3 -I judge.py prompts --a out/A-gemma3-4b --b out/M-gemma3-4b --out judge/
 - `--jobs N` replays N sequences at once (sequences are independent threads). It shortens a quality run on an engine that
   serves requests in parallel; latency is not comparable across runs with different `jobs` (the scorer says so).
 - `--seq id,id` runs a subset; `--batch n` changes the batch size (the app's is 3).
+- `--memory-dir <dir>` reads the memories from `<root>/<dir>` instead of `memory/` (`memory-named`: every entity has its target form). It is
+  recorded in `meta.json` (`memory_dir`), only when given.
+- `--apply hint|both|both-names` (layout `t2` and a condition with the memory, `M`; absent is `hint`) sets how the memory's rows are applied
+  (design names-and-context section 10): `hint` every row is a hint, today's request byte for byte; `both` every row (entities and terms) is
+  `.both`; `both-names` entities `.both`, terms hints. A `.both` row goes out as a hint row as before, selected on the lines as the screen
+  showed them (`RequestLayout.selectRows` matches a row's source against the items), and its target is also written into the item lines
+  being translated: `ContextMemory.replaceRows`, then `ApplePreinsertion.insert` on each item (`BenchKit/Apply.swift`). The context lines
+  (before and after) stay original, as the product leaves them. A request that failed and fell back to the stateless request carries no rewrite.
+  Each request of such a run records `replaced` (`[{id, text, spans: [[matched, target]]}]`: the lines the engine saw rewritten); `meta.json`
+  has `apply` and `replaced_lines`. The translations are keyed by the ORIGINAL lines, so `score.py` and `judge.py` read the sequences
+  unchanged. A default run has none of these fields: its files stay what they were.
+- `--dump-bodies <dir>` writes `<dir>/<sequence id>.jsonl`, the finished request body of every request (no key is in a body); `cmp` of two
+  arms' dumps lists the sequences whose requests differ, which is how arms with identical requests are found and left out of the evidence.
 
 ## Runs (`runs/`): the experiment data is content
 
@@ -349,7 +365,9 @@ translations: 100 %; one name swapped drops accuracy and raises carry-over), `te
 pair, the tally on a fake verdict set), `tests/test_failures.py` (failed attempts by reason, leaks and echoes counted on a mini run and on a doctored real run; run again with
 `--neuter` it must fail), `tests/test_summary.py` (SUMMARY.md renders identically twice and equals the committed file), `tests/test_runs.py` (preservation: no overwrite, a manifest that verifies, and
 `verify` failing on a missing manifest, a changed file, a changed summary and a short oracle run), `runs.py verify` (every
-preserved run), the runner's Swift tests, and `tests/check_render.py` (the runner's and the scorer's renderings of every
+preserved run), the runner's Swift tests, `tests/test_particles.py` (a hand-broken Korean particle after a written name is caught, a correct one
+passes, a Han character replaced inside a longer word is flagged) and `tests/test_both_bench.py` (a planted wrong name shows in the rewritten class only, the judge tally
+splits by class, a sequence none of whose requests was rewritten counts as identical to hint); each of the two is run again with `--neuter` and must fail; and `tests/check_render.py` (the runner's and the scorer's renderings of every
 memory are identical).
 
 ## Assumptions and limits

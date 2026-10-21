@@ -16,6 +16,12 @@ python3 -I runs.py verify
 python3 -I tests/test_failures.py
 # FAIL-first: the same checks with the leak detection switched off must fail, or they would pass on the unfixed scorer
 if python3 -I tests/test_failures.py --neuter >/dev/null 2>&1; then echo "test_failures passed with the leak counter neutered" >&2; exit 1; fi
+python3 -I tests/test_particles.py
+# FAIL-first: the particle check with its table switched off must fail the same test
+if python3 -I tests/test_particles.py --neuter >/dev/null 2>&1; then echo "test_particles passed with the particle table neutered" >&2; exit 1; fi
+python3 -I tests/test_both_bench.py
+# FAIL-first: the same checks with the line classes pooled must fail
+if python3 -I tests/test_both_bench.py --neuter >/dev/null 2>&1; then echo "test_both_bench passed with the classes pooled" >&2; exit 1; fi
 python3 -I tests/test_latency.py
 python3 -I tests/test_summary.py
 bash tests/test_film_consistency.sh

@@ -4,7 +4,7 @@ import Foundation
 // bench-run: replays the translation bench's sequences against an engine under one condition.
 //
 //   bench-run run --engine engines/<file>.json --condition A --out <dir> [--root <bench dir>] [--seq id,id] [--jobs N]
-//                 [--layout reference|t2|tg] [--batch 3]
+//                 [--layout reference|t2|tg] [--batch 3] [--apply hint|both|both-names] [--memory-dir <dir>] [--dump-bodies <dir>]
 //   bench-run plan [--root <bench dir>] [--seq id,id] [--batch 3]      the batches of each sequence, no engine
 //   bench-run render-memory <memory.json> [--sections window,document,entities,terms] [--no-speech]
 //   bench-run conditions
@@ -90,6 +90,10 @@ case "run":
     let jobs = Int(arguments.option("--jobs") ?? "1") ?? 1
     let batch = Int(arguments.option("--batch") ?? "3") ?? 3
     let layoutName = arguments.option("--layout") ?? "reference"
+    let memoryDir = arguments.option("--memory-dir")
+    let dumpBodies = arguments.option("--dump-bodies").map { URL(fileURLWithPath: $0) }
+    let applyName = arguments.option("--apply")
+    guard let apply = ApplyMode(rawValue: applyName ?? "hint") else { fail("unknown --apply \(applyName ?? ""); use hint, both or both-names") }
     guard let spec = ConditionSpec.parse(conditionName) else { fail("unknown condition \(conditionName); see `bench-run conditions`") }
     let engineFile: EngineFile
     let engine: any BenchEngine
@@ -102,17 +106,25 @@ case "run":
     case "reference": layout = ReferenceLayout()
     case "t2":
         guard let kind = engineFile.layoutKind else { fail("layout t2 does not cover engine kind \(engineFile.kind)", code: 3) }
-        layout = T2Layout(kind: kind)
+        layout = T2Layout(kind: kind, apply: apply)
     case "tg": layout = TranslateGemmaLayout()
     default: fail("unknown layout \(layoutName)")
     }
     if let problem = engine.preflight() { fail("engine \(engine.label) cannot run: \(problem)", code: 3) }
     if layoutName == "tg" && engine.kindName != "openAICompatible" { fail("layout tg needs an openAICompatible engine", code: 3) }
-    let corpus = try Corpus.load(root: root, only: only)
+    // A mode that writes into the source is the product layout's: another layout would silently run as `hint`.
+    if apply.rewrites && (layoutName != "t2" || !spec.memory) { fail("--apply \(apply.rawValue) needs --layout t2 and a condition with the memory (M)", code: 3) }
+    if let memoryDir, !FileManager.default.fileExists(atPath: root.appendingPathComponent(memoryDir).path) {
+        fail("--memory-dir \(memoryDir): no such directory under \(root.path)", code: 3)
+    }
+    let corpus = try Corpus.load(root: root, only: only, memoryDir: memoryDir ?? "memory")
     if corpus.isEmpty { fail("no sequences under \(root.path)") }
     var options = RunOptions(spec: spec, layout: layout, layoutName: layoutName, engine: engine, out: URL(fileURLWithPath: outPath))
     options.jobs = jobs
     options.batchSize = batch
+    options.apply = apply
+    options.memoryDir = memoryDir
+    options.dumpBodies = dumpBodies
     options.progress = { line in FileHandle.standardError.write(Data((line + "\n").utf8)) }
     do { try await Runner.run(corpus, options: options) } catch { fail("run failed: \(error)", code: 4) }
     out("wrote \(corpus.count) sequences to \(outPath)")

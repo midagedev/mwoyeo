@@ -153,8 +153,9 @@ public enum Corpus {
         return try JSONDecoder().decode(Memory.self, from: Data(contentsOf: url))
     }
 
-    /// Every `sequences/*.json` of the bench directory with its memory, sorted by id; `only` keeps the named ones.
-    public static func load(root: URL, only: Set<String>? = nil) throws -> [(BenchSequence, Memory)] {
+    /// Every `sequences/*.json` of the bench directory with its memory (`<memoryDir>/<id>.json`, `memory` by default), sorted by id;
+    /// `only` keeps the named ones.
+    public static func load(root: URL, only: Set<String>? = nil, memoryDir: String = "memory") throws -> [(BenchSequence, Memory)] {
         let dir = root.appendingPathComponent("sequences")
         let files = try FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)
             .filter { $0.pathExtension == "json" }.sorted { $0.lastPathComponent < $1.lastPathComponent }
@@ -162,7 +163,7 @@ public enum Corpus {
         for f in files {
             let seq = try loadSequence(f)
             if let only, !only.contains(seq.id) { continue }
-            out.append((seq, try loadMemory(root.appendingPathComponent("memory/\(seq.id).json"))))
+            out.append((seq, try loadMemory(root.appendingPathComponent("\(memoryDir)/\(seq.id).json"))))
         }
         return out
     }

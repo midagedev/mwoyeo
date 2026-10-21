@@ -77,8 +77,11 @@ public struct RequestRecord: Codable, Sendable, Equatable {
     public var failed: [Int]
     /// Learned terms this request added (source, target).
     public var termsAdded: [[String]]
+    /// `--apply both|both-names` only (absent otherwise, so a default run keeps today's bytes): the item lines the request carried
+    /// rewritten, as the engine saw them, with the places the rows were written. An empty list is a request where nothing was.
+    public var replaced: [ItemRewrite]?
     enum CodingKeys: String, CodingKey {
-        case n, screen, items, context, attempts, reply, usage, layout, fallback, failed
+        case n, screen, items, context, attempts, reply, usage, layout, fallback, failed, replaced
         case latencyMs = "latency_ms", termsAdded = "terms_added"
     }
 }
@@ -102,7 +105,14 @@ public struct RunMeta: Codable, Sendable {
     public var sequences: [String]
     public var started: String
     public var seconds: Double
-    enum CodingKeys: String, CodingKey { case condition, layout, engine, kind, model, price, jobs, sequences, started, seconds, batchSize = "batch_size" }
+    /// Only when `--apply both|both-names` / `--memory-dir` were given: the mode, the memory directory, and how many item lines were rewritten.
+    public var apply: String?
+    public var memoryDir: String?
+    public var replacedLines: Int?
+    enum CodingKeys: String, CodingKey {
+        case condition, layout, engine, kind, model, price, jobs, sequences, started, seconds, apply
+        case batchSize = "batch_size", memoryDir = "memory_dir", replacedLines = "replaced_lines"
+    }
 }
 
 // MARK: - the replay
@@ -115,6 +125,13 @@ public struct RunOptions: Sendable {
     public var out: URL
     public var jobs = 1
     public var batchSize = 3
+    /// The mode the layout was built with (`T2Layout.apply`), so the records say whether a request carries `replaced`.
+    public var apply = ApplyMode.hint
+    /// The memory directory the corpus was read from, recorded in `meta.json` when it is not `memory`.
+    public var memoryDir: String?
+    /// `--dump-bodies <dir>`: `<dir>/<sequence id>.jsonl` gets the finished request body of every request, one per line (a debug aid:
+    /// `cmp` of two arms' bodies shows which requests differ). Not part of a run.
+    public var dumpBodies: URL?
     public var progress: @Sendable (String) -> Void = { _ in }
 
     public init(spec: ConditionSpec, layout: any ContextLayout, layoutName: String, engine: any BenchEngine, out: URL) {
@@ -136,10 +153,12 @@ public enum Runner {
         var translations: [Int: String] = [:]
         var records: [RequestRecord] = []
         var previousWire: Wire?
+        var bodies = Data()
         let plan = Replay.plan(seq, batchSize: o.batchSize)
         for batch in plan {
             let step = Step(sequence: seq, memory: memory, batch: batch, history: history)
             let prompt = try o.layout.build(o.spec, step: step, thread: thread)
+            if o.dumpBodies != nil, let body = prompt.bodyOverride { bodies += body + Data("\n".utf8) }
             var attempts: [AttemptRecord] = []
             var reply = await o.engine.translate(EngineRequest(items: batch.items, source: seq.source, target: seq.target,
                                                                prompt: prompt, sequenceID: seq.id))
@@ -179,9 +198,14 @@ public enum Runner {
                 n: batch.number, screen: batch.screen, items: batch.items.map(\.id), context: usedPrompt.contextIDs,
                 attempts: attempts, latencyMs: attempts.reduce(0) { $0 + $1.latencyMs }, reply: reply.text, usage: reply.usage,
                 layout: LayoutRecord.measure(wire: reply.wire, prompt: usedPrompt, previous: previousWire, usage: reply.usage),
-                fallback: stateless && ok ? batch.items.map(\.id) : [], failed: ok ? [] : batch.items.map(\.id), termsAdded: added))
+                fallback: stateless && ok ? batch.items.map(\.id) : [], failed: ok ? [] : batch.items.map(\.id), termsAdded: added,
+                replaced: o.apply.rewrites ? usedPrompt.rewrites : nil))
             previousWire = reply.wire
             o.progress("\(seq.id) \(batch.number)/\(plan.count) \(attempts.reduce(0) { $0 + $1.latencyMs }) ms\(ok ? "" : " FAILED: " + (reply.error ?? ""))")
+        }
+        if let dir = o.dumpBodies {
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            try bodies.write(to: dir.appendingPathComponent("\(seq.id).jsonl"))
         }
         return SequenceOutput(id: seq.id, condition: o.spec.name, translations: Dictionary(uniqueKeysWithValues: translations.map { (String($0.key), $0.value) }),
                               requests: records)
@@ -204,7 +228,8 @@ public enum Runner {
         let started = ISO8601DateFormatter().string(from: Date())
         let enc = JSONEncoder()
         enc.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        try await withThrowingTaskGroup(of: Void.self) { group in
+        var replacedLines = 0
+        try await withThrowingTaskGroup(of: Int.self) { group in
             var next = 0
             var running = 0
             func launch() {
@@ -215,18 +240,21 @@ public enum Runner {
                 group.addTask {
                     let out = try await replay(seq, memory: mem, options: o)
                     try enc.encode(out).write(to: o.out.appendingPathComponent("\(seq.id).json"))
+                    return out.requests.reduce(0) { $0 + ($1.replaced?.count ?? 0) }
                 }
             }
             for _ in 0..<max(1, o.jobs) { launch() }
             while running > 0 {
-                try await group.next()
+                replacedLines += try await group.next() ?? 0
                 running -= 1
                 launch()
             }
         }
         let secs = Double((clock.now - start) / .milliseconds(1)) / 1000
         let meta = RunMeta(condition: o.spec.name, layout: o.layoutName, engine: o.engine.label, kind: o.engine.kindName, model: o.engine.model,
-                           price: o.engine.price, jobs: o.jobs, batchSize: o.batchSize, sequences: corpus.map { $0.0.id }, started: started, seconds: secs)
+                           price: o.engine.price, jobs: o.jobs, batchSize: o.batchSize, sequences: corpus.map { $0.0.id }, started: started, seconds: secs,
+                           apply: o.apply.rewrites ? o.apply.rawValue : nil, memoryDir: o.memoryDir,
+                           replacedLines: o.apply.rewrites ? replacedLines : nil)
         let pretty = JSONEncoder()
         pretty.outputFormatting = [.sortedKeys, .withoutEscapingSlashes, .prettyPrinted]
         try pretty.encode(meta).write(to: o.out.appendingPathComponent("meta.json"))

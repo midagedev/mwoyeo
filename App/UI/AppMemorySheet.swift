@@ -294,10 +294,10 @@ struct AppMemorySheet: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityElement(children: .ignore)
+            // No `.accessibilityElement(children: .ignore)` on a Button: it swaps the button's element for one with no AXPress (D11). The label, value and hint
+            // replace what the button says; `PressChecks` presses it.
             .accessibilityLabel("Customize")
             .accessibilityValue(editor.customizeSummary)
-            .accessibilityAddTraits(.isButton)
             .accessibilityHint(customizeOpen ? String(localized: "Collapses the options") : String(localized: "Shows the options"))
         }
     }

@@ -342,10 +342,9 @@ struct ScriptEditor: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityElement(children: .ignore)
+            // No `.accessibilityElement(children: .ignore)` on a Button: it leaves the element with no AXPress (D11; `PressChecks`).
             .accessibilityLabel("Script")
             .accessibilityValue(stateWord)
-            .accessibilityAddTraits(.isButton)
             if open { editorBody }
         }
     }

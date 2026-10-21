@@ -316,11 +316,10 @@ struct TranslationSettings: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            // One element: the name, and where it is used, its languages and what it keeps as its value ("Pinned" is told too).
-            .accessibilityElement(children: .ignore)
+            // The name, and where it is used, its languages and what it keeps as its value ("Pinned" is told too). No `.accessibilityElement(children: .ignore)`
+            // on a Button: it leaves the element with no AXPress (D11; `PressChecks`).
             .accessibilityLabel(title)
             .accessibilityValue(pinned ? "\(spoken) · \(String(localized: "Pinned"))" : spoken)
-            .accessibilityAddTraits(.isButton)
             Menu { actions() } label: { Image(nsImage: .moreActions) }
                 .menuStyle(.borderlessButton)
                 .menuIndicator(.hidden)

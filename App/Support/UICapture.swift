@@ -213,6 +213,10 @@ enum UICapture {
                 // Only the accessibility checks (the whole of check-logic takes minutes).
                 let failed = await AccessibilityChecks.run(model)
                 report("accessibility", failed)
+            case "press-checks":
+                // Only the press checks (the whole of check-logic takes minutes).
+                let failed = await PressChecks.run(model)
+                report("press", failed)
             case "drift-checks":
                 // Only the drift meter's checks (the whole of check-logic takes minutes).
                 let failed = DriftChecks.run()
@@ -560,6 +564,7 @@ enum UICapture {
             failed += await NamesLensChecks.run(model)
             failed += await LensRouteChecks.run(model)
             failed += await AccessibilityChecks.run(model)
+            failed += await PressChecks.run(model)
             failed += await PackChecks.run(model)
             // The script service's timing checks first: one service serves every connection, and MCP's `test_rules` leaves it running (integration
             // 2026-10-21: after MCPChecks, "while(true) is cut within 250 ms" took 4.7 s; alone it passes).

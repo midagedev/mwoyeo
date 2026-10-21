@@ -8,7 +8,8 @@ import SwiftUI
 ///
 /// What is checked: Reduce Motion holds the lens glow and the SwiftUI motion still; the lens is one element a screen reader can name,
 /// read and act on; the picker can place a lens without a pointer; and no control or image of Settings, Onboarding, the menu panel and
-/// the engine sheet is without a name a screen reader can say.
+/// the engine sheet is without a name a screen reader can say, and no button of them is without a press action (`AXPress`, `unpressable`; the
+/// controls that open something are pressed in `PressChecks`).
 ///
 /// macOS has no programmatic audit like iOS's `performAccessibilityAudit`, so the audit walks the tree itself, through the accessibility
 /// API an assistive app uses (VoiceOver, Accessibility Inspector): every view is hosted in a window as the app hosts it. What it cannot
@@ -128,6 +129,30 @@ enum AccessibilityChecks {
         return items
     }
 
+    /// The first element of the window titled `title` with the role `role` that a screen reader names `label`, as an assistive app finds it:
+    /// the one it reads the actions of and presses (`PressChecks`). Asked on the main thread, like `tree`.
+    @MainActor
+    static func element(inWindowTitled title: String, role: String, label: String) -> AXUIElement? {
+        let app = AXUIElementCreateApplication(getpid())
+        AXUIElementSetMessagingTimeout(app, 10)
+        func find(_ element: AXUIElement, _ depth: Int) -> AXUIElement? {
+            guard depth < 40 else { return nil }
+            if string(element, kAXRoleAttribute) == role, name(of: element) == label { return element }
+            for child in (attribute(element, kAXChildrenAttribute) as? [AXUIElement]) ?? [] { if let hit = find(child, depth + 1) { return hit } }
+            return nil
+        }
+        for window in (attribute(app, kAXWindowsAttribute) as? [AXUIElement]) ?? [] where string(window, kAXTitleAttribute) == title {
+            if let hit = find(window, 0) { return hit }
+        }
+        return nil
+    }
+
+    /// The buttons of `items` that cannot be pressed through the accessibility API (no `AXPress`): what VoiceOver's "press" and an agent have.
+    /// `.accessibilityElement(children: .ignore)` on a Button did it (D11, 2026-10-21); the window's own buttons are the system's.
+    static func unpressable(_ items: [Item]) -> [Item] {
+        items.filter { $0.role == "AXButton" && $0.enabled && !windowButtonSubroles.contains($0.subrole) && !$0.actions.contains(kAXPressAction) }
+    }
+
     /// The controls and images of `items` that a screen reader could not name.
     static func unlabeled(_ items: [Item]) -> [Item] {
         items.filter { ($0.role == "AXImage" || controlRoles.contains($0.role)) && $0.label.isEmpty && !systemSubroles.contains($0.subrole) }
@@ -172,12 +197,8 @@ enum AccessibilityChecks {
 
     /// A view shown in a window as the app shows it, and the tree it gives after `settle` seconds.
     static func hostedTree<V: View>(_ view: V, size: CGSize, model: AppModel, name: String, settle: Double = 1.0) async -> [Item] {
-        let title = "mwoyeo-a11y-\(name)"
-        let w = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.titled], backing: .buffered, defer: false)
-        w.title = title
-        w.contentView = NSHostingView(rootView: view.environment(model))
-        w.setFrameTopLeftPoint(NSPoint(x: 80, y: (NSScreen.main?.frame.height ?? 900) - 60))
-        w.orderFrontRegardless()
+        let w = window(view, size: size, model: model, name: name)
+        let title = w.title
         try? await Task.sleep(for: .seconds(settle))
         // SwiftUI builds its tree as it is asked and keeps filling it for a moment: the tree counts once two reads in a row agree.
         var items = await tree(ofWindowTitled: title)
@@ -193,6 +214,16 @@ enum AccessibilityChecks {
         }
         w.orderOut(nil)
         return items
+    }
+
+    /// `view` in a window as the app shows it, in front and titled "mwoyeo-a11y-<name>" (the title `tree(ofWindowTitled:)` asks for); the caller closes it.
+    static func window<V: View>(_ view: V, size: CGSize, model: AppModel, name: String) -> NSWindow {
+        let w = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.titled], backing: .buffered, defer: false)
+        w.title = "mwoyeo-a11y-\(name)"
+        w.contentView = NSHostingView(rootView: view.environment(model))
+        w.setFrameTopLeftPoint(NSPoint(x: 80, y: (NSScreen.main?.frame.height ?? 900) - 60))
+        w.orderFrontRegardless()
+        return w
     }
 
     /// The views the audit covers: Settings (every tab), Onboarding, the menu panel (empty, a lens row), the engine sheet (the list, a form),
@@ -306,6 +337,10 @@ enum AccessibilityChecks {
             let bad = unlabeled(items), same = ambiguous(items)
             report.check("\(name): \(items.count) elements, \(bad.count) unlabeled controls or images, \(same.count) indistinguishable controls"
                          + (same.isEmpty ? "" : " (\(same.joined(separator: ", ")))"), items.count > 2 && bad.isEmpty && same.isEmpty)
+            let mute = unpressable(items)
+            report.check("\(name): \(items.filter { $0.role == "AXButton" }.count) buttons, \(mute.count) that do not answer AXPress"
+                         + (mute.isEmpty ? "" : " (\(mute.map { $0.label.isEmpty ? $0.role : $0.label }.joined(separator: ", ")))"), mute.isEmpty,
+                         detail: "a button read as one element needs its own press action: no .accessibilityElement(children: .ignore) on a Button")
             // ui-audit-1-1-5 X1; the rebuilt profile sheet (its minus buttons are 22 pt) is in it.
             let small = smallIconButtons(items)
             report.check("\(name): \(iconButtons(items).count) icon buttons, \(small.count) under \(Int(minimumHit)) × \(Int(minimumHit)) pt"
@@ -313,6 +348,8 @@ enum AccessibilityChecks {
         }
         // The instrument must see the buttons it is about: a tree with no sizes would pass the check above for nothing.
         let seen = views.reduce(0) { $0 + iconButtons($1.items).count }
+        let pressable = views.reduce(0) { $0 + $1.items.filter { $0.role == "AXButton" && $0.actions.contains(kAXPressAction) }.count }
+        report.check("the audit read the actions of \(pressable) buttons across the views, so the AXPress line above is about buttons it saw", pressable >= 90)
         report.check("the audit read the hit area of \(seen) icon buttons across the views (the menu footer, the ⋯ menu, the shortcut ✕, the notice ✕, the trash)", seen >= 8)
         await menuChecks(model, views.first { $0.name == "menu" }?.items ?? [], report)
         return report.failed

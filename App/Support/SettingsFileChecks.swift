@@ -854,9 +854,13 @@ enum SettingsFileChecks {
         let populatedContextObject = populatedEngineObjects.first?["context"] as? [String: Any] ?? [:]
         let populatedAllowObject = populatedEngineObjects.first?["allow"] as? [String: Any] ?? [:]
         // The new shape's profile: the file's own type (`ProfileFile`), fully populated, against the schema of `profiles[]`.
-        let populatedFile = ProfileFile(AppProfile(bundleID: "a", appName: "A", source: "ja", target: "en", customEngineID: engine.id, paragraphReader: .lineGrouping, note: "n",
-                                                   entries: populated.entries, context: AppContextOverride(mode: .conversation, previousLines: 5), id: "a",
-                                                   when: [ProfileCondition(app: "a", titleContains: "t")], useLearned: true))
+        var populatedProfile = AppProfile(bundleID: "a", appName: "A", source: "ja", target: "en", customEngineID: engine.id, paragraphReader: .lineGrouping, note: "n",
+                                          entries: populated.entries, context: AppContextOverride(mode: .conversation, previousLines: 5), id: "a",
+                                          when: [ProfileCondition(app: "a", titleContains: "t")], useLearned: true)
+        // A row with every key it writes (`regex` only when true, `on` only when false), and a script that is off.
+        populatedProfile.rewrites = [RewriteRow(.before, "f", "r", regex: true, on: false)]
+        populatedProfile.script = RewriteScript(source: "s", on: false)
+        let populatedFile = ProfileFile(populatedProfile)
         let populatedFileKeys = (try? JSONSerialization.jsonObject(with: JSONEncoder().encode(populatedFile))) as? [String: Any] ?? [:]
         let fileProfile = at(schemaObject, "properties", "profiles", "items")
         let levels: [(name: String, app: Set<String>, schema: Set<String>)] = [
@@ -871,6 +875,8 @@ enum SettingsFileChecks {
             ("profiles[].entries[]", Set(((populatedFileKeys["entries"] as? [[String: Any]])?.first ?? [:]).keys), schemaKeys(at(fileProfile, "properties", "entries", "items"))),
             ("profiles[].when[]", Set(((populatedFileKeys["when"] as? [[String: Any]])?.first ?? [:]).keys), schemaKeys(at(fileProfile, "properties", "when", "items"))),
             ("profiles[].context", Set((populatedFileKeys["context"] as? [String: Any] ?? [:]).keys), schemaKeys(at(fileProfile, "properties", "context"))),
+            ("profiles[].rewrites[]", Set(((populatedFileKeys["rewrites"] as? [[String: Any]])?.first ?? [:]).keys), schemaKeys(at(fileProfile, "properties", "rewrites", "items"))),
+            ("profiles[].script", Set((populatedFileKeys["script"] as? [String: Any] ?? [:]).keys), schemaKeys(at(fileProfile, "properties", "script"))),
         ]
         for level in levels {
             check("schema: \(level.name) has exactly the fields the app keeps", !level.app.isEmpty && level.app == level.schema)
@@ -1036,6 +1042,72 @@ enum SettingsFileChecks {
         model.settings.checksForUpdates = true
         model.settings.lensStyle = .glow
         failed += ProfileFileChecks.run(dir: dir)
+        return failed
+    }
+
+    /// `rewrites` and `script`, top level and in a profile (rewrite-rules §1-§3, §9; round rewrite-run part B), and `profilePin` taking null (addendum A5).
+    /// Run by `RewriteChecks.run`, so the quick `rewrite-checks` mode has them too.
+    static func rewriteKeys() -> Int {
+        var failed = 0
+        func check(_ what: String, _ ok: Bool, _ detail: @autoclosure () -> String = "") {
+            print("check-logic: \(ok ? "PASS" : "FAIL") settings file: \(what)" + (ok || detail().isEmpty ? "" : " [\(detail())]"))
+            if !ok { failed += 1 }
+        }
+        func read(_ json: String, over current: AppSettings = AppSettings()) -> SettingsFileResult { SettingsFileCheck.read(Data(json.utf8), over: current) }
+
+        // Nothing set: the file is the file it was, byte for byte (the key is not even listed).
+        let plain = String(decoding: SettingsFileFormat.render(AppSettings()), as: UTF8.self)
+        check("nothing set: neither rewrites nor script is written", !plain.contains("\"rewrites\"") && !plain.contains("\"script\""))
+
+        var set = AppSettings()
+        set.rewrites = [RewriteRow(.before, "▼"), RewriteRow(.before, "（[ぁ-ゖ]+）", regex: true), RewriteRow(.after, "...", "…", on: false)]
+        set.script = RewriteScript(source: "function before(line, ctx) { return line }")
+        set.appProfiles = [AppProfile(bundleID: "com.example.app", appName: "Example", source: "ja", target: "en")]
+        set.appProfiles[0].rewrites = [RewriteRow(.after, "a", "b", regex: true)]
+        set.appProfiles[0].script = RewriteScript(source: "function after(s, d, c) { return d }", on: false)
+        let rendered = SettingsFileFormat.render(set)
+        let back = SettingsFileCheck.read(rendered, over: AppSettings())
+        let body = String(decoding: rendered, as: UTF8.self)
+        check("rows and a script, All apps' and a profile's, survive the file; `regex` is written only when true and `on` only when false",
+              back.settings == set && back.issues.isEmpty && !body.contains("\"regex\": false") && !body.contains("\"on\": true") && body.contains("\"on\": false"), "\(back.issues)")
+
+        // The strict check: a bad row is reported and dropped, the others stay in order.
+        let rows = """
+        {"rewrites": [{"stage":"before","find":"a"},{"stage":"during","find":"b"},{"stage":"before","find":""},{"stage":"before","find":"\(String(repeating: "x", count: 201))"},
+                      {"stage":"after","find":"c","replace":"\(String(repeating: "y", count: 201))"},{"stage":"after","find":"d","regex":"yes"},{"find":"e"},{"stage":"after","find":"f","replace":"g","on":false}]}
+        """
+        let dropped = read(rows)
+        check("a row with a stage that is not one, an empty find, a find or a replace over 200, a regex that is not true or false, or no stage is reported and dropped; the rest stay",
+              dropped.settings.rewrites == [RewriteRow(.before, "a"), RewriteRow(.after, "f", "g", on: false)] && dropped.issues.count >= 6
+              && dropped.issues.contains { $0.message.contains("rewrites[1]") } && dropped.issues.contains { $0.message.contains("rewrites[2]") }, "\(dropped.settings.rewrites) \(dropped.issues.map(\.message))")
+        let many = "{\"rewrites\": [" + (0..<(RewriteLimits.maxRows + 1)).map { "{\"stage\":\"before\",\"find\":\"f\($0)\"}" }.joined(separator: ",") + "]}"
+        let capped = read(many)
+        check("a 33rd row is reported and the first 32 apply", capped.settings.rewrites.count == RewriteLimits.maxRows && capped.issues.contains { $0.message.contains("33 items") && $0.message.contains("32") }, "\(capped.issues.map(\.message))")
+        let longScript = read("{\"script\": {\"source\": \"\(String(repeating: "a", count: RewriteLimits.maxScript + 1))\"}}", over: set)
+        check("a script over 8,000 characters is reported and the current one stays", longScript.settings.script == set.script && longScript.issues.contains { $0.message.contains("script") && $0.message.contains("8000") }, "\(longScript.issues.map(\.message))")
+        let noSource = read("{\"script\": {\"on\": false}}", over: set)
+        check("a script without a source is reported and the current one stays", noSource.settings.script == set.script && !noSource.issues.isEmpty)
+
+        // In a profile: the same rows, dropped one by one, and the profile itself is kept.
+        let inProfile = read("""
+        {"profiles": [{"id": "p", "name": "P", "source": "ja", "target": "en", "rewrites": [{"stage":"before","find":"a"},{"stage":"sideways","find":"b"}], "script": {"source": "function after(s, d) { return d }"}}]}
+        """)
+        check("in a profile a bad row is reported with its place and dropped, and the profile with its script is kept",
+              inProfile.settings.appProfiles.first?.rewrites == [RewriteRow(.before, "a")] && inProfile.settings.appProfiles.first?.script?.source == "function after(s, d) { return d }"
+              && inProfile.issues.contains { $0.message.contains("profiles[0].rewrites[1]") }, "\(inProfile.issues.map(\.message))")
+        check("the schema lists both keys with their limits and their examples pass, in All apps and in a profile",
+              SettingSpec.spec(for: "rewrites") != nil && SettingSpec.spec(for: "script") != nil && SettingsFileCheck.uncoveredKeys().isEmpty
+              && SettingSpec.missingRestoreColumns(SettingSpec.all).isEmpty)
+
+        // profilePin: null is Auto (addendum A5, FAIL-first on the kind `.text`, which rejects null).
+        var pinned = AppSettings()
+        pinned.profilePin = "all"
+        let cleared = read("{\"profilePin\": null}", over: pinned)
+        check("profilePin accepts null: the pin goes and each lens is on Auto, with no issue", cleared.settings.profilePin == nil && cleared.issues.isEmpty, "\(cleared.issues.map(\.message))")
+        let badPin = read("{\"profilePin\": \"\"}", over: pinned)
+        check("profilePin still rejects an empty id and keeps the pin", badPin.settings.profilePin == "all" && !badPin.issues.isEmpty)
+        let schemaPin = (SettingSpec.spec(for: "profilePin")?.kind.schema()["type"] as? [String]) ?? []
+        check("the schema says profilePin may be a string or null", Set(schemaPin) == ["string", "null"], "\(schemaPin)")
         return failed
     }
 

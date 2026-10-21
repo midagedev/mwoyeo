@@ -306,14 +306,13 @@ enum AccessibilityChecks {
             let bad = unlabeled(items), same = ambiguous(items)
             report.check("\(name): \(items.count) elements, \(bad.count) unlabeled controls or images, \(same.count) indistinguishable controls"
                          + (same.isEmpty ? "" : " (\(same.joined(separator: ", ")))"), items.count > 2 && bad.isEmpty && same.isEmpty)
-            // ui-audit-1-1-5 X1. The Memory sheet is the profile-UI round's (its minus buttons are in X1 too): its check joins when that sheet is rebuilt.
-            guard name != "memory-sheet" else { continue }
+            // ui-audit-1-1-5 X1; the rebuilt profile sheet (its minus buttons are 22 pt) is in it.
             let small = smallIconButtons(items)
             report.check("\(name): \(iconButtons(items).count) icon buttons, \(small.count) under \(Int(minimumHit)) × \(Int(minimumHit)) pt"
                          + (small.isEmpty ? "" : " (\(sizes(small)))"), small.isEmpty, detail: "every icon button needs a hit area of at least 20 × 20 pt (HIG, Accessibility)")
         }
         // The instrument must see the buttons it is about: a tree with no sizes would pass the check above for nothing.
-        let seen = views.filter { $0.name != "memory-sheet" }.reduce(0) { $0 + iconButtons($1.items).count }
+        let seen = views.reduce(0) { $0 + iconButtons($1.items).count }
         report.check("the audit read the hit area of \(seen) icon buttons across the views (the menu footer, the ⋯ menu, the shortcut ✕, the notice ✕, the trash)", seen >= 8)
         await menuChecks(model, views.first { $0.name == "menu" }?.items ?? [], report)
         return report.failed

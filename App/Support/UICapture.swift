@@ -1,5 +1,6 @@
 #if !MAS
 import AppKit
+import Carbon.HIToolbox
 import MwoyeoCore
 import MwoyeoEngines
 import SwiftUI
@@ -24,6 +25,15 @@ import SwiftUI
 /// translation-packs-states (Settings › Translation with a row in each state), image-window-pack-ask|downloading|notfinished|unsupported
 /// (the Translate Image window's status line), lens-menu-memory (the lens menu of an app with a memory: its info line, Memory for <App>…, Remember Languages and Forget <App>…), memory-forget-alert (the alert that Forget <App>… asks), memory-sheet-lens (Settings with no profile at all, a lens's "Memory for <App>…" set: the Memory sheet comes up empty; PASS/FAIL), names-lens-checks (only the lens menu's memory block and the first edit of a memory; PASS/FAIL lines), lens-route-checks (only the lens's own route: its app's languages and engine, its own cache and pace; PASS/FAIL lines), memory-profile-row, memory-menu, memory-sheet-empty, memory-sheet-filled, memory-sheet-tall (the filled sheet at 820 pt, every section in view), memory-sheet-fresh (the app profile's row with its memory, its ⋯ menu, and the Memory sheet empty, filled with learned rows, and asking whether to start fresh), check-logic (prints PASS/FAIL for the engine selection and the
 /// engine notice's dismissal; no window). Run it with `MWOYEO_MEMORY_SECRETS=1` so it does not touch the Keychain. It keeps its
+/// Profile and Restore Defaults screens (round ui-all; the names are the ones of docs/design/profiles-ui-checklist.md §3): settings-translation, settings-general,
+/// settings-appearance and settings-shortcuts at defaults (no Restore Defaults… button), their -changed twins (one preference changed: the button at the foot),
+/// restore-sheet and restore-sheet-done (the sheet of General's restore, asking, then after Restore), settings-profiles (eight profiles, one with a name of 40
+/// characters), sheet-l1, sheet-l2, sheet-new-window and sheet-row-details (the profile sheet), lens-menu-l0, lens-menu-l1 and lens-menu-l1-sub (the lens menu
+/// with no profile, with profiles, and its Profile submenu), menu-l1 and menu-l1-pinned (the panel's profile caption), engine-cloud-context (a cloud
+/// engine's sheet, Context opened), sheet-row-details-use (a name's details with the Use pop-up open), sheet-rewrites (the sheet scrolled to the rules table:
+/// an After row and its particle caption, the Script row collapsed), sheet-script (scrolled to the Script editor open on a script with a syntax error: its line)
+/// and sheet-script-test (the Script editor with a script, a sample line and the Test run through the real service), and profile-ui-checks, rewrite-ui-checks and
+/// restore-checks (only their PASS/FAIL lines).
 /// preferences in a scratch suite of its own (deleted at exit; `MWOYEO_DEFAULTS_SUITE` names one to keep), never the app's real
 /// ones; `CFFIXED_USER_HOME` does not move those. `--mock` is a tools/mock-openai server the sample translations go to.
 enum UICapture {
@@ -232,6 +242,19 @@ enum UICapture {
                 await ContextChecks.routeChecks(t)
                 let failed = await LensRouteChecks.run(model) + t.failures
                 report("lens route", failed)
+            case "profile-ui-checks":
+                // Only the profile screens' checks (the whole of check-logic takes minutes).
+                report("profile ui", await ProfileUIChecks.run(model))
+            case "rewrite-ui-checks":
+                // Only the rewrite editor's checks (the whole of check-logic takes minutes).
+                report("rewrite ui", await RewriteUIChecks.run(model))
+            case "restore-checks":
+                // Only Restore Defaults' checks (the whole of check-logic takes minutes).
+                report("restore defaults", await RestoreChecks.run(model))
+            case "rewrite-checks":
+                // Only the rewrite engine's and the script service's checks (the whole of check-logic takes minutes).
+                let failed = await RewriteChecks.run()
+                report("rewrite", failed)
             case "inpaint-footprint": await LensRobustChecks.inpaintFootprint()
             case "menu-icon": LensRobustChecks.menuIcon(into: out.appendingPathComponent("menu-icon.png"))
             case "sheet-pick": await shoot(name, EngineSheet(), CGSize(width: 480, height: 560))
@@ -282,6 +305,11 @@ enum UICapture {
             case "image-window-pack", "image-window-blocked": await imageWindowBlocked(name)
             case "add-flow": await addFlow()
             case "memory-profile-row", "memory-menu", "memory-sheet-empty", "memory-sheet-filled", "memory-sheet-tall", "memory-sheet-fresh": await memoryScene(name)
+            case "settings-translation", "settings-translation-changed", "settings-general", "settings-general-changed", "settings-appearance",
+                 "settings-appearance-changed", "settings-shortcuts-changed", "restore-sheet", "restore-sheet-done", "settings-profiles", "sheet-l1", "sheet-l2",
+                 "sheet-new-window", "sheet-row-details", "sheet-row-details-use", "sheet-rewrites", "sheet-script", "sheet-script-test", "lens-menu-l0", "lens-menu-l1", "lens-menu-l1-sub", "menu-l1", "menu-l1-pinned",
+                 "engine-cloud-context":
+                await profileScene(name)
             default: print("unknown scenario \(name)")
             }
         }
@@ -302,9 +330,15 @@ enum UICapture {
             case "sheet-context-memory":
                 // Context off, and a note written for Mail: what the sheet says it sends (the context service's memory-only mode).
                 model.settings.appProfiles = [AppProfile(bundleID: "com.apple.mail", appName: "Mail", source: "ja", target: "ko", note: "Formal register.")]
-            case "sheet-context-collapsed-on": e.context = EngineContext(enabled: true, previousLines: 3)
-            case "sheet-context-deepl": e.context = EngineContext(enabled: true, previousLines: 3, deepLInstructions: true)
-            default: e.context = EngineContext(enabled: true, previousLines: 3, includeTitle: !name.hasSuffix("-chat"), useLearned: true)
+            case "sheet-context-collapsed-on": model.settings.context = AppContextOverride(mode: .conversation, previousLines: 3)
+            case "sheet-context-deepl":
+                model.settings.context = AppContextOverride(mode: .conversation, previousLines: 3)
+                e.allow.deepLInstructions = true
+            default:
+                // The amount is All apps' (`context`, `useLearned`); what may leave is the engine's (`allow`). The title stays off in the "-chat" ones.
+                model.settings.context = AppContextOverride(mode: .conversation, previousLines: 3)
+                model.settings.useLearned = true
+                e.allow.title = !(name.hasSuffix("-chat") || name == "engine-cloud-context")
             }
             let expanded = !name.contains("collapsed")
             model.settings.engines = [e]
@@ -316,6 +350,8 @@ enum UICapture {
             model.settings.appProfiles = []
             model.settings.engines = []
             model.settings.customEngineID = nil
+            model.settings.context = nil
+            model.settings.useLearned = false
         }
 
         /// A gate in the middle of the initialization, on a clock of its own: the text reader done in 34 s, then the paragraph reader
@@ -514,10 +550,16 @@ enum UICapture {
             failed += await EnginePermissionChecks.run(model)
             failed += await EngineContextChecks.run(model)
             failed += await MemorySheetChecks.run(model)
+            failed += await ProfileUIChecks.run(model)
+            failed += await RewriteUIChecks.run(model)
+            failed += await RestoreChecks.run(model)
             failed += await NamesLensChecks.run(model)
             failed += await LensRouteChecks.run(model)
             failed += await AccessibilityChecks.run(model)
             failed += await PackChecks.run(model)
+            // The script service's timing checks first: one service serves every connection, and MCP's `test_rules` leaves it running (integration
+            // 2026-10-21: after MCPChecks, "while(true) is cut within 250 ms" took 4.7 s; alone it passes).
+            failed += await RewriteChecks.run()
             failed += MCPChecks.run(model)
             failed += await HideLensChecks.run(model)
             report("check-logic", failed)
@@ -692,6 +734,133 @@ enum UICapture {
             report("engine-row-click", failed)
         }
 
+        // MARK: the profile screens (round ui-all, design names-and-context §6, §9)
+
+        /// The profiles of the captures: an app's (Emulator), a game in it (the app and a title), a paper reader, a web profile and presets picked by hand;
+        /// `many` adds the rest of eight, one with a name of 40 characters. The game uses an engine on this Mac (the mock).
+        private func profileFixtures(many: Bool = false) -> [AppProfile] {
+            let emu = "com.example.emu"
+            let local = engine("Local Qwen", mock, "qwen3:8b")
+            model.settings.engines = [local]
+            let hakuBoth = MemoryEntry(src: "ハク", dst: "하쿠", kind: .person, gender: .m, apply: .both)
+            var list = [
+                AppProfile(bundleID: emu, appName: "Emulator", source: "ja", target: "ko", note: "A game console; every game has its own cast.", entries: [hakuBoth]),
+                AppProfile(bundleID: "", appName: "月涙譚", source: "ja", target: "ko", note: "Fantasy; formal speech.",
+                           entries: [hakuBoth, MemoryEntry(src: "九十九", dst: "츠쿠모", kind: .person), MemoryEntry(src: "魔王城", dst: "마왕성", kind: .place)],
+                           context: AppContextOverride(mode: .conversation, previousLines: 3), id: "tsukinamida", name: "月涙譚",
+                           when: [ProfileCondition(app: emu, titleContains: "月涙譚")], engine: .added(local.id), useLearned: true),
+                AppProfile(bundleID: "", appName: "Papers", source: "en", target: "ko", note: "Academic register; keep formulas.", id: "papers", name: "Papers",
+                           when: [ProfileCondition(app: "com.example.pdf"), ProfileCondition(titleContains: "Preprint")]),
+                AppProfile(bundleID: "", appName: "Anime", source: "ja", target: "ko", id: "anime", name: "Anime", when: [], engine: .apple),
+            ]
+            if many {
+                // The name of 40 characters is the fifth row: the list shows six, and the long name is seen without "Show All".
+                list += [AppProfile(bundleID: "", appName: "A profile whose name is as long as the field allows", source: "ja", target: "en", id: "long", name: "A profile whose name is as long as the field allows", when: []),
+                         AppProfile(bundleID: "", appName: "Work", source: "en", target: "ko", note: "Formal.", id: "work", name: "Work", when: []),
+                         AppProfile(bundleID: "com.apple.Safari", appName: "Safari", source: "auto", target: "ko"),
+                         AppProfile(bundleID: "com.apple.MobileSMS", appName: "Messages", source: "en", target: "ko",
+                                    entries: [MemoryEntry(src: "Alice", dst: "앨리스", kind: .person)])]
+            }
+            return list
+        }
+
+        private func profileScene(_ name: String) async {
+            let saved = model.settings, savedFront = model.frontmostBundleID
+            defer { model.settings = saved; model.frontmostBundleID = savedFront }
+            let emu = LensWatch.Read(bundleID: "com.example.emu", appName: "Emulator", title: "月涙譚 — 第二章")
+            // The screens at defaults are the defaults: no profile, no engine, no changed preference.
+            model.settings = AppSettings()
+            switch name {
+            case "settings-translation": await shoot(name, TranslationSettings(), CGSize(width: 560, height: 900))
+            case "settings-general": await shoot(name, GeneralSettings(), CGSize(width: 560, height: 1000))
+            case "settings-appearance": await shoot(name, AppearanceSettings(), CGSize(width: 560, height: SettingsTab.appearance.height))
+            case "settings-translation-changed":
+                model.settings.cacheSize = 20000
+                await shoot(name, TranslationSettings(), CGSize(width: 560, height: 900))
+            case "settings-general-changed":
+                model.settings.targetLanguage = Languages.targets.first { $0 != AppSettings().targetLanguage } ?? "ja"
+                await shoot(name, GeneralSettings(), CGSize(width: 560, height: 1000))
+            case "settings-appearance-changed":
+                model.settings.lensTint = .ocean
+                // Taller than the window: the Restore Defaults… button at the foot is in the shot.
+                await shoot(name, AppearanceSettings(), CGSize(width: 560, height: SettingsTab.appearance.height + 120))
+            case "settings-shortcuts-changed":
+                model.settings.shortcuts[HotKeyAction.pause.rawValue] = KeyCombo(keyCode: kVK_ANSI_P, modifiers: controlKey | optionKey, display: "⌃⌥P")
+                model.settingsTab = .shortcuts
+                await shoot(name, SettingsView(), CGSize(width: 560, height: 760))
+                model.settingsTab = .general
+            case "restore-sheet", "restore-sheet-done":
+                // General with two preferences changed, and a consent that stays: the sheet's Changes and Kept rows.
+                model.settings.targetLanguage = Languages.targets.first { $0 != AppSettings().targetLanguage } ?? "ja"
+                model.settings.framesPerSecond = 15
+                model.settings.renderMode = .fast
+                model.settings.savesTranscripts = true
+                let sheet = RestoreDefaultsSheet(tab: .general, model: model, restoring: name == "restore-sheet-done")
+                await shoot(name, sheet, CGSize(width: 420, height: name == "restore-sheet-done" ? 160 : 300))
+            case "settings-profiles":
+                model.settings.appProfiles = profileFixtures(many: true)
+                await shoot(name, TranslationSettings(), CGSize(width: 560, height: 1500))
+            case "sheet-row-details-use":
+                model.settings.appProfiles = profileFixtures()
+                let titles = await menuShot(name, AppMemorySheet(target: MemoryTarget(id: "com.example.emu", name: "Emulator", kind: .profile), model: model, openDetails: [0], customize: false),
+                                            CGSize(width: 520, height: 640)) { _, windowTitle in await axPopUp(inWindowTitled: windowTitle, named: String(localized: "Use")) }
+                print("\(name): \(titles ?? [])")
+                print("\(name): \(titles?.count == EntryApply.allCases.count ? "PASS" : "FAIL") the Use pop-up holds \(EntryApply.allCases.count) items")
+            case "sheet-l1", "sheet-row-details":
+                model.settings.appProfiles = profileFixtures()
+                let sheet = AppMemorySheet(target: MemoryTarget(id: "com.example.emu", name: "Emulator", kind: .profile), model: model,
+                                           openDetails: name == "sheet-row-details" ? [0] : [], customize: false)
+                await shoot(name, sheet, CGSize(width: 520, height: 640))
+            case "sheet-l2":
+                model.settings.appProfiles = profileFixtures()
+                await shoot(name, AppMemorySheet(target: MemoryTarget(id: "tsukinamida", name: "月涙譚", kind: .profile), model: model, height: 1100, customize: true),
+                            CGSize(width: 520, height: 1100), wait: 2)
+            case "sheet-rewrites", "sheet-script", "sheet-script-test":
+                // 月涙譚 with a rules table (a plain row, a pattern row, a fixed phrase, an After row) and, for the script, an `after`: sound for the Test, with a
+                // syntax error (its line) for sheet-script. The sheet is the size a window has, scrolled to the section as a person scrolls there.
+                var list = profileFixtures()
+                if let i = list.firstIndex(where: { $0.id == "tsukinamida" }) {
+                    list[i].rewrites = [RewriteRow(.before, "（[ぁ-ゖ]+）", "", regex: true), RewriteRow(.before, "▼", ""), RewriteRow(.before, "セーブしますか？", "Save?"),
+                                        RewriteRow(.after, "...", "…")]
+                    switch name {
+                    case "sheet-script-test":
+                        list[i].script = RewriteScript(source: "function after(src, dst, ctx) {\n  return ctx.target === \"ko\" ? dst.replace(/\\.\\.\\./g, \"…\") : dst\n}\n", on: true)
+                    case "sheet-script":
+                        list[i].script = RewriteScript(source: "function after(src, dst, ctx) {\n  return ctx.target === \"ko\" ? dst.replace(/\\.\\.\\./g, \"…\" : dst\n}\n", on: true)
+                    default: break
+                    }
+                }
+                model.settings.appProfiles = list
+                let target = MemoryTarget(id: "tsukinamida", name: "月涙譚", kind: .profile, lensSource: "勇者（ゆうしゃ）は剣を抜いた...", lensTranslation: "용사는 검을 뽑았다...")
+                let scripted = name != "sheet-rewrites"
+                await shoot(name, AppMemorySheet(target: target, model: model, height: 640, customize: true, scriptOpen: scripted, runsTest: name == "sheet-script-test",
+                                                 scrollTo: scripted ? "script" : "rewrites"),
+                            CGSize(width: 520, height: 640), wait: 5)
+            case "sheet-new-window":
+                model.settings.appProfiles = profileFixtures()
+                let phrase = ContextText.truncated(emu.title, toCharacters: ProfileCondition.maxTitleLength)
+                let profileName = ContextText.truncated(emu.title, toCharacters: AppProfile.maxNameLength)
+                let draft = AppProfile(bundleID: "", appName: profileName, source: "ja", target: "ko", id: ProfileIDs.fresh(named: profileName, in: model.settings.appProfiles),
+                                       name: profileName, when: [ProfileCondition(app: emu.bundleID, titleContains: phrase)])
+                let target = MemoryTarget(id: draft.id, name: profileName, kind: .new, draft: draft, focusesPhrase: true, lensBundleID: emu.bundleID,
+                                          lensAppName: emu.appName, lensTitle: emu.title)
+                await shoot(name, AppMemorySheet(target: target, model: model, height: 1100), CGSize(width: 520, height: 1100), wait: 2)
+            case "lens-menu-l0":
+                await lens(name, badge: nil, notice: nil, menu: true, app: emu)
+            case "lens-menu-l1", "lens-menu-l1-sub":
+                model.settings.appProfiles = profileFixtures()
+                await lens(name, badge: nil, notice: nil, menu: true, app: emu, submenu: name.hasSuffix("-sub"))
+            case "menu-l1", "menu-l1-pinned":
+                model.settings.appProfiles = profileFixtures()
+                model.frontmostBundleID = "com.example.emu"
+                if name == "menu-l1-pinned" { model.settings.profilePin = "anime" }
+                await shoot(name, MenuPanel(), CGSize(width: 340, height: 330))
+            case "engine-cloud-context":
+                await contextSheet(name)
+            default: print("unknown profile scenario \(name)")
+            }
+        }
+
         // MARK: the app profile's memory
 
         /// The profile row, its ⋯ menu and the Memory sheet of an app (Messages: a real bundle, so the card has its category). The engine is
@@ -719,6 +888,7 @@ enum UICapture {
                 AppProfile(bundleID: "com.apple.Safari", appName: "Safari", source: "ja", target: "en"),
                 AppProfile(bundleID: "com.example.vn", appName: "Visual Novel Reader With A Very Long Name", source: "ja", target: "en",
                            paragraphReader: .lineGrouping, note: "Fantasy setting, formal speech.", entries: Array(names.prefix(2)))]
+            model.settings = model.settings.convertedFromOldFields()   // the engine above carries 1.1.4's `context`: the converter makes it the amount
             await model.translator.update(settings: model.effectiveSettings)
             if name.hasPrefix("memory-sheet"), filled {
                 let lens = LensContext(bundleID: messages, appName: "Messages", categoryWord: "social", confirmedTitle: "Alice", lensID: "L1", screen: [])
@@ -743,7 +913,7 @@ enum UICapture {
         }
 
         /// The ⋯ menu of the first profile row, open: the popup button is pressed in code (no pointer event), the window and the menu are
-        /// captured while it tracks, and the order of its items is checked: Paragraphs, then Memory…, then Forget This App.
+        /// captured while it tracks, and the order of its items is checked: Edit…, Duplicate, Use for Every Lens, Remove….
         /// The lens menu of an app that has a memory (Messages: three names, a note, languages other than the lens's own, two glossary pairs),
         /// and the alert its "Forget <App>…" asks.
         private func lensMemory(_ name: String) async {
@@ -788,20 +958,72 @@ enum UICapture {
         }
 
         private func memoryMenu(_ name: String) async {
-            let w = NSWindow(contentRect: NSRect(origin: .zero, size: CGSize(width: 560, height: 700)), styleMask: [.titled], backing: .buffered, defer: false)
-            let host = NSHostingView(rootView: TranslationSettings().environment(model))
+            // The ⋯ buttons are popup buttons, top to bottom: the added engine's, All apps', then the profile rows' (Messages, Safari, Visual Novel).
+            guard let titles = await menuShot(name, TranslationSettings(), CGSize(width: 560, height: 700), opener: { host, _ in
+                let popups = views(host).filter { String(describing: type(of: $0)).contains("PopupButton") }
+                    .sorted { $0.convert($0.bounds, to: nil).maxY > $1.convert($1.bounds, to: nil).maxY }
+                guard popups.count == 5, let button = popups[2] as? NSButton else { return nil }
+                return { button.performClick(nil) }
+            }) else {
+                print("\(name): FAIL the ⋯ button of the Messages row was not found")
+                return
+            }
+            // A profile row's ⋯ (design §6.2): Edit…, Duplicate, Use for Every Lens, then Remove… after a divider.
+            let order = [String(localized: "Edit…"), String(localized: "Duplicate"), String(localized: "Use for Every Lens"), String(localized: "Remove…")]
+                .map { titles.firstIndex(of: $0) }
+            print("memory-menu: \(titles)")
+            print("memory-menu: \(order.allSatisfy { $0 != nil } && zip(order.compactMap { $0 }, order.compactMap { $0 }.dropFirst()).allSatisfy { $0 < $1 } ? "PASS" : "FAIL") the profile row's menu reads Edit…, Duplicate, Use for Every Lens, Remove…")
+        }
+
+        /// A pop-up of the window titled `windowTitle` that SwiftUI draws itself (a Picker in a grouped Form is no AppKit button), found through the accessibility
+        /// tree by its name; the closure presses it the way VoiceOver does (no pointer event).
+        private func axPopUp(inWindowTitled windowTitle: String, named label: String) async -> (() -> Void)? {
+            func text(_ e: AXUIElement, _ a: String) -> String? {
+                var v: CFTypeRef?
+                return AXUIElementCopyAttributeValue(e, a as CFString, &v) == .success ? v as? String : nil
+            }
+            func named(_ e: AXUIElement) -> [String] {
+                var titled: CFTypeRef?
+                AXUIElementCopyAttributeValue(e, kAXTitleUIElementAttribute as CFString, &titled)
+                return [text(e, kAXDescriptionAttribute), text(e, kAXTitleAttribute), titled.flatMap { text($0 as! AXUIElement, kAXValueAttribute) }].compactMap { $0 }
+            }
+            func find(_ e: AXUIElement, _ depth: Int) -> AXUIElement? {
+                if depth > 40 { return nil }
+                let role = text(e, kAXRoleAttribute) ?? ""
+                if role == "AXPopUpButton" || role == "AXMenuButton", named(e).contains(label) { return e }
+                var kids: CFTypeRef?
+                guard AXUIElementCopyAttributeValue(e, kAXChildrenAttribute as CFString, &kids) == .success else { return nil }
+                for k in (kids as? [AXUIElement]) ?? [] { if let hit = find(k, depth + 1) { return hit } }
+                return nil
+            }
+            let app = AXUIElementCreateApplication(getpid())
+            // SwiftUI builds its accessibility tree as it is asked, and keeps filling it for a moment: ask again until the pop-up is there.
+            for _ in 0..<15 {
+                var windows: CFTypeRef?
+                AXUIElementCopyAttributeValue(app, kAXWindowsAttribute as CFString, &windows)
+                for w in (windows as? [AXUIElement]) ?? [] where text(w, kAXTitleAttribute) == windowTitle {
+                    if let hit = find(w, 0) { return { AXUIElementPerformAction(hit, kAXPressAction as CFString) } }
+                }
+                try? await Task.sleep(for: .milliseconds(400))
+            }
+            return nil
+        }
+
+        /// `view` in a window, with the pop-up `opener` finds (it returns the closure that opens it; it is given the hosting view and the window's title) opened:
+        /// the window and the menu are captured while it tracks. Returns the menu's items, nil when `opener` found none.
+        private func menuShot<V: View>(_ name: String, _ view: V, _ size: CGSize, opener: (NSView, String) async -> (() -> Void)?) async -> [String]? {
+            let w = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.titled], backing: .buffered, defer: false)
+            w.title = name
+            let host = NSHostingView(rootView: view.environment(model))
             w.contentView = host
             w.setFrameTopLeftPoint(NSPoint(x: 80, y: (NSScreen.main?.frame.height ?? 900) - 60))
             NSApp.activate(ignoringOtherApps: true)
             w.makeKeyAndOrderFront(nil)
             try? await Task.sleep(for: .seconds(delay))
-            // The ⋯ buttons are popup buttons, top to bottom: the added engine's, then the profile rows' (Messages, Safari, Visual Novel).
-            let popups = views(host).filter { String(describing: type(of: $0)).contains("PopupButton") }
-                .sorted { $0.convert($0.bounds, to: nil).maxY > $1.convert($1.bounds, to: nil).maxY }
-            guard popups.count == 4, let button = popups[1] as? NSButton else {
-                print("\(name): FAIL the ⋯ button of the Messages row was not found among \(popups.count) popup buttons")
+            guard let open = await opener(host, w.title) else {
+                print("\(name): the pop-up was not found")
                 w.orderOut(nil)
-                return
+                return nil
             }
             nonisolated(unsafe) var titles: [String] = []
             nonisolated(unsafe) var tracked: NSMenu?
@@ -830,16 +1052,15 @@ enum UICapture {
                 }
             }
             RunLoop.main.add(t, forMode: .common)
-            button.performClick(nil)
+            open()
+            // An accessibility press may return before the menu tracks: the run loop gets time for the timer.
+            try? await Task.sleep(for: .seconds(2))
             t.invalidate()
             NotificationCenter.default.removeObserver(token)
             print("wrote \(path)")
             backdrop.orderOut(nil)
-            let memory = titles.firstIndex(of: String(localized: "Memory…")), forget = titles.firstIndex(of: String(localized: "Forget This App"))
-            let paragraphs = titles.firstIndex(of: String(localized: "Paragraphs"))
-            print("memory-menu: \(titles)")
-            print("memory-menu: \(paragraphs != nil && memory != nil && forget != nil && paragraphs! < memory! && memory! < forget! ? "PASS" : "FAIL") Memory… sits below Paragraphs and above Forget This App")
             w.orderOut(nil)
+            return titles
         }
 
         // MARK: capture
@@ -873,7 +1094,7 @@ enum UICapture {
 
         /// A lens pill over a page-like backdrop; the screen area around it is captured.
         /// - `app`: the app the menu's memory block is about (`RegionSession.appUnderLens`); the page is taller then, for the longer menu.
-        private func lens(_ name: String, badge: String?, notice: String?, menu: Bool = false, app: LensWatch.Read? = nil) async {
+        private func lens(_ name: String, badge: String?, notice: String?, menu: Bool = false, app: LensWatch.Read? = nil, submenu: Bool = false) async {
             let screen = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1512, height: 982)
             let region = NSRect(x: 200, y: screen.height - 520, width: 400, height: 150)
             var content = region.insetBy(dx: -40, dy: -70).offsetBy(dx: 0, dy: -10)
@@ -900,7 +1121,12 @@ enum UICapture {
                 config.follow(nil)
                 let session = RegionSession(config: config, settings: model.settings, translator: model.translator, inpainter: nil)
                 if let app { session.appUnderLens = { _ in app } }
-                let m = session.contextMenu()
+                var m = session.contextMenu()
+                // The Profile item's submenu on its own, as it opens beside the item (a menu cannot be asked to open a submenu without a pointer).
+                if submenu, let holder = m.items.first(where: { $0.submenu != nil }), let sub = holder.submenu {
+                    holder.submenu = nil
+                    m = sub
+                }
                 // Menu tracking runs the run loop in its own mode: the capture has to be timed in common modes.
                 nonisolated(unsafe) let menu = m   // the timer fires on the main run loop, during menu tracking
                 let t = Timer(timeInterval: 0.8, repeats: false) { _ in

@@ -41,7 +41,7 @@ enum NamesLensChecks {
         let read = LensWatch.Read(bundleID: app, appName: appName, title: "")
 
         /// The menu of a lens over `app` (nil: over nothing known), unanchored, as `contextMenu()` builds it. `confirm` answers the alert.
-        func lensMenu(over app: LensWatch.Read?, confirm: @escaping @MainActor (String, Int) -> Bool = { _, _ in false }) -> NSMenu {
+        func lensMenu(over app: LensWatch.Read?, confirm: @escaping @MainActor (String, Int, Bool) -> Bool = { _, _, _ in false }) -> NSMenu {
             var config = RegionConfig(name: "Safari", rect: CGRect(x: 200, y: 300, width: 360, height: 200))
             config.follow(nil)
             let session = RegionSession(config: config, settings: model.settings, translator: model.translator, inpainter: nil)
@@ -137,21 +137,28 @@ enum NamesLensChecks {
         // MARK: G1: Forget asks when there is a memory
         start(profiles: [rich])
         var asked: [(String, Int)] = []
-        let cancelled = lensMenu(over: read) { a, n in asked.append((a, n)); return false }
+        let cancelled = lensMenu(over: read) { a, n, _ in asked.append((a, n)); return false }
         click(item(cancelled, forget))
         check("Forget <App>… on an app with memory asks first, with the app and the count of its names; Cancel keeps everything",
               item(cancelled, forgetLanguages) == nil && asked.count == 1 && asked[0].0 == appName && asked[0].1 == 2 && model.profile(for: app) == rich,
               "asked \(asked)")
-        let confirmed = lensMenu(over: read) { _, _ in true }
+        let confirmed = lensMenu(over: read) { _, _, _ in true }
         click(item(confirmed, forget))
         check("and removes the profile with its memory when the answer is yes", model.profile(for: app) == nil)
         start(profiles: [AppProfile(bundleID: app, appName: appName, source: "ja", target: "en")])
         asked = []
-        let bare = lensMenu(over: read) { a, n in asked.append((a, n)); return true }
+        let bare = lensMenu(over: read) { a, n, _ in asked.append((a, n)); return true }
         check("an app with languages only keeps today's Forget Languages for <App>, with no alert",
               item(bare, forget) == nil && item(bare, forgetLanguages) != nil)
         click(item(bare, forgetLanguages))
         check("which removes the profile without asking", asked.isEmpty && model.profile(for: app) == nil)
+        // 2026-10-21 (round ui-all, addendum A3): the alert says "Its note and n names" only for a profile that has a note; the lens tells it.
+        var notes: [Bool] = []
+        for profile in [AppProfile(bundleID: app, appName: appName, source: "ja", target: "en", entries: names), rich] {
+            start(profiles: [profile])
+            click(item(lensMenu(over: read) { _, _, hasNote in notes.append(hasNote); return false }, forget))
+        }
+        check("the Forget alert is told whether the profile has a note: no for names alone, yes for a note and names", notes == [false, true], "\(notes)")
         let alert = LensMemoryMenu.forgetAlert(app: appName, names: 12)
         check("the alert names the app and the count, has Forget (destructive) and Cancel",
               alert.messageText.contains(appName) && alert.informativeText.contains("12") && alert.buttons.count == 2
@@ -164,7 +171,7 @@ enum NamesLensChecks {
         opening.setNote("")
         _ = opening.addRow()
         check("opening the sheet of an app with no profile makes none, and the sheet is not 'gone'; an empty edit makes none either",
-              model.settings.appProfiles.isEmpty && !opening.gone && opening.appName == appName, "\(model.settings.appProfiles.count)")
+              model.settings.appProfiles.isEmpty && !opening.gone && opening.title == appName, "\(model.settings.appProfiles.count)")
         let engine = ContextChecks.engine("openai", base: URL(string: "http://127.0.0.1:1")!)
         for (label, source, target, custom) in [("the base pair", "ja", "ko", false), ("the base pair and engine", "en", "de", true)] {
             start(source: source, target: target)

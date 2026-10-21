@@ -47,17 +47,17 @@ enum EngineContextChecks {
               [cloud, local, anthropic].allSatisfy(EngineContextRules.asksLearned) && !EngineContextRules.asksLearned(deepL)
               && EngineContextRules.asksDeepLNotes(deepL) && ![cloud, local, anthropic].contains(where: EngineContextRules.asksDeepLNotes))
 
-        // The summary, and what the Sent line and the footnote say (their words are checked in the file that owns them).
-        let on3 = EngineContext(enabled: true, previousLines: 3)
-        let offKept = EngineContext(enabled: false, previousLines: 5, includeTitle: true, useLearned: true, deepLInstructions: true)
-        check("the collapsed line says Off when off (whatever the other switches hold) and the number of lines when on",
-              EngineContextRules.summary(nil) == String(localized: "Off") && EngineContextRules.summary(offKept) == String(localized: "Off")
-              && EngineContextRules.summary(on3).contains("3") && EngineContextRules.summary(on3) != EngineContextRules.summary(EngineContext(enabled: true, previousLines: 5)))
+        // The summary, and what the Sent line and the footnote say (their words are checked in the file that owns them). The collapsed line is
+        // All apps' amount in words (design §6.5): the one the person set, "names and note" while none is.
+        let on3 = AppContextOverride(mode: .conversation, previousLines: 3)
+        check("the collapsed line says what All apps' amount sends: names and note when none is set, only the line when off, the number of lines when a conversation",
+              EngineContextRules.summary(nil) == String(localized: "names and note") && EngineContextRules.summary(AppContextOverride(mode: .off)) == String(localized: "only the line")
+              && EngineContextRules.summary(AppContextOverride(mode: .nearby)) == String(localized: "nearby lines")
+              && EngineContextRules.summary(on3).contains("3") && EngineContextRules.summary(on3) != EngineContextRules.summary(AppContextOverride(mode: .conversation, previousLines: 5)))
         EngineContextSent.checks(model) { what, ok, note in check(what, ok, note) }
 
-        // What a control writes: settings.json, live, and the line follows. The Context section of the sheet is still the one of 1.1.4 (round
-        // R4 rebuilds it over the new keys; prof-file, 2026-10-21, addendum A3). What these checks pin is what such a control will write: All apps'
-        // `context` (the amount), `useLearned`, and the engine's `allow`, set on the model the way the controls will.
+        // What a control writes: settings.json, live, and the line follows. The Context section writes All apps' `context` (the amount) and
+        // `useLearned` through `AppModel`, and the engine's `allow` through `EngineContextRules.update` (design names-and-context §6.5).
         let e = EngineConfig(name: "Context check", kind: cloud)
         model.settings.engines = [e]
         model.settings.customEngineID = e.id
@@ -73,7 +73,7 @@ enum EngineContextChecks {
               && ContextChecks.plan(model.settings, engine: model.settings.activeEngineConfig) == nil)
         model.settings.context = AppContextOverride(mode: .nearby, previousLines: 0)
         let lineOn = EngineContextSent.line(for: model.settings.engines[0], in: model)
-        check("Use context on writes settings.json at once, and the Sent line changes with it",
+        check("an amount of nearby lines writes settings.json at once, and the Sent line changes with it",
               fileContext()?["mode"] as? String == "nearby" && lineOn != lineOff && !lineOn.isEmpty, "\(lineOff) → \(lineOn)")
         model.settings.context = AppContextOverride(mode: .conversation, previousLines: 6)
         model.settings.engines[0].allow.title = true
@@ -95,8 +95,17 @@ enum EngineContextChecks {
         check("the amount off, with the title and learning still set, is Off: the file says so, there is no context plan, and the request is Off's bytes",
               fileContext()?["mode"] as? String == "off" && ContextChecks.plan(model.settings, engine: model.settings.activeEngineConfig) == nil
               && !offBodies.contains(false), "\(offBodies)")
+        // The lines switch (off this Mac): `allow.lines` false is written, and with a conversation asked the Sent line says what goes now.
+        model.settings.context = AppContextOverride(mode: .conversation, previousLines: 6)
+        let lineAsked = EngineContextSent.line(for: model.settings.engines[0], in: model)
+        EngineContextRules.update(e.id, in: model) { $0.lines = false }
+        check("the lines switch writes engines[].allow.lines false and the Sent line drops the lines around",
+              fileAllow()?["lines"] as? Bool == false && EngineContextSent.line(for: model.settings.engines[0], in: model) != lineAsked,
+              "\(lineAsked) → \(EngineContextSent.line(for: model.settings.engines[0], in: model))")
+        EngineContextRules.update(e.id, in: model) { $0.lines = true; $0.title = false }
+        check("turned back to their defaults, the lines and the title write nothing: no allow key in the file", fileAllow() == nil, "\(String(describing: fileAllow()))")
         let beforeGone = model.settings.engines
-        EngineContextRules.update(UUID(), in: model) { $0.enabled = true }
+        EngineContextRules.update(UUID(), in: model) { $0.title = true }
         check("a control of an engine that is gone writes nothing", model.settings.engines == beforeGone)
 
         // Reduce Motion.
@@ -148,25 +157,29 @@ enum EngineContextChecks {
         func labels(_ items: [AccessibilityChecks.Item]) -> [String] { items.map(\.label) }
         func place(_ items: [AccessibilityChecks.Item], _ label: String) -> Int? { items.firstIndex { $0.label == label } }
 
-        var chat = EngineConfig(name: "Context chat", kind: cloud)
-        chat.context = EngineContext(enabled: true, previousLines: 3)
+        let chat = EngineConfig(name: "Context chat", kind: cloud)
         // The footnote says that lines go along when All apps' amount sends them (round prof-file: the engine's own switch is All apps' `context`).
         // An engine is sent lines when a chain that uses it asks for them, so the chat engine is the one in use.
         model.settings.context = AppContextOverride(mode: .conversation, previousLines: 3)
         model.settings.customEngineID = chat.id
         let chatSheet = await shown("chat", chat)
+        // What the open sheet says is the summary of the amount it was shown with (the context changes below; integration 2026-10-21).
+        let chatSaid = "AXValueDescription=\(EngineContextRules.summary(model.settings.context))"
         let chatItems = chatSheet.items
         let sentLine = EngineContextSent.line(for: chat, in: model)
         // What starts the Sent line in the app's language: the collapsed section is checked for it below, so it has to recognise the line.
         let sentPrefix = String(localized: "Sent: \("")")
         check("the start the checks look for tells the Sent line in the app's language", sentLine.hasPrefix(sentPrefix), sentLine)
-        let order = ["Test", "Context", "Use context", "Previous lines", "Include window title", "Learn names and terms"]
+        let order = ["Test", "Context", "For all apps", "Earlier lines", "Learn names and terms", "Send the lines around the text", "Send the window title"]
             .map { name in place(chatItems, NSLocalizedString(name, comment: "")) }
             + [chatItems.firstIndex { $0.value == sentLine }, place(chatItems, String(localized: "Advanced"))]
         let found = order.compactMap { $0 }
         check("the chat sheet shows Context between the sample result and Advanced: its controls in order, then the Sent line",
               found.count == order.count && zip(found, found.dropFirst()).allSatisfy { $0 < $1 },
               "order \(order) in \(labels(chatItems).filter { !$0.isEmpty })")
+        check("the cloud engine's open Context has Send the window title off, as it ships (the title can hold text from elsewhere, so it is off this Mac)",
+              chatItems.first { $0.label == String(localized: "Send the window title") }?.value == "0",
+              "\(chatItems.first { $0.label == String(localized: "Send the window title") }?.line ?? "no such element")")
         let footnotes = EngineContextSent.footnotes(for: chat, in: model)
         check("the sheet of an engine whose context is on says under the box that allows sending what goes along, in the words the footnote gives",
               !footnotes.isEmpty && footnotes.allSatisfy { note in chatItems.contains { $0.value == note } }, "\(footnotes) in \(chatItems.map(\.value).filter { !$0.isEmpty })")
@@ -175,18 +188,16 @@ enum EngineContextChecks {
               AccessibilityChecks.unlabeled(chatItems).map(\.line).joined(separator: "; "))
         model.settings.context = nil
 
-        var deepLEngine = EngineConfig(name: "Context DeepL", kind: deepL)
-        deepLEngine.context = EngineContext(enabled: true, previousLines: 3)
+        let deepLEngine = EngineConfig(name: "Context DeepL", kind: deepL)
         let deepLItems = await tree("deepl", deepLEngine)
         check("the DeepL sheet shows the notes switch after the title switch, and no Learn names and terms",
               place(deepLItems, String(localized: "Use my notes with DeepL")) != nil && place(deepLItems, String(localized: "Learn names and terms")) == nil
-              && place(deepLItems, String(localized: "Include window title")).map { $0 < (place(deepLItems, String(localized: "Use my notes with DeepL")) ?? 0) } == true)
+              && place(deepLItems, String(localized: "Send the window title")).map { $0 < (place(deepLItems, String(localized: "Use my notes with DeepL")) ?? 0) } == true)
 
-        var localEngine = EngineConfig(name: "Context local", kind: local)
-        localEngine.context = EngineContext(enabled: true, previousLines: 3)
+        let localEngine = EngineConfig(name: "Context local", kind: local)
         let localItems = await tree("local", localEngine)
         check("the sheet of a server on this Mac has no window title switch",
-              place(localItems, String(localized: "Use context")) != nil && place(localItems, String(localized: "Include window title")) == nil)
+              place(localItems, String(localized: "For all apps")) != nil && place(localItems, String(localized: "Send the window title")) == nil)
 
         let templateItems = await tree("template", EngineConfig(name: "Context template", kind: template))
         let commandItems = await tree("command", EngineConfig(name: "Context command", kind: command))
@@ -198,19 +209,19 @@ enum EngineContextChecks {
         let collapsed = collapsedSheet.items
         // The summary is the group's accessibility value (AXValueDescription, what a screen reader says after the name; AXValue stays
         // the open or shut state the system keeps).
-        let said = "AXValueDescription=\(EngineContextRules.summary(chat.context))"
+        let said = "AXValueDescription=\(EngineContextRules.summary(model.settings.context))"
         check("collapsed, the section shows its name alone: no controls, no Sent line; its value is the summary",
-              place(collapsed, String(localized: "Context")) != nil && place(collapsed, String(localized: "Use context")) == nil
+              place(collapsed, String(localized: "Context")) != nil && place(collapsed, String(localized: "For all apps")) == nil
               && !collapsed.contains { $0.value.hasPrefix(sentPrefix) } && collapsedSheet.triangle.contains(said) && collapsedSheet.triangle.contains("AXDisclosing=0"),
               "\(collapsedSheet.triangle) in \(labels(collapsed).filter { !$0.isEmpty }.joined(separator: ", "))")
         check("open, the section keeps the same value, and the system says it is open",
-              chatSheet.triangle.contains(said) && chatSheet.triangle.contains("AXDisclosing=1"), "\(chatSheet.triangle)")
+              chatSheet.triangle.contains(chatSaid) && chatSheet.triangle.contains("AXDisclosing=1"), "\(chatSheet.triangle)")
 
-        var claude = EngineConfig(name: "Context Anthropic", kind: anthropic)
-        claude.context = EngineContext(enabled: true, previousLines: 3)
+        model.settings.context = nil
+        let claude = EngineConfig(name: "Context Anthropic", kind: anthropic)
         let anthropicItems = await tree("anthropic", claude)
         check("the Anthropic sheet has the section, with the title switch and Learn names and terms, and no DeepL notes switch",
-              place(anthropicItems, String(localized: "Context")) != nil && place(anthropicItems, String(localized: "Include window title")) != nil
+              place(anthropicItems, String(localized: "Context")) != nil && place(anthropicItems, String(localized: "Send the window title")) != nil
               && place(anthropicItems, String(localized: "Learn names and terms")) != nil && place(anthropicItems, String(localized: "Use my notes with DeepL")) == nil)
         return failed
     }

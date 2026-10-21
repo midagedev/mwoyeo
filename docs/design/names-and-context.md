@@ -194,13 +194,14 @@ Apple Translation, templates and commands are outside the table: they take only 
 | `engines[j].context.enabled == false` | `engines[j].allow.lines = false` | only when the top-level amount sends lines and no profile does |
 | `engines[j].context.useLearned` | `useLearned` (top-level, profile) | from the same engine as the amount; a profile whose own engine differs gets its own |
 | `.includeTitle`, `.deepLInstructions` | `allow.title`, `allow.deepLInstructions` | copied when `enabled` was on, else false (they did nothing, `EngineContext.swift:57-62`) |
-| `appleUsesPinnedTerms: true` | `entries[].apply = "both"` on every user row; `glossaryApply: "both"` | A3; false or absent → nothing written (`hint`): Apple stays exactly as today |
+| `appleUsesPinnedTerms: true` | `entries[].apply = "both"` on the user rows of each profile whose engine in effect is Apple (its own, else All apps', else Apple); `glossaryApply: "both"` when All apps' is | A3; per engine in effect, because the switch only ever changed Apple and `both` costs LLM engines (R7, 2026-10-21: the judge preferred `hint` over `both` on name lines 76:41, p = 0.002); other rows and the glossary keep their mode; false or absent → nothing written (`hint`): Apple stays exactly as today |
 | `glossary`, `sourceLanguage`, `targetLanguage`, `customEngineID`, `engine`, `paragraphReader` | unchanged | All apps' fields |
 
 - Every request a 1.1.4 file made is made again, except four cases, pinned as a list in R3's gate: (a) a lens over app B while A is in
   front uses B's pair and engine (Q1); (b) a spare engine's own `previousLines` follows the profile amount (the only value with no new
   home); (c) an engine with context off × an app whose override sent lines × another engine with context on: the new rules apply;
-  (d) with the Apple switch on, engines other than Apple Translation also get those names put into the source (`both`; R7 measures it).
+  (d) with the Apple switch on, the rows of a profile whose engine in effect is Apple (Apple Translation, or Foundation Models, which takes replace rows now)
+  become `both`; the rows of a profile on an added engine keep their mode, so no added engine gets names put into the source (user, 2026-10-21, after R7).
 - Before the first save in the new shape the file is copied once to `settings-1.1.4.json` beside it. `appProfiles`,
   `engines[].context` and `appleUsesPinnedTerms` are read, never written; with both `profiles` and `appProfiles`, the latter is ignored.
 
@@ -382,12 +383,13 @@ The user: "ai 번역시에 토큰을 소모하는 문맥주입과 소모하지 �
   then the glossary pairs (when `glossaryApply` is not hint) whose source the chain lacks; no switch gates it. `ApplePreinsertion`
   (longest match, plural, capital) inserts for every kind; the answer check and plain retry stay Apple's (`TranslationService.swift:1103-1120`).
 - **Default path, byte for byte**: absent `apply` is hint, so with no replace or both row Apple gets today's request, and the glossary
-  keeps today's survived-term output patch (`:825-832`). The switch's migration is §5.2; its toggles go (§6).
+  keeps today's survived-term output patch (`:825-832`). The switch's migration is §5.2; its toggles go (§6). The migration is per engine in
+  effect (user, 2026-10-21): R7 measured `hint` over `both` for names on LLM engines (76:41, p = 0.002), so only Apple's rows become `both`.
 - **A new row's mode** (the sheet sets it when the row is first stored): **both** when the profile's engine takes no hints (Apple
   Translation, FM, a template, a command) and the name has 2+ characters, so a name written for Apple works at once (§6.3); else
   **hint**: no source change unless asked; a one-character Han `src` replaced breaks a word (王 in 王様) where a hint costs one row. A
-  row without `apply` (an older file, an agent) is hint. **Both is better for names** (person or place) where Apple translates, and
-  likely on LLMs (final form plus gender; R7 measures it): with Apple in effect the pop-up marks Both "recommended for names".
+  row without `apply` (an older file, an agent) is hint. **Both is better for names** (person or place) where Apple translates; on LLM
+  engines R7 measured the opposite (the judge preferred `hint` over `both` on name lines 76:41, p = 0.002): with Apple in effect the pop-up marks Both "recommended for names".
 - **Replacing in the OUTPUT** breaks Korean particles (은/는, 이/가 after a different final consonant): only as an explicit
   after-rewrite (`rewrite-rules.md`), with that warning beside it.
 - **Cost, in the row's details** (§6.3, L2): a "Use" pop-up, "Tell the translator · ≈ n tokens", "Swap into the text · free", "Both

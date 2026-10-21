@@ -310,6 +310,25 @@ enum TextRecognizer {
     static let traceReads = ProcessInfo.processInfo.environment["MWOYEO_TRACE_READS"] != nil
     #endif
 
+    /// `MWOYEO_DUMP_READS=<dir>` (with `MWOYEO_TRACE_READS`) writes the picture of every read as `<dir>/read-<n>-<kind>.png` and names it in
+    /// the `[read]` trace, so that a line a live read dropped can be read again from the very pixels it was given
+    /// (`tools/ocr-probe/lines.swift`). The App Store build has no such switch.
+    #if MAS
+    static func dumpRead(_ image: CGImage, kind: ReadKind, roi: CGRect?) {}
+    #else
+    private static let readDumpDirectory = ProcessInfo.processInfo.environment["MWOYEO_DUMP_READS"].map { URL(fileURLWithPath: $0) }
+    private static let readDumpCount = OSAllocatedUnfairLock(initialState: 0)
+    static func dumpRead(_ image: CGImage, kind: ReadKind, roi: CGRect?) {
+        guard let dir = readDumpDirectory else { return }
+        let n = readDumpCount.withLock { n -> Int in n += 1; return n }
+        let url = dir.appendingPathComponent(String(format: "read-%04d-%@.png", n, kind.rawValue))
+        guard let d = CGImageDestinationCreateWithURL(url as CFURL, "public.png" as CFString, 1, nil) else { return }
+        CGImageDestinationAddImage(d, image, nil)
+        CGImageDestinationFinalize(d)
+        FileHandle.standardError.write("[read]\t\(kind.rawValue)\timage\t\(url.path)\t\(roi.map { "\($0)" } ?? "-")\n".data(using: .utf8)!)
+    }
+    #endif
+
     static func printRead(_ kind: ReadKind, size: String, roi: CGRect?, _ out: VisionExec.Output) {
         func field(_ s: String) -> String { s.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\t", with: "\\t").replacingOccurrences(of: "\n", with: "\\n") }
         func rect(_ r: CGRect) -> String { "\(r.minX)\t\(r.minY)\t\(r.width)\t\(r.height)" }

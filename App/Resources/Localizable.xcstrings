@@ -11851,76 +11851,6 @@
         }
       }
     },
-    "Foundation Models follows your glossary · for names in games and stories": {
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Foundation Models가 용어집을 지켜 번역 · 게임·작품 고유명사에"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Foundation Modelsが用語集に従って翻訳 · ゲームや物語の固有名詞に"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Foundation Models 会遵循你的术语表 · 适合游戏和故事中的专有名词"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Foundation Models 會遵循你的詞彙表 · 適合遊戲和故事中的專有名詞"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Foundation Models hält sich an Ihr Glossar · für Namen in Spielen und Geschichten"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Foundation Models respecte votre glossaire · pour les noms de jeux et d’histoires"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Foundation Models respeta tu glosario · para nombres de juegos e historias"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Foundation Models следует вашему глоссарию · для имён в играх и историях"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O Foundation Models segue seu glossário · para nomes em jogos e histórias"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Foundation Models segue il tuo glossario · per i nomi in giochi e storie"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Foundation Models дотримується вашого глосарія · для імен у іграх та історіях"
-          }
-        }
-      }
-    },
     "Free key at aistudio.google.com": {
       "extractionState": "manual",
       "localizations": {
@@ -35378,6 +35308,72 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Solid"
+          }
+        }
+      }
+    },
+    "Apple Intelligence follows your glossary exactly · for names in games and stories": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Intelligence가 용어집을 그대로 지켜 번역 · 게임·작품 고유명사에"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Apple Intelligence follows your glossary exactly · for names in games and stories"
+          }
+        }
+      }
+    },
+    "Its note is removed.": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "메모도 함께 지워집니다."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Its note is removed."
+          }
+        }
+      }
+    },
+    "Its %lld names are removed.": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Its %lld name is removed."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Its %lld names are removed."
+                }
+              }
+            }
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이름 %lld개도 함께 지워집니다."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Its %lld names are removed."
           }
         }
       }

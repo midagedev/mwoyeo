@@ -14,6 +14,9 @@ final class ReaderWorker: NSObject, ReaderXPC {
     /// A read slower than this is logged with its kind (design §4.15; the lens patience S).
     private static let slowMs = 8000.0
 
+    /// The programs of this process were read once (`verifyPrograms`); the worker's queue is the only user.
+    private var programsChecked = false
+
     init(role: ReaderRole) { self.role = role }
 
     func read(_ job: Data, surface: IOSurface?, bytes: Data?, reply: @escaping (Data) -> Void) {
@@ -39,10 +42,10 @@ final class ReaderWorker: NSObject, ReaderXPC {
 
     private func answer(_ data: Data, surface: IOSurface?, bytes: Data?) -> Data {
         let began = ProcessInfo.processInfo.systemUptime
-        func reply(_ id: UInt64, lines: [ReadLine] = [], paragraphs: [[ReadLine]] = [], error: ReadFailure? = nil) -> Data {
+        func reply(_ id: UInt64, lines: [ReadLine] = [], paragraphs: [[ReadLine]] = [], error: ReadFailure? = nil, lowConfidence: Int = 0) -> Data {
             let ms = (ProcessInfo.processInfo.systemUptime - began) * 1000
             let r = ReadReply(id: id, role: role, pid: getpid(), lines: lines, paragraphs: paragraphs, ms: ms,
-                              footprint: ReaderWire.physFootprint(), error: error)
+                              footprint: ReaderWire.physFootprint(), error: error, lowConfidence: lowConfidence)
             return (try? ReaderWire.encode(r)) ?? Data()
         }
         guard let job = try? ReaderWire.decode(ReadJob.self, from: data) else {
@@ -62,11 +65,13 @@ final class ReaderWorker: NSObject, ReaderXPC {
         }
 
         let output: VisionExec.Output
+        let lowConfidence: Int
         let picture = image
         do {
-            output = try Self.blocking {
-                try await VisionExec.run(job.kind, image: picture, roi: job.roi, languages: job.languages,
-                                         documentLanguages: job.documentLanguages, customWords: job.customWords)
+            if role == .lines, job.fake.isEmpty, !programsChecked { try verifyPrograms(); programsChecked = true }
+            (output, lowConfidence) = try Self.blocking {
+                try await VisionExec.runCounting(job.kind, image: picture, roi: job.roi, languages: job.languages,
+                                                 documentLanguages: job.documentLanguages, customWords: job.customWords)
             }
         } catch {
             let failure = ReadFailure.from(error)
@@ -77,13 +82,52 @@ final class ReaderWorker: NSObject, ReaderXPC {
         func wired(_ line: OCRLine) -> ReadLine { shift == 0 ? VisionExec.wire(line) : VisionExec.wire(line).shifted(by: shift) }
         let out: Data
         switch output {
-        case let .lines(lines): out = reply(job.id, lines: lines.map(wired))
-        case let .paragraphs(paragraphs): out = reply(job.id, paragraphs: paragraphs.map { $0.map(wired) })
+        case let .lines(lines): out = reply(job.id, lines: lines.map(wired), lowConfidence: lowConfidence)
+        case let .paragraphs(paragraphs): out = reply(job.id, paragraphs: paragraphs.map { $0.map(wired) }, lowConfidence: lowConfidence)
         }
         let ms = (ProcessInfo.processInfo.systemUptime - began) * 1000
         if ms > Self.slowMs { log.notice("kind=\(job.kind.rawValue, privacy: .public) ms=\(Int(ms)) (slow)") }
         return out
     }
+
+    /// Reads the drawn page of `ProgramCheck` with the programs this process has, once, before the first read: programs that leave
+    /// whole widths of lines out of every answer are dropped with their cache and compiled again by the next process (the host sees
+    /// the exit as a crash, restarts the service and reads again). The read that is the first of a cold cache is also the compile, so
+    /// the page costs a compile nothing; a cache that was read and found good once for this build is not read again.
+    private func verifyPrograms() throws {
+        let id = Bundle.main.bundleIdentifier ?? "", osBuild = Self.osBuild
+        guard let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else { return }
+        let build = Self.buildIdentity
+        if E5Programs.isVerified(bundleID: id, in: caches, osBuild: osBuild, build: build) { return }
+        let drawn = VisionExec.checkLines, read = try VisionExec.checkRead()
+        let resets = E5Programs.resetsSoFar(bundleID: id, in: caches, osBuild: osBuild)
+        switch ProgramCheck.verdict(drawn: drawn, read: read, resetsSoFar: resets) {
+        case .good:
+            E5Programs.markVerified(bundleID: id, in: caches, osBuild: osBuild, build: build)
+            log.notice("programs read \(read, privacy: .public) of \(drawn, privacy: .public) lines of the check page")
+        case .reset:
+            log.error("programs read \(read, privacy: .public) of \(drawn, privacy: .public) lines of the check page: dropping the cache (reset \(resets + 1, privacy: .public))")
+            if E5Programs.reset(bundleID: id, in: caches, osBuild: osBuild) { exit(0) }
+            log.error("programs: the cache was not found, serving as it is")
+        case .stillBad:
+            log.error("programs read \(read, privacy: .public) of \(drawn, privacy: .public) lines of the check page after \(resets, privacy: .public) resets: serving as it is")
+        }
+    }
+
+    /// The system build (`kern.osversion`), which the e5rt cache is made per.
+    private static let osBuild: String = {
+        var size = 0
+        sysctlbyname("kern.osversion", nil, &size, nil, 0)
+        var bytes = [CChar](repeating: 0, count: size)
+        sysctlbyname("kern.osversion", &bytes, &size, nil, 0)
+        return String(cString: bytes)
+    }()
+
+    /// This service binary: its modification time (a build of the same version differs in it), which the compiled programs belong to.
+    private static let buildIdentity: String = {
+        let modified = (Bundle.main.executablePath.flatMap { try? FileManager.default.attributesOfItem(atPath: $0)[.modificationDate] as? Date })
+        return String(Int(modified?.timeIntervalSince1970 ?? 0))
+    }()
 
     /// Runs async work to its end on this (the worker's) thread: the Swift document request is async, the job is not.
     private static func blocking<T: Sendable>(_ work: @escaping @Sendable () async throws -> T) throws -> T {

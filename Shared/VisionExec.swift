@@ -58,24 +58,32 @@ enum VisionExec {
     /// answers; a compile is never aborted from here.
     static func run(_ kind: ReadKind, image: CGImage?, roi: CGRect?, languages: [String], documentLanguages: [Locale.Language],
                     customWords: [String]) async throws -> Output {
+        try await runCounting(kind, image: image, roi: roi, languages: languages, documentLanguages: documentLanguages, customWords: customWords).output
+    }
+
+    /// `run`, and how many lines it left out for a confidence under `minConfidence` (the reply carries it to the host's stats).
+    static func runCounting(_ kind: ReadKind, image: CGImage?, roi: CGRect?, languages: [String], documentLanguages: [Locale.Language],
+                            customWords: [String]) async throws -> (output: Output, lowConfidence: Int) {
         switch kind {
         case .rev3, .rev2, .fast:
             guard let image else { throw Failure(description: "\(kind.rawValue) read without a picture") }
-            return .lines(try readLines(kind, in: image, roi: roi, languages: languages, customWords: customWords))
+            let read = try readCounting(kind, in: image, roi: roi, languages: languages, customWords: customWords)
+            return (.lines(read.lines), read.lowConfidence)
         case .doc:
             #if READER_SERVICE
             guard let image else { throw Failure(description: "doc read without a picture") }
-            return .paragraphs(try await documentLines(in: image, roi: roi, languages: documentLanguages, customWords: customWords))
+            return (.paragraphs(try await documentLines(in: image, roi: roi, languages: documentLanguages, customWords: customWords)), 0)
             #else
             throw Failure(description: "documents are read by the Docs service")
             #endif
         case .warmLines:
             guard let picture = probePicture else { throw Failure(description: "the probe picture could not be drawn") }
-            return .lines(try recognize(in: picture, roi: nil, level: .accurate, revision: 3, customWords: [], identifiers: []))
+            let read = try recognize(in: picture, roi: nil, level: .accurate, revision: 3, customWords: [], identifiers: [])
+            return (.lines(read.lines), read.lowConfidence)
         case .warmDoc:
             #if READER_SERVICE
             guard let picture = probePicture else { throw Failure(description: "the probe picture could not be drawn") }
-            return .paragraphs(try await documentLines(in: picture, roi: nil, languages: documentLanguages, customWords: []))
+            return (.paragraphs(try await documentLines(in: picture, roi: nil, languages: documentLanguages, customWords: [])), 0)
             #else
             throw Failure(description: "documents are read by the Docs service")
             #endif
@@ -85,6 +93,11 @@ enum VisionExec {
     /// The Objective-C recognizer of `kind`, restricted to Vision's own `languages` identifiers (empty: detect). `.fast` has no
     /// custom words.
     static func readLines(_ kind: ReadKind, in image: CGImage, roi: CGRect?, languages: [String], customWords: [String]) throws -> [OCRLine] {
+        try readCounting(kind, in: image, roi: roi, languages: languages, customWords: customWords).lines
+    }
+
+    /// `readLines`, and how many lines it left out for a confidence under `minConfidence`.
+    static func readCounting(_ kind: ReadKind, in image: CGImage, roi: CGRect?, languages: [String], customWords: [String]) throws -> (lines: [OCRLine], lowConfidence: Int) {
         switch kind {
         case .rev3: try recognize(in: image, roi: roi, level: .accurate, revision: 3, customWords: customWords, identifiers: languages)
         case .rev2: try recognize(in: image, roi: roi, level: .accurate, revision: 2, customWords: customWords, identifiers: languages)
@@ -93,13 +106,16 @@ enum VisionExec {
         }
     }
 
+    /// The least confidence of a line Vision returns that is kept; a line under it is dropped, and counted (`reader: host … low-confidence`).
+    static let minConfidence: VNConfidence = 0.3
+
     /// The Objective-C recognizer, run to completion (the callers bound it). `identifiers` picks the languages to read (empty:
     /// detect).
     private static func recognize(in image: CGImage, roi: CGRect?, level: VNRequestTextRecognitionLevel, revision: Int?,
-                                  customWords: [String], identifiers: [String]) throws -> [OCRLine] {
+                                  customWords: [String], identifiers: [String]) throws -> (lines: [OCRLine], lowConfidence: Int) {
         let size = CGSize(width: image.width, height: image.height)
         // A region with no pixel in the picture has no origin, and Vision traps on it (v1.0.0 crash report): no request.
-        guard let region = regionOfInterest(roi, in: size) else { return [] }
+        guard let region = regionOfInterest(roi, in: size) else { return ([], 0) }
         let req = VNRecognizeTextRequest()
         req.recognitionLevel = level
         if let revision { req.revision = revision }
@@ -108,13 +124,16 @@ enum VisionExec {
         if identifiers.isEmpty { req.automaticallyDetectsLanguage = true } else { req.recognitionLanguages = identifiers }
         req.regionOfInterest = region
         try VNImageRequestHandler(cgImage: image).perform([req])
-        return (req.results ?? []).compactMap { obs -> OCRLine? in
-            guard let c = obs.topCandidates(1).first, c.confidence >= 0.3 else { return nil }
+        var low = 0
+        let lines = (req.results ?? []).compactMap { obs -> OCRLine? in
+            guard let c = obs.topCandidates(1).first else { return nil }
+            guard c.confidence >= minConfidence else { low += 1; return nil }
             let words = wordRanges(c.string).compactMap { r in
                 (try? c.boundingBox(for: r)).flatMap { $0 }.map { OCRWord(rect: pixelRect(unclip($0.boundingBox, from: region), in: size), range: r) }
             }
             return OCRLine(rect: pixelRect(unclip(obs.boundingBox, from: region), in: size), text: c.string, words: words)
         }
+        return (lines, low)
     }
 
     #if READER_SERVICE
@@ -261,4 +280,55 @@ enum VisionExec {
         }
         return ctx.makeImage()
     }()
+
+    // MARK: The page of the program check
+
+    /// The rows of the page the Lines service draws to read its own programs once (`ProgramCheck`): a type size and the width of the
+    /// line over the height of its box, which is what picks the width class a line is read in. Eleven widths (8 to 44 times) in
+    /// three sizes: 33 lines, 18 of them over 25 times, the band the bad cache of 2026-10-21 dropped. Times, in black on white.
+    static let checkRows: [(size: CGFloat, aspect: Double)] = [28, 38, 50].flatMap { size in
+        [8.0, 13, 18, 22, 25, 28, 31, 34, 37, 40, 44].map { (CGFloat(size), $0) }
+    }
+
+    static var checkLines: Int { checkRows.count }
+
+    /// The page: one line per row, 1.7 type sizes apart, 1920 px wide (a screen's width: the widest line a lens reads).
+    static let checkPicture: CGImage? = {
+        let words = "the quick brown fox jumps over a lazy dog while reading text in a long justified line of a paper about translation and noise floor".split(separator: " ")
+        func line(_ text: String, _ size: CGFloat) -> CTLine {
+            CTLineCreateWithAttributedString(NSAttributedString(
+                string: text, attributes: [NSAttributedString.Key(kCTFontAttributeName as String): CTFontCreateWithName("Times" as CFString, size, nil),
+                                           NSAttributedString.Key(kCTForegroundColorFromContextAttributeName as String): true]))
+        }
+        var lines: [(CTLine, CGFloat)] = []
+        for (i, row) in checkRows.enumerated() {
+            var text = "", next = i
+            // A box of Times type is about 0.95 of its size tall; the line grows by whole words to its aspect.
+            while CTLineGetTypographicBounds(line(text, row.size), nil, nil, nil) < row.aspect * Double(row.size) * 0.95 - 40 {
+                text += words[next % words.count] + " "
+                next += 1
+            }
+            lines.append((line(text, row.size), row.size))
+        }
+        let width = 1920, height = Int(lines.reduce(0.0) { $0 + Double($1.1) * 1.7 }) + 40
+        guard let ctx = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0,
+                                  space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
+        ctx.setFillColor(.white)
+        ctx.fill(CGRect(x: 0, y: 0, width: width, height: height))
+        ctx.setFillColor(.black)
+        var top = 20.0
+        for (line, size) in lines {
+            ctx.textPosition = CGPoint(x: 30, y: Double(height) - top - Double(size))
+            CTLineDraw(line, ctx)
+            top += Double(size) * 1.7
+        }
+        return ctx.makeImage()
+    }()
+
+    /// How many lines the Lines programs return for the page (`ProgramCheck.verdict`): the accurate revision 3 read with the language
+    /// detected, as the warm-up reads, whole page.
+    static func checkRead() throws -> Int {
+        guard let page = checkPicture else { throw Failure(description: "the check page could not be drawn") }
+        return try recognize(in: page, roi: nil, level: .accurate, revision: 3, customWords: [], identifiers: []).lines.count
+    }
 }

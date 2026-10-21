@@ -95,6 +95,7 @@ struct EngineSheet: View {
             buttons
         }
         .frame(width: 480, height: 560)
+        .onExitCommand { dismiss() }
         .task { await start() }
         .onDisappear {
             job?.cancel()
@@ -106,6 +107,18 @@ struct EngineSheet: View {
     // MARK: - Step 1
 
     private var pick: some View {
+        VStack(spacing: 0) {
+            // The sheet says what it is for (ui-audit-1-1-5 9.2), as the Memory sheet does.
+            HStack {
+                Text("Add a Translation Engine").font(.headline)
+                Spacer()
+            }
+            .padding(.horizontal, 20).padding(.top, 16).padding(.bottom, 4)
+            pickForm
+        }
+    }
+
+    private var pickForm: some View {
         Form {
             Section("On this Mac") {
                 ForEach(Self.localNames, id: \.self) { name in
@@ -258,11 +271,11 @@ struct EngineSheet: View {
                 } footer: {
                     VStack(alignment: .leading, spacing: 4) {
                         Group {
-                            Text("Your engine's provider handles that text under its own privacy policy.")
+                            Text("Your engine’s provider handles that text under its own privacy policy.")
                             ForEach(contextFootnotes, id: \.self) { Text(verbatim: $0) }
                         }
                         .foregroundStyle(.secondary)
-                        Link("Privacy Policy", destination: Distribution.privacyPolicy)
+                        Link("Mwoyeo Privacy Policy", destination: Distribution.privacyPolicy)
                     }
                     .font(.caption)
                 }
@@ -428,9 +441,14 @@ struct EngineSheet: View {
 
     private var buttons: some View {
         HStack {
-            Button("Cancel") { dismiss() }.keyboardShortcut(.cancelAction)
+            // A new engine past step 1 has Back where Cancel was, so the bar never shows Cancel, Back and Add together (ui-audit-1-1-5 9.3);
+            // Esc still closes the sheet (`onExitCommand` on the body).
+            if step != .pick, !isEdit {
+                Button("Back") { back() }
+            } else {
+                Button("Cancel") { dismiss() }.keyboardShortcut(.cancelAction)
+            }
             Spacer()
-            if step != .pick, !isEdit { Button("Back") { back() } }
             if step == .configure {
                 Button(isEdit ? "Save" : "Add") { commit() }
                     .keyboardShortcut(.defaultAction)

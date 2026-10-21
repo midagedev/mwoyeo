@@ -316,6 +316,11 @@ final class AppMemoryEditor {
     /// The line the Script's Test works on, and what it made of it.
     var sample = ""
     var testResult: ScriptTestResult?
+    /// The Test is waiting for the service: the sheet says so, so that a press is never a press with nothing to see (film3 D12, 2026-10-21).
+    var testing = false
+    /// How long the Test waits for the service before it ends with a line that says so. A parameter, so a check can shrink it. The connection itself answers
+    /// within its start budget (10 s) plus launchd's throttle (at most 10 s) and two calls of `RewriteLimits.lineBudgetMs`; this bounds a call that does not come back.
+    @ObservationIgnored var testBudget: Duration = .seconds(30)
     /// The side that runs and checks regex rows and scripts: the app's service, or a fake in a gate.
     @ObservationIgnored var service: any RewriteService = ScriptConnection.shared
     @ObservationIgnored var checking: Task<Void, Never>?

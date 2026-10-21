@@ -1,4 +1,5 @@
 import MwoyeoCore
+import os
 import SwiftUI
 
 /// The side that runs and checks regex rows and scripts (rewrite-rules §5): the app's `ScriptConnection`, or a fake in a gate. The sheet's Test and its
@@ -20,6 +21,8 @@ struct ScriptTestResult: Equatable {
 /// model is Core's (`RewriteRow`, `RewriteScript`, the limits of `RewriteLimits`); this adds the editing: drafts, the caps at the field, the checks
 /// (the pure ones always, the service's only when a pattern or a script is there, so a profile with none never starts it) and the Test.
 extension AppMemoryEditor {
+    private static let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "script")
+
     /// The rows stored for the profile (All apps' are the settings' own).
     var rewrites: [RewriteRow] { isAllApps ? model.settings.rewrites : (profile?.rewrites ?? []) }
     var script: RewriteScript? { isAllApps ? model.settings.script : profile?.script }
@@ -167,24 +170,72 @@ extension AppMemoryEditor {
     // MARK: Test
 
     /// "Test": the sample goes through the script alone, `before` and then `after` (on the lens's last translation, else on the sample). Nothing is sent.
-    /// A script the time limit cuts is turned off, as at run time (§5).
+    /// A script the time limit cuts is turned off, as at run time (§5). It always ends: in the two lines, or in a line that says what went wrong, within
+    /// `testBudget` (D12: a press that shows nothing is the one thing the Test must not do).
     func runTest() async {
-        guard let s = script, !s.source.isEmpty, !sample.isEmpty else { return }
+        guard let s = script, !s.source.isEmpty, !sample.isEmpty else {
+            Self.log.notice("script test: not run (script \(self.script?.source.isEmpty == false, privacy: .public), sample \(!self.sample.isEmpty, privacy: .public))")
+            return
+        }
+        guard !testing else { return }
+        testing = true
+        testResult = nil
+        defer { testing = false }
+        Self.log.notice("script test: running on a line of \(self.sample.count, privacy: .public) characters")
         let id = isAllApps ? AppProfile.allAppsID : (profile?.id ?? AppProfile.allAppsID)
         let context = RewriteContext(app: appBundleID ?? target.lensBundleID ?? "", profile: id, source: profile?.source ?? model.settings.sourceLanguage,
                                      target: profile?.target ?? model.settings.targetLanguage)
         let plan = RewritePlan(chain: [RewriteLayer(profile: id, script: RewriteScript(source: s.source, on: true))])
-        var session = RewriteSession(plan: plan, context: context, runner: service)
-        let sent = await session.before(sample)
-        let shown = await session.after(src: sent, dst: target.lensTranslation ?? sample)
+        let session = RewriteSession(plan: plan, context: context, runner: service)
+        let line = sample, translated = target.lensTranslation ?? line, budget = testBudget
+        let ran: TestRun? = await withCheckedContinuation { continuation in
+            let first = FirstAnswer(continuation)
+            Task {
+                var session = session
+                let sent = await session.before(line)
+                let shown = await session.after(src: sent, dst: translated)
+                first.resume(TestRun(sent: sent, shown: shown, turnedOff: !session.turnedOff.isEmpty, issue: session.issues.first))
+            }
+            Task {
+                try? await Task.sleep(for: budget)
+                first.resume(nil)
+            }
+        }
+        guard let ran else {
+            testResult = ScriptTestResult(before: line, after: line, issue: "\(RewriteText.serviceUnavailable) (no answer)")
+            Self.log.notice("script test: no answer within the budget")
+            return
+        }
         var issue: String?
-        if !session.turnedOff.isEmpty {
+        if ran.turnedOff {
             setScriptOn(false)
             issue = ScriptWords.turnedOff
-        } else if let found = session.issues.first {
+        } else if let found = ran.issue {
             issue = found.line.map { String(localized: "Line \($0): \(found.message)") } ?? found.message
         }
-        testResult = ScriptTestResult(before: sent, after: shown, issue: issue)
+        testResult = ScriptTestResult(before: ran.sent, after: ran.shown, issue: issue)
+        Self.log.notice("script test: answered (issue \(issue != nil, privacy: .public))")
+    }
+
+    /// What one Test made of the sample.
+    private struct TestRun: Sendable {
+        var sent: String
+        var shown: String
+        var turnedOff: Bool
+        var issue: RewriteIssue?
+    }
+
+    /// Resumes its continuation with the first of the two things that race for it (the session's end, the budget's end) and drops the second.
+    private final class FirstAnswer: @unchecked Sendable {
+        private let lock = NSLock()
+        private var continuation: CheckedContinuation<TestRun?, Never>?
+
+        init(_ continuation: CheckedContinuation<TestRun?, Never>) { self.continuation = continuation }
+
+        func resume(_ value: TestRun?) {
+            let c = lock.withLock { () -> CheckedContinuation<TestRun?, Never>? in defer { continuation = nil }; return continuation }
+            c?.resume(returning: value)
+        }
     }
 }
 
@@ -379,10 +430,12 @@ struct ScriptEditor: View {
                 .accessibilityLabel("A line to test")
                 .textFieldStyle(.roundedBorder)
             Button("Test") { Task { await editor.runTest() } }
-                .disabled(source.isEmpty || editor.sample.isEmpty)
+                .disabled(source.isEmpty || editor.sample.isEmpty || editor.testing)
                 .help("Run the script on this line. Nothing is sent.")
         }
-        if let result = editor.testResult {
+        if editor.testing {
+            Text("Checking…").font(.callout).foregroundStyle(.secondary)
+        } else if let result = editor.testResult {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Before → \(result.before)")
                 Text("After → \(result.after)")

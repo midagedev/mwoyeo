@@ -10,6 +10,8 @@ Per page (p1..pN, whole pages; N is the number of pages of the PDF) and in total
                       and is rightly translated.
   math_heavy_kept     blocks left as written because they are mostly inline mathematics (`TranslationFilter.isMathHeavy`, D5): the
                       render's `ocr.kept.math`; the blocks are listed in detail.txt from the trace for review.
+  equation_kept       detail.txt only: the rows of displayed equations left as written (`CodeRegion.Reason.equation`, D8), from the trace's
+                      `kept code (equation)` lines, for review; the table has no column for them.
   overlaps/spill/cut/clipped  the sums of the render's `layout:` line (clipped: a translation that needs more room than its patch
                       has at the smallest size). ellipsis: of those, the translations cut to fit and ended in "…" (D4).
   big_text            drawn body-like blocks (40 or more characters per source line) whose font size is over 1.3 times the
@@ -107,6 +109,15 @@ def kept_math(out, name):
     return count, lines
 
 
+def kept_equation(out, name):
+    """The rows of displayed equations the render left as written (`CodeRegion.Reason.equation`, D8): the `kept code (equation)` lines of its
+    trace (.err), listed in detail.txt for review. A row of a display that holds a word and was drawn translated is `formula_translated`."""
+    err = os.path.join(out, name + '.err')
+    if not os.path.exists(err):
+        return []
+    return [re.sub(r' \d+$', '', ln.split('[trace] kept code (equation): ', 1)[1].rsplit(' ms', 1)[0]) for ln in open(err, encoding='utf-8', errors='replace') if '[trace] kept code (equation): ' in ln]
+
+
 def counter(out, name, key):
     """One counter of the render's work line (`work[still]: erase=33 ocr.column_break=1 ...`), summed over its work lines; 0 when absent."""
     total = 0
@@ -197,6 +208,8 @@ def main():
         (pages if re.fullmatch(r'p\d+', n) else crops).append((n, row))
         for line in kml:
             detail.append(f'{n} math_heavy_kept: {line[:150]}')
+        for line in kept_equation(out, n):
+            detail.append(f'{n} equation_kept: {line[:150]}')
         for s, t in ft:
             detail.append(f'{n} formula_translated: {s[:90]!r} -> {t[:60]!r}')
         for b in bt:

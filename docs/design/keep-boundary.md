@@ -263,3 +263,25 @@ formulas. It is deferred with this document (user scope for the first MAS submis
 - A rule-based code-region keep: group adjacent blocks by tint and indentation, then score keywords and line ends.
 - No model.
 - The paper-side gaps (inline spans, block splitting) wait for the stage gates in §7.
+
+## 10. Rows of displayed equations (D8, 2026-10-21)
+
+The text rules cannot keep a row of a display that holds a word. `ô = 1.4826 medianpering| l(p) - l|,` holds a run of letters that reads
+as a word (the garbled `median_{p∈ring}`), `∨ prompt ∨ S ≥ 2 ∧ D(R),` holds a real one. `isFormula` lets one word through only beside
+an `=` and twice its letters in the rest, `isMathHeavy` needs 2 signs and 20 characters; both rows fail both, so the row was translated
+and drawn over the typeset equation (4 of the 8 windows of the method paper that show a display; film3's A8 counted 5, its fifth is
+prose). The place on the page says what the text cannot.
+
+`CodeRegion.Reason.equation` keeps a block that stands off the body text of its column by 1.5 line heights on each side and holds a sign
+of mathematics and at most one word of prose. The margins come from the blocks of four words (of two characters or more) over the
+block's middle; a block whose box holds the middle of this one is no margin. Table: the four rows stand 2.5 to 6.8 off, a paragraph's
+first line 0.7 to 1.0.
+
+| signal (needs, on a block the text rules translate) | the four rows | pure-keep blocks of the two papers (doc read) | translate / mixed blocks |
+|---|---|---|---|
+| stands off both sides, a sign, at most one word | 4 of 4 | 5 flipped (dev 2, hold-out 3) | 0 |
+| an equation number at the right margin on its row | 2 of 4 | 0 beyond the row above | 1 before it had to stand at the right margin (a reference `(A2)` cut off its sentence) |
+
+The number was left out: it adds no row and costs a guard. Not done: rows with no sign (49 of 95 pure-keep blocks of the two papers are
+still translated; most hold no sign of mathematics: recognizer garbage, `det Dy`), and the chain "a row next to a kept row".
+Results, speed and the method: [tools/keep-labels/RESULTS-d8-equation-2026-10-21.txt](../../tools/keep-labels/RESULTS-d8-equation-2026-10-21.txt).

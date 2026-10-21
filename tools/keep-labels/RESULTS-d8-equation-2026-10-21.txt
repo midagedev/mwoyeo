@@ -1,0 +1,78 @@
+D8: rows of displayed equations that hold a word (round d8keep, 2026-10-21, base 258e76a)
+===============================================================================================================================
+
+WHAT BROKE. film3's A8 (8 windows of the method paper, tools/paper-own/mwoyeo-method, each with a display equation): 4 of them redrew a
+row of the equation, translated, over the typeset one (E, F, G, H). A fifth (C) was counted too; its two "drawn" blocks are lines of prose
+that hold inline mathematics ("k that is on screen at time t is, with s = t - tk - 1," and "animation: it starts at speed 3/T = 20 s-1
+of its to-"), translated rightly; the rows of its eq (11) (`S<=0`, `S > 0, CK = P,` ...) were kept before and after. The scorer
+(score8.py eq_drawn, score.py formula_translated) counts any drawn block with a sign of mathematics and under 6 prose words.
+
+THE CAUSE (blocks as the app hands them to CodeKeep, post readBlocks; the `[keepfeed]` trace lines of MWOYEO_TRACE_READS=1):
+the text rules decide a row alone (TextRecognizer.verdict -> TranslationFilter.isLiteral = pattern | isFormula | isIdentifier | isMathHeavy);
+CodeRegion keeps only code, terminal, log, config, diff. isFormula takes one prose word (a run of 3 letters or more with a vowel) only
+beside a relation and with twice its letters in the rest; isMathHeavy needs 2 signs, 20 characters and a 0.30 share.
+
+  row (window)                                          prose word      rest vs 2x    signs  L+D    share   formula  heavy
+  ô = 1.4826 medianpering| l(p) - l|,        (E, eq 7)  medianpering 12    4 < 24         1     21    0.33    false    false (signs)
+  ô = 1.4826 medianpEring|l(p) - l],         (G, eq 7)  medianpEring 12    4 < 24         1     21    1.00    false    false (signs)
+  V prompt V S>=2 ^ D(R),                    (F, eq 6)  prompt        6    5 < 12         2     12    0.57    false    false (chars)
+  >=0.30 A[hsigt                             (H, eq 3)  hsigt         5    1 < 10         1      9    0.29    false    false (signs, chars, share)
+kept before and after: (10) s* = max { s € [Smin Smax] : measure(s) <= box }, isMathHeavy (3 signs, share 0.59); (12) Uc(to, t1) =,
+(13) A(to, t1) = ppUp(to, t1) + PIUL(to, t1)., (1) literal(x) = P(x) V F(x) V I(x) V H(x), (2) F(x) = [=1] V [W <= ...(x) \ 2(x)], (16)
+Df = max pb(f) - pb(0)||2' : isFormula (no prose word).
+
+THE FIX. CodeRegion.Reason.equation (Core/Sources/MwoyeoCore/CodeRegion.swift, isEquationRow): a block that stands off the body text of
+its column by 1.5 line heights on each side, holds a sign of mathematics (TranslationFilter.shape(of:).signs >= 1) and at most one prose
+word. Body text = blocks of 4 words of 2 characters or more over the block's middle, within 25 line heights; a block whose box holds the
+middle of this one is no margin (two columns read as one paragraph). Every added guard: gaps both sides (`standsOff`), signs, prose words,
+the body-text test (longWords), the enclosing-block test. Each guard, taken out on a scratch copy of Core, fails a test (EquationRowTests or
+CodeRegionTests); the unmutated copy passes:
+  signs not needed                      6 tests: a heading set off, other script, a stray keyword in an indented run, a two-column table, the windows, a + / - equation
+  any number of prose words             2: a set-off sentence with a formula, a + / - equation
+  no right gap                          2: a row set off one side only, a two-column table
+  left gap not needed                   3: a sentence at the margin, a sentence cut before its reference, an enclosing block
+  an enclosing block counts as a margin 1: aBlockThatHoldsTheRowIsNoMarginOfTheBodyText
+  any short block is body text          2: a short label is no margin, a two-column table
+  words counted without their length    1: a two-column table (the cell "O(k · n · d^2)" has 5 tokens, 2 of two characters or more)
+FAIL-first on base 258e76a (a scratch copy with only the measuring accessor TranslationFilter.shape): aDisplayRowWithOneWordOrBracketIsKept
+8 issues (4 rows x [region says equation, kept]), theSameTextAtTheMarginOfTheBodyIsAProseLine 1, the rest pass on base as they should.
+
+SIGNALS COMPARED (needs today; labelled papers 2401.10066 dev + 2310.06142 hold-out, doc read, keep-labels labels/):
+  signal                                                     4 D8 rows   pure-keep blocks flipped   translate/mixed blocks flipped
+  stands off both sides + sign + <= 1 word  (chosen)         4 / 4       5 (dev 2, hold-out 3)      0
+  an equation number "(7)" at the right margin on its row    2 / 4       0 beyond the row above     1 before it had to be flush right
+                                                             (E, G; F row 3 and H lie off the number's band)
+The number was dropped: no row gained, one guard more. Left side only (no right gap): a sentence cut at a formula, flush right with the
+margin, flips (test aRowSetOffOnOneSideOnlyIsNotADisplay).
+
+RESULTS.
+1 Labelled papers, tools/keep-labels/run-rules.sh (KEEP_FEED = the papers' feed), report diff base 258e76a -> this tree (only the paper
+  sections move; the cases (code) sections are identical):
+    [papers dev, doc]    block keep P 0.82 -> 0.83  R 0.68 -> 0.73   keep->translated words 643 -> 636   translate->kept words 32 -> 32
+    [papers hold, doc]   block keep P 0.90 -> 0.91  R 0.59 -> 0.66   keep->translated words 304 -> 289   translate->kept words  8 ->  8
+    [papers dev, vn]     R 0.59 -> 0.62   keep->translated words 674 -> 673   translate->kept words 10 -> 10
+    [papers hold, vn]    R 0.60 -> 0.62   keep->translated words 294 -> 287   translate->kept words 24 -> 24
+    blocks flipped by the region: {'equation': 2} {'equation': 3} {'equation': 1} {'equation': 1}; with translate words in the truth: 0.
+2 The A8 windows on the d8keep build (film3's score8.py; pictures /tmp/film3/a8/*.png, en -> ko): eq_drawn E 1 -> 0, F 1 -> 0, G 1 -> 0,
+  H 1 -> 0; A B D S1 S2 S3 D2 D3 D4 I P P2 P3 unchanged (0); C 2 and J 1 stay (prose lines, translated rightly). The translated pairs of
+  every other block of the 19 windows are byte-identical to the base build's. The four rows are listed `kept: equation` by the render.
+3 Paper bench (tools/paper-bench, 41 renders, base = /tmp/latin-runs/paper-r3p, this tree on the same pages): formula_translated pages 3-6
+  11 -> 9, crops 23 -> 21; the four lines that left detail.txt are the four D8 rows (p4, p5, p4-c1, p5-c1); no line was added; blocks 518 -> 516
+  (pages), 495 -> 493 (crops); p3 reads 61 blocks. Rows now kept (detail.txt `equation_kept`, new): p3 `A = (W=0) V (W=1 AeAL, 220)`, p4 `V prompt V S>=2 A D(R),`,
+  p5 `woax = 1.al1 - 1.ctrong`, `poax >= 2])`, `ô = 1.4826 modianpering|€(p) - Z],`, p9 `ateppuration), reat = 1 - u` (a listing in a figure),
+  p4-c1, p5-c1: equation rows, rows of a table of conditions, garbage of a code figure; none is a sentence.
+4 Use-case bench (52 pictures x vn / swift / auto = 156 renders, base = the lead's uc-r3): `cmp` of the score files equal; the sources,
+  translations, block lines and layout line of every one of the 156 renders are byte-identical; no render kept a block as `equation`
+  (translate->kept: +0). (A first run lost 19 renders to ane-env's 8 GiB disk floor, rc=75; they were re-run, not scored as they were.)
+5 Speed (CodeRegion.keep over the 737 blocks / 1333 lines of the 13 bench pages, best of 5, three alternating pairs, load 11 to 19):
+  before 1486 / 1497 / 1490 us per line (2687 / 2707 / 2694 us per block), after 1491 / 1503 / 1501 (2696 / 2718 / 2715): +0.4 to +0.7 %,
+  inside the noise of the pairs. TranslationFilter.isLiteral: 46.5 us per block both. (The 2.7 ms per block of CodeRegion.keep is not this
+  rule's: per-line Swift Regex literals in features(of:); see the round's outside list.)
+
+NOT DONE. Rows with no sign of mathematics in a display: 49 of 95 pure-keep blocks of the two papers (doc read) are still translated;
+most hold no sign (kana-like recognizer garbage, `det Dy`, `92 + (1 + 9,)2`). A seed-and-chain rule (a row next to a kept row or a kept
+number) would reach some; it was not measured here.
+
+REPRODUCE. Core: `cd Core && swift test --filter EquationRowTests` (fixtures are real windows, text and boxes of the [keepfeed] lines).
+Papers: tools/keep-labels/run-rules.sh labels with KEEP_WORK and KEEP_FEED set (see its header). A render's blocks: MWOYEO_TRACE_READS=1
+prints `[keepfeed]` records (CodeKeep.printFeed); python3 over them, or keeprules with KEEP_FEED, replays the rule without the picture.

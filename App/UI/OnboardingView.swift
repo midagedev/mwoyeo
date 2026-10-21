@@ -30,22 +30,25 @@ struct OnboardingView: View {
                          detail: model.hasScreenPermission ? String(localized: "Allowed. Mwoyeo reads only what is under a lens, and never stores or sends it.")
                              : String(localized: "Needed to read the text under a lens. You may have to reopen Mwoyeo after allowing it.")) {
                     if !model.hasScreenPermission {
-                        Button("Allow") { model.requestPermission() }.buttonStyle(.glassProminent)
+                        // While the permission is missing this is the step to take: Return presses it (ui-audit-1-1-5 8.1).
+                        Button("Allow") { model.requestPermission() }.buttonStyle(.glassProminent).keyboardShortcut(.defaultAction)
                     }
                 }
                 StepCard(number: 2, title: String(localized: "Languages"), done: true,
-                         detail: intelligence.isAvailable ? String(localized: "Apple Intelligence translates with context. For faster translation, get a language pack in Settings › Translation.")
-                             : String(localized: "Mwoyeo uses Apple Translation. Get a language pack in Settings › Translation.")) {
+                         detail: intelligence.isAvailable ? String(localized: "Apple Intelligence translates with context. A lens offers a faster language pack when one helps.")
+                             : String(localized: "Mwoyeo uses Apple Translation. A lens offers the language pack it needs.")) {
                     LanguageBar(source: $model.settings.sourceLanguage, target: $model.settings.targetLanguage)
                         .frame(width: 230)
                 }
                 StepCard(number: 3, title: String(localized: "Place a Lens"), done: !model.regions.isEmpty,
                          detail: String(localized: "Press \(model.shortcut(.addLens) ?? "⌃⌥L") anywhere, then drag an area or click. The lens follows the window it lands on; hold ⌥ to pin it to the screen.")) {
+                    // The step that starts using the app is the prominent one; it is the default once the permission is there (ui-audit-1-1-5 8.1).
                     Button("Try It Now") {
                         finish()
                         Task { await model.addRegion() }
                     }
-                    .buttonStyle(.glass)
+                    .buttonStyle(.glassProminent)
+                    .keyboardShortcut(model.hasScreenPermission ? KeyboardShortcut.defaultAction : nil)
                     .disabled(!model.hasScreenPermission)
                 }
             }
@@ -60,11 +63,10 @@ struct OnboardingView: View {
 
             HStack {
                 Text("Everything happens on this Mac.")
-                    .font(.caption).foregroundStyle(.tertiary)
+                    .font(.caption).foregroundStyle(.secondary)
                 Spacer()
-                Button("Get Started") { finish() }
-                    .keyboardShortcut(.defaultAction)
-                    .buttonStyle(.glassProminent)
+                Button("Done") { finish() }
+                    .buttonStyle(.glass)
                     .controlSize(.large)
             }
             .padding(28)

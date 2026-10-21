@@ -16,6 +16,9 @@ enum PressChecks {
     /// How long a poll waits for SwiftUI to build the tree or to answer a press: a bound for a view that never gets there, not a wait (a poll ends the
     /// moment its condition holds).
     private static let bound = 6.0
+    /// How long a Test may take to show its lines or its error: a service that starts waits for launchd (`ScriptConnection.startBudget`, 10 s) and runs two
+    /// calls of at most `RewriteLimits.lineBudgetMs` each.
+    private static let testBound = 25.0
     private static let bundle = "com.example.press"
 
     private typealias Items = [AccessibilityChecks.Item]
@@ -85,6 +88,25 @@ enum PressChecks {
         check("Script answers AXPress", s.presses, note(s))
         check("pressing Script through the accessibility server opens its editor", s.effected, note(s))
 
+        // MARK: Test, the button under the Script's editor (D12: it answered AXPress and showed nothing)
+        let function = "function before(line, ctx) { return line + \"<\" }\nfunction after(src, dst, ctx) { return dst + \">\" }"
+        let lens = MemoryTarget(id: bundle, name: "Example Press", kind: .profile, lensSource: "Controls and noise.", lensTranslation: "제어 및 소음.")
+        model.settings.appProfiles = [profile]
+        let prefilled = await pressTest("test-prefilled", target: lens, typed: nil, script: function, model: model)
+        check("Test, with the sample the sheet prefilled from the lens and a script set through the accessibility server, answers AXPress and shows Before and After",
+              prefilled.answer == .success && prefilled.rows(before: "Controls and noise.<", after: "제어 및 소음.>"), prefilled.note)
+        // The sheet as the lens menu opens it for an app with no profile yet (film3): the script's first edit makes the profile from the draft.
+        model.settings.appProfiles = []
+        let fresh = MemoryTarget(id: bundle, name: "Example Press", lensBundleID: bundle, lensAppName: "Example Press", lensSource: "Controls and noise.", lensTranslation: "제어 및 소음.")
+        let draft = await pressTest("test-draft", target: fresh, typed: nil, script: function, turnsOn: true, model: model)
+        check("Test, in the sheet of an app that has no profile yet (its first edit makes it), answers AXPress and shows Before and After",
+              draft.answer == .success && draft.rows(before: "Controls and noise.<", after: "제어 및 소음.>"), draft.note)
+        // No line from a lens and none typed: the Test says so to assistive technology (disabled), instead of answering a press with nothing.
+        model.settings.appProfiles = [profile]
+        let empty = await pressTest("test-empty", target: MemoryTarget(id: bundle, name: "Example Press", kind: .profile), typed: nil, script: function, expectsRows: false, model: model)
+        check("Test, with no line to test, is disabled for the accessibility server and shows nothing",
+              empty.items.contains { $0.role == "AXButton" && $0.label == String(localized: "Test") && !$0.enabled } && !empty.rows(before: "", after: ""), empty.note)
+
         // MARK: a profile's row in Settings › Translation (and All apps')
         let settings = TranslationSettings()
         let rows: [(name: String, label: String, id: String)] = [("profile", ProfileWords.cut(profile.name, at: 32), profile.id), ("all-apps", String(localized: "All apps"), AppProfile.allAppsID)]
@@ -119,10 +141,59 @@ enum PressChecks {
                      sameRole: before.filter { $0.role == role }.map { "\($0.line.trimmingCharacters(in: .whitespaces)) \($0.actions)" })
     }
 
-    /// The window's tree, read again until `done` holds for it (or `bound` seconds).
-    private static func until(_ title: String, _ done: (Items) -> Bool) async -> Items {
+    /// What pressing Test did, for `pressTest`.
+    private struct Tested {
+        var answer: AXError?
+        var items: Items
+        /// What was in the way: an element that was not found, or the tree the press left.
+        var note: String
+        /// Both lines the Test makes, as the sheet words them, are on screen.
+        func rows(before: String, after: String) -> Bool {
+            items.contains { $0.value == String(localized: "Before → \(before)") } && items.contains { $0.value == String(localized: "After → \(after)") }
+        }
+    }
+
+    /// The Memory sheet of `target` with its Script editor open, `script` put in the editor and `typed` (when not nil) in the sample line through the
+    /// accessibility server as an agent writes a field, then Test pressed the way `press` presses: what the tree holds when its two lines or the
+    /// service's error come, or after `testBound`.
+    private static func pressTest(_ name: String, target: MemoryTarget, typed: String?, script: String, turnsOn: Bool = false, expectsRows: Bool = true, model: AppModel) async -> Tested {
+        let sheet = AppMemorySheet(target: target, model: model, height: 1100, customize: true, scriptOpen: true)
+        let w = AccessibilityChecks.window(sheet, size: CGSize(width: 520, height: 1100), model: model, name: "press-\(name)")
+        defer { w.orderOut(nil) }
+        let title = w.title
+        let editor = String(localized: "Script text"), sample = String(localized: "A line to test"), test = String(localized: "Test")
+        let ready = await until(title) { $0.contains { $0.role == "AXTextArea" && $0.label == editor } && $0.contains { $0.role == "AXButton" && $0.label == test } }
+        /// Writes the field's value as an agent does, then confirms it (`AXConfirm`: a text field takes what was written into its binding only then; the
+        /// script's editor takes it as it is written).
+        func set(_ role: String, _ label: String, _ text: String) -> Bool {
+            guard let element = AccessibilityChecks.element(inWindowTitled: title, role: role, label: label) else { return false }
+            let wrote = AXUIElementSetAttributeValue(element, kAXValueAttribute as CFString, text as CFString) == .success
+            if role == "AXTextField" { AXUIElementPerformAction(element, kAXConfirmAction as CFString) }
+            return wrote
+        }
+        let wrote = set("AXTextArea", editor, script)
+        let typedIn = typed.map { set("AXTextField", sample, $0) } ?? true
+        if turnsOn, let toggle = AccessibilityChecks.element(inWindowTitled: title, role: "AXCheckBox", label: String(localized: "Run this script")) {
+            AXUIElementPerformAction(toggle, kAXPressAction as CFString)
+        }
+        let enabled = await until(title) { $0.contains { $0.role == "AXButton" && $0.label == test && $0.enabled } }
+        var answer: AXError?
+        if let button = AccessibilityChecks.element(inWindowTitled: title, role: "AXButton", label: test) {
+            answer = AXUIElementPerformAction(button, kAXPressAction as CFString)
+        }
+        let shown = await until(title, within: expectsRows ? testBound : 0) { items in items.contains { $0.value.hasPrefix(String(localized: "Before → \("")")) } }
+        let after = await AccessibilityChecks.tree(ofWindowTitled: title)
+        let appeared = shown.contains { $0.value.hasPrefix(String(localized: "Before → \("")")) }
+        let held = after.first { $0.role == "AXTextArea" && $0.label == editor }?.value.count ?? 0
+        print("check-logic: note press: \(name): script written \(wrote) (\(held) characters), sample written \(typedIn), on \(turnsOn), Test \(enabled.contains { $0.label == test && $0.enabled } ? "enabled" : "disabled") answer \(answer.map { "\($0.rawValue)" } ?? "none")")
+        let lines = after.filter { $0.value.contains("→") || $0.value.contains("Line ") }.map { $0.line.trimmingCharacters(in: .whitespaces) }
+        return Tested(answer: answer, items: after, note: "in \(ready.count) elements: script written \(wrote), sample written \(typedIn), answer \(answer.map { "\($0.rawValue)" } ?? "none"), appeared \(appeared), lines \(lines)")
+    }
+
+    /// The window's tree, read again until `done` holds for it (or `within` seconds).
+    private static func until(_ title: String, within: Double = bound, _ done: (Items) -> Bool) async -> Items {
         var items = await AccessibilityChecks.tree(ofWindowTitled: title)
-        for _ in 0..<Int(bound * 10) where !done(items) {
+        for _ in 0..<Int(within * 10) where !done(items) {
             try? await Task.sleep(for: .milliseconds(100))
             items = await AccessibilityChecks.tree(ofWindowTitled: title)
         }

@@ -507,10 +507,13 @@ enum RewriteUIChecks {
         var runs = 0
         var issues: [RewriteIssue] = []
         var outcome: @Sendable (RewriteStage, String, String) -> RewriteRun.Outcome = { _, text, _ in .text(text) }
+        /// A call that is stuck for good (a service that never answers): it comes back after this long, far past any budget a check gives.
+        var stuckFor: Duration?
 
         func regex(_ row: RewriteRow, on text: String, budgetMs: Double, waits: Bool) async -> RewriteRun { runs += 1; return RewriteRun(.text(text)) }
         func script(_ script: RewriteScript, stage: RewriteStage, text: String, src: String, context: RewriteContext, budgetMs: Double, waits: Bool) async -> RewriteRun {
             runs += 1
+            if let stuckFor { try? await Task.sleep(for: stuckFor) }
             return RewriteRun(outcome(stage, text, src))
         }
         func check(rows: [RewriteRow], script: RewriteScript?) async -> RewriteCheckResult { checks += 1; return RewriteCheckResult(issues: issues, defines: []) }
@@ -624,6 +627,15 @@ enum RewriteUIChecks {
         check("a throw leaves the sample as it was, the script stays on, and the Test reads its line", stored()?.script?.on == true && ed.testResult?.before == "line"
               && ed.testResult?.issue == String(localized: "Line \(4): \("boom is not defined")"), "\(String(describing: ed.testResult))")
         fake.outcome = { stage, text, _ in .text(stage == .before ? text + "<" : text + ">") }
+        // D12 (film3, 2026-10-21): a Test whose call to the service never comes back must not be a press with nothing to see.
+        let hung = FakeService()
+        hung.stuckFor = .seconds(5)
+        let stuck = editor(hung)
+        stuck.sample = "line"
+        stuck.testBudget = .milliseconds(50)
+        await stuck.runTest()
+        check("a Test whose service does not answer ends within its budget with the unavailable line, and the editor is not left testing",
+              stuck.testResult?.issue?.hasPrefix(RewriteText.serviceUnavailable) == true && !stuck.testing && stuck.testResult?.before == "line", "\(String(describing: stuck.testResult))")
         let translated = editor(fake, target: MemoryTarget(id: app, name: "Rewrite UI", kind: .profile, lensSource: "src", lensTranslation: "shown"))
         await translated.runTest()
         check("with the lens's last translation the after side works on it, not on the sample", translated.testResult == ScriptTestResult(before: "src<", after: "shown>", issue: nil),

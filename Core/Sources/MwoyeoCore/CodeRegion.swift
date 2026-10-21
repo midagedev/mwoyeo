@@ -12,10 +12,16 @@ import Foundation
 /// they hold: keywords, line ends `; { } ) ]`, symbols, a comment marker, a prompt, a hash-led line, diff marks, `key = value`, a
 /// typeface of fixed pitch. The container alone keeps nothing (a callout box, a bullet list and a table are containers of prose); the
 /// text alone keeps only when it is strong.
+///
+/// A row of a displayed equation is the other thing a page sets apart (`Reason.equation`): no region of blocks, one block that stands off the
+/// text of its column and holds mathematics.
 public enum CodeRegion {
     /// Why a block is kept. New kinds, apart from the math kinds of `ProtectedSpans.Kind`.
     public enum Reason: String, Sendable, Equatable {
         case code, terminal, log, config, diff
+        /// A row of a displayed equation that holds a word of the page's language or one the recognizer made of its symbols: set off from the
+        /// text on both sides, a sign of mathematics in it and at most one word of prose (`isEquationRow`).
+        case equation
     }
 
     /// One word of a line with its box, as the reader placed it (a script it cannot place has no words).
@@ -83,6 +89,14 @@ public enum CodeRegion {
         static let pitchShare = 0.5
         /// Blocks that can be measured: fewer say nothing (a garbled displayed equation of three words once looked fixed).
         static let pitchBlocks = 2
+        /// An equation row (round d8keep, 2026-10-21). A block stands off the text when the margins of the body text (blocks of `bodyWords` words of two
+        /// characters or more over its middle, within `marginReach`) lie this many of its line heights beyond it on each side: the displays of the method paper's
+        /// windows stand 3.3 to 6.9 off, a paragraph's first line one em (0.7 to 1.0), a heading or a caption at the margin or centred with no sign.
+        static let displayGap = 1.5
+        static let bodyWords = 4
+        /// A row holds a sign of mathematics and at most this many words of prose.
+        static let equationSigns = 1
+        static let equationProse = 1
         /// Lines of one shape (`name = value`, `"key": value`) that make a listing of settings, and not a label or two.
         static let listing = 3
         /// Two lines start on one left edge when their first glyphs are this many line heights apart at most. H2: the comment lines of a code run
@@ -99,7 +113,20 @@ public enum CodeRegion {
             guard let reason = verdict(members.map { infos[$0] }) else { continue }
             for i in members { out[i] = reason }
         }
+        for i in infos.indices where out[i] == nil && isEquationRow(infos[i]) { out[i] = .equation }
         return out
+    }
+
+    /// A row of a displayed equation: set off from the text of its column on both sides, a sign of mathematics in it and no more than a
+    /// word of prose. The text alone cannot say: "ô = 1.4826 medianpering| l(p) - l|," holds a run of letters that reads as a word and
+    /// "∨ prompt ∨ S ≥ 2 ∧ D(R)," holds one, and `TranslationFilter.isFormula` takes both for prose (D8, film3's A8: 5 of the 8 windows of
+    /// the method paper that show a display redrew a row of it, translated). The place says what the text cannot; the sign keeps a heading,
+    /// an author line or a caption, which stand off the margins as well, out of it. The number at the margin of a numbered display ("(7)")
+    /// adds nothing the place does not say: it fired on 2 of the 4 rows and on no row of the labelled papers that the place missed.
+    static func isEquationRow(_ b: Info) -> Bool {
+        guard (b.gapLeft ?? 0) >= K.displayGap && (b.gapRight ?? 0) >= K.displayGap else { return false }
+        let shape = TranslationFilter.shape(of: b.lines.joined(separator: " "))
+        return shape.signs >= K.equationSigns && shape.proseWords <= K.equationProse
     }
 
     /// The blocks with their geometry, and the regions they form: indices of the blocks that sit together in one box, one indented
@@ -115,6 +142,19 @@ public enum CodeRegion {
                 margin = min(margin, c.x0)
             }
             infos[i].indented = infos[i].x0 - margin >= K.indent * infos[i].lineHeight
+
+            // The margins of the body text over its middle, in line heights: how far the block stands off it.
+            let middle = (infos[i].x0 + infos[i].x1) / 2
+            var left: Double?, right: Double?
+            for (j, c) in infos.enumerated() where j != i && c.longWords >= K.bodyWords {
+                // A block whose box holds the middle of this one is not its neighbour (two columns read as one paragraph).
+                guard abs(c.midY - infos[i].midY) <= K.marginReach * infos[i].lineHeight, c.x0 <= middle, middle <= c.x1,
+                      !(c.y0...c.y1).contains(infos[i].midY) else { continue }
+                left = min(left ?? c.x0, c.x0)
+                right = max(right ?? c.x1, c.x1)
+            }
+            infos[i].gapLeft = left.map { (infos[i].x0 - $0) / infos[i].lineHeight }
+            infos[i].gapRight = right.map { ($0 - infos[i].x1) / infos[i].lineHeight }
         }
 
         var parent = Array(0..<n)
@@ -142,8 +182,13 @@ public enum CodeRegion {
         var tinted: Bool
         var background: RGBA
         var words: Int
+        /// The words of two characters or more: the body text has four, a cell of mathematics ("O(k · n · d^2)") has two.
+        var longWords: Int
         var gutter: Bool
         var indented = false
+        /// How far the block stands off the body text of its column on each side, in its line heights; nil with no body text over its middle.
+        var gapLeft: Double?
+        var gapRight: Double?
 
         var midY: Double { (y0 + y1) / 2 }
 
@@ -156,7 +201,9 @@ public enum CodeRegion {
             lineHeight = max(1, heights[heights.count / 2])
             tinted = Info.delta(b.background, frame) >= K.tint
             background = b.background
-            words = b.text.split(whereSeparator: \.isWhitespace).count
+            let tokens = b.text.split(whereSeparator: \.isWhitespace)
+            words = tokens.count
+            longWords = tokens.filter { $0.count >= 2 }.count
             let joined = lines.joined(separator: " ")
             gutter = joined.wholeMatch(of: /\s*\d{1,3}\s*[:.]?\s*/) != nil || (lines.first?.firstMatch(of: /^\s*\d{1,3}:\s*\S/) != nil)
         }

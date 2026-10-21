@@ -370,6 +370,20 @@ public enum TranslationFilter {
     static let mathShareLimit = 0.30
     static let mathSignLimit = 2
 
+    /// What one block's text holds, for the rules that weigh it against its place on the page (`CodeRegion`'s equation rows). A letter of a
+    /// script other than Latin, Greek and Cyrillic ends both scans before the signs are counted: such a block has none.
+    public struct Shape: Sendable, Equatable {
+        /// Words of prose as `isFormula` counts them: three letters or more with a vowel, not an operand.
+        public var proseWords: Int
+        /// Signs of mathematics as `mathShare` counts them.
+        public var signs: Int
+    }
+
+    public static func shape(of text: String) -> Shape {
+        let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return Shape(proseWords: FormulaScan(t).proseWordCount, signs: MathShare(t).signs)
+    }
+
     /// One identifier written in camelCase with an inner capital ("MatMul", "SoftMax", "ReLU", "LayerNorm"): a name from
     /// code or a figure, or a brand ("YouTube"). A single plain word ("Scale", "Linear") is not one, and neither is a
     /// brand run into Japanese ("YouTubeで見る").
@@ -574,6 +588,8 @@ private struct FormulaScan {
             if count >= 2 && lettersOnly && vowel { onlyAtoms = false }
         }
     }
+
+    var proseWordCount: Int { proseWords }
 
     var isFormula: Bool {
         guard supported, letters > 0 else { return false }

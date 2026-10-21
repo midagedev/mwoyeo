@@ -1,0 +1,2 @@
+stub estimator (min_lines=99): true body columns found on 0 of 26 (page,column) cells   [real estimator: 24 of 26]
+truth shifted by 10 pt: found on 0 of 26 cells

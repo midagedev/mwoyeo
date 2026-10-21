@@ -1,0 +1,40 @@
+p10A  lens x 100..400 cap x 10..490
+   page-level 72.2..398.5 (w 326.2, 42 lines)
+   real crop  72.5..398.0 (w 325.5, 17 lines)
+   sim crop   72.5..398.5 (w 326.0, 19 lines)
+p10B  lens x 170..370 cap x 90..450
+   page-level 72.2..398.5 (w 326.2, 42 lines)
+   real crop  90.0..398.0 (w 308.0, 17 lines) [left=capture edge]
+   sim crop   90.0..398.5 (w 308.5, 19 lines) [left=capture edge]
+p10C  lens x 300..500 cap x 220..580
+   page-level none
+   real crop  none
+   sim crop   none
+p10D  lens x 150..650 cap x 0..800
+   page-level none
+   real crop  none
+   sim crop   none
+p10E  lens x 200..350 cap x 120..430
+   page-level 72.2..398.5 (w 326.2, 42 lines)
+   real crop  120.0..398.5 (w 278.5, 18 lines) [left=capture edge]
+   sim crop   120.0..398.5 (w 278.5, 19 lines) [left=capture edge]
+p10F  lens x 500..750 cap x 407..817
+   page-level 420.5..746.5 (w 326.0, 37 lines)
+   real crop  420.8..746.5 (w 325.8, 15 lines)
+   sim crop   421.0..746.5 (w 325.5, 15 lines)
+p3T   lens x 100..400 cap x 10..490
+   page-level none
+   real crop  none
+   sim crop   none
+p3F   lens x 80..480 cap x 0..640
+   page-level none
+   real crop  none
+   sim crop   none
+p5A   lens x 100..400 cap x 10..490
+   page-level 72.5..398.0 (w 325.5, 28 lines)
+   real crop  72.5..398.0 (w 325.5, 8 lines)
+   sim crop   72.5..398.0 (w 325.5, 8 lines)
+p9A   lens x 100..400 cap x 10..490
+   page-level none
+   real crop  none
+   sim crop   none

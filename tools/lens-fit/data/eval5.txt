@@ -1,0 +1,9 @@
+x axis, columns as targets (reach 8 pt):
+   paper pages     lens W=200: 12.7% of left-edge positions are held by a column target (mean over 8 page(s), 3 column(s) a page)
+   paper pages     lens W=320: 10.8% of left-edge positions are held by a column target (mean over 8 page(s), 3 column(s) a page)
+   paper pages     lens W=600: 18.3% of left-edge positions are held by a column target (mean over 8 page(s), 3 column(s) a page)
+   Preview shot B  lens W=200:  5.0% of left-edge positions are held by a column target (mean over 1 page(s), 2 column(s) a page)
+   Preview shot B  lens W=320:  5.5% of left-edge positions are held by a column target (mean over 1 page(s), 2 column(s) a page)
+   Preview shot B  lens W=600:  6.2% of left-edge positions are held by a column target (mean over 1 page(s), 2 column(s) a page)
+y axis, paragraph edges as targets (a block of >= 2 lines):
+   paper prose pages: 37.0% of y positions held by a paragraph edge (mean; min 28.9 max 44.1)

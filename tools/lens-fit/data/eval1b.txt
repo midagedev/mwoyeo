@@ -1,0 +1,2 @@
+paper, 24 cells: width err mean +1.20  median |.| 1.35  p90 |.| 2.10  max |.| 2.10 ; share within 2 pt: 87%, within 3 pt: 100%
+       left err mean +0.11 max|.| 0.59 ; right err mean +1.31 max|.| 2.00

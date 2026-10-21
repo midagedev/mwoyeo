@@ -1,0 +1,9 @@
+shotA blocks 28 columns found [(149.8, 737.0, 2, 8), (778.0, 1365.5, 3, 11)]
+   true 149.0..737.5  est 149.8..737.0  err L +0.8 R -0.5  width err -1.2
+   true 778.0..1365.0  est 778.0..1365.5  err L +0.0 R +0.5  width err +0.5
+shotB blocks 12 columns found [(149.0, 737.5, 3, 22), (777.5, 1365.5, 5, 20)]
+   true 148.5..737.0  est 149.0..737.5  err L +0.5 R +0.5  width err +0.0
+   true 777.0..1365.0  est 777.5..1365.5  err L +0.5 R +0.5  width err +0.0
+take lens (770, 382, 600, 270) rest capture x 552..1512 y 302..734 -> column 777.5..1365.5 (true 777..1365): the lens would move +7.5 / -4.5 pt
+take lens (770, 382, 600, 270) wide capture x 432..1512 y 222..812 -> column 777.5..1365.5 (true 777..1365): the lens would move +7.5 / -4.5 pt
+lens over the left column (140, 382, 600, 270) -> 149.0..737.5

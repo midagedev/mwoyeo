@@ -1,0 +1,22 @@
+p1  oracle cols 4  ocr cols 5  recovered 3  spurious 2  body L/R err (pt): ['-0.1/+1.5', '-0.0/+1.6']
+      spurious: 90..398 (w 308) blocks 1 lines 5
+      spurious: 439..746 (w 308) blocks 4 lines 15
+p2  oracle cols 2  ocr cols 3  recovered 2  spurious 1  body L/R err (pt): ['-0.1/+1.5', '-0.5/+1.6']
+      spurious: 91..396 (w 306) blocks 1 lines 4
+p3  oracle cols 8  ocr cols 2  recovered 2  spurious 0  body L/R err (pt): ['+0.4/+1.5', '-0.5/+1.6']
+p4  oracle cols 5  ocr cols 3  recovered 3  spurious 0  body L/R err (pt): ['-0.6/+1.5', '+0.5/+1.6']
+p5  oracle cols 6  ocr cols 2  recovered 2  spurious 0  body L/R err (pt): ['+0.4/+1.5', '+0.5/+1.6']
+p6  oracle cols 2  ocr cols 2  recovered 2  spurious 0  body L/R err (pt): ['-0.1/+1.5', '-0.0/+1.6']
+p7  oracle cols 2  ocr cols 2  recovered 2  spurious 0  body L/R err (pt): ['+0.4/+1.0', '-0.0/+1.6']
+p8  oracle cols 3  ocr cols 3  recovered 2  spurious 1  body L/R err (pt): ['+0.4/+0.5', '+0.2/+1.6']
+      spurious: 434..680 (w 246) blocks 1 lines 4
+p9  oracle cols 7  ocr cols 3  recovered 3  spurious 0  body L/R err (pt): ['+0.4/+0.0', '-0.0/+0.6']
+p10 oracle cols 10  ocr cols 2  recovered 2  spurious 0  body L/R err (pt): ['+0.2/+2.0', '-0.0/+1.6']
+p11 oracle cols 3  ocr cols 3  recovered 3  spurious 0  body L/R err (pt): ['+0.4/+1.5', '+0.5/+1.1']
+p12 oracle cols 4  ocr cols 4  recovered 3  spurious 1  body L/R err (pt): ['+0.2/+1.5', '+0.2/+0.1']
+      spurious: 99..398 (w 299) blocks 3 lines 9
+p13 oracle cols 5  ocr cols 1  recovered 1  spurious 0  body L/R err (pt): ['miss', 'miss']
+matched oracle columns 30 of 61
+edge error (pt) left: mean +0.54 sd 0.54 max|.| 2.76 ; right: mean -0.90 sd 0.56 max|.| 3.31 ; n=30
+within 2 pt: left 96% right 96%
+true body columns found on 24 of 26 (page,column) cells

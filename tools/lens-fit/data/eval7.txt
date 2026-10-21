@@ -1,0 +1,10 @@
+setting                             found  spurious   uc>0
+default (tol 6, split 24, support 4)     24        11      7
+tol=3                                  24        11      7
+tol=10                                 23        10      7
+split=16                               24        11      5
+split=40                               24        11      7
+min_support=3                          24        12      9
+min_support=6                          24         8      3
+min_lines=1                            24        23     12
+min_lines=3                            24         8      3

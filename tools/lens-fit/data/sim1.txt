@@ -1,0 +1,45 @@
+prose pages [2, 4, 6, 7, 8, 10, 11, 12]
+--- capture margins: at rest
+ W pt  lenses col in cap   exact  part-unk  wrong  none   (lens positions with an unambiguous true column; % of them)
+  160    1021         0%      0%       99%     0%    1%   ambiguous lens positions (gutter / across): 299
+  240     833        57%     56%       43%     0%    1%   ambiguous lens positions (gutter / across): 327
+  320     680        81%     80%       19%     0%    2%   ambiguous lens positions (gutter / across): 320
+  400     516        96%     95%        4%     0%    1%   ambiguous lens positions (gutter / across): 324
+  560     143       100%     99%        0%     0%    1%   ambiguous lens positions (gutter / across): 377
+--- capture margins: wide (lens moving / content moving)
+ W pt  lenses col in cap   exact  part-unk  wrong  none   (lens positions with an unambiguous true column; % of them)
+  160    1021        73%     74%       26%     0%    0%   ambiguous lens positions (gutter / across): 299
+  240     833        89%     89%       11%     0%    0%   ambiguous lens positions (gutter / across): 327
+  320     680        97%     97%        3%     0%    0%   ambiguous lens positions (gutter / across): 320
+  400     516        98%     98%        2%     0%    0%   ambiguous lens positions (gutter / across): 324
+  560     143       100%    100%        0%     0%    0%   ambiguous lens positions (gutter / across): 377
+p1 (title + abstract + two columns)
+--- capture margins: at rest
+ W pt  lenses col in cap   exact  part-unk  wrong  none   (lens positions with an unambiguous true column; % of them)
+  160      65         0%      0%      100%     0%    0%   ambiguous lens positions (gutter / across): 100
+  240      60        13%     13%       87%     0%    0%   ambiguous lens positions (gutter / across): 85
+  320      51        18%     18%       82%     0%    0%   ambiguous lens positions (gutter / across): 74
+  400      43        40%     40%       60%     0%    0%   ambiguous lens positions (gutter / across): 62
+  560      25       100%    100%        0%     0%    0%   ambiguous lens positions (gutter / across): 40
+--- capture margins: wide (lens moving / content moving)
+ W pt  lenses col in cap   exact  part-unk  wrong  none   (lens positions with an unambiguous true column; % of them)
+  160      65        20%     20%       80%     0%    0%   ambiguous lens positions (gutter / across): 100
+  240      60        20%     20%       80%     0%    0%   ambiguous lens positions (gutter / across): 85
+  320      51        37%     37%       63%     0%    0%   ambiguous lens positions (gutter / across): 74
+  400      43       100%    100%        0%     0%    0%   ambiguous lens positions (gutter / across): 62
+  560      25       100%    100%        0%     0%    0%   ambiguous lens positions (gutter / across): 40
+table / listing pages 3 5 9 13
+--- capture margins: at rest
+ W pt  lenses col in cap   exact  part-unk  wrong  none   (lens positions with an unambiguous true column; % of them)
+  160     280         3%      4%       93%     2%    0%   ambiguous lens positions (gutter / across): 380
+  240     242        51%     52%       45%     3%    0%   ambiguous lens positions (gutter / across): 338
+  320     209        74%     74%       22%     4%    1%   ambiguous lens positions (gutter / across): 291
+  400     171        92%     92%        8%     0%    0%   ambiguous lens positions (gutter / across): 249
+  560      78       100%    100%        0%     0%    0%   ambiguous lens positions (gutter / across): 182
+--- capture margins: wide (lens moving / content moving)
+ W pt  lenses col in cap   exact  part-unk  wrong  none   (lens positions with an unambiguous true column; % of them)
+  160     280        68%     70%       26%     4%    0%   ambiguous lens positions (gutter / across): 380
+  240     242        83%     83%       13%     4%    0%   ambiguous lens positions (gutter / across): 338
+  320     209        93%     93%        7%     0%    0%   ambiguous lens positions (gutter / across): 291
+  400     171        95%     95%        5%     0%    0%   ambiguous lens positions (gutter / across): 249
+  560      78       100%    100%        0%     0%    0%   ambiguous lens positions (gutter / across): 182

@@ -98,7 +98,8 @@ mechanical replacement apart from context; a table in the UI and scripts, both; 
   pt, then it scrolls) whose empty state shows §3's two examples in tertiary as a starting point; counter "n / 8,000" (orange at the
   cap); "Run this script" switch (off until turned on); a sample field filled with the opening lens's last line (else any lens of this
   profile; empty: prompt "A line to test"); "Test" → "Before → …" and "After → …" (callout, monospaced, selectable; on the sample and
-  its last shown translation, else on the sample; nothing is sent). Errors in red with their line (no column: public JavaScriptCore gives none); the same errors go to the log
+  its last shown translation, else on the sample; nothing is sent; while it runs the sheet says "Checking…" and the button is off, and it always ends in the two lines or in the
+  line "The script service did not answer…" within 30 s: a press never shows nothing, film3 D12). Errors in red with their line (no column: public JavaScriptCore gives none); the same errors go to the log
   (category `script`). Every new help tag starts with a verb and stays ≤ 75 characters.
 - Empty and zero setup: a profile without rewrites shows, inside Customize, only "Add Rewrite" and the collapsed Script row (R9's gate);
   with Customize closed, neither. The App Store build hides Script if review objects (§6); the table stays.

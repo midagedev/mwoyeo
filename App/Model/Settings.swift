@@ -29,7 +29,7 @@ enum TranslationEngineChoice: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .auto: String(localized: "The fastest translation when a language pack is installed, Apple Intelligence otherwise")
         case .highFidelity: String(localized: "Always Apple Intelligence’s translation model · the most natural and the slowest, about 1 s a line")
-        case .customModel: String(localized: "Foundation Models follows your glossary · for names in games and stories")
+        case .customModel: String(localized: "Apple Intelligence follows your glossary exactly · for names in games and stories")
         }
     }
 }
@@ -232,23 +232,52 @@ struct AppSettings: Codable, Equatable {
     var enginePermissions = EnginePermissions()
     /// The files the translation log is written as (settings.json only: no row in Settings).
     var transcriptFormats: [TranscriptFileFormat] = [.markdown, .srt]
-    /// Languages (and engine) remembered per app; the app in front decides which applies (see `effective`).
+    /// The profiles (design §1.1, §5.1; `profiles` in settings.json): the languages, engine, memory and amount of an app, a window or a
+    /// preset. Today's name for the property is kept, for the screens that read it. A 1.1.4 file's `appProfiles` is read into it.
     var appProfiles: [AppProfile] = []
+    /// All apps' amount of context (design §1.4, §5.1: `context`): nil is `memory`, the default (the card, the note and the names, no screen
+    /// lines). A profile's own `context` lays over it. The engines no longer hold an amount (`engines[].allow` holds what they may be sent).
+    var context: AppContextOverride?
+    /// All apps' "learn names and terms" (design §1.4, §5.1: `useLearned`); a profile may set its own. Written only when true.
+    var useLearned = false
+    /// What every lens is pinned to (design §1.3, §5.1: `profilePin`): a profile's id, or `all`; nil is Auto. A lens's own pin stays with
+    /// the lens, not here.
+    var profilePin: String?
+    /// How the glossary's pairs are used, one mode for all (design §10, §5.1: `glossaryApply`). Written only when not `hint`.
+    var glossaryApply = EntryApply.hint
     /// How text is cut into paragraphs, unless an app's profile says otherwise.
     var paragraphReader = ParagraphReader.automatic
-    /// Apple Translation follows the names and terms pinned in an app's memory by putting the user's translation into the
-    /// source text (design §7a, §9). Off by default; settings.json holds the key only while it is true.
-    var appleUsesPinnedTerms = false
+    /// 1.1.4's Apple switch, as a view of the new model (design §5.2 case (d), §10): on means every user row and the glossary are used
+    /// in both ways, hint and replace. It is never written: the file holds each row's `apply` and `glossaryApply`, and a 1.1.4 file that
+    /// had it on is read into those. It stays only while the Memory sheet has the switch (R4 removes both).
+    var appleUsesPinnedTerms: Bool {
+        get { glossaryApply != .hint || appProfiles.contains { $0.entries.contains { $0.apply != .hint } } }
+        set {
+            glossaryApply = newValue ? .both : .hint
+            for i in appProfiles.indices {
+                appProfiles[i].entries = appProfiles[i].entries.map { row in var r = row; r.apply = newValue ? .both : .hint; return r }
+            }
+        }
+    }
     /// An agent connected with `Mwoyeo --mcp` may use the app: read the translation log, read and write each app's memory, read and change
     /// the settings (all but this one). Off by default; the person turns it on in Settings, and an agent cannot (settings.json holds the
     /// key only while it is true).
     var agentConnection = false
 
-    /// The settings that translate while the app `frontmost` is in front: this app's profile over the base choice.
-    func effective(frontmost: String?) -> AppSettings {
+    /// The settings that translate while the app `frontmost` is in front: this app's profile over the base choice. With a pin (`profilePin`,
+    /// or a lens's own, `lensPin`) the head of the pinned chain decides instead (design §1.3): the pinned profile, or All apps alone.
+    func effective(frontmost: String?, lensPin: String? = nil) -> AppSettings {
         var s = self
-        let c = AppProfiles.effective(base: LanguageChoice(source: sourceLanguage, target: targetLanguage, customEngineID: customEngineID),
-                                      profiles: appProfiles, frontmost: frontmost, engines: Set(engines.map(\.id)))
+        if let lensPin { s.profilePin = lensPin }
+        let base = LanguageChoice(source: sourceLanguage, target: targetLanguage, customEngineID: customEngineID)
+        let known = Set(engines.map(\.id))
+        let c: LanguageChoice
+        switch s.pin {
+        case .auto: c = AppProfiles.effective(base: base, profiles: appProfiles, frontmost: frontmost, engines: known)
+        case .allAppsOnly, .profile:
+            let head = ProfileChain.chain(for: WindowFacts(bundleID: frontmost), profiles: appProfiles, pin: s.pin).first?.profile
+            c = AppProfiles.effective(base: base, profile: head, engines: known)
+        }
         s.sourceLanguage = c.source
         s.targetLanguage = c.target
         s.customEngineID = c.customEngineID
@@ -258,12 +287,84 @@ struct AppSettings: Codable, Equatable {
     /// The added engine in use; nil is Apple.
     var activeEngineConfig: EngineConfig? { customEngineID.flatMap { id in engines.first { $0.id == id } } }
 
+    /// This value with the old fields of its engines turned into the new keys (design §5.2, the one Core converter): each engine's own
+    /// `context` becomes All apps' amount (`context`), `useLearned` and the engine's `allow`, and is dropped. A value with none is returned as it
+    /// is. The file and the preferences are read this way (`init(from:)`); this is for a value built in code the 1.1.4 way: the fixtures of
+    /// the checks, and the old Context section of the engine sheet until it is rebuilt.
+    func convertedFromOldFields() -> AppSettings {
+        guard engines.contains(where: { $0.context != nil }) else { return self }
+        let value = ProfileMigration.convert(LegacySettings(customEngineID: customEngineID, appProfiles: appProfiles, engines: engines)).value
+        var s = self
+        s.engines = value.engines ?? engines
+        s.appProfiles = value.profiles.map(\.profile)
+        s.context = value.context
+        s.useLearned = value.useLearned ?? false
+        return s
+    }
+
+    /// The glossary's pairs the translator may be told (design §10): all of them, unless the glossary is only replaced in the text.
+    var glossaryHintPairs: [(String, String)] { glossaryApply == .replace ? [] : glossaryPairs }
+
     var glossaryPairs: [(String, String)] {
         glossary.split(whereSeparator: \.isNewline).compactMap { line in
             let parts = line.split(separator: "=", maxSplits: 1).map { $0.trimmingCharacters(in: .whitespaces) }
             guard parts.count == 2, !parts[0].isEmpty, !parts[1].isEmpty else { return nil }
             return (parts[0], parts[1])
         }
+    }
+
+    // The keys, as the file and the preferences' copy hold them. `appProfiles` is `profiles` here; the old `appProfiles`, `appleUsesPinnedTerms`
+    // and `engines[].context` are read (`init(from:)`) and never written (design §5.2).
+    enum CodingKeys: String, CodingKey {
+        case sourceLanguage, targetLanguage, engine, engines, customEngineID, engineRejections, renderMode, useInpaintingModel, glossary
+        case framesPerSecond, settleDelay, fontStyle, boxOpacity, lensStyle, lensTint, lensTabVisibility, lensTabPosition, cacheSize, shortcuts
+        case checksForUpdates, hasCompletedOnboarding, savesTranscripts, exportFolder, exportBookmark, enginePermissions, transcriptFormats
+        case paragraphReader, agentConnection
+        case profiles, context, useLearned, profilePin, glossaryApply
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(sourceLanguage, forKey: .sourceLanguage)
+        try c.encode(targetLanguage, forKey: .targetLanguage)
+        try c.encode(engine, forKey: .engine)
+        try c.encode(engines.map(Self.withoutOldContext), forKey: .engines)
+        try c.encodeIfPresent(customEngineID, forKey: .customEngineID)
+        try c.encode(engineRejections, forKey: .engineRejections)
+        try c.encode(renderMode, forKey: .renderMode)
+        try c.encode(useInpaintingModel, forKey: .useInpaintingModel)
+        try c.encode(glossary, forKey: .glossary)
+        try c.encode(framesPerSecond, forKey: .framesPerSecond)
+        try c.encode(settleDelay, forKey: .settleDelay)
+        try c.encode(fontStyle, forKey: .fontStyle)
+        try c.encode(boxOpacity, forKey: .boxOpacity)
+        try c.encode(lensStyle, forKey: .lensStyle)
+        try c.encode(lensTint, forKey: .lensTint)
+        try c.encode(lensTabVisibility, forKey: .lensTabVisibility)
+        try c.encode(lensTabPosition, forKey: .lensTabPosition)
+        try c.encode(cacheSize, forKey: .cacheSize)
+        try c.encode(shortcuts, forKey: .shortcuts)
+        try c.encode(checksForUpdates, forKey: .checksForUpdates)
+        try c.encode(hasCompletedOnboarding, forKey: .hasCompletedOnboarding)
+        try c.encode(savesTranscripts, forKey: .savesTranscripts)
+        try c.encode(exportFolder, forKey: .exportFolder)
+        try c.encodeIfPresent(exportBookmark, forKey: .exportBookmark)
+        try c.encode(enginePermissions, forKey: .enginePermissions)
+        try c.encode(transcriptFormats, forKey: .transcriptFormats)
+        try c.encode(paragraphReader, forKey: .paragraphReader)
+        try c.encode(agentConnection, forKey: .agentConnection)
+        try c.encode(appProfiles.map(ProfileFile.init), forKey: .profiles)
+        try c.encodeIfPresent(context, forKey: .context)
+        try c.encode(useLearned, forKey: .useLearned)
+        try c.encodeIfPresent(profilePin, forKey: .profilePin)
+        try c.encode(glossaryApply, forKey: .glossaryApply)
+    }
+
+    /// An engine as the file keeps it: its old `context` is not written (the amount is All apps' now, `engines[].allow` is the engine's).
+    private static func withoutOldContext(_ e: EngineConfig) -> EngineConfig {
+        var out = e
+        out.context = nil
+        return out
     }
 
     // Decode leniently so adding a field never wipes a user's saved settings.
@@ -274,8 +375,10 @@ struct AppSettings: Codable, Equatable {
         sourceLanguage = try c.decodeIfPresent(String.self, forKey: .sourceLanguage) ?? d.sourceLanguage
         targetLanguage = try c.decodeIfPresent(String.self, forKey: .targetLanguage) ?? d.targetLanguage
         engine = (try? c.decodeIfPresent(TranslationEngineChoice.self, forKey: .engine)) ?? d.engine
-        // One engine this build cannot read (saved by a newer version) must not take the others with it.
-        engines = ((try? c.decodeIfPresent([Lossy<EngineConfig>].self, forKey: .engines)) ?? nil)?.compactMap(\.value) ?? d.engines
+        // The profiles, the amount, the permissions and the Apple switch: a file of 1.1.4 is converted here (design §5.2, one Core function),
+        // one already in the new shape is read as it is. One engine or profile this build cannot read must not take the others with it.
+        let converted = ProfileMigration.convert((try? LegacySettings(from: decoder)) ?? LegacySettings()).value
+        engines = converted.engines ?? d.engines
         customEngineID = (try? c.decodeIfPresent(UUID.self, forKey: .customEngineID)) ?? d.customEngineID
         engineRejections = (try? c.decodeIfPresent([UUID: [String]].self, forKey: .engineRejections)) ?? d.engineRejections
         renderMode = (try? c.decodeIfPresent(RenderMode.self, forKey: .renderMode)) ?? d.renderMode
@@ -298,9 +401,12 @@ struct AppSettings: Codable, Equatable {
         exportBookmark = (try? c.decodeIfPresent(Data.self, forKey: .exportBookmark)) ?? nil
         enginePermissions = (try? c.decodeIfPresent(EnginePermissions.self, forKey: .enginePermissions)) ?? d.enginePermissions
         transcriptFormats = ((try? c.decodeIfPresent([Lossy<TranscriptFileFormat>].self, forKey: .transcriptFormats)) ?? nil)?.compactMap(\.value) ?? d.transcriptFormats
-        appProfiles = ((try? c.decodeIfPresent([Lossy<AppProfile>].self, forKey: .appProfiles)) ?? nil)?.compactMap(\.value) ?? d.appProfiles
+        appProfiles = converted.profiles.map(\.profile)
+        context = converted.context
+        useLearned = converted.useLearned ?? false
+        profilePin = converted.profilePin
+        glossaryApply = converted.glossaryApply ?? .hint
         paragraphReader = (try? c.decodeIfPresent(ParagraphReader.self, forKey: .paragraphReader)) ?? d.paragraphReader
-        appleUsesPinnedTerms = (try? c.decodeIfPresent(Bool.self, forKey: .appleUsesPinnedTerms)) ?? d.appleUsesPinnedTerms
         agentConnection = (try? c.decodeIfPresent(Bool.self, forKey: .agentConnection)) ?? d.agentConnection
     }
 }
@@ -320,6 +426,9 @@ struct RegionConfig: Codable, Identifiable, Equatable {
     var isEnabled = true
     /// When set, the region moves with this window; otherwise it is pinned to the screen.
     var anchor: WindowAnchor?
+    /// The profile this lens is pinned to (design §1.3: Auto or pinned, per lens): a profile's id, or `all` for All apps alone. nil is Auto,
+    /// or the pin of the whole app (`AppSettings.profilePin`). Kept with the lens, not in settings.json: the file's reset never touches it.
+    var profilePin: String? = nil
 
     /// Follows `window` from where the lens is now, or pins it to the screen when nil. The name says which.
     mutating func follow(_ window: WindowInfo?) {
@@ -328,6 +437,19 @@ struct RegionConfig: Codable, Identifiable, Equatable {
                          offset: CGPoint(x: rect.minX - w.bounds.minX, y: rect.minY - w.bounds.minY))
         }
         name = window.map { $0.appName.isEmpty ? String(localized: "Window") : $0.appName } ?? String(localized: "Screen")
+    }
+}
+
+extension RegionConfig {
+    /// A lens saved by an earlier build has no `profilePin`; one that cannot be read as a string is Auto too, never a lens lost.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        rect = try c.decode(CGRect.self, forKey: .rect)
+        isEnabled = try c.decode(Bool.self, forKey: .isEnabled)
+        anchor = try c.decodeIfPresent(WindowAnchor.self, forKey: .anchor)
+        profilePin = (try? c.decodeIfPresent(String.self, forKey: .profilePin)) ?? nil
     }
 }
 

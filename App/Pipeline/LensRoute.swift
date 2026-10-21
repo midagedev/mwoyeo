@@ -1,5 +1,6 @@
 import Foundation
 import MwoyeoCore
+import OSLog
 
 /// What one lens translates with: its own settings (languages, engine), and the cache namespace and pace slot that follow them
 /// (design names-and-context §1.3 "The whole chain is per lens, languages and engine too (Q1)", §8 P1 and P2). A lens over the window of
@@ -35,8 +36,21 @@ struct LensRoute: Sendable {
 
     /// A lens over the window of `app` (nil: none known): the base settings with that app's profile over them. With no app profile the
     /// route is the base whichever app is under the lens, and it names no app.
-    init(base: AppSettings, over app: String?) {
-        self.init(base.effective(frontmost: app), app: app, tracksApp: !base.appProfiles.isEmpty)
+    ///
+    /// `pin` is the lens's own choice of profile (`RegionConfig.profilePin`, design §1.3: Auto or pinned per lens): the profile's id, or `all`
+    /// for All apps alone. It lays over the file's `profilePin` for this lens. An id no profile has is no pin, and is logged.
+    init(base: AppSettings, over app: String?, pin: String? = nil) {
+        let lensPin = pin.flatMap { Self.known($0, in: base) ? $0 : nil }
+        self.init(base.effective(frontmost: app, lensPin: lensPin), app: app, tracksApp: !base.appProfiles.isEmpty)
+    }
+
+    private static let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "lens")
+
+    /// Whether a lens's pin names All apps or a profile that exists; a pin that names a gone profile is dropped with a log line.
+    private static func known(_ pin: String, in base: AppSettings) -> Bool {
+        if pin == AppProfile.allAppsID || base.appProfiles.contains(where: { $0.id == pin }) { return true }
+        log.notice("a lens is pinned to a profile that is gone; it follows Auto")
+        return false
     }
 
     private init(_ settings: AppSettings, app: String?, tracksApp: Bool) {
@@ -60,7 +74,9 @@ struct LensRoute: Sendable {
     /// entries unreachable while switching engines back and forth keeps each one's. The same string keys the pace stats.
     /// `engine: nil` is Apple's namespace whatever engine is chosen (where a fallback stores).
     static func namespace(_ s: AppSettings, engine: EngineConfig?) -> String {
-        "\(space(s, engine: engine))|\(s.glossary.hashValue)"
+        // How the glossary is used is part of what a translation depends on (design §10); `hint`, the default, adds nothing: today's key.
+        let apply = s.glossaryApply == .hint ? "" : "|g:\(s.glossaryApply.rawValue)"
+        return "\(space(s, engine: engine))|\(s.glossary.hashValue)\(apply)"
     }
 
     /// The namespace without the glossary: what an engine's speed depends on (pair and engine identity).

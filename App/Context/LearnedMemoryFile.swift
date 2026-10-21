@@ -1,9 +1,11 @@
 import AppKit
 import MwoyeoCore
 
-/// The learned-memory file (design §10, the user's decision of 2026-10-19): while Save transcripts is on, the names and terms the
-/// app learned for an app are written beside the transcripts, `<exportFolder>/Memory/<bundle id>.json`, so an agent can read them
-/// before it edits the app's memory in settings.json. There is no setting of its own: one opt-in for "save what the lenses read".
+/// The learned-memory file (design §10, the user's decision of 2026-10-19; per head, names-and-context §2.1 and §8 P7): while Save
+/// transcripts is on, the names and terms learned for a profile are written beside the transcripts, `<exportFolder>/Memory/<id>.json`, so
+/// an agent can read them before it edits the profile in settings.json. An app's profile has its bundle id as id, so 1.1.4's files keep
+/// their names; where All apps is the head the rows are the app's, under its bundle id. There is no setting of its own: one opt-in for
+/// "save what the lenses read". The `bundleID` of the functions below is that key (the head's id), whichever profile it names.
 ///
 /// What the file holds is the rows a request may use (two sightings or more), as source → translation pairs with their kind and
 /// gender, and nothing else of the screen: no line, no title, no count of the lines read. A term is at most 40 characters and has no
@@ -13,7 +15,7 @@ enum LearnedMemoryFile {
 
     static func folder(_ root: URL) -> URL { root.appendingPathComponent(folderName) }
 
-    /// `com.example.chat` → `com.example.chat.json`. A bundle id is already a file name; anything outside letters, digits, `.`, `-`
+    /// `com.example.chat` → `com.example.chat.json`. A profile id (a bundle id for an app's profile) is already a file name; anything outside letters, digits, `.`, `-`
     /// and `_` becomes `-`, and a name that is empty or only dots cannot be, so it is `app`.
     static func fileName(for bundleID: String) -> String {
         let allowed = Set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_")
@@ -35,7 +37,7 @@ enum LearnedMemoryFile {
         stamp.formatOptions = [.withInternetDateTime]
         let file = File(app: bundleID, appName: appName, updated: stamp.string(from: updated),
                         about: "Names and terms Mwoyeo learned while translating in this app (src is how it is written, dst how it was translated). "
-                            + "To keep one, add it as a row of appProfiles[].entries in settings.json; this file is not read back.",
+                            + "To keep one, add it as a row of profiles[].entries in settings.json; this file is not read back.",
                         rows: rows.map { Row(src: $0.src, dst: $0.dst, kind: $0.kind.rawValue, gender: $0.gender?.rawValue) })
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
@@ -134,7 +136,7 @@ final class LearnedMemoryWriter {
         guard let access = env.access(settings) else { return }
         let dir = LearnedMemoryFile.folder(access.url)
         let url = dir.appendingPathComponent(LearnedMemoryFile.fileName(for: bundleID))
-        let name = AppProfiles.profile(for: bundleID, in: settings.appProfiles)?.appName ?? bundleID
+        let name = (settings.appProfiles.first { $0.id == bundleID } ?? AppProfiles.profile(for: bundleID, in: settings.appProfiles))?.appName ?? bundleID
         let data = LearnedMemoryFile.render(bundleID: bundleID, appName: name, rows: rows, updated: env.date())
         await Task.detached(priority: .utility) {
             defer { access.end() }

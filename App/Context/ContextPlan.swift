@@ -5,44 +5,41 @@ import MwoyeoCore
 /// untouched (design §9: the default translation never changes; context works only where the user turned it on).
 enum ContextPlan: Equatable {
     /// The added engine gets the document's context: the card, the note and names, the lines before and after. With
-    /// `options.memoryOnly` it gets the card, the note and the matching names and nothing of the document.
-    case engine(EngineConfig, ContextOptions, AppProfile?)
-    /// Apple Translation gets the user's pinned names and terms put into its source text (`ApplePreinsertion`). Never the context
-    /// path: Apple takes no context, whatever the app's override says.
-    case applePins([MemoryEntry])
+    /// `options.memoryOnly` it gets the card, the note and the matching names and nothing of the document. `replace` are the rows
+    /// written into the line being translated (design §10); the hint rows are chosen on the original line, so a `both` row is both.
+    case engine(EngineConfig, ContextOptions, MergedChain, replace: [MemoryEntry])
+    /// The kinds that take no hints (Apple Translation, Foundation Models for profile rows, a template, a command), and an engine whose
+    /// request is Off, get the replace rows written into the source text and nothing else (design §10: "Apple pre-insertion is the replace
+    /// mode, not a path of its own"). Never the context path: they take no context, whatever the amount says.
+    case replaceOnly([MemoryEntry])
 
-    /// Whether a lens has any use for the window it covers under these settings: the added engine could be On (the engine's switch or
-    /// some app's override) or could send some app's written memory (the card needs the app), or Apple Translation has pinned terms
-    /// to use. Anything else reads no window at all, so Off costs nothing.
+    /// Whether a lens has any use for the window it covers under these settings: a name or term is written into the text (which profile
+    /// applies is decided by the window), or the added engine could be sent more than the line (design §4.2, asked of the request table over
+    /// `ContextRoute.candidates`): lines around the text, or the card, the note and the names. Anything else reads no window at all, so Off
+    /// costs nothing.
     static func needsWindow(_ s: AppSettings) -> Bool {
-        if let engine = s.activeEngineConfig {
-            return LayoutKind.engine(engine.kind).tier != nil
-                && (ContextOptions.couldBeOn(engine: engine, profiles: s.appProfiles)
-                    || ContextOptions.memoryOnlyCouldApply(engine: engine, profiles: s.appProfiles))
-        }
-        // The pinned terms are the app's own names and the global glossary's pairs: the lens is read for either of them, for the
-        // plan that carries them needs a lens.
-        return s.appleUsesPinnedTerms && s.engine != .customModel
-            && (s.appProfiles.contains { !$0.entries.isEmpty } || !s.glossaryPairs.isEmpty)
+        if s.hasReplaceRows { return true }
+        guard let engine = s.activeEngineConfig else { return false }
+        return ContextRoute.candidates(s).contains { ContextOptions.requestOptions(engine: engine, chain: $0.chain).enabled }
     }
 
     /// - `engine`: the added engine in use, nil for Apple.
     /// - `engineRests`: that engine is cooling down after a failure, so Apple stands in.
-    /// - `profile`: the profile of the app under the lens (not the app in front).
-    static func decide(settings: AppSettings, engine: EngineConfig?, engineRests: Bool, profile: AppProfile?) -> ContextPlan? {
-        if let engine {
-            // A resting engine is Apple's stand-in; an HTTP template or a command owns its body, so no context goes into it.
-            guard !engineRests, LayoutKind.engine(engine.kind).tier != nil else { return nil }
-            // The engine's switches and the app's override, else the app's written memory alone, else today's path.
-            let options = ContextOptions.requestOptions(engine: engine, profile: profile)
-            return options.enabled ? .engine(engine, options, profile) : nil
+    /// - `chain`: the chain of the window under the lens, merged (`ContextRoute.pair`).
+    static func decide(settings: AppSettings, engine: EngineConfig?, engineRests: Bool, chain: MergedChain) -> ContextPlan? {
+        // Every kind takes the replace rows: they are free and cost the engine nothing it does not already do (design §10). Foundation Models
+        // has the glossary in its instructions (`RequestLayout.foundationModelsInstructions`), so it is given the profiles' rows alone.
+        let followsGlossary = engine == nil && settings.engine == .customModel
+        let replace = followsGlossary
+            ? ContextMemory.replaceRows(rows: chain.rows.map(\.entry), glossary: [], glossaryApply: .hint)
+            : ContextMemory.replaceRows(chain: chain)
+        if let engine, !engineRests, LayoutKind.engine(engine.kind).tier != nil {
+            // The request table (design §4.2): what the chain wants, cut to what the engine allows and its kind takes.
+            let options = ContextOptions.requestOptions(engine: engine, chain: chain)
+            if options.enabled { return .engine(engine, options, chain, replace: replace) }
         }
-        // Apple Translation: the profile's override may say On (`nearby` alone turns it on), and that changes nothing here. Only
-        // the pinned names do, and only when the user turned them on and wrote some for this app or in the global glossary.
-        guard settings.appleUsesPinnedTerms, settings.engine != .customModel else { return nil }
-        // The app's own rows first, then the glossary's pairs the app's memory does not have (the app's row wins).
-        let rows = ContextMemory.applePins(appRows: profile?.entries ?? [], glossary: settings.glossaryPairs)
-        guard !rows.isEmpty else { return nil }
-        return .applePins(rows)
+        // Apple Translation, a resting engine's stand-in, a template, a command, Foundation Models, or an engine with nothing to send: today's
+        // path, with the replace rows in the source when there are any.
+        return replace.isEmpty ? nil : .replaceOnly(replace)
     }
 }

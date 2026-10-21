@@ -142,7 +142,7 @@ final class RegionSession {
         // One look at the window under the lens: its app is the reader's context, and with an app profile it is the owner of the route too.
         let window = appUnderLens(config)
         let owner = OwnerTracker(base.appProfiles.isEmpty ? nil : window?.bundleID)
-        let route = LensRoute(base: base, over: owner.app)
+        let route = LensRoute(base: base, over: owner.app, pin: config.profilePin)
         let settings = route.settings
         self.capturer = capturer
         self.translator = translator
@@ -309,7 +309,7 @@ final class RegionSession {
         let window = appUnderLens(config)
         // With no app profile no owner is known, and none is read for.
         if new.appProfiles.isEmpty { owner = OwnerTracker(nil) } else { _ = takeOwner(of: window) }
-        adopt(LensRoute(base: new, over: owner.app))
+        adopt(LensRoute(base: new, over: owner.app, pin: config.profilePin))
         await pushRoute(lensApp: Self.readerContext(of: window))
     }
 
@@ -330,7 +330,7 @@ final class RegionSession {
     @discardableResult
     private func noteOwner(of window: LensWatch.Read?, settled: Bool = false) -> Bool {
         guard takeOwner(of: window, settled: settled) else { return false }
-        adopt(LensRoute(base: base, over: owner.app))
+        adopt(LensRoute(base: base, over: owner.app, pin: config.profilePin))
         let context = Self.readerContext(of: window)
         Task { await pushRoute(lensApp: context) }
         return true

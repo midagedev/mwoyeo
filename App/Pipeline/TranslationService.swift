@@ -322,17 +322,18 @@ actor TranslationService {
     /// `route` is the lens's own: its languages, engine, glossary, cache namespace and pace slot (`LensRoute`), whatever app is in front.
     /// nil is the service's own (`defaultRoute`): what the menu bar, the harness, an agent and the image window translate with.
     ///
-    /// `context` is the document the lens covers. With none, or when the settings leave context Off for its app and engine, or when
-    /// the engine is Apple Translation or Foundation Models, the code below runs as it always did. Where context is On the call takes
-    /// `translateWithContext`; Apple Translation with the user's pinned terms takes `translateWithPins` (see `ContextPlan`).
+    /// `context` is the document the lens covers. With none, or when the settings leave context Off for its app and engine, and no name
+    /// is to be written into the text, the code below runs as it always did. Where context is On the call takes `translateWithContext`;
+    /// a kind that takes no context, or an engine with nothing to be sent, with replace rows takes `translateWithPins` (see `ContextPlan`).
     func translate(_ texts: [String], route given: LensRoute? = nil, context: LensContext? = nil,
                    onResult: (@Sendable (String, String) -> Void)? = nil) async -> TranslationOutcome {
         let lens = given ?? defaultRoute
         if let context, let plan = contextPlan(for: context, route: lens) {
             switch plan {
-            case let .engine(engine, options, profile):
-                return await translateWithContext(texts, engine: engine, options: options, profile: profile, lens: context, route: lens, onResult: onResult)
-            case let .applePins(entries):
+            case let .engine(engine, options, chain, replace):
+                return await translateWithContext(texts, engine: engine, options: options, chain: chain, replace: replace, lens: context, route: lens,
+                                                  onResult: onResult)
+            case let .replaceOnly(entries):
                 return await translateWithPins(texts, entries: entries, route: lens, onResult: onResult)
             }
         }
@@ -887,10 +888,10 @@ extension TranslationService {
         // app's window than the document's (the window changed hands, and the route and the document have not caught up with each other)
         // has no context this time: today's path, nothing of the document's app goes with another app's engine.
         guard lens.serves(document.bundleID) else { return nil }
-        let pairing = ContextRoute.pair(settings: lens.settings, lens: document.bundleID)
+        let pairing = ContextRoute.pair(settings: lens.settings, lens: document.bundleID, title: document.confirmedTitle)
         var rests = false
         if pairing.engine != nil, case .apple = routing(for: lens) { rests = true }
-        return ContextPlan.decide(settings: lens.settings, engine: pairing.engine, engineRests: rests, profile: pairing.profile)
+        return ContextPlan.decide(settings: lens.settings, engine: pairing.engine, engineRests: rests, chain: pairing.chain)
     }
 
     // MARK: the added engine, with the document's context
@@ -899,8 +900,8 @@ extension TranslationService {
     /// lookups and stores use the namespace of this thread and this memory (design §8.1), and each group's request carries the card,
     /// the note and names, and the lines before and after. A group the engine fails or misses its deadline goes the old way (Apple takes
     /// it while the engine rests). The same health bookkeeping as the old path: the engine's cooldown, the lens's events, the issue.
-    private func translateWithContext(_ texts: [String], engine: EngineConfig, options: MwoyeoCore.ContextOptions, profile: AppProfile?,
-                                      lens document: LensContext, route: LensRoute,
+    private func translateWithContext(_ texts: [String], engine: EngineConfig, options: MwoyeoCore.ContextOptions, chain: MergedChain,
+                                      replace: [MemoryEntry], lens document: LensContext, route: LensRoute,
                                       onResult: (@Sendable (String, String) -> Void)?) async -> TranslationOutcome {
         var outcome = TranslationOutcome()
         // Memory only takes the app and nothing of the document: no title, no screen, no lines. The thread is then the app's, the
@@ -908,7 +909,7 @@ extension TranslationService {
         let lens = options.memoryOnly ? document.appOnly : document
         let space = route.namespace
         let target = route.settings.targetLanguage
-        let pass = contexts.begin(lens, profile: profile, pair: LanguagePair(route.settings.sourceLanguage, target), engineID: engine.id.uuidString,
+        let pass = contexts.begin(lens, chain: chain, pair: LanguagePair(route.settings.sourceLanguage, target), engineID: engine.id.uuidString,
                                   now: ProcessInfo.processInfo.systemUptime)
         let scoped = ContextNamespace.make(base: space, key: pass.key, fingerprint: pass.fingerprint)
 
@@ -917,7 +918,7 @@ extension TranslationService {
         let cjkSource = sourceIsCJK(route)
         // A line that is only a name or a term of the memory this call sends is that row's translation, the engine not asked (a name plate
         // the engine renders its own way in a batch). The rows are the ones the request sends (`RequestLayout.exactRows`).
-        let named = RequestLayout.exactRows(request: contexts.request(lens, pass: pass, items: [], source: nil, target: target, glossary: route.settings.glossaryPairs),
+        let named = RequestLayout.exactRows(request: contexts.request(lens, pass: pass, items: [], source: nil, target: target, glossary: route.settings.glossaryHintPairs),
                                             options: options, kind: .engine(engine.kind))
         for t in texts where seen.insert(t).inserted {
             if !TranslationFilter.needsTranslation(t, cjkSource: cjkSource) {
@@ -943,7 +944,7 @@ extension TranslationService {
         // The lines of this call join the thread when it is over, in the order they were asked for, cache hits included (§8.1).
         defer {
             if !options.memoryOnly {
-                contexts.observe(lens, key: pass.key, lines: needing.map { ($0, outcome.translations[$0]) }, now: ProcessInfo.processInfo.systemUptime)
+                contexts.observe(lens, pass: pass, lines: needing.map { ($0, outcome.translations[$0]) }, now: ProcessInfo.processInfo.systemUptime)
             }
         }
         guard !todo.isEmpty else { return outcome }
@@ -960,8 +961,8 @@ extension TranslationService {
         for source in order {
             if Task.isCancelled { outcome.cancelled = true; break }
             let items = groups[source]!
-            let run = await attemptWithContext(items, source: source, engine: engine, options: options, lens: lens, pass: pass, route: route,
-                                               onResult: onResult)
+            let run = await attemptWithContext(items, source: source, engine: engine, options: options, replace: replace, lens: lens, pass: pass,
+                                               route: route, onResult: onResult)
             switch run.status {
             case .value:
                 engineRecovered(engine)
@@ -1009,8 +1010,8 @@ extension TranslationService {
 
     /// One group through the added engine under context, under the engine deadline: what `attempt` does for an engine, with the
     /// context request in place of the plain one. Pace is learned from the engine's output only, as there.
-    private func attemptWithContext(_ items: [String], source: String, engine: EngineConfig, options: MwoyeoCore.ContextOptions, lens: LensContext,
-                                    pass: ContextBook.Pass, route: LensRoute,
+    private func attemptWithContext(_ items: [String], source: String, engine: EngineConfig, options: MwoyeoCore.ContextOptions,
+                                    replace: [MemoryEntry], lens: LensContext, pass: ContextBook.Pass, route: LensRoute,
                                     onResult: (@Sendable (String, String) -> Void)?) async -> Attempt {
         if !enginesSynced { await syncEngines() }
         let streamed = Streamed()
@@ -1026,7 +1027,8 @@ extension TranslationService {
             onResult?(s, shown)
         }
         let result = await withDeadline(Self.addedEngineDeadline(items: items.count)) {
-            try await self.contextGroup(items, source: source, engine: engine, options: options, lens: lens, pass: pass, route: route, onResult: deliver)
+            try await self.contextGroup(items, source: source, engine: engine, options: options, replace: replace, lens: lens, pass: pass,
+                                        route: route, onResult: deliver)
         }
         var a = Attempt(route: .added(engine), translated: streamed.all, status: .value)
         defer { pace.finish(slot: slot, total: ProcessInfo.processInfo.systemUptime - started, ok: a.isOK, cancelled: a.isCancelled) }
@@ -1047,16 +1049,19 @@ extension TranslationService {
 
     /// The engine call itself. It prints no item (the old path's `engine ←` trace line stays the only place screen text can reach
     /// stderr, and only under MWOYEO_TRACE).
-    private func contextGroup(_ items: [String], source: String, engine: EngineConfig, options: MwoyeoCore.ContextOptions, lens: LensContext,
-                              pass: ContextBook.Pass, route: LensRoute,
+    private func contextGroup(_ items: [String], source: String, engine: EngineConfig, options: MwoyeoCore.ContextOptions, replace: [MemoryEntry],
+                              lens: LensContext, pass: ContextBook.Pass, route: LensRoute,
                               onResult: @escaping @Sendable (String, String) -> Void) async throws -> [String: String] {
         Trace.count("translate.requests")
         Trace.count("translate.texts", items.count)
         Trace.count("translate.context")
         try requirePermission(engine)
         let glossary = route.settings.glossaryPairs
-        let request = contexts.request(lens, pass: pass, items: items, source: source == "und" ? nil : source, target: route.settings.targetLanguage,
-                                       glossary: glossary)
+        var request = contexts.request(lens, pass: pass, items: items, source: source == "und" ? nil : source, target: route.settings.targetLanguage,
+                                       glossary: route.settings.glossaryHintPairs)
+        // The replace rows are written into the line being translated and into nothing else (design §10): the hint rows were chosen on the
+        // original (`items`), so a `both` row is a hint and a replacement; the context lines are the screen's own words.
+        if !replace.isEmpty { request.rewritten = items.map { ApplePreinsertion.insert(into: $0, entries: replace).text } }
         let clock = ContinuousClock()
         let start = clock.now
         let reply = try await client.translate(request, options: options, engine: engine)
@@ -1073,16 +1078,16 @@ extension TranslationService {
             onResult(s, t)
         }
         let used = RequestLayout.selectedRows(request: request, options: options, kind: .engine(engine.kind))
-        contexts.finish(lens, items: items, reply: reply, used: used, options: options, glossary: glossary)
+        contexts.finish(lens, pass: pass, items: items, reply: reply, used: used, options: options, glossary: glossary)
         return out
     }
 
     // MARK: Apple Translation, with the user's pinned names and terms
 
-    /// Apple Translation follows the names the user pinned for this app by getting them in the source text (design §7a, §9; off
-    /// unless `appleUsesPinnedTerms`). The old path translates the changed texts, so its cache is keyed by them: a changed entry is a new
-    /// key. An answer that lacks a pinned target is asked again as the text stood, so a line is never worse than it was. Apple takes no
-    /// context, so nothing else of the app's memory is used.
+    /// A kind that takes no hints follows the names the chain says to replace by getting them in the source text (design §10: the replace
+    /// mode, Apple Translation's pre-insertion among the kinds). The old path translates the changed texts, so its cache is keyed by them: a
+    /// changed entry is a new key. An answer that lacks a target is asked again as the text stood, so a line is never worse than it was. Such
+    /// a kind takes no context, so nothing else of the memory is used.
     private func translateWithPins(_ texts: [String], entries: [MemoryEntry], route lens: LensRoute,
                                    onResult: (@Sendable (String, String) -> Void)?) async -> TranslationOutcome {
         var pre: [String: ApplePreinsertion] = [:]
@@ -1100,7 +1105,7 @@ extension TranslationService {
                 onResult?(t, row)
                 continue
             }
-            let p = ApplePreinsertion.insert(into: t, entries: entries, appleUsesPinnedTerms: true)
+            let p = ApplePreinsertion.insert(into: t, entries: entries)
             if !p.isEmpty { pre[t] = p }
             if sources[p.text] == nil { sent.append(p.text) }
             sources[p.text, default: []].append(t)

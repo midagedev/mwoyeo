@@ -38,6 +38,9 @@ final class SettingsFileStore {
     }
 
     private var brokenURL: URL { url.appendingPathExtension("broken") }
+    /// Where the file of Mwoyeo 1.1.4 is kept before the first save in the new shape (design §5.2).
+    static let oldShapeName = "settings-1.1.4.json"
+    private var oldShapeURL: URL { url.deletingLastPathComponent().appendingPathComponent(Self.oldShapeName) }
     private var schemaURL: URL { url.deletingLastPathComponent().appendingPathComponent(SettingsFileFormat.schemaName) }
 
     init(url: URL = SettingsFileStore.defaultURL) { self.url = url }
@@ -83,6 +86,7 @@ final class SettingsFileStore {
     func save(_ settings: AppSettings) {
         let data = SettingsFileFormat.render(settings)
         guard data != lastSeen else { return }
+        keepOldShape()
         var notice: [SettingsFileIssue] = []
         if needsBackup, FileManager.default.fileExists(atPath: url.path) {
             needsBackup = false
@@ -96,6 +100,18 @@ final class SettingsFileStore {
         }
         write(data)
         issues = notice
+    }
+
+    /// The first save in the new shape copies a file in 1.1.4's shape beside it, once: `settings-1.1.4.json` is never overwritten, so a
+    /// downgrade has the file it left. A file already in the new shape, or no file, copies nothing.
+    private func keepOldShape() {
+        guard let existing = try? Data(contentsOf: url), SettingsFileCheck.isOldShape(existing),
+              !FileManager.default.fileExists(atPath: oldShapeURL.path) else { return }
+        do {
+            try FileManager.default.copyItem(at: url, to: oldShapeURL)
+        } catch {
+            log.error("settings-1.1.4.json could not be written: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     private func write(_ data: Data) {

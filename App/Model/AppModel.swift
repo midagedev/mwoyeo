@@ -513,6 +513,8 @@ final class AppModel {
         guard let i = settings.engines.firstIndex(where: { $0.id == engine.id }) else { return }
         var updated = engine
         updated.context = engine.context ?? settings.engines[i].context
+        // The same for what the engine may be sent (`allow`): the sheet has no control for it until it is rebuilt, so a default `allow` is no choice.
+        updated.allow = engine.allow == .default ? settings.engines[i].allow : engine.allow
         settings.engines[i] = updated
     }
 
@@ -524,7 +526,7 @@ final class AppModel {
     /// A copy under a new id, with its own (empty) key slot. It is the same user's engine, so its context is copied.
     func duplicateEngine(_ id: UUID) {
         guard let e = settings.engines.first(where: { $0.id == id }) else { return }
-        settings.engines.append(EngineConfig(name: String(localized: "\(e.name) copy"), kind: e.kind, context: e.context))
+        settings.engines.append(EngineConfig(name: String(localized: "\(e.name) copy"), kind: e.kind, context: e.context, allow: e.allow))
     }
 
     /// Removes the engine, its saved key and what it learned about its server.

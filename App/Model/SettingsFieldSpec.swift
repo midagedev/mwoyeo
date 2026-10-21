@@ -1,4 +1,5 @@
 import Foundation
+import MwoyeoCore
 
 /// One step on the way to a value in settings.json: an object key or an array index.
 enum FieldStep: Equatable {
@@ -66,13 +67,19 @@ indirect enum FieldKind {
     case uuid
     /// A UUID string, or null.
     case idOrNull
+    /// What a profile is called in the file (design §5.1): 1 to 255 letters, digits, `.`, `-` and `_`, and never `all` (All apps' own id).
+    case identifier
+    /// An engine of a profile (design §5.1): an engine's id, `apple` (Apple's own translation), or null (follow All apps').
+    case engineRef
     /// An http or https address.
     case url
     /// An array. `dropsBad`: its items are independent rows, so a bad one is reported and dropped and the rest apply;
     /// otherwise one bad item fails the list. Items past `maxItems` are reported and dropped.
-    case list(FieldKind, maxItems: Int? = nil, unique: Bool = false, dropsBad: Bool = false)
-    /// An object with these properties and no others.
-    case object([FieldSpec])
+    /// `uniqueBy` names a property of the items that no two may share: a later item with a value already taken is reported and dropped.
+    case list(FieldKind, maxItems: Int? = nil, unique: Bool = false, dropsBad: Bool = false, uniqueBy: String? = nil)
+    /// An object with these properties and no others. `needsOneOf` lists properties of which at least one must be there (a condition with
+    /// neither `app` nor `titleContains` is no condition).
+    case object([FieldSpec], needsOneOf: [String] = [])
     /// An object whose `tag` property picks which of `variants` it is: its other properties are `common` plus that variant's.
     case tagged(tag: String, tagDoc: String, common: [FieldSpec], variants: [FieldVariant])
     /// An object with any keys (or only `keys`, named `keyNoun`) whose values are all of one kind.
@@ -141,6 +148,14 @@ extension FieldKind {
             if value is NSNull { return nil }
             if let s = value as? String, Self.isUUID(s) { return nil }
             return "expected an engine id from engines, or null"
+        case .identifier:
+            guard let s = value as? String else { return "expected an id, got \(SettingSpec.name(of: value))" }
+            if s == AppProfile.allAppsID { return "\"all\" is the id of All apps; a profile needs another" }
+            return AppProfile.isValidID(s) ? nil : "\"\(s)\" is not an id; use 1 to 255 letters, digits, dots, hyphens or underscores"
+        case .engineRef:
+            if value is NSNull { return nil }
+            if let s = value as? String, s == "apple" || Self.isUUID(s) { return nil }
+            return "expected an engine id from engines, \"apple\", or null"
         case .url:
             guard let s = value as? String else { return "expected an http or https address, got \(SettingSpec.name(of: value))" }
             return Self.isHTTPAddress(s) ? nil : "\"\(s)\" is not an http or https address such as http://localhost:8765/v1"
@@ -171,9 +186,10 @@ extension FieldKind {
             return nil
         }
         switch self {
-        case let .list(element, maxItems, unique, dropsBad):
+        case let .list(element, maxItems, unique, dropsBad, uniqueBy):
             guard let items = value as? [Any] else { return fail("expected \(listNoun(element)), got \(SettingSpec.name(of: value))") }
             var kept: [Any] = []
+            var taken: [String: Int] = [:]
             var failed = false
             for (i, item) in items.prefix(maxItems ?? items.count).enumerated() {
                 let child = path.appending(.index(i))
@@ -186,6 +202,13 @@ extension FieldKind {
                     _ = fail("\(shown) is listed twice", at: child, cost: .drop)
                     continue
                 }
+                if let uniqueBy, let key = (ok as? [String: Any])?[uniqueBy] as? String {
+                    if let first = taken[key] {
+                        _ = fail("\(uniqueBy) \"\(key)\" is already used by item \(first)", at: child.appending(.key(uniqueBy)), cost: .drop)
+                        continue
+                    }
+                    taken[key] = i
+                }
                 kept.append(ok)
             }
             if let maxItems, items.count > maxItems {
@@ -193,9 +216,13 @@ extension FieldKind {
             }
             return failed ? nil : kept
 
-        case let .object(fields):
+        case let .object(fields, needsOneOf):
             guard let object = value as? [String: Any] else { return fail("expected an object, got \(SettingSpec.name(of: value))") }
-            return Self.readFields(object, fields: fields, foreign: [:], tagged: nil, at: path, fallout: fallout, problems: &problems)
+            let read = Self.readFields(object, fields: fields, foreign: [:], tagged: nil, at: path, fallout: fallout, problems: &problems)
+            if let read, !needsOneOf.isEmpty, !needsOneOf.contains(where: { read[$0] != nil }) {
+                return fail("needs \(needsOneOf.joined(separator: " or "))")
+            }
+            return read
 
         case let .tagged(tag, tagDoc, common, variants):
             guard let object = value as? [String: Any] else { return fail("expected an object, got \(SettingSpec.name(of: value))") }
@@ -268,8 +295,8 @@ extension FieldKind {
     /// Every `FieldSpec` in the tree below this kind, depth first (for checks that walk the whole tree).
     var fields: [FieldSpec] {
         switch self {
-        case let .list(element, _, _, _): element.fields
-        case let .object(fields): fields.flatMap { [$0] + $0.kind.fields }
+        case let .list(element, _, _, _, _): element.fields
+        case let .object(fields, _): fields.flatMap { [$0] + $0.kind.fields }
         case let .tagged(_, _, common, variants): (common + variants.flatMap(\.fields)).flatMap { [$0] + $0.kind.fields }
         case let .map(value, _, _): value.fields
         default: []
@@ -322,15 +349,21 @@ extension FieldKind {
             return ["type": "string", "format": "uuid", "pattern": Self.uuidPattern]
         case .idOrNull:
             return ["type": ["string", "null"], "format": "uuid", "pattern": Self.uuidPattern]
+        case .identifier:
+            return ["type": "string", "minLength": 1, "maxLength": 255, "pattern": "^(?!all$)[\\p{L}\\p{N}._-]+$"]
+        case .engineRef:
+            return ["type": ["string", "null"], "pattern": "^(apple|\(Self.uuidPattern.dropFirst().dropLast()))$"]
         case .url:
             return ["type": "string", "format": "uri", "pattern": Self.httpAddressPattern]
-        case let .list(element, maxItems, unique, _):
+        case let .list(element, maxItems, unique, _, _):
             var s: [String: Any] = ["type": "array", "items": element.schema()]
             if let maxItems { s["maxItems"] = maxItems }
             if unique { s["uniqueItems"] = true }
             return s
-        case let .object(fields):
-            return Self.objectSchema(fields)
+        case let .object(fields, needsOneOf):
+            var s = Self.objectSchema(fields)
+            if !needsOneOf.isEmpty { s["anyOf"] = needsOneOf.map { ["required": [$0]] } }
+            return s
         case let .tagged(tag, tagDoc, common, variants):
             // Only the tag and the common properties are required everywhere; a variant's own required ones are in its `then`.
             let head = common + [FieldSpec(tag, .choice(variants.map(\.tag)), tagDoc, required: true)]

@@ -16,27 +16,70 @@ struct SettingsFileIssue: Equatable {
 /// A setting's `kind` is a `FieldKind` tree (`SettingsFieldSpec.swift`): the same tree gives the schema and the check, nested objects included.
 /// `SettingsFileCheck.uncoveredKeys` fails a check when AppSettings writes a key this table lacks.
 struct SettingSpec {
+    /// The tab of Settings a key belongs to (design names-and-context §9): what "Restore Defaults…" at the foot of that tab covers. `none` is
+    /// a key no tab shows (a key of 1.1.4 that is read and never written).
+    enum Tab: String, CaseIterable { case general, translation, appearance, shortcuts, about, none }
+    /// What kind of thing a key holds (§9): a `preference` Restore sets to its default, a `consent` it keeps (shown as "kept", turned off only by
+    /// hand), `data` it never touches (deleted per item, with its own confirmation).
+    enum Nature: String, CaseIterable { case preference, consent, data }
+
     let key: String
     let kind: FieldKind
     let doc: String
     /// Realistic values of the whole setting, for `examples` in the schema; each must pass the check.
     var examples: [Any] = []
+    /// A key of 1.1.4 the app still reads (and converts) and never writes (design §5.2); the schema marks it `deprecated`.
+    var deprecated = false
+    /// Where Restore Defaults finds the key (§9). Filled from `columns`, the one table; `missingRestoreColumns` fails a key that has no row.
+    var tab: Tab?
+    var nature: Nature?
 
-    static let all: [SettingSpec] = [
+    /// The §9 table, row for row: the tab and the nature of every key the file holds. A key not in it has no home for Restore Defaults, and the
+    /// check says so (`missingRestoreColumns`). Keys that are not in the file at all (`SettingsFileCheck.notInFile`: `enginePermissions`,
+    /// `exportBookmark`, `engineRejections`, `hasCompletedOnboarding`) are consent or data that Restore never touches and have no row here.
+    static let columns: [String: (tab: Tab, nature: Nature)] = [
+        "sourceLanguage": (.general, .preference), "targetLanguage": (.general, .preference), "renderMode": (.general, .preference),
+        "settleDelay": (.general, .preference), "framesPerSecond": (.general, .preference), "transcriptFormats": (.general, .preference),
+        "savesTranscripts": (.general, .consent), "exportFolder": (.general, .consent), "agentConnection": (.general, .consent),
+        "engine": (.translation, .preference), "customEngineID": (.translation, .preference), "cacheSize": (.translation, .preference),
+        "paragraphReader": (.translation, .preference), "profilePin": (.translation, .preference),
+        "context": (.translation, .consent), "useLearned": (.translation, .consent),
+        "engines": (.translation, .data), "glossary": (.translation, .data), "glossaryApply": (.translation, .data), "profiles": (.translation, .data),
+        "useInpaintingModel": (.appearance, .preference), "fontStyle": (.appearance, .preference), "boxOpacity": (.appearance, .preference),
+        "lensStyle": (.appearance, .preference), "lensTint": (.appearance, .preference), "lensTabVisibility": (.appearance, .preference),
+        "lensTabPosition": (.appearance, .preference),
+        "shortcuts": (.shortcuts, .preference),
+        "checksForUpdates": (.about, .consent),
+        // 1.1.4's keys: read and converted, never written, shown by no tab; what they were is what they became (`profiles`, `glossaryApply`).
+        "appProfiles": (.none, .data), "appleUsesPinnedTerms": (.none, .consent),
+    ]
+
+    /// The keys of `specs` that lack the tab or the nature (§9: "a key without them fails"); empty when every key has both.
+    static func missingRestoreColumns(_ specs: [SettingSpec]) -> [String] {
+        specs.filter { $0.tab == nil || $0.nature == nil }.map(\.key)
+    }
+
+    static let all: [SettingSpec] = rows.map { row in
+        var spec = row
+        (spec.tab, spec.nature) = (columns[row.key]?.tab, columns[row.key]?.nature)
+        return spec
+    }
+
+    private static let rows: [SettingSpec] = [
         .init(key: "sourceLanguage", kind: .choice(Languages.sources),
               doc: "Language of the text on screen: a code such as ja or zh-Hans, or auto to detect it per line."),
         .init(key: "targetLanguage", kind: .choice(Languages.targets), doc: "Language to translate into, as a code such as en or ko."),
         .init(key: "engine", kind: .choice(TranslationEngineChoice.allCases.map(\.rawValue)),
               doc: "Apple's translation choice: auto (the language pack when installed), highFidelity (Apple Intelligence's translation model) or customModel (a prompted on-device model that follows the glossary)."),
         .init(key: "engines", kind: .engines,
-              doc: "Translation engines you added, each with a name, a kind and its address. API keys are never stored here; they stay in the Keychain. Add engines in Settings > Translation.",
+              doc: "Translation engines you added, each with a name, a kind, its address and what it may be sent (allow). API keys are never stored here; they stay in the Keychain. Add engines in Settings > Translation.",
               examples: SettingExamples.engines),
         .init(key: "customEngineID", kind: .idOrNull, doc: "The id of the added engine in use, or null to use Apple's translation."),
         .init(key: "renderMode", kind: .choice(RenderMode.allCases.map(\.rawValue)),
               doc: "How translations are drawn: adaptive (boxes while things move, a rewrite in place once still), fast (always boxes) or seamless (always erase and rewrite)."),
         .init(key: "useInpaintingModel", kind: .bool,
               doc: "Erase the original text with the on-device model when rewriting in place; off fills with a flat colour."),
-        .init(key: "glossary", kind: .string, doc: "Fixed translations for names and terms in every app, one \"source = target\" pair per line. Names and terms of one app (a game's cast, a show's places) go in that app's memory instead: the note and entries of its appProfiles item."),
+        .init(key: "glossary", kind: .string, doc: "Fixed translations for names and terms in every app, one \"source = target\" pair per line, used the way glossaryApply says. Names and terms of one app, window or preset (a game's cast, a show's places) go in a profile instead: the note and entries of its profiles item."),
         .init(key: "framesPerSecond", kind: .number(1...30),
               doc: "How many times a second the screen is checked for changes. Settings offers 4, 8 and 15."),
         .init(key: "settleDelay", kind: .number(0.2...2),
@@ -56,18 +99,30 @@ struct SettingSpec {
               doc: "Global keyboard shortcuts by action name; an action left out has no shortcut. Each has a Carbon keyCode, a Carbon modifiers mask and a display text. Easier to set in Settings > Shortcuts."),
         .init(key: "checksForUpdates", kind: .bool, doc: "Ask GitHub once a day whether a newer version is out."),
         .init(key: "savesTranscripts", kind: .bool,
-              doc: "Translation log: every lens writes what it read and its translation to <exportFolder>/Transcripts (Markdown and SRT, see transcriptFormats) while this is true. The names and terms the app learned for an app (engines[].context.useLearned) are written to <exportFolder>/Memory/<bundle id>.json while this is true; the file is never read back."),
+              doc: "Translation log: every lens writes what it read and its translation to <exportFolder>/Transcripts (Markdown and SRT, see transcriptFormats) while this is true. The names and terms learned for a profile (useLearned) are written to <exportFolder>/Memory/<profile id>.json while this is true (an app's profile has its bundle id as id); the file is never read back."),
         .init(key: "exportFolder", kind: .string,
               doc: "Folder of the translation log (its Transcripts folder, while savesTranscripts is true), of the learned names (its Memory folder, same condition) and of saved lens images. The App Store version shows the folder chosen in Settings; a path typed here does not open one there."),
         .init(key: "transcriptFormats", kind: .choiceList(TranscriptFileFormat.allCases.map(\.rawValue)),
               doc: "Files of the translation log: markdown, srt, and jsonl (one JSON line per translated line with time, lens, app, source, target, engine, original and translation, added as it happens so tail -f works)."),
+        .init(key: "profiles", kind: .profiles,
+              doc: "Profiles: a name, a language pair and optionally an engine, a paragraph reader, a note and names and terms, an amount of context and a learn switch. `when` says where a profile is used: each condition is an app (a bundle ID, the app field of each translation log line), a window-title phrase, or both; with none a profile is a preset, used only when it is picked. A lens uses every profile whose conditions match the window it covers, narrowest first (an app and a title, then a title, then an app), then All apps (the top-level keys); the first profile decides the languages and where the learned names are kept. Each name or term has apply: hint (told to the translator where it appears), replace (written into the text before translating, free, and the only way to give a name to Apple Translation) or both. Easier to set from a lens's menu and Settings > Translation; the memory is where one app's names belong, the glossary is for every app. Every item needs id, source and target (copy sourceLanguage and targetLanguage to keep an app on them); an item without them is dropped. Writing a note or names is enough for an added engine (OpenAI-compatible or Anthropic) to be sent the app's name and category, the note and the names that occur in the text, even with context off; no screen lines and no window title go with them. A context mode of off turns that off too.",
+              examples: SettingExamples.profiles),
+        .init(key: "context", kind: .amount,
+              doc: "How much goes with each line for every profile that sets no amount of its own (All apps' amount): off (only the line), memory (the app's name and category, the note and the names that occur in the text; this is what a missing key means), nearby (also the lines around the text on screen) or conversation (also the lines read before, previousLines of them). What an engine may be sent of that is its allow."),
+        .init(key: "useLearned", kind: .bool,
+              doc: "Also send the names and terms picked up while translating, and record the terms the engine's reply names, for every profile that does not say otherwise. Learned terms stay in memory and are saved only as the learned-memory file (savesTranscripts). Written to the file only when true; write false to turn it off."),
+        .init(key: "profilePin", kind: .text(maxLength: 255, minLength: 1),
+              doc: "Pins every lens to one profile: its id, or all for All apps only. Left out, each lens picks by its window (Auto). It must name a profile in profiles. A lens's own choice stays with the lens."),
+        .init(key: "glossaryApply", kind: .choice(EntryApply.allCases.map(\.rawValue)),
+              doc: "How the glossary's pairs are used, one mode for all: hint (told to the translator when a pair occurs in the text), replace (the translation is written into the text before translating, free; Apple Translation uses it too) or both. A pair a profile's names have a row for is not used. Written to the file only when not hint."),
         .init(key: "appProfiles", kind: .appProfiles,
-              doc: "Per app, keyed by bundle ID (the app field of each translation log line): the app's memory (note: a note for the translator; entries: names and terms with their translations and kinds), and the languages, engine and paragraph reader remembered for it; the app in front decides which applies. Easier to set from a lens's menu; the memory is where one app's names belong, the glossary is for every app. Every item needs bundleID, source and target (the languages for that app; copy sourceLanguage and targetLanguage to keep the app on them); an item without them is dropped. A profile can also carry a context override for that app. Writing a note or names is enough: an added engine (OpenAI-compatible or Anthropic) is sent the app's name and category, the note and the names that occur in the text, even when its own context is off; no screen lines and no window title go with them. A context mode of off turns that off too.",
-              examples: SettingExamples.appProfiles),
+              doc: "Read, never written: the per-app profiles of Mwoyeo 1.1.4. A file that has this key and no profiles is converted to profiles on the next save, and the old file is kept beside it as settings-1.1.4.json.",
+              deprecated: true),
         .init(key: "paragraphReader", kind: .choice(ParagraphReader.allCases.map(\.rawValue)),
               doc: "How text is cut into paragraphs: automatic, documentLayout (the macOS document model) or lineGrouping (the app's own line rules)."),
         .init(key: "appleUsesPinnedTerms", kind: .bool,
-              doc: "Apple Translation follows the names and terms you pinned in an app's memory and the pairs in the global glossary, by putting your translation into the source text. A name the app's memory has wins over the glossary's pair of the same name. Off by default. Written to the file only when true; write false to turn it off."),
+              doc: "Read, never written: the switch of Mwoyeo 1.1.4. On, it becomes apply: both on every name in profiles and glossaryApply: both, which also puts those names into the text for engines other than Apple Translation.",
+              deprecated: true),
         .init(key: "agentConnection", kind: .bool,
               doc: "Lets an agent connected with `Mwoyeo --mcp` use the app: read the translation log, read and write each app's memory, and read and change settings. Off by default, so a connected agent is refused until the person turns it on in Settings > General. An agent cannot change this key. Written to the file only when true; write false to turn it off."),
     ]
@@ -122,7 +177,20 @@ extension FieldKind {
                                             default: "off")
     private static let headers = FieldKind.map(.string)
 
-    /// `engines[].context`: the keys, defaults and limits are those of `EngineContext` and `AppContextOverride`, never a copy.
+    /// `engines[].allow`: the keys and defaults are those of `EngineAllow`, never a copy.
+    private static let engineAllow: FieldKind = .object([
+        FieldSpec("lines", .bool,
+                  "The lines around the text on screen (and the earlier lines) may be sent to this engine when the amount asks for them. Off: this engine gets only the line, whatever a profile asks, and the memory.",
+                  example: true, default: EngineAllow.default.lines),
+        FieldSpec("title", .bool,
+                  "The window title may be sent. Off by default, because the title can hold text from elsewhere and leaves this Mac when the engine is a cloud service; a server on this Mac gets it whenever lines go.",
+                  example: false, default: EngineAllow.default.title),
+        FieldSpec("deepLInstructions", .bool,
+                  "DeepL only. Send custom_instructions and a formality that come from the memory of the profiles in use. Other engine kinds ignore it.",
+                  example: false, default: EngineAllow.default.deepLInstructions),
+    ])
+
+    /// `engines[].context` (1.1.4, read and converted): the keys, defaults and limits are those of `EngineContext` and `AppContextOverride`, never a copy.
     /// A field this object lacks would be dropped at the app's next save, and `SettingsFileChecks` fails when the two differ.
     private static let engineContext: FieldKind = .object([
         FieldSpec("enabled", .bool,
@@ -147,10 +215,12 @@ extension FieldKind {
         tag: "kind",
         tagDoc: "What the engine speaks: openAICompatible (Ollama, LM Studio and the like), anthropic, deepL, httpTemplate (any HTTP service you describe) or command (a program of your own). The other fields depend on it.",
         common: [
-            FieldSpec("id", .uuid, "Identifies the engine; customEngineID and appProfiles refer to it.", example: exampleUUID),
+            FieldSpec("id", .uuid, "Identifies the engine; customEngineID and the profiles refer to it.", example: exampleUUID),
             FieldSpec("name", .string, "The name shown in Settings.", required: true, example: "Local Qwen"),
+            FieldSpec("allow", engineAllow,
+                      "What this engine may be sent: the lines around the text (lines, on by default), the window title (title, off by default) and, for DeepL, the memory as its instructions (deepLInstructions, off by default). What a request carries is the amount (context, a profile's context) cut to what the engine allows and takes. Written only when it differs from the default."),
             FieldSpec("context", engineContext,
-                      "What this engine is sent besides the lines to translate. Everything here is off by default: left out, or with enabled false, every request is the one it always was. An app's own context (appProfiles[].context) is laid over these."),
+                      "Read, never written: the context of Mwoyeo 1.1.4. A file that has it and no profiles is converted: the amount becomes context, learning becomes useLearned, and the title and DeepL switches become allow."),
         ],
         variants: [
             FieldVariant(tag: "openAICompatible", fields: [
@@ -195,6 +265,9 @@ extension FieldKind {
         FieldSpec("gender", .choice(Gender.allCases.map(\.rawValue)), "For a person: f, m or n (neutral), so pronouns and agreement come out right.", example: "m"),
         FieldSpec("note", .text(maxLength: MemoryEntry.maxEntryNote), "A short hint about it, up to \(MemoryEntry.maxEntryNote) characters.", example: "the speaker's older colleague"),
         FieldSpec("reading", .text(maxLength: MemoryEntry.maxName), "How src is pronounced, such as the kana of a kanji name.", example: "たなか"),
+        FieldSpec("apply", .choice(EntryApply.allCases.map(\.rawValue)),
+                  "How the row is used: hint (told to the translator where it appears; costs tokens), replace (written into the text before translating; free, and the only way Apple Translation takes a name) or both. Left out, hint.",
+                  example: "both"),
         FieldSpec("addressing", .list(.object([
             FieldSpec("to", .text(maxLength: MemoryEntry.maxName, minLength: 1), "Who is being spoken to, as written in that entry's src.", required: true, example: "Hana"),
             FieldSpec("register", .choice(Register.allCases.map(\.rawValue)), "How this person speaks to them.", required: true, example: "polite"),
@@ -202,8 +275,48 @@ extension FieldKind {
                   "How this person speaks to others: one row per listener, up to \(MemoryEntry.maxAddressing)."),
     ]), maxItems: AppProfile.maxEntries, dropsBad: true)
 
-    /// What the app remembers per app. The memory fields (note, entries, context) are all optional; their limits are the
-    /// constants of the Core types that keep them (`AppProfile`, `MemoryEntry`, `AppContextOverride`), never a second copy.
+    /// An amount of context: `context` of the file and of a profile. The modes and limits are those of `AppContextOverride`.
+    static let amount: FieldKind = .object([
+        FieldSpec("mode", .choice(AppContextOverride.Mode.allCases.map(\.rawValue)),
+                  "How much goes along with each line: off (only the line; a profile's note and names are not sent either), memory (the app's name and category, the note and the names that occur in the text), nearby (also the two lines above it and the two below it on screen) or conversation (also the lines read before).",
+                  required: true, example: "nearby"),
+        FieldSpec("previousLines", .integer(0...AppContextOverride.maxPreviousLines),
+                  "How many earlier lines go along in conversation mode, 0 to \(AppContextOverride.maxPreviousLines).",
+                  example: 3, default: AppContextOverride.defaultPreviousLines),
+    ])
+
+    /// One condition of `when` (design §1.2): an app, a window-title phrase, or both.
+    private static let condition: FieldKind = .object([
+        FieldSpec("app", .text(minLength: 1), "Bundle identifier of the app whose window the profile is for.", example: "com.example.emu"),
+        FieldSpec("titleContains", .text(maxLength: ProfileCondition.maxTitleLength, minLength: 1),
+                  "A phrase the window's title must contain (case, accents and width ignored). Keep the part that stays the same, like a game's name. The title only picks the profile on this Mac; it is never sent because of it.",
+                  example: "月涙譚"),
+    ], needsOneOf: ["app", "titleContains"])
+
+    /// The profiles (design §5.1, §5.3). The limits are the constants of the Core types that keep them (`AppProfile`, `MemoryEntry`,
+    /// `AppContextOverride`, `ProfileCondition`), never a second copy. Each field of an item is optional but `id`, `source` and `target`.
+    static let profiles: FieldKind = .list(.object([
+        FieldSpec("id", .identifier, "Identifies the profile: unique, 1 to 255 letters, digits, dots, hyphens and underscores, never all. An app's profile uses its bundle ID, so its learned names keep their file name.",
+                  required: true, example: "com.example.chat"),
+        FieldSpec("name", .text(maxLength: AppProfile.maxNameLength, minLength: 1), "The name shown in Settings and the lens menu. Left out, the id.", example: "Example Chat"),
+        FieldSpec("when", .list(condition, maxItems: AppProfile.maxConditions, dropsBad: true),
+                  "Where the profile is used, up to \(AppProfile.maxConditions) conditions; a window that matches any of them uses it. Left out or empty, a preset: used only when it is picked.",
+                  example: [["app": "com.example.chat"]]),
+        FieldSpec("source", .choice(Languages.sources), "Source language code, or auto.", required: true, example: "ja"),
+        FieldSpec("target", .choice(Languages.targets), "Target language code.", required: true, example: "en"),
+        FieldSpec("customEngineID", .engineRef, "Engine for this profile: an id from engines, apple for Apple's own translation, or null / left out to follow All apps."),
+        FieldSpec("paragraphReader", .choice(ParagraphReader.allCases.map(\.rawValue)), "Paragraph reader for this profile; left out follows the default."),
+        FieldSpec("note", .text(maxLength: AppProfile.maxNoteLength),
+                  "A note for the translator: who is talking, the setting, the register. Up to \(AppProfile.maxNoteLength) characters. The notes of the profiles in use go together, broad to narrow, and over \(AppProfile.maxNoteLength) characters the broadest are dropped whole.",
+                  example: "Casual chat between two friends. Keep it informal and short."),
+        FieldSpec("entries", appEntries,
+                  "Names and terms with their translations, up to \(AppProfile.maxEntries) rows. A bad row is reported and dropped; the rest apply. A second row with the same src is left out; of two profiles in use, the narrower one's row wins."),
+        FieldSpec("context", amount, "The amount of context for this profile; left out follows the top-level context."),
+        FieldSpec("useLearned", .bool, "Learn names and terms for this profile (they are kept under the first profile in use); left out follows the top-level useLearned.", example: true),
+    ]), maxItems: AppProfile.maxProfiles, dropsBad: true, uniqueBy: "id")
+
+    /// What the app remembers per app, as 1.1.4 wrote it (read and converted to `profiles`). The memory fields (note, entries, context) are
+    /// all optional; their limits are the constants of the Core types that keep them, never a second copy.
     static let appProfiles: FieldKind = .list(.object([
         FieldSpec("bundleID", .string, "Bundle identifier of the app.", required: true, example: "com.example.chat"),
         FieldSpec("appName", .string, "The app's name, for display.", example: "Example Chat"),
@@ -211,19 +324,10 @@ extension FieldKind {
         FieldSpec("target", .choice(Languages.targets), "Target language code.", required: true, example: "en"),
         FieldSpec("customEngineID", .idOrNull, "Engine for this app; null keeps the base choice."),
         FieldSpec("paragraphReader", .choice(ParagraphReader.allCases.map(\.rawValue)), "Paragraph reader for this app; left out follows the default."),
-        FieldSpec("note", .text(maxLength: AppProfile.maxNoteLength),
-                  "A note for the translator about this app: who is talking, the setting, the register. Up to \(AppProfile.maxNoteLength) characters.",
+        FieldSpec("note", .text(maxLength: AppProfile.maxNoteLength), "A note for the translator about this app. Up to \(AppProfile.maxNoteLength) characters.",
                   example: "Casual chat between two friends. Keep it informal and short."),
-        FieldSpec("entries", appEntries,
-                  "Names and terms of this app with their translations, up to \(AppProfile.maxEntries) rows. A bad row is reported and dropped; the rest apply. A second row with the same src is left out."),
-        FieldSpec("context", .object([
-            FieldSpec("mode", .choice(AppContextOverride.Mode.allCases.map(\.rawValue)),
-                      "How much surrounding text goes along with each line: off (none, and the app's note and names are not sent either), nearby (the two lines above it and the two below it on screen) or conversation (also the lines read before).",
-                      required: true, example: "nearby"),
-            FieldSpec("previousLines", .integer(0...AppContextOverride.maxPreviousLines),
-                      "How many earlier lines go along in conversation mode, 0 to \(AppContextOverride.maxPreviousLines).",
-                      example: 3, default: AppContextOverride.defaultPreviousLines),
-        ]), "Context for this app's translations. Left out, the app follows the engine's own context switch, which is off by default; a note or names written for the app are still sent (the app's name, the note and the names in the text, nothing from the screen). off sends nothing but the lines."),
+        FieldSpec("entries", appEntries, "Names and terms of this app, up to \(AppProfile.maxEntries) rows. A bad row is reported and dropped; the rest apply."),
+        FieldSpec("context", amount, "Context for this app's translations."),
     ]))
 }
 
@@ -233,11 +337,29 @@ enum SettingExamples {
         [["id": FieldKind.exampleUUID, "kind": "openAICompatible", "name": "Local Qwen", "baseURL": "http://localhost:8765/v1",
           "model": "qwen3:8b", "thinking": "off"] as [String: Any]],
         [["kind": "deepL", "name": "DeepL", "baseURL": "https://api.deepl.com", "formality": "prefer_more"] as [String: Any]],
-        [["kind": "openAICompatible", "name": "Local Qwen with context", "baseURL": "http://localhost:8765/v1", "model": "qwen3:8b",
-          "context": ["enabled": true, "previousLines": 3, "includeTitle": false, "useLearned": false, "deepLInstructions": false] as [String: Any]] as [String: Any]],
+        [["kind": "openAICompatible", "name": "Cloud chat that may see the window title", "baseURL": "https://api.example.com/v1", "model": "gpt-example",
+          "allow": ["lines": true, "title": true, "deepLInstructions": false] as [String: Any]] as [String: Any]],
     ]
 
-    /// One profile with a note, two entries that carry addressing, and a context override.
+    /// An app's profile with a note, two entries that carry addressing (one both ways), a context override and a learn switch; and a
+    /// preset with no conditions.
+    static let profiles: [Any] = [
+        [[
+            "id": "com.example.chat", "name": "Example Chat", "when": [["app": "com.example.chat"]], "source": "ja", "target": "en",
+            "paragraphReader": "lineGrouping", "note": "Casual chat between two friends. Keep it informal and short.",
+            "entries": [
+                ["src": "田中", "dst": "Tanaka", "kind": "person", "gender": "m", "note": "the speaker's older colleague", "reading": "たなか", "apply": "both",
+                 "addressing": [["to": "Hana", "register": "polite"]]] as [String: Any],
+                ["src": "花", "dst": "Hana", "kind": "person", "gender": "f",
+                 "addressing": [["to": "Tanaka", "register": "casual"]]] as [String: Any],
+            ],
+            "context": ["mode": "nearby", "previousLines": 3] as [String: Any], "useLearned": true,
+        ] as [String: Any],
+        ["id": "anime", "name": "Anime", "source": "ja", "target": "ko", "customEngineID": "apple"] as [String: Any],
+        ["id": "game-1", "name": "月涙譚", "when": [["app": "com.example.emu", "titleContains": "月涙譚"]], "source": "ja", "target": "ko"] as [String: Any]],
+    ]
+
+    /// The 1.1.4 shape of one profile, for the key that is read and never written.
     static let appProfiles: [Any] = [
         [[
             "bundleID": "com.example.chat", "appName": "Example Chat", "source": "ja", "target": "en", "paragraphReader": "lineGrouping",
@@ -257,6 +379,9 @@ enum SettingExamples {
 struct SettingsFileResult {
     var settings: AppSettings
     var issues: [SettingsFileIssue]
+    /// The file is in 1.1.4's shape and was converted (design §5.2): the next save writes the new shape, after copying this file to
+    /// `settings-1.1.4.json`. Not an issue: nothing in the file is wrong.
+    var convertedFromOldShape = false
     /// False when the text is not JSON at all (nothing in it was applied).
     var parsed = true
     /// The keys whose value differs from `current`.
@@ -272,14 +397,20 @@ enum SettingsFileCheck {
         guard let data = try? JSONEncoder().encode(s),
               var d = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return [:] }
         for k in notInFile { d[k] = nil }
-        if omittingUnset { for k in writtenOnlyWhenTrue where d[k] as? Bool == false { d[k] = nil } }
+        if omittingUnset { for (k, v) in writtenOnlyWhenSet where (d[k] as? NSObject)?.isEqual(v) == true { d[k] = nil } }
         if d["customEngineID"] == nil { d["customEngineID"] = NSNull() }
+        if !omittingUnset { for k in nullWhenUnset where d[k] == nil { d[k] = NSNull() } }
         return d
     }
 
-    /// Switches added after 1.1.2 that are off by default. The file holds one only while it is true, so a file from before
-    /// the key re-saves byte for byte. The schema still lists it, with its default.
-    static let writtenOnlyWhenTrue: Set<String> = ["appleUsesPinnedTerms", "agentConnection"]
+    /// Keys that hold nothing while unset and are not written then (`encodeIfPresent`): a read of every setting (`get_settings`) shows them
+    /// as null, the way it shows `customEngineID`, so the list of keys is the table's.
+    static let nullWhenUnset = ["context", "profilePin"]
+
+    /// Keys added after 1.1.2 whose default is not written: the file holds one only while it differs, so a file from before the key
+    /// re-saves byte for byte. The schema still lists it, with its default. A switch is written only while it is true, `glossaryApply`
+    /// only while it is not hint.
+    static let writtenOnlyWhenSet: [String: NSObject] = ["useLearned": false as NSNumber, "agentConnection": false as NSNumber, "glossaryApply": "hint" as NSString]
 
     /// Keys AppSettings writes to the file that `SettingSpec.all` does not describe (the schema would lack them). Every
     /// switch counts, also one the file leaves out while it is off.
@@ -324,6 +455,16 @@ enum SettingsFileCheck {
             issues += problems.map { SettingsFileIssue(line: lines.line(of: $0.path), message: $0.message) }
             if let kept { accepted[key] = kept }
         }
+        // The pin names a profile that the file (or, when the file has none, the app) has, or `all` (design §5.3).
+        if let pin = accepted["profilePin"] as? String, pin != AppProfile.allAppsID {
+            let ids = Set(((accepted["profiles"] as? [[String: Any]]) ?? current.appProfiles.map { ["id": $0.id] }).compactMap { $0["id"] as? String })
+            if !ids.contains(pin) {
+                let path = FieldPath(steps: [.key("profilePin")])
+                issues.append(.init(line: lines.line(of: path), message: "profilePin: no profile has the id \"\(pin)\"; keeping the current value"))
+                accepted["profilePin"] = nil
+            }
+        }
+        let converted = convertingOldShape(&accepted)
         for line in lines.trailingCommas {
             issues.append(.init(line: line, message: "trailing comma: JSON does not allow a comma before } or ]; the app reads it, other tools will not"))
         }
@@ -337,7 +478,34 @@ enum SettingsFileCheck {
               let settings = try? JSONDecoder().decode(AppSettings.self, from: data) else {
             return SettingsFileResult(settings: current, issues: issues + [.init(line: 1, message: "the settings could not be applied")])
         }
-        return SettingsFileResult(settings: settings, issues: issues, parsed: true, changed: changedKeys(current, settings))
+        return SettingsFileResult(settings: settings, issues: issues, convertedFromOldShape: converted, parsed: true, changed: changedKeys(current, settings))
+    }
+
+    // MARK: the file of 1.1.4 (design §5.2)
+
+    /// The keys the new shape has and 1.1.4 did not: a file in 1.1.4's shape has none of them, so what `current` holds under them is
+    /// replaced, not kept, when the file is converted.
+    private static let newShapeKeys = ["profiles", "context", "useLearned", "profilePin", "glossaryApply"]
+
+    /// Converts the old keys of `accepted` (the validated values of the file) into the new shape, in place: one Core function
+    /// (`ProfileMigration.convert`), the file's own `engines` and `appProfiles` and Apple switch in, `profiles`, `context`, `useLearned`
+    /// and `glossaryApply` and the engines' `allow` out. A key the conversion leaves out is cleared (null), so the settings the app holds
+    /// do not stand in for it. True when the file was in 1.1.4's shape.
+    private static func convertingOldShape(_ accepted: inout [String: Any]) -> Bool {
+        guard let data = try? JSONSerialization.data(withJSONObject: accepted),
+              let old = try? JSONDecoder().decode(LegacySettings.self, from: data), old.isOldShape,
+              let encoded = try? JSONEncoder().encode(ProfileMigration.convert(old).value),
+              let new = (try? JSONSerialization.jsonObject(with: encoded)) as? [String: Any] else { return false }
+        accepted["appProfiles"] = nil
+        accepted["appleUsesPinnedTerms"] = nil
+        for key in newShapeKeys { accepted[key] = new[key] ?? NSNull() }
+        if accepted["engines"] != nil { accepted["engines"] = new["engines"] ?? [] }
+        return true
+    }
+
+    /// Whether `data` is a settings file in 1.1.4's shape (design §5.2): the store keeps a copy of it before the first save in the new shape.
+    static func isOldShape(_ data: Data) -> Bool {
+        (try? JSONDecoder().decode(LegacySettings.self, from: data))?.isOldShape ?? false
     }
 
     static func changedKeys(_ a: AppSettings, _ b: AppSettings) -> [String] {
@@ -427,6 +595,7 @@ enum SettingsSchema {
         for spec in SettingSpec.all {
             var p = spec.kind.schema()
             p["description"] = spec.doc
+            if spec.deprecated { p["deprecated"] = true }
             if let d = defaults[spec.key] { p["default"] = d }
             if !spec.examples.isEmpty { p["examples"] = spec.examples }
             props[spec.key] = p
@@ -465,7 +634,11 @@ enum SettingsFileCommand {
 
     static func check(_ url: URL) -> (lines: [String], code: Int32) {
         guard let data = try? Data(contentsOf: url) else { return (["\(url.lastPathComponent):1: cannot read \(url.path)"], 1) }
-        let issues = SettingsFileCheck.read(data, over: AppSettings()).issues
-        return issues.isEmpty ? (["ok"], 0) : (issues.map { $0.described(file: url.lastPathComponent) }, 1)
+        let result = SettingsFileCheck.read(data, over: AppSettings())
+        // A file of 1.1.4 is not wrong: the note says what the next save does, and the exit code is the issues'.
+        let note = result.convertedFromOldShape
+            ? ["\(url.lastPathComponent):1: in the shape of Mwoyeo 1.1.4: converted on the next save (appProfiles to profiles, engines[].context to context and allow); the old file is kept as \(SettingsFileStore.oldShapeName)"]
+            : []
+        return result.issues.isEmpty ? (note + ["ok"], 0) : (note + result.issues.map { $0.described(file: url.lastPathComponent) }, 1)
     }
 }

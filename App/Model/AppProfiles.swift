@@ -219,22 +219,21 @@ extension AppModel {
 
     /// The engine sheet's "Sent:" line for `engine` as the sheet has it now (its pending switches too), over the apps' written memory.
     func sentPreview(forEngine engine: EngineConfig) -> SentSummary {
-        ContextPreview.engineSummary(engine: engine, profiles: settings.appProfiles, category: { Self.category(ofApp: $0) },
-                                     glossary: settings.glossaryPairs)
+        ContextPreview.engineSummary(engine: engine, settings: settings, category: { Self.category(ofApp: $0) })
     }
 
     /// What `engine` could be sent beyond the lines to translate: the lines of the window, the memory written for these apps.
     func contextDisclosure(forEngine engine: EngineConfig) -> EnginePermissions.ContextDisclosure {
-        EnginePermissions.disclosure(engine, profiles: settings.appProfiles)
+        EnginePermissions.disclosure(engine, in: settings)
     }
 
     /// What the engine in effect while this app is in front is sent of this app, as fields (and `text`, the English line). Apple Translation
     /// takes no context. The pairing is the request path's (`ContextRoute`).
     func sentPreview(for bundleID: String, named name: String? = nil) -> SentSummary {
         let pairing = ContextRoute.own(bundleID, in: settings)
-        return ContextPreview.summary(engine: pairing.engine, profile: pairing.profile, appName: pairing.profile?.appName ?? name ?? bundleID,
-                                      category: Self.category(ofApp: bundleID), learnedUsable: learnedCounts[bundleID]?.usable ?? 0,
-                                      glossary: settings.glossaryPairs)
+        return ContextPreview.summary(engine: pairing.engine, chain: pairing.chain, appName: pairing.profile?.appName ?? name ?? bundleID,
+                                      category: Self.category(ofApp: bundleID),
+                                      learnedUsable: learnedCounts[pairing.chain.learnedKey ?? bundleID]?.usable ?? 0)
     }
 
     /// The other added engines that get this app's memory or context when another app is in front and a lens covers this app's window
@@ -276,12 +275,22 @@ enum LensMemoryMenu {
         return line.count > lineLimit ? String(line.prefix(lineLimit - 1)) + "…" : line
     }
 
-    /// Forgetting an app that has a memory removes the memory with the languages, so it asks first (§3.2).
-    static func forgetAlert(app: String, names: Int) -> NSAlert {
+    /// What the alert says goes (ui-audit): the note only when there is one, and the names only when there are some.
+    static func forgetDetail(names: Int, hasNote: Bool) -> String {
+        switch (hasNote, names > 0) {
+        case (true, true): String(localized: "Its note and \(names) names are removed.")
+        case (true, false): String(localized: "Its note is removed.")
+        default: String(localized: "Its \(names) names are removed.")
+        }
+    }
+
+    /// Forgetting an app that has a memory removes the memory with the languages, so it asks first (§3.2). A caller that knows the profile
+    /// says whether it has a note (`hasNote`); one that does not asks as before.
+    static func forgetAlert(app: String, names: Int, hasNote: Bool = true) -> NSAlert {
         let alert = NSAlert()
         alert.alertStyle = .warning
         alert.messageText = String(localized: "Forget the languages and the memory for \(app)?")
-        alert.informativeText = String(localized: "Its note and \(names) names are removed.")
+        alert.informativeText = forgetDetail(names: names, hasNote: hasNote)
         alert.addButton(withTitle: String(localized: "Forget")).hasDestructiveAction = true
         alert.addButton(withTitle: String(localized: "Cancel"))
         return alert

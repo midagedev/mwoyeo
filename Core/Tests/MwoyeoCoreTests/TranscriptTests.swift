@@ -67,8 +67,38 @@ import Testing
         ev += r.observe(time: 5.5, lines: line("Hi", "안녕"))
         ev += r.observe(time: 6, lines: line("Hi", "안녕하세요"))
         ev += r.finish(time: 6)
-        #expect(entries(ev) == [.init(time: 5.5, source: "Hi", translation: "안녕")])
+        // 2026-10-21 (D13): the entries were [5.5 안녕] only; a line that stays and is translated differently is written again (below).
+        #expect(entries(ev) == [.init(time: 5.5, source: "Hi", translation: "안녕"), .init(time: 6, source: "Hi", translation: "안녕하세요")])
         #expect(cues(ev) == [.init(start: 5, end: 6, source: "Hi", translation: "안녕하세요")])
+    }
+
+    @Test func aLineThatStaysAndIsTranslatedDifferentlyIsWrittenAgainOnceAndItsCueKeepsTheLastTranslation() {
+        // film3, 2026-10-21 (D13): "Controls and noise." was read, then the script went on, and the lens showed 대조군 for the line that never left it;
+        // the log had only the first translation.
+        var r = TranscriptRecorder()
+        var ev = run(&r, [0, 1], line("Controls", "제어"))
+        ev += run(&r, [2, 3, 4], line("Controls", "대조군"))
+        ev += r.finish(time: 4)
+        #expect(entries(ev) == [.init(time: 0, source: "Controls", translation: "제어"), .init(time: 2, source: "Controls", translation: "대조군")])
+        #expect(cues(ev) == [.init(start: 0, end: 4, source: "Controls", translation: "대조군")])
+    }
+
+    @Test func aTranslationThatReturnsToTheFirstOneIsAnotherEntryAndTheSameTranslationAgainIsNot() {
+        var r = TranscriptRecorder()
+        var ev = run(&r, [0, 1], line("Hi", "안녕"))
+        ev += run(&r, [2, 3], line("Hi", "여보세요"))
+        ev += run(&r, [4, 5], line("Hi", "안녕"))
+        ev += run(&r, [6, 7], line("Hi", "안녕"))
+        #expect(entries(ev).map(\.translation) == ["안녕", "여보세요", "안녕"])
+    }
+
+    @Test func aTranslationThatBecomesTheSourceOrEmptyIsNotAnEntryAndDoesNotForgetTheLastOne() {
+        var r = TranscriptRecorder()
+        var ev = run(&r, [0], line("Hi", "안녕"))
+        ev += run(&r, [1], line("Hi", "Hi"))
+        ev += run(&r, [2], line("Hi", ""))
+        ev += run(&r, [3], line("Hi", "안녕"))
+        #expect(entries(ev).map(\.translation) == ["안녕"])
     }
 
     @Test func translationEqualToSourceWritesNothing() {

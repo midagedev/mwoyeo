@@ -22,6 +22,38 @@ import Testing
         #expect(out == [Entry(time: 1, source: whole, translation: "t:" + whole)])
     }
 
+    @Test func aLineTranslatedDifferentlyWhileHeldIsWrittenOnceWithTheNewerTranslation() {
+        // D13 (2026-10-21): the same source again, with another translation, within the hold: one entry, the newer translation, the first time.
+        var m = TranscriptMerger(hold: 3)
+        _ = m.add([entry(1, "Controls and noise.")], now: 1)
+        _ = m.add([.entry(Entry(time: 2, source: "Controls and noise.", translation: "대조군 및 소음."))], now: 2)
+        #expect(m.finish() == [Entry(time: 1, source: "Controls and noise.", translation: "대조군 및 소음.")])
+    }
+
+    @Test func aLineTranslatedDifferentlyAfterItWasWrittenIsWrittenAgain() {
+        var m = TranscriptMerger(hold: 3)
+        _ = m.add([entry(1, "Controls and noise.")], now: 1)
+        #expect(m.add([], now: 5) == [Entry(time: 1, source: "Controls and noise.", translation: "t:Controls and noise.")])
+        _ = m.add([.entry(Entry(time: 6, source: "Controls and noise.", translation: "대조군 및 소음."))], now: 6)
+        #expect(m.add([], now: 10) == [Entry(time: 6, source: "Controls and noise.", translation: "대조군 및 소음.")])
+    }
+
+    @Test func theRecorderAndTheMergerTogetherLogTheEffectOfAChangeOnALineThatNeverLeft() {
+        // What `TranscriptWriter` does: the recorder's events go through the merger once a second, and the entries come out after the hold.
+        var r = TranscriptRecorder()
+        var m = TranscriptMerger(hold: 3)
+        var written: [Entry] = []
+        let controls = TranscriptRecorder.Observed(source: "Controls and noise.", translation: "제어 및 소음.", inLens: true)
+        let fixed = TranscriptRecorder.Observed(source: "Controls and noise.", translation: "대조군 및 소음.", inLens: true)
+        for t in 0..<20 {
+            written += m.add(r.observe(time: Double(t), lines: [t < 8 ? controls : fixed]), now: Double(t))
+        }
+        written += m.add(r.finish(time: 20), now: 20) + m.finish()
+        #expect(written.map(\.translation) == ["제어 및 소음.", "대조군 및 소음."])
+        #expect(written.map(\.time) == [0, 8])
+        #expect(m.cues.map(\.translation) == ["대조군 및 소음."])
+    }
+
     @Test func aFragmentArrivingAfterTheWholeIsDropped() {
         var m = TranscriptMerger(hold: 3)
         _ = m.add([entry(1, whole)], now: 1)

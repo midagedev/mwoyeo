@@ -79,7 +79,10 @@ public struct TranscriptRecorder: Sendable {
             if open[s] == nil { opened += 1 }
             o.lastSeen = time
             if let t = Self.usable(line) {
-                if o.translation == nil { entries.append(.entry(Entry(time: time, source: s, translation: t))) }
+                // An entry for the first translation of a line, and another when a line that stays in the lens is translated differently (a script,
+                // a name or an engine was changed under it): the log is where an agent reads what a change did to text already read. The same
+                // translation again writes nothing.
+                if o.translation != t { entries.append(.entry(Entry(time: time, source: s, translation: t))) }
                 o.translation = t
             }
             open[s] = o
@@ -247,6 +250,11 @@ public struct TranscriptMerger: Sendable {
     }
 
     private mutating func holdEntry(_ e: TranscriptRecorder.Entry, now: TimeInterval) {
+        // The same line translated differently while it is still held (a change reached it): the newer translation is the one written.
+        if let i = held.firstIndex(where: { $0.entry.source == e.source }) {
+            held[i].entry.translation = e.translation
+            return
+        }
         guard let i = held.firstIndex(where: { Self.related($0.entry.source, e.source) }) else {
             held.append(Held(entry: e, arrived: now))
             return

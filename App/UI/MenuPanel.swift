@@ -37,14 +37,12 @@ struct MenuPanel: View {
             }
             #endif
             HStack(spacing: 8) {
-                LanguageBar(source: Binding(get: { model.effectiveSettings.sourceLanguage }, set: { model.setLanguages(source: $0) }),
-                            target: Binding(get: { model.effectiveSettings.targetLanguage }, set: { model.setLanguages(target: $0) }))
+                LanguageBar(source: Binding(get: { model.barPair.source }, set: { model.setBarLanguages(source: $0) }),
+                            target: Binding(get: { model.barPair.target }, set: { model.setBarLanguages(target: $0) }))
                 if !model.settings.engines.isEmpty { EngineMenu() }
             }
-            if let profile = model.activeProfile {
-                Text("\(profile.appName) profile").font(.caption2).foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity).padding(.top, -6)
-            }
+            // L1 (design §6.5): once a profile exists the caption is a menu that pins every lens; at L0 there is no caption at all.
+            if !model.settings.appProfiles.isEmpty { ProfileCaption().padding(.top, -6) }
             regionList
             addButton
             Divider().padding(.horizontal, -4)
@@ -281,8 +279,86 @@ struct RegionRow: View {
     private var subtitle: String {
         if let e = model.error(of: region.id) { return e }
         let size = "\(Int(region.rect.width))×\(Int(region.rect.height))"
-        if region.anchor != nil { return String(localized: "Follows the window · \(size)") }
-        return String(localized: "Pinned to the screen · \(size)")
+        let base = region.anchor != nil ? String(localized: "Follows the window · \(size)") : String(localized: "Pinned to the screen · \(size)")
+        // The lens's own profile is named only when it is not the one the caption names (design §6.5).
+        guard let head = lensHeadName else { return base }
+        return "\(base) · \(head)"
+    }
+}
+
+extension RegionRow {
+    /// The head of this lens's chain, when it differs from the caption's (the front window's head); nil with no profile or when they agree.
+    fileprivate var lensHeadName: String? {
+        let s = model.settings
+        guard !s.appProfiles.isEmpty, let anchor = region.anchor, let app = AppModel.app(ofWindow: anchor.windowID) else { return nil }
+        let lens = ProfileWords.head(s, bundleID: app.bundleID, title: anchor.title, lensPin: region.profilePin)
+        let caption = ProfileWords.head(s, bundleID: model.frontmostBundleID, title: nil)
+        guard lens.id != caption.id else { return nil }
+        return ProfileWords.cut(lens.name, at: 24)
+    }
+}
+
+/// The caption under the language bar (design §6.5), a borderless menu: "Profile: Auto" / "Profile: <head>" / "Profile: <name> (every lens)".
+/// A choice pins every lens and clears their own pins (`AppModel.pinEveryLens`); "Auto" returns them all to Auto.
+struct ProfileCaption: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.openSettings) private var openSettings
+
+    private var caption: String {
+        ProfileWords.caption(head: ProfileWords.head(model.settings, bundleID: model.frontmostBundleID, title: nil), pin: model.settings.pin, owner: .menuBar, limit: 24)
+    }
+
+    var body: some View {
+        let pin = Binding<String?>(get: { model.settings.profilePin }, set: { model.pinEveryLens($0) })
+        Menu {
+            Picker("Profile", selection: pin) {
+                Text("Auto — each lens picks").tag(String?.none)
+                Text("All Apps Only").tag(String?.some(AppProfile.allAppsID))
+                ForEach(model.settings.appProfiles.prefix(8)) { p in Text(ProfileWords.cut(p.name, at: 24)).tag(String?.some(p.id)) }
+            }
+            .pickerStyle(.inline)
+            .labelsHidden()
+            Divider()
+            Button("Profiles in Settings…") {
+                model.settingsTab = .translation
+                NSApp.activate(ignoringOtherApps: true)
+                openSettings()
+            }
+        } label: {
+            HStack(spacing: 3) {
+                Text(caption).lineLimit(1)
+                Image(systemName: "chevron.down").font(.system(size: 8, weight: .semibold)).accessibilityHidden(true)
+            }
+            .font(.caption2).foregroundStyle(.secondary)
+        }
+        // The language bar's own menu style: a borderless menu button takes its name from its chevron ("go down") and ignores the label set on it.
+        .menuStyle(.button)
+        .buttonStyle(.plain)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .frame(maxWidth: .infinity)
+        .accessibilityLabel(caption)
+    }
+}
+
+extension AppModel {
+    /// The profile the menu bar's language bar edits (design §6.5): the pinned one, else the head of the front window's chain; nil is All apps.
+    var barProfile: AppProfile? { ProfileWords.head(settings, bundleID: frontmostBundleID, title: nil).profile }
+
+    /// The pair the language bar shows: that profile's, else All apps'.
+    var barPair: (source: String, target: String) {
+        barProfile.map { ($0.source, $0.target) } ?? (settings.sourceLanguage, settings.targetLanguage)
+    }
+
+    /// The language bar's edits go to that profile, else to All apps.
+    func setBarLanguages(source: String? = nil, target: String? = nil) {
+        if let p = barProfile, let i = settings.appProfiles.firstIndex(where: { $0.id == p.id }) {
+            if let source { settings.appProfiles[i].source = source }
+            if let target { settings.appProfiles[i].target = target }
+        } else {
+            if let source { settings.sourceLanguage = source }
+            if let target { settings.targetLanguage = target }
+        }
     }
 }
 

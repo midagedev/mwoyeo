@@ -41,6 +41,7 @@ struct SettingsView: View {
 struct GeneralSettings: View {
     @Environment(AppModel.self) private var model
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
+    @State private var restoring = false
 
     var body: some View {
         @Bindable var model = model
@@ -148,8 +149,10 @@ struct GeneralSettings: View {
             } header: {
                 Text("Advanced")
             }
+            RestoreDefaultsFoot(tab: .general) { restoring = true }
         }
         .formStyle(.grouped)
+        .restoreDefaultsSheet(tab: .general, isPresented: $restoring)
     }
 
     /// The first problem found in settings.json, and how many more there are; nil while there is none.
@@ -205,6 +208,10 @@ struct TranslationSettings: View {
     @State private var cached = 0
     @State private var sheet: EngineSheetTarget?
     @State private var removing: EngineConfig?
+    @State private var removingProfile: AppProfile?
+    @State private var showAllProfiles = false
+    @State private var restoring = false
+    private let routes = ProfileRoutes.shared
     /// The active added engine's speed, polled; nil (no row at all) until it has enough batches.
     @State private var speed: SpeedSummary?
     private let intelligence = IntelligenceTranslator()
@@ -214,74 +221,141 @@ struct TranslationSettings: View {
         Binding(get: { EngineSelection(model.settings) }, set: { model.select($0) })
     }
 
-    /// The paragraph reader remembered for one app; nil follows the default (Automatic).
-    private func readerChoice(for p: AppProfile) -> Binding<ParagraphReader?> {
-        Binding(get: { model.profile(for: p.bundleID)?.paragraphReader },
-                set: { choice in
-                    guard var updated = model.profile(for: p.bundleID) else { return }
-                    updated.paragraphReader = choice
-                    model.remember(updated)
-                })
+    // MARK: Profiles (design names-and-context §6.2)
+
+    /// The first rows the list shows; "Show All n Profiles" opens the rest in place (≤ 50).
+    private static let shownProfiles = 6
+
+    /// All apps' row: "Everywhere else · Japanese → Korean · glossary 2".
+    private var allAppsSubtitle: String {
+        let s = model.settings
+        return "\(String(localized: "Everywhere else")) · \(ProfileWords.pair(s.sourceLanguage, s.targetLanguage)) · \(String(localized: "glossary \(s.glossaryPairs.count)"))"
     }
 
-    /// The languages, and the paragraph reader only when it is not the automatic one.
-    private func profileDetail(_ p: AppProfile) -> String {
-        let pair = "\(Languages.name(p.source)) → \(Languages.name(p.target))"
-        guard let reader = p.paragraphReader, reader != .automatic else { return pair }
-        return "\(pair) · \(reader.title)"
+    /// A profile's row: the name (cut in the middle at 32), and one line under it, the first part cut being the memory, then the pair, never where.
+    private func profileSubtitle(_ p: AppProfile) -> some View {
+        HStack(spacing: 0) {
+            Text(ProfileWords.whereLine(p, in: model.settings.appProfiles)).lineLimit(1).layoutPriority(2)
+            Text(verbatim: " · \(ProfileWords.pair(p.source, p.target))").lineLimit(1).layoutPriority(1)
+            if let memory = ProfileWords.memoryLine(p) { Text(verbatim: " · \(memory)").lineLimit(1).truncationMode(.tail) }
+        }
+        .font(.caption).foregroundStyle(.secondary)
     }
 
-    /// An app profile's row: the app, its languages, and (once it has memory) what it remembers, which is the first to be cut short.
-    private func profileLabel(_ p: AppProfile) -> some View {
-        VStack(alignment: .leading) {
-            Text(p.appName)
-            HStack(spacing: 0) {
-                Text(profileDetail(p)).lineLimit(1).layoutPriority(1)
-                if let summary = AppMemorySummary.short(p) {
-                    Text(verbatim: " · \(summary)").lineLimit(1).truncationMode(.tail)
+    /// The subtitle as one line, for a screen reader and the tooltip.
+    private func profileSubtitleLine(_ p: AppProfile) -> String {
+        [ProfileWords.whereLine(p, in: model.settings.appProfiles), ProfileWords.pair(p.source, p.target), ProfileWords.memoryLine(p)]
+            .compactMap { $0 }.joined(separator: " · ")
+    }
+
+    /// Profiles made or converted (from a lens's menu, or here); the section exists only once there is one.
+    private var profilesSection: some View {
+        let all = model.settings.appProfiles
+        let shown = showAllProfiles ? all : Array(all.prefix(Self.shownProfiles))
+        return Section {
+            profileRow(title: String(localized: "All apps"), subtitle: Text(allAppsSubtitle).font(.caption).foregroundStyle(.secondary).lineLimit(1),
+                       spoken: allAppsSubtitle, pinned: model.settings.profilePin == AppProfile.allAppsID, open: { model.memoryTarget = .allApps }) {
+                Button("Edit…") { model.memoryTarget = .allApps }
+            }
+            ForEach(shown) { p in
+                profileRow(title: ProfileWords.cut(p.name, at: 32), subtitle: profileSubtitle(p), spoken: profileSubtitleLine(p), pinned: model.settings.profilePin == p.id,
+                           open: { model.memoryTarget = MemoryTarget(id: p.id, name: p.name, kind: .profile) }) {
+                    Button("Edit…") { model.memoryTarget = MemoryTarget(id: p.id, name: p.name, kind: .profile) }
+                    Button("Duplicate") { duplicate(p) }
+                    if model.settings.profilePin == p.id {
+                        Button("Back to Auto") { model.pinEveryLens(nil) }
+                    } else {
+                        Button("Use for Every Lens") { model.pinEveryLens(p.id) }
+                    }
+                    Divider()
+                    Button("Remove…", role: .destructive) { removingProfile = p }
                 }
             }
-            .font(.caption).foregroundStyle(.secondary)
-            .help(AppMemorySummary.full(p) ?? "")
+            if all.count > Self.shownProfiles, !showAllProfiles {
+                Button { withAnimation(Motion.shared.animation(.snappy)) { showAllProfiles = true } } label: {
+                    Label("Show All \(all.count) Profiles", systemImage: "chevron.down")
+                }
+                .labelStyle(ListActionLabelStyle())
+                .buttonStyle(.borderless).foregroundStyle(.tint)
+            }
+            Button { newProfile() } label: { Label("New Profile…", systemImage: "plus") }
+                .labelStyle(ListActionLabelStyle())
+                .buttonStyle(.borderless).foregroundStyle(.tint)
+                .disabled(all.count >= AppProfile.maxProfiles)
+        } header: {
+            Text("Profiles")
+        } footer: {
+            Text("Each lens uses the closest match: a window title, then an app, then All apps. To choose by hand, use a lens’s menu or the menu bar.")
+                .font(.caption).foregroundStyle(.secondary)
         }
     }
 
-    /// Languages remembered per app (from a lens's menu); the group exists only once there is one.
-    private var appProfiles: some View {
-        Section {
-            ForEach(model.settings.appProfiles) { p in
-                LabeledContent {
-                    // The rarely needed choices stay behind ⋯, as on the added engine rows.
-                    Menu {
-                        Picker("Paragraphs", selection: readerChoice(for: p)) {
-                            Text("Automatic").tag(ParagraphReader?.none)
-                            ForEach(ParagraphReader.allCases.filter { $0 != .automatic }, id: \.self) { Text($0.title).tag(ParagraphReader?.some($0)) }
-                        }
-                        Button("Memory…") { model.memoryTarget = MemoryTarget(id: p.bundleID, name: p.appName) }
-                        Divider()
-                        Button("Forget This App", role: .destructive) { model.forgetProfile(p.bundleID) }
-                    } label: { Image(nsImage: .moreActions) }
-                        .menuStyle(.borderlessButton)
-                        .menuIndicator(.hidden)
-                        .fixedSize()
-                        .frame(width: 22, height: 22).contentShape(Rectangle())   // ui-audit-1-1-5 X1
-                        .help("More actions for \(p.appName)")
-                        .accessibilityLabel("More actions for \(p.appName)")
-                } label: {
-                    profileLabel(p)
+    /// The two actions at the foot of the list start their words at one edge: a glyph in a column of its own (ui-all A4: "Show All 8 Profiles" began 26 pt left of "New Profile…").
+    private struct ListActionLabelStyle: LabelStyle {
+        func makeBody(configuration: Configuration) -> some View {
+            HStack(spacing: 8) {
+                configuration.icon.frame(width: 18)
+                configuration.title
+            }
+        }
+    }
+
+    /// One row: a click opens the sheet; "Pinned" while every lens is pinned to it; ⋯ (≥ 20 pt) holds the rest.
+    private func profileRow<Actions: View>(title: String, subtitle: some View, spoken: String, pinned: Bool, open: @escaping () -> Void,
+                                           @ViewBuilder actions: () -> Actions) -> some View {
+        HStack(spacing: 8) {
+            Button(action: open) {
+                HStack(spacing: 8) {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(title).lineLimit(1)
+                        subtitle
+                    }
+                    Spacer(minLength: 4)
+                    if pinned { Text("Pinned").font(.caption).foregroundStyle(.secondary) }
                 }
+                .contentShape(Rectangle())
             }
-            if AppMemorySummary.showsAppleToggle(model.settings) {
-                Toggle("Use my names and terms with Apple Translation", isOn: AppMemorySummary.appleToggle(model))
-            }
-        } header: {
-            Text("App profiles")
-        } footer: {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("The app in front picks the languages, one pair at a time.")
-                Text("Names and terms you wrote go to Apple Translation inside the text, only if you turn this on.")
-            }
-            .font(.caption).foregroundStyle(.secondary)
+            .buttonStyle(.plain)
+            // One element: the name, and where it is used, its languages and what it keeps as its value ("Pinned" is told too).
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(title)
+            .accessibilityValue(pinned ? "\(spoken) · \(String(localized: "Pinned"))" : spoken)
+            .accessibilityAddTraits(.isButton)
+            Menu { actions() } label: { Image(nsImage: .moreActions) }
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .fixedSize()
+                .frame(width: 22, height: 22).contentShape(Rectangle())   // ui-audit-1-1-5 X1
+                .help("More actions for \(title)")
+                .accessibilityLabel("More actions for \(title)")
+        }
+    }
+
+    private func duplicate(_ p: AppProfile) {
+        var copy = p
+        copy.name = ContextText.truncated(String(localized: "\(p.name) copy"), toCharacters: AppProfile.maxNameLength)
+        copy.id = ProfileIDs.fresh(named: copy.name, in: model.settings.appProfiles)
+        guard model.settings.appProfiles.count < AppProfile.maxProfiles, let i = model.settings.appProfiles.firstIndex(where: { $0.id == p.id }) else { return }
+        model.settings.appProfiles.insert(copy, at: i + 1)
+    }
+
+    /// "New Profile…": a preset made by hand; the sheet opens on Customize with the name ready, and stores nothing until the first edit.
+    private func newProfile() {
+        let s = model.settings
+        let name = String(localized: "New Profile")
+        let draft = AppProfile(bundleID: "", appName: name, source: s.sourceLanguage, target: s.targetLanguage,
+                               id: ProfileIDs.fresh(named: name, in: s.appProfiles), name: name, when: [])
+        model.memoryTarget = MemoryTarget(id: draft.id, name: name, kind: .new, draft: draft)
+    }
+
+    /// "Tell the translator · ≈ 9 tokens a pair", "Swap into the text · free": the glossary's one mode, with what a pair costs (the budget's own count).
+    private func glossaryItem(_ apply: EntryApply) -> String {
+        let pairs = model.settings.glossaryPairs
+        let tokens = pairs.isEmpty ? 0 : pairs.map { ContextMemory.hintCost(MemoryEntry(src: $0.0, dst: $0.1, kind: .term)) }.reduce(0, +) / pairs.count
+        switch apply {
+        case .hint: return String(localized: "Tell the translator · ≈ \(tokens) tokens a pair")
+        case .replace: return String(localized: "Swap into the text · free")
+        case .both: return String(localized: "Both · ≈ \(tokens) tokens a pair")
         }
     }
 
@@ -352,6 +426,7 @@ struct TranslationSettings: View {
                 case .add: EngineSheet().environment(model)
                 case let .edit(engine): EngineSheet(editing: engine).environment(model)
                 case let .allow(engine): EngineSheet(editing: engine, focusConsent: true).environment(model)
+                case let .context(engine): EngineSheet(editing: engine, autopilot: .init(expandContext: true)).environment(model)
                 }
             }
             .confirmationDialog("Remove this engine?", isPresented: Binding(get: { removing != nil }, set: { if !$0 { removing = nil } }),
@@ -367,7 +442,7 @@ struct TranslationSettings: View {
             } footer: {
                 Text("Language packs are stored on this Mac and translate quickly, even offline.").font(.caption).foregroundStyle(.secondary)
             }
-            if !model.settings.appProfiles.isEmpty { appProfiles }
+            if !model.settings.appProfiles.isEmpty { profilesSection }
             Section {
                 Picker("Keep up to", selection: $model.settings.cacheSize) {
                     ForEach([1000, 5000, 20000], id: \.self) { n in
@@ -403,18 +478,39 @@ struct TranslationSettings: View {
                                 .padding(.top, 1).padding(.leading, 5).allowsHitTesting(false)
                         }
                     }
+                // L1, once the glossary holds a pair (design §6.2): how the pairs are used, with the cost of each way.
+                if !model.settings.glossaryPairs.isEmpty {
+                    Picker("Use them", selection: $model.settings.glossaryApply) {
+                        ForEach(EntryApply.allCases, id: \.self) { Text(glossaryItem($0)).tag($0) }
+                    }
+                }
             } header: {
                 Text("Glossary")
             } footer: {
                 Text("One “original = translation” per line. Apple Intelligence uses these exactly, and text recognition uses them as hints.")
                     .font(.caption).foregroundStyle(.secondary)
             }
+            RestoreDefaultsFoot(tab: .translation) { restoring = true }
         }
         .formStyle(.grouped)
+        .restoreDefaultsSheet(tab: .translation, isPresented: $restoring)
         // The sheet is the model's (a lens's "Memory for <App>…" sets it), so it comes up for an app without a profile too, where the
         // "App profiles" section is not on screen.
         .sheet(item: $model.memoryTarget) { target in
-            AppMemorySheet(bundleID: target.id, model: model, appName: target.name)
+            AppMemorySheet(target: target, model: model)
+        }
+        .confirmationDialog(removingProfile.map { String(localized: "Remove \(ProfileWords.cut($0.name, at: 24))?") } ?? "",
+                            isPresented: Binding(get: { removingProfile != nil }, set: { if !$0 { removingProfile = nil } }),
+                            presenting: removingProfile) { p in
+            Button("Remove", role: .destructive) { model.removeProfile(id: p.id) }
+        } message: { p in
+            if let detail = ProfileWords.removeDetail(names: p.entries.count, hasNote: !p.note.isEmpty) { Text(detail) }
+        }
+        // "Change…" in the profile sheet: the sheet closes first, then the engine's sheet comes up with its Context open.
+        .onChange(of: routes.engineToEdit) { _, id in
+            guard let id, let engine = model.settings.engines.first(where: { $0.id == id }) else { return }
+            routes.engineToEdit = nil
+            Task { try? await Task.sleep(for: .milliseconds(400)); sheet = .context(engine) }
         }
     }
 }
@@ -500,6 +596,7 @@ struct LanguagePacksView: View {
 
 struct AppearanceSettings: View {
     @Environment(AppModel.self) private var model
+    @State private var restoring = false
 
     var body: some View {
         @Bindable var model = model
@@ -555,8 +652,10 @@ struct AppearanceSettings: View {
                 Text("Flat and gradient backgrounds are filled from their surroundings. On photos and artwork, an on-device inpainting model redraws the background.")
                     .font(.caption).foregroundStyle(.secondary)
             }
+            RestoreDefaultsFoot(tab: .appearance) { restoring = true }
         }
         .formStyle(.grouped)
+        .restoreDefaultsSheet(tab: .appearance, isPresented: $restoring)
     }
 
     /// A small round sample of a tint's colours (not a template image, so a menu keeps its colours).
@@ -618,8 +717,9 @@ private struct LensStyleCard: View {
     }
 }
 
-private struct ShortcutSettings: View {
+struct ShortcutSettings: View {
     @Environment(AppModel.self) private var model
+    @State private var restoring = false
 
     var body: some View {
         Form {
@@ -631,12 +731,10 @@ private struct ShortcutSettings: View {
                 Text("These work in any app. If a shortcut also does something in another app, record a different one: macOS can’t tell Mwoyeo when two apps want the same keys.")
                     .font(.caption).foregroundStyle(.secondary)
             }
-            Section {
-                Button("Restore Defaults") { model.settings.shortcuts = HotKeyAction.defaults }
-                    .disabled(model.settings.shortcuts == HotKeyAction.defaults)
-            }
+            RestoreDefaultsFoot(tab: .shortcuts) { restoring = true }
         }
         .formStyle(.grouped)
+        .restoreDefaultsSheet(tab: .shortcuts, isPresented: $restoring)
     }
 }
 
@@ -795,10 +893,12 @@ enum EngineSheetTarget: Identifiable {
     case edit(EngineConfig)
     /// "Allow…" on an engine that needs the person's permission: the edit sheet, at the box.
     case allow(EngineConfig)
+    /// "Change…" in a profile's Context: the edit sheet with its Context open.
+    case context(EngineConfig)
     var id: String {
         switch self {
         case .add: "add"
-        case let .edit(e), let .allow(e): e.id.uuidString
+        case let .edit(e), let .allow(e), let .context(e): e.id.uuidString
         }
     }
 }

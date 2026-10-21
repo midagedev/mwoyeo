@@ -2,45 +2,97 @@ import AppKit
 import MwoyeoCore
 import SwiftUI
 
-/// The Memory sheet of one app (design §3): what the translator is told about the app. Entered from the profile row's ⋯ menu and from
-/// "Memory for <App>…" in a lens's menu; an app with no profile opens it empty, and its first edit makes the profile. Edits go straight to settings.json through `AppModel`, as every other setting does; the file reloads live.
+/// The profile sheet (design names-and-context §6.3): what the translator is told for one profile, an app, a window or All apps. Entered from a
+/// profile row in Settings › Translation, from "Memory for <App>…" and "New Profile…" in a lens's menu and from the menu bar; an app with no
+/// profile opens it empty, and its first edit makes the profile. Edits go straight to settings.json through `AppModel`, as every other setting
+/// does; the file reloads live.
 ///
-/// Order, top to bottom: the note, the names and terms (src and dst on the row, the rest behind the row's disclosure), the app's
-/// context choice with its one-line promise, the "Sent:" line, the learned rows (only when there are some), and the buttons.
+/// Order, top to bottom: the names and terms (the reason people come), the note, the learned rows (only when there are some), the "Sent:" line
+/// (only with an added engine in effect), and **Customize**, one collapsed row whose summary says what differs from All apps. Open, it shows
+/// When it’s used, Languages, Context, Rewrites and Script, in that order (L2, design §6.1). The bottom bar is "Done", and "Start Fresh"
+/// only while the profile keeps a conversation.
 struct AppMemorySheet: View {
     @State private var editor: AppMemoryEditor
+    @State private var customizeOpen: Bool
+    private let scriptOpen: Bool
+    private let runsTest: Bool
+    private let scrollTarget: String?
+    @State private var phraseSelection: TextSelection?
     private let height: CGFloat
     @Environment(\.dismiss) private var dismiss
-    @FocusState private var noteFocused: Bool
+    @FocusState private var focus: Field?
 
-    /// - `openDetails`, `askingToStartFresh`, `height`: for the capture harness: rows (by position) whose details start open, the sheet as
-    ///   it is after Start Fresh was pressed, and a taller sheet that shows every section without scrolling.
-    /// - `appName`: what the app is called when it has no profile yet (the lens gave it); a profile has its own.
-    init(bundleID: String, model: AppModel, appName: String? = nil, openDetails: [Int] = [], askingToStartFresh: Bool = false, height: CGFloat = 640) {
+    private enum Field: Hashable { case note, name, phrase(Int), pending }
+
+    /// - `openDetails`, `askingToStartFresh`, `height`, `customize`: for the capture harness: rows (by position) whose details start open, the
+    ///   sheet as it is after Start Fresh was pressed, a taller sheet that shows every section without scrolling, and Customize open or shut
+    ///   whatever the profile uses (nil: as the profile asks, design §6.3). `scriptOpen` opens the Script editor and `runsTest` runs its Test once, for the same.
+    init(target: MemoryTarget, model: AppModel, openDetails: [Int] = [], askingToStartFresh: Bool = false, height: CGFloat = 640, customize: Bool? = nil,
+         scriptOpen: Bool = false, runsTest: Bool = false, scrollTo: String? = nil) {
         self.height = height
-        let e = AppMemoryEditor(bundleID: bundleID, model: model, appName: appName)
+        self.scriptOpen = scriptOpen
+        self.runsTest = runsTest
+        self.scrollTarget = scrollTo
+        let e = AppMemoryEditor(target: target, model: model)
         for i in openDetails where e.rows.indices.contains(i) { e.expanded.insert(e.rows[i].id) }
         e.confirmingFresh = askingToStartFresh
         _editor = State(initialValue: e)
+        _customizeOpen = State(initialValue: customize ?? e.customizeStartsOpen)
     }
 
-    private var appName: String { editor.appName }
+    /// An app's sheet (a bundle ID, and the name the lens gave it when it has no profile yet).
+    init(bundleID: String, model: AppModel, appName: String? = nil, openDetails: [Int] = [], askingToStartFresh: Bool = false, height: CGFloat = 640,
+         customize: Bool? = nil, scriptOpen: Bool = false) {
+        self.init(target: MemoryTarget(id: bundleID, name: appName), model: model, openDetails: openDetails, askingToStartFresh: askingToStartFresh,
+                  height: height, customize: customize, scriptOpen: scriptOpen)
+    }
 
     var body: some View {
         VStack(spacing: 0) {
             header
-            Form {
-                noteSection
-                namesSection
-                contextSection
-                if !editor.learned.isEmpty { learnedSection }
+            Divider()
+            ScrollViewReader { proxy in
+                Form {
+                    namesSection
+                    if !editor.isAllApps { noteSection }
+                    if !editor.learned.isEmpty { learnedSection }
+                    if let sent = editor.sent { sentSection(sent) }
+                    customizeRow.id("customize")
+                    if customizeOpen { customizeBody }
+                }
+                .formStyle(.grouped)
+                .onChange(of: customizeOpen) { _, open in
+                    if open { withAnimation(Motion.shared.animation(.snappy)) { proxy.scrollTo("customize", anchor: .top) } }
+                }
+                .task {
+                    // The capture harness: the sheet scrolled to a section, as a person who scrolls down to it sees it.
+                    guard let id = scrollTarget else { return }
+                    try? await Task.sleep(for: .milliseconds(1500))
+                    proxy.scrollTo(id, anchor: id == "rewrites" ? UnitPoint(x: 0.5, y: 0.12) : .top)
+                }
+                .task {
+                    // A profile being made by hand opens on Customize with the name, or the window's phrase, ready to be typed over.
+                    guard customizeOpen, editor.target.kind == .new else { return }
+                    try? await Task.sleep(for: .milliseconds(350))
+                    proxy.scrollTo("customize", anchor: .top)
+                    if editor.target.focusesPhrase, let i = editor.profile?.when.firstIndex(where: { !($0.titleContains ?? "").isEmpty }) {
+                        focus = .phrase(i)
+                        let text = editor.profile?.when[i].titleContains ?? ""
+                        phraseSelection = TextSelection(range: text.startIndex..<text.endIndex)
+                    } else {
+                        focus = .name
+                    }
+                }
             }
-            .formStyle(.grouped)
             Divider()
             footer
         }
         .frame(width: 520, height: height)
         .task(id: editor.profile) { editor.reconcile() }
+        .task {
+            await editor.check()
+            if runsTest { await editor.runTest() }   // the capture harness: the Script's Test as it looks once run
+        }
         .task(id: editor.learnedCounts) { await editor.refreshLearned() }
         .onChange(of: editor.gone) { _, gone in if gone { dismiss() } }
         .onDisappear { editor.closing() }
@@ -49,41 +101,99 @@ struct AppMemorySheet: View {
     // MARK: header and buttons
 
     private var header: some View {
-        HStack(alignment: .firstTextBaseline) {
-            Text("Memory for \(appName)").font(.headline)
-            Spacer()
+        VStack(alignment: .leading, spacing: 2) {
+            Text("Memory for \(editor.title)").font(.headline).lineLimit(1).truncationMode(.tail)
+            Text(editor.captionLine).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.tail)
         }
-        .padding(.horizontal, 20).padding(.top, 16).padding(.bottom, 4)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 30).padding(.top, 16).padding(.bottom, 10)
+        .accessibilityElement(children: .combine)
     }
 
     @ViewBuilder private var footer: some View {
         if editor.confirmingFresh {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Start fresh?").font(.headline)
-                Text("The conversation kept for this app is forgotten. Your note, names and learned terms stay.")
+                Text("The conversation kept for this profile is forgotten. Your note, names and learned terms stay.")
                     .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 HStack {
                     Spacer()
                     Button("Cancel") { withAnimation(Motion.shared.animation(.easeOut(duration: 0.15))) { editor.confirmingFresh = false } }
                         .keyboardShortcut(.cancelAction)
-                    // A plain button in a sheet does not colour its destructive role; red text as an alert's destructive button has.
-                    Button("Start Fresh", role: .destructive) { Task { await editor.startFresh() } }
-                        .foregroundStyle(.red)
+                    // Plain, not destructive: the person chose it (ui-audit-1-1-5 10.6).
+                    Button("Start Fresh") { Task { await editor.startFresh() } }
+                        .keyboardShortcut(.defaultAction)
                 }
             }
             .padding(16)
         } else {
             HStack {
-                Button("Forget Learned") { Task { await editor.forgetLearned() } }
-                    .disabled(editor.learned.isEmpty)
-                    .help(editor.learned.isEmpty ? String(localized: "Nothing has been learned for this app yet.")
-                          : String(localized: "Forget the names and terms learned for this app."))
-                Button("Start Fresh") { withAnimation(Motion.shared.animation(.easeOut(duration: 0.15))) { editor.confirmingFresh = true } }
-                    .help("Forget the conversation kept for this app. Learned names stay.")
+                if editor.keepsConversation {
+                    Button("Start Fresh") { withAnimation(Motion.shared.animation(.easeOut(duration: 0.15))) { editor.confirmingFresh = true } }
+                        .help("Forget the conversation kept for this profile. Learned names stay.")
+                }
                 Spacer()
                 Button("Done") { dismiss() }.keyboardShortcut(.defaultAction)
             }
             .padding(16)
+        }
+    }
+
+    // MARK: names and terms
+
+    private var namesSection: some View {
+        Section {
+            if editor.isAllApps {
+                LabeledContent("Glossary") {
+                    HStack(spacing: 8) {
+                        Text("\(editor.glossaryCount) pairs").foregroundStyle(.secondary).monospacedDigit()
+                        // The glossary is a section of this tab: the sheet closes first (no sheet over a sheet, design §6.1).
+                        Button("Edit Glossary…") { dismiss() }.buttonStyle(.borderless).foregroundStyle(.tint)
+                    }
+                }
+            } else {
+                if editor.rows.isEmpty {
+                    Text("Type a name as the screen shows it, then how it should read.").font(.callout).foregroundStyle(.secondary)
+                }
+                ForEach(editor.rows) { row in
+                    NameRow(editor: editor, id: row.id)
+                }
+                swapCallout
+                Button {
+                    withAnimation(Motion.shared.animation(.easeOut(duration: 0.15))) {
+                        if let id = editor.addRow() { editor.expanded.remove(id) }
+                    }
+                } label: {
+                    Label("Add Name", systemImage: "plus")
+                }
+                .disabled(!editor.canAddRow)
+                HStack {
+                    if !editor.canAddRow {
+                        Text("That is the most. Remove a name to add another.").font(.caption).foregroundStyle(.orange)
+                    }
+                    Spacer()
+                    Text("Names: \(editor.rows.count) of \(AppMemoryEditor.maxRows)")
+                        .font(.caption).monospacedDigit()
+                        .foregroundStyle(editor.canAddRow ? Color.secondary : Color.orange)
+                }
+            }
+        } header: {
+            Text("Names and terms")
+        }
+    }
+
+    /// Rows on Tell while the engine in effect takes no hints: one callout with the one button that fixes them (design §6.3).
+    @ViewBuilder private var swapCallout: some View {
+        let n = editor.swappableHintRows.count
+        if n > 0 {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text("\(editor.engineName) uses only names swapped into the text; \(n) here are not.")
+                    .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 8)
+                Button("Swap Them In") { withAnimation(Motion.shared.animation(.easeOut(duration: 0.15))) { editor.swapThemIn() } }
+                    .buttonStyle(.borderless).foregroundStyle(.tint)
+            }
+            .accessibilityElement(children: .contain)
         }
     }
 
@@ -94,7 +204,7 @@ struct AppMemorySheet: View {
             TextEditor(text: Binding(get: { editor.note }, set: { editor.setNote($0) }))
                 .font(.body)
                 .scrollContentBackground(.hidden)
-                .focused($noteFocused)
+                .focused($focus, equals: .note)
                 .frame(minHeight: 52, maxHeight: 72)
                 .overlay(alignment: .topLeading) {
                     if editor.note.isEmpty {
@@ -104,74 +214,12 @@ struct AppMemorySheet: View {
                 }
                 .accessibilityLabel("Note for the translator")
             HStack {
-                Text("Told to the translator with every line from this app.").font(.caption).foregroundStyle(.secondary)
+                Text("Told to the translator with every line from this profile.").font(.caption).foregroundStyle(.secondary)
                 Spacer()
                 Counter(count: editor.note.count, limit: AppMemoryEditor.maxNote)
             }
         } header: {
             Text("Note")
-        }
-    }
-
-    // MARK: names and terms
-
-    private var namesSection: some View {
-        Section {
-            ForEach(editor.rows) { row in
-                NameRow(editor: editor, id: row.id)
-            }
-            Button {
-                withAnimation(Motion.shared.animation(.easeOut(duration: 0.15))) {
-                    if let id = editor.addRow() { editor.expanded.remove(id) }
-                }
-            } label: {
-                Label("Add Name", systemImage: "plus")
-            }
-            .disabled(!editor.canAddRow)
-            HStack {
-                if !editor.canAddRow {
-                    Text("That is the most. Remove a name to add another.").font(.caption).foregroundStyle(.orange)
-                }
-                Spacer()
-                Text("Names: \(editor.rows.count) of \(AppMemoryEditor.maxRows)")
-                    .font(.caption).monospacedDigit()
-                    .foregroundStyle(editor.canAddRow ? Color.secondary : Color.orange)
-            }
-        } header: {
-            Text("Names and terms")
-        }
-    }
-
-    // MARK: context
-
-    private var contextSection: some View {
-        Section {
-            Picker("Context for this app", selection: Binding(get: { editor.contextChoice }, set: { editor.setContext($0) })) {
-                Text("Follow the engine").tag(AppMemoryEditor.ContextChoice.follow)
-                Text("Off").tag(AppMemoryEditor.ContextChoice.off)
-                Text("Nearby").tag(AppMemoryEditor.ContextChoice.nearby)
-                Text("Conversation").tag(AppMemoryEditor.ContextChoice.conversation)
-            }
-            if editor.contextChoice == .conversation {
-                Stepper(value: Binding(get: { editor.earlierLines }, set: { editor.setEarlierLines($0) }),
-                        in: 0...AppContextOverride.maxPreviousLines) {
-                    Text("Earlier lines: \(editor.earlierLines)").monospacedDigit()
-                }
-            }
-            Text("Applies only to engines you added. Apple Translation is not affected.")
-                .font(.caption).foregroundStyle(.secondary)
-            // What the engine in effect is sent, by the request path's own rule; never cut, it wraps.
-            VStack(alignment: .leading, spacing: 4) {
-                Text(EngineContextSent.said(editor.sent, in: .current))
-                    .font(.callout)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .textSelection(.enabled)
-                if !editor.otherReceivers.isEmpty {
-                    Text("Also sent to \(ListFormatter.localizedString(byJoining: editor.otherReceivers.map(\.name))) when another app is in front.")
-                        .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            .accessibilityElement(children: .combine)
         }
     }
 
@@ -184,7 +232,7 @@ struct AppMemorySheet: View {
                     VStack(alignment: .leading, spacing: 1) {
                         Text("\(record.entry.src) → \(record.entry.dst)").lineLimit(1).truncationMode(.tail).foregroundStyle(.secondary)
                         if !record.isUsable {
-                            Text("Seen once. Used after a second sighting.").font(.caption).foregroundStyle(.tertiary)
+                            Text("Seen once. Used after a second sighting.").font(.caption).foregroundStyle(.secondary)
                         }
                     }
                     Spacer(minLength: 8)
@@ -205,7 +253,233 @@ struct AppMemorySheet: View {
         } header: {
             Text("Learned")
         } footer: {
-            Text("Names and terms the engine suggested. Pin keeps one as your own.").font(.caption).foregroundStyle(.secondary)
+            HStack {
+                Text("Names and terms the engine suggested. Pin keeps one as your own.").font(.caption).foregroundStyle(.secondary)
+                Spacer(minLength: 8)
+                Button("Forget All") { Task { await editor.forgetLearned() } }
+                    .buttonStyle(.borderless).foregroundStyle(.tint).font(.caption)
+                    .help("Forget the names and terms learned for this profile.")
+            }
+        }
+    }
+
+    // MARK: what is sent
+
+    /// What the engine in effect is sent for this profile, by the request path's own rule; never cut, it wraps.
+    private func sentSection(_ sent: SentSummary) -> some View {
+        Section {
+            Text(EngineContextSent.said(sent, in: .current))
+                .font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+                .textSelection(.enabled)
+                .accessibilityElement(children: .combine)
+        }
+    }
+
+    // MARK: Customize (L2)
+
+    /// The disclosure row: a triangle, "Customize" and, in secondary, what differs from All apps. One accessibility element; the summary is its value.
+    private var customizeRow: some View {
+        Section {
+            Button {
+                withAnimation(Motion.shared.animation(.snappy)) { customizeOpen.toggle() }
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                        .rotationEffect(.degrees(customizeOpen ? 90 : 0)).frame(width: 12)
+                    Text("Customize")
+                    Spacer(minLength: 12)
+                    Text(editor.customizeSummary).foregroundStyle(.secondary).lineLimit(1).truncationMode(.tail)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Customize")
+            .accessibilityValue(editor.customizeSummary)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityHint(customizeOpen ? String(localized: "Collapses the options") : String(localized: "Shows the options"))
+        }
+    }
+
+    @ViewBuilder private var customizeBody: some View {
+        if !editor.isAllApps {
+            whenSection
+            languagesSection
+        }
+        contextSection
+        // (d) Rewrites, (e) Script (design rewrite-rules §7): after Context, drawn only with Customize open.
+        RewriteTable(editor: editor).id("rewrites")
+        ScriptEditor(editor: editor, open: scriptOpen).id("script")
+    }
+
+    // (a) When it’s used
+
+    private var whenSection: some View {
+        Section {
+            LabeledContent("Name") {
+                TextField("Name", text: Binding(get: { editor.profile?.name ?? "" }, set: { editor.setName($0) }))
+                    .labelsHidden().multilineTextAlignment(.trailing)
+                    .focused($focus, equals: .name)
+            }
+            let conditions = editor.profile?.when ?? []
+            ForEach(Array(conditions.enumerated()), id: \.offset) { i, c in conditionRow(i, c) }
+            if let pending = editor.pendingPhrase {
+                HStack(spacing: 8) {
+                    Image(systemName: "textformat").frame(width: 14).foregroundStyle(.secondary).accessibilityHidden(true)
+                    TextField("Title contains", text: Binding(get: { pending }, set: { editor.pendingPhrase = $0 }))
+                        .labelsHidden()
+                        .focused($focus, equals: .pending)
+                        .onSubmit { editor.commitPending() }
+                        .onChange(of: focus) { _, now in if now != .pending { editor.commitPending() } }
+                    Spacer(minLength: 0)
+                }
+                Text("Keep the part that stays the same, like a game’s name.").font(.caption).foregroundStyle(.secondary)
+            }
+            if conditions.isEmpty, editor.pendingPhrase == nil {
+                Text("No conditions: used only when you pick it.").font(.callout).foregroundStyle(.secondary)
+            }
+            if editor.canAddCondition { addConditionMenu }
+        } header: {
+            Text("When it’s used")
+        }
+    }
+
+    private func conditionRow(_ i: Int, _ c: ProfileCondition) -> some View {
+        let profiles = editor.allProfiles
+        let app = c.app.flatMap { $0.isEmpty ? nil : $0 }
+        return HStack(spacing: 8) {
+            Group {
+                if let app, let icon = Self.icon(ofApp: app) {
+                    Image(nsImage: icon).resizable().frame(width: 14, height: 14)
+                } else {
+                    Image(systemName: c.titleContains != nil ? "textformat" : "app").frame(width: 14).foregroundStyle(.secondary)
+                }
+            }
+            .accessibilityHidden(true)
+            if let phrase = c.titleContains {
+                TextField("Title contains", text: Binding(get: { phrase }, set: { editor.setPhrase($0, at: i) }),
+                          selection: focus == .phrase(i) ? $phraseSelection : .constant(nil))
+                    .labelsHidden()
+                    .focused($focus, equals: .phrase(i))
+                if let app { Text("in \(ProfileWords.appName(app, in: profiles))").foregroundStyle(.secondary).lineLimit(1) }
+            } else if let app {
+                Text(ProfileWords.appName(app, in: profiles)).lineLimit(1)
+            }
+            Spacer(minLength: 4)
+            Button { editor.removeCondition(at: i) } label: { Image(systemName: "minus.circle").frame(width: 22, height: 22).contentShape(Rectangle()) }
+                .buttonStyle(.borderless).foregroundStyle(.secondary)
+                .help("Remove this condition")
+                .accessibilityLabel("Remove this condition")
+        }
+    }
+
+    private var addConditionMenu: some View {
+        Menu {
+            if let bundle = editor.target.lensBundleID {
+                Button(editor.target.lensAppName ?? bundle) { editor.addCondition(ProfileCondition(app: bundle)) }
+                    .disabled(editor.profile?.when.contains(ProfileCondition(app: bundle)) == true)
+            }
+            let title = editor.target.lensTitle ?? ""
+            Button("This Window’s Title") {
+                editor.addCondition(ProfileCondition(app: editor.target.lensBundleID,
+                                                     titleContains: String(title.prefix(ProfileCondition.maxTitleLength))))
+            }
+            .disabled(title.isEmpty)
+            Button("Other App…") { chooseApp() }
+            Button("Title Contains…") {
+                editor.pendingPhrase = ""
+                Task { try? await Task.sleep(for: .milliseconds(100)); focus = .pending }
+            }
+        } label: {
+            // ui-audit-1-1-5 X1: a hit area of at least 20 pt. A borderless menu is 16 pt tall whatever its label; the language bar's style takes the
+            // label's own height, so the padding is the control's.
+            Label("Add Condition", systemImage: "plus").padding(.vertical, 4).contentShape(Rectangle())
+        }
+        .menuStyle(.button)
+        .buttonStyle(.plain)
+        .menuIndicator(.hidden)
+        .foregroundStyle(.tint)
+        .fixedSize()
+    }
+
+    /// "Other App…": an app of this Mac, by its bundle ID.
+    private func chooseApp() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.application]
+        panel.directoryURL = URL(fileURLWithPath: "/Applications")
+        panel.canChooseDirectories = false
+        panel.prompt = String(localized: "Choose")
+        guard panel.runModal() == .OK, let url = panel.url, let id = Bundle(url: url)?.bundleIdentifier else { return }
+        editor.addCondition(ProfileCondition(app: id))
+    }
+
+    private static func icon(ofApp bundleID: String) -> NSImage? {
+        NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID).map { NSWorkspace.shared.icon(forFile: $0.path) }
+    }
+
+    // (b) Languages
+
+    private var languagesSection: some View {
+        Section {
+            Picker("From", selection: Binding(get: { editor.profile?.source ?? "auto" }, set: { editor.setSource($0) })) {
+                ForEach(Languages.sources, id: \.self) { Text(Languages.name($0)).tag($0) }
+            }
+            Picker("To", selection: Binding(get: { editor.profile?.target ?? "en" }, set: { editor.setTarget($0) })) {
+                ForEach(Languages.targets, id: \.self) { Text(Languages.name($0)).tag($0) }
+            }
+            // The file's own value ("" follows All apps, "apple", an engine's id): `ProfileEngine` is Core's and not Hashable. With no added engine there is
+            // only Apple to choose, so the row is not drawn (a Settings row that cannot act is not drawn, design §6.1).
+            if !editor.engines.isEmpty {
+                Picker("Engine", selection: Binding(get: { editor.profile?.engine?.fileValue ?? "" },
+                                                    set: { editor.setEngine(ProfileEngine.named($0)) })) {
+                    Text("Same as All apps (\(editor.allAppsEngineName))").tag("")
+                    Text("Apple Translation").tag(ProfileEngine.apple.fileValue)
+                    ForEach(editor.engines) { engine in Text(engine.name).tag(ProfileEngine.added(engine.id).fileValue) }
+                }
+            }
+            Picker("Paragraphs", selection: Binding(get: { editor.profile?.paragraphReader }, set: { editor.setReader($0) })) {
+                Text("Automatic").tag(ParagraphReader?.none)
+                ForEach(ParagraphReader.allCases.filter { $0 != .automatic }, id: \.self) { Text($0.title).tag(ParagraphReader?.some($0)) }
+            }
+        } header: {
+            Text("Languages")
+        }
+    }
+
+    // (c) Context
+
+    private var contextSection: some View {
+        Section {
+            if editor.takesContext {
+                Picker("Context", selection: Binding(get: { editor.contextChoice }, set: { editor.setContext($0) })) {
+                    if !editor.isAllApps { Text("Same as All apps (\(editor.allAppsWords))").tag(AppMemoryEditor.ContextChoice.follow) }
+                    Text("Only the line").tag(AppMemoryEditor.ContextChoice.off)
+                    Text("Names and note").tag(AppMemoryEditor.ContextChoice.memory)
+                    Text("Nearby lines").tag(AppMemoryEditor.ContextChoice.nearby)
+                    Text("Conversation").tag(AppMemoryEditor.ContextChoice.conversation)
+                }
+                if editor.contextChoice == .conversation {
+                    Stepper(value: Binding(get: { editor.earlierLines }, set: { editor.setEarlierLines($0) }), in: 0...AppContextOverride.maxPreviousLines) {
+                        Text("Earlier lines: \(editor.earlierLines)").monospacedDigit()
+                    }
+                }
+                if editor.learns {
+                    Toggle("Learn names and terms", isOn: Binding(get: { editor.learnsNames }, set: { editor.setLearnsNames($0) }))
+                }
+                if editor.linesAskedButDenied, let engine = editor.engineInEffect {
+                    HStack {
+                        Text("\(engine.name) gets only the line.").font(.caption).foregroundStyle(.orange)
+                        Spacer(minLength: 8)
+                        Button("Change…") { ProfileRoutes.shared.editEngineContext(engine.id); dismiss() }
+                            .buttonStyle(.borderless).foregroundStyle(.tint)
+                    }
+                }
+            } else {
+                Text("\(editor.engineName) gets only the line.").font(.callout).foregroundStyle(.secondary)
+            }
+        } header: {
+            Text("Context")
         }
     }
 }
@@ -223,7 +497,7 @@ private struct Counter: View {
     }
 }
 
-/// One name or term: the name and its translation on the row; the rest behind the disclosure.
+/// One name or term: the name and its translation on the row; the rest behind the disclosure (the Use pop-up first, design §10).
 private struct NameRow: View {
     let editor: AppMemoryEditor
     let id: UUID
@@ -249,7 +523,7 @@ private struct NameRow: View {
                         .labelsHidden()
                         .accessibilityLabel("Its translation")
                     Button { withAnimation(Motion.shared.animation(.easeOut(duration: 0.15))) { editor.removeRow(id) } } label: {
-                        Image(systemName: "minus.circle")
+                        Image(systemName: "minus.circle").frame(width: 22, height: 22).contentShape(Rectangle())   // ui-audit-1-1-5 X1
                     }
                     .buttonStyle(.borderless)
                     .foregroundStyle(.secondary)
@@ -267,11 +541,31 @@ private struct NameRow: View {
         switch p {
         case .incomplete: "Fill in the name and its translation to store it."
         case .duplicate: "Another row already has this name."
-        case .full: "That is the most names this app keeps."
+        case .full: "That is the most names this profile keeps."
         }
     }
 
+    private func caption(_ apply: EntryApply) -> LocalizedStringKey {
+        switch apply {
+        case .hint: "Told to AI engines where it appears."
+        case .replace: "Written into the text before translating; Apple Translation uses it too."
+        case .both: "Both of these."
+        }
+    }
+
+    private func item(_ apply: EntryApply) -> String {
+        let cost = editor.cost(of: apply, row: row)
+        let recommended = apply == .both && editor.recommendsBoth && [EntryKind.person, .place, .org].contains(row.kind)
+        return recommended ? cost + " · " + String(localized: "recommended for names") : cost
+    }
+
     @ViewBuilder private var details: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Picker("Use", selection: Binding(get: { row.apply }, set: { v in editor.edit(id) { $0.apply = v } })) {
+                ForEach(EntryApply.allCases, id: \.self) { Text(item($0)).tag($0) }
+            }
+            Text(caption(row.apply)).font(.caption).foregroundStyle(.secondary)
+        }
         Picker("Kind", selection: Binding(get: { row.kind }, set: { v in editor.edit(id) { $0.kind = v } })) {
             Text("Person").tag(EntryKind.person)
             Text("Place").tag(EntryKind.place)
@@ -303,6 +597,8 @@ private struct NameRow: View {
                                                       set: { v in editor.edit(id) { r in if let i = r.addressing.firstIndex(where: { $0.id == a.id }) { r.addressing[i].to = v } } }),
                               prompt: Text("Who"))
                         .labelsHidden().accessibilityLabel("Who this person speaks to")
+                        .textFieldStyle(.roundedBorder)
+                        .frame(maxWidth: 180)
                     Picker("Register", selection: Binding(get: { editor.row(id)?.addressing.first { $0.id == a.id }?.register ?? .polite },
                                                            set: { v in editor.edit(id) { r in if let i = r.addressing.firstIndex(where: { $0.id == a.id }) { r.addressing[i].register = v } } })) {
                         Text("Casual").tag(Register.casual)
@@ -311,9 +607,11 @@ private struct NameRow: View {
                         Text("Honorific").tag(Register.honorific)
                     }
                     .labelsHidden().fixedSize()
-                    Button { editor.edit(id) { r in r.addressing.removeAll { $0.id == a.id } } } label: { Image(systemName: "minus.circle") }
-                        .buttonStyle(.borderless).foregroundStyle(.secondary)
-                        .accessibilityLabel("Remove this person")
+                    Button { editor.edit(id) { r in r.addressing.removeAll { $0.id == a.id } } } label: {
+                        Image(systemName: "minus.circle").frame(width: 22, height: 22).contentShape(Rectangle())   // ui-audit-1-1-5 X1
+                    }
+                    .buttonStyle(.borderless).foregroundStyle(.secondary)
+                    .accessibilityLabel("Remove this person")
                 }
             }
             if row.addressing.count < AppMemoryEditor.maxAddressing {
@@ -321,41 +619,26 @@ private struct NameRow: View {
                     .buttonStyle(.borderless)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)   // the label starts where "Kind" does (ui-all A4)
     }
 }
 
-/// The app whose Memory sheet is open (`TranslationSettings`' `.sheet(item:)`, `AppModel.memoryTarget`). `name` is the lens's name for an
-/// app that has no profile yet.
-struct MemoryTarget: Identifiable {
-    let id: String
-    var name: String? = nil
+/// What the rest of Settings asks of the profile sheet that cannot be said by closing it: "Change…" on a denied context opens the engine's sheet
+/// at its Context (design §6.3 c, §6.5), and the sheet is closed first (no sheet over a sheet).
+@MainActor @Observable
+final class ProfileRoutes {
+    static let shared = ProfileRoutes()
+    /// The engine whose sheet Settings › Translation opens next, with its Context open.
+    var engineToEdit: UUID?
+
+    func editEngineContext(_ id: UUID) { engineToEdit = id }
 }
 
-/// What the app profiles list says about an app's memory, and when it offers the one switch that belongs to all of them.
-enum AppMemorySummary {
-    /// " · 3 names" of the row: the note and the names, nil while the app has neither. The first part of the row to be cut short.
-    static func short(_ p: AppProfile) -> String? {
-        var parts: [String] = []
-        if !p.note.isEmpty { parts.append(String(localized: "note")) }
-        if !p.entries.isEmpty { parts.append(String(localized: "\(p.entries.count) names")) }
-        return parts.isEmpty ? nil : parts.joined(separator: " · ")
-    }
-
-    /// The tooltip: the note and the names in full (the first dozen).
-    static func full(_ p: AppProfile) -> String? {
-        guard p.hasMemory else { return nil }
-        var lines: [String] = []
-        if !p.note.isEmpty { lines.append(p.note) }
-        lines += p.entries.prefix(12).map { "\($0.src) → \($0.dst)" }
-        if p.entries.count > 12 { lines.append("…") }
-        return lines.joined(separator: "\n")
-    }
-
-    /// "Use my names and terms with Apple Translation" is one global key: it is offered under the profiles and only while there is one.
-    static func showsAppleToggle(_ s: AppSettings) -> Bool { !s.appProfiles.isEmpty }
-
-    /// The switch's binding: it writes `appleUsesPinnedTerms` through the settings path, so into settings.json.
-    @MainActor static func appleToggle(_ model: AppModel) -> Binding<Bool> {
-        Binding(get: { model.settings.appleUsesPinnedTerms }, set: { model.settings.appleUsesPinnedTerms = $0 })
+extension AppModel {
+    /// Settings on Translation with `target`'s sheet up (a lens's menu, the menu bar's profile menu and Settings' own rows come here). Without a
+    /// way to open Settings (`openSettingsAction`) nothing is left waiting for the next time it opens.
+    func openProfile(_ target: MemoryTarget) {
+        memoryTarget = target
+        if !openSettings(on: .translation) { memoryTarget = nil }
     }
 }

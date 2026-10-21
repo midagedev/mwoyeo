@@ -338,7 +338,7 @@ enum ProfileUIChecks {
         let lens = session(over: read, reported: reported)
         let menu = lens.contextMenu()
         let item = profileItem(menu)
-        let memoryAt = menu.items.firstIndex { $0.title == String(localized: "Memory for \(String(localized: "月涙譚"))…") }
+        let memoryAt = menu.items.firstIndex { $0.title == String(localized: "Memory for \("月涙譚")…") }
         check("with a profile the lens menu has one \"Profile: …\" item after Memory for …, naming the head of the lens's chain (the title profile first)",
               item?.title == String(localized: "Profile: \("月涙譚")") && memoryAt.map { menu.items.firstIndex(of: item!) == $0 + 1 } == true && menu.items.filter { $0.submenu != nil }.count == 1,
               menu.items.map(\.title).joined(separator: " | "))

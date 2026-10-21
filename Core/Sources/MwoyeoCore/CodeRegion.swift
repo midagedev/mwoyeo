@@ -125,7 +125,13 @@ public enum CodeRegion {
     /// adds nothing the place does not say: it fired on 2 of the 4 rows and on no row of the labelled papers that the place missed.
     static func isEquationRow(_ b: Info) -> Bool {
         guard (b.gapLeft ?? 0) >= K.displayGap && (b.gapRight ?? 0) >= K.displayGap else { return false }
-        let shape = TranslationFilter.shape(of: b.lines.joined(separator: " "))
+        return holdsMathNotProse(b.lines.joined(separator: " "))
+    }
+
+    /// A sign of mathematics and at most a word of prose: what the text of a row of a display holds. The one test of `isEquationRow` (a block) and
+    /// of `DisplayRow` (a line the reader put into a paragraph).
+    static func holdsMathNotProse(_ text: String) -> Bool {
+        let shape = TranslationFilter.shape(of: text)
         return shape.signs >= K.equationSigns && shape.proseWords <= K.equationProse
     }
 

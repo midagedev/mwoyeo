@@ -1,0 +1,36 @@
+{
+ "call": 29,
+ "try": 1,
+ "ids": [
+  "item-0114.1",
+  "item-0218.2",
+  "item-0088.2",
+  "item-0193.2",
+  "item-0044.1",
+  "item-0291.2",
+  "item-0314.1",
+  "item-0157.2",
+  "item-0174.2",
+  "item-0037.2",
+  "item-0078.1",
+  "item-0254.1",
+  "item-0003.2",
+  "item-0291.1",
+  "item-0293.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e5f20ef5-0d88-47ff-aeab-b15f44b89fd0",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 as Siobhan speaks to Rory.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"더 이상 faithfully captures the change-of-state meaning of 不是...了.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"그분은 and 하셨어 respectfully and naturally refer to the listener's father.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly addresses Tsukumo without adding the honorific 씨.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both forensic results and forensics results are natural, valid English.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"텟사이 공 correctly translates the aristocratic honorific 鉄斎殿.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Accurately maps 다 to scrub everything instead of repeating it twice.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"받으시면 properly uses honorifics for the external business contact.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both don't have to and don't need to are exact equivalents.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Post is much more natural than leave for chat channel introductions.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 preserves the blend name Sanhong and uses proper register.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both 싸네요 and 저렴하네요 are natural, polite translations in this context.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"물 밑바닥 accurately translates 水の底 and removes the unnecessary comma.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"텟사이 공 correctly translates the aristocratic honorific 鉄斎殿.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both herb pouch and medicine pouch are equally natural and accurate.\"}\n]\n",
+  "duration_seconds": 226.373177,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14149,
+   "output_tokens": 34858,
+   "thinking_tokens": 34361,
+   "cache_read_tokens": 0,
+   "total_tokens": 49007
+  }
+ }
+}

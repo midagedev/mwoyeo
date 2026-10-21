@@ -1,0 +1,36 @@
+{
+ "call": 11,
+ "try": 2,
+ "ids": [
+  "item-0172.2",
+  "item-0262.1",
+  "item-0087.2",
+  "item-0093.1",
+  "item-0068.2",
+  "item-0143.2",
+  "item-0331.2",
+  "item-0290.1",
+  "item-0326.1",
+  "item-0288.2",
+  "item-0250.2",
+  "item-0014.1",
+  "item-0114.2",
+  "item-0208.2",
+  "item-0032.1"
+ ],
+ "problem": "empty response (the CLI's print-timeout ran out?)",
+ "event": {
+  "conversation_id": "cd4b7719-3f1c-4a95-ae00-f7c09e6ebbf0",
+  "status": "SUCCESS",
+  "response": "",
+  "duration_seconds": 0,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 0
+  }
+ }
+}

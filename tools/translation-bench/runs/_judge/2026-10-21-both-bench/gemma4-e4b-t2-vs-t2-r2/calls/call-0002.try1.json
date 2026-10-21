@@ -1,0 +1,36 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0012.1",
+  "item-0016.2",
+  "item-0001.2",
+  "item-0009.2",
+  "item-0002.1",
+  "item-0003.1",
+  "item-0005.2",
+  "item-0008.1",
+  "item-0002.2",
+  "item-0016.1",
+  "item-0010.2",
+  "item-0011.1",
+  "item-0008.2",
+  "item-0009.1",
+  "item-0013.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7f3b1c3f-6817-4c0c-9414-76063cccf8e8",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Capitalized 'Bureau' matches the specified terminology.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly uses male pronouns for Kaoru.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'가지고 있어' faithfully translates 'keep' in this context.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"반말 correctly matches addressing Thorne by bare name.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Accurately translates the pronoun '你' as '네가'.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both phrasing choices are equally natural synonyms.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Accurately translates the pronoun '你' as '네가'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly uses male pronouns for Kaoru.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Accurately conveys the arrival deadline 'due at'.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both phrasing choices are equally natural synonyms.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"반말 correctly matches addressing Thorne by bare name.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"}\n]\n",
+  "duration_seconds": 99.157647,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13830,
+   "output_tokens": 15288,
+   "thinking_tokens": 14861,
+   "cache_read_tokens": 0,
+   "total_tokens": 29118
+  }
+ }
+}

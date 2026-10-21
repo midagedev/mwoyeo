@@ -1,0 +1,36 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0161.2",
+  "item-0183.2",
+  "item-0007.2",
+  "item-0343.2",
+  "item-0342.1",
+  "item-0353.2",
+  "item-0238.1",
+  "item-0099.2",
+  "item-0134.2",
+  "item-0136.2",
+  "item-0077.1",
+  "item-0029.1",
+  "item-0182.2",
+  "item-0197.2",
+  "item-0352.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e3758562-5daf-4e5e-bb2d-45553fbb961b",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 leaves untranslated Japanese text.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 naturally omits the source furigana kanji.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 uses the correct informal speech level and proper name.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 accurately captures company-wide for 전사.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 uses the natural subject particle and conversational ending.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Hinata speaks to Takanashi in banmal, correctly matched in Translation 2.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 uses standard software documentation terminology.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 is more idiomatic and natural Korean phrasing.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Tsukumo speaks to Suzanne in hapsyoche speech level.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 uses the grammatically correct verbal conjugation.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 maintains consistent polite register, avoiding mixed speech levels.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 maintains consistent honorifics and more natural phrasing.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations are equally natural and faithful.\"}\n]\n",
+  "duration_seconds": 142.294754,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13719,
+   "output_tokens": 22700,
+   "thinking_tokens": 22248,
+   "cache_read_tokens": 0,
+   "total_tokens": 36419
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0152.1",
+  "item-0236.1",
+  "item-0111.2",
+  "item-0278.1",
+  "item-0293.2",
+  "item-0219.1",
+  "item-0180.2",
+  "item-0286.2",
+  "item-0217.1",
+  "item-0340.2",
+  "item-0279.1",
+  "item-0015.2",
+  "item-0298.2",
+  "item-0257.1",
+  "item-0357.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cd970e40-6f8d-42eb-a7bc-69b37d37b64e",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"물놀이 is more natural than 계곡 놀이 for 川遊び.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are natural and faithful renderings of the archaic line.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both endings are natural and faithful ways to express reassurance.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"제외한 내용 fits technical documentation register better than 빼 둔 내용.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 does not add the unprompted word out.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both generic a Space and contextual the Space are valid.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Dex is the speaker and speaks to Rook in 반말.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"충돌이 발생하면 is more appropriate for technical documentation than 충돌이 나면.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"at home and right? sound much more natural in casual chat.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"수고 많으십니다 is the proper greeting during ongoing work, not past.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말, which Translation 1 uses.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Faithfully translates 様 as 님 without adding unmentioned princess title.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Licia speaks to Saku in 반말, correctly matched in Translation 1.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both spaced and unspaced auxiliary verbs are acceptable in Korean.\"}\n]\n",
+  "duration_seconds": 199.998939,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13589,
+   "output_tokens": 28515,
+   "thinking_tokens": 28033,
+   "cache_read_tokens": 0,
+   "total_tokens": 42104
+  }
+ }
+}

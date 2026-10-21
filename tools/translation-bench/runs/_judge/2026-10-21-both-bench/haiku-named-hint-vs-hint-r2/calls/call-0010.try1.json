@@ -1,0 +1,36 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0162.2",
+  "item-0326.2",
+  "item-0099.2",
+  "item-0249.1",
+  "item-0161.2",
+  "item-0326.1",
+  "item-0027.1",
+  "item-0341.1",
+  "item-0021.1",
+  "item-0103.1",
+  "item-0335.2",
+  "item-0306.1",
+  "item-0085.1",
+  "item-0184.2",
+  "item-0068.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3b697e02-fcb9-4a19-8801-532a55a07197",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"-다던데 is a more natural conversational hearsay ending than -있다고.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Siobhan speaks to Rory in 반말, which Translation 2 correctly uses.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both share the same subject mistranslation and are equally acceptable.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'원해' and '디자인을 맡아' read much more naturally than Translation 2.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Suzanne speaks to Herve in 해요체, which Translation 2 correctly uses.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in 반말, which Translation 1 correctly uses.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'Old Man Takanashi' is more natural and idiomatic for 小鳥遊老人.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 avoids the unnatural pronoun '그걸' and sounds more colloquial.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"万俟 is pronounced Moqi, so 'Senior Brother Mo' is correct.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Identical wording; differing only in terminal punctuation, which is ignored formatting.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'재촉했어' and '답을 줘야 해' are more natural Korean phrasing.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"'Sneered' is idiomatic English for 冷笑, avoiding awkward translationese.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'When' correctly captures expected timing; 'if' wrongly implies doubt.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'On site' accurately translates 현장, whereas 'on the floor' is ambiguous.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'Small' fits '좁아서' for an unoccupied home better than 'cramped'.\"}\n]\n",
+  "duration_seconds": 221.695401,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14033,
+   "output_tokens": 31770,
+   "thinking_tokens": 31243,
+   "cache_read_tokens": 0,
+   "total_tokens": 45803
+  }
+ }
+}

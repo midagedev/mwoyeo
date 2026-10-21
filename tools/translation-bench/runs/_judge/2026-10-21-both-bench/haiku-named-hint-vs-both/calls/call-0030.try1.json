@@ -1,0 +1,36 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0169.2",
+  "item-0158.1",
+  "item-0200.2",
+  "item-0128.1",
+  "item-0029.2",
+  "item-0179.2",
+  "item-0059.2",
+  "item-0313.2",
+  "item-0124.1",
+  "item-0023.1",
+  "item-0154.2",
+  "item-0080.1",
+  "item-0242.1",
+  "item-0278.2",
+  "item-0322.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4a118296-0bdd-4849-b866-fbcb07980fef",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'네' is more natural than '좋아요' when acknowledging an instruction.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'watch over' captures minding the office without implying surveillance.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both make the same error with '언니' and are equally good.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 when Siobhan speaks to Rory.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Faithful to 'Thorne' without adding '선장님', and avoids '물건'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'Field trip' fits on-site onboarding visit; 'trial' and 'goes up' mistranslate.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"'석양 무렵' and '저녁 무렵' are equally valid translations of 夕暮れ.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly uses the established name '휴가' instead of '히나타'.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Identical except for a comma; equally good.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 matching Rory's speech level to Siobhan.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"'함께 가지 못해' and '동행하지 못해' are equally good here.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Correctly uses 반말 matching informal '-なの?' and Lysia's speech to Saku.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'맞다' correctly translates 'そうだ'; '그러고 보니' translates 'そういえば'.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Correctly uses 반말 to Lu Ming and avoids unnatural '그녀는'.\"}\n]\n",
+  "duration_seconds": 162.801217,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14010,
+   "output_tokens": 25289,
+   "thinking_tokens": 24760,
+   "cache_read_tokens": 0,
+   "total_tokens": 39299
+  }
+ }
+}

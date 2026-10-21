@@ -1,0 +1,22 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0058.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dc8b1e35-c3ad-4a22-830f-b3dcde508841",
+  "status": "SUCCESS",
+  "response": "[{\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 uses natural Korean phrasing instead of translationese.\"}]\n",
+  "duration_seconds": 8.919303,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 9184,
+   "output_tokens": 1057,
+   "thinking_tokens": 1027,
+   "cache_read_tokens": 0,
+   "total_tokens": 10241
+  }
+ }
+}

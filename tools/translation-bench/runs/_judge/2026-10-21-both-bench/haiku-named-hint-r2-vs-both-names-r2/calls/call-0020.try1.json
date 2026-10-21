@@ -1,0 +1,36 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0183.2",
+  "item-0046.2",
+  "item-0198.1",
+  "item-0223.2",
+  "item-0291.1",
+  "item-0181.2",
+  "item-0207.2",
+  "item-0183.1",
+  "item-0138.1",
+  "item-0256.1",
+  "item-0236.1",
+  "item-0303.1",
+  "item-0013.1",
+  "item-0037.1",
+  "item-0061.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "38b358d9-6f88-49c8-b617-001c4528fc73",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correctly refers to father with honorifics instead of '그 사람'.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and convey identical meaning.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 is more natural and idiomatic in Korean dialogue.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both are equally accurate and natural English translations.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations have identical text; formatting differences are ignored.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both are natural and accurate renderings of the Japanese sentence.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 is more natural and accurately conveys the deadline.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly identifies father using proper Korean honorifics instead of '그 사람'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Adding '받은' makes the Korean phrasing natural and grammatically complete.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 faithfully preserves the contrastive structure and reported speech.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Correctly uses 해요체 as required by the speaker facts.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Correctly uses 해요체 according to the speaker relationship facts.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 accurately translates '夕方には' without adding an unstated approximation.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both are natural and accurate translations of the casual remark.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Correctly uses 반말 according to the speaker relationship facts.\"}\n]\n",
+  "duration_seconds": 84.314815,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13597,
+   "output_tokens": 12624,
+   "thinking_tokens": 12151,
+   "cache_read_tokens": 0,
+   "total_tokens": 26221
+  }
+ }
+}

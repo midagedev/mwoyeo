@@ -1,0 +1,36 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0016.2",
+  "item-0255.2",
+  "item-0194.2",
+  "item-0159.1",
+  "item-0126.1",
+  "item-0205.2",
+  "item-0260.2",
+  "item-0222.2",
+  "item-0338.1",
+  "item-0272.2",
+  "item-0001.2",
+  "item-0191.2",
+  "item-0015.2",
+  "item-0342.1",
+  "item-0053.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "34f846d0-e3cc-4ae6-8501-8bfdd961d736",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly renders the active manual section heading.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly translates '도' (also) and uses present tense.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 is faithful without adding 'I'm sure'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 is far more natural and omits awkward Hanzi.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 avoids assuming gender ('Mr.') for gender-neutral 'さん'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 uses 'and' and 'my stuff' more naturally.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'Should we invite' fits joint plans; 'Good to hear' fits context.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both 'lure' and 'bribe' are equally natural and accurate translations.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly translates '好的' and avoids a logical contradiction.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'Direct handoff' correctly translates 직거래; 'direct trade' is Konglish.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 accurately conveys the contrast and indirect speech markers.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 correctly translates @周婷 to @주정 per the facts.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 for the siblings' clash.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 faithfully renders 'wants us' rather than a command.\"}\n]\n```\n",
+  "duration_seconds": 159.59141,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13944,
+   "output_tokens": 24266,
+   "thinking_tokens": 23768,
+   "cache_read_tokens": 0,
+   "total_tokens": 38210
+  }
+ }
+}

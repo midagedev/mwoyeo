@@ -1,0 +1,36 @@
+{
+ "call": 38,
+ "try": 1,
+ "ids": [
+  "item-0216.2",
+  "item-0041.1",
+  "item-0248.1",
+  "item-0199.2",
+  "item-0101.2",
+  "item-0082.1",
+  "item-0336.2",
+  "item-0128.2",
+  "item-0117.2",
+  "item-0311.2",
+  "item-0079.2",
+  "item-0094.2",
+  "item-0291.1",
+  "item-0070.1",
+  "item-0248.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4f68d9c5-de78-49bc-a65f-075a3be7caf4",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"More natural idiom for asking someone's opinion on a clue.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly uses informal speech (반말) and translates tea blend name accurately.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Natural English idiom; trembling fingertips is awkward and unidiomatic.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both reception desk and front desk are natural and accurate.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Respects the required polite speech level (해요체) and avoids inappropriate pronouns.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both particle choices and phrasings are natural, accurate, and equivalent.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Accurately translates the interjection of surprise 'ん?' as '응?'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'당분간' accurately captures the temporal nuance of 'for now'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'몫' is the precise and natural Korean term for a share.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'선장님' fits the ship setting; '사령관님' contradicts context.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Better captures the adversative transition and reported speech naturally.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Naturally preserves the pronoun 'it' instead of repeating the noun.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Correctly interprets who rests; candidate 1 wrongly attributes it to Jiu.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both 'raised his head' and 'looked up' are natural and accurate.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"'Fingers trembling' is natural English; 'fingertips trembling' is unidiomatic.\"}\n]\n",
+  "duration_seconds": 171.332942,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13781,
+   "output_tokens": 24442,
+   "thinking_tokens": 23940,
+   "cache_read_tokens": 0,
+   "total_tokens": 38223
+  }
+ }
+}

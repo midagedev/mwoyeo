@@ -1,0 +1,36 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0007.1",
+  "item-0016.2",
+  "item-0009.2",
+  "item-0071.2",
+  "item-0062.2",
+  "item-0065.1",
+  "item-0022.1",
+  "item-0020.2",
+  "item-0006.2",
+  "item-0022.2",
+  "item-0018.1",
+  "item-0044.1",
+  "item-0013.2",
+  "item-0041.1",
+  "item-0055.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "78c6fd59-2e8f-4244-b281-7cdd43fe4c1d",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the required haeyo-che speech level.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the past tense for past continuous stay.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate English renderings.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'New hires at MoaLogis' reads more naturally than 'New MoaLogis hires'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'The qi stones' correctly specifies the sect's saved stones.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates '직접' as 'yourself'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 uses proper sentence segmentation instead of a comma splice.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 faithfully translates '직접' as 'yourself'.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'믿겠습니다' is the natural Korean expression when counting on someone.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate casual Korean.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 1 absurdly adds person honorific '씨' to a cafe name.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 captures the spoken elder dialogue tone and question punctuation.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 as required by the facts.\"}\n]\n",
+  "duration_seconds": 180.473636,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14010,
+   "output_tokens": 27004,
+   "thinking_tokens": 26535,
+   "cache_read_tokens": 0,
+   "total_tokens": 41014
+  }
+ }
+}

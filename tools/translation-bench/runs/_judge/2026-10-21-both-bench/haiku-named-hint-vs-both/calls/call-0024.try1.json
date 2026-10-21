@@ -1,0 +1,36 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0333.1",
+  "item-0234.2",
+  "item-0168.2",
+  "item-0138.1",
+  "item-0177.2",
+  "item-0028.2",
+  "item-0115.1",
+  "item-0234.1",
+  "item-0331.2",
+  "item-0013.1",
+  "item-0037.1",
+  "item-0061.2",
+  "item-0069.1",
+  "item-0007.1",
+  "item-0049.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "417703d5-8c2a-40c7-a5a6-77caef0fb7df",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'잘못된' is more natural than '틀린' for a code version.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'securely against his body' translates 贴身 and 收好 accurately.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Wearing safety shoes is the condition while observing, not a sequential step.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'Good to hear' captures the relief of '다행이다' better than 'Good'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'첫 배송분' and particles '의', '에' are more accurate and natural.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'잘하다' meaning to be skilled at is written without spaces.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'old Mr. Takanashi' is much more natural than 'an old man named'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'securely against his body' translates 贴身 and 收好 accurately.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Miss Qiu is expected to recover, so 'when' fits context better.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Quotation mark style is purely formatting; both translations are identical.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'Post' is the natural verb for sending messages in chat channels.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"The trailing period is purely formatting; both translations are identical.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Correctly preserves the full name '린위안' specified in the facts.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Uses correct informal register (반말) and accurately conveys who transfers money.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"'개 때문에 불평하면' is much more natural Korean for 'complains about'.\"}\n]\n",
+  "duration_seconds": 123.811632,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13941,
+   "output_tokens": 19040,
+   "thinking_tokens": 18528,
+   "cache_read_tokens": 0,
+   "total_tokens": 32981
+  }
+ }
+}

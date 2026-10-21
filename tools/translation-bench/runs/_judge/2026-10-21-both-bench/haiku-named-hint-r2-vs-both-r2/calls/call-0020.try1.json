@@ -1,0 +1,36 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0090.1",
+  "item-0005.1",
+  "item-0333.1",
+  "item-0185.2",
+  "item-0205.2",
+  "item-0179.1",
+  "item-0157.1",
+  "item-0100.2",
+  "item-0063.1",
+  "item-0257.1",
+  "item-0032.2",
+  "item-0026.1",
+  "item-0053.1",
+  "item-0342.2",
+  "item-0119.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "91db6c6b-5e6d-4ce8-9a39-a88050344deb",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체, matching the speaker's assigned speech level.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 preserves 'Modakbul', which Translation 2 omitted.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'돌 관리' is far more natural in Korean than '돌을 돌보는 걸'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'모순되는데요' fits the rebuttal context much better than '모순이네요'.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both '급한' and '긴급한' are equally accurate and natural translations.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Gender is unspecified in context, making both translations equally valid assumptions.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 'her' for Chou Shuang.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 accurately translates '喫茶ふくろう' without hallucinating '탐정국'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in 반말; Translation 1 uses 반말.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'또 재촉했어' correctly translates the completed aspect of '又来催了'.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 translates the name to Korean instead of leaving katakana.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 accurately captures the request nuance of '-ちょうだい' more naturally.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'他' refers to the speaker's father, making '아빠' respectful and correct.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 reads much more naturally and idiomatically as spoken dialogue.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"In English, locks are not described as 'closed'.\"}\n]\n",
+  "duration_seconds": 206.491296,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13832,
+   "output_tokens": 28480,
+   "thinking_tokens": 27957,
+   "cache_read_tokens": 0,
+   "total_tokens": 42312
+  }
+ }
+}

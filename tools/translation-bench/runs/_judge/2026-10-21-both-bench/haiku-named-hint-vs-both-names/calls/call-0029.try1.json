@@ -1,0 +1,36 @@
+{
+ "call": 29,
+ "try": 1,
+ "ids": [
+  "item-0290.1",
+  "item-0246.2",
+  "item-0057.1",
+  "item-0099.1",
+  "item-0055.2",
+  "item-0304.2",
+  "item-0194.1",
+  "item-0207.1",
+  "item-0206.2",
+  "item-0111.1",
+  "item-0163.1",
+  "item-0051.2",
+  "item-0065.1",
+  "item-0321.1",
+  "item-0104.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "17479f23-dabd-4dbe-a651-a64b59008d71",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 accurately translates 盒 as box and has natural phrasing.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 师兄 as Senior Brother, not Junior Brother.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations convey the meaning and nuance equally well.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 naturally expresses the current state of absence.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 properly translates the name into Korean Hangul.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translates footer into Korean instead of leaving English.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 between siblings as specified.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both options are natural colloquial Korean translations of the line.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 as required by the facts.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both Great and Good are equally natural translations here.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 uses terms that fit the fantasy shrine register.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translating sir as 선생님 is unnatural translationese for a landlord.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 reads more naturally without redundant phrasing.\"}\n]\n",
+  "duration_seconds": 111.813635,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14218,
+   "output_tokens": 17066,
+   "thinking_tokens": 16615,
+   "cache_read_tokens": 0,
+   "total_tokens": 31284
+  }
+ }
+}

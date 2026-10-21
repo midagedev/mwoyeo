@@ -1,0 +1,36 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0002.2",
+  "item-0202.1",
+  "item-0051.1",
+  "item-0239.2",
+  "item-0205.1",
+  "item-0034.1",
+  "item-0240.1",
+  "item-0106.1",
+  "item-0364.1",
+  "item-0058.1",
+  "item-0333.1",
+  "item-0041.2",
+  "item-0228.1",
+  "item-0129.1",
+  "item-0337.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2c1258bc-dc52-41b1-a9e9-3e578aa01f94",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"물거울 is accurate and natural for 水鏡 in fantasy context.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'Search scope' is standard terminology in software documentation.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate casual English.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Candidate 1 accurately translates 'きっと' and sounds more natural.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Candidate 2 maintains consistent spoken 반말 (해체) throughout.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Xu Nuo speaks in 반말; avoids unnatural pronoun '그녀'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Uses natural present perfect tense for someone who just woke up.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'That one' refers to the tag, correctly translated as '그것'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Avoids assuming unstated gender and translates 文章 more accurately.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations convey the casual inquiry naturally and accurately.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'클로닝' accurately translates 'Cloning' without unnecessary parentheticals.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"'Guard' accurately captures '守住' in sect defense context.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Gareth speaks in 해요체; Candidate 2 uses correct speech level.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Candidate 2 left most of the sentence untranslated in Japanese.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Correctly transcribes Chinese name 曾岚 (Zēng Lán) as '쩡란'.\"}\n]\n```\n",
+  "duration_seconds": 77.557125,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13895,
+   "output_tokens": 12563,
+   "thinking_tokens": 12073,
+   "cache_read_tokens": 0,
+   "total_tokens": 26458
+  }
+ }
+}

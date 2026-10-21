@@ -1,0 +1,36 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0136.1",
+  "item-0218.1",
+  "item-0210.1",
+  "item-0302.2",
+  "item-0324.2",
+  "item-0182.2",
+  "item-0001.2",
+  "item-0175.1",
+  "item-0015.2",
+  "item-0184.2",
+  "item-0053.2",
+  "item-0026.2",
+  "item-0240.1",
+  "item-0074.1",
+  "item-0249.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d817998e-d7f0-4158-92fa-45df4162af16",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correctly uses 반말 matching speaker's speech level.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Reads much more naturally, avoiding translationese '누군가'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Identical except for terminal punctuation.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both are equally natural, polite, and accurate.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'Shadowing report' fits workplace onboarding better than 'field trip'.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly uses 반말 matching speaker's speech level.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"More faithful to '良くは' with '좋지는'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'고맙습니다' correctly and naturally translates '助かります'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'The Space' correctly refers to the previously introduced Space.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both are natural and accurate translations.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Uses correct term '메리골드' and correct speech level 해요체.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"'Forwarded' is the proper term for document approval workflows.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Present tense 'sits' correctly describes existing desk arrangement.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Correctly romanizes 仇(qiú) as Qiu instead of Chou.\"}\n]\n",
+  "duration_seconds": 154.158756,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14079,
+   "output_tokens": 22526,
+   "thinking_tokens": 22072,
+   "cache_read_tokens": 0,
+   "total_tokens": 36605
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 35,
+ "try": 1,
+ "ids": [
+  "item-0136.2",
+  "item-0281.2",
+  "item-0145.1",
+  "item-0091.1",
+  "item-0024.2",
+  "item-0301.1",
+  "item-0276.1",
+  "item-0229.1",
+  "item-0211.2",
+  "item-0138.2",
+  "item-0265.2",
+  "item-0009.1",
+  "item-0105.1",
+  "item-0293.2",
+  "item-0144.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5e3be4f1-8b44-4c0f-8966-d2d52e4f2336",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates the address term instead of leaving Chinese characters.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses more natural phrasing and the correct selection particle.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both are natural and accurate translations for onboarding.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Identical except for minor punctuation formatting.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Wow' translates the exclamation '헐' much more accurately than 'Wait'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly uses the required 해요체 speech level.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"More natural chat register and faithful rendering of 'she's out'.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both phrases naturally translate '끝입니다' in documentation.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Accurately transcribes 'かささぎばし' without missing syllables.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Uses correct Korean tea terminology for first harvest leaves.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Correctly uses 반말 as required by speaker relationship.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Avoids incorrect gender kinship term '언니' for a male speaker.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Transliterates the name into Hangul and uses proper honorifics.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both '수정 내용' and '수정 사항' are standard and natural.\"}\n]\n",
+  "duration_seconds": 89.663946,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13805,
+   "output_tokens": 13808,
+   "thinking_tokens": 13346,
+   "cache_read_tokens": 0,
+   "total_tokens": 27613
+  }
+ }
+}

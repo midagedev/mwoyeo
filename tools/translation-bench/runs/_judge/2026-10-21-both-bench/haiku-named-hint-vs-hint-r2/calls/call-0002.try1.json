@@ -1,0 +1,36 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0055.1",
+  "item-0086.1",
+  "item-0042.2",
+  "item-0199.1",
+  "item-0062.1",
+  "item-0145.2",
+  "item-0077.2",
+  "item-0339.1",
+  "item-0251.1",
+  "item-0018.2",
+  "item-0236.1",
+  "item-0112.2",
+  "item-0015.1",
+  "item-0050.2",
+  "item-0282.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1d8ca96d-7b85-402e-b2d7-7dce5a14c7cd",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"앉으세요 is natural; 앉아 주세요 is an awkward Japanese calque.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly translates the name as 휴가 per the facts.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"그러고 보니 correctly renders the interjection; 맞아 incorrectly implies agreement.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Identical translations except for ending punctuation, which is ignored.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Notes is the standard term for a note-taking app.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly uses 합쇼체 speech level as specified in the facts.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly uses 반말 speech level as required by the facts.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are natural and accurately convey the original meaning.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Uses standard orthography 브리지 and natural phrasing 공구함 and 가져다줄래.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Accurately translates 濡れた as wet and 駆け込んできた as came rushing.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Present perfect has spent accurately reflects the aspect of 磨いてきた.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"조식 포함 and 하룻밤에 900 정도야 read much more naturally.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Correctly translates the name 周婷 to 주정 instead of Hanja.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"골치 아픈 이야기 is natural Korean; 고생스러운 이야기 is an unnatural calque.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"공유 서버 correctly matches the context of sharing with the team.\"}\n]\n```\n",
+  "duration_seconds": 137.415196,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13706,
+   "output_tokens": 19109,
+   "thinking_tokens": 18603,
+   "cache_read_tokens": 0,
+   "total_tokens": 32815
+  }
+ }
+}

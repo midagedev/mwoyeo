@@ -1,0 +1,36 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0162.2",
+  "item-0007.2",
+  "item-0223.2",
+  "item-0349.1",
+  "item-0221.2",
+  "item-0042.2",
+  "item-0277.2",
+  "item-0356.2",
+  "item-0346.1",
+  "item-0214.1",
+  "item-0140.1",
+  "item-0029.1",
+  "item-0309.1",
+  "item-0350.1",
+  "item-0334.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a1f2cef6-3bf8-4209-8e0f-60e742b0c07a",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"아이페 is incorrect transliteration of Aoife; 푸터 fits web dev better.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are grammatically correct and natural, differing only by a comma.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"주정 correctly keeps the full name, and 빡빡해서 accurately translates 票很紧.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Inspector Akira captures the respectful title and register toward a police inspector.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly translates the tutorial's imperative instruction instead of making it conditional.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"~로군 naturally reflects the older male detective's soliloquy register.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Natural phrasing for 分けてもらえ that fits the guild master's authoritative register.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Present tense 'receive' correctly fits procedural instructions for future onboarding steps.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural in Korean.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly uses 반말 to Lu Ming and avoids awkward pronoun 그녀.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"여러분 is far more natural than translationese 당신 in tech tutorials.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Mr./Ms. properly translates the honorific for an English professional user guide.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated in Japanese.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Adding 'your' clarifies who is meant and reads much more naturally.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both particle inclusion and omission are equally natural in casual Korean.\"}\n]\n",
+  "duration_seconds": 139.238609,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13508,
+   "output_tokens": 20125,
+   "thinking_tokens": 19629,
+   "cache_read_tokens": 0,
+   "total_tokens": 33633
+  }
+ }
+}

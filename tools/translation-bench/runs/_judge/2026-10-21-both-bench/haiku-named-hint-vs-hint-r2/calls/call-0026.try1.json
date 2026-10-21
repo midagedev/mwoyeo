@@ -1,0 +1,36 @@
+{
+ "call": 26,
+ "try": 1,
+ "ids": [
+  "item-0099.1",
+  "item-0055.2",
+  "item-0288.1",
+  "item-0111.1",
+  "item-0163.1",
+  "item-0051.2",
+  "item-0065.1",
+  "item-0325.1",
+  "item-0104.2",
+  "item-0084.2",
+  "item-0062.2",
+  "item-0223.2",
+  "item-0114.1",
+  "item-0202.1",
+  "item-0088.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "567185ee-e859-477e-b69e-c24511f0d535",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Follows established spelling 'Byun' from the context.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'앉으세요' is much more natural than '앉아 주세요' for seating guests.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both are standard Korean spacing variants with identical meaning.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Identical except for a comma; both are equally good.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates '받은 출입증' rather than simplifying it.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly maintains the 합쇼체 speech level.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Reflection' and 'you're all set' are more natural workplace phrasing.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates the name instead of leaving Chinese characters.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'물거울' accurately translates 水鏡 and '에르베 씨' matches the source.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 correctly addresses Seoyoon instead of saying 'I'll rest'.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'Notes' is natural software terminology, whereas 'memo' is unidiomatic.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'그럼' is natural Korean dialogue; '뭐, 그래' is an awkward calque.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'Old Mr. Takanashi' is much more natural narrative fiction prose.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both 'gave a nod' and 'nodded' are equally natural and accurate.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'옛 서책' fits the fantasy RPG setting better than '서적'.\"}\n]\n",
+  "duration_seconds": 119.760142,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14043,
+   "output_tokens": 18350,
+   "thinking_tokens": 17842,
+   "cache_read_tokens": 0,
+   "total_tokens": 32393
+  }
+ }
+}

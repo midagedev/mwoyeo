@@ -1,0 +1,36 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0239.2",
+  "item-0218.2",
+  "item-0153.1",
+  "item-0234.2",
+  "item-0209.2",
+  "item-0104.1",
+  "item-0135.2",
+  "item-0241.1",
+  "item-0336.1",
+  "item-0166.1",
+  "item-0143.2",
+  "item-0093.1",
+  "item-0191.2",
+  "item-0253.2",
+  "item-0085.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "67b0776c-5581-4e3e-837f-14545542574a",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'내일 말입니다' is a much more natural topic transition.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly translates '三红' as '삼홍' instead of '산홍'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses subject honorifics and more natural conversational indirect speech.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly translates 'It's pronounced' without hallucinating '이프'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'누가 왔어' is more natural spoken Korean than '누군가'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Avoids redundant duplication of the name 'Joonho Byun'.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'-줄 것 같아?' is much more natural conversational Korean.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Correctly reflects Suzanne's royal title '공주님' from facts.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translates '三红' instead of leaving Chinese characters untranslated.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'-거든' naturally conveys the explanatory reason in casual speech.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Correctly uses 해요체 required for speaking to Zhou Ting.\"}\n]\n```\n",
+  "duration_seconds": 205.007967,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13787,
+   "output_tokens": 28997,
+   "thinking_tokens": 28525,
+   "cache_read_tokens": 0,
+   "total_tokens": 42784
+  }
+ }
+}

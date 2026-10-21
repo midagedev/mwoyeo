@@ -1,0 +1,37 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0061.2",
+  "item-0069.1",
+  "item-0007.1",
+  "item-0049.2",
+  "item-0117.1",
+  "item-0194.1",
+  "item-0187.2",
+  "item-0165.1",
+  "item-0264.1",
+  "item-0257.1",
+  "item-0167.1",
+  "item-0321.2",
+  "item-0299.2",
+  "item-0255.2",
+  "item-0072.2"
+ ],
+ "problem": "status ERROR",
+ "event": {
+  "conversation_id": "5c697aca-5089-4024-9bdb-00bd45b55c37",
+  "status": "ERROR",
+  "response": "",
+  "error": "The stream was interrupted. Please continue the task you were working on.",
+  "duration_seconds": 140.051533,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13936,
+   "output_tokens": 19127,
+   "thinking_tokens": 19127,
+   "cache_read_tokens": 0,
+   "total_tokens": 33063
+  }
+ }
+}

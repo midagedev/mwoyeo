@@ -1,0 +1,36 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0237.2",
+  "item-0057.1",
+  "item-0099.1",
+  "item-0055.2",
+  "item-0300.2",
+  "item-0194.1",
+  "item-0111.1",
+  "item-0163.1",
+  "item-0051.2",
+  "item-0065.1",
+  "item-0317.1",
+  "item-0104.2",
+  "item-0084.2",
+  "item-0062.2",
+  "item-0241.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "983a8d27-6490-4f6b-a4f2-accb88818404",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates the onboarding task list appropriately instead of literal 'Foothold'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Accurately translates '好的', '票很紧', and '得抢' without claiming tickets sold out.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'제외한 내용' accurately captures omitted changes in a version control context.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translates Chinese characters '三红' into Korean '삼홍'.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'On site' is the natural and accurate translation for '현장'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Mountain gate' is the standard genre term for '山门'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'Put' is more natural than 'wrote' for filling in forms.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Faithfully translates '一道缝' instead of omitting the crack detail.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly uses 해요체 as required by the speaker facts.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'소장' respects the instruction not to use honorifics, unlike '소장님'.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'하셨어요' naturally and respectfully reports what the speaker's mother said.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'Trembled slightly' is the natural English collocation for shaking hands.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Correctly uses 반말 speech level as specified in the facts.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Faithfully translates 'again' as '또' instead of replacing it with '제발'.\"}\n]\n",
+  "duration_seconds": 100.852778,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13636,
+   "output_tokens": 15754,
+   "thinking_tokens": 15248,
+   "cache_read_tokens": 0,
+   "total_tokens": 29390
+  }
+ }
+}

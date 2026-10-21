@@ -1,0 +1,36 @@
+{
+ "call": 39,
+ "try": 1,
+ "ids": [
+  "item-0227.1",
+  "item-0310.2",
+  "item-0075.2",
+  "item-0022.2",
+  "item-0052.1",
+  "item-0202.2",
+  "item-0096.2",
+  "item-0108.2",
+  "item-0011.1",
+  "item-0156.2",
+  "item-0334.1",
+  "item-0311.1",
+  "item-0109.2",
+  "item-0216.1",
+  "item-0203.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "773e5771-5427-410a-ab92-60bdf4ba3167",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"우리 is more appropriate than humble 저희 for a superior.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 又 as again.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates never gave back without adding 아직도.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 殿 as 공.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are equally natural, accurate, and use appropriate speech level.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both are accurate and natural translations of the line.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 沈んでおる as 가라앉아 있지.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 is more faithful; intact mistranslates かかったまま as undamaged.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and use the correct speech level.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both are accurate and natural translations of the app instruction.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 is more natural and translates 伤 faithfully.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 correctly avoids leaving source kanji in the dialogue.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 avoids assuming a male gender for Takanashi.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 captures the deductive nuance of な with then.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the request for permission as 자도 돼.\"}\n]\n",
+  "duration_seconds": 137.950868,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14224,
+   "output_tokens": 16878,
+   "thinking_tokens": 16408,
+   "cache_read_tokens": 0,
+   "total_tokens": 31102
+  }
+ }
+}

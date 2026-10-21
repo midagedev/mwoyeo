@@ -1,0 +1,36 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0071.1",
+  "item-0121.2",
+  "item-0116.1",
+  "item-0220.2",
+  "item-0213.1",
+  "item-0264.2",
+  "item-0017.1",
+  "item-0183.1",
+  "item-0303.1",
+  "item-0276.1",
+  "item-0309.2",
+  "item-0258.1",
+  "item-0035.2",
+  "item-0054.2",
+  "item-0286.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5f86f8a4-ea25-4f89-a108-9ed611f10813",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Avoids hallucinated English text and incorrect reading of the name.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'감사합니다' is much more natural than the literal '도움이 됩니다'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"A magical stone emits '기운' rather than living presence '기척'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'뭐, 그렇지' is the natural, idiomatic reply to the question.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are equally accurate, faithful, and natural.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'That's a relief' fits the context of reassurance better than 'Thanks'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'다른 일로 바꿔야' expresses switching tasks much more clearly.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Omits the redundant Japanese kanji furigana in Korean text.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 unfaithfully adds '도' which alters the original meaning.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly avoids misidentifying the elderly male shopkeeper as female.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Avoids awkwardly repeating the name in parentheses.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'쏜 선장' appropriately reflects the captain's title and register.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Correctly uses 반말 speech level between Rory and Siobhan.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'Passage' translates '文章' more accurately than 'sentence' ('文').\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"'Scraped together' accurately translates '辛苦攒下的' without negative connotations of 'hoarded'.\"}\n]\n",
+  "duration_seconds": 180.038548,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 7228,
+   "output_tokens": 25451,
+   "thinking_tokens": 24950,
+   "cache_read_tokens": 6574,
+   "total_tokens": 32679
+  }
+ }
+}

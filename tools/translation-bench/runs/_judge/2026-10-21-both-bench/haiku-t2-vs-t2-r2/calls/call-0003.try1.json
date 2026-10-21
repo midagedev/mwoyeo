@@ -1,0 +1,36 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0272.1",
+  "item-0318.2",
+  "item-0204.2",
+  "item-0059.1",
+  "item-0173.2",
+  "item-0190.1",
+  "item-0270.1",
+  "item-0112.2",
+  "item-0146.2",
+  "item-0077.1",
+  "item-0184.1",
+  "item-0254.2",
+  "item-0146.1",
+  "item-0221.1",
+  "item-0242.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "294b3bbd-dde0-4814-a62f-62d4ce4d5065",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Faithfully refers to notes as pronouns without adding unstated words.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Gerald is a freezer, so '만나서' fits personification better than '둬서'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly uses 'they' for the invited members instead of 'you'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'맞다' correctly translates 'そうだ' when recalling something, unlike '그래'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'와 달래' faithfully captures 'wants us to' rather than 'told us'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'회의실로' uses the correct destination particle for the verb of movement.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'버스는' correctly preserves the topic marker of the Japanese source.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly translates 'yet' as '벌써' without adding unnecessary words.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Transliterates the Japanese name into Hangul instead of keeping katakana.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translates the name and title into English instead of leaving hanzi.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'알았어' and '한테' match the casual chat register between peers.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Faithfully places 'everything' once without adding redundant modifiers.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Transliterates the name into Hangul instead of leaving katakana script.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'마중 나와 달래' is the natural, idiomatic Korean expression.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Preserves the original topic focus and fits formal written tutorial style.\"}\n]\n",
+  "duration_seconds": 136.073794,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13794,
+   "output_tokens": 20414,
+   "thinking_tokens": 19904,
+   "cache_read_tokens": 0,
+   "total_tokens": 34208
+  }
+ }
+}

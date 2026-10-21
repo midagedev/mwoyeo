@@ -1,0 +1,34 @@
+{
+ "call": 44,
+ "try": 1,
+ "ids": [
+  "item-0096.1",
+  "item-0315.1",
+  "item-0323.1",
+  "item-0244.2",
+  "item-0263.1",
+  "item-0095.2",
+  "item-0098.1",
+  "item-0301.2",
+  "item-0261.1",
+  "item-0232.1",
+  "item-0239.1",
+  "item-0287.2",
+  "item-0232.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "667109bb-9920-40da-8c43-002a35e4cbec",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"More faithful; avoids unnecessary contrastive particle '는'.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both convey the meaning and register equally well.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"许诺 is female, so she must use '언니', not '누나'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'Yeah' fits the informal texting register better than 'Yes'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'발음은' is more natural Korean parenthetical phrasing than '로 발음'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Avoids redundant duplicate name 'Seojin Um (Seojin Um)'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'기억해 두겠습니다' accurately translates the auxiliary verb '〜ておく'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'Spirit-Restoring Pill' correctly translates the term '回灵丹'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'다들' accurately captures the plural pronoun '你们' in group chat.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Transliterates pronunciation into Hangul and avoids leaving Japanese hiragana.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'examples featuring' correctly conveys using fictional personas in user guides.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"'도저히 만들 수 없어' faithfully translates '根本做不出来'.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Transliterates pronunciation into Hangul and avoids leaving Japanese hiragana.\"}\n]\n",
+  "duration_seconds": 138.970775,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13128,
+   "output_tokens": 20294,
+   "thinking_tokens": 19860,
+   "cache_read_tokens": 0,
+   "total_tokens": 33422
+  }
+ }
+}

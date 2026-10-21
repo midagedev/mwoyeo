@@ -1,0 +1,36 @@
+{
+ "call": 16,
+ "try": 1,
+ "ids": [
+  "item-0334.1",
+  "item-0064.1",
+  "item-0179.1",
+  "item-0154.1",
+  "item-0279.1",
+  "item-0214.1",
+  "item-0103.1",
+  "item-0053.2",
+  "item-0221.2",
+  "item-0144.2",
+  "item-0230.2",
+  "item-0148.1",
+  "item-0089.1",
+  "item-0012.2",
+  "item-0063.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4c66dea7-3ecb-4ab3-b56e-e1a9b423af2a",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translates Chinese slang AA into natural Korean 더치페이.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Dao is the correct genre term for xianxia 道.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Field trip report correctly reflects the on-site onboarding context.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"동행하지 못해 fits the formal humble register toward royalty better.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"브랜치 작업하기 is standard technical documentation phrasing for Working with.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Identical translations differing only in punctuation spacing; both mistranslate 湊.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correctly handles the surname pronunciation and the place name 环岛路.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 is much more natural and avoids awkward translationese.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both particles 에서 and 으로 are equally natural here.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"An older brother to his younger sister is 오빠, not 형.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both self-introductions are accurate, natural, and use correct register.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both when and if are equally accurate and natural here.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 再来月 as the end of next month.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Correctly uses 반말 matching the speaker's relationship with the listener.\"}\n]\n",
+  "duration_seconds": 154.159371,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13904,
+   "output_tokens": 22097,
+   "thinking_tokens": 21618,
+   "cache_read_tokens": 0,
+   "total_tokens": 36001
+  }
+ }
+}

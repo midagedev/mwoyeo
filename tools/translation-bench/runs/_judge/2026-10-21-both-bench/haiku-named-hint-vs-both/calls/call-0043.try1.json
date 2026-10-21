@@ -1,0 +1,36 @@
+{
+ "call": 43,
+ "try": 1,
+ "ids": [
+  "item-0210.2",
+  "item-0345.1",
+  "item-0171.1",
+  "item-0160.1",
+  "item-0045.2",
+  "item-0173.1",
+  "item-0139.1",
+  "item-0102.2",
+  "item-0290.2",
+  "item-0038.1",
+  "item-0215.2",
+  "item-0204.1",
+  "item-0193.1",
+  "item-0241.2",
+  "item-0027.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5b6a93aa-8a94-478c-ad60-a098d602b76c",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Plural Quick Notes fits ongoing meeting decisions better than a single note.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in banmal, which Translation 2 correctly uses.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 naturally translates affirmation as 응 and sudden realization as 어.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Won't end faithfully captures the frustration of the present tense 안 끝나.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Short notes reflects the defined meaning of ひとこと as 短いメモ.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"조심하겠습니다 is the natural Korean response to a request not to scratch something.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"You've been out cold idiomatically captures 昏 and the immediate waking context.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Older brother should be translated as 형, not eldest brother 큰형.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"어떻게 써 faithfully means how do you spell, not what the name is.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Thorne speaks to Rook in haeyoche, which Translation 1 correctly uses.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both particles are equally natural and accurate for copying to a destination.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Siobhan speaks to Gareth in hapsyoche, correctly used in Translation 2.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 correctly addresses Tsukumo without adding the unwarranted honorific 씨.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 accurately translates again as 또 rather than replacing it.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 1 leaves a Chinese character untranslated, while Translation 2 translates properly.\"}\n]\n",
+  "duration_seconds": 116.858253,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13721,
+   "output_tokens": 19623,
+   "thinking_tokens": 19108,
+   "cache_read_tokens": 0,
+   "total_tokens": 33344
+  }
+ }
+}

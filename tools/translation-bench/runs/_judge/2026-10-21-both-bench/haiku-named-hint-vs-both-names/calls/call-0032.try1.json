@@ -1,0 +1,36 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0251.1",
+  "item-0282.2",
+  "item-0326.2",
+  "item-0133.2",
+  "item-0355.1",
+  "item-0139.2",
+  "item-0312.1",
+  "item-0119.1",
+  "item-0113.2",
+  "item-0118.1",
+  "item-0331.1",
+  "item-0178.2",
+  "item-0258.2",
+  "item-0100.1",
+  "item-0085.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f48d7ec5-1e7c-499b-b997-a90e953b6d70",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"许诺 is female, so she addresses 周婷 as 언니, not 누나.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Siblings share Aunt Zhou, making '네 저우 이모' unnatural in Korean.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are accurate; they differ only by a period.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Facts state 烏丸 is read Karasuma (가라스마), not Karasumaru.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 is more idiomatic and accurately conveys the deadline.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 introduces untranslated Japanese characters into the English text.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'첫물 찻잎' is the accurate tea-industry term for 头采.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 replaces Aoife with an entirely wrong name (아일리시).\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'Feed her' fits an unconscious person, and 'wound' is inaccurate.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both make identical errors and differ only in vocative placement.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Facts specify 日向 is read Hyūga (휴가), not Hinata.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'송구합니다' matches the deferential register for addressing a princess.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"'도움이 됩니다' is awkward Japanese translationese for 助かります.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in 반말; Translation 1 uses 반말.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'그럭저럭이지' naturally translates 'まあな', whereas '뭐, 그래' is translationese.\"}\n]\n```\n",
+  "duration_seconds": 119.430419,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14085,
+   "output_tokens": 18929,
+   "thinking_tokens": 18402,
+   "cache_read_tokens": 0,
+   "total_tokens": 33014
+  }
+ }
+}

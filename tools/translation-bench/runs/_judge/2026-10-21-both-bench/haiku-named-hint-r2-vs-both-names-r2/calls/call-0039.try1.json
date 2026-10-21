@@ -1,0 +1,36 @@
+{
+ "call": 39,
+ "try": 1,
+ "ids": [
+  "item-0006.2",
+  "item-0052.2",
+  "item-0127.1",
+  "item-0069.2",
+  "item-0061.1",
+  "item-0210.2",
+  "item-0317.1",
+  "item-0171.1",
+  "item-0160.1",
+  "item-0045.2",
+  "item-0173.1",
+  "item-0139.1",
+  "item-0102.2",
+  "item-0290.2",
+  "item-0038.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "08849827-ff7c-46b9-95fd-a099a177d7b8",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Imperative style is more natural for onboarding guidelines.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More idiomatic Korean phrasing for natural sibling dialogue.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Questioning and concise phrasing better fit a police inspector.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both are equally natural banmal expressions in casual chat.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly uses banmal speech level per the facts.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Identical translations aside from a trailing period.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"자리를 비웠거든 naturally expresses the state and reasoning.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"얘기 and 이야기 are completely interchangeable here.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"알았어 is the natural Korean response to a request.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Faithfully translates without adding an unstated 'already'.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Grammatically sound and reads much more naturally in narrative.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Identical except for an optional comma.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"여전히 correctly conveys 'still as planned'; 아직 is unnatural.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Identical except for an internal comma.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Correctly expresses ordering from the shop rather than to it.\"}\n]\n",
+  "duration_seconds": 118.47112,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13797,
+   "output_tokens": 17364,
+   "thinking_tokens": 16925,
+   "cache_read_tokens": 0,
+   "total_tokens": 31161
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0313.2",
+  "item-0110.2",
+  "item-0223.1",
+  "item-0254.2",
+  "item-0231.2",
+  "item-0042.1",
+  "item-0120.1",
+  "item-0102.1",
+  "item-0237.1",
+  "item-0040.2",
+  "item-0213.1",
+  "item-0249.1",
+  "item-0050.2",
+  "item-0311.2",
+  "item-0032.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "15b695f6-c48f-4f58-866f-7cf499b7e43a",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Pell speaks informally; T2 awkwardly mixes bare name with honorifics.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'Bay' for cargo storage is '베이', not an aircraft hangar (격납고).\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'To Chaeyul too' accurately captures the focus of '채율 씨한테도'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'항상 조건이 붙네' accurately captures the idiom 'there's always a catch'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'늙은이' is the natural humble self-reference for an elderly speaker.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'그보다 내일 말인데요' is much more natural conversational Korean.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate renderings of the line.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'여전히' correctly conveys 'still' regarding a planned schedule, unlike '아직'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translating into English should not retain the Japanese source term '(ひろば)'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally report the professor's statement in Korean.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both '따라 달라집니다' and '달려 있습니다' are equally accurate and natural.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"T2 correctly uses 'Qiu Shuang' matching the specified pronunciation 'qiú'.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"T2 mistakenly translates '좀 쉬어' as 'I'll rest'.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"T1 has natural chat phrasing and appropriate Korean subject omission.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"T1 ends with an erroneous dangling syllable '자'; T2 is fluent.\"}\n]\n",
+  "duration_seconds": 166.964854,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14103,
+   "output_tokens": 23559,
+   "thinking_tokens": 23029,
+   "cache_read_tokens": 0,
+   "total_tokens": 37662
+  }
+ }
+}

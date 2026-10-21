@@ -1,0 +1,36 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0074.1",
+  "item-0051.1",
+  "item-0037.2",
+  "item-0052.2",
+  "item-0046.2",
+  "item-0072.1",
+  "item-0035.2",
+  "item-0057.2",
+  "item-0029.2",
+  "item-0078.1",
+  "item-0012.1",
+  "item-0032.1",
+  "item-0079.2",
+  "item-0075.2",
+  "item-0045.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8e2be947-89dd-4d6f-b000-92bb36ce2221",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in banmal.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 leaves Chinese characters untranslated.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'좋게 말하다' correctly translates '说好听的' rather than '좋다고 하다'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'in Hearth' and plural 'practice screens' read more naturally.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'ride in the car' accurately translates '차 타는 거'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly translates '都' as 'already' for the ward.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Tsukumo speaks to Suzanne in hapsyoche ('안 됩니다').\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are accurate; difference is an Oxford comma.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'고속열차 예약' is more natural Korean than '고속철도 예약'.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Omitting the unnecessary particle '의' reads more naturally.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'작성하겠습니다' is the proper business term for drafting a proposal.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 correctly retains 'me' as the volunteered person.\"}\n]\n",
+  "duration_seconds": 95.27083,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14344,
+   "output_tokens": 14310,
+   "thinking_tokens": 13848,
+   "cache_read_tokens": 0,
+   "total_tokens": 28654
+  }
+ }
+}

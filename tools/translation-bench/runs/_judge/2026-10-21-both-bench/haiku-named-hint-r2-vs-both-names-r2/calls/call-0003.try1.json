@@ -1,0 +1,36 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0255.1",
+  "item-0275.2",
+  "item-0184.1",
+  "item-0142.1",
+  "item-0221.1",
+  "item-0197.2",
+  "item-0115.2",
+  "item-0149.1",
+  "item-0269.1",
+  "item-0196.2",
+  "item-0068.2",
+  "item-0321.2",
+  "item-0092.1",
+  "item-0225.2",
+  "item-0266.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "56a7725d-fa3a-4bd6-82cf-43ceef6d229d",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified 해요체 speech level.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 uses natural phrasing ('둘이 나눠서 내자') for splitting bills.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both 'a Space' and 'the Space' are natural and valid in context.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both 'bribe' and 'lure' are natural and faithful renderings of 꼬시다.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate 반말 renderings of the source.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"The only difference is punctuation, which should be ignored.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 is more faithful; Translation 2 adds unstated 'I'm sure'.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 correctly transcribes '산홍' and phrases the sentence naturally.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both '폐를 끼쳐' and '폐를 끼쳐서' are equally correct and natural.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 respects the required polite/합쇼체 speech level toward Thorne.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'Medicine pouch' accurately translates 药囊 for an alchemist's remedies.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 correctly uses '푸터' and '유지하세요' for Git software context.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 2 left the text in Japanese; Translation 1 translated correctly.\"}\n]\n",
+  "duration_seconds": 177.234059,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13649,
+   "output_tokens": 26100,
+   "thinking_tokens": 25595,
+   "cache_read_tokens": 0,
+   "total_tokens": 39749
+  }
+ }
+}

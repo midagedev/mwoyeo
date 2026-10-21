@@ -1,0 +1,36 @@
+{
+ "call": 16,
+ "try": 1,
+ "ids": [
+  "item-0175.1",
+  "item-0285.2",
+  "item-0288.2",
+  "item-0067.2",
+  "item-0136.1",
+  "item-0245.1",
+  "item-0317.2",
+  "item-0094.1",
+  "item-0107.1",
+  "item-0307.1",
+  "item-0171.2",
+  "item-0153.1",
+  "item-0314.1",
+  "item-0029.1",
+  "item-0220.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e05854dc-2de9-4855-9f65-c4d1bbec4420",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'그럼'이 '那就'의 의미를 더 정확히 살림\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Gerald의 표준 외래어 표기는 '제럴드'임\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"보조용언 띄어쓰기 차이 외에 동등함\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'밥 사 줘'가 '请我'의 의미를 정확히 살림\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"해요체 격식에 맞고 '그녀에게' 번역투를 피함\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"집주인에게 '선생님' 호칭은 어색하며 1이 자연스러움\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"성씨 '仇'의 올바른 병음 표기는 'Qiu'임\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"발음 표기 방식 차이이며 둘 다 자연스러움\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'won't end'가 정확하며 불필요한 'already'가 없음\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"문장 부호 차이 외에 내용이 동일함\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"앞 문맥의 정의('短いメモ')에 부합함\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'현재 작업 중인' 등 기술 문서에 더 자연스러움\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"쉼표 유무 차이 외에 완전히 동일함\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'え'를 살리고 대화체 반말이 더 자연스러움\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"어휘와 조사 차이 외에 둘 다 자연스러움\"}\n]\n",
+  "duration_seconds": 201.54258,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13800,
+   "output_tokens": 30469,
+   "thinking_tokens": 29949,
+   "cache_read_tokens": 0,
+   "total_tokens": 44269
+  }
+ }
+}

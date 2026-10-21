@@ -1,0 +1,36 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0275.2",
+  "item-0009.1",
+  "item-0105.1",
+  "item-0349.1",
+  "item-0144.1",
+  "item-0295.2",
+  "item-0246.1",
+  "item-0359.1",
+  "item-0065.2",
+  "item-0036.1",
+  "item-0090.2",
+  "item-0267.1",
+  "item-0151.1",
+  "item-0252.1",
+  "item-0306.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fdfc34d7-8e4f-40e3-bb67-1bc2c4a192f1",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Present tense 'sits' accurately translates 앉습니다.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Transcribes the reading in Hangul instead of raw Hiragana.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate in Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Uses consistent 해요체 and accurately translates 盒 as 상자.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both 인터넷으로 and 인터넷에서 are equally natural and acceptable.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly uses 반말 as specified for Zhou Ting's speech.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations failed to translate the Japanese text into Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly uses 반말 as Xu Nuo speaks to Lu Ming.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Correctly uses 해요체 as specified for Takanashi speaking to Kiryu.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly preserves the indirect speech nuance of 온대.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"-니까 is grammatically appropriate before the conjecture ending -을 거야.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 remains Chinese.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Correctly uses the standard 해요체 ending -어요 as specified.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while Translation 1 remains Japanese.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Avoids the incorrect phonetic transliteration 아오이프 for Aoife.\"}\n]\n",
+  "duration_seconds": 227.131269,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13915,
+   "output_tokens": 35049,
+   "thinking_tokens": 34575,
+   "cache_read_tokens": 0,
+   "total_tokens": 48964
+  }
+ }
+}

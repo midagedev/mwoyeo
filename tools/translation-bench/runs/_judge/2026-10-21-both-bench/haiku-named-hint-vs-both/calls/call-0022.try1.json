@@ -1,0 +1,36 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0310.2",
+  "item-0002.2",
+  "item-0051.1",
+  "item-0250.2",
+  "item-0307.2",
+  "item-0312.1",
+  "item-0252.2",
+  "item-0106.1",
+  "item-0223.1",
+  "item-0058.1",
+  "item-0285.1",
+  "item-0041.2",
+  "item-0219.1",
+  "item-0129.1",
+  "item-0212.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ead7fdbf-accf-4b29-8530-adb1ea16b2cf",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 between the clashing siblings.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly uses '언니' for a female speaker.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 is natural; wards do not have seams.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 naturally asks if something is wrong regarding the leave.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 faithfully preserves 'という' as '~라는'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 transliterates Tomasz into Korean as guided by the context.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 is left entirely untranslated in Japanese.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural in Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly omits the unnecessary Japanese text in parentheses.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 avoids assuming an unstated male gender with 'Mr.'.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 uses the required term '마정석' for 魔石.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 as specified in the facts.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 reads more naturally by omitting the awkward particle '의'.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 correctly translates cargo bay as '베이', not '격납고'.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates '记' as recording, which Translation 2 omits.\"}\n]\n",
+  "duration_seconds": 164.613373,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13867,
+   "output_tokens": 25274,
+   "thinking_tokens": 24783,
+   "cache_read_tokens": 0,
+   "total_tokens": 39141
+  }
+ }
+}

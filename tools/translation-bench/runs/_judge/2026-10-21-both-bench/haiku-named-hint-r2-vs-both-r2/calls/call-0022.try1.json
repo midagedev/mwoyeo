@@ -1,0 +1,36 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0041.2",
+  "item-0213.1",
+  "item-0129.1",
+  "item-0187.2",
+  "item-0298.2",
+  "item-0089.2",
+  "item-0070.2",
+  "item-0058.2",
+  "item-0177.1",
+  "item-0257.2",
+  "item-0137.2",
+  "item-0190.2",
+  "item-0211.1",
+  "item-0046.2",
+  "item-0227.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "96aa453b-3975-48fc-841d-30e998d9b91e",
+  "status": "SUCCESS",
+  "response": "[{\"case\": 1, \"better\": \"1\", \"why\": \"Translates 三红 correctly as black teas and uses natural Korean.\"}, {\"case\": 2, \"better\": \"1\", \"why\": \"Natural plural phrasing for documentation; avoids an awkward definite article.\"}, {\"case\": 3, \"better\": \"2\", \"why\": \"'쳐다봤어' naturally and accurately translates '盯着看' here.\"}, {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly uses 해요체 as specified in the facts.\"}, {\"case\": 5, \"better\": \"1\", \"why\": \"A hot tub is a pool, not a swimming pool (수영장).\"}, {\"case\": 6, \"better\": \"1\", \"why\": \"Avoids awkward honorifics (-시-) between informal peers and sounds natural.\"}, {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and equally good.\"}, {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly uses 반말 as specified for Rook speaking to Dex.\"}, {\"case\": 9, \"better\": \"2\", \"why\": \"Uses proper formal documentation style and correct preposition 'to Hearth'.\"}, {\"case\": 10, \"better\": \"2\", \"why\": \"Accurately conveys completed action '또 재촉했어' and the deadline nuance.\"}, {\"case\": 11, \"better\": \"1\", \"why\": \"Correctly translates 오빠 as older brother instead of untranslated 'oppa'.\"}, {\"case\": 12, \"better\": \"tie\", \"why\": \"Both candidates failed to translate the line into Korean.\"}, {\"case\": 13, \"better\": \"1\", \"why\": \"Avoids awkward 'Mr./Ms.' and correctly translates '도' as also.\"}, {\"case\": 14, \"better\": \"2\", \"why\": \"More natural English; avoids literal translation of '올립니다' as 'goes up'.\"}, {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 2 mangles the name Aoife into '아이핀'.\"}]\n",
+  "duration_seconds": 144.24642,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13776,
+   "output_tokens": 20250,
+   "thinking_tokens": 19786,
+   "cache_read_tokens": 0,
+   "total_tokens": 34026
+  }
+ }
+}

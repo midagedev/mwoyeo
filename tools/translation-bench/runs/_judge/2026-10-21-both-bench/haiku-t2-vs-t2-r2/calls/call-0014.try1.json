@@ -1,0 +1,36 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0175.1",
+  "item-0223.1",
+  "item-0153.2",
+  "item-0012.2",
+  "item-0063.2",
+  "item-0016.2",
+  "item-0073.1",
+  "item-0191.2",
+  "item-0277.1",
+  "item-0067.1",
+  "item-0207.1",
+  "item-0217.1",
+  "item-0228.1",
+  "item-0340.1",
+  "item-0201.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d003fef5-ad41-430e-8c2f-037011a543be",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Faithfully preserves the truncated source text without hallucinating endings.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Dripping umbrella is more natural and idiomatic than soaked umbrella.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural in Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"말씀대로 is the natural Korean expression for お言葉に甘えて.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly treats Kai as a name, not sea.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 accurately translates そうだ instead of mistranslating it as 그러고 보니.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Faithfully translates the request nuance of 見せてくれる into 보여줄래.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 1 incorrectly introduces the pronoun 'his' for the speaker.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are equally faithful and natural.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Recovered matches the software manual register much better than got back.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 as required by the facts.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 faithfully captures という, which Translation 1 omits.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified 반말 speech level.\"}\n]\n",
+  "duration_seconds": 186.421258,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13890,
+   "output_tokens": 28025,
+   "thinking_tokens": 27560,
+   "cache_read_tokens": 0,
+   "total_tokens": 41915
+  }
+ }
+}

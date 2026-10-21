@@ -1,0 +1,36 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0046.2",
+  "item-0217.2",
+  "item-0245.2",
+  "item-0281.1",
+  "item-0192.2",
+  "item-0228.2",
+  "item-0268.2",
+  "item-0138.1",
+  "item-0218.2",
+  "item-0028.2",
+  "item-0115.1",
+  "item-0218.1",
+  "item-0319.2",
+  "item-0013.1",
+  "item-0037.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fd68b848-2b79-426f-bb83-bbada89c239a",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'Fingers trembling' is much more natural English than 'fingertips trembling'.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'On site' is more faithful to 현장 than 'on the floor'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'맞아' and '그걸로 사자' are much more natural in Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 leaves the name in untranslated kanji '澪'.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"'Yeah' and 'Right' are equally natural translations of 그러게.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'어림도 없어' captures 'Not until...' and the tone much better.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'첫물' correctly translates '头采' (first harvest); '첫 잎' is incorrect.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'Signed it' is idiomatic for contracts; 'stamped it' is overly literal.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'날 용서해 줄 것 같아' is much more natural Korean dialogue.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 没问题 as '문제없어'; T1 misses the meaning.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"'Signed it' is idiomatic for contracts; 'stamped it' is overly literal.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"'경찰서' and '찾아봐 달라고' correctly translate 署 and 調べる.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 translates 'ㅋㅋ' to 'lol' instead of leaving Korean script.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'Engaged' correctly translates 'かかった' (locked); 'intact' mistranslates it.\"}\n]\n",
+  "duration_seconds": 191.83378,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13677,
+   "output_tokens": 27010,
+   "thinking_tokens": 26474,
+   "cache_read_tokens": 0,
+   "total_tokens": 40687
+  }
+ }
+}

@@ -1,0 +1,15 @@
+Judge passes of round both-bench (2026-10-21; results note ../RESULTS-2026-10-21-both-bench.md). Judge: agy gemini-3.8-flash-high, both orders,
+8 calibration items per pass; prompts built by `judge.py prompts --a <A> --b <B> --root <root with memory -> memory-named, sequences>`; run by `judge-run.py run`.
+A = the first run, B = the second. Each directory: key.json (the blind key), run.json (the call log), verdicts.jsonl, calls/ (every try).
+Tallies: `python3 -I both_bench.py judge --pair <dir> --verdicts <dir>/verdicts.jsonl --b-run <B> --hint <hint run> --both-names <run> --both <run>`
+(the key and the verdicts are the inputs; copy the dir back to a scratch path that holds `key.json` and `run/verdicts.jsonl` if the script wants that layout).
+
+haiku-t2-vs-t2-r2                        A runs/M-haiku-5-5-t2                       B runs/M-haiku-5-5-t2-r2                    noise floor, memory/ (old set); complete
+gemma4-e4b-t2-vs-t2-r2                   A runs/M-gemma4-e4b-t2                      B runs/M-gemma4-e4b-t2-r2                   noise floor; complete
+haiku-named-hint-vs-both-names           A runs/M-haiku-5-5-t2-named-hint            B runs/M-haiku-5-5-t2-named-both-names      complete
+haiku-named-hint-vs-both                 A runs/M-haiku-5-5-t2-named-hint            B runs/M-haiku-5-5-t2-named-both            complete
+haiku-named-hint-vs-hint-r2              A runs/M-haiku-5-5-t2-named-hint            B runs/M-haiku-5-5-t2-named-hint-r2         class-wise noise floor; 28 of 688 prompts without a verdict (agy quota reached), one calibration verdict missing => a screen
+haiku-named-hint-r2-vs-both-names-r2     A runs/M-haiku-5-5-t2-named-hint-r2         B runs/M-haiku-5-5-t2-named-both-names-r2   complete
+haiku-named-hint-r2-vs-both-r2           A runs/M-haiku-5-5-t2-named-hint-r2         B runs/M-haiku-5-5-t2-named-both-r2         PARTIAL: 166 of 706 prompts without a verdict (agy "Individual quota reached. Resets in 2h30m", seen about 03:00 UTC 2026-10-21); resume with `judge-run.py run --pair /tmp/bothbench/judge/haiku-both-r2-vs-hintr2 --out <that dir>/run` (the prompts are in that scratch dir; done calls are skipped)
+gemma4-e4b-named-hint-vs-both-names      A runs/M-gemma4-e4b-t2-named-hint           B runs/M-gemma4-e4b-t2-named-both-names     complete
+gemma4-e4b-named-hint-vs-both            A runs/M-gemma4-e4b-t2-named-hint           B runs/M-gemma4-e4b-t2-named-both           complete

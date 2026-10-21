@@ -1,0 +1,36 @@
+{
+ "call": 13,
+ "try": 1,
+ "ids": [
+  "item-0243.1",
+  "item-0126.2",
+  "item-0105.2",
+  "item-0112.2",
+  "item-0068.2",
+  "item-0195.1",
+  "item-0223.2",
+  "item-0092.2",
+  "item-0344.1",
+  "item-0270.2",
+  "item-0217.2",
+  "item-0298.2",
+  "item-0299.2",
+  "item-0337.1",
+  "item-0204.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8437dc3a-0363-4c50-9e97-993a376e8647",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are completely accurate and natural.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates 'え' and uses natural conversational banmal.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'두 분 다' naturally and idiomatically translates 'both'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 faithfully captures 'でも' with 'even when offline'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'-해서' naturally and correctly expresses the cause of feeling cold.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'여러분이' is much more natural than '당신이' in software documentation.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 cleanly omits the redundant Japanese source text.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"The compound surname 万俟 is correctly romanized as Moqi, not Wanqi.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are equally natural, differing only in punctuation.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural in Korean.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in banmal, which Translation 2 correctly uses.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates 'シュザンヌ様' without adding '공주'.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 is more faithful to the source without adding '들어온'.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Chinese, while Translation 1 is well translated.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 'sir' and uses hapsyoche.\"}\n]\n",
+  "duration_seconds": 125.961774,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13550,
+   "output_tokens": 17882,
+   "thinking_tokens": 17386,
+   "cache_read_tokens": 0,
+   "total_tokens": 31432
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 20,
+ "try": 2,
+ "ids": [
+  "item-0159.1",
+  "item-0201.1",
+  "item-0154.1",
+  "item-0222.2",
+  "item-0302.1",
+  "item-0289.2",
+  "item-0121.1",
+  "item-0352.1",
+  "item-0086.2",
+  "item-0137.1",
+  "item-0045.1",
+  "item-0329.2",
+  "item-0110.2",
+  "item-0214.2",
+  "item-0285.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6df6a96d-ac80-4b90-af2e-a4c40dd668ca",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"'고지서 왔어' avoids unnatural '벌써' conflicting with the promised date.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More natural and accurate without inconsistent pronoun shifts.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses correct 반말 speech level and proper tea terminology.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Uses standard Korean loanword orthography instead of raw English.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are equally natural and faithful.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'medicine pouch' accurately and faithfully translates 药囊.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'Old Mr. Takanashi' preserves the natural, respectful register in context.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Identical translations with only a trivial punctuation difference.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'Wow' faithfully translates the exclamation '헐' unlike 'Wait'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate in this context.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'3년 만에' is the natural, idiomatic Korean expression.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Avoids the incorrect pronoun 'we' since Seoyoon moves alone.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'부탁드립니다' accurately translates 'お願いいたします' in response to an offer.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Correctly uses 반말 speech level and avoids awkward '그녀가'.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"'바로 쓸 수 있는' faithfully translates '现成' and reads more naturally.\"}\n]\n",
+  "duration_seconds": 164.99045,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13866,
+   "output_tokens": 24320,
+   "thinking_tokens": 23844,
+   "cache_read_tokens": 0,
+   "total_tokens": 38186
+  }
+ }
+}

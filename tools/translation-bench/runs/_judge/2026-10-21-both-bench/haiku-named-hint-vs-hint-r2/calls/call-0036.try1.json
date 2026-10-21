@@ -1,0 +1,36 @@
+{
+ "call": 36,
+ "try": 1,
+ "ids": [
+  "item-0065.2",
+  "item-0036.1",
+  "item-0090.2",
+  "item-0151.1",
+  "item-0252.1",
+  "item-0292.2",
+  "item-0132.2",
+  "item-0201.2",
+  "item-0123.1",
+  "item-0131.2",
+  "item-0340.2",
+  "item-0020.2",
+  "item-0056.2",
+  "item-0054.1",
+  "item-0025.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f1368d86-d04c-4195-9ce6-10a4fb1f5208",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Reflection and you're all set fit the onboarding context better.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly transcribes the Chinese name Zeng Lan as 쩡란 instead of 증란.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"몫 accurately translates 份 as a monetary share, unlike 쪽 것.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"찬성해요 is the correct and natural verb collocation with 에.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses standard Korean spelling 브리지 and more natural phrasing.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Inspector Akira properly localizes the title and honorific in English.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correctly uses 해요체 matching Thorne's polite speech level to Rook.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly refers to the speaker's father as 아빠 instead of 그분.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Faithfully translates だけよ without adding an unprompted causal 니까요.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly uses 해요체 and transcribes 셰천, despite using 언니.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are identical except for an insignificant comma.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Grew heavier is the more natural and standard English collocation.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"그래 naturally translates the conversational transition, unlike awkward 그렇지.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Faithfully captures the contrastive nuance of 良くは without adding 상황.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Correctly uses 반말 matching Hinata's speech level to Takanashi.\"}\n]\n",
+  "duration_seconds": 196.147875,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14030,
+   "output_tokens": 27510,
+   "thinking_tokens": 27018,
+   "cache_read_tokens": 0,
+   "total_tokens": 41540
+  }
+ }
+}

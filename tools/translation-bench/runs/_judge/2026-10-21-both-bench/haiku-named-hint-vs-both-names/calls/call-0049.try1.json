@@ -1,0 +1,31 @@
+{
+ "call": 49,
+ "try": 1,
+ "ids": [
+  "item-0244.2",
+  "item-0263.1",
+  "item-0095.2",
+  "item-0098.1",
+  "item-0301.2",
+  "item-0261.1",
+  "item-0232.1",
+  "item-0239.1",
+  "item-0287.2",
+  "item-0232.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5e855c7c-566a-4494-9618-cf0d6fd4b531",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Lu Ming speaks to Xu Nuo in banmal.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Siobhan speaks to Gareth in hapsyoche.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are identical except for an exclamation mark.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 avoids unnatural Hanja in parentheses.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'By the way' accurately captures the topic transition of '근데'.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate in banmal.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 naturally translates 'きっと' and sounds more conversational.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 avoids making an unwarranted gender assumption.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"}\n]\n",
+  "duration_seconds": 63.19067,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 12249,
+   "output_tokens": 9484,
+   "thinking_tokens": 9195,
+   "cache_read_tokens": 0,
+   "total_tokens": 21733
+  }
+ }
+}

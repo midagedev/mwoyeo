@@ -1,0 +1,1 @@
+{"started": "2026-10-21T10:40:50+0900", "pair": "/tmp/bothbench/judge/gemma4-bothnames-vs-hint", "model": "gemini-3.8-flash-high", "batch": 15, "jobs": 3, "seed": 11, "tries": 3, "max_items": 0, "prompts": 104, "calls": 7}

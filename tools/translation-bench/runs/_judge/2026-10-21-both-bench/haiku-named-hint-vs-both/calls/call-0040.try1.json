@@ -1,0 +1,36 @@
+{
+ "call": 40,
+ "try": 1,
+ "ids": [
+  "item-0125.1",
+  "item-0107.2",
+  "item-0351.1",
+  "item-0039.1",
+  "item-0038.2",
+  "item-0326.1",
+  "item-0152.2",
+  "item-0169.1",
+  "item-0005.2",
+  "item-0133.1",
+  "item-0227.1",
+  "item-0324.1",
+  "item-0075.2",
+  "item-0022.2",
+  "item-0052.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4cb452bd-bf59-46e0-91ac-3decf915c7f5",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Standard spelling '브리지' and natural Korean '공구 상자'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'수고 많으십니다' correctly translates present greeting 'お疲れさまです'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'호타루 건' is natural business Korean for the matter.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both make identical errors with name and pronoun; equally good.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Thorne speaks to Rook in 해요체 ('그럼 뭔데요?').\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Standard spelling '브리지' and more natural Korean word order.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly conveys '먼저 말을 걸지 않습니다' without syntactic ambiguity.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'네' and '가볼게요' are far more natural to an elder.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'언니' correctly and naturally refers to '婷姐'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'Takanashi-san' avoids making an unverified gender assumption with 'Ms.'.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'그래도' is much more natural in casual chat than '하지만'.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Natural English phrasing; 'get mixed up whether' is unidiomatic.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural; formatting differences ignored.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Suzanne speaks to Herve in 해요체 ('들려주세요'), not 반말.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'조식 포함' is the standard lodging term for '含早餐'.\"}\n]\n",
+  "duration_seconds": 174.734682,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13955,
+   "output_tokens": 27574,
+   "thinking_tokens": 27071,
+   "cache_read_tokens": 0,
+   "total_tokens": 41529
+  }
+ }
+}

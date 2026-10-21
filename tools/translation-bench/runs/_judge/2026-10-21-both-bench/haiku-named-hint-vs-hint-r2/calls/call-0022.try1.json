@@ -1,0 +1,36 @@
+{
+ "call": 22,
+ "try": 1,
+ "ids": [
+  "item-0244.1",
+  "item-0231.2",
+  "item-0279.2",
+  "item-0286.1",
+  "item-0200.1",
+  "item-0138.1",
+  "item-0028.2",
+  "item-0115.1",
+  "item-0271.1",
+  "item-0318.1",
+  "item-0013.1",
+  "item-0037.1",
+  "item-0061.2",
+  "item-0069.1",
+  "item-0007.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1ef9ef13-04b4-4fce-b81f-e4030db0911e",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 avoids unnatural over-honorification of an inanimate object.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and faithful to the context.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are identical in wording; formatting differences are ignored.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly translates the surname Moqi and Senior Brother.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly conveys not initiating conversation, avoiding misplaced modifier.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 uses appropriate honorifics and natural topicalization for the superintendent.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate in casual chat.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 correctly translates the cat's name Bori instead of Boris.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations correctly use specified terms and read naturally.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 as required by the facts.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 avoids disrespectfully referring to the father as 그 사람.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 uses natural and idiomatic 'at home'.\"}\n]\n",
+  "duration_seconds": 89.106596,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13908,
+   "output_tokens": 14320,
+   "thinking_tokens": 13867,
+   "cache_read_tokens": 0,
+   "total_tokens": 28228
+  }
+ }
+}

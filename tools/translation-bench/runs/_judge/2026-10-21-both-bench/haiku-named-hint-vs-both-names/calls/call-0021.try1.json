@@ -1,0 +1,36 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0008.1",
+  "item-0125.2",
+  "item-0326.1",
+  "item-0306.2",
+  "item-0190.2",
+  "item-0163.2",
+  "item-0237.2",
+  "item-0010.2",
+  "item-0235.2",
+  "item-0130.1",
+  "item-0090.1",
+  "item-0005.1",
+  "item-0270.1",
+  "item-0198.1",
+  "item-0207.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "daab58da-57c8-4410-bdc5-40aebfd5d081",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"More natural greeting and polite self-introduction matching register.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are equally natural and faithful translations in context.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Equally good; the only difference is punctuation formatting.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"More precise translation avoiding unintended ambiguity about grandfather's actions.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"있잖아 better reflects the character's 반말 speech level to Saku.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly uses 해요체 as required by the speaker's facts.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are equally natural and accurate translations in 반말.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"수호자 correctly reflects shrine keeper rather than a gatekeeper.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are equally natural; only difference is pronoun contraction.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Maintains consistent 해요체 register without mixing speech levels.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Accurately captures the tea-brewing context of the scene.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Avoids incorrect male pronoun for senior female disciple Zeng Ruoshui.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Respectfully refers to father using 그분 and honorific verb.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Properly localizes footer to 푸터 instead of leaving English.\"}\n]\n",
+  "duration_seconds": 191.65639,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13985,
+   "output_tokens": 28299,
+   "thinking_tokens": 27833,
+   "cache_read_tokens": 0,
+   "total_tokens": 42284
+  }
+ }
+}

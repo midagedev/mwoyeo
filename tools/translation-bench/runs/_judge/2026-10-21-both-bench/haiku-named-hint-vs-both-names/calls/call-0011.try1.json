@@ -1,0 +1,36 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0249.2",
+  "item-0102.1",
+  "item-0341.1",
+  "item-0254.2",
+  "item-0026.2",
+  "item-0177.1",
+  "item-0136.1",
+  "item-0115.2",
+  "item-0212.2",
+  "item-0084.1",
+  "item-0050.2",
+  "item-0253.1",
+  "item-0284.1",
+  "item-0144.2",
+  "item-0272.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "93534f06-8ff8-40ad-b294-5bf5d7a7eddb",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Identical meaning and wording aside from formatting.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"-더니 is more natural for recounting past actions with ongoing results.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Field trip report is inappropriate for corporate onboarding.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"내 옷에 is more natural than literal 내 몸에.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly uses 반말 as specified in the facts.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Avoids false causality with 'so' and translates -는데 accurately.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Uses plain pronoun 나 instead of humble 저 for the princess.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Matches the name 타카나시 and required 해요체 speech level.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 conflates hiroba with Space (the workspace term).\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 leaves the Hanzi character 婷 untranslated.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Faithfully translates Thorne without adding the unmentioned title 선장.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both failed to translate into the target language Korean.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"얘 is natural for an adult crewmate; 꼬마야 implies a child.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Omitting the particle 의 sounds much more natural in Korean.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both are accurate and natural translations with identical register.\"}\n]\n",
+  "duration_seconds": 99.793291,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13770,
+   "output_tokens": 14265,
+   "thinking_tokens": 13800,
+   "cache_read_tokens": 0,
+   "total_tokens": 28035
+  }
+ }
+}

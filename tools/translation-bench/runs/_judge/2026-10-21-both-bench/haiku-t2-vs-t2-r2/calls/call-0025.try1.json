@@ -1,0 +1,36 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0190.2",
+  "item-0071.1",
+  "item-0121.2",
+  "item-0267.1",
+  "item-0205.2",
+  "item-0198.1",
+  "item-0071.2",
+  "item-0017.1",
+  "item-0183.1",
+  "item-0291.2",
+  "item-0266.1",
+  "item-0205.1",
+  "item-0313.2",
+  "item-0238.1",
+  "item-0054.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e019e562-83b1-4997-9988-a25393edfe89",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'회의실로' is more natural with 옮겨 두겠습니다.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"周婷 speaks in 반말 according to the facts.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Omitting the pronoun '그거' is more natural in Korean.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translating 'sir' to a landlord as '선생님' is unnatural.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 leaves the name 'minato' untranslated in English.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Omitting '선생님' is much more natural for 'sir' here.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"周婷 speaks in 반말 according to the facts.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"陆明 is male (누나) and speaks in 해요체.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 leaves 小鳥遊 untranslated in Japanese kanji.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"リーシア speaks to 朔 in 반말.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 1 leaves the name 'Aoife' untranslated in English.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 1 leaves the name 'minato' untranslated in English.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Dex speaks to Rook in 반말.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"陆明 is male (not 언니) and speaks in 해요체.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 fits manual register; Translation 2 unnaturally retains '-san'.\"}\n]\n",
+  "duration_seconds": 84.903393,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13902,
+   "output_tokens": 13111,
+   "thinking_tokens": 12622,
+   "cache_read_tokens": 0,
+   "total_tokens": 27013
+  }
+ }
+}

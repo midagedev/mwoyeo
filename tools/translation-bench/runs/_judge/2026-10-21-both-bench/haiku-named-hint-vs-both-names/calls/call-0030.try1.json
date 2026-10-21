@@ -1,0 +1,36 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0084.2",
+  "item-0062.2",
+  "item-0352.2",
+  "item-0114.1",
+  "item-0227.2",
+  "item-0088.2",
+  "item-0193.2",
+  "item-0044.1",
+  "item-0339.2",
+  "item-0318.1",
+  "item-0157.2",
+  "item-0174.2",
+  "item-0037.2",
+  "item-0078.1",
+  "item-0095.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f112e9ae-6fc3-4b1f-9335-6705624e9fee",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 translates the name character instead of leaving Hanja untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 uses the natural spoken contraction 건 instead of 것은.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Identical except for a comma; both are accurate and natural.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 matching the facts.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Identical except for spacing; both are equally acceptable.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and equally good.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the speaker's informal speech level (반말).\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 uses correct speech level 반말 and translates dresser accurately.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 accurately translates equipment status as 상태 rather than 상황.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 avoids 누나, which is incorrect for female speaker 许诺.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 reads much more naturally and idiomatically as narrative prose.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally render the informal message.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the required term 수호막 for 結界.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 correctly uses present tense for her current ongoing stance.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Identical except for punctuation; both are equally faithful and natural.\"}\n]\n",
+  "duration_seconds": 141.036937,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13987,
+   "output_tokens": 23493,
+   "thinking_tokens": 23011,
+   "cache_read_tokens": 0,
+   "total_tokens": 37480
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0320.2",
+  "item-0343.1",
+  "item-0055.1",
+  "item-0340.2",
+  "item-0254.1",
+  "item-0331.1",
+  "item-0274.1",
+  "item-0057.2",
+  "item-0103.2",
+  "item-0306.1",
+  "item-0135.2",
+  "item-0341.1",
+  "item-0141.1",
+  "item-0126.2",
+  "item-0293.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0483439d-7444-4fbd-b929-09ac28fb45f1",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"\\\"Bring together\\\" is more faithful to まとめる than \\\"gather\\\".\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Speaker is an accountant checking inventory, so \\\"확인해 볼게요\\\" is correct.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates \\\"〜という\\\" as \\\"-이라는 분\\\".\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly assigns \\\"everything\\\" only to the second clause.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate colloquial Korean.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both spacing variants are standard and acceptable in Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 reads much more naturally in Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 reads more naturally without the unnecessary comma.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 uses natural Korean phrasing instead of Japanese translationese.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 accurately renders \\\"both\\\" as \\\"두 분 모두\\\".\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both word orders are equally natural with identical meaning.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 better preserves the causal nuance of \\\"-くて\\\".\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 2 left the source text untranslated.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 transliterates the name and uses proper honorifics.\"}\n]\n",
+  "duration_seconds": 210.479338,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13493,
+   "output_tokens": 30949,
+   "thinking_tokens": 30483,
+   "cache_read_tokens": 0,
+   "total_tokens": 44442
+  }
+ }
+}

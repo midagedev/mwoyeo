@@ -1,0 +1,36 @@
+{
+ "call": 13,
+ "try": 1,
+ "ids": [
+  "item-0100.2",
+  "item-0214.2",
+  "item-0200.2",
+  "item-0039.2",
+  "item-0295.2",
+  "item-0079.1",
+  "item-0225.1",
+  "item-0086.2",
+  "item-0125.2",
+  "item-0033.2",
+  "item-0162.2",
+  "item-0144.2",
+  "item-0067.2",
+  "item-0192.1",
+  "item-0217.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ea00309f-37dc-449d-9445-14769e769adb",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both forensic and forensics results are accurate and natural.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are natural and accurate translations of the sentence.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both forms are equally natural and accurate in casual chat.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Siobhan must speak to Gareth in hapsyoche (죄송합니다).\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'Task list' accurately translates 과제 목록, unlike checklist.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"가격 인하에 동의하다 is cleaner and more natural phrasing.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 correctly translates keep as 유지하세요 and uses 푸터.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both out of breath and breathless are accurate and natural.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"알겠어요 appropriately acknowledges an instruction from an elder.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 avoids awkwardly inventing one-line notes.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 uses proper question mark and terminal punctuation.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 transliterates 三红 into Hangul instead of Hanzi.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Omitting the particle 의 in 휴가 씨 탓 is more natural.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 correctly uses banmal for speaking to Lin Xia.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Rory must speak to Siobhan in banmal.\"}\n]\n",
+  "duration_seconds": 120.400058,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13731,
+   "output_tokens": 20348,
+   "thinking_tokens": 19879,
+   "cache_read_tokens": 0,
+   "total_tokens": 34079
+  }
+ }
+}

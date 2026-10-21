@@ -1,0 +1,36 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0273.1",
+  "item-0041.2",
+  "item-0129.1",
+  "item-0278.1",
+  "item-0291.1",
+  "item-0089.2",
+  "item-0070.2",
+  "item-0058.2",
+  "item-0198.1",
+  "item-0010.1",
+  "item-0137.2",
+  "item-0180.2",
+  "item-0225.1",
+  "item-0046.2",
+  "item-0266.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "47812b76-6432-4941-87b4-55d2435c105b",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"물량 fits the batch of incoming tea leaves better than 주문.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Xu Nuo speaks to Lu Ming in banmal.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"첫물 is the natural specialized Korean tea term for 头采.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Linxia is female, so older brother refers to himself as 오빠.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"A princess would not humble her family using 저희 to Tsukumo.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Identical except for trailing period; formatting differences are ignored.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"말씀대로 is the natural idiomatic expression for お言葉に甘えて.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"일하는데 is more faithful and natural than assuming 회사.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both fail speech level; punctuation difference is ignored.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"casual chat take place fits the internal wiki register better.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 uses haeyo-che (-나요?), matching the required speech level.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 2 leaves Japanese source text untranslated.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"어서 오십시오 and 입니다 match ようこそ and でございます better.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Consistently capitalizes both feature names Hiroba and Hitokoto.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 correctly uses haeyo-che (예요) as specified.\"}\n]\n",
+  "duration_seconds": 91.201859,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13965,
+   "output_tokens": 12615,
+   "thinking_tokens": 12138,
+   "cache_read_tokens": 0,
+   "total_tokens": 26580
+  }
+ }
+}

@@ -1,0 +1,133 @@
+{
+ "a": "M",
+ "b": "M",
+ "identical": 435,
+ "items": {
+  "item-0001": {
+   "seq": "subs-en-ko-1",
+   "line": 24,
+   "kind": "real",
+   "a_text": "좋아. 루크, 세레스에 도착할 때까지 그 욕조를 보관해 둬.",
+   "b_text": "좋아. 루크, 세레스에 도착할 때까지 그 욕조를 가지고 있어."
+  },
+  "item-0002": {
+   "seq": "chat-zh-ko-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "그럼 오늘 밤에 잡고, 잡으면 단톡방에 알려줘",
+   "b_text": "그럼 네가 오늘 밤에 잡고, 잡으면 단톡방에 알려줘"
+  },
+  "item-0003": {
+   "seq": "game-ja-ko-1",
+   "line": 5,
+   "kind": "calibration",
+   "a_text": "아, 네! 왕녀님인 줄 모르고 실례했습니다",
+   "b_text": "아, 네! 왕녀님인 줄 모르고 실례했습니다"
+  },
+  "item-0004": {
+   "seq": "chat-ja-ko-2",
+   "line": 5,
+   "kind": "real",
+   "a_text": "곤란하네요. 견적서가 없으면 품의를 진행할 수 없습니다.",
+   "b_text": "곤란하네요. 견적서가 없으면 품의를 돌릴 수 없습니다."
+  },
+  "item-0005": {
+   "seq": "subs-ja-ko-1",
+   "line": 8,
+   "kind": "calibration",
+   "a_text": "실례합니다. 여기 다방 부엉이 맞나요?",
+   "b_text": "실례합니다. 여기 다방 부엉이 맞나요?"
+  },
+  "item-0006": {
+   "seq": "subs-zh-ko-1",
+   "line": 1,
+   "kind": "calibration",
+   "a_text": "잎이 도착하면 바로 볶아야 하고, 하루도 보관할 수 없다.",
+   "b_text": "잎이 도착하면 바로 볶아야 하고, 하루도 보관할 수 없다."
+  },
+  "item-0007": {
+   "seq": "subs-zh-ko-1",
+   "line": 7,
+   "kind": "real",
+   "a_text": "샤샤, 이 항목 좀 봐봐. 모차의 매입 가격이 20% 올랐어.",
+   "b_text": "샤샤, 이 항목 좀 봐봐. 모차 매입 가격이 20% 올랐어."
+  },
+  "item-0008": {
+   "seq": "subs-ja-ko-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "아, 소장님! 키류 씨, 우산 두고 가셨어요!",
+   "b_text": "아, 소장님! 키류 씨, 우산 놓고 가셨어요!"
+  },
+  "item-0009": {
+   "seq": "subs-en-ko-1",
+   "line": 23,
+   "kind": "real",
+   "a_text": "쏜, 저 욕조가 제 무릎을 살려주는 유일한 거예요.",
+   "b_text": "쏜, 저 욕조가 내 무릎을 살려주는 유일한 것이야."
+  },
+  "item-0010": {
+   "seq": "subs-en-ko-1",
+   "line": 27,
+   "kind": "real",
+   "a_text": "메리골드가 정오까지 세레스에 결혼 치즈를 싣고 가고 있어. 제럴드가 죽게 놔두지 마.",
+   "b_text": "메리골드의 화물로 결혼 치즈가 정오까지 세레스에 도착해야 해. 제럴드가 죽게 놔두지 마."
+  },
+  "item-0011": {
+   "seq": "chat-ko-en-1",
+   "line": 1,
+   "kind": "calibration",
+   "a_text": "Seoyoon, are you still at the office?",
+   "b_text": "Seoyoon, are you still at the office?"
+  },
+  "item-0012": {
+   "seq": "game-ja-en-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "Hikaru, who did you ask to watch the bureau?",
+   "b_text": "Hikaru, who did you ask to watch the Bureau?"
+  },
+  "item-0013": {
+   "seq": "chat-ja-ko-2",
+   "line": 32,
+   "kind": "calibration",
+   "a_text": "형이 이사해서, 가서 돕고 싶어요.",
+   "b_text": "형이 이사해서, 가서 돕고 싶어요."
+  },
+  "item-0014": {
+   "seq": "game-zh-en-1",
+   "line": 13,
+   "kind": "calibration",
+   "a_text": "Jie Xuan stood at the palace entrance, his sword unsheathed, but the lights flickered for a moment.",
+   "b_text": "Jie Xuan stood at the palace entrance, his sword unsheathed, but the lights flickered for a moment."
+  },
+  "item-0015": {
+   "seq": "docs-ja-en-1",
+   "line": 7,
+   "kind": "calibration",
+   "a_text": "Each page can have up to ten items.",
+   "b_text": "Each page can have up to ten items."
+  },
+  "item-0016": {
+   "seq": "game-ja-en-1",
+   "line": 23,
+   "kind": "real",
+   "a_text": "Kaoru removed his glasses and slowly pressed his temples.",
+   "b_text": "Kaoru removed her glasses and slowly pressed her fingertips to the bridge of her nose."
+  },
+  "item-0017": {
+   "seq": "chat-zh-ko-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "주정 언니, 알겠어요. 제가 찾아봤는데, 국경절 고속열차표가 정말 부족해서 오늘 밤에 잡아야 해요",
+   "b_text": "주정아, 알겠어. 내가 찾아봤는데, 국경절 고속열차표가 정말 부족하대. 오늘 밤에 잡아야 할 것 같아"
+  },
+  "item-0018": {
+   "seq": "docs-ko-en-1",
+   "line": 19,
+   "kind": "calibration",
+   "a_text": "Launchpad item 1 is logging into the wiki and joining the company messenger.",
+   "b_text": "Launchpad item 1 is logging into the wiki and joining the company messenger."
+  }
+ }
+}

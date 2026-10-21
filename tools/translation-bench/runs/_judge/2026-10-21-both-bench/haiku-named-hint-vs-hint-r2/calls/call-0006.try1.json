@@ -1,0 +1,36 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0194.1",
+  "item-0318.2",
+  "item-0050.1",
+  "item-0097.2",
+  "item-0155.1",
+  "item-0155.2",
+  "item-0304.2",
+  "item-0059.1",
+  "item-0113.1",
+  "item-0040.1",
+  "item-0251.2",
+  "item-0322.1",
+  "item-0177.1",
+  "item-0007.2",
+  "item-0257.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c410d4ab-ddba-4bce-adb5-aea3af3e3b78",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly includes 'also' for '도'.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are natural and accurate translations for leaving work.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 is more natural and does not add '꽤'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 is more natural and avoids repetitive phrasing.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both have identical errors and differ only by punctuation.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both have identical errors and differ only by punctuation.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 is much more natural and idiomatic narrative prose.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 appropriately reflects the elderly master's register with '돌아가마'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 writes pronunciation in Hangul instead of raw hiragana.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate in 반말.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 uses standard spelling '브리지' and natural Korean '공구함'.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 uses the more natural conversational contraction '가져오신대요'.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both are equally valid and natural translations for technical documentation.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'at home' is much more natural than 'at the house'.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 correctly romanizes the compound surname 万俟 as 'Mo Qi'.\"}\n]\n",
+  "duration_seconds": 125.470074,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13916,
+   "output_tokens": 19376,
+   "thinking_tokens": 18894,
+   "cache_read_tokens": 0,
+   "total_tokens": 33292
+  }
+ }
+}

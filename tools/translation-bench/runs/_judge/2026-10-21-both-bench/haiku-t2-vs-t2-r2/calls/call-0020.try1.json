@@ -1,0 +1,36 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0026.1",
+  "item-0053.1",
+  "item-0194.2",
+  "item-0119.2",
+  "item-0295.2",
+  "item-0129.2",
+  "item-0141.2",
+  "item-0298.2",
+  "item-0002.2",
+  "item-0051.1",
+  "item-0327.2",
+  "item-0182.2",
+  "item-0345.1",
+  "item-0296.1",
+  "item-0106.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5a4700dd-3f85-4b22-a903-5d1ed3a714e9",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Step 2 is more faithful without adding unmentioned words like onboarding.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 is left completely untranslated in Japanese.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 is left completely untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly uses polite speech appropriate when addressing the captain.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"두면 안 돼요 is more faithful and natural than 묵혀 둘 수 없어요.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate casual English messages.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"사건도 없고 is more natural than 사건도 없어서 with particle 도.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"일단 accurately translates for now, whereas 아직 means still.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both spacings 해 둘게 and 해둘게 are acceptable in Korean orthography.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"잘하세요 properly uses honorifics when addressing a club senior.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"룬벨 correctly transliterates the Katakana proper noun ルーンベル.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"그나저나 accurately translates btw as by the way.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"품의를 올리다 is the standard Korean business expression for 稟議を回す.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both omitting and including the particle 의 are equally natural.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"ひときわ means even harder or noticeably, not suddenly.\"}\n]\n",
+  "duration_seconds": 137.045156,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13507,
+   "output_tokens": 20443,
+   "thinking_tokens": 19956,
+   "cache_read_tokens": 0,
+   "total_tokens": 33950
+  }
+ }
+}

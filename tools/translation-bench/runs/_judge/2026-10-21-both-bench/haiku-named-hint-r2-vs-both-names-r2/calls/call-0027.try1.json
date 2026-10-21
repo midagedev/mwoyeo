@@ -1,0 +1,36 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0100.1",
+  "item-0228.2",
+  "item-0187.1",
+  "item-0207.1",
+  "item-0251.2",
+  "item-0030.2",
+  "item-0164.2",
+  "item-0024.1",
+  "item-0021.2",
+  "item-0324.1",
+  "item-0277.1",
+  "item-0004.1",
+  "item-0150.1",
+  "item-0260.2",
+  "item-0282.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4ff46b7e-8c4a-4778-88ac-dc714b2ba792",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"\\\"Forensic results\\\" is more grammatically standard than \\\"forensics results\\\".\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 to address Herve.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 when Rory speaks to Siobhan.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"\\\"마트 쪽에서 또 재촉했어\\\" sounds much more natural in Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 when Suzanne speaks to Tsukumo.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"\\\"Organizes tags\\\" is a more natural translation of タグを分けています.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"\\\"Your cat\\\" correctly specifies ownership based on the conversation context.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"\\\"Do not\\\" and \\\"to Hearth\\\" match formal documentation style.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"\\\"Right?\\\" accurately captures the empathetic agreement of \\\"그러게\\\".\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"\\\"Shadowing report\\\" correctly reflects corporate onboarding rather than \\\"field trip\\\".\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 accurately conveys \\\"wants us there\\\" in natural 반말.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 correctly captures the assertive proposal in 반말.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 when Ricia speaks to Saku.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 2 confuses \\\"ひろば\\\" with \\\"space\\\" (ワークスペース).\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations are identical except for title case formatting.\"}\n]\n```\n",
+  "duration_seconds": 144.396387,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13371,
+   "output_tokens": 19475,
+   "thinking_tokens": 18976,
+   "cache_read_tokens": 0,
+   "total_tokens": 32846
+  }
+ }
+}

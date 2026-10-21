@@ -1,0 +1,36 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0216.2",
+  "item-0041.1",
+  "item-0248.1",
+  "item-0199.2",
+  "item-0101.2",
+  "item-0082.1",
+  "item-0328.2",
+  "item-0128.2",
+  "item-0117.2",
+  "item-0304.1",
+  "item-0079.2",
+  "item-0094.2",
+  "item-0283.2",
+  "item-0070.1",
+  "item-0248.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "357827b9-e646-4f24-817b-b66ae369475c",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"'then' captures the deductive nuance of 'な'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"许诺 speaks to 陆明 in 반말.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"More natural English dialogue without redundant phrasing.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Identical except for punctuation, which is ignored.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"T1 has correct name; T2 has correct speech level.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly transcribes 雨宮 as 아마미야.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'에르베 님' fits the fantasy register for an elder tutor.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 is much more natural narrative English.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both '돌계단 끝에' and '너머로' are natural and accurate.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both parenthetical pronunciation phrasings are equally natural.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"The cat's name is Bori, not Boris.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'말씀대로' and '계신 건가요' are more natural and faithful.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"More natural English dialogue without redundant phrasing.\"}\n]\n",
+  "duration_seconds": 203.550273,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13909,
+   "output_tokens": 27874,
+   "thinking_tokens": 27422,
+   "cache_read_tokens": 0,
+   "total_tokens": 41783
+  }
+ }
+}

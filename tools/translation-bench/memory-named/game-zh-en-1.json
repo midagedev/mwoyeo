@@ -1,0 +1,12 @@
+{
+ "entities": [
+  {"name": "单云舟", "reading": "Shàn Yúnzhōu", "dst": "Shan Yunzhou", "role": "junior disciple"},
+  {"name": "曾若水", "reading": "Zēng Ruòshuǐ", "dst": "Zeng Ruoshui", "role": "ward keeper"},
+  {"name": "覃长老", "reading": "Qín", "dst": "Elder Qin", "role": "elder"},
+  {"name": "乐川", "reading": "Yuè Chuān", "dst": "Yue Chuan", "role": "alchemist"},
+  {"name": "解玄", "reading": "Xiè Xuán", "dst": "Xie Xuan", "gender": "female", "role": "envoy of a rival pavilion"}
+ ],
+ "document": {"title": "云岭仙途", "domain": "xianxia RPG", "summary": "disciples try to keep their mountain sect's ward from failing"},
+ "window": {"title": "云岭仙途", "app": "云岭仙途", "category": "Games"},
+ "terms": [{"src": "师姐", "dst": "Shijie"}, {"src": "灵石", "dst": "qi stone"}, {"src": "结界", "dst": "ward"}]
+}

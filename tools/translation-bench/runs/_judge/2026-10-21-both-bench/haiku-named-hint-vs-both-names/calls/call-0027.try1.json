@@ -1,0 +1,36 @@
+{
+ "call": 27,
+ "try": 1,
+ "ids": [
+  "item-0245.2",
+  "item-0072.1",
+  "item-0275.2",
+  "item-0020.1",
+  "item-0083.1",
+  "item-0116.2",
+  "item-0294.2",
+  "item-0265.1",
+  "item-0351.2",
+  "item-0322.2",
+  "item-0318.2",
+  "item-0134.1",
+  "item-0161.1",
+  "item-0262.2",
+  "item-0106.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9204b986-c709-4763-8631-9c133556f375",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly avoids honorific 계시군요 for the beast.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 uses standard Pinyin Qiu for the surname 仇.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 accurately translates 先 as 먼저 and reads naturally.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural renderings.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 misgenders the male client Takanashi with Ms.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 sounds more natural without the awkward pronoun 그걸.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 faithfully preserves という as 씨라는.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 uses the more natural recurring expression 두 시간씩.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Hinata speaks to Takanashi in banmal, matched in Translation 1.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Xu Nuo is female and cannot use 누나 for Zhou Ting.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 correctly avoids honorifics toward a subordinate.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both post and leave are natural and accurate here.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"That one refers to tag, correctly translated as 그것, not 방법.\"}\n]\n",
+  "duration_seconds": 112.77893,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14183,
+   "output_tokens": 16619,
+   "thinking_tokens": 16156,
+   "cache_read_tokens": 0,
+   "total_tokens": 30802
+  }
+ }
+}

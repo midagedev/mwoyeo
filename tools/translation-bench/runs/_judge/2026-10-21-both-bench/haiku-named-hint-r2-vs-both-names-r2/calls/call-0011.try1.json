@@ -1,0 +1,36 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0226.1",
+  "item-0138.2",
+  "item-0228.1",
+  "item-0180.2",
+  "item-0278.2",
+  "item-0187.2",
+  "item-0130.2",
+  "item-0113.1",
+  "item-0097.2",
+  "item-0234.2",
+  "item-0063.2",
+  "item-0016.2",
+  "item-0233.2",
+  "item-0155.2",
+  "item-0145.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b5c7bd00-df8a-4eb1-9fab-38a3f8b73325",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Indefinite article 'a pet hotel' is more natural for first mention.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are equally natural and faithful 반말 translations.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly uses 해요체 speech level as specified in the facts.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'두 분 다' naturally translates 'both' in Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'몫' accurately translates '份' for a financial share.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly uses 반말 when speaking to Siobhan.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are equally accurate; the difference is only punctuation.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Preserves the exact singular feature name 'Quick Note'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'맞다' correctly expresses sudden realization for 'そうだ'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly expresses recurring schedule and maintains consistent honorifics.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Correctly pronounces surname 万俟 as Moqi and uses standard order.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both singular and plural are natural idioms for phone duty.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'첫 배송분' faithfully translates '第一批' (first batch).\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Present perfect 'has spent' faithfully reflects the aspect of '〜てきた'.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Correctly uses 해요체 speech level as specified in the facts.\"}\n]\n",
+  "duration_seconds": 94.790316,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13994,
+   "output_tokens": 13900,
+   "thinking_tokens": 13426,
+   "cache_read_tokens": 0,
+   "total_tokens": 27894
+  }
+ }
+}

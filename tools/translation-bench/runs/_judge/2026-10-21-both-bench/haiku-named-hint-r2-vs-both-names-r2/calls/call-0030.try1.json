@@ -1,0 +1,36 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0018.1",
+  "item-0124.1",
+  "item-0020.1",
+  "item-0163.2",
+  "item-0154.1",
+  "item-0006.1",
+  "item-0224.2",
+  "item-0080.2",
+  "item-0180.1",
+  "item-0092.2",
+  "item-0122.2",
+  "item-0316.2",
+  "item-0297.2",
+  "item-0152.1",
+  "item-0327.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6ff9d238-1978-4d44-8d71-a8822b17ce0a",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Swordsman uses 검 rather than 칼.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Uses correct 반말 speech level.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Singular report fits the specific onboarding task.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Neither translated the text into Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Accurately translates 呼ぼうよ without adding 'try'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Imperative mood fits instructional onboarding guide style.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Faithfully translates pronoun 'it' as 그게.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Much more natural Korean expression in this context.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Accurately and naturally translates 'both' as 두 분 다.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"药囊 is accurately translated as medicine pouch.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"More concise and natural documentation phrasing.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"좋네 naturally translates conversational reaction 'Nice'.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both make the exact same translation errors.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Reads much more naturally in dialogue.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated.\"}\n]\n",
+  "duration_seconds": 137.746994,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13839,
+   "output_tokens": 18929,
+   "thinking_tokens": 18509,
+   "cache_read_tokens": 0,
+   "total_tokens": 32768
+  }
+ }
+}

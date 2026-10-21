@@ -1,0 +1,36 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0112.1",
+  "item-0343.1",
+  "item-0068.2",
+  "item-0142.2",
+  "item-0161.2",
+  "item-0092.2",
+  "item-0349.2",
+  "item-0173.2",
+  "item-0345.1",
+  "item-0016.2",
+  "item-0344.2",
+  "item-0293.1",
+  "item-0105.2",
+  "item-0014.1",
+  "item-0064.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f8d35a4f-7b4e-4a23-b007-aa23567b16e1",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both spacing variants ('지켜왔습니다' and '지켜 왔습니다') are valid Korean orthography.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 uses natural Korean phrasing ('저희 집안', '세운 곳').\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly conveys asking for permission ('자도 돼') rather than ability.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'Before anything else' and 'without permission' are more natural and accurate.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 avoids inappropriate honorific -시- from a boss to subordinate.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly renders 'そうだ' as sudden recollection ('맞다').\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates 'アキラさん' without adding an unmentioned title.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Participial phrase 'Panting, he said' best translates the adverbial '喘着气说'.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate; particle omission is acceptable.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 captures the potential form 'まとめられる' ('lets you bring').\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 1 invents '사령관님', which contradicts the character's actual role.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'lure her' accurately translates '꼬셔야지' without adding incorrect directional 'out'.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 as required by the facts.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 1 confuses Minato with the speaker Mina, creating a contradiction.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"'하지만' captures the contrastive objection in 'ですが' better than '그런데'.\"}\n]\n",
+  "duration_seconds": 213.567128,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14122,
+   "output_tokens": 31059,
+   "thinking_tokens": 30521,
+   "cache_read_tokens": 0,
+   "total_tokens": 45181
+  }
+ }
+}

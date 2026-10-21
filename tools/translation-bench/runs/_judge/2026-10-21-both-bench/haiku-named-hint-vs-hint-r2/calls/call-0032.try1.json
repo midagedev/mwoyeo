@@ -1,0 +1,36 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0280.1",
+  "item-0255.1",
+  "item-0140.2",
+  "item-0116.2",
+  "item-0239.2",
+  "item-0019.2",
+  "item-0035.2",
+  "item-0082.2",
+  "item-0242.1",
+  "item-0188.1",
+  "item-0018.1",
+  "item-0124.1",
+  "item-0020.1",
+  "item-0163.2",
+  "item-0154.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "be0bd6e6-8a51-4048-b62c-ee84b5621299",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"동행 better reflects the formal register of お供 for royalty.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Adding your makes the English instruction much more natural.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말; 1 correctly uses 반말.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"값을 치르다 and 안 봐줄걸 are grammatically correct and natural.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural in Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"1 correctly transliterates 雨宮 as 아마미야, whereas 2 misspells it.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"확보했습니다 better fits the formal business register for reporting.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"许诺 speaks to 陆明 in 반말; 2 correctly uses 반말.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"2 accurately translates 濡れた as wet and preserves came.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"2 correctly conveys over three years without implying a hiatus.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"The rain grew heavier is a more natural English collocation.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"2 accurately translates 출입증 as access badge and preserves 받은.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Rook speaks to Dex in 반말; 2 correctly uses 반말.\"}\n]\n",
+  "duration_seconds": 173.352652,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13805,
+   "output_tokens": 25076,
+   "thinking_tokens": 24605,
+   "cache_read_tokens": 0,
+   "total_tokens": 38881
+  }
+ }
+}

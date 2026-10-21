@@ -1,0 +1,36 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0012.2",
+  "item-0013.1",
+  "item-0007.2",
+  "item-0014.1",
+  "item-0004.2",
+  "item-0004.1",
+  "item-0005.1",
+  "item-0010.1",
+  "item-0001.1",
+  "item-0017.2",
+  "item-0018.1",
+  "item-0014.2",
+  "item-0011.2",
+  "item-0006.2",
+  "item-0006.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a1469f72-2fcb-49bd-a829-5ab59a5084c5",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 capitalizes Bureau as specified in the terms.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 reads more naturally without the unnecessary particle 의.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"품의를 진행하다 is more natural business Korean than the Japanese calque.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"품의를 진행하다 is more natural business Korean than the Japanese calque.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly translates due at as arriving by the deadline.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"가지고 있어 correctly conveys keeping the tub rather than storing it.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 speech level as specified in facts.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations are identical.\"}\n]\n```\n",
+  "duration_seconds": 43.919355,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13686,
+   "output_tokens": 7639,
+   "thinking_tokens": 7218,
+   "cache_read_tokens": 0,
+   "total_tokens": 21325
+  }
+ }
+}

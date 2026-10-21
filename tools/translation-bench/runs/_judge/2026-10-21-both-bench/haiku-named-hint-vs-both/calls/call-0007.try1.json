@@ -1,0 +1,36 @@
+{
+ "call": 7,
+ "try": 1,
+ "ids": [
+  "item-0166.1",
+  "item-0136.1",
+  "item-0280.1",
+  "item-0023.2",
+  "item-0111.2",
+  "item-0028.1",
+  "item-0279.2",
+  "item-0094.1",
+  "item-0235.2",
+  "item-0351.2",
+  "item-0153.1",
+  "item-0112.1",
+  "item-0254.2",
+  "item-0222.2",
+  "item-0142.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b546c291-2d1d-4ba5-b354-c195707ceffc",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Uses proper title Inspector Akira matching her professional rank.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly uses the required hapsyoche speech level.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'The landlady' is more natural than 'That landlady'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly uses banmal speech level toward Siobhan.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Sect gate' fits xianxia terminology, and 'lifted' is natural.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Uses correct Korean spacing for the compound verb '잘해요'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Faithfully translates 'Working with' as '브랜치로 작업하기'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly translates asking for permission rather than physical capability.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translates the name into Korean instead of leaving Chinese characters.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'호타루 건' is natural Korean business terminology unlike '호타루 분'.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Correctly translates third-person referent instead of first person.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'Changes sync' provides a clear subject, avoiding ambiguous pronoun 'they'.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both are equally natural and accurate polite translations.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"말씀드리자면 is a more natural introductory preface than 말씀드리면.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Maintains natural parallel structure matching the source repetition.\"}\n]\n",
+  "duration_seconds": 194.916166,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13784,
+   "output_tokens": 29007,
+   "thinking_tokens": 28527,
+   "cache_read_tokens": 0,
+   "total_tokens": 42791
+  }
+ }
+}

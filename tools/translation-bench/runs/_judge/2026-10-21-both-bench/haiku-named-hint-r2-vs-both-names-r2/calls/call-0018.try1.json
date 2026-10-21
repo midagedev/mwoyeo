@@ -1,0 +1,36 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0220.1",
+  "item-0032.2",
+  "item-0026.1",
+  "item-0285.1",
+  "item-0176.2",
+  "item-0119.2",
+  "item-0179.1",
+  "item-0129.2",
+  "item-0283.2",
+  "item-0002.2",
+  "item-0051.1",
+  "item-0270.2",
+  "item-0165.1",
+  "item-0211.1",
+  "item-0196.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "347f9438-f017-4df6-b43c-345f0b86eb87",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses third person; Translation 2 mistakenly uses first person.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 is natural and fluent, while 2 has trailing garbage text.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Dex and Rook speak in banmal to each other; Translation 2 matches.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 avoids the incorrect pronoun 'we' for Seoyoon's move.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'앉으세요' is the natural Korean expression for offering a seat.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Rook speaks to Dex in banmal; Translation 2 uses banmal.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'안 좋아' naturally conveys that a mechanical malfunction is bad news.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'Direct handoff' naturally translates secondhand marketplace '직거래'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'Should we' properly reflects proposing to include a mutual coworker.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'~줄 것 같아?' is much more natural Korean dialogue than translationese.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the honorific infix '-시-' for a senior.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 captures the atmospheric register of '夕暮れ' and fantasy setting.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'안 오시잖아요' accurately conveys the conversational nuance of sentence-final '~し'.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 accurately captures both '贴身' and '收好' (securely).\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate business Korean.\"}\n]\n",
+  "duration_seconds": 194.751867,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13999,
+   "output_tokens": 27524,
+   "thinking_tokens": 27014,
+   "cache_read_tokens": 0,
+   "total_tokens": 41523
+  }
+ }
+}

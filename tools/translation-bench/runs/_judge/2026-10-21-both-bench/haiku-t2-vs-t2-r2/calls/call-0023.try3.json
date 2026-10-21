@@ -1,0 +1,36 @@
+{
+ "call": 23,
+ "try": 3,
+ "ids": [
+  "item-0061.2",
+  "item-0069.1",
+  "item-0007.1",
+  "item-0049.2",
+  "item-0117.1",
+  "item-0194.1",
+  "item-0187.2",
+  "item-0165.1",
+  "item-0264.1",
+  "item-0257.1",
+  "item-0167.1",
+  "item-0321.2",
+  "item-0299.2",
+  "item-0255.2",
+  "item-0072.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8dff8177-7570-4ba4-a3bc-060a075ad9c0",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'잘못' is more natural than '틀리게', and it respects the client.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly translates the cat's name as Bori instead of Boris.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Accurately translates 'ran into', 'on his back', and 'token'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'I know' is much more natural than 'Right' for 그러게.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Avoids incorrect transliteration '아오이페' and translates 'lose it' accurately.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Japanese.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'이번 물량' accurately fits incoming tea leaves, unlike '이 주문'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'Questioning' and 'let's begin' correctly reflect police investigation tone.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Correctly translates the action 'Cloning' rather than the noun '클론'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly translates xianxia terms 'formation-eye token' and 'Dao'.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Equally good; only difference is the optional particle '을'.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Uses correct 반말 and accurately translates 'super' as 관리인.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Correctly asks for permission ('자도 돼?') and avoids '아오이페'.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Equally natural informal Korean expressions for announcing meeting end.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"'At the office' and 'at work' are equally natural.\"}\n]\n",
+  "duration_seconds": 201.623697,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13938,
+   "output_tokens": 28334,
+   "thinking_tokens": 27820,
+   "cache_read_tokens": 0,
+   "total_tokens": 42272
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 7,
+ "try": 1,
+ "ids": [
+  "item-0059.1",
+  "item-0195.2",
+  "item-0259.2",
+  "item-0076.2",
+  "item-0358.1",
+  "item-0172.1",
+  "item-0269.2",
+  "item-0087.2",
+  "item-0303.1",
+  "item-0323.2",
+  "item-0012.2",
+  "item-0013.2",
+  "item-0274.2",
+  "item-0322.1",
+  "item-0167.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c07b6164-f091-440e-9368-e05e52a5a31e",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly uses 해요체 and 누나 for a male speaker.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Accurately translates 沈んでおる as 가라앉아 있다 instead of sleeping.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Accurately places 'everything' in the second clause matching '다'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Preserves the exact feature term 'Quick Note' without pluralizing it.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 includes the subject pronoun, avoiding an awkward sentence fragment.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'안심이 되네요' is much more natural and idiomatic for '放心了'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'풀장' fits a hot tub, whereas '수영장' means swimming pool.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Thorne speaks to Rook in 해요체, making '뭔데요' correct.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Keeping 'Aoife' makes the pronunciation explanation logical; '아오이프' is incorrect.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are equally natural, faithful, and accurate.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'Eom Seo-jin' is natural; 'Mr./Ms. Eom-seojin' is awkward and unidiomatic.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 is much more natural and fluent literary English.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"'三成' means three tenths (30%), not 'three parts'.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Hinata speaks to Takanashi in 반말, making Translation 2 correct.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Calling one's father '그' in Korean is unnatural and disrespectful.\"}\n]\n",
+  "duration_seconds": 112.739698,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14170,
+   "output_tokens": 16785,
+   "thinking_tokens": 16257,
+   "cache_read_tokens": 0,
+   "total_tokens": 30955
+  }
+ }
+}

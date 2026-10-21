@@ -1,0 +1,36 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0184.2",
+  "item-0130.2",
+  "item-0046.1",
+  "item-0093.2",
+  "item-0042.1",
+  "item-0148.1",
+  "item-0153.2",
+  "item-0166.1",
+  "item-0228.2",
+  "item-0341.2",
+  "item-0347.2",
+  "item-0305.1",
+  "item-0177.2",
+  "item-0159.2",
+  "item-0208.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5d27222b-0efc-4acc-a3ab-07c49dcdc357",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Old Man preceding a surname is a capitalized epithet.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly uses the required 해요체 speech level for Zhou Yi.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both phrasing options are equally natural and accurate in Korean.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations convey the meaning and tone equally well.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"The sentence ending fits the older male detective's tone much better.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"再来月 means the month after next, not next month's end.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Plural Quick Notes correctly matches recording decisions across multiple meetings.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"브리지 is the correct standard Korean spelling for bridge.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Correctly uses 해요체 as specified in the facts for Gareth.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Avoids mistranslating onboarding field experience as a schoolchildren's field trip.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"More faithfully translates 以前の状態に戻せます than replacing state with version.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both 우리 버전 and 우리 것 accurately translate ours.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Avoids incorrect causality and uses natural phrasing like my stuff.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Adding 벌써 incorrectly implies surprise at the bill arriving early.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"The compound surname 万俟 is correctly pronounced Mo Qi.\"}\n]\n",
+  "duration_seconds": 175.106384,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13632,
+   "output_tokens": 26003,
+   "thinking_tokens": 25536,
+   "cache_read_tokens": 0,
+   "total_tokens": 39635
+  }
+ }
+}

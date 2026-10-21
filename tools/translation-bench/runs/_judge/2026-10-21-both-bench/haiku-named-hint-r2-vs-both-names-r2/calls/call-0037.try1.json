@@ -1,0 +1,36 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0169.1",
+  "item-0005.2",
+  "item-0133.1",
+  "item-0227.1",
+  "item-0296.2",
+  "item-0075.2",
+  "item-0022.2",
+  "item-0052.1",
+  "item-0202.2",
+  "item-0096.2",
+  "item-0108.2",
+  "item-0011.1",
+  "item-0156.2",
+  "item-0291.2",
+  "item-0297.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c2419339-487e-4f07-a5a1-8bb9703f3a7e",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Uses natural '그 사람' rather than bookish pronoun '그'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses 해요체 (-거예요), matching the tutorial's informal polite speech level.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both 그다음 and 그런 다음 are accurate and natural here.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Uses appropriate honorifics for a friend's mother, unlike Translation 1.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'三成' means three parts in ten (30%), not three shares.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Addressed to Aunt Zhou, so 해요체 is required by the facts.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Respects Akira's request to be called Akira without '-san'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 uses natural Korean phrasing instead of awkward translationese.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural renderings of the line.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are faithful and natural with correct honorifics.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'used to work ... before' is redundant; Translation 1 is idiomatic.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 as required by the facts.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 uses natural dialogue phrasing instead of literal translationese.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both translations are identical except for the trailing symbol.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both make identical errors with the surname and conditional aspect.\"}\n]\n",
+  "duration_seconds": 141.336933,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14123,
+   "output_tokens": 19612,
+   "thinking_tokens": 19126,
+   "cache_read_tokens": 0,
+   "total_tokens": 33735
+  }
+ }
+}

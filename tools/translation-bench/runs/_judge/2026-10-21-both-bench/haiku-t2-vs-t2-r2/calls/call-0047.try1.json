@@ -1,0 +1,23 @@
+{
+ "call": 47,
+ "try": 1,
+ "ids": [
+  "item-0287.2",
+  "item-0232.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "af8c55ed-ed4f-41e8-a73e-ad4f48c300ee",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Xu Nuo speaks to Lu Ming in informal banmal.\"}\n]\n```\n",
+  "duration_seconds": 25.755921999999998,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 9724,
+   "output_tokens": 3922,
+   "thinking_tokens": 3857,
+   "cache_read_tokens": 0,
+   "total_tokens": 13646
+  }
+ }
+}

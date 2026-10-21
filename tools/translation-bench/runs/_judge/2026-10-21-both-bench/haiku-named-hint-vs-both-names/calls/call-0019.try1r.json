@@ -1,0 +1,36 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0195.1",
+  "item-0135.1",
+  "item-0186.2",
+  "item-0078.2",
+  "item-0286.1",
+  "item-0354.2",
+  "item-0080.2",
+  "item-0316.2",
+  "item-0234.1",
+  "item-0134.2",
+  "item-0043.1",
+  "item-0075.1",
+  "item-0135.2",
+  "item-0113.1",
+  "item-0057.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "75895a5b-9bd1-47fa-9a73-9f726e30fc58",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"T2 correctly translates 沈んで as 가라앉아 and uses fitting register.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both romanizations and phrasings are accurate, natural, and acceptable.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"T2 translates 'that' and 'each conflict' much more naturally.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"T2 correctly conveys the present stance rather than mistranslating into past.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural with negligible stylistic difference.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations correctly use 반말 and are equally natural.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"T2 respects the facts block's speech level and correctly translates 환다오루.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"T2 avoids the hallucinated dangling word '실수' at the end.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"T2 correctly keeps '쏜' and translates 'only thing' much more naturally.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are accurate; omitting or including '이건' is equivalent.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both '-하셨나요?' and '-하셨어요?' are natural, polite 해요체 forms.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"T1 captures the formal xianxia register of '别来无恙' much better.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both romanizations and phrasings are accurate, natural, and acceptable.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"T2 translates '喂' accurately as 'feed' for an unconscious person.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations are completely faithful, natural, and idiomatic.\"}\n]\n",
+  "duration_seconds": 176.259994,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14040,
+   "output_tokens": 26591,
+   "thinking_tokens": 26079,
+   "cache_read_tokens": 0,
+   "total_tokens": 40631
+  }
+ }
+}

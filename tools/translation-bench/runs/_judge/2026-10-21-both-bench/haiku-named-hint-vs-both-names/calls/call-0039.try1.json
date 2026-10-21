@@ -1,0 +1,36 @@
+{
+ "call": 39,
+ "try": 1,
+ "ids": [
+  "item-0054.1",
+  "item-0025.1",
+  "item-0216.2",
+  "item-0041.1",
+  "item-0248.1",
+  "item-0199.2",
+  "item-0101.2",
+  "item-0284.2",
+  "item-0082.1",
+  "item-0348.1",
+  "item-0128.2",
+  "item-0117.2",
+  "item-0321.2",
+  "item-0079.2",
+  "item-0094.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a462427e-0156-4b91-a983-95edc122ac00",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 reads more naturally and matches the source aspect.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 reads much more naturally for the crime scene.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'Guard' correctly translates 守住 in this cultivation context.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly follows the pronunciation hint 'TOH-mash'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'To mark them' is more idiomatic and natural English.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'얘' fits an adult crewmate, whereas '꼬마야' means child.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 correctly renders the guide section heading.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 as required by the facts.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"'에서' is the correct particle for ordering from a store.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 faithfully preserves the respectful address 'sir'.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 accurately reflects '又' and the narrative direction.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"'Organizes' accurately translates 分ける for grouping tags by project.\"}\n]\n",
+  "duration_seconds": 130.53885,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13737,
+   "output_tokens": 20584,
+   "thinking_tokens": 20129,
+   "cache_read_tokens": 0,
+   "total_tokens": 34321
+  }
+ }
+}

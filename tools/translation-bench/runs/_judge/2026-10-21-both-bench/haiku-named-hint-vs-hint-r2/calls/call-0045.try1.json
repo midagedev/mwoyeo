@@ -1,0 +1,36 @@
+{
+ "call": 45,
+ "try": 1,
+ "ids": [
+  "item-0008.2",
+  "item-0320.1",
+  "item-0081.2",
+  "item-0316.1",
+  "item-0344.2",
+  "item-0203.2",
+  "item-0305.2",
+  "item-0022.1",
+  "item-0325.2",
+  "item-0276.2",
+  "item-0047.1",
+  "item-0073.2",
+  "item-0156.1",
+  "item-0229.2",
+  "item-0049.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d86f6fb6-1dd9-42fa-acaa-74f6ff1b20b1",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correctly romanizes 仇(qiú) as Qiu instead of Chou.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly translates the name Aoife instead of hallucinating 아이핀.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"괜찮을까요 naturally conveys concern about whether Raizo will manage alone.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Properly localizes the honorific for an English user guide register.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"根本 is accurately translated as 도저히 rather than 제대로.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"자도 돼 naturally translates asking for permission rather than ability.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly uses 반말 according to the specified speech level.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Accurately translates the archaic honorific 殿 (-dono) as 공.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 left 婷姐 untranslated in Chinese characters.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 is concise and avoids an inaccurate temporal clause.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"조심해 주세요 is a more natural polite request than 조심하세요.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"어? is the natural Korean interjection for noticing someone arriving.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations are identical aside from formatting.\"}\n]\n",
+  "duration_seconds": 110.12382,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13890,
+   "output_tokens": 15706,
+   "thinking_tokens": 15237,
+   "cache_read_tokens": 0,
+   "total_tokens": 29596
+  }
+ }
+}

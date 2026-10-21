@@ -1,0 +1,36 @@
+{
+ "call": 9,
+ "try": 1,
+ "ids": [
+  "item-0073.1",
+  "item-0149.1",
+  "item-0114.2",
+  "item-0260.1",
+  "item-0188.1",
+  "item-0194.2",
+  "item-0060.1",
+  "item-0300.2",
+  "item-0362.1",
+  "item-0143.2",
+  "item-0104.1",
+  "item-0074.1",
+  "item-0191.2",
+  "item-0196.2",
+  "item-0019.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cf4fe235-a8f9-45da-b351-cd1d8ac76ac7",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly translates confirmation email instead of invitation email.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly identifies tea blend name instead of three black teas.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly uses informal speech level (반말) for Zhou Ting.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translates the character name Haku into Korean script.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Identical translations ignoring punctuation formatting.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly spells the surname Amamiya without typos.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both casual phrasing choices are equally natural.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Uses the correct polite speech level (해요체) for Sogo.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Uses natural lodging terminology (조식 포함) and conversational phrasing.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Faithful translation of 收好 as securely tucked away.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Natural spoken dialogue without mixing written declarative forms.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"}\n]\n",
+  "duration_seconds": 198.88679,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14012,
+   "output_tokens": 30444,
+   "thinking_tokens": 30016,
+   "cache_read_tokens": 0,
+   "total_tokens": 44456
+  }
+ }
+}

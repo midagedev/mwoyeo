@@ -1,0 +1,36 @@
+{
+ "call": 35,
+ "try": 1,
+ "ids": [
+  "item-0028.2",
+  "item-0054.1",
+  "item-0025.1",
+  "item-0216.2",
+  "item-0041.1",
+  "item-0248.1",
+  "item-0199.2",
+  "item-0101.2",
+  "item-0082.1",
+  "item-0314.2",
+  "item-0128.2",
+  "item-0117.2",
+  "item-0290.1",
+  "item-0079.2",
+  "item-0094.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "133aa6d3-a653-4108-b5bc-30017fbe2a35",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'네 저우 이모' is unnatural between siblings; '걱정 마' is more natural.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'펠 박사님' is more respectful and natural than '펠 박사'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'By the way' fits the topic transition of '근데' better than 'But'.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 adds unnecessary Hanja in parentheses to dialogue.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'-겠네요' captures the reactive nuance of '那得...了' more naturally.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Ricia speaks to Saku in 반말; Translation 2 is correct.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'움직이면 안 되는' expresses 'must never move' much more naturally.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'동행하지 못해' better reflects the formal register of an attendant.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Sogo speaks in 해요체; Translation 1 correctly uses 해요체.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'알겠습니다' acknowledges an order ('Aye') much better than '예'.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Identical except for punctuation; equally good.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'가격 인하에 동의하지 않는' is more natural in business context.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 correctly preserves the 반말 speech level of 'なの?'.\"}\n]\n",
+  "duration_seconds": 185.502138,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13887,
+   "output_tokens": 25844,
+   "thinking_tokens": 25344,
+   "cache_read_tokens": 0,
+   "total_tokens": 39731
+  }
+ }
+}

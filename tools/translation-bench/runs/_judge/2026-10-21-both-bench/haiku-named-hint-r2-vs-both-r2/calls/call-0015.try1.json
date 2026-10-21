@@ -1,0 +1,36 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0064.1",
+  "item-0173.2",
+  "item-0324.1",
+  "item-0195.2",
+  "item-0208.1",
+  "item-0103.1",
+  "item-0331.2",
+  "item-0221.2",
+  "item-0184.2",
+  "item-0206.2",
+  "item-0142.2",
+  "item-0089.1",
+  "item-0012.2",
+  "item-0063.2",
+  "item-0016.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8f54d018-5cef-42a3-82b6-4dcaba0bacba",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly identifies third-person subject, despite wrong pronoun gender.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 as specified in the facts.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 transliterates the name properly without leftover Japanese text.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 and transliterates Aoife.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and equally good.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 left most of the sentence in Japanese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 uses natural Korean phrasing for paying for coolant.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 idiomatically translates signing a contract instead of literal stamping.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 accurately conveys not initiating conversation to the driver.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 correctly translates confirmation email instead of invitation email.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 avoids the inappropriate honorific infix -시- for a friend.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 to Rory.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations naturally and accurately convey the meaning in 반말.\"}\n]\n",
+  "duration_seconds": 158.95362,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14024,
+   "output_tokens": 23220,
+   "thinking_tokens": 22758,
+   "cache_read_tokens": 0,
+   "total_tokens": 37244
+  }
+ }
+}

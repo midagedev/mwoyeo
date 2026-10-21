@@ -1,0 +1,36 @@
+{
+ "call": 29,
+ "try": 1,
+ "ids": [
+  "item-0003.2",
+  "item-0286.1",
+  "item-0288.2",
+  "item-0169.2",
+  "item-0158.1",
+  "item-0200.2",
+  "item-0128.1",
+  "item-0029.2",
+  "item-0179.2",
+  "item-0059.2",
+  "item-0307.2",
+  "item-0273.1",
+  "item-0023.1",
+  "item-0154.2",
+  "item-0080.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d8002300-b01e-49d5-b4d0-fffb0c168f85",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More faithful to '濡れた' (wet) and '駆け込んできた' (came rushing in).\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'bribe with treats' accurately translates 꼬셔야지 without adding 'out'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly transliterates Tomasz to Korean based on the pronunciation guide.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"More faithfully captures the nuance of 'でも' (even while offline).\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Faithfully translates the question without adding an unprompted 'already'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'당분간' correctly translates 'for now', whereas '지금' means 'now'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'동행하지 못해' better fits the formal register of 'お供できず'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Localizes '〜さん' naturally for an English user guide instead of '-san'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translates '婷姐' into Korean rather than leaving raw Chinese characters.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate casual English.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Avoids inserting unnecessary parenthetical hanja into spoken dialogue.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Avoids referring to their father as '그 사람' and translates '可'.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Correctly uses 반말 as specified for 许诺 speaking to 陆明.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both are equally good; they differ only by punctuation.\"}\n]\n",
+  "duration_seconds": 123.604579,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13815,
+   "output_tokens": 17768,
+   "thinking_tokens": 17260,
+   "cache_read_tokens": 0,
+   "total_tokens": 31583
+  }
+ }
+}

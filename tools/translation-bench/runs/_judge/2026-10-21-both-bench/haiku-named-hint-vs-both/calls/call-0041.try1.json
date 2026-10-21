@@ -1,0 +1,36 @@
+{
+ "call": 41,
+ "try": 1,
+ "ids": [
+  "item-0296.1",
+  "item-0202.2",
+  "item-0096.2",
+  "item-0108.2",
+  "item-0011.1",
+  "item-0156.2",
+  "item-0304.1",
+  "item-0319.1",
+  "item-0324.2",
+  "item-0109.2",
+  "item-0216.1",
+  "item-0203.1",
+  "item-0060.2",
+  "item-0197.1",
+  "item-0321.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f5cf7d9c-9576-43da-b366-b4fce733af3f",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"\\\"Apparently\\\" contradicts asking directly; Translation 1 is more faithful to 하더라.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Rory is not Siobhan's sibling; calling her mother \\\"엄마\\\" is incorrect.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Rook must speak to Thorne in 합쇼체; Translation 2 correctly uses honorifics.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses designated term 메리골드 and natural spoken dialogue register.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Lysia speaks to Saku in 반말; Translation 2 uses the correct level.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 约好 as scheduling an appointment, not promising.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Pell is a ship's doctor, not 박사; \\\"두 시간씩\\\" is more natural.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly addresses Hervé, an old tutor, as 선생님.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"\\\"Get mixed up\\\" is more faithful to 헷갈려 than \\\"forget\\\".\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both mistranslate the subject; phrasing and romanization differences are equally acceptable.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 uses proper ship suffix -호 and natural dialogue ending -거든.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 avoids attaching subject honorific -시- to an inanimate keepsake.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"\\\"You needn't worry\\\" better captures the polite register of ご安心を.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"As landlord, Gareth shouldn't use subject honorific -시- (사세요) for the super.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Compound surname 万俟 is pronounced Mòqí; Translation 1 gets the name right.\"}\n]\n",
+  "duration_seconds": 232.00188,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14261,
+   "output_tokens": 37265,
+   "thinking_tokens": 36719,
+   "cache_read_tokens": 0,
+   "total_tokens": 51526
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 16,
+ "try": 2,
+ "ids": [
+  "item-0079.1",
+  "item-0112.1",
+  "item-0109.1",
+  "item-0167.2",
+  "item-0130.2",
+  "item-0040.2",
+  "item-0033.2",
+  "item-0325.1",
+  "item-0318.1",
+  "item-0135.1",
+  "item-0159.1",
+  "item-0067.2",
+  "item-0137.1",
+  "item-0328.1",
+  "item-0159.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "47408b41-c182-404e-a85d-edb92583448f",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 completes the truncated sentence instead of leaving English.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 specifies 요금 고지서 and avoids unnatural 벌써.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are faithful, accurate, and equally natural.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are identical except for an optional particle.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 romanizes Modakbul instead of leaving untranslated Korean.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly drops unnatural Japanese honorifics (-san) in English.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 mistakes Minato (湊) for the speaker Mina (미나).\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"가격 인하 is the proper business term for 降价.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"너 같은 사람을 둬서 translates lucky to have you accurately.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"두 분 모두 is grammatically natural and fluent in Korean.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Professor Han requires the honorific marker -시- (도착하신대).\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 localizes -san as Ms. instead of keeping -san.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 2 incorrectly uses 누나 for a female speaker.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 accurately says pack my stuff instead of everything.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Professor Han requires the honorific marker -시- (도착하신대).\"}\n]\n",
+  "duration_seconds": 229.914501,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13750,
+   "output_tokens": 35363,
+   "thinking_tokens": 34873,
+   "cache_read_tokens": 0,
+   "total_tokens": 49113
+  }
+ }
+}

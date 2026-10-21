@@ -1,0 +1,36 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0061.2",
+  "item-0069.1",
+  "item-0007.1",
+  "item-0049.2",
+  "item-0117.1",
+  "item-0236.2",
+  "item-0196.1",
+  "item-0165.1",
+  "item-0292.2",
+  "item-0262.2",
+  "item-0167.1",
+  "item-0218.1",
+  "item-0343.1",
+  "item-0147.1",
+  "item-0258.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ba34fe2b-4eaf-483a-9655-c0e0c5489c48",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 includes 'to explain', translating 説明します.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 distinguishes trying to book from succeeding.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'제외한' correctly translates leaving out, unlike '빼 둔'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Korean siblings sharing an aunt do not say '네 저우 이모'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'해천 씨 몫' accurately translates '那份' (share or portion).\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Preserves 'you' to clarify who merges the branch.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly uses 반말 between older brother and younger sister.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Rook speaks to Captain Thorne politely, not in 반말.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'민박으로 해요' and '예매' are more accurate and natural.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'다음다음 달' is standard Korean; '재내달' is not a word.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both 'in' and 'to' are equally natural and accurate.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"The two candidate translations are completely identical.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Titles used as direct address should be capitalized.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'선택하세요' is natural for conflict resolution, unlike '유지하세요'.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 2 incorrectly adds 'while we were away'.\"}\n]\n",
+  "duration_seconds": 160.939955,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13626,
+   "output_tokens": 22041,
+   "thinking_tokens": 21560,
+   "cache_read_tokens": 0,
+   "total_tokens": 35667
+  }
+ }
+}

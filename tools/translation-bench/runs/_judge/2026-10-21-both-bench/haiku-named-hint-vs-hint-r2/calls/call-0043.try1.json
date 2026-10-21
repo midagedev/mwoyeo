@@ -1,0 +1,36 @@
+{
+ "call": 43,
+ "try": 1,
+ "ids": [
+  "item-0327.1",
+  "item-0148.2",
+  "item-0263.2",
+  "item-0118.2",
+  "item-0162.1",
+  "item-0131.1",
+  "item-0043.2",
+  "item-0283.1",
+  "item-0209.1",
+  "item-0143.1",
+  "item-0235.1",
+  "item-0044.2",
+  "item-0003.1",
+  "item-0256.2",
+  "item-0151.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "750a349c-f11d-4525-908b-4727d641636b",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both convey the truncated line faithfully and read naturally.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"-니까 correctly precedes conjectural -을 거야, unlike -아서/어서.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Preserves the original two-sentence structure and scene-setting style faithfully.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"돌 관리 is much more natural in Korean than 돌을 돌보다.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"가본 적 있다던데 provides a natural, complete conversational ending.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Follows required 해요체 speech level and transliterates the name correctly.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Faithfully preserves the mid-word truncation instead of inventing an ending.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly translates the cat's name as Bori instead of Boris.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Appropriately retains the kanji in parentheses rather than raw hiragana.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"가격 인하 is the accurate business term and collocates naturally.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Correctly identifies the invited members as they, not you.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translates naturally into Korean instead of using awkward literal 원하셔.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"학회가 있다고 하셨어 is grammatically natural with the particle 에는.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Good that you're awake is far more idiomatic and natural.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"산에 찬성해요 uses the natural verb form rather than awkward copula.\"}\n]\n",
+  "duration_seconds": 225.22426,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13993,
+   "output_tokens": 30726,
+   "thinking_tokens": 30235,
+   "cache_read_tokens": 0,
+   "total_tokens": 44719
+  }
+ }
+}

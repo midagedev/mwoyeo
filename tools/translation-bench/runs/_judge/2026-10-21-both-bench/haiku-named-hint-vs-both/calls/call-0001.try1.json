@@ -1,0 +1,36 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0047.2",
+  "item-0172.2",
+  "item-0227.2",
+  "item-0153.2",
+  "item-0206.2",
+  "item-0277.1",
+  "item-0188.2",
+  "item-0140.1",
+  "item-0354.2",
+  "item-0302.1",
+  "item-0245.2",
+  "item-0060.1",
+  "item-0251.1",
+  "item-0186.2",
+  "item-0048.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3c82078a-9eda-4bca-983d-b314dd4819f1",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"뭘 is more natural than 무엇을 in casual chat.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Consistently lowercases both feature names instead of capitalizing only one.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"그래도 is much more natural in casual conversation than 하지만.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly identifies third-person subject rather than first person.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly refers to the invited member with 'they'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly uses the required 합쇼체 speech level.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'reach out to' is more faithful and natural for 문의하세요.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'home' and ', right?' capture the context and nuance better.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Faithful to source without hallucinating 'usually'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly uses 반말 speech level and natural phrasing.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Correctly uses 반말 speech level.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Better preserves the polite register of ご安心を.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both are equally natural and accurate translations.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'She's three' reads more naturally than the fragmented phrasing.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Does not redundantly include source kanji in the translation.\"}\n]\n",
+  "duration_seconds": 124.170687,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13733,
+   "output_tokens": 18990,
+   "thinking_tokens": 18540,
+   "cache_read_tokens": 0,
+   "total_tokens": 32723
+  }
+ }
+}

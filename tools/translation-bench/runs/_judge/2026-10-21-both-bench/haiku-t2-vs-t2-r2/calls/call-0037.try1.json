@@ -1,0 +1,36 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0056.2",
+  "item-0054.1",
+  "item-0025.1",
+  "item-0216.2",
+  "item-0041.1",
+  "item-0248.1",
+  "item-0199.2",
+  "item-0101.2",
+  "item-0082.1",
+  "item-0330.1",
+  "item-0128.2",
+  "item-0117.2",
+  "item-0336.1",
+  "item-0079.2",
+  "item-0094.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6e674b18-1da0-4b60-9af4-13bb758c56a5",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 naturally translates into English without keeping Japanese text.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 assumes an unstated male gender with 'Mr.'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both are identical except for minor punctuation and formatting differences.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 avoids falsely attributing the statement to the speaker.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Keeping 'Aoife' makes the pronunciation explanation coherent and sensible.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 preserves the river context contrasting with the mountain.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 incorrectly applies an honorific to an inanimate object.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 uses the required formal speech level (합쇼체).\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 with the ending '-하죠'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 faithfully includes '先' and fits the context better.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'편히 다녀오세요' is the natural Korean expression for using the restroom.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Retains 'Aoife' properly and translates 'lose it' more naturally.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"'Leave work' is more faithful to '퇴근' than 'head home'.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 completes the truncated word instead of leaving raw 'sta'.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'무슨 차를 우릴까' is more idiomatic and accurate for brewing tea.\"}\n]\n",
+  "duration_seconds": 135.819465,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13953,
+   "output_tokens": 20397,
+   "thinking_tokens": 19903,
+   "cache_read_tokens": 0,
+   "total_tokens": 34350
+  }
+ }
+}

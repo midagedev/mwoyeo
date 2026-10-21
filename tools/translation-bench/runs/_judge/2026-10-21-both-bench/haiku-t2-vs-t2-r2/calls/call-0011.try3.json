@@ -1,0 +1,36 @@
+{
+ "call": 11,
+ "try": 3,
+ "ids": [
+  "item-0172.2",
+  "item-0262.1",
+  "item-0087.2",
+  "item-0093.1",
+  "item-0068.2",
+  "item-0143.2",
+  "item-0331.2",
+  "item-0290.1",
+  "item-0326.1",
+  "item-0288.2",
+  "item-0250.2",
+  "item-0014.1",
+  "item-0114.2",
+  "item-0208.2",
+  "item-0032.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "46982fab-5e35-4f72-ba37-a4800a9b3826",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"말해봐 is more natural than the literal 계속 말해 봐.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"그곳 correctly translates anaphoric reference instead of 저기를.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Faithfully conveys the imperative command and pronoun rather than a suggestion.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Elderly speakers should not use honorific 시 on younger listeners.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Should we correctly captures the inclusive planning between coworkers.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"옮겨 주세요 is more natural and polite for 해요체 requests.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"그게 왜 브리지에 있어 is far more natural than contrastive 그건.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly avoids conflating hiroba with space, the term for workspace.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 is translated into Korean, while Translation 2 is not.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translates the name Karasuma instead of leaving Japanese kanji.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are identical except for quotation mark formatting.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"MoaLogis new hires is more idiomatic phrasing than New MoaLogis hires.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Correctly uses 저우 이모 as specified in the facts.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"It's handy is natural documentation English, avoiding awkward convenient.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Reviewed is more accurate and professional for approving reports than checked.\"}\n]\n",
+  "duration_seconds": 229.48488,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13685,
+   "output_tokens": 33650,
+   "thinking_tokens": 33165,
+   "cache_read_tokens": 0,
+   "total_tokens": 47335
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0275.2",
+  "item-0337.2",
+  "item-0168.2",
+  "item-0157.1",
+  "item-0017.2",
+  "item-0316.2",
+  "item-0102.1",
+  "item-0302.2",
+  "item-0186.2",
+  "item-0025.2",
+  "item-0014.2",
+  "item-0339.2",
+  "item-0310.1",
+  "item-0247.1",
+  "item-0132.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e89d0522-5fc4-4fb1-abaf-dac5a9d45c0a",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 as specified in the facts.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 avoids awkward translationese and reads much more naturally.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Spoken ending 싣고 있어 is much more natural than 싣고 있다.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"안심이 되네요 is natural Korean, whereas 안심이에요 is awkward translationese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 translates the honorific and reads more naturally in English.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 as specified in the facts.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the line into Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 as Siobhan speaks to Rory.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 as Hinata speaks to Takanashi.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 2 was left untranslated in Japanese.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations are accurate, fluent, and equally good.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 又 as again.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 preserves Modakbul which Translation 1 omitted.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 and has more natural phrasing.\"}\n]\n",
+  "duration_seconds": 186.922974,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13660,
+   "output_tokens": 29006,
+   "thinking_tokens": 28531,
+   "cache_read_tokens": 0,
+   "total_tokens": 42666
+  }
+ }
+}

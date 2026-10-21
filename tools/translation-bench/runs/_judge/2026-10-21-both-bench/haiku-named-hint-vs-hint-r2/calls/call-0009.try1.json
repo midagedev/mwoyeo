@@ -1,0 +1,36 @@
+{
+ "call": 9,
+ "try": 1,
+ "ids": [
+  "item-0214.2",
+  "item-0324.2",
+  "item-0047.2",
+  "item-0338.2",
+  "item-0332.2",
+  "item-0057.2",
+  "item-0130.2",
+  "item-0240.1",
+  "item-0077.1",
+  "item-0176.2",
+  "item-0084.1",
+  "item-0234.2",
+  "item-0330.2",
+  "item-0217.2",
+  "item-0254.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "583e10da-a901-4625-aacf-381c2485b653",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 contradicts the given pronunciation guide by writing 아오이프.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly identifies the subject as 'You' rather than 'We'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and correctly use the 해요체 level.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both 'bribe' and 'lure' are accurate and natural translations of 꼬셔야지.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Siobhan speaks to Gareth in 합쇼체, which Translation 1 correctly follows.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 is more natural; Translation 2's 둘이서 같이 is redundant.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 uses the ungrammatical phrasing 'have Chaeyul to do it'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 sounds more natural than Translation 2's awkward phrasing.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Zhou Ting speaks in 반말 to her friends, matching Translation 1.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Rook is an engineer, making Translation 1's 사령관님 inaccurate.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Jiu tells Seoyoon to rest, which Translation 2 mistranslates as first-person.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations are faithful, natural, and use the correct 반말 level.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말, which Translation 2 correctly uses.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 captures 'always a catch' accurately with 있기 마련이지.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Plural 'Quick Notes' correctly corresponds to decisions from multiple meetings.\"}\n]\n",
+  "duration_seconds": 142.22801,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13892,
+   "output_tokens": 23330,
+   "thinking_tokens": 22794,
+   "cache_read_tokens": 0,
+   "total_tokens": 37222
+  }
+ }
+}

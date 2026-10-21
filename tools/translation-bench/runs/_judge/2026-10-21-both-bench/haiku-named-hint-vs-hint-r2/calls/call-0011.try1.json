@@ -1,0 +1,36 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0142.2",
+  "item-0330.1",
+  "item-0201.1",
+  "item-0213.1",
+  "item-0297.2",
+  "item-0276.1",
+  "item-0014.1",
+  "item-0179.1",
+  "item-0087.1",
+  "item-0032.1",
+  "item-0256.1",
+  "item-0042.1",
+  "item-0164.1",
+  "item-0146.2",
+  "item-0030.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8ecdd31c-2985-48b3-b5b9-1ec25d5ae296",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"T2's '빼도록 하죠' is much more natural than '그만두기로 해요'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말; T1 correctly uses 반말.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"T2 naturally resolves the pronoun referring to father as '아빠'.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"T1 is faithful; T2 adds unstated 'while we were away'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"T1 failed to translate the Japanese text into Korean.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"T1 faithfully translates '用拼配' as '블렌딩으로' and preserves tone.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"T2's '물놀이하다가 추웠잖아' is much more natural Korean than '-느라'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"T1 avoids inserting Chinese characters in parentheses into dialogue.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are natural and faithfully convey the meaning.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"T1's '그러고 보니' correctly captures the discourse marker 'そうだ'.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"T2 better matches register and accurately translates '三天' and '你们'.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Facts specify Sogo uses 해요체; T1 correctly uses '설명드릴게요'.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"T2's '우리 것' naturally translates 'ours' and fits Git terminology.\"}\n]\n",
+  "duration_seconds": 138.043289,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13590,
+   "output_tokens": 21643,
+   "thinking_tokens": 21129,
+   "cache_read_tokens": 0,
+   "total_tokens": 35233
+  }
+ }
+}

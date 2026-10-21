@@ -1,0 +1,36 @@
+{
+ "call": 44,
+ "try": 1,
+ "ids": [
+  "item-0003.1",
+  "item-0256.2",
+  "item-0151.2",
+  "item-0120.2",
+  "item-0266.2",
+  "item-0101.1",
+  "item-0303.2",
+  "item-0226.2",
+  "item-0168.1",
+  "item-0238.2",
+  "item-0016.1",
+  "item-0308.1",
+  "item-0124.2",
+  "item-0343.2",
+  "item-0019.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6a44c4e4-8cd0-4015-99ec-272619e56c52",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 transliterates the Japanese name into Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 transliterates Tomasz using the provided pronunciation.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 as specified in the facts.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 is more faithful to the search context.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 avoids mistranscribing Aoife and translates more naturally.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 합쇼체 for Dex speaking to Thorne.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 transliterates the Chinese road name into Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 합쇼체 for Siobhan speaking to Gareth.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 for Hinata speaking to Takanashi.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 and avoids inappropriate kinship terms.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 translates naturally instead of mistranslating そうだ as 그러고 보니.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 adheres to the defined term Sticky.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 transliterates Takanashi instead of leaving kanji untranslated.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 correctly translates the speaker's first-person intent.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 appropriately uses polite speech and honorifics toward superiors.\"}\n]\n",
+  "duration_seconds": 180.739891,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13809,
+   "output_tokens": 27975,
+   "thinking_tokens": 27487,
+   "cache_read_tokens": 0,
+   "total_tokens": 41784
+  }
+ }
+}

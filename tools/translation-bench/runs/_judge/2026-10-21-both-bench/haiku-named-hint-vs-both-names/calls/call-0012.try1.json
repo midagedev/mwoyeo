@@ -1,0 +1,36 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0174.1",
+  "item-0269.1",
+  "item-0240.2",
+  "item-0234.2",
+  "item-0236.2",
+  "item-0087.1",
+  "item-0225.1",
+  "item-0365.1",
+  "item-0265.2",
+  "item-0334.2",
+  "item-0081.1",
+  "item-0185.1",
+  "item-0264.1",
+  "item-0076.1",
+  "item-0079.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dcc7b661-c037-44d5-b86e-e0f492039c44",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and equally good.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"A hot tub is a 풀장, not a 수영장 (swimming pool).\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations convey the meaning and context equally well.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Pell addresses Thorne informally; T2 adds 선장님 and clumsy '유일한 물건'.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both 깨어날 때가 왔구나 and 되었구나 are natural and faithful.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Thorne speaks to Rook in 해요체, correctly used in 1.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Xu Nuo speaks to Lu Ming in 반말; 2 is correct.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'Watch the Bureau' correctly translates 留守番; 'watch over' means guarding.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'두 시간씩' is much more natural here than '동안'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both versions are equally natural with or without the subject particle.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"T2 translates 'btw' naturally without awkward redundancy like '(참고로)'.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"T2 preserves the punchy, atmospheric visual novel scene-setting sentence structure.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'토요일에는 정오까지' accurately translates 'Saturdays till noon' and captures stairs.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Preserves the singular UI feature name 'Quick Note' as defined.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"T2 faithfully translates '又' as 'back down' based on context.\"}\n]\n",
+  "duration_seconds": 198.1561,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13950,
+   "output_tokens": 28809,
+   "thinking_tokens": 28293,
+   "cache_read_tokens": 0,
+   "total_tokens": 42759
+  }
+ }
+}

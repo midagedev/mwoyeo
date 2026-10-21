@@ -1,0 +1,36 @@
+{
+ "call": 13,
+ "try": 1,
+ "ids": [
+  "item-0182.1",
+  "item-0268.1",
+  "item-0158.2",
+  "item-0217.1",
+  "item-0142.1",
+  "item-0185.2",
+  "item-0197.2",
+  "item-0105.2",
+  "item-0205.1",
+  "item-0265.1",
+  "item-0173.2",
+  "item-0115.2",
+  "item-0172.2",
+  "item-0012.2",
+  "item-0063.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "80be7bd5-99b0-49d9-95f6-39d5ba05d9da",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Fits the context of relief better than thanking Hikaru.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Contraction '건' is more natural than '것은' in spoken dialogue.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate synonyms.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Accurately translates the idiom 'there's always a catch'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'빼도록 하죠' is much more natural than '그만두기로 해요' here.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both polite endings are acceptable and natural in tutorial documentation.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'잘하세요?' appropriately uses the honorific suffix '-시-' toward a senior.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'얘' is natural, whereas '꼬마야' incorrectly treats an adult as a child.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Avoids assuming an unstated gender prefix like 'Mr.'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'무슨 일 있으세요?' is the natural idiom when someone requests leave.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'그 후에' correctly conveys sequential order, unlike '나중에' (later).\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Correctly asks about the specific superintendent's availability on weekends.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Faithfully translates 'シュザンヌ様' without inappropriately adding '공주' (princess).\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'sections' is more natural than 'parts' in document app contexts.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'shadowing' is the correct corporate term; 'field trip' implies school excursions.\"}\n]\n",
+  "duration_seconds": 106.498937,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13604,
+   "output_tokens": 17225,
+   "thinking_tokens": 16718,
+   "cache_read_tokens": 0,
+   "total_tokens": 30829
+  }
+ }
+}

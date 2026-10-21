@@ -1,0 +1,35 @@
+{
+ "call": 7,
+ "try": 1,
+ "ids": [
+  "item-0048.2",
+  "item-0040.1",
+  "item-0041.1",
+  "item-0031.1",
+  "item-0050.1",
+  "item-0012.2",
+  "item-0013.1",
+  "item-0038.2",
+  "item-0033.2",
+  "item-0052.2",
+  "item-0030.2",
+  "item-0050.2",
+  "item-0036.2",
+  "item-0029.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8cad0e65-09bc-4e1e-9413-f2164c7bfdb3",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Natural English translation without awkward untranslated Japanese honorifics.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly uses the required 해요체 speech level.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly uses 반말 and the informal first-person pronoun.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Preserves statement meaning instead of mistranslating it into a question.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Omitting the redundant pronoun '제가' reads much more naturally.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Avoids the disrespectful 반말 pronoun '너' for a polite relationship.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both terms are equally valid Korean translations of 高铁.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly renders character name and uses required 해요체 speech level.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"More faithful and natural translation of 'let him in'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly translates 寿星 as birthday person rather than party.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Correctly uses the required 반말 speech level.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Omitting the redundant pronoun '제가' reads much more naturally.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Consistently uses the required 합쇼체 speech level.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Correctly uses past tense to reflect past duration of stay.\"}\n]\n",
+  "duration_seconds": 146.537039,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13729,
+   "output_tokens": 22189,
+   "thinking_tokens": 21754,
+   "cache_read_tokens": 0,
+   "total_tokens": 35918
+  }
+ }
+}

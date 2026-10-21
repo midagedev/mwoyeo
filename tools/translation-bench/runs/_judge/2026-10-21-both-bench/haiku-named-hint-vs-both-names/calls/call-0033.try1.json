@@ -1,0 +1,36 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0187.1",
+  "item-0252.2",
+  "item-0226.1",
+  "item-0066.2",
+  "item-0030.2",
+  "item-0164.2",
+  "item-0024.1",
+  "item-0021.2",
+  "item-0348.2",
+  "item-0307.2",
+  "item-0004.1",
+  "item-0150.1",
+  "item-0324.2",
+  "item-0313.1",
+  "item-0170.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f79759c3-d39a-49fc-9f72-50af3f5779c3",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'Reach out to' is more faithful and natural for 문의하세요.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Identical meaning; formatting and capitalization differences are ignored.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"1 faithfully translates 水の底 as bottom (밑바닥).\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"1 is natural; '자' in 2 sounds awkward for customer service.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"The two candidate translations are completely identical.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"1 fits first-day schedule; 2 adds unprompted 'usually'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'보자' correctly captures the suggestive proposal of 看看...吧.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'Leave your umbrella' is more idiomatic in English.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Suzanne speaks to Hervé in 해요체; 2 uses correct speech level.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"2 cleanly translates without retaining unnecessary Japanese text.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both incorrectly use 언니 for a male speaker.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"1 faithfully translates まだ新人 as 'still a rookie'.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"1 correctly translates 水鏡 as 물거울 and さん as 님.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"1 correctly uses 해요체 when addressing Aunt Zhou.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"1 uses standard numerals and a complete sentence ending.\"}\n]\n",
+  "duration_seconds": 185.479534,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13752,
+   "output_tokens": 29614,
+   "thinking_tokens": 29147,
+   "cache_read_tokens": 0,
+   "total_tokens": 43366
+  }
+ }
+}

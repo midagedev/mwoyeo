@@ -1,0 +1,36 @@
+{
+ "call": 35,
+ "try": 1,
+ "ids": [
+  "item-0347.1",
+  "item-0181.1",
+  "item-0175.2",
+  "item-0067.1",
+  "item-0023.2",
+  "item-0189.1",
+  "item-0353.2",
+  "item-0039.2",
+  "item-0325.1",
+  "item-0070.2",
+  "item-0164.1",
+  "item-0292.1",
+  "item-0330.1",
+  "item-0247.2",
+  "item-0299.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4e348613-19d0-4861-8cd1-acca1e1d8262",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 faithfully translates '以前の状態' as 'an earlier state'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly translates a direct statement without hearsay '-대'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 as Lin Yuan speaks to his sister.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural in Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly uses Korean honorifics for father and grandfather.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 합쇼체 as Rook speaks to Captain Thorne.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translates the prohibition faithfully and avoids slang '까먹다'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 uses the correct verb form '찬성해요' with '산에'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 naturally expresses completing a contract rather than an ordeal.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly renders wearing safety shoes as the attendant condition.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 does not add the unsupported word 'usually'.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 uses natural Korean idiom instead of literal '너를 가져서'.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 uses natural phrasing, avoiding awkward phrasing in Translation 2.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 as Takanashi speaks to Kiryu.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 uses the more natural phrasing 'come back'.\"}\n]\n```\n",
+  "duration_seconds": 142.918398,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13880,
+   "output_tokens": 23147,
+   "thinking_tokens": 22644,
+   "cache_read_tokens": 0,
+   "total_tokens": 37027
+  }
+ }
+}

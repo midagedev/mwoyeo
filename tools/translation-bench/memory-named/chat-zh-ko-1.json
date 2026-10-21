@@ -1,0 +1,9 @@
+{
+ "entities": [
+  {"name": "周婷", "reading": "Zhōu Tíng", "dst": "주정", "gender": "female", "role": "friend, organizer", "speaks_to": {"陆明": "반말", "许诺": "반말"}},
+  {"name": "陆明", "reading": "Lù Míng", "dst": "루밍", "gender": "male", "role": "friend", "speaks_to": {"周婷": "해요체", "许诺": "반말"}},
+  {"name": "许诺", "reading": "Xǔ Nuò", "dst": "쉬눠", "gender": "female", "role": "friend", "speaks_to": {"周婷": "해요체", "陆明": "반말"}}
+ ],
+ "window": {"title": "十一厦门行 (3)", "app": "WeChat", "category": "Social Networking"},
+ "terms": [{"src": "打卡", "dst": "인증샷"}]
+}

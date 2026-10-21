@@ -1,0 +1,36 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0200.1",
+  "item-0315.2",
+  "item-0109.1",
+  "item-0231.1",
+  "item-0268.2",
+  "item-0292.1",
+  "item-0111.2",
+  "item-0306.2",
+  "item-0279.1",
+  "item-0078.2",
+  "item-0227.2",
+  "item-0245.2",
+  "item-0296.1",
+  "item-0077.2",
+  "item-0146.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "86d91158-0ab5-4a32-8f4c-3a96e2b8ed47",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"전 and 저는 are interchangeable contractions; both are equally good.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"싸네요 is much more natural than 저렴하네요 in casual chat.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Xu Nuo speaks to Lu Ming using 반말, matching facts.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"늙은이 is natural self-reference for an elderly character.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"반차를 쓰다 is the natural and idiomatic Korean collocation.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"연락해 볼게요 accurately translates chase and uses the correct particle.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Punctuation difference only; both are equally valid English.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"토마시 correctly reflects the specified pronunciation TOH-mash.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Identical except terminal punctuation; equally good ignoring formatting.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Post is the natural verb for sharing intros in chat.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"픽업 와 달래 is natural Korean and avoids awkward calques.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"쉬잔 님 faithfully translates シュザンヌ様 without adding unmentioned titles.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"三成 means three parts in ten, not three shares.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"병합해 들어오는 브랜치 accurately renders merging in.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"싫어해 accurately translates the simple present statement without extra endings.\"}\n]\n",
+  "duration_seconds": 160.703373,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13766,
+   "output_tokens": 23953,
+   "thinking_tokens": 23476,
+   "cache_read_tokens": 0,
+   "total_tokens": 37719
+  }
+ }
+}

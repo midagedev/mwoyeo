@@ -1,0 +1,36 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0304.2",
+  "item-0089.2",
+  "item-0336.1",
+  "item-0058.2",
+  "item-0312.2",
+  "item-0262.1",
+  "item-0137.2",
+  "item-0196.2",
+  "item-0217.1",
+  "item-0046.2",
+  "item-0233.2",
+  "item-0122.2",
+  "item-0205.2",
+  "item-0207.2",
+  "item-0245.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ddc26216-38be-4380-a1bb-e073483971b9",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Doctor Pell is a ship doctor, and '두 시간씩' is more natural.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both 'if' and 'when' are equally accurate and natural here.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Candidate 1 completes the sentence naturally instead of cutting off mid-word.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Candidate 1 avoids assuming an unstated gender unlike 'Mr.' in 2.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Candidate 2 transliterates Tomasz as '토마시' per the pronunciation guide.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Candidate 2 follows the defined term 'Shijie' and correct kinship term.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Candidate 1 preserves the platform name and impersonal instructional register.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Candidate 1 correctly uses 반말 when speaking to Xu Nuo.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Candidate 1 correctly uses 반말 toward Siobhan while honoring her mother.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Candidate 2 renders the name naturally without clumsy honorifics.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Candidate 1 correctly uses '아메미야' as emphasized in the context.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Candidate 2 uses domain-appropriate '무슨 차' and correct spacing.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Candidate 2 romanizes the name instead of leaving Korean script.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Candidate 1 translates '濡れた' faithfully as 'wet' rather than 'dripping'.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Candidate 1 correctly uses 반말 when addressing Rory.\"}\n]\n```\n",
+  "duration_seconds": 123.674837,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13770,
+   "output_tokens": 19427,
+   "thinking_tokens": 18911,
+   "cache_read_tokens": 0,
+   "total_tokens": 33197
+  }
+ }
+}

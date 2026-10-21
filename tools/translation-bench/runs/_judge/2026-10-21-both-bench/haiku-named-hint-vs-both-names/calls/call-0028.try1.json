@@ -1,0 +1,36 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0213.1",
+  "item-0071.1",
+  "item-0121.2",
+  "item-0116.1",
+  "item-0358.2",
+  "item-0250.2",
+  "item-0268.2",
+  "item-0017.1",
+  "item-0183.1",
+  "item-0307.1",
+  "item-0280.1",
+  "item-0273.2",
+  "item-0262.1",
+  "item-0035.2",
+  "item-0054.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "59aabdbf-00b6-4bb4-9433-dc7a36c1f060",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Captures 约好 as scheduling an appointment rather than making a promise.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both 분명 and 분명히 are equally natural and accurate translations.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Old Mr. Takanashi is more natural and respectful than Old Takanashi.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Faithfully translates the pronoun that as 그걸, avoiding ambiguity.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 is a complete sentence, avoiding an awkward fragment.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly uses 반말 and accurately translates the speaker's meaning.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"기침은 나쁜 거야 is much more natural Korean than 기침은 나빠.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"이야기 and 얘기 are interchangeable and equally natural.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Correctly uses her for Akira, who is female in facts.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Cleanly translates without unnecessarily retaining the Japanese source word.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"My brother reads much more naturally in casual English.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"검을 겨눈 채 accurately captures the combat stance of 構え.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Post is the standard, natural verb for chat and messaging channels.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Explicitly clarifies him as 기사님 with appropriate context and respect.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both 감싸는 and 감싸고 있는 are equally natural and accurate.\"}\n]\n",
+  "duration_seconds": 123.394856,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13984,
+   "output_tokens": 18399,
+   "thinking_tokens": 17917,
+   "cache_read_tokens": 0,
+   "total_tokens": 32383
+  }
+ }
+}

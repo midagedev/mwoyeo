@@ -1,0 +1,36 @@
+{
+ "call": 33,
+ "try": 2,
+ "ids": [
+  "item-0020.1",
+  "item-0163.2",
+  "item-0154.1",
+  "item-0006.1",
+  "item-0247.1",
+  "item-0080.2",
+  "item-0180.1",
+  "item-0092.2",
+  "item-0234.1",
+  "item-0122.2",
+  "item-0286.2",
+  "item-0237.1",
+  "item-0313.1",
+  "item-0152.1",
+  "item-0317.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e52475f7-c135-42f0-b172-6eb0563f995e",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"\\\"~이라는\\\" reads much more naturally than passive translationese \\\"~이라고 불리는\\\".\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly uses the singular female pronoun \\\"her\\\" for the pet dog.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"\\\"호타루 건\\\" is natural Korean business phrasing unlike the calque \\\"호타루 분\\\".\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are equally accurate, natural, and appropriate in Git context.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Much more natural and concise instructional style for an onboarding guide.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"\\\"입에 발린 말\\\" is the natural Korean idiomatic equivalent of the phrase.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are equally natural, accurate, and faithful to the original.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Correctly uses the required glossary term \\\"마정석\\\" for 魔石.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correctly uses Akira's title to maintain proper professional register.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are equally natural, polite, and faithful in business context.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean, while Translation 1 remains in Japanese.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Uses standard Korean \\\"네가\\\" and more natural, idiomatic phrasing.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Correctly uses 반말, matching Dex's established speech level to Rook.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Uses the title \\\"선장\\\" and avoids disrespectful pronoun \\\"걔\\\" for a superior.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both phrasing options are equally clear, natural, and accurate.\"}\n]\n",
+  "duration_seconds": 222.63698,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13707,
+   "output_tokens": 33484,
+   "thinking_tokens": 32974,
+   "cache_read_tokens": 0,
+   "total_tokens": 47191
+  }
+ }
+}

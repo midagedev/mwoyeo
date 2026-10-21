@@ -1,0 +1,1 @@
+{"started": "2026-10-21T09:41:41+0900", "pair": "/tmp/bothbench/judge/noise-haiku", "model": "gemini-3.8-flash-high", "batch": 15, "jobs": 3, "seed": 11, "tries": 3, "max_items": 0, "prompts": 692, "calls": 47}

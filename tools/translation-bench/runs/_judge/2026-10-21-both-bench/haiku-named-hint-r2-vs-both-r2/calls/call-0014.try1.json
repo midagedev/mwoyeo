@@ -1,0 +1,36 @@
+{
+ "call": 14,
+ "try": 1,
+ "ids": [
+  "item-0292.1",
+  "item-0194.2",
+  "item-0017.2",
+  "item-0155.2",
+  "item-0217.2",
+  "item-0146.1",
+  "item-0196.2",
+  "item-0025.2",
+  "item-0014.2",
+  "item-0158.2",
+  "item-0195.1",
+  "item-0224.2",
+  "item-0266.1",
+  "item-0192.1",
+  "item-0145.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6aa7450a-ba6a-4e58-95c9-a6ee6071845c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates 找房子 naturally as 숙소 instead of literal 방.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses 해요체 appropriate for addressing guild master Tessai.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Faithful to the original without adding unprompted 함께.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the line completely untranslated in Japanese.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Avoids using spaces which conflicts with the defined term Space.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both options are equally natural and accurate formal business Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correctly uses 반말 for Lin Yuan speaking to his sister.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly uses second person you for an onboarding guide.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Correctly uses the singular pronoun I instead of we.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Faithfully captures the nuance of でも as even while offline.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Correctly uses 반말 and translates the English name Aoife.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Forensic is the standard adjective form modifying results.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Preserves the predicate structure rather than leaving an unfinished connective.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Avoids the incorrect transliteration 아오이프 despite the pronunciation guide.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translates 助かります naturally as an expression of gratitude.\"}\n]\n```\n",
+  "duration_seconds": 179.136471,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13727,
+   "output_tokens": 25985,
+   "thinking_tokens": 25518,
+   "cache_read_tokens": 0,
+   "total_tokens": 39712
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 42,
+ "try": 1,
+ "ids": [
+  "item-0256.2",
+  "item-0151.2",
+  "item-0120.2",
+  "item-0266.2",
+  "item-0101.1",
+  "item-0303.2",
+  "item-0226.2",
+  "item-0168.1",
+  "item-0238.2",
+  "item-0016.1",
+  "item-0308.1",
+  "item-0124.2",
+  "item-0326.2",
+  "item-0019.1",
+  "item-0031.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "54ab5211-1fac-4111-85ad-8271f8dc91a1",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More faithful to the adversative 'but' and reported speech.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are accurate and differ only in contraction and punctuation.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both are natural, accurate translations with identical speech level.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 left the Japanese text completely untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'움직이면 안 되는' is more natural Korean than '움직이지 않아야 하는'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly uses the required 해요체 speech level instead of 반말.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both share the same naming error and are otherwise equivalent.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'Old Man Takanashi' is much more natural than 'Old Takanashi'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Uses gender-neutral 'they' since the person's gender is unspecified.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both 'the phones' and 'the phone' are natural translations.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Correctly uses 반말 as specified in the speaker facts.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both 'training on' and 'training for' are equally good.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'Casual chat' better matches the professional register of onboarding documentation.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Faithfully captures the necessary condition nuance of '才算'.\"}\n]\n",
+  "duration_seconds": 105.559838,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13520,
+   "output_tokens": 15609,
+   "thinking_tokens": 15133,
+   "cache_read_tokens": 0,
+   "total_tokens": 29129
+  }
+ }
+}

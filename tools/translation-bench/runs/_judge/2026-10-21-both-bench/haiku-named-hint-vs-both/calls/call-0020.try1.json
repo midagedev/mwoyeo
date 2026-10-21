@@ -1,0 +1,36 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0281.2",
+  "item-0008.1",
+  "item-0125.2",
+  "item-0196.1",
+  "item-0302.2",
+  "item-0174.1",
+  "item-0188.1",
+  "item-0228.2",
+  "item-0010.2",
+  "item-0339.2",
+  "item-0130.1",
+  "item-0090.1",
+  "item-0005.1",
+  "item-0266.1",
+  "item-0190.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c245c2ce-0793-42df-a752-8a2274cb0720",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Follows specified term '선장' for Captain.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'Powers of observation' accurately and naturally translates 観察眼.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses correct loanword spelling '브리지' and natural Korean '공구 상자'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Lu Ming speaks to Xu Nuo in banmal.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Xu Nuo uses banmal with Lu Ming and avoids unnatural '그녀'.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Reach out to' is a more accurate translation of 문의하세요.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Takanashi speaks to Hinata in banmal, matching ~だな.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"'Folded' and 'folded up' are equally natural and accurate here.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"'함께' and '같이' are synonymous and equally good.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Maintains consistent haeyo-che and flows much more naturally.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"-(으)니까 is grammatically required before conjectural -(으)ㄹ 거야.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Refers to older friend 婷姐 naturally as '언니'.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'Your cat' correctly identifies whose cat is meant.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both 'handy' and 'convenient' accurately translate 便利です here.\"}\n]\n",
+  "duration_seconds": 124.557835,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13858,
+   "output_tokens": 17975,
+   "thinking_tokens": 17489,
+   "cache_read_tokens": 0,
+   "total_tokens": 31833
+  }
+ }
+}

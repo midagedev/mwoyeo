@@ -1,0 +1,36 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0207.2",
+  "item-0256.1",
+  "item-0050.1",
+  "item-0050.2",
+  "item-0230.2",
+  "item-0212.1",
+  "item-0342.1",
+  "item-0018.2",
+  "item-0185.1",
+  "item-0077.2",
+  "item-0237.2",
+  "item-0196.1",
+  "item-0086.1",
+  "item-0042.2",
+  "item-0317.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ea54bc85-1a32-4c35-a1a0-809d9e059745",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 as Rory speaks to Siobhan.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 transliterates Tomasz to 토마시 instead of leaving Latin script.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"One-line notes is more faithful to ひとこと than comments.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"One-line notes is more faithful to ひとこと than comments.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 reads more naturally and avoids the awkward together with.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"이미 neutrally translates もう, whereas 벌써 implies unexpected surprise.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural renderings of the source.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly translates ticket booking and the reminder phrasing.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Chinese.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 translates 覃长老 to Elder Qín instead of Chinese characters.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 uses standard 네가 and translates 你来 much more naturally.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 captures the suggestive nuance of 吧 and punctuation correctly.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 1 uses wrong speech level and inverts who was volunteered.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both candidate translations are accurate, natural, and equally good.\"}\n]\n",
+  "duration_seconds": 135.294706,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13480,
+   "output_tokens": 20422,
+   "thinking_tokens": 19944,
+   "cache_read_tokens": 0,
+   "total_tokens": 33902
+  }
+ }
+}

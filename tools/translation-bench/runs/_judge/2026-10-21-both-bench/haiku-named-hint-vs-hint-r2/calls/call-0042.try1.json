@@ -1,0 +1,36 @@
+{
+ "call": 42,
+ "try": 1,
+ "ids": [
+  "item-0193.1",
+  "item-0241.2",
+  "item-0027.2",
+  "item-0108.1",
+  "item-0110.1",
+  "item-0001.1",
+  "item-0009.2",
+  "item-0035.1",
+  "item-0198.2",
+  "item-0149.2",
+  "item-0314.2",
+  "item-0206.1",
+  "item-0056.1",
+  "item-0289.1",
+  "item-0036.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "800cb55b-0247-4588-8e16-591e2f08ff83",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"2 correctly translates 再来月 as month after next, not next month-end.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'Training on' is the idiomatic preposition for learning a system.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'Old Man Takanashi' naturally captures 老人 for an elderly person.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"2 is more faithful; 'intact' mistranslates being locked as undamaged.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"2 correctly maps '청소' to 'clean it' and '다' to 'everything'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'Direct handoff' accurately translates 직거래; 'direct trade' is Konglish.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"2 avoids incorrectly using 'we' for Seoyoon's personal sofa.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both '노트북에' and '노트북으로' are equally natural and accurate.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are identical except punctuation and share the same speech level.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"1 faithfully translates 'our' (우리), preserving the contrast with 'his'.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are identical except for an optional comma.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"1 avoids misgendering Takanashi, who is an elderly man.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"'그래' naturally fits the context, whereas '그렇지' sounds unnatural.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'Saved up' accurately conveys 攒下的; 'hoarded' wrongly implies greed.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"1 correctly transcribes Zēng Lán as 쩡란 instead of Sino-Korean 증란.\"}\n]\n",
+  "duration_seconds": 162.315477,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14034,
+   "output_tokens": 21770,
+   "thinking_tokens": 21246,
+   "cache_read_tokens": 0,
+   "total_tokens": 35804
+  }
+ }
+}

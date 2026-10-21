@@ -1,0 +1,36 @@
+{
+ "call": 48,
+ "try": 1,
+ "ids": [
+  "item-0365.2",
+  "item-0203.2",
+  "item-0305.2",
+  "item-0022.1",
+  "item-0325.2",
+  "item-0356.1",
+  "item-0276.2",
+  "item-0047.1",
+  "item-0073.2",
+  "item-0156.1",
+  "item-0229.2",
+  "item-0049.1",
+  "item-0096.1",
+  "item-0315.1",
+  "item-0323.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "330f8070-ce80-4be5-bd4f-c49cbda57985",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'watch' accurately translates 留守番; 'watch over' implies protection.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"The guide uses them as examples, not examples provided by them.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both '우리 것' and '우리 버전' accurately translate 'ours'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'Pinning ... is handy' reads much more naturally than 'It's convenient to'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'really done' fits completing a contract; 'really over' implies an ordeal.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Present tense 'receive' correctly fits onboarding instructions for future steps.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both '긁었다' and '긁적였다' are natural translations of 頭をかいた.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 固めさせろ and removes the raw furigana.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 確認のメール as confirmation email, not invitation.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 translates 鼓浪屿 into Korean instead of leaving Chinese characters.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'여러분이' is natural in Korean tutorials; '당신이' is awkward translationese.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Consistently uses 해요체, matching Takanashi's speech level to Kiryu.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both 'put' and 'wrote' are natural for filling out a form.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'발음은' reads much more naturally before the subject particle than '로 발음'.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both 'walked off' and 'walked away' are natural, accurate translations.\"}\n]\n",
+  "duration_seconds": 96.148387,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13535,
+   "output_tokens": 13983,
+   "thinking_tokens": 13451,
+   "cache_read_tokens": 0,
+   "total_tokens": 27518
+  }
+ }
+}

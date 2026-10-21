@@ -1,0 +1,36 @@
+{
+ "call": 29,
+ "try": 1,
+ "ids": [
+  "item-0133.2",
+  "item-0336.2",
+  "item-0139.2",
+  "item-0119.1",
+  "item-0113.2",
+  "item-0118.1",
+  "item-0314.2",
+  "item-0178.2",
+  "item-0189.1",
+  "item-0100.1",
+  "item-0251.2",
+  "item-0187.1",
+  "item-0346.1",
+  "item-0066.2",
+  "item-0030.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fb7e8343-9cf7-48eb-a495-1cdb6377f2e9",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Gareth speaks in 해요체; 2 correctly uses 해요체.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"1 faithfully translates 퇴근 as leaving work rather than heading home.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"1 faithfully translates 行きたい as 가고 싶어요.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Rook speaks respectfully to Captain Thorne; 2 uses honorifics.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"1 transliterates Tomasz to 토마시 based on the pronunciation context.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"1 is more natural and concise documentation phrasing than 2.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"2 naturally translates 老师傅 as 장인 instead of literal 노사부.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"2 translates the sibling banter idiomatically with 가르치려 드네.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"1 accurately translates 盒 as 상자 rather than 개.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both share the 형 error and convey the line equally well.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"1 translates into English, whereas 2 leaves Korean text untranslated.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"1 correctly translates 这批货 as 이번 물량 in harvest context.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally in casual chat context.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"2 naturally translates ああ as 그래 and 来たぞ as 왔다.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"2 has natural Korean syntax without translationese phrasing like 때문입니다.\"}\n]\n",
+  "duration_seconds": 202.960233,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13676,
+   "output_tokens": 30549,
+   "thinking_tokens": 30066,
+   "cache_read_tokens": 0,
+   "total_tokens": 44225
+  }
+ }
+}

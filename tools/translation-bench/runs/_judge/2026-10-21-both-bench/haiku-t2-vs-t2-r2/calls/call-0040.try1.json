@@ -1,0 +1,36 @@
+{
+ "call": 40,
+ "try": 1,
+ "ids": [
+  "item-0109.2",
+  "item-0216.1",
+  "item-0203.1",
+  "item-0060.2",
+  "item-0197.1",
+  "item-0309.1",
+  "item-0068.1",
+  "item-0098.2",
+  "item-0261.2",
+  "item-0230.1",
+  "item-0097.1",
+  "item-0287.1",
+  "item-0091.2",
+  "item-0250.1",
+  "item-0345.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "42e5a2e2-2072-4c49-a8a2-0b9086be9c3c",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"'겨눈 채' captures the continuous stance more naturally than '겨누고'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"T1 avoids falsely attributing 'saying three days' to the speaker.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"T1 preserves correct present tense and accurately translates '母の形見'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"T1 uses required 해요체 speech level and translates the name.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Pouches' and 'all the best' are more idiomatic and genre-appropriate.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"T2 avoids duplicating the person's name in parentheses.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Should we' correctly reflects the joint plan to invite Subin.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'뵀어요' uses the proper Korean honorific for meeting a professor.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"T1 correctly identifies who came to investigate and transliterates the name.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'With' is idiomatic; 'together with' incorrectly implies Eom is also reviewed.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'Experience report' correctly translates '체험 보고서' in this onboarding context.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'3:2:1 비율로' is the natural Korean expression for blend ratios.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are identical except for an optional comma.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Single quotes are standard Korean punctuation; corner brackets are Japanese.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'품의를 올리다' is the standard Korean business collocation for '稟議を回す'.\"}\n]\n",
+  "duration_seconds": 168.114245,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13792,
+   "output_tokens": 28096,
+   "thinking_tokens": 27587,
+   "cache_read_tokens": 0,
+   "total_tokens": 41888
+  }
+ }
+}

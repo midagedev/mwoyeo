@@ -1,0 +1,36 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0272.1",
+  "item-0262.1",
+  "item-0221.2",
+  "item-0028.1",
+  "item-0247.2",
+  "item-0076.1",
+  "item-0218.1",
+  "item-0228.1",
+  "item-0111.2",
+  "item-0277.2",
+  "item-0092.1",
+  "item-0112.1",
+  "item-0320.2",
+  "item-0190.1",
+  "item-0184.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d7d8fe8e-ecf1-4836-af12-e34159fc27f0",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"T2 correctly translates \\\"好的\\\" and \\\"很紧\\\" without claiming tickets already sold out.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Identical except for punctuation, which instructions say to ignore.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"T2 accurately reflects \\\"~ておきます\\\" as \\\"기억해 두겠습니다\\\" and sounds more natural.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and convey the exact same meaning.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"T1 preserves \\\"Modakbul\\\", which T2 completely omitted.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both modal forms (\\\"she'd\\\" and \\\"she'll\\\") are natural and equally valid here.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"T2 correctly uses 반말 and the correct name \\\"해천\\\".\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"T2 accurately translates the past progressive context and captures \\\"还\\\" as \\\"아직\\\".\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Identical except for punctuation, which should be ignored.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"T1 uses natural English (\\\"come back\\\") instead of awkward phrasing (\\\"come again\\\").\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"T1 is natural Korean; T2 uses awkward, literal translationese (\\\"차가운 것뿐이라면\\\").\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"T1 uses natural phrasing and standard lodging terminology (\\\"조식 포함\\\").\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"T1 completely mistranslates the person's name as \\\"아이핀\\\".\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both fail to read 湊 as \\\"소우\\\" and contain Romaji artifacts.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both \\\"on the floor\\\" and \\\"on site\\\" are natural and accurate.\"}\n]\n",
+  "duration_seconds": 156.180392,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14160,
+   "output_tokens": 24376,
+   "thinking_tokens": 23839,
+   "cache_read_tokens": 0,
+   "total_tokens": 38536
+  }
+ }
+}

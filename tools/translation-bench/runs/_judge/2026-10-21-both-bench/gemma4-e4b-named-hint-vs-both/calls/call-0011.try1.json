@@ -1,0 +1,36 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0012.2",
+  "item-0019.1",
+  "item-0039.2",
+  "item-0058.1",
+  "item-0013.1",
+  "item-0080.1",
+  "item-0061.2",
+  "item-0066.2",
+  "item-0024.2",
+  "item-0025.1",
+  "item-0076.1",
+  "item-0066.1",
+  "item-0083.2",
+  "item-0060.2",
+  "item-0072.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b7147900-cd0a-4b15-b58c-86dd2919d732",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both '고속철도' and '고속열차' are equally acceptable here.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'응' is much more natural than '아아' in Korean.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both fail speech level; differ only by punctuation.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 is much more natural Korean.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 mistakenly adds '씨' to cafe name.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 reads more naturally without '-san'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Properly separates sentences with a period.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Dex speaks to Rook in 반말, making '너' appropriate.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'I know' is much more natural than 'Right'.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Equally good; only difference is an optional comma.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 properly separates sentences with a period.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Gets character name and speech level (해요체) right.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'in Hearth' is more natural for a channel.\"}\n]\n",
+  "duration_seconds": 187.073661,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13951,
+   "output_tokens": 28403,
+   "thinking_tokens": 27954,
+   "cache_read_tokens": 0,
+   "total_tokens": 42354
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0201.1",
+  "item-0259.1",
+  "item-0334.1",
+  "item-0033.2",
+  "item-0040.1",
+  "item-0332.1",
+  "item-0242.2",
+  "item-0115.2",
+  "item-0347.2",
+  "item-0007.2",
+  "item-0180.2",
+  "item-0352.1",
+  "item-0296.1",
+  "item-0330.2",
+  "item-0277.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9771c1b2-d15e-489b-8106-92e65deeb430",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Avoids assuming gender (Mr.) when no gender is specified.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"알았어 is much more natural than 알겠어 when acknowledging a request.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Uses correct informal speech level (반말) for speaking to Rory.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly transcribes 曾岚 (Zēng Lán) as 쩡란 instead of 증란.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"남아 있지만 is much more natural for software than 머무르지만.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Uses female sibling term 오빠 and correct informal speech level 반말.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are equally natural and accurate translations.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"The two candidate translations are identical.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both are identical aside from allowed vs standard spacing.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"제외한 내용 is more precise and appropriate technical phrasing.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"확인해 둬 accurately captures the preparatory aspect of しといて.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Uses polite speech level (해요체) appropriate for speaking to 周婷.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both are natural and evocative translations of the scene.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and get terms right.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"More natural and concise phrasing for help documentation.\"}\n]\n",
+  "duration_seconds": 179.83545,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13652,
+   "output_tokens": 26883,
+   "thinking_tokens": 26411,
+   "cache_read_tokens": 0,
+   "total_tokens": 40535
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0175.1",
+  "item-0184.2",
+  "item-0162.2",
+  "item-0100.2",
+  "item-0063.1",
+  "item-0195.2",
+  "item-0032.2",
+  "item-0026.1",
+  "item-0053.1",
+  "item-0209.2",
+  "item-0119.2",
+  "item-0212.1",
+  "item-0129.2",
+  "item-0146.2",
+  "item-0141.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d1b97ecd-c261-408f-adc8-a7f491277e57",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"\\\"당분간\\\" accurately translates \\\"for now\\\", whereas \\\"아직\\\" means \\\"still\\\".\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"\\\"노인이라고\\\" avoids the literal \\\"~상대로\\\" translationese and the added \\\"굳이\\\".\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"\\\"reflection\\\" is standard for onboarding takeaways, whereas \\\"impression\\\" is unidiomatic here.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"\\\"법도\\\" fits the solemn fantasy shrine setting much better than \\\"규칙\\\".\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"\\\"블렌딩으로\\\" correctly translates \\\"用拼配\\\", whereas \\\"블렌딩에 섞어\\\" is ungrammatical.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"\\\"여러분이\\\" is standard for tutorials, whereas \\\"당신이\\\" is awkward translationese.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"\\\"서책\\\" fits the fantasy RPG setting and old tutor's speech much better.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"\\\"저희 집안\\\" is natural Korean, whereas \\\"제 집안\\\" is unnatural translationese.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both \\\"충돌이 나면\\\" and \\\"충돌이 발생하면\\\" are equally natural and accurate.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"\\\"있기 마련이지\\\" captures the cynical idiomatic nuance of \\\"always a catch\\\" better.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations express \\\"あの時計だけ\\\" accurately and naturally in English.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"\\\"또 까먹으면 안 돼요\\\" captures the natural colloquial tone of chat messages.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"\\\"4번 베이\\\" is standard sci-fi terminology, whereas \\\"격납고\\\" means aircraft hangar.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both \\\"미안\\\" and \\\"미안해\\\" are equally natural and accurate informal apologies.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"\\\"이 주문\\\" fits the drama context naturally, whereas \\\"배치\\\" is awkward translationese.\"}\n]\n",
+  "duration_seconds": 180.381369,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13987,
+   "output_tokens": 27976,
+   "thinking_tokens": 27405,
+   "cache_read_tokens": 0,
+   "total_tokens": 41963
+  }
+ }
+}

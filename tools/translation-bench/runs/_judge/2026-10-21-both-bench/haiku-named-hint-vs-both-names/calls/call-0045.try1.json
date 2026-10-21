@@ -1,0 +1,36 @@
+{
+ "call": 45,
+ "try": 1,
+ "ids": [
+  "item-0149.2",
+  "item-0332.2",
+  "item-0206.1",
+  "item-0056.1",
+  "item-0289.1",
+  "item-0036.2",
+  "item-0346.2",
+  "item-0148.2",
+  "item-0263.2",
+  "item-0118.2",
+  "item-0162.1",
+  "item-0131.1",
+  "item-0043.2",
+  "item-0283.1",
+  "item-0209.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9379c126-df59-4b37-887d-b908bf2bf790",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 to Lin Xia.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 uses 합쇼체 matching Rook's speech level to Thorne.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 to Lin Xia.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly translates '说三日就是三日' without inventing 'I said'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 accurately translates 药囊 as medicine pouch for an alchemist.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 1 names the wrong person, replacing 湊 with 카이.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and respect all terms.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 再来月; Translation 2 mistranslates it.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 합쇼체 to Gareth.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 places the vocative naturally at the sentence start.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 2 mispronounces Aoife as '아이페' and mistranslates footer.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural literary renderings.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate in 해요체.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 matching Licia's speech level.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 2 makes an unwarranted gender assumption with 'Ms.'.\"}\n]\n",
+  "duration_seconds": 176.178722,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14059,
+   "output_tokens": 28272,
+   "thinking_tokens": 27780,
+   "cache_read_tokens": 0,
+   "total_tokens": 42331
+  }
+ }
+}

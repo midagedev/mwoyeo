@@ -1,0 +1,36 @@
+{
+ "call": 20,
+ "try": 1,
+ "ids": [
+  "item-0331.2",
+  "item-0119.2",
+  "item-0195.2",
+  "item-0129.2",
+  "item-0141.2",
+  "item-0297.1",
+  "item-0002.2",
+  "item-0051.1",
+  "item-0166.2",
+  "item-0333.1",
+  "item-0230.2",
+  "item-0214.1",
+  "item-0106.1",
+  "item-0206.2",
+  "item-0058.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6f1304cb-9bbe-460b-9041-260fcb03cb99",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correctly transliterates Karasuma instead of Karasumaru.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Matches the prescribed character name Kiryu from the facts.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both failed to translate into Korean, leaving Japanese text.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Uses the proper Korean tea terminology for first flush harvest.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Natural sibling banmal register and accurate translation of 没大没小.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Reads more naturally, properly expressing the condition for observing.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Translations are identical aside from punctuation, which is ignored.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Consistently maintains the required hapsyoche speech level throughout.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Uses the natural and grammatically correct Korean verb form 모순되네요.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly translates 'still' in schedule contexts rather than using 여전히.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Avoids mispronouncing Aoife as 아오이프 and translates edits better.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Uses the appropriate fantasy RPG weapon term 검 instead of 칼.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Avoids assuming an ungrounded gender title like Ms. for Takanashi.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Phrases 'at work' far more naturally in conversational Korean.\"}\n]\n",
+  "duration_seconds": 129.634806,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13662,
+   "output_tokens": 19063,
+   "thinking_tokens": 18589,
+   "cache_read_tokens": 0,
+   "total_tokens": 32725
+  }
+ }
+}

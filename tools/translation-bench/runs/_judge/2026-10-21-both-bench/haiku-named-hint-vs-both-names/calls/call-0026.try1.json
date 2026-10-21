@@ -1,0 +1,36 @@
+{
+ "call": 26,
+ "try": 1,
+ "ids": [
+  "item-0049.2",
+  "item-0117.1",
+  "item-0218.1",
+  "item-0210.1",
+  "item-0165.1",
+  "item-0363.1",
+  "item-0271.1",
+  "item-0167.1",
+  "item-0295.2",
+  "item-0315.2",
+  "item-0147.1",
+  "item-0280.2",
+  "item-0182.1",
+  "item-0253.2",
+  "item-0335.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e1df0dd7-008e-4505-b26a-99902981903d",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Hinata speaks to Kiryu in 합쇼체, matching '있습니다'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'가게에서 주문하자' is natural Korean for ordering from a shop.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'수고 많으십니다' is much more polite and appropriate toward a superior.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'used to ... before' is redundant; Translation 1 is more natural.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'someone got in touch right away' is more natural English.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Older brother speaking to his sister should use '오빠', not '형'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Zhou Ting speaks to her friends in 반말.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly renders 'also said' rather than unnatural '그도'.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are identical except for comma punctuation.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Faithfully renders 'wants to' as '-고 싶어 합니다' with natural notation.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in 반말.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"'older brother' accurately renders '오빠', and 'he'd' fits reported speech.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"'두 분 다' naturally and accurately translates 'both' in Korean.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Neither translation translated the text into the target language Korean.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'다음 주에는' faithfully preserves the nuance of contrastive topic marker 'は'.\"}\n]\n```\n",
+  "duration_seconds": 179.328883,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13702,
+   "output_tokens": 28133,
+   "thinking_tokens": 27630,
+   "cache_read_tokens": 0,
+   "total_tokens": 41835
+  }
+ }
+}

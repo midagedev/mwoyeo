@@ -1,0 +1,36 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0036.1",
+  "item-0090.2",
+  "item-0267.1",
+  "item-0151.1",
+  "item-0252.1",
+  "item-0300.1",
+  "item-0132.2",
+  "item-0201.2",
+  "item-0123.1",
+  "item-0131.2",
+  "item-0349.2",
+  "item-0020.2",
+  "item-0056.2",
+  "item-0054.1",
+  "item-0025.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6d345308-31d6-4dd2-9210-b71a46a9b06f",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"More natural phrasing for returning and faithful translation of the predicate.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly uses 해요체 as required by the facts.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly uses 해요체 as required by the facts.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and equivalent in meaning.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly translates '石段の先に' as '돌계단 끝에'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Reads much more naturally while faithfully conveying the meaning.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Identical translations except for an allowable spacing difference.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Does not assume an unstated gender or add 'Mr.'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'병합해 들어오는' more accurately captures 'merging in'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Identical translations except for an optional comma.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both appropriately translate the line using natural polite Korean.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 1 left most of the sentence untranslated in Chinese.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both are accurate and natural renderings of the pronunciation note.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 2 mistakenly identifies 湊 as a different character, 카이.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Correctly addresses the onboarding reader as 'you'.\"}\n]\n",
+  "duration_seconds": 108.673747,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13595,
+   "output_tokens": 15392,
+   "thinking_tokens": 14931,
+   "cache_read_tokens": 0,
+   "total_tokens": 28987
+  }
+ }
+}

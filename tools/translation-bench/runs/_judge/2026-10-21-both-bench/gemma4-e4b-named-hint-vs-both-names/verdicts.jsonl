@@ -1,0 +1,104 @@
+{"id": "item-0018.1", "better": "tie", "why": "Identical translations differing only by punctuation.", "call": 2}
+{"id": "item-0010.2", "better": "tie", "why": "Both translations are completely identical.", "call": 2}
+{"id": "item-0005.2", "better": "tie", "why": "Both translations are completely identical.", "call": 2}
+{"id": "item-0021.1", "better": "tie", "why": "Both translations are completely identical.", "call": 2}
+{"id": "item-0006.1", "better": "2", "why": "Translation 1 leaves '阁主' untranslated in Chinese.", "call": 2}
+{"id": "item-0038.1", "better": "2", "why": "Uses correct name '휴가' and proper 해요체 speech level.", "call": 2}
+{"id": "item-0011.2", "better": "tie", "why": "Equally good translations differing only by a serial comma.", "call": 2}
+{"id": "item-0020.2", "better": "tie", "why": "Both translations are completely identical.", "call": 2}
+{"id": "item-0025.2", "better": "2", "why": "Translation 2 naturally translates conversational 'ああ' as '응'.", "call": 2}
+{"id": "item-0044.2", "better": "1", "why": "Translation 1 reads much more naturally in Korean.", "call": 2}
+{"id": "item-0002.1", "better": "tie", "why": "Both are equally natural and faithful translations.", "call": 2}
+{"id": "item-0024.1", "better": "1", "why": "Translation 1 correctly uses 해요체 matching speaker speech level.", "call": 2}
+{"id": "item-0030.1", "better": "1", "why": "Translation 1 correctly uses 반말 as Rory speaks to Siobhan.", "call": 2}
+{"id": "item-0012.1", "better": "1", "why": "Translation 1 uses natural pronouns instead of awkward '당신'.", "call": 2}
+{"id": "item-0045.2", "better": "1", "why": "Translation 2 mistakenly addresses Zeng Shijie as 'Senior Sister Wanqi'.", "call": 2}
+{"id": "item-0043.2", "better": "1", "why": "Translation 1 avoids a comma splice.", "call": 1}
+{"id": "item-0037.2", "better": "2", "why": "Translation 2 uses natural Korean phrasing.", "call": 1}
+{"id": "item-0027.1", "better": "tie", "why": "Both translations are equally natural and accurate.", "call": 1}
+{"id": "item-0047.2", "better": "1", "why": "Translation 1 correctly uses the required 해요체.", "call": 1}
+{"id": "item-0034.1", "better": "1", "why": "Translation 1 correctly uses the required 반말.", "call": 1}
+{"id": "item-0024.2", "better": "2", "why": "Translation 2 correctly uses the required 해요체.", "call": 1}
+{"id": "item-0047.1", "better": "2", "why": "Translation 2 correctly uses the required 해요체.", "call": 1}
+{"id": "item-0046.1", "better": "tie", "why": "The two translations are identical.", "call": 1}
+{"id": "item-0036.1", "better": "1", "why": "Translation 1 correctly uses the required 합쇼체.", "call": 1}
+{"id": "item-0028.2", "better": "tie", "why": "The two translations are identical.", "call": 1}
+{"id": "item-0032.1", "better": "1", "why": "Translation 1 uses a natural spoken dialogue ending.", "call": 1}
+{"id": "item-0032.2", "better": "2", "why": "Translation 2 uses a natural spoken dialogue ending.", "call": 1}
+{"id": "item-0028.1", "better": "tie", "why": "The two translations are identical.", "call": 1}
+{"id": "item-0014.2", "better": "1", "why": "Translation 1 avoids a comma splice.", "call": 1}
+{"id": "item-0015.1", "better": "tie", "why": "The two translations are identical.", "call": 1}
+{"id": "item-0008.2", "better": "2", "why": "Siobhan speaks to Rory in banmal, not haeyoche.", "call": 3}
+{"id": "item-0035.2", "better": "1", "why": "Haku is a beast, so '자' is better than '사람'.", "call": 3}
+{"id": "item-0017.2", "better": "2", "why": "Correctly identifies Kiryu instead of Takanashi.", "call": 3}
+{"id": "item-0007.2", "better": "2", "why": "'검은 안개다' accurately translates '黒霧じゃ' unlike '흑무야'.", "call": 3}
+{"id": "item-0031.2", "better": "2", "why": "Preserves the declarative sentence instead of mistranslating as a question.", "call": 3}
+{"id": "item-0023.1", "better": "2", "why": "'거 맞지?' correctly captures seeking reassurance in 'tell me'.", "call": 3}
+{"id": "item-0022.2", "better": "1", "why": "Tsukumo speaks to Herve in haeyoche, not hapsyoche.", "call": 3}
+{"id": "item-0052.1", "better": "1", "why": "'寿星' refers to the birthday person, not birthday party.", "call": 3}
+{"id": "item-0026.2", "better": "tie", "why": "Identical except for punctuation formatting.", "call": 3}
+{"id": "item-0040.2", "better": "2", "why": "Sogo speaks to Hyuga in haeyoche, not hapsyoche.", "call": 3}
+{"id": "item-0048.1", "better": "2", "why": "Natural English phrasing without untranslated Japanese honorific suffixes.", "call": 3}
+{"id": "item-0004.1", "better": "1", "why": "'Keep' means retain it, not put it in storage.", "call": 3}
+{"id": "item-0019.1", "better": "tie", "why": "Both translations are completely identical.", "call": 3}
+{"id": "item-0037.1", "better": "1", "why": "'냉동고에서 소리가 나' is much more natural Korean.", "call": 3}
+{"id": "item-0042.2", "better": "1", "why": "Correctly captures the emphasis of '就' with '바로'.", "call": 3}
+{"id": "item-0034.2", "better": "2", "why": "Translation 2 correctly uses 반말 to Lin Xia.", "call": 6}
+{"id": "item-0001.2", "better": "2", "why": "Translation 2 retains the object 'me', preserving who was volunteered.", "call": 6}
+{"id": "item-0011.1", "better": "tie", "why": "Both translations are accurate and differ only by an Oxford comma.", "call": 6}
+{"id": "item-0046.2", "better": "tie", "why": "Both translations are identical.", "call": 6}
+{"id": "item-0045.1", "better": "2", "why": "Translation 1 incorrectly translates Zeng Shijie as Senior Sister Wanqi.", "call": 6}
+{"id": "item-0026.1", "better": "tie", "why": "Both translations are identical except for punctuation formatting.", "call": 6}
+{"id": "item-0039.1", "better": "1", "why": "'믿겠습니다' is more natural than '믿습니다' when asking a favor.", "call": 6}
+{"id": "item-0003.2", "better": "2", "why": "'说好听的' means saying nice things, not saying something is good.", "call": 6}
+{"id": "item-0041.2", "better": "1", "why": "Takanashi speaks to Hinata in 반말, not 존댓말.", "call": 6}
+{"id": "item-0035.1", "better": "2", "why": "Haku is beast-formed, so '자' is more accurate than '사람'.", "call": 6}
+{"id": "item-0006.2", "better": "1", "why": "Translation 2 leaves Chinese characters untranslated.", "call": 6}
+{"id": "item-0010.1", "better": "tie", "why": "Both translations are identical.", "call": 6}
+{"id": "item-0020.1", "better": "tie", "why": "Both translations are identical.", "call": 6}
+{"id": "item-0051.2", "better": "tie", "why": "Both make the same errors and differ only by a particle.", "call": 6}
+{"id": "item-0007.1", "better": "1", "why": "'검은 안개다' accurately captures the tone of '黒霧じゃ'.", "call": 6}
+{"id": "item-0044.1", "better": "2", "why": "Translation 2 uses natural Korean phrasing instead of awkward noun compounding.", "call": 4}
+{"id": "item-0017.1", "better": "1", "why": "Translation 1 correctly names Kiryu instead of mistaking her for Takanashi.", "call": 4}
+{"id": "item-0008.1", "better": "1", "why": "Translation 1 correctly uses banmal from Siobhan to Rory.", "call": 4}
+{"id": "item-0025.1", "better": "1", "why": "Translation 1 naturally translates conversational affirmative Japanese into Korean.", "call": 4}
+{"id": "item-0039.2", "better": "tie", "why": "Both translations are equally polite, natural, and faithful in Korean.", "call": 4}
+{"id": "item-0009.1", "better": "1", "why": "Translation 1 uses the appropriate fantasy RPG term for sword.", "call": 4}
+{"id": "item-0023.2", "better": "1", "why": "Translation 1 accurately conveys the conversational nuance of seeking reassurance.", "call": 4}
+{"id": "item-0043.1", "better": "2", "why": "Translation 2 avoids an awkward comma splice by using a period.", "call": 4}
+{"id": "item-0027.2", "better": "tie", "why": "Subject particle omission is equally natural in casual Korean speech.", "call": 4}
+{"id": "item-0018.2", "better": "1", "why": "Translation 1 properly separates the two sentences with a period.", "call": 4}
+{"id": "item-0014.1", "better": "2", "why": "Translation 2 uses a semicolon to avoid a comma splice.", "call": 4}
+{"id": "item-0009.2", "better": "2", "why": "Translation 2 uses the appropriate fantasy RPG term for sword.", "call": 4}
+{"id": "item-0049.2", "better": "tie", "why": "Both translations express working from home accurately and naturally in banmal.", "call": 4}
+{"id": "item-0033.1", "better": "2", "why": "Translation 2 faithfully and idiomatically translates the phrasal verb let in.", "call": 4}
+{"id": "item-0042.1", "better": "2", "why": "Translation 2 accurately captures the emphasis of the adverb 就.", "call": 4}
+{"id": "item-0022.1", "better": "2", "why": "Translation 2 correctly uses the required haeyo-che speech level.", "call": 5}
+{"id": "item-0001.1", "better": "1", "why": "Translation 1 correctly includes the object 'me' rather than oneself.", "call": 5}
+{"id": "item-0016.2", "better": "2", "why": "Pets ride in cars rather than take cars.", "call": 5}
+{"id": "item-0019.2", "better": "tie", "why": "Both translations are identical.", "call": 5}
+{"id": "item-0015.2", "better": "tie", "why": "Both translations are identical.", "call": 5}
+{"id": "item-0013.2", "better": "2", "why": "고속열차 is more natural than 고속철도 when booking a train.", "call": 5}
+{"id": "item-0029.1", "better": "2", "why": "Translation 2 correctly conveys having stayed in the village.", "call": 5}
+{"id": "item-0021.2", "better": "tie", "why": "Both translations are identical.", "call": 5}
+{"id": "item-0051.1", "better": "tie", "why": "Both make identical errors and are otherwise stylistic variants.", "call": 5}
+{"id": "item-0002.2", "better": "tie", "why": "Both translations are equally good despite misgendering Subin.", "call": 5}
+{"id": "item-0016.1", "better": "1", "why": "Pets ride in cars rather than take cars.", "call": 5}
+{"id": "item-0049.1", "better": "tie", "why": "Both translations are natural, faithful, and equally good.", "call": 5}
+{"id": "item-0003.1", "better": "1", "why": "Translation 1 correctly translates 说好听的 as saying nice words.", "call": 5}
+{"id": "item-0004.2", "better": "2", "why": "Translation 2 correctly translates 'keep' in use rather than storage.", "call": 5}
+{"id": "item-0005.1", "better": "tie", "why": "Both translations are identical.", "call": 5}
+{"id": "item-0048.2", "better": "1", "why": "Natural English translation without awkward untranslated Japanese honorifics.", "call": 7}
+{"id": "item-0040.1", "better": "1", "why": "Correctly uses the required 해요체 speech level.", "call": 7}
+{"id": "item-0041.1", "better": "2", "why": "Correctly uses 반말 and the informal first-person pronoun.", "call": 7}
+{"id": "item-0031.1", "better": "1", "why": "Preserves statement meaning instead of mistranslating it into a question.", "call": 7}
+{"id": "item-0050.1", "better": "1", "why": "Omitting the redundant pronoun '제가' reads much more naturally.", "call": 7}
+{"id": "item-0012.2", "better": "1", "why": "Avoids the disrespectful 반말 pronoun '너' for a polite relationship.", "call": 7}
+{"id": "item-0013.1", "better": "tie", "why": "Both terms are equally valid Korean translations of 高铁.", "call": 7}
+{"id": "item-0038.2", "better": "1", "why": "Correctly renders character name and uses required 해요체 speech level.", "call": 7}
+{"id": "item-0033.2", "better": "1", "why": "More faithful and natural translation of 'let him in'.", "call": 7}
+{"id": "item-0052.2", "better": "2", "why": "Correctly translates 寿星 as birthday person rather than party.", "call": 7}
+{"id": "item-0030.2", "better": "2", "why": "Correctly uses the required 반말 speech level.", "call": 7}
+{"id": "item-0050.2", "better": "2", "why": "Omitting the redundant pronoun '제가' reads much more naturally.", "call": 7}
+{"id": "item-0036.2", "better": "2", "why": "Consistently uses the required 합쇼체 speech level.", "call": 7}
+{"id": "item-0029.2", "better": "1", "why": "Correctly uses past tense to reflect past duration of stay.", "call": 7}

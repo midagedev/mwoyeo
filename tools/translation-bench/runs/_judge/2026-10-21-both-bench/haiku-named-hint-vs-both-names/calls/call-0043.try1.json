@@ -1,0 +1,36 @@
+{
+ "call": 43,
+ "try": 1,
+ "ids": [
+  "item-0250.1",
+  "item-0364.2",
+  "item-0031.2",
+  "item-0006.2",
+  "item-0052.2",
+  "item-0127.1",
+  "item-0069.2",
+  "item-0061.1",
+  "item-0210.2",
+  "item-0350.2",
+  "item-0171.1",
+  "item-0160.1",
+  "item-0045.2",
+  "item-0173.1",
+  "item-0139.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e60d80dc-4e1c-4461-855d-4f3e738e6624",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Lu Ming speaks in banmal to Xu Nuo.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Avoids assuming an unstated male gender.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"봐 is much more natural than 보라구.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"아메미야 님 is proper business register for a client.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"万俟 is pronounced Moqi; Wan is incorrect.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"안 봐줄걸 accurately translates the meaning of forgive.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are equally natural, polite, and accurate.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Reflection and all set are natural in onboarding guides.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Avoids redundancy and captures natural conversational tone.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both are equally accurate and natural English instructions.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"첫 엠티 is grammatically correct Korean.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"殿 corresponds to 공, not 님.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"3년 만에 들어온 is idiomatic Korean phrasing.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Participial phrase Panting he said is more natural.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 2 leaves untranslated Japanese characters.\"}\n]\n",
+  "duration_seconds": 174.113863,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14009,
+   "output_tokens": 27090,
+   "thinking_tokens": 26653,
+   "cache_read_tokens": 0,
+   "total_tokens": 41099
+  }
+ }
+}

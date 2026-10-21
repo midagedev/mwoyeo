@@ -1,0 +1,1 @@
+{"started": "2026-10-21T11:20:31+0900", "pair": "/tmp/bothbench/judge/haiku-bothnames-r2-vs-hintr2", "model": "gemini-3.8-flash-high", "batch": 15, "jobs": 3, "seed": 11, "tries": 3, "max_items": 0, "prompts": 658, "calls": 44}

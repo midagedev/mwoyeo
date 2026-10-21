@@ -1,0 +1,36 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0107.1",
+  "item-0351.2",
+  "item-0047.2",
+  "item-0253.1",
+  "item-0278.1",
+  "item-0340.2",
+  "item-0249.1",
+  "item-0111.2",
+  "item-0034.2",
+  "item-0183.2",
+  "item-0050.1",
+  "item-0284.2",
+  "item-0083.2",
+  "item-0284.1",
+  "item-0029.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cf0e8bcf-4b06-43d9-add6-a435c9df7424",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"\\\"우리 집안\\\" is much more natural Korean than \\\"제 집안\\\".\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both \\\"bags\\\" and \\\"sacks\\\" are equally valid translations for 袋.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 uses the specified term \\\"수호막\\\" for 結界.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1's \\\"-거든\\\" naturally conveys the explanatory tone of \\\"anyway\\\".\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Gerund phrasing (\\\"Using it...\\\") is more natural for a guide heading.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Gerald is a freezer, making \\\"사람이 있어서\\\" correct over \\\"사람을 둬서\\\".\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 matches the specified pronunciation \\\"TOH-mash\\\" (토마시).\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"\\\"Before anything else\\\" translates \\\"先に言っておくが\\\" much more naturally.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 uses the required 해요체 speech level to Zhou Ting.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 correctly interprets cut-off \\\"sta\\\" as stairs (계단).\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 translates 婷姐 to \\\"누나\\\" rather than raw Chinese.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"\\\"Right?\\\" and ending with the emoticon is much more natural.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 translates 婷姐 to \\\"누나\\\" rather than raw Chinese.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"\\\"동행하지 못해\\\" better fits the formal register of \\\"お供できず\\\".\"}\n]\n",
+  "duration_seconds": 103.880482,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14010,
+   "output_tokens": 14878,
+   "thinking_tokens": 14354,
+   "cache_read_tokens": 0,
+   "total_tokens": 28888
+  }
+ }
+}

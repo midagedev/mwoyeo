@@ -1,0 +1,36 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0278.1",
+  "item-0255.2",
+  "item-0285.2",
+  "item-0087.1",
+  "item-0140.1",
+  "item-0127.2",
+  "item-0155.1",
+  "item-0015.1",
+  "item-0045.1",
+  "item-0218.2",
+  "item-0288.2",
+  "item-0050.1",
+  "item-0259.1",
+  "item-0008.1",
+  "item-0028.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4b060b6f-2740-472c-9363-587e744e8d75",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Accurately translates '那份' as '몫' and transcribes Chen correctly.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly uses 해요체 as specified in the facts.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Avoids incorrectly using 'we' for Seoyoon's sofa.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'무리야' faithfully translates '辛いのは無理'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'옛 서책' better fits the fantasy RPG register.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"More natural dialogue; 'questioning' fits police investigation better.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Present perfect 'has spent' correctly captures ongoing aspect '〜てきた'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'고맙습니다' is natural, avoiding awkward literal translation '도움이 됩니다'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Faithful to the source without adding an unprompted 'already'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'그래, 부탁해' and '누가 왔어' read much more naturally.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Correctly uses 반말 as specified in the facts.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Avoids mistranslating the suggestion '쉬어' as first-person 'I'll rest'.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"'then' captures deduction in '〜な', and 'Hm' reflects 'ほう'.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'확보했습니다' is more appropriate for formal business reporting.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"T2 mistakenly adds '도' (also), distorting the original meaning.\"}\n]\n",
+  "duration_seconds": 127.017711,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13985,
+   "output_tokens": 17436,
+   "thinking_tokens": 16931,
+   "cache_read_tokens": 0,
+   "total_tokens": 31421
+  }
+ }
+}

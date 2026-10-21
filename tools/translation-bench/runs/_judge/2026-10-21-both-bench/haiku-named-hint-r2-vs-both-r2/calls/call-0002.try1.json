@@ -1,0 +1,36 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0002.1",
+  "item-0212.1",
+  "item-0301.1",
+  "item-0245.2",
+  "item-0337.2",
+  "item-0182.1",
+  "item-0182.2",
+  "item-0062.1",
+  "item-0225.2",
+  "item-0140.1",
+  "item-0048.2",
+  "item-0114.2",
+  "item-0258.1",
+  "item-0015.1",
+  "item-0299.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4f42d263-7426-405a-a1ac-f8c93a0feb37",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"One-liners means jokes; one-line notes fits a note app.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"저녁쯤엔 more faithfully captures には and pairs well with 그때까지.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Takanashi is male; Ms. Takanashi uses the wrong gender title.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Faithfully preserves the source truncation without hallucinating endings or Hanja.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"기억해 두겠습니다 accurately captures the aspectual nuance of 覚えておきます.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"기억해 두겠습니다 accurately captures the aspectual nuance of 覚えておきます.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly uses 반말 as specified in the facts.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"조심하겠습니다 is more natural when promising to handle items carefully.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Old Mr. Takanashi is much more natural narrative prose.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Faithfully translates the verb 喂 (feeding her) which 1 omitted.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 2 hallucinates 결계 and violates the required term 수호막.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 is faithful without adding an inaccurate temporal clause.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"이미 만들어 둔 correctly translates 现成, unlike 제가 쓰는.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 2 failed to translate into Korean.\"}\n]\n",
+  "duration_seconds": 84.442876,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13958,
+   "output_tokens": 14784,
+   "thinking_tokens": 14299,
+   "cache_read_tokens": 0,
+   "total_tokens": 28742
+  }
+ }
+}

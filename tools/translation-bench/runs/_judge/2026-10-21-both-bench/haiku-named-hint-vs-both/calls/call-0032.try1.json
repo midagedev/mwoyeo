@@ -1,0 +1,36 @@
+{
+ "call": 32,
+ "try": 1,
+ "ids": [
+  "item-0066.2",
+  "item-0030.2",
+  "item-0164.2",
+  "item-0024.1",
+  "item-0021.2",
+  "item-0343.1",
+  "item-0339.1",
+  "item-0004.1",
+  "item-0150.1",
+  "item-0286.2",
+  "item-0309.1",
+  "item-0170.2",
+  "item-0260.2",
+  "item-0004.2",
+  "item-0147.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "66ff9d77-c78a-43ef-b0c3-42e03b6a76d6",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are identical except for punctuation.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 faithfully captures the conditional meaning of 抢到了.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'That was fast' is more natural when reacting to quick events.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"The surname 仇 is correctly romanized as Qiu, not Chou.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Omitting '선생님' avoids awkward translationese for 'sir' to a landlord.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"'같이' and '함께' are equally natural and interchangeable synonyms.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both 1200 and 천이백 are equally acceptable number formats.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 avoids the unnatural Korean honorific term '관리인님'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'Scraped together' accurately translates 辛苦攒下的, unlike the negative 'hoarded'.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 avoids redundant name duplication in Translation 2.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'Day 1' is standard and natural for wiki onboarding headings.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 avoids the incorrect phonetic transcription '아오이페' for Aoife.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both 천이백 and 1200 are equally acceptable number formats.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"'가본 적 있다던데' is a much more natural hearsay ending.\"}\n]\n",
+  "duration_seconds": 165.766434,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13959,
+   "output_tokens": 25426,
+   "thinking_tokens": 24934,
+   "cache_read_tokens": 0,
+   "total_tokens": 39385
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 13,
+ "try": 1,
+ "ids": [
+  "item-0092.1",
+  "item-0014.1",
+  "item-0164.1",
+  "item-0332.2",
+  "item-0032.1",
+  "item-0046.1",
+  "item-0093.2",
+  "item-0042.1",
+  "item-0186.2",
+  "item-0141.1",
+  "item-0153.2",
+  "item-0030.1",
+  "item-0167.2",
+  "item-0102.1",
+  "item-0177.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "99e71a41-98ab-4e0e-aef3-0c9ca1dba333",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 leaves kanji untranslated.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 'I'm moving' instead of 'We're moving'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Siobhan speaks to Rory in informal speech (반말).\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Siobhan is female (오빠) and speaks to Rory in 반말.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 2 leaves the name in Japanese katakana.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'Goes to' is natural; 'goes up to' is literal translationese.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Suzanne is a princess; '쉬잔 공주님' is natural Korean royalty phrasing.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 localizes the name without untranslated Japanese '-san'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'Guard' accurately conveys defending the formation, unlike literal 'hold'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 is completely untranslated Chinese.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 fits the formal onboarding guide register better.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Zhou Yi speaks to Lin Xia in informal speech (반말).\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both 'to' and 'in' are natural and equally valid.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both '어떻게 할까' and '어떻게 할래' are equally natural and accurate.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'Do not' and 'to' fit formal wiki documentation style.\"}\n]\n",
+  "duration_seconds": 165.176773,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13914,
+   "output_tokens": 24955,
+   "thinking_tokens": 24454,
+   "cache_read_tokens": 0,
+   "total_tokens": 38869
+  }
+ }
+}

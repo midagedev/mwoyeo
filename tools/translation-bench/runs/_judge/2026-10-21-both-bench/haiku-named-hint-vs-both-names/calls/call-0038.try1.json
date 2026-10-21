@@ -1,0 +1,36 @@
+{
+ "call": 38,
+ "try": 1,
+ "ids": [
+  "item-0291.2",
+  "item-0065.2",
+  "item-0036.1",
+  "item-0090.2",
+  "item-0267.1",
+  "item-0151.1",
+  "item-0252.1",
+  "item-0310.1",
+  "item-0132.2",
+  "item-0201.2",
+  "item-0123.1",
+  "item-0131.2",
+  "item-0361.2",
+  "item-0020.2",
+  "item-0056.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7de0871b-873b-4a48-b2b5-5741adbd3dc9",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"'Stolen' faithfully translates '盗まれた', whereas 'taken' is less specific.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'지닌 자' and '규율' better fit the mythical shrine tone.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 mistranslates the name Minato as Kai.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'무슨 차를' is much more natural in this context.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are equally natural, faithful, and accurate.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 leaves the name '채율' untranslated in Hangul.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"The only difference is capitalization formatting, which is ignored.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'Short notes' matches the text's definition of 'ひとこと' as 短いメモ.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'우리 동갑이잖아요' is much more natural Korean phrasing.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 awkwardly shifts pronouns from 'we' to 'you'.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 correctly preserves the reported speech in '온대'.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 reads much more naturally and idiomatically.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both 'happen' and 'take place' are equally natural and accurate.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both translations are equally accurate, natural, and faithful.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 2 falsely adds 'I said', misattributing the speaker.\"}\n]\n",
+  "duration_seconds": 141.968397,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13887,
+   "output_tokens": 23122,
+   "thinking_tokens": 22629,
+   "cache_read_tokens": 0,
+   "total_tokens": 37009
+  }
+ }
+}

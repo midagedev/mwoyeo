@@ -1,0 +1,36 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0188.2",
+  "item-0250.2",
+  "item-0165.2",
+  "item-0043.1",
+  "item-0075.1",
+  "item-0113.1",
+  "item-0057.2",
+  "item-0152.1",
+  "item-0293.2",
+  "item-0291.2",
+  "item-0207.2",
+  "item-0293.1",
+  "item-0290.1",
+  "item-0121.1",
+  "item-0348.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f7c7749e-e740-4594-b7a2-db87761e4188",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are identical except for formatting.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified haeyo-che speech level.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 uses polite speech appropriate for Captain Thorne.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 better conveys the polite register of Hikaru's statement.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly conveys the professor's statement with honorifics.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 is natural Korean; Translation 2 is awkward translationese.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Xu Nuo is female and cannot refer to someone as 누나.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 properly transcribes the name into Korean Hangul.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified pronunciation Qiu for the name.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly identifies who should rest after the move.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 uses natural spoken dialogue and fits the aspect.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the specified pronunciation Qiu for the name.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both administrator and admin are accurate translations of 管理者.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 has a consistent register and translates thing naturally.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 is much more natural and idiomatic in Korean.\"}\n]\n",
+  "duration_seconds": 155.761677,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14264,
+   "output_tokens": 21306,
+   "thinking_tokens": 20834,
+   "cache_read_tokens": 0,
+   "total_tokens": 35570
+  }
+ }
+}

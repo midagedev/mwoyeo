@@ -1,0 +1,36 @@
+{
+ "call": 23,
+ "try": 1,
+ "ids": [
+  "item-0122.2",
+  "item-0280.1",
+  "item-0274.2",
+  "item-0334.2",
+  "item-0310.1",
+  "item-0228.2",
+  "item-0168.2",
+  "item-0138.1",
+  "item-0172.1",
+  "item-0028.2",
+  "item-0115.1",
+  "item-0228.1",
+  "item-0344.1",
+  "item-0013.1",
+  "item-0037.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7902489d-9f4e-4cf0-86ac-c13670728f8a",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 matching the specified speech level.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 avoids the inappropriately honorific '계셨어요' for friends.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 matching the specified speech level.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 matching the specified speech level.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 adheres to the defined term 'Sticky'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 matching the specified speech level.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'본 게' reads much more naturally in spoken Korean than '본 것은'.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are identical except for punctuation formatting.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 translates 'chase' more faithfully and naturally.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'관리인분' is the natural and idiomatic Korean honorific.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 matching the specified speech level.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'자쿠지' is the natural colloquial Korean term for hot tub.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'부탁드립니다' is contextually faithful and '그만두기로 해요' matches 해요체.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 uses natural active voice matching the conversational tone.\"}\n]\n",
+  "duration_seconds": 157.836412,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13801,
+   "output_tokens": 21656,
+   "thinking_tokens": 21179,
+   "cache_read_tokens": 0,
+   "total_tokens": 35457
+  }
+ }
+}

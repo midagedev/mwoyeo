@@ -1,0 +1,36 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0250.2",
+  "item-0296.2",
+  "item-0196.2",
+  "item-0071.2",
+  "item-0017.1",
+  "item-0183.1",
+  "item-0290.1",
+  "item-0264.2",
+  "item-0333.2",
+  "item-0312.1",
+  "item-0236.2",
+  "item-0054.2",
+  "item-0273.2",
+  "item-0226.1",
+  "item-0057.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d56ae2a3-91d3-464a-a854-be083a4390e5",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates \\\"シュザンヌ様\\\" as \\\"쉬잔 님\\\".\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 avoids the trailing stray character found in Translation 1.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 captures \\\"收好\\\" by including \\\"securely\\\".\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 mistranslates 老师傅 (master craftsmen) as father-in-law.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"\\\"안심이 되네요\\\" is more natural Korean than \\\"안심이에요\\\".\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 matching the relationship.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 as specified in facts.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 translates \\\"still coming\\\" much more naturally.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 correctly attributes the statement to the rival envoy.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 correctly uses present perfect for 〜てきた.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 is more faithful to the original predicate.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Context refers to a tea leaves shipment (물량), not order.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 includes the title \\\"선장님\\\", respecting the hierarchy.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations make identical speech-level errors and are equally good.\"}\n]\n",
+  "duration_seconds": 149.761266,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14245,
+   "output_tokens": 21952,
+   "thinking_tokens": 21465,
+   "cache_read_tokens": 0,
+   "total_tokens": 36197
+  }
+ }
+}

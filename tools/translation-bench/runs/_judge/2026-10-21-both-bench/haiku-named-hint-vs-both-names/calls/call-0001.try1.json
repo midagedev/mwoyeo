@@ -1,0 +1,36 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0145.2",
+  "item-0067.2",
+  "item-0233.2",
+  "item-0212.1",
+  "item-0275.1",
+  "item-0136.2",
+  "item-0331.2",
+  "item-0327.1",
+  "item-0327.2",
+  "item-0342.1",
+  "item-0190.1",
+  "item-0338.2",
+  "item-0040.1",
+  "item-0301.1",
+  "item-0319.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3272bff7-9cd6-4f45-8226-8a9f0c8e2126",
+  "status": "SUCCESS",
+  "response": "[{\"case\": 1, \"better\": \"tie\", \"why\": \"Both reception desk and front desk are accurate translations.\"}, {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural with identical meaning and register.\"}, {\"case\": 3, \"better\": \"2\", \"why\": \"좋아하거든요 accurately conveys the explanatory nuance of Japanese なんですよ.\"}, {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 correctly keeps hiroba instead of mistranslating it as space.\"}, {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates 先 as 먼저.\"}, {\"case\": 6, \"better\": \"1\", \"why\": \"As a princess, Leicia should use 나 rather than humble 저.\"}, {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 휴가 as specified in the facts.\"}, {\"case\": 8, \"better\": \"1\", \"why\": \"강한 사람 matches source 人 and avoids inappropriate honorifics before royalty.\"}, {\"case\": 9, \"better\": \"2\", \"why\": \"강한 사람 matches source 人 and avoids inappropriate honorifics before royalty.\"}, {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 translates 三红 into Korean instead of leaving raw hanzi.\"}, {\"case\": 11, \"better\": \"2\", \"why\": \"있잖아 correctly reflects Leicia's 반말 speech level when addressing Saku.\"}, {\"case\": 12, \"better\": \"1\", \"why\": \"헷갈려 faithfully means mix up, not forget.\"}, {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 translates ㅋㅋ into English instead of leaving Korean characters.\"}, {\"case\": 14, \"better\": \"1\", \"why\": \"By the way accurately translates the topic-shifting discourse marker 근데.\"}, {\"case\": 15, \"better\": \"2\", \"why\": \"Your cat correctly clarifies who is meant and reads more naturally.\"}]\n",
+  "duration_seconds": 133.259587,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14114,
+   "output_tokens": 19729,
+   "thinking_tokens": 19280,
+   "cache_read_tokens": 0,
+   "total_tokens": 33843
+  }
+ }
+}

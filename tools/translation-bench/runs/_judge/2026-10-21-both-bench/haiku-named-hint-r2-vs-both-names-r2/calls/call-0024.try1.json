@@ -1,0 +1,36 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0111.1",
+  "item-0163.1",
+  "item-0051.2",
+  "item-0065.1",
+  "item-0289.2",
+  "item-0104.2",
+  "item-0084.2",
+  "item-0062.2",
+  "item-0205.2",
+  "item-0114.1",
+  "item-0246.2",
+  "item-0088.2",
+  "item-0044.1",
+  "item-0191.2",
+  "item-0286.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cb87bd41-d689-46a7-8b0f-5fbf824b0d7b",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are identical except for an optional comma.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Neither candidate translated the line into the target language Korean.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"잘하세요 correctly includes the honorific suffix -시- when addressing a senior.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"완전 폭발할 거야 accurately captures the colloquial meaning of 'lose it'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"준비하겠습니다 is more concise and natural than bureaucratic 준비하도록 하겠습니다.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"그 후에 accurately conveys sequential order for 'afterwards' in tutorial steps.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Faithfully translates 받은 출입증 as 'access badge you receive'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Uses correct name 키류 and correctly treats Kiryu as the topic.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Causal 'so' creates a more natural and accurate spoken dialogue.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Romanizes Modakbul instead of leaving Korean Hangul untranslated.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translates 二人で concisely as 둘이서 without redundant 함께.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Properly translates the name without leaving the Japanese honorific -san.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Natural phrasing without slashes and accurately fits the sales team context.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Plural Quick Notes fits habitual recording of multiple meeting decisions.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Correctly uses 해요체 as required when Xu Nuo addresses Zhou Ting.\"}\n]\n",
+  "duration_seconds": 152.485903,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13859,
+   "output_tokens": 21310,
+   "thinking_tokens": 20822,
+   "cache_read_tokens": 0,
+   "total_tokens": 35169
+  }
+ }
+}

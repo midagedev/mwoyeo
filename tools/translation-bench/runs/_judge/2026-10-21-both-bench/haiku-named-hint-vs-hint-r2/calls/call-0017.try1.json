@@ -1,0 +1,36 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0279.1",
+  "item-0328.1",
+  "item-0075.1",
+  "item-0064.1",
+  "item-0135.1",
+  "item-0227.2",
+  "item-0238.1",
+  "item-0089.1",
+  "item-0087.2",
+  "item-0284.1",
+  "item-0127.2",
+  "item-0265.2",
+  "item-0148.1",
+  "item-0067.1",
+  "item-0174.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "862daed7-1156-492a-b302-b5b208eccfb9",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are identical except for trailing punctuation.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'아직도' faithfully captures the meaning of 'never gave them back'.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'Organizes' is more natural and accurate for categorizing tags than 'sorts'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'All the best' is more natural than 'all of the best'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'우리' is appropriate for a superior speaking to a subordinate.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'부탁드립니다' accurately translates 'お願いいたします' without an unstated '잘'.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are identical except for trailing punctuation.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'물놀이하다가' is natural, whereas '-느라' is unnatural with sensory adjectives.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Rory speaks to Siobhan in 반말, which Translation 2 uses.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'둘이 반반' is much more natural Korean than '두 명이 반반씩'.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'무슨 일 있으세요?' is the natural polite expression for this context.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"'-으니까' correctly connects a reason to the conjecture '-ㄹ 거야'.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'밥 사 줘' faithfully translates '请我' and reads more naturally.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Suzanne speaks to Tsukumo in 반말, which Translation 2 uses.\"}\n]\n",
+  "duration_seconds": 109.954779,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13852,
+   "output_tokens": 17099,
+   "thinking_tokens": 16600,
+   "cache_read_tokens": 0,
+   "total_tokens": 30951
+  }
+ }
+}

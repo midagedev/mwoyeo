@@ -1,0 +1,36 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0042.1",
+  "item-0040.1",
+  "item-0041.2",
+  "item-0003.2",
+  "item-0063.1",
+  "item-0003.1",
+  "item-0034.1",
+  "item-0010.1",
+  "item-0065.2",
+  "item-0064.1",
+  "item-0034.2",
+  "item-0015.1",
+  "item-0029.1",
+  "item-0047.2",
+  "item-0074.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "54407e1f-6719-45c4-9a16-9e0836bd638f",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates '封じ直せる' as '다시 봉인할'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"九十九 speaks to エルヴェ in 해요체.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 captures the elder speaker's conversational register much better.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'검' is more appropriate than '칼' for a swordsman's 剣.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'깨어날 때' is much more natural than '깨어남의 때'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'검' is more appropriate than '칼' for a swordsman's 剣.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'고동치다' is more natural and literary than '맥동하다'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'품의를 진행하다' is more natural than the calque '돌리다'.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"十河 speaks to 日向 in 해요체.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'고동치다' is more natural and literary than '맥동하다'.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"'센서 문제인 거 맞지?' better conveys seeking reassurance.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"九十九 speaks to シュザンヌ in 합쇼체.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 correctly names 키류 씨 instead of 타카나시.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Siobhan speaks to Rory in 반말.\"}\n]\n",
+  "duration_seconds": 136.156171,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14451,
+   "output_tokens": 20296,
+   "thinking_tokens": 19797,
+   "cache_read_tokens": 0,
+   "total_tokens": 34747
+  }
+ }
+}

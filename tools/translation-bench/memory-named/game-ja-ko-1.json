@@ -1,0 +1,10 @@
+{
+ "entities": [
+  {"name": "朔", "reading": "さく", "dst": "사쿠", "gender": "male", "role": "young hero", "speaks_to": {"リーシア": "해요체", "鉄斎": "합쇼체"}},
+  {"name": "リーシア", "dst": "리시아", "gender": "female", "role": "princess", "speaks_to": {"朔": "반말", "鉄斎": "해요체"}},
+  {"name": "鉄斎", "reading": "てっさい", "dst": "텟사이", "gender": "male", "role": "guild master", "speaks_to": {"朔": "반말", "リーシア": "합쇼체"}}
+ ],
+ "document": {"title": "ルーンベルの灯", "domain": "JRPG", "summary": "a young guild hand and a princess save a village barrier"},
+ "window": {"title": "ルーンベルの灯", "app": "ルーンベルの灯", "category": "Games"},
+ "terms": [{"src": "魔石", "dst": "마정석"}, {"src": "結界", "dst": "수호막"}, {"src": "ギルド", "dst": "조합"}]
+}

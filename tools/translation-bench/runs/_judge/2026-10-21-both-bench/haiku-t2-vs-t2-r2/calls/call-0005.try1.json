@@ -1,0 +1,36 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0084.1",
+  "item-0175.2",
+  "item-0283.2",
+  "item-0195.1",
+  "item-0076.1",
+  "item-0076.2",
+  "item-0028.1",
+  "item-0253.2",
+  "item-0078.2",
+  "item-0219.2",
+  "item-0153.1",
+  "item-0048.1",
+  "item-0102.1",
+  "item-0269.2",
+  "item-0099.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d524d752-c35d-40d9-b9be-5766afb98711",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Refers to the specific onboarding task report in the singular.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Faithfully preserves the truncated source text without hallucinating an ending.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Sneered is far more natural than the literal cold laugh.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"조심하겠습니다 is more natural when handling physical items carefully.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both gender pronouns and phrasings are equally valid and natural.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both gender pronouns and phrasings are equally valid and natural.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"용서해 줄 것 같아 is much more natural spoken Korean.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"관리인분 properly matches the honorific 계신가요 with natural word order.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Uses proper object marking and translates what you leave out naturally.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly translates ひとこと as a one-line note and uses singular tag.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"재촉하네 naturally conveys 又来催了 without an inappropriate progressive aspect.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translates the name, captures 只, and translates 你就知道 naturally.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Faithfully translates 店不能倒 without changing the grammatical agency.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Correctly uses the required 해요체 speech level instead of dangling particles.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Identical translations differing only by punctuation.\"}\n]\n",
+  "duration_seconds": 178.414908,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13902,
+   "output_tokens": 25853,
+   "thinking_tokens": 25374,
+   "cache_read_tokens": 0,
+   "total_tokens": 39755
+  }
+ }
+}

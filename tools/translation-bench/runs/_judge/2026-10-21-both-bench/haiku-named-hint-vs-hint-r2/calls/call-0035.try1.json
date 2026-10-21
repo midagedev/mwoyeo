@@ -1,0 +1,36 @@
+{
+ "call": 35,
+ "try": 1,
+ "ids": [
+  "item-0046.1",
+  "item-0024.2",
+  "item-0299.2",
+  "item-0274.2",
+  "item-0229.1",
+  "item-0211.2",
+  "item-0138.2",
+  "item-0264.1",
+  "item-0009.1",
+  "item-0105.1",
+  "item-0292.1",
+  "item-0144.1",
+  "item-0319.2",
+  "item-0246.1",
+  "item-0275.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cbf4e6fc-f747-4f98-b35b-ead748d8d330",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 capitalizes both feature names consistently.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly writes Minato in Hangul.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly translates '오빠' as older brother.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly omits the unnecessary Japanese word.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Identical meaning and wording; formatting differences are ignored.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 avoids the ambiguous misplaced modifier 'working first'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 as specified in facts.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 avoids the incorrect pronoun 'we'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 naturally translates 'Kid' for an adult.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 properly translates Akira's title as Inspector.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 uses the more natural word '물밑에서'.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are equally natural, accurate, and appropriate.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 follows the pronunciation guide 'TOH-mash'.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both '그런 다음' and '그다음' are equally natural.\"}\n]\n",
+  "duration_seconds": 181.564939,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13481,
+   "output_tokens": 25096,
+   "thinking_tokens": 24641,
+   "cache_read_tokens": 0,
+   "total_tokens": 38577
+  }
+ }
+}

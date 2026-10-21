@@ -1,0 +1,36 @@
+{
+ "call": 41,
+ "try": 1,
+ "ids": [
+  "item-0289.1",
+  "item-0036.2",
+  "item-0313.1",
+  "item-0148.2",
+  "item-0263.2",
+  "item-0118.2",
+  "item-0162.1",
+  "item-0131.1",
+  "item-0043.2",
+  "item-0283.1",
+  "item-0209.1",
+  "item-0143.1",
+  "item-0235.1",
+  "item-0044.2",
+  "item-0003.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f99ebbe8-6622-4aac-b49f-29de23b298e9",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"More natural and concise business Korean without redundant phrasing.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly uses plain imperative 해라체 matching the guild master's speech.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly uses informal speech and natural phrasing for peer address.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly uses 해요체 as required by the speaker facts.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Accurately translates 'shared server' as 공유 서버 in Git context.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly translates 오빠 as older brother instead of untranslated oppa.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Properly uses a question mark for the question and ends correctly.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Faithfully translates the past form 触れた as 닿은 and reads naturally.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Correctly uses second-person perspective suitable for an onboarding guide.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly interprets the joint proposal as 'Should we invite'.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"More naturally expresses scratching one's head in bashfulness.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Correctly uses 반말 (해라체) instead of 하게체.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Avoids assuming an unstated gender and translates the term faithfully.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Correctly uses 반말 as required by the speaker facts.\"}\n]\n",
+  "duration_seconds": 121.758103,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13957,
+   "output_tokens": 18429,
+   "thinking_tokens": 17955,
+   "cache_read_tokens": 0,
+   "total_tokens": 32386
+  }
+ }
+}

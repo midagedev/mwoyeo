@@ -1,0 +1,36 @@
+{
+ "call": 11,
+ "try": 1,
+ "ids": [
+  "item-0107.1",
+  "item-0268.2",
+  "item-0150.2",
+  "item-0178.1",
+  "item-0084.1",
+  "item-0085.1",
+  "item-0181.2",
+  "item-0356.1",
+  "item-0141.1",
+  "item-0283.2",
+  "item-0345.2",
+  "item-0146.1",
+  "item-0081.1",
+  "item-0177.1",
+  "item-0260.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "00a5ca8a-ed00-45d1-b1b2-3b6ef1ce0264",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"\\\"수고 많으십니다\\\" is the appropriate greeting to a superior.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 faithfully captures \\\"必须\\\" with \\\"꼭\\\".\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 refers to the specific superintendent respectfully and accurately.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both miss the required speech level and are otherwise equivalent.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"\\\"trembled slightly\\\" is much more natural English for physical movement.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"\\\"and\\\" avoids false causality, and \\\"my stuff\\\" is more natural.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 uses natural sibling speech instead of parental \\\"~렴\\\".\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Omitting \\\"의\\\" makes the compound noun \\\"모차 매입가\\\" more natural.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"\\\"이 주문은\\\" is natural Korean; \\\"배치\\\" is an awkward transliteration.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 uses the correct name \\\"아메미야\\\" and speech level.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말, correctly reflected in 1.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"\\\"미안해\\\" and \\\"미안\\\" are equally accurate and natural in 반말.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"\\\"나를\\\" and \\\"날\\\" are equally acceptable and natural here.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"\\\"첫 배송분\\\" accurately translates \\\"第一批\\\", and grammar is more natural.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"\\\"푸터\\\" is accurate; \\\"아오이페\\\" and \\\"바닥글\\\" are mistranslations.\"}\n]\n",
+  "duration_seconds": 171.440936,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13787,
+   "output_tokens": 26288,
+   "thinking_tokens": 25770,
+   "cache_read_tokens": 0,
+   "total_tokens": 40075
+  }
+ }
+}

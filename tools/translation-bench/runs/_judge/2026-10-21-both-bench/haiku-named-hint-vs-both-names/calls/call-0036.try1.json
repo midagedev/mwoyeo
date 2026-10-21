@@ -1,0 +1,36 @@
+{
+ "call": 36,
+ "try": 1,
+ "ids": [
+  "item-0011.2",
+  "item-0018.1",
+  "item-0160.2",
+  "item-0184.1",
+  "item-0244.1",
+  "item-0010.1",
+  "item-0018.2",
+  "item-0072.2",
+  "item-0170.1",
+  "item-0231.2",
+  "item-0071.2",
+  "item-0186.1",
+  "item-0048.1",
+  "item-0312.2",
+  "item-0296.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e1e89e80-063d-4b59-96ea-8aba7a7ac3a0",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"1 avoids mispronouncing Aoife, adding '도', and mixing speech levels.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'I know, right' captures the empathetic agreement of 그러게 much better.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'공' correctly renders the honorific title '殿' in this JRPG register.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'Old Man' before a surname should be capitalized as a title.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Lu Ming speaks to Xu Nuo in 반말 per the facts.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'수호자' accurately reflects shrine keeper rather than '문지기' (gatekeeper).\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'I know, right' captures the empathetic agreement of 그러게 much better.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"1 correctly transliterates 仇 as Qiu and translates 守 as guard.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'잡아뒀어' captures the nuance of 押さえた much better than '예약했어'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"'수정 내용' and '수정 사항' are equally accurate and natural translations.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"'분명히' and '분명' are completely synonymous and equally natural.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"1 translates 'resolve each conflict' naturally without translationese like '각 충돌'.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"1 captures the natural teasing tone without overly negative phrasing like '번지르르하게'.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'첫물 찻잎' uses the authentic, precise tea industry term for 头采.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'won't end' faithfully conveys the frustration of an ongoing, dragging meeting.\"}\n]\n",
+  "duration_seconds": 108.555384,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13896,
+   "output_tokens": 17641,
+   "thinking_tokens": 17107,
+   "cache_read_tokens": 0,
+   "total_tokens": 31537
+  }
+ }
+}

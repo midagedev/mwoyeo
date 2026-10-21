@@ -1,0 +1,36 @@
+{
+ "call": 14,
+ "try": 2,
+ "ids": [
+  "item-0014.1",
+  "item-0064.2",
+  "item-0145.2",
+  "item-0032.1",
+  "item-0046.1",
+  "item-0093.2",
+  "item-0042.1",
+  "item-0332.1",
+  "item-0214.2",
+  "item-0159.1",
+  "item-0347.1",
+  "item-0192.2",
+  "item-0272.2",
+  "item-0285.2",
+  "item-0330.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0f94a2c2-77c6-44ab-abf0-4a720ba9b444",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correct transliteration of Gerald and faithful translation of that.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 has correct English conditional grammar and aspect.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Faithfully translates シュザンヌ様 as 쉬잔 님 instead of 공주.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are faithful, accurate, and equally natural.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 avoids the awkward Mr./Ms. translation of 님.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 reads much more naturally and idiomatically.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 was left untranslated in Japanese.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Matches the natural informal 반말 register between uncle and niece.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Identical translations with the same error; formatting differences ignored.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Faithfully translates the explanatory clause and uses natural phrasing.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Siobhan is female, making 형 a severe gender mistranslation.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Correctly uses 반말 as required by the speaker facts.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Questioning accurately reflects police investigation terminology unlike interview.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Uses the specified term 마정석 instead of 마석.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both are faithful, natural, and accurately honor the professor.\"}\n]\n",
+  "duration_seconds": 167.040742,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14232,
+   "output_tokens": 25417,
+   "thinking_tokens": 24954,
+   "cache_read_tokens": 0,
+   "total_tokens": 39649
+  }
+ }
+}

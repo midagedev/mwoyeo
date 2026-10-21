@@ -1,0 +1,36 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0294.1",
+  "item-0207.1",
+  "item-0141.1",
+  "item-0126.2",
+  "item-0337.1",
+  "item-0048.1",
+  "item-0048.2",
+  "item-0135.2",
+  "item-0083.2",
+  "item-0342.2",
+  "item-0262.2",
+  "item-0329.2",
+  "item-0208.1",
+  "item-0302.1",
+  "item-0103.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d95ef5e6-ca27-4524-a231-a94c9ae59fd7",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'손님이다' is more faithful to '客人じゃ' than adding '오셨다'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 accurately translates '仲' as '사이' and is more natural.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly translates '没大没小' and uses proper 반말 register.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 translates naturally without awkward Chinese characters in parentheses.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 as specified in the facts.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both '겨눈 채' and '겨누고' are equally accurate and natural.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both '겨누고' and '겨눈 채' are equally accurate and natural.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'all the best' is more natural English than 'all of the best'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'Wow' faithfully conveys the surprise of '헐'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 between the clashing siblings.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Identical except punctuation; formatting differences are ignored.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 avoids wrongly elevating a peer with honorific '시'.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"'알겠어요' is much more natural than '좋아요' when accepting tasks.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 1 is in Japanese, not the target language Korean.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Identical except punctuation; formatting differences are ignored.\"}\n]\n",
+  "duration_seconds": 221.323578,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13925,
+   "output_tokens": 34327,
+   "thinking_tokens": 33826,
+   "cache_read_tokens": 0,
+   "total_tokens": 48252
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 41,
+ "try": 1,
+ "ids": [
+  "item-0169.1",
+  "item-0005.2",
+  "item-0133.1",
+  "item-0227.1",
+  "item-0342.2",
+  "item-0075.2",
+  "item-0022.2",
+  "item-0052.1",
+  "item-0296.1",
+  "item-0202.2",
+  "item-0096.2",
+  "item-0108.2",
+  "item-0011.1",
+  "item-0156.2",
+  "item-0304.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d58a1b64-fc44-432c-b611-ac2d6546a3ee",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 as specified in the facts.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Zeng Ruoshui is female; Translation 2 incorrectly uses 'his mouth'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 correctly transliterates からすま as 가라스마, not 가라스마루.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are virtually identical and equally acceptable in Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 translates 三红 into Korean instead of leaving Chinese characters.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 captures the proper formal register for 别来无恙.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and equally good.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"万俟 is pronounced Mòqí; Translation 2 incorrectly calls him Wan.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'Won't end' better captures the frustration and tense of 안 끝나.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'Search scope' is standard software terminology for 検索の範囲.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are natural and faithfully convey the informal text.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'What do you make of' is the natural idiom for どう見る.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 1 incorrectly writes 아오이프 despite the stated EE-fa pronunciation.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 translates 鼓浪屿 to 구랑위 instead of leaving Chinese characters.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"}\n]\n",
+  "duration_seconds": 117.803338,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13966,
+   "output_tokens": 18728,
+   "thinking_tokens": 18234,
+   "cache_read_tokens": 0,
+   "total_tokens": 32694
+  }
+ }
+}

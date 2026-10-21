@@ -1,0 +1,36 @@
+{
+ "call": 38,
+ "try": 1,
+ "ids": [
+  "item-0132.2",
+  "item-0201.2",
+  "item-0123.1",
+  "item-0131.2",
+  "item-0355.2",
+  "item-0020.2",
+  "item-0056.2",
+  "item-0054.1",
+  "item-0025.1",
+  "item-0216.2",
+  "item-0041.1",
+  "item-0248.1",
+  "item-0199.2",
+  "item-0101.2",
+  "item-0284.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d711d5c9-1579-4905-848b-583eb0def84f",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 better matches the formal instructional register of documentation.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 'ひとこと' as 'short note' rather than 'single note'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and use the correct speech level.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 accurately translates '现成' as ready to use.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 uses the more natural idiom 'foot of the mountain'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 does not insert 'still' and translates '聞こう' accurately.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 sounds much more natural and idiomatic for drama dialogue.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly translates '文章' as 'passage' rather than 'sentence'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 uses 'notes', the appropriate term for note-taking apps.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 adheres to the specified term '메리골드'.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified 해요체 speech level.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 accurately conveys the explanatory nuance of '所以...才...'.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 uses more natural phrasing ('바닥', '닿는 자') in Korean.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 reads more naturally and fits the onboarding documentation register.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations are identical.\"}\n]\n",
+  "duration_seconds": 140.820458,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13733,
+   "output_tokens": 21185,
+   "thinking_tokens": 20687,
+   "cache_read_tokens": 0,
+   "total_tokens": 34918
+  }
+ }
+}

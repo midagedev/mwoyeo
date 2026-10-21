@@ -1,0 +1,36 @@
+{
+ "call": 16,
+ "try": 1,
+ "ids": [
+  "item-0112.1",
+  "item-0153.1",
+  "item-0148.1",
+  "item-0204.2",
+  "item-0063.1",
+  "item-0319.2",
+  "item-0172.1",
+  "item-0170.1",
+  "item-0164.1",
+  "item-0307.2",
+  "item-0171.2",
+  "item-0220.2",
+  "item-0157.1",
+  "item-0065.2",
+  "item-0247.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "4108bd6b-191e-48e2-8a58-6ff291d2c1a5",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"When fits the context where she is expected to wake up.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 avoids the inappropriate honorific -시- when addressing a friend.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 as specified in the facts.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are faithful, accurate, and read naturally in English.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly translates the compound surname 万俟 as Moqi, not Wanqi.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"걔 is natural spoken Korean; 그녀 is awkward translationese.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 as Siobhan speaks to Rory.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates 还 as 아직.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Your cat naturally clarifies ownership in English conversation.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 faithfully translates our as 우리.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"이야기 and 얘기 are equivalent, equally natural Korean synonyms.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Correctly identifies third-person subject instead of mistranslating as first-person I.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 as Lu Ming speaks to Xu Nuo.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"완전 폭발할 거야 accurately translates the idiom lose it.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally convey the sentence in 반말.\"}\n]\n",
+  "duration_seconds": 203.026251,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14408,
+   "output_tokens": 28823,
+   "thinking_tokens": 28347,
+   "cache_read_tokens": 0,
+   "total_tokens": 43231
+  }
+ }
+}

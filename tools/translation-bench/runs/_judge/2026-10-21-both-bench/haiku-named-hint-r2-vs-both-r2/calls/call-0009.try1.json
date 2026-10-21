@@ -1,0 +1,36 @@
+{
+ "call": 9,
+ "try": 1,
+ "ids": [
+  "item-0329.1",
+  "item-0112.2",
+  "item-0245.1",
+  "item-0175.1",
+  "item-0247.2",
+  "item-0350.1",
+  "item-0094.1",
+  "item-0150.2",
+  "item-0289.2",
+  "item-0162.2",
+  "item-0205.1",
+  "item-0084.1",
+  "item-0329.2",
+  "item-0317.2",
+  "item-0135.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "55fbc09a-cbce-49c0-9eb8-45e54a9fe315",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 is more natural and concise instructional English.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly translates '固めさせろ' as '지키게 해라'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 avoids unnecessary hanja and uses natural phrasing for moonlight.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses natural business term '회신' instead of literal '회답'.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are equally natural, accurate, and completely synonymous.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 as specified in the facts.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 naturally preserves the pronoun 'it' as '그게'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the honorific particle '께' for an elder.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 captures the speaker's archaic register with '~이니라'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are equally fluent, natural, and accurate.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 uses '긴급한', which better suits the tutorial register.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 correctly translates the name, National Day, and urgency.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 is more natural and concise instructional English.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 captures the emphatic nuance of 'とは知らず' with '줄도'.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 consistently honors the mother and uses natural chat phrasing.\"}\n]\n",
+  "duration_seconds": 181.444931,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13836,
+   "output_tokens": 26608,
+   "thinking_tokens": 26107,
+   "cache_read_tokens": 0,
+   "total_tokens": 40444
+  }
+ }
+}

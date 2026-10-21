@@ -1,0 +1,36 @@
+{
+ "call": 2,
+ "try": 2,
+ "ids": [
+  "item-0036.2",
+  "item-0043.1",
+  "item-0011.1",
+  "item-0017.2",
+  "item-0081.2",
+  "item-0024.1",
+  "item-0081.1",
+  "item-0039.1",
+  "item-0028.1",
+  "item-0043.2",
+  "item-0008.1",
+  "item-0077.2",
+  "item-0078.2",
+  "item-0047.1",
+  "item-0033.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2ea13e04-1805-467b-a61f-25e64ac11528",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"덱스가 is natural subject marker, and conversational ending fits dialogue.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are equally natural and faithful translations of the line.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'For team use' is much more natural for manual headings.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'자' fits fantasy tone and non-human keeper better than '사람'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'meet in person' is much more natural than 'direct transaction'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Dex speaks in 반말, making '너' much more natural than '당신'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'meet in person' is much more natural than 'direct transaction'.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both fail the required 해요체 speech level; punctuation difference is ignored.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both make the same pronoun error and are equally natural.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both are equally natural and faithful translations of the line.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'寿星' means the birthday person ('생일 주인공'), not birthday party.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Speaking to Lin Xia requires 반말 rather than 해요체.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Equally good; only difference is an optional Oxford comma.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Correctly names Kiryu as the person who left the umbrella.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 2 wrongly turns it into a question and uses 해요체.\"}\n]\n",
+  "duration_seconds": 145.417367,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13955,
+   "output_tokens": 24010,
+   "thinking_tokens": 23528,
+   "cache_read_tokens": 0,
+   "total_tokens": 37965
+  }
+ }
+}

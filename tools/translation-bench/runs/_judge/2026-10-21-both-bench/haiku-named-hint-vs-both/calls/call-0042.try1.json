@@ -1,0 +1,36 @@
+{
+ "call": 42,
+ "try": 1,
+ "ids": [
+  "item-0068.1",
+  "item-0098.2",
+  "item-0261.2",
+  "item-0230.1",
+  "item-0097.1",
+  "item-0287.1",
+  "item-0091.2",
+  "item-0250.1",
+  "item-0358.2",
+  "item-0031.2",
+  "item-0006.2",
+  "item-0052.2",
+  "item-0127.1",
+  "item-0069.2",
+  "item-0061.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "99c201ca-6f1a-4820-b9a7-2d4ac510b257",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"물놀이하느라 is more natural and grammatically correct.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Rory is male (uses 누나) and speaks 반말 to Siobhan.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"그럼 결정이네 captures the idiomatic meaning much more naturally.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Older brother speaking to younger sister refers to himself as 오빠.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both spacing variants are standard and equally good.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translates 'go easy on the stairs' much more idiomatically.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'guard the ward' is standard and idiomatic, unlike 'hold'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"무슨 일 있으세요? is natural when asking about leave reasons.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Faithfully translates 喫茶ふくろう without adding 탐정국.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Preserves 'our' (우리), contrasting with 'his' (자기).\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"조식 포함 is standard travel terminology and phrasing is natural.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"고속열차 예매 and 숙소 알아봐 are more natural Korean.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Uses the established character name 린위안 correctly.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Identical except trailing punctuation; equally good.\"}\n]\n",
+  "duration_seconds": 89.901308,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13883,
+   "output_tokens": 14688,
+   "thinking_tokens": 14212,
+   "cache_read_tokens": 0,
+   "total_tokens": 28571
+  }
+ }
+}

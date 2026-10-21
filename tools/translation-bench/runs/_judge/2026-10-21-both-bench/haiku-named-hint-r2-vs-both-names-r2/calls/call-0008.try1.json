@@ -1,0 +1,36 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0252.1",
+  "item-0086.1",
+  "item-0027.1",
+  "item-0323.2",
+  "item-0257.1",
+  "item-0002.1",
+  "item-0114.2",
+  "item-0123.1",
+  "item-0309.2",
+  "item-0013.2",
+  "item-0141.2",
+  "item-0103.2",
+  "item-0273.2",
+  "item-0326.1",
+  "item-0112.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fb9d8587-454a-4f95-b64c-b7f6db7ca875",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"셰천 씨 and 운전해 주면 are more polite and natural.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and fluent.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Xu Nuo is female, so 언니 is correct; 누나 is wrong gender.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"ひとこと means a one-line note, not a line of text.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"~줄 것 같아 is more natural spoken Korean than ~라고 생각해.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 romanizes Modakbul instead of leaving Korean script.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both with and together with are natural and accurate.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"마중 나가거라 is idiomatic and matches the speaker's master register.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"저녁에는 faithfully translates 夕方には without adding an unprompted 쯤.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"죽게 두면 안 돼 faithfully captures don't let die.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"old Mr. Takanashi is a more natural rendering of 小鳥遊老人.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 avoids inserting unnecessary hanja in parentheses into dialogue.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both prepositions are natural and accurate in this context.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"When fits the context; If implies unwarranted doubt about waking up.\"}\n]\n",
+  "duration_seconds": 148.02978,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13699,
+   "output_tokens": 21901,
+   "thinking_tokens": 21417,
+   "cache_read_tokens": 0,
+   "total_tokens": 35600
+  }
+ }
+}

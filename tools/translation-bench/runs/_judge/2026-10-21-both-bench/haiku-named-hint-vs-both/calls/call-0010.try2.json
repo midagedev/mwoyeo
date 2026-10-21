@@ -1,0 +1,36 @@
+{
+ "call": 10,
+ "try": 2,
+ "ids": [
+  "item-0294.2",
+  "item-0340.1",
+  "item-0289.2",
+  "item-0074.1",
+  "item-0347.2",
+  "item-0292.1",
+  "item-0026.2",
+  "item-0297.1",
+  "item-0171.2",
+  "item-0109.1",
+  "item-0097.2",
+  "item-0077.2",
+  "item-0050.2",
+  "item-0348.1",
+  "item-0253.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "876bc4f1-563f-4116-9252-29bace86fb9f",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 2 inappropriately refers to their father as 그 사람.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 좀 쉬어 as an imperative, not let's.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 left the source text completely untranslated.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 오빠 for a female speaker instead of 형.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified 반말 speech level.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 reads more naturally and has proper punctuation.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly reflects the plural meaning and reads naturally.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 naturally translates affirmation and reaction interjections.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are equally good, differing only in minor phrasing.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are identical except for equally acceptable spacing.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 uses the more natural verb predicate 찬성해요.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 직거래 as in-person handoff, not direct trade.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 分けてもらえ and matches speaker tone.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 uses the more natural connective ending -더니.\"}\n]\n",
+  "duration_seconds": 190.60372,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14065,
+   "output_tokens": 27954,
+   "thinking_tokens": 27486,
+   "cache_read_tokens": 0,
+   "total_tokens": 42019
+  }
+ }
+}

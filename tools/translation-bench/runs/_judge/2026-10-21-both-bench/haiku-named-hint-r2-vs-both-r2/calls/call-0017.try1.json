@@ -1,0 +1,36 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0026.2",
+  "item-0064.2",
+  "item-0074.1",
+  "item-0176.2",
+  "item-0144.2",
+  "item-0161.2",
+  "item-0304.1",
+  "item-0268.1",
+  "item-0039.2",
+  "item-0317.1",
+  "item-0079.1",
+  "item-0155.1",
+  "item-0112.1",
+  "item-0109.1",
+  "item-0275.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f93edc07-a0be-45a1-b06c-f580f08ae42d",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Better captures the request nuance of ちょうだい.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly refers to the envoy rather than the speaker.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Consistently maintains the required high honorific register.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Then' accurately captures the deductive nuance of the line.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'대피' is much more natural than '피난' for immediate danger.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Trembled slightly' is more natural English for hand movement.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'뭐, 그렇지' accurately translates the modest nuance of 'まあな'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Avoids the redundant 'before' when using 'used to'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'줄도 모르고' better captures the emphatic nuance of 'とは知らず'.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Correctly conveys the reported speech and avoids a sentence fragment.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 actually translates the text into Korean.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'북문을 지키게 해라' correctly translates the military meaning.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'Meet for a direct handoff' is much more natural English.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Uses polite speech appropriate for addressing the captain.\"}\n]\n",
+  "duration_seconds": 197.477822,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14150,
+   "output_tokens": 26039,
+   "thinking_tokens": 25577,
+   "cache_read_tokens": 0,
+   "total_tokens": 40189
+  }
+ }
+}

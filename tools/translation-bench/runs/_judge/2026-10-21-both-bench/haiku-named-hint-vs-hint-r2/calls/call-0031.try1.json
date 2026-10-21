@@ -1,0 +1,36 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0220.1",
+  "item-0224.1",
+  "item-0269.1",
+  "item-0122.1",
+  "item-0176.1",
+  "item-0344.1",
+  "item-0091.1",
+  "item-0088.1",
+  "item-0327.2",
+  "item-0034.1",
+  "item-0181.1",
+  "item-0343.1",
+  "item-0233.2",
+  "item-0231.1",
+  "item-0012.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "88b784c8-fa9c-4097-b9f0-df5d48a02678",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural phrasing and particles for section chief speaking to subordinate.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'건은' is much more natural Korean business phrasing than calque '분은'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Omitting 'sir' avoids an awkward calque like '선생님' for landlord.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Faithful to the source by not adding the unmentioned title '선장'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Rook is an engineer, not a commander ('사령관님').\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'도저히' accurately conveys '根本' (not at all), unlike '제대로'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Preserves the singular feature name 'Quick Note' defined in source.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are equally accurate, polite, and natural.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'마을을 감싸는' is more concise and natural than '-고 있는'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'I know, right' captures the empathetic agreement of '그러게' much better.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'천천히 쓰세요' is appropriate for restroom use; '쉬다 오세요' is not.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Identical translations ignoring formatting symbol.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both 'over' and 'during' are equally natural and accurate here.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both translations convey the meaning and tone equally well.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"'sections' is more appropriate for software documentation than 'parts'.\"}\n]\n",
+  "duration_seconds": 146.259549,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13677,
+   "output_tokens": 21048,
+   "thinking_tokens": 20541,
+   "cache_read_tokens": 0,
+   "total_tokens": 34725
+  }
+ }
+}

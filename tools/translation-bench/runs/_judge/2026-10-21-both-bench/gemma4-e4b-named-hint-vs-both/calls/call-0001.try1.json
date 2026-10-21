@@ -1,0 +1,36 @@
+{
+ "call": 1,
+ "try": 1,
+ "ids": [
+  "item-0032.2",
+  "item-0035.1",
+  "item-0040.2",
+  "item-0016.1",
+  "item-0023.2",
+  "item-0062.1",
+  "item-0048.1",
+  "item-0079.1",
+  "item-0052.1",
+  "item-0023.1",
+  "item-0048.2",
+  "item-0055.1",
+  "item-0056.2",
+  "item-0059.1",
+  "item-0059.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "49208ac8-ae27-44f7-820a-8d87a4ca6916",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'ride in the car' is much more natural here.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly uses 해요체 according to the speaker rules.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are equally plausible and natural.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'제조사 무라타 씨' is more natural than '제조사인'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'The qi stones' correctly refers to the specific stones.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly uses 반말 according to the speaker rules.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'모차 매입 가격' is more natural without the particle '의'.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'제조사 무라타 씨' is more natural than '제조사인'.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Correctly uses 반말 according to the speaker rules.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Correctly uses 해요체 according to the speaker rules.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both have identical errors and variants are equally good.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both have identical errors and variants are equally good.\"}\n]\n",
+  "duration_seconds": 151.032245,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14163,
+   "output_tokens": 22250,
+   "thinking_tokens": 21809,
+   "cache_read_tokens": 0,
+   "total_tokens": 36413
+  }
+ }
+}

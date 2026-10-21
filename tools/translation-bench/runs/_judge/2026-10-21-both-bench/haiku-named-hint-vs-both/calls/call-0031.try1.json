@@ -1,0 +1,36 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0133.2",
+  "item-0349.2",
+  "item-0139.2",
+  "item-0341.2",
+  "item-0119.1",
+  "item-0113.2",
+  "item-0118.1",
+  "item-0326.2",
+  "item-0178.2",
+  "item-0189.1",
+  "item-0100.1",
+  "item-0085.2",
+  "item-0187.1",
+  "item-0243.2",
+  "item-0226.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "2e8366c3-a4ef-40b0-89a3-0953e7cc9136",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Takanashi is male; Translation 1 misgenders him with 'Ms.'\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'盒' means boxes (상자), not pieces (개); T2 maintains polite register.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'out cold' translates '昏' accurately without adding an unnecessary 'now'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'Wait' correctly captures the surprise of '헐', whereas 'Huh' does not.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'only that watch' faithfully translates 'あの時計だけ' without adding extraneous words.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Xu Nuo speaks to Zhou Ting in haeyo-che, which Translation 2 uses.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'저장 기록' accurately translates countable 'save' (record) in a Git context.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'브리지' is standard loanword orthography, and word order is more natural.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'월세' is more natural and precise than '집세' for monthly rent.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 translates the line, whereas Translation 2 leaves Chinese untranslated.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'법도' fits the fantasy shrine keeper's archaic register better than '규칙'.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'이사하는데' provides background, so 'and' is more faithful than causal 'so'.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'손님이다' faithfully translates '客人じゃ', and '마중' fits '出迎え' accurately.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate; 'of' makes no difference.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"}\n]\n",
+  "duration_seconds": 178.762314,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13848,
+   "output_tokens": 29395,
+   "thinking_tokens": 28859,
+   "cache_read_tokens": 0,
+   "total_tokens": 43243
+  }
+ }
+}

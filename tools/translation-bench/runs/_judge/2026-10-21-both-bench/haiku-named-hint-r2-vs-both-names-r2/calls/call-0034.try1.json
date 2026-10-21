@@ -1,0 +1,36 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0076.1",
+  "item-0126.2",
+  "item-0153.2",
+  "item-0318.2",
+  "item-0211.2",
+  "item-0276.1",
+  "item-0066.2",
+  "item-0310.2",
+  "item-0181.1",
+  "item-0190.1",
+  "item-0062.1",
+  "item-0265.1",
+  "item-0247.1",
+  "item-0132.1",
+  "item-0010.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "74f4858e-47d7-4a5e-9410-9162b11cb13a",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"\\\"물놀이하다가\\\" is much more natural Korean than \\\"계곡 놀이 때문에\\\".\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"\\\"고객용\\\" is more appropriate than \\\"손님용\\\" in a business context.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 avoids inappropriate honorifics (-시-) toward a peer.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"\\\"첫 엠티\\\" is idiomatic and grammatically natural Korean, unlike \\\"처음 엠티\\\".\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"\\\"securely\\\" faithfully translates \\\"收好\\\", which Translation 2 omits.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 reads more naturally without repeating the particle \\\"up\\\".\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"\\\"그럭저럭이지\\\" correctly captures the modest nuance of \\\"まあな\\\", unlike \\\"그럼\\\".\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 is clear, avoiding Translation 2's ambiguous word order.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural user guide phrasing.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"\\\"confirmation email\\\" faithfully translates \\\"確認のメール\\\", unlike \\\"invitation email\\\".\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Uses the specified name \\\"키류\\\" and correctly interprets the topic.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"\\\"국경절\\\" correctly translates the \\\"十一\\\" holiday, unlike \\\"10월 1일\\\".\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are equally faithful and natural in 반말.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Identical except for capitalization, which should be ignored.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Correctly uses 반말 according to the speaker's relationship.\"}\n]\n",
+  "duration_seconds": 124.938673,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13793,
+   "output_tokens": 16692,
+   "thinking_tokens": 16169,
+   "cache_read_tokens": 0,
+   "total_tokens": 30485
+  }
+ }
+}

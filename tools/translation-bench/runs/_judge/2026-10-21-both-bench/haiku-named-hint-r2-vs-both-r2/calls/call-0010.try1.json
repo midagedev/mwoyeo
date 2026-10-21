@@ -1,0 +1,36 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0105.2",
+  "item-0159.1",
+  "item-0087.1",
+  "item-0345.2",
+  "item-0050.2",
+  "item-0346.1",
+  "item-0269.2",
+  "item-0099.2",
+  "item-0264.1",
+  "item-0223.1",
+  "item-0172.2",
+  "item-0130.2",
+  "item-0092.2",
+  "item-0097.2",
+  "item-0078.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7a07f611-bc44-47cb-bf06-4d81d8e71868",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translates strict accurately as 엄격하다 and is more natural.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Uses the required 합쇼체 speech level for the captain.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translates 퇴근하고 and 말만 그럴듯하게 much more naturally.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translates 水鏡 as 물거울 and maintains spoken dialogue style.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Correctly interprets the truncated sta as stairs in context.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly transcribes pinyin jiě as 제 per standard orthography.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly uses 반말 speech level between tenants.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translates afterwards as 그 후에 and uses standard Git terms.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Captures 话音未落 accurately with fully left his mouth.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Reads much more naturally with sneered and turned to leave.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translates chase faithfully as 연락해 보다 regarding the meter issue.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Uses the required 반말 speech level for Zhou Ting.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translates Japanese 手配 into natural Korean rather than raw kanji.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Correctly translates 署 as 경찰서 instead of awkward literal 서.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Faithfully translates 하셔 as doing it without assuming a workplace.\"}\n]\n",
+  "duration_seconds": 129.021014,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14329,
+   "output_tokens": 18874,
+   "thinking_tokens": 18400,
+   "cache_read_tokens": 0,
+   "total_tokens": 33203
+  }
+ }
+}

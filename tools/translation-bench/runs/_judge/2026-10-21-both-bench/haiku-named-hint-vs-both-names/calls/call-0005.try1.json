@@ -1,0 +1,36 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0259.1",
+  "item-0153.1",
+  "item-0094.1",
+  "item-0255.1",
+  "item-0034.2",
+  "item-0055.1",
+  "item-0224.2",
+  "item-0192.1",
+  "item-0199.1",
+  "item-0048.2",
+  "item-0123.2",
+  "item-0155.1",
+  "item-0238.1",
+  "item-0141.1",
+  "item-0208.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "8c4a3470-ffdf-4700-9b5a-d6694db72dcb",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correctly pairs 'properly' with clean and 'everything' with scrub.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Plural 'Quick Notes' naturally matches decisions from multiple meetings.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'Organizes' correctly translates 分ける; 'sorts' implies ordering tags.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly uses informal speech (반말) for speaking to a younger sister.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly uses informal speech (반말) when speaking to Lu Ming.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and read naturally.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'알겠습니다' accurately captures 'Aye' as an acknowledgment of an order.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Male speaker correctly uses '누나' instead of '언니' for older sister.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Correctly follows the explicit pronunciation 'TOH-mash' as 토마시.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Uses idiomatic Korean rather than an awkward literal translation.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Correctly captures the reported speech ending (-대) as 'said she'd come'.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'-는 법이란다' sounds much more natural than literal translationese '-는 것이란다'.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 2 leaves untranslated Korean text in the English sentence.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'잘해요' is the natural, idiomatic Korean equivalent of '得意'.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Correctly romanizes the polyphonic surname 万俟 as 'Mo Qi'.\"}\n]\n",
+  "duration_seconds": 157.408525,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13973,
+   "output_tokens": 23222,
+   "thinking_tokens": 22711,
+   "cache_read_tokens": 0,
+   "total_tokens": 37195
+  }
+ }
+}

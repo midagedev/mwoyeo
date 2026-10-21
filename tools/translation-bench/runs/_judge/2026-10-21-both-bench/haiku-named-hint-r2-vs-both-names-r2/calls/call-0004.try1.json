@@ -1,0 +1,36 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0251.1",
+  "item-0264.1",
+  "item-0325.2",
+  "item-0201.2",
+  "item-0253.2",
+  "item-0121.1",
+  "item-0060.1",
+  "item-0306.1",
+  "item-0165.2",
+  "item-0304.2",
+  "item-0280.1",
+  "item-0043.1",
+  "item-0245.1",
+  "item-0177.1",
+  "item-0314.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6ed9cebc-8bb0-451e-9159-f903065906e0",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses banmal according to the speaker rules.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 naturally translates 茶山 as 차밭 instead of 찻산.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 translates ㅋㅋ into lol instead of leaving Korean script.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly recognizes 三红 as a blend name and uses banmal.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are equally faithful and natural.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are equally polite, accurate, and natural.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 reads more naturally by omitting the unnatural pronoun 당신.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly transcribes Tomasz as 토마시 per the pronunciation guide.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 accurately translates ~し as ~고요 rather than ~잖아요.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 続きを聞かせて as 계속 들려줘.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 transliterates 湊 into Hangul 미나토 instead of romaji.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 correctly addresses the new hire with 'you'.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates シュザンヌ様 as 쉬잔 님 without additions.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 correctly translates yet without assuming 벌써 (already).\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 according to the speaker rules.\"}\n]\n```\n",
+  "duration_seconds": 152.99022,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13919,
+   "output_tokens": 27578,
+   "thinking_tokens": 27079,
+   "cache_read_tokens": 0,
+   "total_tokens": 41497
+  }
+ }
+}

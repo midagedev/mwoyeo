@@ -1,0 +1,36 @@
+{
+ "call": 40,
+ "try": 2,
+ "ids": [
+  "item-0060.2",
+  "item-0197.1",
+  "item-0307.2",
+  "item-0068.1",
+  "item-0098.2",
+  "item-0261.2",
+  "item-0230.1",
+  "item-0097.1",
+  "item-0287.1",
+  "item-0091.2",
+  "item-0250.1",
+  "item-0343.2",
+  "item-0031.2",
+  "item-0006.2",
+  "item-0052.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f960ab5b-2420-41d4-9c01-ca674be49fb4",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correctly uses informal speech (반말) and avoids tautological phrasing.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Honorific suffix '-시-' is more appropriate when addressing a senior.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally accurate; punctuation difference is negligible.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both convey the meaning and tone of the message accurately.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Please don't worry' captures the tone of 'ご安心を' more naturally.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'Use Chaeyul' is more natural English for specifying a name.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 has more natural phrasing and register for siblings.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'공금 계좌' and '넣을게' fit shared travel expenses better.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Preserves the exact singular feature name 'Quick Note'.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'쉬잔 님' accurately and faithfully translates 'シュザンヌ様'.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Identical translations aside from the ignored UI glyph.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'Array-eye' and the perfective aspect are more faithful and natural.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"The particle '-도' accurately reflects the emphatic nuance of 'とは知らず'.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Contrastive particle '너는' and standard spacing are more natural.\"}\n]\n",
+  "duration_seconds": 197.139801,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14001,
+   "output_tokens": 27484,
+   "thinking_tokens": 27000,
+   "cache_read_tokens": 0,
+   "total_tokens": 41485
+  }
+ }
+}

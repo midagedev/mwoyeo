@@ -1,0 +1,36 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0030.1",
+  "item-0175.2",
+  "item-0172.1",
+  "item-0201.1",
+  "item-0191.2",
+  "item-0310.1",
+  "item-0078.2",
+  "item-0282.1",
+  "item-0194.2",
+  "item-0080.2",
+  "item-0208.2",
+  "item-0225.1",
+  "item-0043.1",
+  "item-0075.1",
+  "item-0113.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c0a59a6f-d8b8-41b9-a5f4-42ebe5db786d",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Faithfully captures the conditional meaning of 抢到了.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Accurately translates 'for now' as 당분간 rather than 아직.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Maintains consistent lowercase capitalization for both feature names.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly translates ひとこと as short note instead of single note.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translates the heading actively rather than using an unnatural passive voice.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly uses the required informal speech level (반말) between siblings.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Correctly uses informal speech (반말) instead of inappropriate polite forms.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Uses the natural Korean idiom 다녀오세요 for someone using the restroom.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both on site and on the floor are accurate and natural.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly uses informal speech (반말) matching the speaker's established register.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are polite, accurate, and natural business Korean.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Avoids the misspelling of the name 雨宮 as 아마메야.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both 내용 and 항목 are natural, accurate translations of staged changes.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translates 좁아서 more naturally as small rather than cramped.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Correctly uses polite speech (해요체) as required by the facts.\"}\n]\n",
+  "duration_seconds": 192.425866,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13410,
+   "output_tokens": 27665,
+   "thinking_tokens": 27179,
+   "cache_read_tokens": 0,
+   "total_tokens": 41075
+  }
+ }
+}

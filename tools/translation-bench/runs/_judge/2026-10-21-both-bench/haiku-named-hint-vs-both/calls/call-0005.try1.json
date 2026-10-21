@@ -1,0 +1,36 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0332.2",
+  "item-0185.1",
+  "item-0042.2",
+  "item-0327.1",
+  "item-0207.1",
+  "item-0262.2",
+  "item-0083.2",
+  "item-0247.1",
+  "item-0173.2",
+  "item-0062.1",
+  "item-0040.2",
+  "item-0006.1",
+  "item-0050.1",
+  "item-0087.2",
+  "item-0265.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b8f0085c-c2af-4c66-86ad-a2fefa3a98d3",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both 해 and 해라 are valid 반말 forms.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 鼓浪屿 to 구랑위 without raw pinyin.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the line untranslated in Japanese.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 as specified in the facts.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 faithfully translates 濡れた as wet rather than dripping.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 follows the term Shijie and translates 师兄 correctly.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are identical aside from a minor comma.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 translates 형 accurately and avoids redundant 'before'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"조심하겠습니다 is more natural than 주의하겠습니다 for handling objects carefully.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 as specified in the facts.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 uses 아직 appropriately instead of the awkward 여전히.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 'our' as 우리.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 accurately translates 직거래 as in-person handoff.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 avoids redundant duplication of the English name.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both are equally good translations with identical wording.\"}\n]\n",
+  "duration_seconds": 142.46431,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14151,
+   "output_tokens": 20949,
+   "thinking_tokens": 20477,
+   "cache_read_tokens": 0,
+   "total_tokens": 35100
+  }
+ }
+}

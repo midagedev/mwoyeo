@@ -1,0 +1,36 @@
+{
+ "call": 41,
+ "try": 1,
+ "ids": [
+  "item-0127.1",
+  "item-0069.2",
+  "item-0061.1",
+  "item-0210.2",
+  "item-0331.1",
+  "item-0171.1",
+  "item-0160.1",
+  "item-0045.2",
+  "item-0173.1",
+  "item-0139.1",
+  "item-0102.2",
+  "item-0290.2",
+  "item-0038.1",
+  "item-0215.2",
+  "item-0204.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d505bba8-5459-4e19-8047-493b3b61e458",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"\\\"둘이\\\" is much more natural than \\\"두 명이\\\" in conversational Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Referring to one's father as \\\"그 사람\\\" is unnatural and disrespectful.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly uses the specified 반말 speech level.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Uses the correct object particle \\\"내용을\\\" and reads more naturally.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Correctly transcribes the name 烏丸 as 가라스마.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Faithfully matches the user guide's definition of 短いメモ as short notes.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"\\\"법도\\\" fits the archaic fantasy shrine keeper's register better than \\\"규칙\\\".\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly uses the required 합쇼체 speech level.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"\\\"그 후에\\\" accurately conveys sequential tutorial steps, unlike \\\"나중에\\\".\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Faithfully translates \\\"指先\\\" as fingertips.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Correctly uses the specified 해요체 speech level.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"\\\"의사의 지시야\\\" is more natural and idiomatic in Korean.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"\\\"두 시간씩\\\" and \\\"박사님\\\" are much more natural in Korean.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"\\\"분\\\" fits polite Korean register better than translationese \\\"사람\\\".\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"\\\"위치\\\" is the standard technical term in Git documentation, unlike \\\"자리\\\".\"}\n]\n",
+  "duration_seconds": 152.026349,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13941,
+   "output_tokens": 20494,
+   "thinking_tokens": 19998,
+   "cache_read_tokens": 0,
+   "total_tokens": 34435
+  }
+ }
+}

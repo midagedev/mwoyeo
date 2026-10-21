@@ -1,0 +1,36 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0022.1",
+  "item-0001.1",
+  "item-0016.2",
+  "item-0019.2",
+  "item-0015.2",
+  "item-0013.2",
+  "item-0029.1",
+  "item-0021.2",
+  "item-0051.1",
+  "item-0002.2",
+  "item-0016.1",
+  "item-0049.1",
+  "item-0003.1",
+  "item-0004.2",
+  "item-0005.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "898c6cf9-3db3-4a34-a36e-479e486340df",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses the required haeyo-che speech level.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly includes the object 'me' rather than oneself.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Pets ride in cars rather than take cars.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"고속열차 is more natural than 고속철도 when booking a train.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 correctly conveys having stayed in the village.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both make identical errors and are otherwise stylistic variants.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are equally good despite misgendering Subin.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Pets ride in cars rather than take cars.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and equally good.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 说好听的 as saying nice words.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 'keep' in use rather than storage.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations are identical.\"}\n]\n",
+  "duration_seconds": 216.126621,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14060,
+   "output_tokens": 33777,
+   "thinking_tokens": 33342,
+   "cache_read_tokens": 0,
+   "total_tokens": 47837
+  }
+ }
+}

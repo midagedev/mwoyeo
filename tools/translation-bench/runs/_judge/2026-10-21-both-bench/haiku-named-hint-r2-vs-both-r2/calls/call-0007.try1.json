@@ -1,0 +1,36 @@
+{
+ "call": 7,
+ "try": 1,
+ "ids": [
+  "item-0059.1",
+  "item-0077.2",
+  "item-0309.2",
+  "item-0137.1",
+  "item-0256.1",
+  "item-0314.2",
+  "item-0243.2",
+  "item-0267.2",
+  "item-0278.2",
+  "item-0200.1",
+  "item-0192.2",
+  "item-0215.1",
+  "item-0185.1",
+  "item-0219.1",
+  "item-0060.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "dfae67d8-978c-4e5d-af90-bc229d4b1f58",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 translates 婷姐 instead of leaving Chinese characters.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 uses a more natural Korean phrasing for the command.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally good, differing only by a trailing period.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translates '오빠' accurately as 'older brother' instead of transliterating 'oppa'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'casual chat' fits the workplace onboarding guide register better than 'chit-chat'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'Post an introduction' is much more natural English than 'Leave'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translates the line, while Translation 2 left it untranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified 해요체 speech level.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 is faithful, while Translation 2 adds unprompted 'already'.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 1 mispronounces Aoife despite the explicit pronunciation guide.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations are equally good, differing only by parenthetical English.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"'모순되는데요' uses the proper verb and natural conversational nuance.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'そうだ' expressing sudden recall translates to '맞다', not agreement '맞아'.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates '还' as '아직'.\"}\n]\n",
+  "duration_seconds": 135.30655,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13435,
+   "output_tokens": 20548,
+   "thinking_tokens": 20051,
+   "cache_read_tokens": 0,
+   "total_tokens": 33983
+  }
+ }
+}

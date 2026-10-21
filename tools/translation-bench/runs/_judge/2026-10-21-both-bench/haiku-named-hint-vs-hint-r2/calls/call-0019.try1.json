@@ -1,0 +1,36 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0210.1",
+  "item-0130.1",
+  "item-0090.1",
+  "item-0005.1",
+  "item-0295.1",
+  "item-0277.1",
+  "item-0178.1",
+  "item-0170.1",
+  "item-0187.2",
+  "item-0100.2",
+  "item-0063.1",
+  "item-0204.2",
+  "item-0032.2",
+  "item-0026.1",
+  "item-0053.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "630e51dc-61c9-483b-a273-8f42fd65a296",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'제외한' accurately translates 'leave out'; '빼 둔' means set aside.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates 'ㅋㅋ' into natural English instead of leaving Korean characters.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'해천 씨 몫' accurately and naturally translates '解辰那份'.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both '-하셨나요?' and '-하셨어요?' are equally valid, natural 해요체 endings.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'확인해 봐' naturally translates the imperative instruction to check inboxes.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'come back' is much more natural than 'come again' here.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'그 사람' avoids the unnatural translationese pronoun '그녀'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'will be returned' is standard and natural, unlike 'goes back'.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'움직이면 안 되는' is idiomatic Korean for 'must never move'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'충돌을 하나씩' sounds much more natural than translationese '각 충돌'.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'shadowing' matches the corporate onboarding context; 'field trip' does not.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"'자리에' and '위치에' are equally accurate and natural.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Avoids awkward parenthetical Chinese characters in spoken drama dialogue.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'납품일 회신' is natural Korean, avoiding translationese '~에 대한'.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'오래' is much more natural conversational Korean than '와 줬으면 한대'.\"}\n]\n",
+  "duration_seconds": 162.101594,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13745,
+   "output_tokens": 22505,
+   "thinking_tokens": 21981,
+   "cache_read_tokens": 0,
+   "total_tokens": 36250
+  }
+ }
+}

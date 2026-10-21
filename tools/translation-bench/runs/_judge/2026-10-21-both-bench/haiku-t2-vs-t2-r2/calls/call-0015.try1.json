@@ -1,0 +1,36 @@
+{
+ "call": 15,
+ "try": 1,
+ "ids": [
+  "item-0001.2",
+  "item-0304.1",
+  "item-0015.2",
+  "item-0303.1",
+  "item-0053.2",
+  "item-0026.2",
+  "item-0064.2",
+  "item-0074.1",
+  "item-0251.1",
+  "item-0269.1",
+  "item-0155.1",
+  "item-0227.2",
+  "item-0262.2",
+  "item-0039.2",
+  "item-0311.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d04df71a-ac3b-4cab-9b1e-287296809461",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Uses the specified term '메리골드' and conversational 반말.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"More idiomatic for an onboarding schedule describing the first day.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Rook is an engineer, not the captain; '선장님' is incorrect.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translates the place name into Korean instead of leaving Chinese characters.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Japanese.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"More concise and natural without inserting the unmentioned word 'Onboarding'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Don't move around' is much more natural than 'carelessly'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'Hoarded' inappropriately adds a negative connotation for the sect's elder.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Korean.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Properly completes sentence in required 해요체 and uses natural term '대피'.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'그 과정에서' accurately translates 'that' referring to the merge process.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Uses proper honorifics ('오실 수') when referring to the professor.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'그곳' correctly translates discourse anaphora where '저기' is unnatural.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'-대요' is much more natural and conversational in messaging.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"'그 사람' and '얘기' are much more natural in Korean dialogue.\"}\n]\n",
+  "duration_seconds": 190.902963,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13957,
+   "output_tokens": 29236,
+   "thinking_tokens": 28738,
+   "cache_read_tokens": 0,
+   "total_tokens": 43193
+  }
+ }
+}

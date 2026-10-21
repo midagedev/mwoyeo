@@ -1,0 +1,36 @@
+{
+ "call": 28,
+ "try": 1,
+ "ids": [
+  "item-0128.1",
+  "item-0029.2",
+  "item-0179.2",
+  "item-0059.2",
+  "item-0300.1",
+  "item-0299.1",
+  "item-0023.1",
+  "item-0154.2",
+  "item-0080.1",
+  "item-0224.2",
+  "item-0324.1",
+  "item-0308.2",
+  "item-0133.2",
+  "item-0334.2",
+  "item-0139.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "5260351c-9cb3-4932-97b3-28662d3db7b4",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and use valid terminology.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 translates 'え' and uses natural conversational 반말.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 accurately translates '用拼配' and '混进去' without adding '어때요'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 consistently uses 반말 and natural conversational phrasing.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 adheres to the required 반말 speech level.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 correctly translates '오빠' as 'my older brother'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 is faithful, whereas Translation 2 adds unmentioned hearsay.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 as required by the facts.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 mistranslates 'ひろば' as 'space', confusing it with workspace.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'호타루 건' in Translation 1 is natural Korean business phrasing.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 correctly identifies the subject ('You') for the new hire.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 합쇼체 ('알겠습니다') matching the speaker's speech level.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 correctly transcribes Zēng Lán as 쩡란 instead of 증란.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 translates '伤' and reads much more naturally in dialogue.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 uses the natural English expression 'fingers' instead of 'fingertips'.\"}\n]\n```\n",
+  "duration_seconds": 130.807112,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14147,
+   "output_tokens": 19597,
+   "thinking_tokens": 19071,
+   "cache_read_tokens": 0,
+   "total_tokens": 33744
+  }
+ }
+}

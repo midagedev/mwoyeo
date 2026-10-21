@@ -1,0 +1,36 @@
+{
+ "call": 30,
+ "try": 1,
+ "ids": [
+  "item-0236.1",
+  "item-0274.1",
+  "item-0341.1",
+  "item-0133.2",
+  "item-0343.2",
+  "item-0139.2",
+  "item-0302.1",
+  "item-0119.1",
+  "item-0113.2",
+  "item-0118.1",
+  "item-0320.2",
+  "item-0178.2",
+  "item-0189.1",
+  "item-0100.1",
+  "item-0085.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "721c300e-aea1-4bfd-a7d9-bc7b87e1b5e4",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"More natural phrasing without awkward pronoun '당신이'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly uses 반말 as specified for Hinata to Takanashi.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'검' fits a fantasy swordsman better than '칼'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'옛 서책' fits the fantasy RPG genre better than '서적'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'Inspector' is capitalized when used as a form of address.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Correctly uses '키류' as specified in the facts.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Transliterates the name to Korean and uses '공유 서버'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Locks are described as 'intact', not 'closed'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Much more natural Korean phrasing than literal '가길 원한대'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Faithfully preserves the mid-word cut-off from the original.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'앉으세요' is the standard polite invitation for welcoming guests.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'상황 보고' fits sci-fi command style without extra 반말.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both are natural, accurate, and use correct speech levels.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Does not hallucinate '탐정국' absent from the source line.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Correctly uses 해요체 as specified in the facts.\"}\n]\n",
+  "duration_seconds": 192.941571,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13822,
+   "output_tokens": 25600,
+   "thinking_tokens": 25116,
+   "cache_read_tokens": 0,
+   "total_tokens": 39422
+  }
+ }
+}

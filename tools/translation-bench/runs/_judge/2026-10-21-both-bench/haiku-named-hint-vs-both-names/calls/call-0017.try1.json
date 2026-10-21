@@ -1,0 +1,36 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0332.1",
+  "item-0274.1",
+  "item-0064.1",
+  "item-0241.1",
+  "item-0166.2",
+  "item-0209.2",
+  "item-0223.1",
+  "item-0237.1",
+  "item-0103.1",
+  "item-0283.2",
+  "item-0353.1",
+  "item-0053.2",
+  "item-0230.2",
+  "item-0319.1",
+  "item-0120.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c331bd50-43a1-41fe-970b-afdb92814e13",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 uses 합쇼체, matching Rook's speech level to Thorne.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'Three tenths' correctly translates '三成', whereas 'three parts' is incorrect.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'하지만' faithfully renders the adversative 'ですが' when objecting to an order.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 uses natural dialogue ending '고집이 세잖아' instead of '세고'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'브리지' is the standard Korean spelling, while '브릿지' is incorrect.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Translation 2 avoids assuming an unstated gender with 'Ms.'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 correctly translates '很紧' as '빡빡해서' instead of '매진돼서'.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural in Korean.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are identical except for punctuation, which is ignored.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 since Ricia addresses Saku.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 avoids the inappropriate honorific '마세요' when addressing a peer.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'네, 지금 바로 가볼게요' is polite and natural toward an elder.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations have identical meaning and phrasing with minor stylistic variation.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'your cat' correctly identifies the referent and reads more naturally.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 omits unnatural pronoun translationese ('우리가') and reads better.\"}\n]\n",
+  "duration_seconds": 221.555705,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14193,
+   "output_tokens": 33561,
+   "thinking_tokens": 33043,
+   "cache_read_tokens": 0,
+   "total_tokens": 47754
+  }
+ }
+}

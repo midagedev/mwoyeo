@@ -1,0 +1,36 @@
+{
+ "call": 24,
+ "try": 1,
+ "ids": [
+  "item-0308.2",
+  "item-0089.2",
+  "item-0260.2",
+  "item-0058.2",
+  "item-0178.1",
+  "item-0266.1",
+  "item-0137.2",
+  "item-0204.2",
+  "item-0242.1",
+  "item-0046.2",
+  "item-0281.2",
+  "item-0122.2",
+  "item-0213.2",
+  "item-0360.1",
+  "item-0255.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "07747c4d-1c1a-499c-8ed5-1fedfec0754a",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'반씩 나누자' is more natural Korean than '반반 나누자'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly uses 해요체 as Lu Ming speaks to Zhou Ting.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are faithful, natural, and equally good.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'doing it' faithfully reflects '하셔' without assuming the workplace.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'송구합니다' fits the deferential register toward a princess much better.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'관리인이' is grammatically natural; '관리인분' is an awkward honorific.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both are equally natural and accurate translations of 'by 2'.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'는' and '공유 서버' match the tutorial context much better.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both '회의실로' and '회의실에' are equally natural with '옮겨 두다'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both '수 없어' and '수가 없어' are completely interchangeable here.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'That's a relief' fits the reassurance context better than 'Thanks'.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"'burst into' captures '冲进' much better than 'ran into'.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'약속을 잡아 뒀어요' correctly translates '约好', unlike '약속해 두었어요'.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'short note' accurately translates 'ひとこと' in this app manual.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Correctly uses 반말 from older brother to younger sister.\"}\n]\n",
+  "duration_seconds": 231.549737,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14023,
+   "output_tokens": 37009,
+   "thinking_tokens": 36492,
+   "cache_read_tokens": 0,
+   "total_tokens": 51032
+  }
+ }
+}

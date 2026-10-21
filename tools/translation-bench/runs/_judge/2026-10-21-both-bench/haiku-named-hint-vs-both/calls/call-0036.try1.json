@@ -1,0 +1,36 @@
+{
+ "call": 36,
+ "try": 1,
+ "ids": [
+  "item-0170.1",
+  "item-0231.2",
+  "item-0071.2",
+  "item-0186.1",
+  "item-0048.1",
+  "item-0308.2",
+  "item-0292.2",
+  "item-0145.1",
+  "item-0091.1",
+  "item-0024.2",
+  "item-0313.1",
+  "item-0311.1",
+  "item-0229.1",
+  "item-0211.2",
+  "item-0138.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "b631e158-7df8-4627-8229-b23cf6c235b0",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both Day one and Day 1 are equally natural translations.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both 하지만 and 그런데 are natural and accurate translations.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 hallucinates English text and gets the name wrong.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both are natural and faithful renderings of the casual phrasing.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 avoids unnatural parenthetical Japanese kanji in dialogue.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 sounds much more natural and idiomatic in Korean.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 as specified for speaking to Rory.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 accurately translates 슈잔느様 to 쉬잔 님.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Guard the ward is more accurate and idiomatic than hold.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"The Chinese surname 仇 is correctly romanized as Qiu.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 uses the correct name reading from the facts.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"수고 많으십니다 is the proper greeting for ongoing daytime work.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 as required by the facts.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both walked away and walked off are equally natural and faithful.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Good to hear faithfully conveys the relief expressed by 다행이다.\"}\n]\n",
+  "duration_seconds": 95.053903,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14280,
+   "output_tokens": 15951,
+   "thinking_tokens": 15481,
+   "cache_read_tokens": 0,
+   "total_tokens": 30231
+  }
+ }
+}

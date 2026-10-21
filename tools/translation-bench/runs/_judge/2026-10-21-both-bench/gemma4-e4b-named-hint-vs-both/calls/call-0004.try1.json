@@ -1,0 +1,36 @@
+{
+ "call": 4,
+ "try": 1,
+ "ids": [
+  "item-0049.1",
+  "item-0068.1",
+  "item-0021.2",
+  "item-0020.1",
+  "item-0070.1",
+  "item-0063.2",
+  "item-0045.2",
+  "item-0038.1",
+  "item-0010.2",
+  "item-0053.1",
+  "item-0054.1",
+  "item-0028.2",
+  "item-0077.1",
+  "item-0050.2",
+  "item-0053.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0a6d9c8f-c00b-4fa2-b9b4-03274a053265",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Omitting the unnecessary particle '의' is more natural in Korean.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Omitting the redundant pronoun '제가' makes it much more natural.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Equally good; identical except for terminal punctuation, ignored per instructions.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Equally good; comma versus period in chat is a stylistic choice.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'깨어날 때가 왔어' is much more natural Korean than '깨어남의 때'.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"T2 correctly retains 'me', whereas T1 mistranslates who was volunteered.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"T2 is much more fluent and natural than literal phrasing in T1.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'품의를 진행하다' is natural business Korean; '돌리다' is literal translationese.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"T2 follows the term 'Shijie' and does not misname Zeng as Wanqi.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"T1 accurately conveys 'that famous cat cafe' as the destination.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Equally good; both convey the same meaning with identical gender errors.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"T1 correctly uses 반말 as required by the speaker facts.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'Boss Kaoru' is the natural honorific form matching required terms.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"T1 follows the term 'Shijie' and does not misname Zeng as Wanqi.\"}\n]\n",
+  "duration_seconds": 195.184682,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14220,
+   "output_tokens": 29554,
+   "thinking_tokens": 29041,
+   "cache_read_tokens": 0,
+   "total_tokens": 43774
+  }
+ }
+}

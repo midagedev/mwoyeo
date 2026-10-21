@@ -1,0 +1,34 @@
+{
+ "call": 48,
+ "try": 1,
+ "ids": [
+  "item-0096.1",
+  "item-0315.1",
+  "item-0323.1",
+  "item-0244.2",
+  "item-0263.1",
+  "item-0095.2",
+  "item-0098.1",
+  "item-0301.2",
+  "item-0261.1",
+  "item-0232.1",
+  "item-0239.1",
+  "item-0287.2",
+  "item-0232.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "ae806890-25ef-4cce-8984-6d5984654fc3",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Rook speaks to Captain Thorne in 합쇼체, not 반말.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Preserves the source text's mid-word truncation at the end.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are faithful, accurate, and natural.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translates WeChat hongbao properly and transliterates Ting instead of Hanzi.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Faithfully translates 二泊 as 이박 (two nights), not 이틀.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Faithfully translates 沈んでおる as 가라앉아 있다 rather than sleeping.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Rory is male (uses 누나) and speaks to Siobhan in 반말.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Dex is an adult crew member; 얘 fits better than 꼬마야.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"결정이네 is the natural Korean equivalent of 決まりだね.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Avoids incorrectly assuming a male pronoun for the speaker.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Mr./Ms. is standard in English manuals; -san is untranslated.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 is more natural and uses the correct locative particle.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Avoids incorrectly assuming a male pronoun for the speaker.\"}\n]\n",
+  "duration_seconds": 216.223664,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13550,
+   "output_tokens": 31719,
+   "thinking_tokens": 31285,
+   "cache_read_tokens": 0,
+   "total_tokens": 45269
+  }
+ }
+}

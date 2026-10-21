@@ -1,0 +1,36 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0126.1",
+  "item-0142.2",
+  "item-0111.2",
+  "item-0185.2",
+  "item-0081.1",
+  "item-0255.1",
+  "item-0329.1",
+  "item-0215.1",
+  "item-0048.2",
+  "item-0174.1",
+  "item-0047.2",
+  "item-0140.1",
+  "item-0176.2",
+  "item-0040.1",
+  "item-0253.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "d24744d8-f773-4622-b62e-d76e053e81e0",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 is completely untranslated Korean.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 avoids awkward translationese pronoun '그가' and is natural.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Chinese.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 respects Akira's explicit request not to be called Inspector.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate in banmal.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 uses natural colloquial phrasing instead of literal translationese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 2 leaves the name in untranslated Chinese characters.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are fluent, accurate, and natural onboarding instructions.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Translation 2 uses the correct kinship term '오빠' and banmal.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 'that one' as referring to the tag.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 reads more naturally without Pinyin tone marks in English.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 drops '-san' to match English documentation register.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations are polite, natural, and convey the same meaning.\"}\n]\n",
+  "duration_seconds": 177.588414,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13905,
+   "output_tokens": 25862,
+   "thinking_tokens": 25394,
+   "cache_read_tokens": 0,
+   "total_tokens": 39767
+  }
+ }
+}

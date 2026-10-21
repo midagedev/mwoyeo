@@ -1,0 +1,36 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0063.2",
+  "item-0288.1",
+  "item-0215.1",
+  "item-0015.1",
+  "item-0109.1",
+  "item-0205.2",
+  "item-0077.2",
+  "item-0040.2",
+  "item-0278.2",
+  "item-0074.2",
+  "item-0311.2",
+  "item-0107.1",
+  "item-0251.2",
+  "item-0196.1",
+  "item-0197.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "41264ce1-2f8c-49a5-bfa9-72655ebc7f34",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 uses standard spelling 브리지 and natural term 공구 상자.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly preserves the honorific 님 from 様.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 properly uses 공주님 for the princess in this register.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"On site accurately translates 현장 for delivery logistics onboarding.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 maintains consistent and natural conversational 반말.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 correctly applies the subject honorific to the mother's arrival.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 translates ㅋㅋ into lol instead of leaving Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"제외한 accurately translates leave out in this version control context.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"조식 포함 is the standard lodging term for 含早餐.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 naturally translates the idiom instead of unnatural literal translation.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"네 and 예 are interchangeable standard Korean synonyms here.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 언니 for a female addressing older female.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 uses natural spoken dialogue and idiomatic phrasing.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both 각각 and 각자 are equally natural and accurate here.\"}\n]\n",
+  "duration_seconds": 229.167926,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13899,
+   "output_tokens": 35955,
+   "thinking_tokens": 35491,
+   "cache_read_tokens": 0,
+   "total_tokens": 49854
+  }
+ }
+}

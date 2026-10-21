@@ -1,0 +1,36 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0008.2",
+  "item-0035.2",
+  "item-0017.2",
+  "item-0007.2",
+  "item-0031.2",
+  "item-0023.1",
+  "item-0022.2",
+  "item-0052.1",
+  "item-0026.2",
+  "item-0040.2",
+  "item-0048.1",
+  "item-0004.1",
+  "item-0019.1",
+  "item-0037.1",
+  "item-0042.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "1c26ae0a-9000-4426-8fcf-6dcbb408257c",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Siobhan speaks to Rory in banmal, not haeyoche.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Haku is a beast, so '자' is better than '사람'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly identifies Kiryu instead of Takanashi.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'검은 안개다' accurately translates '黒霧じゃ' unlike '흑무야'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Preserves the declarative sentence instead of mistranslating as a question.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'거 맞지?' correctly captures seeking reassurance in 'tell me'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Tsukumo speaks to Herve in haeyoche, not hapsyoche.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'寿星' refers to the birthday person, not birthday party.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Identical except for punctuation formatting.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Sogo speaks to Hyuga in haeyoche, not hapsyoche.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Natural English phrasing without untranslated Japanese honorific suffixes.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'Keep' means retain it, not put it in storage.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'냉동고에서 소리가 나' is much more natural Korean.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Correctly captures the emphasis of '就' with '바로'.\"}\n]\n",
+  "duration_seconds": 153.08536,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14030,
+   "output_tokens": 24164,
+   "thinking_tokens": 23680,
+   "cache_read_tokens": 0,
+   "total_tokens": 38194
+  }
+ }
+}

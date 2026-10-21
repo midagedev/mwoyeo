@@ -1,0 +1,36 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0264.2",
+  "item-0004.2",
+  "item-0147.2",
+  "item-0273.1",
+  "item-0222.1",
+  "item-0297.1",
+  "item-0310.2",
+  "item-0242.2",
+  "item-0298.1",
+  "item-0220.1",
+  "item-0224.1",
+  "item-0285.1",
+  "item-0268.1",
+  "item-0122.1",
+  "item-0176.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6d0e9da0-b144-46d6-b748-519ae3734fb8",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 is natural; 계단을 쿵쿵거리다 is an awkward collocation.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both incorrectly use 언니 instead of 누나 for male speaker Kai.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말 as Siobhan speaks to Rory.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"검을 겨눈 채 accurately captures the combat stance in 構え.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"푸시하세요 is standard Korean, while push하세요 is unnatural mixed script.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"노인이라고 is natural Korean, whereas 노인 상대로 is a literal calque.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Context defines ひとこと as short notes, not one-line notes.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"회의실로 is more natural than the Japanese translationese 회의실에.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translating sir as 선생님 when addressing a landlord is unnatural.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"알겠습니다 faithfully conveys Aye as an acknowledgment of an order.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"바로 쓸 수 있는 accurately captures 现成; 적을게요 is more natural.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"기침은 나쁜 거야 sounds natural, whereas 기침은 나빠 implies moral wrongdoing.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Burst into faithfully captures the dynamic momentum of 冲进.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Correctly romanizes the Chinese surname 仇 as Qiu, not Chou.\"}\n]\n",
+  "duration_seconds": 152.736273,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14059,
+   "output_tokens": 25022,
+   "thinking_tokens": 24523,
+   "cache_read_tokens": 0,
+   "total_tokens": 39081
+  }
+ }
+}

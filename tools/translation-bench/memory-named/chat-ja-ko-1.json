@@ -1,0 +1,9 @@
+{
+ "entities": [
+  {"name": "ミナ", "reading": "みな", "dst": "미나", "gender": "female", "role": "club 2nd-year", "speaks_to": {"海": "반말", "ユウ": "반말"}},
+  {"name": "海", "reading": "かい", "dst": "카이", "gender": "male", "role": "club senior", "speaks_to": {"ミナ": "반말", "ユウ": "반말"}},
+  {"name": "ユウ", "reading": "ゆう", "dst": "유우", "gender": "female", "role": "club 1st-year", "speaks_to": {"ミナ": "해요체", "海": "해요체"}}
+ ],
+ "window": {"title": "テニス部 合宿どうする?", "app": "LINE", "category": "Social Networking"},
+ "terms": [{"src": "合宿", "dst": "엠티"}, {"src": "民宿", "dst": "펜션"}]
+}

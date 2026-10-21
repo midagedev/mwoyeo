@@ -1,0 +1,36 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0252.2",
+  "item-0019.2",
+  "item-0035.2",
+  "item-0082.2",
+  "item-0255.2",
+  "item-0188.1",
+  "item-0018.1",
+  "item-0124.1",
+  "item-0020.1",
+  "item-0163.2",
+  "item-0154.1",
+  "item-0006.1",
+  "item-0319.1",
+  "item-0247.1",
+  "item-0080.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "174785e6-d9db-44b2-9c79-df65328d40e7",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"T1's 떠올라 있었다 captures 浮かんでいた; T2's 떠 있었다 means floating.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"T2 correctly uses 소장 instead of honorific 소장님.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"산에 찬성해요 reads more naturally than 산에 찬성이에요.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"버스는 preserves topic marker は and fits context better.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both Breathing hard and Breathless are equally natural and accurate.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Identical translations; formatting symbol ▼ is ignored per instructions.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"T2 directly and faithfully translates Gerald hates that.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"T2 faithfully translates 小鳥遊さんという as 타카나시 씨라는.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"T2 left most of the sentence untranslated in Chinese.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"그런 다음 and 그다음 are equally accurate and natural.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"T1 correctly uses 반말 as specified in the facts.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"브랜치 작업하기 is more natural than literal 브랜치로 작업하기.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both the phones and the phone are natural translations here.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"숨겨놨어 and 숨겨뒀어 are completely synonymous and natural.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Punctuation difference is ignored per prompt instructions.\"}\n]\n```\n",
+  "duration_seconds": 221.334122,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13602,
+   "output_tokens": 29941,
+   "thinking_tokens": 29454,
+   "cache_read_tokens": 0,
+   "total_tokens": 43543
+  }
+ }
+}

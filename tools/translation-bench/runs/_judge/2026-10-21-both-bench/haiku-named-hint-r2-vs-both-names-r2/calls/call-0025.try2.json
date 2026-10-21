@@ -1,0 +1,36 @@
+{
+ "call": 25,
+ "try": 2,
+ "ids": [
+  "item-0157.2",
+  "item-0174.2",
+  "item-0037.2",
+  "item-0078.1",
+  "item-0214.1",
+  "item-0003.2",
+  "item-0254.1",
+  "item-0267.2",
+  "item-0169.2",
+  "item-0242.1",
+  "item-0128.1",
+  "item-0029.2",
+  "item-0179.2",
+  "item-0059.2",
+  "item-0286.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c3512a2d-1f91-4aa8-824b-d978e923f3fe",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Correctly uses 반말 since Lu Ming speaks to Xu Nuo.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translates '公账' accurately as '공금 장부' instead of '공용 계산'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'That was fast' is the natural, idiomatic reaction in English.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'Post' is more natural than 'leave' for a messenger channel.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'붙여둔 자리' naturally captures the tag metaphor and 'where you put it'.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Correctly uses 반말 as specified for Liese speaking to Saku.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'계속 말해 봐' accurately translates 'Go on' in this conversation.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'고생스러운' accurately translates the Japanese idiom '骨の折れる' unlike '머리 아픈'.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'그 사람이' is natural Korean, avoiding the translationese pronoun '그가'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Maintains the princess's register without unnatural humble and honorific additions.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both are accurate and natural military-style 합쇼체 responses.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Correctly uses 해요체 and translates '助かります' naturally as '고마워요'.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translates 'Coughing is bad' naturally as '기침은 안 좋아'.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'지닌 자' fits the mythical fantasy setting better than '가진 자'.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Correctly uses 해요체 as required when Xu Nuo addresses Zhou Ting.\"}\n]\n",
+  "duration_seconds": 228.051593,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14120,
+   "output_tokens": 30538,
+   "thinking_tokens": 30006,
+   "cache_read_tokens": 0,
+   "total_tokens": 44658
+  }
+ }
+}

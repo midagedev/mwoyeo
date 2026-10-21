@@ -1,0 +1,36 @@
+{
+ "call": 29,
+ "try": 1,
+ "ids": [
+  "item-0119.1",
+  "item-0113.2",
+  "item-0118.1",
+  "item-0313.1",
+  "item-0178.2",
+  "item-0189.1",
+  "item-0100.1",
+  "item-0253.2",
+  "item-0187.1",
+  "item-0225.2",
+  "item-0066.2",
+  "item-0030.2",
+  "item-0164.2",
+  "item-0024.1",
+  "item-0021.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "7395b6fa-cb10-40b6-9fde-0415fcb28c1e",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the designated name 키류.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 transliterates furigana into Hangul instead of keeping Japanese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"돌 관리 is much more natural in Korean than 돌을 돌보는 것.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"A long report fits the specific single onboarding task in context.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"그 사람 is natural spoken Korean; 그녀 is awkward translationese.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Wards do not have seams; Translation 1 is much more natural.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"하나씩 해결하세요 is much more idiomatic Korean than 각 충돌.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Three tenths is standard English, whereas three parts in ten is awkward.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"움직이면 안 되는 is far more natural Korean for must never move.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"어서 오십시오 is the standard respectful greeting when welcoming a princess.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Correct honorifics for elders and correct speech level for the speaker.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate renderings of the line.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 avoids overly polite honorifics and translates duration accurately.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 correctly writes the character name in Korean Hangul.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Mo reflects the correct pronunciation of the compound surname 万俟.\"}\n]\n",
+  "duration_seconds": 105.744659,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14078,
+   "output_tokens": 15734,
+   "thinking_tokens": 15250,
+   "cache_read_tokens": 0,
+   "total_tokens": 29812
+  }
+ }
+}

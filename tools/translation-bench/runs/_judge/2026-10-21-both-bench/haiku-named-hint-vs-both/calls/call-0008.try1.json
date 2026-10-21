@@ -1,0 +1,36 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0323.2",
+  "item-0320.2",
+  "item-0180.1",
+  "item-0135.2",
+  "item-0236.1",
+  "item-0200.1",
+  "item-0270.1",
+  "item-0158.2",
+  "item-0165.2",
+  "item-0273.1",
+  "item-0120.1",
+  "item-0155.2",
+  "item-0067.2",
+  "item-0076.2",
+  "item-0102.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a3209f7e-d10b-4c54-a848-6c2a973a55fb",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are faithful, natural, and accurately capture the meaning.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 mistranslates 'tub' as '타이어 통'.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are identical and accurate.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'안심이 되네요' is much more natural Korean than '안심이에요'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 correctly follows the required term '수호막' for 結界.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both incorrectly use '언니' for a male speaker; otherwise equally good.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and equally good.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'watch' accurately renders 留守番; 'watch over' implies guarding or protecting.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 better translates '别来无恙' and uses natural plural 'qi stones'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 as required for Rory addressing Siobhan.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations render the pronunciation note naturally and accurately.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 preserves the original visual novel sentence structure and tone.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"'첫물 찻잎' accurately captures the tea harvest terminology '头采的鲜叶'.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both translations are faithful, fluent, and accurately convey the meaning.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'형' correctly translates 'older brother' without improperly assuming eldest brother.\"}\n]\n",
+  "duration_seconds": 85.694128,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13959,
+   "output_tokens": 13236,
+   "thinking_tokens": 12732,
+   "cache_read_tokens": 0,
+   "total_tokens": 27195
+  }
+ }
+}

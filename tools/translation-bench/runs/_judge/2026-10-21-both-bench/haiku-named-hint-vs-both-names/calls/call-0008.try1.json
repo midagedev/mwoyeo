@@ -1,0 +1,36 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0001.2",
+  "item-0257.2",
+  "item-0146.1",
+  "item-0282.1",
+  "item-0085.1",
+  "item-0258.1",
+  "item-0033.2",
+  "item-0028.1",
+  "item-0311.1",
+  "item-0112.2",
+  "item-0361.1",
+  "item-0313.2",
+  "item-0188.2",
+  "item-0181.2",
+  "item-0089.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "65d088b4-8e5d-438b-b356-bd56b2fb3b45",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'와 달래' faithfully reflects 'wants us there' for a pickup request.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Correctly uses 반말 speech level as specified in facts.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Correctly uses 반말 speech level as specified in facts.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"More natural phrasing; '네 저우 이모' is unnatural between siblings.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'그럭저럭이지' naturally translates 'まあな', unlike awkward '뭐, 그래'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'감사합니다' naturally translates '助かります'; '도움이 됩니다' is translationese.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 2 is left in untranslated Japanese.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Accurately translates 'spare coolant' and 'hot tub' into natural Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly adheres to the specified 합쇼체 speech level.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both spacing variants are equally acceptable under standard Korean orthography.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'take place' is more professional and natural than 'happen'.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Correctly uses 해요체 when speaking to Aunt Zhou.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both 'if' and 'when' are equally accurate and natural.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 correctly translates direct speech without adding hearsay '-대'.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 and proper Korean romanization.\"}\n]\n",
+  "duration_seconds": 96.535297,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13983,
+   "output_tokens": 14312,
+   "thinking_tokens": 13815,
+   "cache_read_tokens": 0,
+   "total_tokens": 28295
+  }
+ }
+}

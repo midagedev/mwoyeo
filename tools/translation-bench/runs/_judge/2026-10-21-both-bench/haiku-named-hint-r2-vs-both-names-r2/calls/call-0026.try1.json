@@ -1,0 +1,36 @@
+{
+ "call": 26,
+ "try": 1,
+ "ids": [
+  "item-0243.1",
+  "item-0023.1",
+  "item-0154.2",
+  "item-0080.1",
+  "item-0300.1",
+  "item-0132.2",
+  "item-0133.2",
+  "item-0320.1",
+  "item-0139.2",
+  "item-0119.1",
+  "item-0113.2",
+  "item-0118.1",
+  "item-0299.1",
+  "item-0178.2",
+  "item-0189.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6c014dc9-2816-43e1-8c43-083400eb2d82",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 reads much more naturally in casual chat.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and equally good.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 uses natural apposition '동기인' and translates '呼ぼうよ' accurately.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 uses the natural expression without awkward over-honorification.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 naturally conveys the idiom and explanatory nuance.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are accurate; capitalization of job titles is optional.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both '그런 다음' and '그다음' are accurate and natural.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both 'at' and 'from' are natural in this context.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Identical except for an optional comma; equally good.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly uses informal speech (반말) between crewmates.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 correctly defines the feature name in the singular.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 properly translates '오빠' as 'older brother'.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 appropriately renders '-殿' as '공' for JRPG register.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"A superior speaking to a subordinate should use '우리도', not '저희도'.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 uses the idiomatic Korean phrase for restroom use.\"}\n]\n",
+  "duration_seconds": 116.228671,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13491,
+   "output_tokens": 15554,
+   "thinking_tokens": 15062,
+   "cache_read_tokens": 0,
+   "total_tokens": 29045
+  }
+ }
+}

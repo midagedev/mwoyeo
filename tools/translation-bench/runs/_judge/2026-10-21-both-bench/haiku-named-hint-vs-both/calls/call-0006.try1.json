@@ -1,0 +1,36 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0074.2",
+  "item-0187.2",
+  "item-0039.2",
+  "item-0059.1",
+  "item-0319.2",
+  "item-0318.1",
+  "item-0249.1",
+  "item-0274.1",
+  "item-0284.1",
+  "item-0315.2",
+  "item-0013.2",
+  "item-0092.1",
+  "item-0142.2",
+  "item-0127.2",
+  "item-0268.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "6b3bdcc1-79f7-4ccb-8beb-a4f0a60130bc",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 1 left the text untranslated in Japanese.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 is more faithful to 客人じゃ and 出迎える.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates 大殿 as the great hall.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"저녁 무렵 is more natural and accurate for 夕暮れ.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"에르베 선생님 properly reflects the old tutor's status and register.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both make the same speech level error and mean the same.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 2 correctly resolves the OCR corruption 雨昔 to 雨音.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 matching the speaker's specified speech level.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"Both translations are identical and use the required term Revisions.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 is more natural and completes the truncated verb smoothly.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are identical except for quote formatting.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Mo Qi Jing correctly pronounces the polyphonic compound surname 万俟.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 preserves the natural parallel repetition of the original line.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"예매 and 숙소 알아봐 are much more idiomatic in Korean.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 faithfully captures 必须 as 꼭 and accurately reflects 明天.\"}\n]\n",
+  "duration_seconds": 239.528149,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13864,
+   "output_tokens": 34982,
+   "thinking_tokens": 34501,
+   "cache_read_tokens": 0,
+   "total_tokens": 48846
+  }
+ }
+}

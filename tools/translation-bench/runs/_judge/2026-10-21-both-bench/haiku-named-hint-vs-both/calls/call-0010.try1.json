@@ -1,0 +1,36 @@
+{
+ "call": 10,
+ "try": 1,
+ "ids": [
+  "item-0294.2",
+  "item-0340.1",
+  "item-0289.2",
+  "item-0074.1",
+  "item-0347.2",
+  "item-0292.1",
+  "item-0026.2",
+  "item-0297.1",
+  "item-0171.2",
+  "item-0109.1",
+  "item-0097.2",
+  "item-0077.2",
+  "item-0050.2",
+  "item-0348.1",
+  "item-0253.1"
+ ],
+ "problem": "no JSON list in the answer",
+ "event": {
+  "conversation_id": "b6a4c948-a65c-4238-b44d-d3dd484ab515",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Referring to on",
+  "duration_seconds": 0,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "thinking_tokens": 0,
+   "cache_read_tokens": 0,
+   "total_tokens": 0
+  }
+ }
+}

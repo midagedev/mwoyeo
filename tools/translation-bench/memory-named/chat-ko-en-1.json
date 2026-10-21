@@ -1,0 +1,11 @@
+{
+ "entities": [
+  {"name": "서윤", "reading": "Seoyoon", "dst": "Seoyoon", "gender": "female", "role": "coworker"},
+  {"name": "지우", "dst": "Jiu", "gender": "male", "role": "coworker"},
+  {"name": "혜진", "dst": "Hyejin", "gender": "female", "role": "senior colleague"},
+  {"name": "민재", "dst": "Minjae", "gender": "male", "role": "Seoyoon's older brother"},
+  {"name": "수빈", "dst": "Subin", "gender": "male", "role": "coworker"}
+ ],
+ "window": {"title": "이삿날 D-3", "app": "KakaoTalk", "category": "Social Networking"},
+ "terms": [{"src": "당근", "dst": "Karrot"}]
+}

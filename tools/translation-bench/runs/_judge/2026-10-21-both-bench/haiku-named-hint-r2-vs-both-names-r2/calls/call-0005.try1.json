@@ -1,0 +1,36 @@
+{
+ "call": 5,
+ "try": 1,
+ "ids": [
+  "item-0194.1",
+  "item-0282.2",
+  "item-0083.2",
+  "item-0023.2",
+  "item-0304.1",
+  "item-0182.1",
+  "item-0299.2",
+  "item-0193.2",
+  "item-0137.1",
+  "item-0273.1",
+  "item-0048.1",
+  "item-0093.1",
+  "item-0090.1",
+  "item-0057.2",
+  "item-0319.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a77c609b-fff7-4d0d-8fff-71eb5479089b",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"'그래' is natural; '그렇지' means 'that's right'.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are correct translations differing only in capitalization formatting.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both are identical except for trailing punctuation formatting.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"'급한' and '긴급한' are equally valid translations for urgent.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'들려줘' naturally translates '聞かせて' for recounting a story.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'공' correctly translates the archaic honorific suffix '殿'.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate in Korean.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Correctly preserves app feature names Hiroba and Hitokoto.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Avoids awkward Hanja in parentheses and sounds more natural.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Faithfully translates the decision '民宿吧' and reads more naturally.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"'잘하고 있어' is natural spoken dialogue, unlike written '잘하고 있다'.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Correctly uses the required 해요체 speech level to Zhou Ting.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Strictly adheres to the defined glossary term Sticky.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"'걔' is natural spoken Korean; '그녀' is awkward translationese.\"}\n]\n",
+  "duration_seconds": 84.858725,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13963,
+   "output_tokens": 14419,
+   "thinking_tokens": 13945,
+   "cache_read_tokens": 0,
+   "total_tokens": 28382
+  }
+ }
+}

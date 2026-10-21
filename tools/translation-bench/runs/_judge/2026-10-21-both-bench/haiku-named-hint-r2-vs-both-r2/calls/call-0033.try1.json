@@ -1,0 +1,36 @@
+{
+ "call": 33,
+ "try": 1,
+ "ids": [
+  "item-0276.1",
+  "item-0088.1",
+  "item-0331.1",
+  "item-0315.2",
+  "item-0034.1",
+  "item-0181.1",
+  "item-0349.1",
+  "item-0246.2",
+  "item-0240.2",
+  "item-0231.1",
+  "item-0012.1",
+  "item-0262.1",
+  "item-0095.1",
+  "item-0140.2",
+  "item-0116.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "524cf6e7-8161-417a-a1de-ae98f6de520e",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Captures '倒' naturally without the awkward repetition of '~까지'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"'Reflection' accurately translates 소감; 'impression' is misleading here.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 2 left the line in untranslated Japanese.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"'Chitchat can wait' and 'questioning' fit the inspector's tone.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'Before anything else' is much more natural than 'I'll say it first'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'다른 일로 바꿔야' is much more natural Korean than '전환해야'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"More polite and appropriate register when addressing a club senior.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 retains the pinyin 'Zēng Lán' from the source.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Plural 'Quick Notes' fits recording decisions across multiple meetings habitually.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Correctly uses 반말, matching the speaker's specified speech level.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are identical.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"'재내달' is not a standard Korean word; '다음다음 달' is correct.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 1 incorrectly translates the cat's name Bori as Boris.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'Old Mr. Takanashi' reads much more naturally as narrative prose.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'Write it as' accurately reflects '쓰다' regarding name spelling.\"}\n]\n```\n",
+  "duration_seconds": 149.18965,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13856,
+   "output_tokens": 20508,
+   "thinking_tokens": 20003,
+   "cache_read_tokens": 0,
+   "total_tokens": 34364
+  }
+ }
+}

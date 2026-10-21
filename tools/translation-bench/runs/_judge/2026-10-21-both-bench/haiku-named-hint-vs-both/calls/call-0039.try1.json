@@ -1,0 +1,36 @@
+{
+ "call": 39,
+ "try": 1,
+ "ids": [
+  "item-0082.1",
+  "item-0342.2",
+  "item-0128.2",
+  "item-0117.2",
+  "item-0317.2",
+  "item-0079.2",
+  "item-0094.2",
+  "item-0301.1",
+  "item-0070.1",
+  "item-0248.2",
+  "item-0066.1",
+  "item-0233.1",
+  "item-0191.1",
+  "item-0189.2",
+  "item-0316.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "3d93720a-8138-435d-ac5e-7a33d2ff9bd3",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"かささぎばし means 까치다리, not the unnatural Sino-Korean 작교.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'Company-wide' accurately translates 전사, unlike 'Company announcements'.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Siobhan correctly speaks to Rory in 반말, not 해요체.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'What are you going to do about' faithfully translates 어떡할 거야.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'소장' respects the speaker's explicit demand not to use honorifics.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'어차피' naturally expresses 'anyway' as a justifying reason.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"'자도 돼?' correctly asks for permission rather than ability.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'얘' fits an adult crew member, whereas '꼬마야' means child.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'대피' correctly describes taking temporary shelter at an inn.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'-는 거예요' faithfully captures the explanatory nuance of '才'.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are identical aside from trailing punctuation.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"'아메미야' correctly reflects the established reading あめみや.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"'Using it as a team' fits a guide section heading.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 translates into Korean with proper honorific register.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 translates into Korean, while Translation 2 remains Japanese.\"}\n]\n",
+  "duration_seconds": 114.234393,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14030,
+   "output_tokens": 18657,
+   "thinking_tokens": 18162,
+   "cache_read_tokens": 0,
+   "total_tokens": 32687
+  }
+ }
+}

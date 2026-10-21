@@ -1,0 +1,36 @@
+{
+ "call": 40,
+ "try": 1,
+ "ids": [
+  "item-0300.1",
+  "item-0070.1",
+  "item-0248.2",
+  "item-0066.1",
+  "item-0233.1",
+  "item-0191.1",
+  "item-0189.2",
+  "item-0320.2",
+  "item-0125.1",
+  "item-0107.2",
+  "item-0357.1",
+  "item-0039.1",
+  "item-0038.2",
+  "item-0330.2",
+  "item-0152.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "084847c2-60a9-473b-a79e-e3672fbbb36e",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly transliterates the name Amamiya (아마미야).\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 better captures the attendant condition of wearing safety shoes.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are identical and accurate.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 2 avoids the unnatural and inappropriate interjection '자'.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly conveys the explanatory nuance of '~なんですよ' with '~거든요'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates '收好' by including 'securely'.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the required speech level (합쇼체).\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 uses the required 합쇼체 register for Gareth.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 more accurately captures the past aspect of '困りましたね'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are equally good and virtually identical.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both translations are identical in meaning and spacing variants are acceptable.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translation 2 uses the natural verbal form '찬성해요' instead of calquing.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 naturally translates group chat ('群') as '단톡방'.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 provides natural dialogue instead of awkward phrasing.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 naturally translates '川遊び' as '물놀이' rather than '계곡 놀이'.\"}\n]\n",
+  "duration_seconds": 130.585728,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13806,
+   "output_tokens": 21073,
+   "thinking_tokens": 20572,
+   "cache_read_tokens": 0,
+   "total_tokens": 34879
+  }
+ }
+}

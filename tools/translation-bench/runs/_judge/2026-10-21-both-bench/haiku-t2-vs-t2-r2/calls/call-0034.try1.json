@@ -1,0 +1,36 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0243.1",
+  "item-0150.2",
+  "item-0134.2",
+  "item-0177.2",
+  "item-0188.2",
+  "item-0286.1",
+  "item-0085.2",
+  "item-0116.1",
+  "item-0259.2",
+  "item-0344.2",
+  "item-0093.2",
+  "item-0258.1",
+  "item-0034.2",
+  "item-0300.1",
+  "item-0147.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "51f878eb-fe75-46f3-ba28-32b8154924cd",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Rook speaks to Dex in banmal.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Avoids assuming a gender pronoun for Bori.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Zhou Ting speaks to her friends in banmal.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Refers respectfully to the speaker's father using honorifics.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both translations are equally faithful, natural, and correct.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 2 is untranslated Japanese.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are equally natural, accurate banmal renderings.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Hyuga speaks to her section chief in hapsyoche.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'Foot of the mountain' is more natural and idiomatic.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Uses correct banmal speech level and translates dresser accurately.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Appropriately polite and honorific when addressing the detective.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Translates names and accurately conveys the request to thank her.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Faithfully translates 'mix in' without adding argumentative nuance.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translates character names into English instead of leaving Chinese characters.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Transliterates the name Tomasz into Korean instead of leaving English.\"}\n]\n",
+  "duration_seconds": 222.396711,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14018,
+   "output_tokens": 35660,
+   "thinking_tokens": 35210,
+   "cache_read_tokens": 0,
+   "total_tokens": 49678
+  }
+ }
+}

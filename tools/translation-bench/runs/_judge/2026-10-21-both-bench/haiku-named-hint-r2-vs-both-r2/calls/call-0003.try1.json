@@ -1,0 +1,36 @@
+{
+ "call": 3,
+ "try": 1,
+ "ids": [
+  "item-0275.2",
+  "item-0323.2",
+  "item-0142.1",
+  "item-0213.2",
+  "item-0198.1",
+  "item-0326.2",
+  "item-0208.2",
+  "item-0132.1",
+  "item-0126.2",
+  "item-0313.2",
+  "item-0269.1",
+  "item-0327.1",
+  "item-0235.2",
+  "item-0268.2",
+  "item-0178.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "f1fabe0a-c3e6-4b33-9966-b72a3725b334",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly uses polite register when speaking to Captain Thorne.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 reads naturally as dialogue without awkward Hanzi in parentheses.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 確認 as confirmation, not invitation.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 preserves the explicit term 'Quick Note' without pluralizing it.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"'어서 오십시오' is much more natural spoken dialogue for welcoming royalty.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'맞이해 주거라' is idiomatic Korean, whereas '마중해 주거라' is awkward.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are equally natural, faithful, and accurate in dialogue context.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are identical except for equally acceptable auxiliary verb spacing.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'브랜치로 시작합니다' faithfully and naturally translates 'starts with one branch'.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations accurately and naturally convey the meaning in casual English.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Rory speaks to Siobhan in 반말; Translation 1 uses correct speech level.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"'Access badge' is more precise for 출입증 in corporate onboarding.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Zhou Ting speaks in 반말; Translation 1 uses correct speech level.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'뭐, 그렇지' accurately captures the casual, modest nuance of 'まあな'.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"'상황 보고' accurately renders 'Status' without using an inappropriate 반말 verb.\"}\n]\n",
+  "duration_seconds": 145.103712,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13651,
+   "output_tokens": 21321,
+   "thinking_tokens": 20810,
+   "cache_read_tokens": 0,
+   "total_tokens": 34972
+  }
+ }
+}

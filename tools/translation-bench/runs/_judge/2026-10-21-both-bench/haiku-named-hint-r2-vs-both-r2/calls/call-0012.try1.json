@@ -1,0 +1,36 @@
+{
+ "call": 12,
+ "try": 1,
+ "ids": [
+  "item-0021.1",
+  "item-0283.2",
+  "item-0087.2",
+  "item-0127.2",
+  "item-0351.1",
+  "item-0270.1",
+  "item-0204.2",
+  "item-0240.1",
+  "item-0068.2",
+  "item-0149.1",
+  "item-0338.1",
+  "item-0159.2",
+  "item-0265.2",
+  "item-0326.1",
+  "item-0294.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "af270e42-4b65-49d0-b03d-88ba08146aa5",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"둘이 is much more natural than 두 명이 when addressing them.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Thirty percent is more natural and captures 轮到 accurately.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"퇴근하고 and 말만 그럴듯하게 are much more natural and idiomatic.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly translates the indirect quotation 온대 as said she'll come.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both sacks and bags are accurate translations of 袋.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"도저히 captures the impossibility of 根本做不出来 more naturally.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly places everything with 다 닦아야 돼 instead of first clause.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Quick Notes matches the plural decisions from meetings logically.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"원해 and 디자인을 맡아 are much more natural and idiomatic.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 invents Boris instead of the cat's name Bori.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Rook speaks to Captain Thorne in 합쇼체 (아닙니다).\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Dex speaks to Captain Thorne in 합쇼체 (입니다).\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"오시는 거죠 naturally captures the confirmation nuance of still coming.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"손님이 오셨다 and 마중해 주거라 are more natural and accurate.\"},\n  {\"case\": 15, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"}\n]\n",
+  "duration_seconds": 133.43139,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13927,
+   "output_tokens": 20993,
+   "thinking_tokens": 20510,
+   "cache_read_tokens": 0,
+   "total_tokens": 34920
+  }
+ }
+}

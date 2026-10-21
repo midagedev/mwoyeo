@@ -1,0 +1,36 @@
+{
+ "call": 9,
+ "try": 1,
+ "ids": [
+  "item-0167.2",
+  "item-0033.2",
+  "item-0040.1",
+  "item-0271.1",
+  "item-0180.2",
+  "item-0265.1",
+  "item-0190.2",
+  "item-0299.1",
+  "item-0210.1",
+  "item-0358.1",
+  "item-0282.2",
+  "item-0330.1",
+  "item-0335.1",
+  "item-0275.1",
+  "item-0015.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e34e2a37-e797-4776-b84a-531f12bf4f27",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"\\\"봐\\\" is much more natural than \\\"보라구\\\".\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 has much more natural and idiomatic Korean phrasing.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"\\\"아직\\\" correctly translates \\\"still\\\", whereas \\\"여전히\\\" is unnatural translationese.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Dex speaks to Rook in 반말; Translation 1 correctly uses 반말.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both candidate translations are identical.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are equally good, ignoring punctuation formatting.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both convenient and handy are equally good translations of 便利.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"\\\"들어온 가장 큰 주문\\\" is more natural and idiomatic in Korean.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Plural \\\"Quick Notes\\\" fits recording decisions from multiple meetings.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 faithfully translates \\\"喫茶ふくろう\\\" without adding \\\"탐정국\\\".\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"\\\"편히 다녀오세요\\\" is the natural Korean expression for restroom use.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"\\\"학회가 있다고 하셨어\\\" is much more natural Korean than \\\"학회라고 하셨어\\\".\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"\\\"plaza\\\" mistranslates the UI feature; \\\"hiroba\\\" preserves the feature name.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 accurately captures \\\"도\\\" (also) and uses present tense.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"\\\"아메미야 님 성함\\\" is more natural Korean than using \\\"님의\\\".\"}\n]\n",
+  "duration_seconds": 222.026272,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13834,
+   "output_tokens": 32469,
+   "thinking_tokens": 31962,
+   "cache_read_tokens": 0,
+   "total_tokens": 46303
+  }
+ }
+}

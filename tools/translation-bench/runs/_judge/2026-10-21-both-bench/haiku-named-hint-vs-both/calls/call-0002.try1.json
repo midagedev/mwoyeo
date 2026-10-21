@@ -1,0 +1,36 @@
+{
+ "call": 2,
+ "try": 1,
+ "ids": [
+  "item-0338.2",
+  "item-0015.1",
+  "item-0135.1",
+  "item-0104.1",
+  "item-0307.1",
+  "item-0087.1",
+  "item-0256.1",
+  "item-0352.1",
+  "item-0176.2",
+  "item-0224.2",
+  "item-0331.1",
+  "item-0273.2",
+  "item-0002.1",
+  "item-0132.1",
+  "item-0055.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "546726bc-bdd0-47ee-87a9-9490b9a5e3f3",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"'고객사' is more natural and accurate for 先方 in business.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are equally natural and accurate.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'안심이 되네요' is much more natural Korean phrasing.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Consistently uses proper honorifics for the mother.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Faithfully translates 'という' as '~라는'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Avoids redundant duplication of the name.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'Give her' is much more natural than 'Feed her'.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are equally natural, accurate, and idiomatic.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'냉각수' is the correct term for coolant here.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations correctly use terms and natural business register.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'When' correctly reflects the context, unlike conditional 'If'.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Correctly uses 반말 as required by the relationship.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Xu Nuo is female, so '언니' is correct.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'Do not' matches the formal guide register better.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translates '三红' into Hangul instead of raw Hanja.\"}\n]\n",
+  "duration_seconds": 89.329321,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14033,
+   "output_tokens": 13011,
+   "thinking_tokens": 12555,
+   "cache_read_tokens": 0,
+   "total_tokens": 27044
+  }
+ }
+}

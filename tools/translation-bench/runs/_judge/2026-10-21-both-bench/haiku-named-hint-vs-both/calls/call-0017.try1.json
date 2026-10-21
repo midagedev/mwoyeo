@@ -1,0 +1,36 @@
+{
+ "call": 17,
+ "try": 1,
+ "ids": [
+  "item-0016.2",
+  "item-0073.1",
+  "item-0103.2",
+  "item-0130.2",
+  "item-0157.1",
+  "item-0269.2",
+  "item-0067.1",
+  "item-0322.2",
+  "item-0218.1",
+  "item-0354.1",
+  "item-0240.1",
+  "item-0353.1",
+  "item-0278.1",
+  "item-0001.2",
+  "item-0208.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "c2b11292-8278-4252-8372-e0b02ca5b54b",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translating 'sir' as '선생님' to a landlord is unnatural.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'Organizes' accurately captures categorizing tags, whereas 'sorts' implies ordering.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Correctly preserves the proper noun Huandao Road as 환다오루.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"More natural phrasing and accurately translates mispronouncing the polyphonic surname.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Faithfully reflects the plain register of '出たら' without awkward over-honorification.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"'발음은' is more natural and standard for parenthetical pronunciation guides.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'첫물 찻잎' is accurate tea terminology for 头采鲜叶, unlike '첫 잎'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly uses informal speech (반말) appropriate for speaking to Lu Ming.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"'더 이상' accurately captures the aspectual change of '不是...了'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Faithful to the source without adding the unmentioned word 'usually'.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"'I know, right' captures '그러게' naturally and preserves emoticon placement.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"'-하셨는데?' naturally follows up on the previous speaker's context.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"'맞다' accurately translates 'そうだ', whereas '그러고 보니' translates 'そういえば'.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both translations are natural, accurate, and use the correct speech level.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"More concise and natural without the redundant bureaucratic phrase '하도록 하겠습니다'.\"}\n]\n",
+  "duration_seconds": 161.267541,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13718,
+   "output_tokens": 22928,
+   "thinking_tokens": 22402,
+   "cache_read_tokens": 0,
+   "total_tokens": 36646
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "call": 38,
+ "try": 1,
+ "ids": [
+  "item-0285.1",
+  "item-0070.1",
+  "item-0248.2",
+  "item-0066.1",
+  "item-0233.1",
+  "item-0191.1",
+  "item-0189.2",
+  "item-0304.2",
+  "item-0125.1",
+  "item-0107.2",
+  "item-0338.1",
+  "item-0039.1",
+  "item-0038.2",
+  "item-0314.1",
+  "item-0152.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "63bc8cce-9c9f-4f2c-a8ac-9dfacb99a53c",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Uses 'When' instead of 'If' matching context.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Avoids assuming gender with 'Ms.' when unspecified.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'물놀이하다가' naturally translates '川遊びで' without mountain-valley contradiction.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'그래' correctly translates affirmative 'ああ', unlike awkward '아'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Avoids redundant duplicated name 'Joonho Byun (Joonho Byun)'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Avoids incorrect pronoun 'his' for female speaker Zeng Ruoshui.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Accurately translates '盒' as '상자' instead of generic '개'.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"'You'll have lunch' is much more natural onboarding guide phrasing.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Correctly keeps the cat's name 'Bori' instead of 'Boris'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translates into English, whereas candidate 2 leaves it in Korean.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Uses natural conversational ending '-대요' rather than stiff '-다고 하네요'.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Preserves name '쏜' and natural register for Dr. Pell.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Uses natural '장인' instead of awkward translationese '노사부님'.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Avoids disrespectful pronoun '걔' when referring to Captain Thorne.\"}\n]\n```\n",
+  "duration_seconds": 202.303643,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13600,
+   "output_tokens": 30295,
+   "thinking_tokens": 29786,
+   "cache_read_tokens": 0,
+   "total_tokens": 43895
+  }
+ }
+}

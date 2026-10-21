@@ -1,0 +1,36 @@
+{
+ "call": 37,
+ "try": 1,
+ "ids": [
+  "item-0145.1",
+  "item-0091.1",
+  "item-0024.2",
+  "item-0317.1",
+  "item-0291.1",
+  "item-0229.1",
+  "item-0211.2",
+  "item-0138.2",
+  "item-0279.2",
+  "item-0009.1",
+  "item-0105.1",
+  "item-0309.2",
+  "item-0144.1",
+  "item-0299.2",
+  "item-0246.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "27c3afdf-1d3e-4427-8a4b-f4d17808e42b",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"tie\", \"why\": \"Both front desk and reception desk accurately translate 안내 데스크.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both translations are identical except formatting, which is ignored.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both miss the required 해요체 and convey meaning equally well.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Correctly uses 해요체 as required by the facts.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Stolen is more faithful and precise than taken for 盗まれた.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"여러분이 is much more natural than translationese 당신이 in Korean tutorials.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"환다오루 is the proper name, whereas 환다오 도로 is mistranslated.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Correctly transliterates Mr. Bell into Korean and maintains consistent honorifics.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Correctly uses 반말 from Rory to Siobhan as specified.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Avoids the corrupt half-translated name 해辰 and correctly translates 只.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Correctly uses 반말 from Alicia to Saku as specified.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 2 failed to translate the sentence into Korean.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"카이 술은 is more natural Korean than translationese 카이의 술은.\"},\n  {\"case\": 14, \"better\": \"tie\", \"why\": \"Both translations are accurate, natural, and adhere to required terms.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Correctly translates 师兄 as Senior Brother instead of Junior Brother.\"}\n]\n",
+  "duration_seconds": 111.234873,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14211,
+   "output_tokens": 18163,
+   "thinking_tokens": 17675,
+   "cache_read_tokens": 0,
+   "total_tokens": 32374
+  }
+ }
+}

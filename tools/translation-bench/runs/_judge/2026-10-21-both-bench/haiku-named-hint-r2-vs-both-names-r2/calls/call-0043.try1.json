@@ -1,0 +1,36 @@
+{
+ "call": 43,
+ "try": 1,
+ "ids": [
+  "item-0033.1",
+  "item-0271.2",
+  "item-0008.2",
+  "item-0081.2",
+  "item-0316.1",
+  "item-0329.2",
+  "item-0203.2",
+  "item-0305.2",
+  "item-0022.1",
+  "item-0276.2",
+  "item-0047.1",
+  "item-0073.2",
+  "item-0156.1",
+  "item-0229.2",
+  "item-0049.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "933fafe7-6d4c-41d0-9ac3-bea792ee91b9",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Distinguishes 'ひとこと' from general notes in the app.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly uses banmal matching Zhou Ting's speech style.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are natural and accurate.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"More natural phrasing for omitting snacks for guests.\"},\n  {\"case\": 5, \"better\": \"tie\", \"why\": \"Both are natural informal Korean expressions.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both accurately translate the terms and text.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Correctly uses haeyo-che matching Gareth's speech level.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both convey the meaning accurately and naturally.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Properly renders name without unnecessary Japanese honorific.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are natural and equally accurate.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Correctly conveys the conditional meaning of 抢到了.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Correctly formats the compound surname without splitting.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Much more natural dialogue translation for hot tub.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Uses natural phrasing and correct present tense.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Reads much more naturally as spoken Korean.\"}\n]\n",
+  "duration_seconds": 129.447809,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13864,
+   "output_tokens": 19296,
+   "thinking_tokens": 18872,
+   "cache_read_tokens": 0,
+   "total_tokens": 33160
+  }
+ }
+}

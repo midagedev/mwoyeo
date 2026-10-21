@@ -1,0 +1,36 @@
+{
+ "call": 19,
+ "try": 1,
+ "ids": [
+  "item-0236.2",
+  "item-0195.2",
+  "item-0058.1",
+  "item-0259.2",
+  "item-0041.2",
+  "item-0129.1",
+  "item-0161.2",
+  "item-0277.2",
+  "item-0089.2",
+  "item-0070.2",
+  "item-0058.2",
+  "item-0244.1",
+  "item-0010.1",
+  "item-0137.2",
+  "item-0199.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "cadd8971-4de5-495d-9ee6-bdc01636bb99",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 when Lu Ming addresses Zhou Ting.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 when Xu Nuo speaks to Lu Ming.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"'경찰서' naturally translates '署', whereas '서' is an awkward calque in Korean.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 captures the deductive nuance and translates 'ほう' accurately as 'Hm'.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Translation 2 avoids unnatural parenthetical kanji in Korean dialogue.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'Direct handoff' correctly translates 직거래, whereas 'direct trade' is Konglish.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are identical in meaning, differing only in punctuation formatting.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 uses appropriate subject honorifics for the speaker's mother.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'꼭 ~할 거예요' accurately conveys the strong determination of '一定要'.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'돌계단 끝에' naturally translates '石段の先に', unlike '너머에'.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'경찰서' naturally translates '署', avoiding the awkward calque '서의'.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'Yeah' matches the casual KakaoTalk register much better than 'Yes'.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 반말, as Zhou Yi speaks to Lin Xia.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 properly preserves the application's feature names 'Hiroba' and 'Hitokoto'.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말, as Licia speaks to Saku.\"}\n]\n",
+  "duration_seconds": 106.041467,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14231,
+   "output_tokens": 13202,
+   "thinking_tokens": 12668,
+   "cache_read_tokens": 0,
+   "total_tokens": 27433
+  }
+ }
+}

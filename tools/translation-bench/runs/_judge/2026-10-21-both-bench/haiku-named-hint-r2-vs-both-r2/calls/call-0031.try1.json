@@ -1,0 +1,36 @@
+{
+ "call": 31,
+ "try": 1,
+ "ids": [
+  "item-0187.1",
+  "item-0237.1",
+  "item-0226.1",
+  "item-0066.2",
+  "item-0030.2",
+  "item-0164.2",
+  "item-0024.1",
+  "item-0021.2",
+  "item-0337.1",
+  "item-0298.1",
+  "item-0004.1",
+  "item-0150.1",
+  "item-0281.2",
+  "item-0303.1",
+  "item-0170.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "838861b6-35d3-43c9-bd11-8f516bd66cfb",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Gareth speaks in 해요체; translation 2 uses the correct speech level.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'회의실로' is the correct and natural particle for '옮기다'.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"'우리 버전' is clearer and more natural than literal '우리 것'.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Siobhan speaks in 합쇼체; translation 2 uses the correct speech level.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Zhou Yi speaks to Lin Xia in 반말; translation 1 uses 반말.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Siobhan speaks to Rory in 반말; translation 2 uses 반말.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both share the same mistranslations and are equally flawed.\"},\n  {\"case\": 8, \"better\": \"1\", \"why\": \"Translation 1 is much more natural Korean than translation 2.\"},\n  {\"case\": 9, \"better\": \"tie\", \"why\": \"The two translations are completely identical.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"'풀' accurately reflects a hot tub, unlike '수영장' (swimming pool).\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Suzanne speaks in 해요체; translation 1 consistently uses 해요체.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'저우 이모께' and '~말고' are more natural and respectful Korean.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 matches the friendly tutorial tone and 해요체 register.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 correctly includes the question mark for a tag question.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"'와 달래' is more natural and idiomatic in casual speech.\"}\n]\n",
+  "duration_seconds": 163.120464,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13884,
+   "output_tokens": 23060,
+   "thinking_tokens": 22555,
+   "cache_read_tokens": 0,
+   "total_tokens": 36944
+  }
+ }
+}

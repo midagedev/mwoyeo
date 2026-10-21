@@ -1,0 +1,36 @@
+{
+ "call": 7,
+ "try": 1,
+ "ids": [
+  "item-0105.2",
+  "item-0221.2",
+  "item-0269.2",
+  "item-0130.1",
+  "item-0243.2",
+  "item-0262.1",
+  "item-0308.2",
+  "item-0185.2",
+  "item-0240.2",
+  "item-0159.2",
+  "item-0258.1",
+  "item-0014.1",
+  "item-0077.1",
+  "item-0167.2",
+  "item-0040.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "9724cb3e-e763-4a7e-82f8-55954aada140",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"\\\"아직도 돌려주지 않았어\\\" captures \\\"never gave them back\\\" more accurately.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are equally natural and accurate casual translations.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Accurate Chinese transliteration and more natural phrasing for packaging request.\"},\n  {\"case\": 4, \"better\": \"tie\", \"why\": \"Both punctuation choices are equally acceptable and natural in Korean.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Arabic numerals and conversational ending \\\"-이야\\\" read much more naturally.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"\\\"닦아 온 돌이다\\\" accurately reflects habitual aspect and present tense.\"},\n  {\"case\": 7, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both subject and topic particles are equally natural here.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"\\\"forwarded\\\" is more professional and accurate for document workflow.\"},\n  {\"case\": 10, \"better\": \"tie\", \"why\": \"Both translations are completely identical.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"\\\"-하는 걸로\\\" correctly conveys conditional agreement rather than simple statement.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"\\\"풀\\\" appropriately describes a hot tub, unlike \\\"수영장\\\".\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"\\\"병합해 들어오는 브랜치\\\" accurately translates \\\"the one you are merging in\\\".\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"\\\"봐\\\" is natural, while \\\"보라구\\\" is unfittingly blunt for a princess.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"\\\"학회가 있다고 하셨어\\\" is more idiomatic Korean than \\\"학회라고 하셨어\\\".\"}\n]\n",
+  "duration_seconds": 159.299083,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13884,
+   "output_tokens": 23755,
+   "thinking_tokens": 23269,
+   "cache_read_tokens": 0,
+   "total_tokens": 37639
+  }
+ }
+}

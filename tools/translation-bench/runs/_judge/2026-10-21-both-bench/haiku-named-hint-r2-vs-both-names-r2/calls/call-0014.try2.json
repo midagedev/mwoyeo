@@ -1,0 +1,36 @@
+{
+ "call": 14,
+ "try": 2,
+ "ids": [
+  "item-0135.2",
+  "item-0094.1",
+  "item-0293.1",
+  "item-0250.2",
+  "item-0281.2",
+  "item-0178.1",
+  "item-0029.1",
+  "item-0275.1",
+  "item-0126.1",
+  "item-0105.1",
+  "item-0075.1",
+  "item-0064.1",
+  "item-0311.1",
+  "item-0089.1",
+  "item-0087.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "0cec8850-506a-4610-9a2d-dc37306db6ae",
+  "status": "SUCCESS",
+  "response": "```json\n[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 is more faithful to 'deal with'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Licia speaks in 반말, matching Japanese なの.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Locks are engaged or locked in English, never closed.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"묵히면 안 돼요 faithfully captures leaving tea leaves unprocessed.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"The title of address Inspector should be capitalized.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"A section chief does not use 저희 with subordinates.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Sogo speaks to Hyuga in 해요체, which Translation 2 uses.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"둘이 나눠서 내자 is more natural for splitting a bill.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"고객용 fits the business context better than 손님용.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"아직도 돌려주지 않았어 naturally conveys never gave them back.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"Lin Xia speaks to her brother in 반말.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Old Man Takanashi is the natural rendering of 小鳥遊老人.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 avoids misnaming Aoife and sounds more natural.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"찍을 거예요 accurately reflects the strong determination of 一定要.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"매운 건 못 먹어 is more natural Korean than 무리야.\"}\n]\n```\n",
+  "duration_seconds": 171.152218,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13927,
+   "output_tokens": 25630,
+   "thinking_tokens": 25154,
+   "cache_read_tokens": 0,
+   "total_tokens": 39557
+  }
+ }
+}

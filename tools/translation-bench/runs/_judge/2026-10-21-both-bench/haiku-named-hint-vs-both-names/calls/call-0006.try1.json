@@ -1,0 +1,36 @@
+{
+ "call": 6,
+ "try": 1,
+ "ids": [
+  "item-0132.1",
+  "item-0343.2",
+  "item-0093.1",
+  "item-0256.1",
+  "item-0092.1",
+  "item-0217.2",
+  "item-0047.2",
+  "item-0359.2",
+  "item-0270.2",
+  "item-0247.1",
+  "item-0086.1",
+  "item-0006.1",
+  "item-0175.1",
+  "item-0165.2",
+  "item-0140.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "34e01d26-4ae6-44b0-a488-3bfaf951386c",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"'동갑' is more natural and idiomatic than '나이 같다'.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"'갈게요' and '제 집안' sound more natural and fitting for royalty.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are equally accurate, faithful, and natural.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly uses 해요체 matching the specified speech level.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"'맞다' accurately translates the sudden realization of 'そうだ'.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"'at home' and 'right?' are more natural and faithful.\"},\n  {\"case\": 7, \"better\": \"2\", \"why\": \"Translation 1 leaves untranslated Japanese furigana, while Translation 2 translates cleanly.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both candidate translations are completely identical.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 1 left the text in Japanese without translating.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Correctly uses 해요체 matching the speaker's specified speech level.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'Wow' faithfully translates the Korean exclamation '헐' unlike 'Wait'.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"'단것을 잘 못 드신다고' accurately conveys the nuance of '苦手'.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Correctly uses 반말 when speaking to the younger sister.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"'someone got in touch' sounds much more natural in chat.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"'여러분의' is standard for software tutorials, avoiding awkward '당신의'.\"}\n]\n",
+  "duration_seconds": 161.932867,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13888,
+   "output_tokens": 23930,
+   "thinking_tokens": 23446,
+   "cache_read_tokens": 0,
+   "total_tokens": 37818
+  }
+ }
+}

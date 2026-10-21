@@ -1,0 +1,371 @@
+{
+ "a": "M",
+ "b": "M",
+ "identical": 437,
+ "items": {
+  "item-0001": {
+   "seq": "chat-en-ko-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "나를 자원해 줘서 고마워, 로리.",
+   "b_text": "자원해 줘서 고마워, 로리."
+  },
+  "item-0002": {
+   "seq": "chat-ko-en-1",
+   "line": 18,
+   "kind": "real",
+   "a_text": "I asked, but Subin can't come on Sunday. She said she has a prior engagement.",
+   "b_text": "I asked, but Subin said she can't come on Sunday. She has a prior engagement."
+  },
+  "item-0003": {
+   "seq": "subs-zh-ko-1",
+   "line": 32,
+   "kind": "real",
+   "a_text": "린위안, 말로만 좋게 말하지 말고, 퇴근하고 나랑 밥 먹어.",
+   "b_text": "린위안, 말로만 좋다고 하지 말고, 퇴근하고 나랑 밥 먹어."
+  },
+  "item-0004": {
+   "seq": "subs-en-ko-1",
+   "line": 24,
+   "kind": "real",
+   "a_text": "좋아. 루크, 세레스에 도착할 때까지 그 욕조를 가지고 있어.",
+   "b_text": "좋아. 루크, 세레스에 도착할 때까지 그 욕조를 보관해 둬."
+  },
+  "item-0005": {
+   "seq": "chat-ja-ko-2",
+   "line": 9,
+   "kind": "calibration",
+   "a_text": "그보다 내일입니다. 상대방 담당자는 아메미야 씨입니다. 시간에 매우 엄격한 분이세요.",
+   "b_text": "그보다 내일입니다. 상대방 담당자는 아메미야 씨입니다. 시간에 매우 엄격한 분이세요."
+  },
+  "item-0006": {
+   "seq": "game-zh-en-1",
+   "line": 14,
+   "kind": "real",
+   "a_text": "Elder Qin, it has been a while. I come under the阁主's orders to take three-tenths of the qi stones.",
+   "b_text": "Elder Qin, how have you been? I come on the pavilion master's orders to take three-tenths of the qi stones."
+  },
+  "item-0007": {
+   "seq": "game-ja-ko-1",
+   "line": 25,
+   "kind": "real",
+   "a_text": "사쿠! 검은 안개다! 라이조에게 북문을 강화시키라고 해!",
+   "b_text": "사쿠! 흑무야! 라이조에게 북문을 지키게 해!"
+  },
+  "item-0008": {
+   "seq": "chat-en-ko-1",
+   "line": 19,
+   "kind": "real",
+   "a_text": "개러스는 모를 거야. 어차피 슈퍼는 월요일까지 안 와.",
+   "b_text": "개러스는 모를 거예요. 어차피 슈퍼는 월요일까지 안 와요."
+  },
+  "item-0009": {
+   "seq": "film-ja-ko-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "하쿠라고 했지. 츠쿠모, 검에서 손 떼라",
+   "b_text": "하쿠라고 했지. 츠쿠모, 칼에서 손 떼라"
+  },
+  "item-0010": {
+   "seq": "subs-zh-ko-1",
+   "line": 20,
+   "kind": "calibration",
+   "a_text": "좋아요, 이 물량은 제가 직접 챙길게요.",
+   "b_text": "좋아요, 이 물량은 제가 직접 챙길게요."
+  },
+  "item-0011": {
+   "seq": "game-zh-en-1",
+   "line": 17,
+   "kind": "real",
+   "a_text": "Xie Xuan sneered, turned, and left without looking back.",
+   "b_text": "Xie Xuan sneered, turned and left without looking back."
+  },
+  "item-0012": {
+   "seq": "subs-en-ko-1",
+   "line": 31,
+   "kind": "real",
+   "a_text": "좋아. 너는 천재야, 루크. 제럴드는 너를 얻어서 운이 좋아.",
+   "b_text": "좋아. 당신은 천재야, 루크. 제럴드는 당신을 얻어서 운이 좋아."
+  },
+  "item-0013": {
+   "seq": "chat-zh-ko-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "민슈(민박)로 하자, 마당 있는 곳으로. 루밍이 고속열차 예약하고, 쉬눠가 숙소 찾을게",
+   "b_text": "민슈(민박)로 하자, 마당 있는 곳으로. 루밍이 고속철도 예약하고, 쉬눠가 숙소 찾을게"
+  },
+  "item-0014": {
+   "seq": "game-zh-en-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "Okay. Miss Qiu has woken up, come call me immediately.",
+   "b_text": "Okay. Miss Qiu has woken up; come call me immediately."
+  },
+  "item-0015": {
+   "seq": "chat-ja-ko-1",
+   "line": 23,
+   "kind": "calibration",
+   "a_text": "맞아, 펜션 근처에 온천이 있대. 우리 언니도 가본 적 있다고",
+   "b_text": "맞아, 펜션 근처에 온천이 있대. 우리 언니도 가본 적 있다고"
+  },
+  "item-0016": {
+   "seq": "chat-ko-en-1",
+   "line": 33,
+   "kind": "real",
+   "a_text": "Yeah, I just sent it. By the way, is it okay for Bori to ride in the car?",
+   "b_text": "Yeah, I just sent it. By the way, is it okay for Bori to take a car?"
+  },
+  "item-0017": {
+   "seq": "subs-ja-ko-1",
+   "line": 30,
+   "kind": "real",
+   "a_text": "아, 소장님! 키류 씨, 우산 놓고 가셨어요!",
+   "b_text": "아, 소장님! 타카나시 씨, 우산 두고 가셨어요!"
+  },
+  "item-0018": {
+   "seq": "chat-zh-ko-1",
+   "line": 11,
+   "kind": "real",
+   "a_text": "세 명 기준 하룻밤에 900위안 정도예요, 아침 식사 포함이에요.",
+   "b_text": "세 명 기준 하룻밤에 900위안 정도예요. 아침 식사 포함이에요."
+  },
+  "item-0019": {
+   "seq": "game-ja-en-1",
+   "line": 11,
+   "kind": "calibration",
+   "a_text": "Akira, please leave your umbrella here",
+   "b_text": "Akira, please leave your umbrella here"
+  },
+  "item-0020": {
+   "seq": "docs-ja-en-1",
+   "line": 8,
+   "kind": "calibration",
+   "a_text": "For teams to use",
+   "b_text": "For teams to use"
+  },
+  "item-0021": {
+   "seq": "chat-ko-en-1",
+   "line": 30,
+   "kind": "calibration",
+   "a_text": "Oh, really? Does he still work there?",
+   "b_text": "Oh, really? Does he still work there?"
+  },
+  "item-0022": {
+   "seq": "film-ja-ko-1",
+   "line": 35,
+   "kind": "real",
+   "a_text": "네, 에르베님 덕분입니다",
+   "b_text": "네, 에르베님 덕분이에요"
+  },
+  "item-0023": {
+   "seq": "subs-en-ko-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "상태 보고해, 루크. 센서 문제인 거겠지.",
+   "b_text": "상태 보고해, 루크. 센서 문제인 거 맞지?"
+  },
+  "item-0024": {
+   "seq": "chat-ja-ko-2",
+   "line": 3,
+   "kind": "real",
+   "a_text": "도움이 됩니다. 그런데, 견적서는 벌써 도착했나요?",
+   "b_text": "도움이 됩니다. 그런데, 견적서는 벌써 도착했습니까?"
+  },
+  "item-0025": {
+   "seq": "chat-ja-ko-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "응, 벌써 예약했어. 2박에 4만 엔이야",
+   "b_text": "아아, 벌써 예약했어. 2박에 4만 엔이야"
+  },
+  "item-0026": {
+   "seq": "subs-ja-ko-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "히나타, 커피 두 잔. …오늘은 일이 없어서 한가하네.",
+   "b_text": "히나타, 커피 두 잔. ...오늘은 일이 없어서 한가하네."
+  },
+  "item-0027": {
+   "seq": "film-ja-ko-1",
+   "line": 24,
+   "kind": "real",
+   "a_text": "고집이 세구나. 그럼, 둘이서 가자",
+   "b_text": "고집 세구나. 그럼, 둘이서 가자"
+  },
+  "item-0028": {
+   "seq": "docs-ko-en-1",
+   "line": 2,
+   "kind": "calibration",
+   "a_text": "Welcome to MoaLogis.",
+   "b_text": "Welcome to MoaLogis."
+  },
+  "item-0029": {
+   "seq": "game-ja-ko-1",
+   "line": 15,
+   "kind": "real",
+   "a_text": "저기, 텟사이 님은 계속 이 마을에 계신 건가요?",
+   "b_text": "저기, 텟사이 님은 계속 이 마을에 계셨어요?"
+  },
+  "item-0030": {
+   "seq": "chat-en-ko-1",
+   "line": 20,
+   "kind": "real",
+   "a_text": "좋아, 하지만 Aoife가 그 개를 직접 치울 거야.",
+   "b_text": "좋아요, 하지만 Aoife가 그 개를 직접 치울 거예요."
+  },
+  "item-0031": {
+   "seq": "game-ja-ko-1",
+   "line": 4,
+   "kind": "real",
+   "a_text": "당신이 사쿠로군. 왕도에서 조사하러 왔군요",
+   "b_text": "당신이 사쿠군요. 왕도에서 조사하러 왔어요?"
+  },
+  "item-0032": {
+   "seq": "subs-en-ko-1",
+   "line": 18,
+   "kind": "real",
+   "a_text": "덱스가 여분의 냉각수를 자기 온수 욕조에 쏟아부었어.",
+   "b_text": "덱스는 여분의 냉각수를 자기 온수 욕조에 쏟아부었다."
+  },
+  "item-0033": {
+   "seq": "chat-en-ko-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "저는 5시까지 일하러 가는데, 시본이 그분께 문을 열어줄 수 있어요.",
+   "b_text": "저는 5시까지 일하러 가는데, 시본이 그분을 들여보내 줄 수 있어요."
+  },
+  "item-0034": {
+   "seq": "subs-zh-ko-1",
+   "line": 2,
+   "kind": "real",
+   "a_text": "린시아, 슈퍼마켓 쪽에서 또 재촉해. 내일 꼭 답해야 해.",
+   "b_text": "린시아, 마트에서 또 재촉해요. 내일 꼭 답해야 해요."
+  },
+  "item-0035": {
+   "seq": "film-ja-ko-1",
+   "line": 13,
+   "kind": "real",
+   "a_text": "네, 하지만 쉬잔 님, 하쿠라는 사람에게서 월루석의 기운이 느껴집니다",
+   "b_text": "네, 하지만 쉬잔 님, 하쿠라는 자에게서 월루석의 기운이 느껴집니다"
+  },
+  "item-0036": {
+   "seq": "film-ja-ko-1",
+   "line": 23,
+   "kind": "real",
+   "a_text": "쉬잔 님, 안 됩니다. 수경에는 제가 가겠습니다",
+   "b_text": "쉬잔 님, 안 돼요. 수경에는 제가 가겠습니다"
+  },
+  "item-0037": {
+   "seq": "subs-en-ko-1",
+   "line": 1,
+   "kind": "real",
+   "a_text": "루크, 냉동고에서 또 소리가 나.",
+   "b_text": "루크, 냉동고가 또 소리를 내고 있어."
+  },
+  "item-0038": {
+   "seq": "chat-ja-ko-2",
+   "line": 7,
+   "kind": "real",
+   "a_text": "히우가 씨 잘못이 아닙니다. 분기 보고가 이틀 늦어지면 부장님께 말씀드리겠습니다.",
+   "b_text": "휴가 씨 잘못이 아니에요. 분기 보고가 이틀 늦어지면 부장님께 말씀드리겠습니다."
+  },
+  "item-0039": {
+   "seq": "chat-ja-ko-2",
+   "line": 20,
+   "kind": "real",
+   "a_text": "부탁드립니다. 소고 과장님만 믿겠습니다.",
+   "b_text": "부탁드립니다. 소고 과장님만 믿습니다."
+  },
+  "item-0040": {
+   "seq": "chat-ja-ko-2",
+   "line": 1,
+   "kind": "real",
+   "a_text": "휴가 씨, 수고하셨습니다. 내일 상대방의 방문 준비는 진행되고 있나요?",
+   "b_text": "휴가 씨, 수고하셨습니다. 내일 상대방의 방문 준비는 진행되고 있습니까?"
+  },
+  "item-0041": {
+   "seq": "subs-ja-ko-1",
+   "line": 31,
+   "kind": "real",
+   "a_text": "제가 전달할게요. 히나타, 가게 지키고 카라스마에게 연락해 줘.",
+   "b_text": "내가 전달할게. 히나타, 가게 지키고 카라스마에게 연락해 줘."
+  },
+  "item-0042": {
+   "seq": "chat-zh-ko-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "주정아, 알겠어. 내가 찾아봤는데, 국경절 고속열차표가 정말 부족하대. 오늘 밤에 잡아야 할 것 같아",
+   "b_text": "주정아, 알겠어. 내가 찾아봤는데, 국경절 고속철도표가 정말 부족하대. 오늘 밤에 바로 잡아야 할 것 같아"
+  },
+  "item-0043": {
+   "seq": "chat-ko-en-1",
+   "line": 32,
+   "kind": "real",
+   "a_text": "Thanks haha, Jiu, did you send the Monday meeting invitation to Chaeyul too?",
+   "b_text": "Thanks haha. Jiu, did you send the Monday meeting invitation to Chaeyul too?"
+  },
+  "item-0044": {
+   "seq": "subs-zh-ko-1",
+   "line": 18,
+   "kind": "real",
+   "a_text": "저우 이모, 첫 수확 신선 잎은 언제 도착해요?",
+   "b_text": "저우 이모, 첫 수확한 신선한 잎은 언제 도착해요?"
+  },
+  "item-0045": {
+   "seq": "game-zh-en-1",
+   "line": 10,
+   "kind": "real",
+   "a_text": "Senior Sister Wanqi, Elder Qin asked you to go to the ward; I and Senior Brother Wanqi are here.",
+   "b_text": "Shijie, Elder Qin asked you to go to the ward; I and Wanqi Shixiong are here."
+  },
+  "item-0046": {
+   "seq": "chat-ja-ko-2",
+   "line": 18,
+   "kind": "calibration",
+   "a_text": "네. 호타루 건은 제조사 무라타 씨의 답변에 달려 있습니다. 빠르면 다음 주, 늦으면 다다음 달이라고 합니다.",
+   "b_text": "네. 호타루 건은 제조사 무라타 씨의 답변에 달려 있습니다. 빠르면 다음 주, 늦으면 다다음 달이라고 합니다."
+  },
+  "item-0047": {
+   "seq": "chat-en-ko-1",
+   "line": 21,
+   "kind": "real",
+   "a_text": "월세는 1일에 내야 해. 카운슬 택스 청구서도 왔으니까 둘이 나눠 내자.",
+   "b_text": "월세는 1일에 내야 해요. 카운슬 택스 청구서도 왔으니 반반 나눠 내요."
+  },
+  "item-0048": {
+   "seq": "game-ja-en-1",
+   "line": 16,
+   "kind": "real",
+   "a_text": "Akira-san, how about hearing from Takanashi-san first?",
+   "b_text": "Akira, how about we hear from Takanashi first?"
+  },
+  "item-0049": {
+   "seq": "chat-en-ko-1",
+   "line": 5,
+   "kind": "real",
+   "a_text": "언제든지. 어차피 집에서 일하잖아.",
+   "b_text": "언제든지. 어차피 재택근무잖아."
+  },
+  "item-0050": {
+   "seq": "subs-en-ko-1",
+   "line": 6,
+   "kind": "real",
+   "a_text": "쏜에게 숨겼어요. 그녀는 계속 제 렌치를 빌려 가요.",
+   "b_text": "제가 쏜에게 숨겼어요. 그녀가 계속 제 렌치를 빌려가요."
+  },
+  "item-0051": {
+   "seq": "subs-zh-ko-1",
+   "line": 3,
+   "kind": "real",
+   "a_text": "형, 그 가격으로는 우리 차를 도저히 만들 수가 없어요.",
+   "b_text": "형, 그 가격으로는 우리 차를 도저히 만들 수 없어요."
+  },
+  "item-0052": {
+   "seq": "chat-zh-ko-1",
+   "line": 12,
+   "kind": "real",
+   "a_text": "생일 주인공 비용은 저희가 낼게요. 제가 먼저 공용 계좌를 만들게요. 저랑 루밍이 각자 300위안씩 먼저 송금할게요.",
+   "b_text": "생일 파티 비용은 저희가 낼게요. 제가 먼저 공용 계좌를 만들 테니, 저랑 루밍이 각자 300위안씩 먼저 송금할게요."
+  }
+ }
+}

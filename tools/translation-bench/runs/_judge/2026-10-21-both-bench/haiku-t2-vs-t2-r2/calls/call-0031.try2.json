@@ -1,0 +1,36 @@
+{
+ "call": 31,
+ "try": 2,
+ "ids": [
+  "item-0282.1",
+  "item-0294.2",
+  "item-0321.1",
+  "item-0220.1",
+  "item-0224.1",
+  "item-0270.2",
+  "item-0122.1",
+  "item-0176.1",
+  "item-0316.2",
+  "item-0257.2",
+  "item-0088.1",
+  "item-0309.2",
+  "item-0034.1",
+  "item-0181.1",
+  "item-0233.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "a1e3fd83-d059-4700-9f4f-79e71e546c44",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"Uses correct hapsyoche speech level and honorific for name.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Correctly transliterates the character name Saku into Hangul.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses banmal to Rory and translates super as 관리인.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Correctly uses haeyoche as specified in the facts.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Uses hapsyoche to Gareth as required by the facts.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"Preserves the topic marker with 버스는 matching バスは.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Faithful to the source without adding the unprompted 함께.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"English prose reads more naturally without pinyin tone marks.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Uses banmal to Saku as specified in the facts.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"More faithful to xianxia genre terms like Guard and Dao.\"},\n  {\"case\": 11, \"better\": \"tie\", \"why\": \"Identical translations differing only in trailing punctuation formatting.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Avoids awkward redundant repetition of the name in parentheses.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Faithfully translates 混进去 and avoids unprompted argumentative tone.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Naturally idiomatic in Korean when responding to a leave request.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Avoids duplicate parenthetical English name present in Translation 2.\"}\n]\n",
+  "duration_seconds": 231.885869,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14010,
+   "output_tokens": 34729,
+   "thinking_tokens": 34263,
+   "cache_read_tokens": 0,
+   "total_tokens": 48739
+  }
+ }
+}

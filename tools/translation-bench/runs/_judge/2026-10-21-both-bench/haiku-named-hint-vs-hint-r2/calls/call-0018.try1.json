@@ -1,0 +1,36 @@
+{
+ "call": 18,
+ "try": 1,
+ "ids": [
+  "item-0121.1",
+  "item-0246.2",
+  "item-0086.2",
+  "item-0045.1",
+  "item-0309.1",
+  "item-0110.2",
+  "item-0183.2",
+  "item-0269.2",
+  "item-0008.1",
+  "item-0125.2",
+  "item-0242.2",
+  "item-0289.2",
+  "item-0144.2",
+  "item-0258.2",
+  "item-0010.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "fa95874b-74a4-41e1-899a-9362845d1fe2",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 1 correctly translates 確認のメール as confirmation email, not invitation email.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 2 correctly transcribes Tomasz as 토마시 following the pronunciation guide.\"},\n  {\"case\": 3, \"better\": \"1\", \"why\": \"Translation 1 uses the specified name 휴가 instead of default 히나타.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Rook speaks to Thorne in 합쇼체, which Translation 2 correctly uses.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 avoids the redundant duplicate name present in Translation 2.\"},\n  {\"case\": 6, \"better\": \"1\", \"why\": \"Translation 1 accurately places properly and everything in their respective clauses.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Xu Nuo speaks to Lu Ming in 반말, matching Translation 1.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"Translation 2 is more natural; 선생님 is awkward translationese for landlord.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"Translation 1 correctly uses Qiu for 仇 based on the text.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 2 naturally translates the imperative 分けてもらえ as 나눠 달라고 해라.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 better matches the formal business register with 확보했습니다.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 avoids the negative connotations of hoarded and hard labor.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both 물밑 and 물 밑바닥 are equally valid translations of 水の底.\"},\n  {\"case\": 14, \"better\": \"2\", \"why\": \"Translation 2 naturally renders 公账我来记 as 공금 장부는 제가 적을게요.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 accurately translates 전사 as company-wide rather than just company.\"}\n]\n",
+  "duration_seconds": 144.978194,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13997,
+   "output_tokens": 21486,
+   "thinking_tokens": 20972,
+   "cache_read_tokens": 0,
+   "total_tokens": 35483
+  }
+ }
+}

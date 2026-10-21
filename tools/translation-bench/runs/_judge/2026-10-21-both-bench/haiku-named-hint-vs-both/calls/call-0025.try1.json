@@ -1,0 +1,36 @@
+{
+ "call": 25,
+ "try": 1,
+ "ids": [
+  "item-0117.1",
+  "item-0346.2",
+  "item-0202.1",
+  "item-0165.1",
+  "item-0297.2",
+  "item-0350.2",
+  "item-0167.1",
+  "item-0355.1",
+  "item-0311.2",
+  "item-0147.1",
+  "item-0280.2",
+  "item-0182.1",
+  "item-0215.1",
+  "item-0259.2",
+  "item-0236.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "723942c6-138b-42cb-bcbb-eeb279fd8a2f",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"2\", \"why\": \"'What are you going to do' faithfully captures '어떡할 거야'.\"},\n  {\"case\": 2, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Translation 2 is natural Korean; Translation 1 is an awkward calque.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"'I trust you are well' accurately renders 别来无恙; uses plural stones.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the defined term 'Sticky'.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both translations are natural, faithful, and use correct terms.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"'봐' is standard and natural, whereas '보라구' is awkward.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are equally accurate and natural in English.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"'수고 많으십니다' is the appropriate greeting for ongoing work.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"'가본 적 있다던데' is natural spoken phrasing for hearsay.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"'The landlady' is more natural and faithful than 'That landlady'.\"},\n  {\"case\": 12, \"better\": \"tie\", \"why\": \"'이야기' and '얘기' are completely interchangeable and equally natural.\"},\n  {\"case\": 13, \"better\": \"tie\", \"why\": \"Both '에' and '으로' are equally correct and natural here.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"'옮겨 주세요' is more natural and polite for a landlord's reminder.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Translation 1 correctly uses the specified term '수호막'.\"}\n]\n",
+  "duration_seconds": 196.503785,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14093,
+   "output_tokens": 31185,
+   "thinking_tokens": 30692,
+   "cache_read_tokens": 0,
+   "total_tokens": 45278
+  }
+ }
+}

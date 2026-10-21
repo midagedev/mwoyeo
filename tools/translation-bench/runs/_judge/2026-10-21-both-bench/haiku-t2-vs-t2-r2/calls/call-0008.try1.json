@@ -1,0 +1,36 @@
+{
+ "call": 8,
+ "try": 1,
+ "ids": [
+  "item-0023.2",
+  "item-0123.2",
+  "item-0144.2",
+  "item-0155.2",
+  "item-0142.1",
+  "item-0002.1",
+  "item-0307.2",
+  "item-0341.2",
+  "item-0264.2",
+  "item-0213.2",
+  "item-0013.2",
+  "item-0244.1",
+  "item-0083.2",
+  "item-0177.1",
+  "item-0288.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "18f2b2f9-159f-4ef3-9382-ffbaae9035a7",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Translation 2 left the text untranslated in Korean.\"},\n  {\"case\": 2, \"better\": \"tie\", \"why\": \"Both are accurate, differing only in quotation mark style.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both translations are accurate and natural with correct terminology.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"Translation 1 accurately translates 'that' rather than treating it temporally.\"},\n  {\"case\": 5, \"better\": \"1\", \"why\": \"Translation 1 sounds natural, avoiding awkward third-person pronouns in speech.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both spacing options for the auxiliary verb are standard Korean.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 translates the line, while Translation 2 remains untranslated.\"},\n  {\"case\": 8, \"better\": \"tie\", \"why\": \"Both translations are equally natural, differing only in adverb placement.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 correctly translates 'Cloning' as an action, not 'clone'.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 'your cat' to clarify ownership naturally.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"Translation 1 translates 'ㅋㅋ' instead of leaving untranslated Korean characters.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"Translation 1 uses 반말 and does not leave Chinese characters untranslated.\"},\n  {\"case\": 13, \"better\": \"2\", \"why\": \"Translation 2 correctly uses 해요체 to address the listener.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 correctly uses honorifics when referring to a father.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 translates '烏丸' into Korean instead of leaving Kanji.\"}\n]\n",
+  "duration_seconds": 81.623538,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13745,
+   "output_tokens": 12287,
+   "thinking_tokens": 11801,
+   "cache_read_tokens": 0,
+   "total_tokens": 26032
+  }
+ }
+}

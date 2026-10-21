@@ -1,0 +1,36 @@
+{
+ "call": 21,
+ "try": 1,
+ "ids": [
+  "item-0321.2",
+  "item-0129.2",
+  "item-0146.2",
+  "item-0141.2",
+  "item-0304.2",
+  "item-0002.2",
+  "item-0051.1",
+  "item-0175.2",
+  "item-0305.1",
+  "item-0243.1",
+  "item-0225.1",
+  "item-0106.1",
+  "item-0217.1",
+  "item-0058.1",
+  "item-0280.2"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "e2895260-ac6f-427c-b842-caaa4288a5f3",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"상자 correctly translates 盒, and the modal ending is more natural.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"쳐다봤어 naturally translates 盯着看 for eyeing merchandise.\"},\n  {\"case\": 3, \"better\": \"tie\", \"why\": \"Both are natural, accurate translations of 회의실을 押さえました in business register.\"},\n  {\"case\": 4, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Chinese source text.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Hands tremble slightly, making Translation 2 far more natural.\"},\n  {\"case\": 6, \"better\": \"2\", \"why\": \"one-line notes fits the note app context; one-liners means jokes.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 해요체 as specified in the facts.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"회신 is standard Korean business terminology for vendor replies.\"},\n  {\"case\": 9, \"better\": \"2\", \"why\": \"Translation 2 uses natural Korean phonetics without awkward Hanja parentheticals.\"},\n  {\"case\": 10, \"better\": \"2\", \"why\": \"Translation 1 is untranslated Japanese source text.\"},\n  {\"case\": 11, \"better\": \"2\", \"why\": \"조심하겠습니다 is the natural Korean response for handling physical objects carefully.\"},\n  {\"case\": 12, \"better\": \"1\", \"why\": \"완전 폭발할 거야 accurately captures the idiom lose it.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"Translation 1 correctly preserves the app feature names Hiroba and Hitokoto.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Translation 1 correctly uses 반말 as required by the facts.\"},\n  {\"case\": 15, \"better\": \"2\", \"why\": \"Translation 2 avoids inappropriate honorifics towards friends/peers.\"}\n]\n",
+  "duration_seconds": 123.48616,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 13949,
+   "output_tokens": 17752,
+   "thinking_tokens": 17266,
+   "cache_read_tokens": 0,
+   "total_tokens": 31701
+  }
+ }
+}

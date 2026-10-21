@@ -1,0 +1,36 @@
+{
+ "call": 34,
+ "try": 1,
+ "ids": [
+  "item-0334.2",
+  "item-0258.2",
+  "item-0321.2",
+  "item-0034.1",
+  "item-0181.1",
+  "item-0251.2",
+  "item-0253.2",
+  "item-0240.2",
+  "item-0231.1",
+  "item-0012.1",
+  "item-0338.1",
+  "item-0095.1",
+  "item-0140.2",
+  "item-0116.2",
+  "item-0020.1"
+ ],
+ "problem": null,
+ "event": {
+  "conversation_id": "424dc369-705e-42bf-b152-4dcca04d11ff",
+  "status": "SUCCESS",
+  "response": "[\n  {\"case\": 1, \"better\": \"1\", \"why\": \"Correctly translates AA to 더치페이 instead of leaving it untranslated.\"},\n  {\"case\": 2, \"better\": \"1\", \"why\": \"Faithfully translates Thorne without adding an unmentioned title.\"},\n  {\"case\": 3, \"better\": \"2\", \"why\": \"Uses Mo for 万 in the compound surname 万俟, not Wan.\"},\n  {\"case\": 4, \"better\": \"1\", \"why\": \"More natural software UI phrasing for restoring an earlier version.\"},\n  {\"case\": 5, \"better\": \"2\", \"why\": \"Uses appropriate 반말 for an older brother without parental ~렴 ending.\"},\n  {\"case\": 6, \"better\": \"tie\", \"why\": \"Both are natural, accurate translations for casual English text messaging.\"},\n  {\"case\": 7, \"better\": \"1\", \"why\": \"-더니 more naturally connects past borrowing with lingering failure to return.\"},\n  {\"case\": 8, \"better\": \"2\", \"why\": \"'I know, right' idiomatically captures 그러게 in casual chat.\"},\n  {\"case\": 9, \"better\": \"1\", \"why\": \"그런데 sounds much more natural than 하지만 in spoken Korean dialogue.\"},\n  {\"case\": 10, \"better\": \"1\", \"why\": \"Translation 2 leaves untranslated Japanese kanji in the Korean text.\"},\n  {\"case\": 11, \"better\": \"1\", \"why\": \"고객사 is the natural business term for 先方 in sales context.\"},\n  {\"case\": 12, \"better\": \"2\", \"why\": \"Correctly translates 沈んでおる as 가라앉아 있다 rather than asleep.\"},\n  {\"case\": 13, \"better\": \"1\", \"why\": \"'be home' and tag question capture the natural Korean nuance.\"},\n  {\"case\": 14, \"better\": \"1\", \"why\": \"Magic stones have 기운 (aura), while 기척 is only for living beings.\"},\n  {\"case\": 15, \"better\": \"1\", \"why\": \"Faithful to the source without hallucinating 'still'.\"}\n]\n",
+  "duration_seconds": 145.820473,
+  "num_turns": 1,
+  "usage": {
+   "input_tokens": 14139,
+   "output_tokens": 23214,
+   "thinking_tokens": 22729,
+   "cache_read_tokens": 0,
+   "total_tokens": 37353
+  }
+ }
+}

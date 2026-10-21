@@ -221,6 +221,10 @@ enum UICapture {
                 // Only the MCP server's checks (the whole of check-logic takes minutes).
                 let failed = MCPChecks.run(model)
                 report("mcp", failed)
+            case "program-checks":
+                // Only the check of the Lines programs (the whole of check-logic takes minutes).
+                let failed = await ProgramChecks.run()
+                report("programs", failed)
             case "hide-lens-checks":
                 // Only the Hide Lenses checks (the whole of check-logic takes minutes).
                 let failed = await HideLensChecks.run(model)
@@ -562,6 +566,7 @@ enum UICapture {
             failed += await RewriteChecks.run()
             failed += MCPChecks.run(model)
             failed += await HideLensChecks.run(model)
+            failed += await ProgramChecks.run()
             report("check-logic", failed)
         }
 

@@ -87,7 +87,7 @@ mechanical replacement apart from context; a table in the UI and scripts, both; 
   names them once set ("2 rewrites · script"). The sheet stays one scroll: no sheet, tab or popover of their own. Words: the stages are
   "Original" (before) and "Translation" (after); "regex" appears only in help, never as a label.
 - **Rewrites**: caption under the header, "Change the text on this Mac, free: the original before it is translated, or the
-  translation after." Empty: one borderless "Add Rewrite". A row, left to right: stage pop-up (96 pt: "Original", "Translation"), Find
+  translation after." Empty: one borderless "Add Rewrite". A row, left to right: stage pop-up ("Original", "Translation"; as wide as the wider name in the app's language, the same on every row), Find
   (flexible, layout priority 1, prompt "Find"), "→" (tertiary), Replace with (flexible, prompt "Replace with"), ".*" toggle (24 pt; help
   "Treat Find as a pattern (a JavaScript regular expression)"), minus (≥ 20 pt). New rows go last; ≤ 32, at 32 "Add Rewrite" is dimmed
   with the caption "That is the most: 32." Under its row, in red: a pattern that does not compile ("Pattern error: …" (no position: JavaScriptCore gives none)); a row

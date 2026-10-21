@@ -165,4 +165,46 @@ import Testing
         let object = try #require(try JSONSerialization.jsonObject(with: Data(line.utf8)) as? [String: Any])
         #expect(object["app"] is NSNull && object["time"] as? String == "1970-01-01T09:00:00.000+09:00")
     }
+
+    // MARK: the memory of a line (design names-and-context §2.2, §7; round agents)
+
+    private func chain(_ names: [(String, String)] = [], reading: String? = nil) -> MergedChain {
+        let rows = names.map { MemoryEntry(src: $0.0, dst: $0.1, kind: .person, reading: reading) }
+        let anime = AppProfile(bundleID: "com.example.emu", appName: "Anime", source: "ja", target: "ko", entries: rows, id: "anime")
+        return ProfileChain.merge([.profile(anime), .allApps], base: ChainBase())
+    }
+
+    @Test func aLineWithMemoryHasProfileAfterAppAndNamesAtTheEnd() throws {
+        let memory = TranscriptMemory(original: "ハクは来た", chain: chain([("ハク", "하쿠"), ("花", "하나")]))
+        let line = TranscriptFormat.jsonlLine(time: Date(timeIntervalSince1970: 0), timeZone: TimeZone(identifier: "UTC")!, lens: "L", app: "com.example.emu",
+                                              source: "ja", target: "ko", engine: "apple", original: "ハクは来た", translation: "하쿠는 왔다", memory: memory)
+        #expect(line.contains("\"app\":\"com.example.emu\",\"profile\":\"anime\",\"source\":\"ja\""))
+        #expect(line.hasSuffix("\"names\":[[\"ハク\",\"하쿠\",\"anime\"]]}\n"))
+        let object = try #require(try JSONSerialization.jsonObject(with: Data(line.utf8)) as? [String: Any])
+        #expect(object.count == 10 && object["names"] as? [[String]] == [["ハク", "하쿠", "anime"]])
+    }
+
+    @Test func aLineWithNoRowInItHasNoNamesKeyAndNoMemoryNoKeyAtAll() throws {
+        let plain = TranscriptFormat.jsonlLine(time: Date(timeIntervalSince1970: 0), timeZone: TimeZone(identifier: "UTC")!, lens: "L", app: "a",
+                                               source: "ja", target: "ko", engine: "apple", original: "こんにちは", translation: "안녕")
+        let none = TranscriptMemory(original: "こんにちは", chain: chain([("ハク", "하쿠")]))
+        let withProfile = TranscriptFormat.jsonlLine(time: Date(timeIntervalSince1970: 0), timeZone: TimeZone(identifier: "UTC")!, lens: "L", app: "a",
+                                                     source: "ja", target: "ko", engine: "apple", original: "こんにちは", translation: "안녕", memory: none)
+        #expect(none.names.isEmpty && !withProfile.contains("\"names\""))
+        #expect(!plain.contains("\"profile\"") && !plain.contains("\"names\"") && plain.hasSuffix("\"translation\":\"안녕\"}\n"))
+        #expect(withProfile.replacingOccurrences(of: "\"profile\":\"anime\",", with: "") == plain)
+    }
+
+    @Test func aRowIsFoundByItsSourceOrItsReadingAndNamesItsProfile() {
+        #expect(TranscriptMemory(original: "つくもが来た", chain: chain([("九十九", "Tsukumo")], reading: "つくも")).names == [["九十九", "Tsukumo", "anime"]])
+        #expect(TranscriptMemory(original: "no name here", chain: ProfileChain.merge([.allApps], base: ChainBase())).profile == "all")
+    }
+
+    @Test func aGlossaryPairThatOccursIsARowFromAllAndAUserRowOfTheChainHidesIt() {
+        let base = ChainBase(glossary: [GlossaryPair(src: "ハク", dst: "Haku"), GlossaryPair(src: "花", dst: "Hana"), GlossaryPair(src: "月", dst: "Moon")])
+        let anime = AppProfile(bundleID: "com.example.emu", appName: "Anime", source: "ja", target: "ko", entries: [MemoryEntry(src: "ハク", dst: "하쿠")], id: "anime")
+        let line = "ハクと花"
+        #expect(TranscriptMemory(original: line, chain: ProfileChain.merge([.profile(anime), .allApps], base: base)).names == [["ハク", "하쿠", "anime"], ["花", "Hana", "all"]])
+        #expect(TranscriptMemory(original: line, chain: ProfileChain.merge([.allApps], base: base)).names == [["ハク", "Haku", "all"], ["花", "Hana", "all"]])
+    }
 }

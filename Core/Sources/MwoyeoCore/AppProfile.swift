@@ -193,6 +193,11 @@ public struct AppProfile: Codable, Equatable, Identifiable, Sendable {
     /// Whether the names this profile sees are learned and kept (design §1.4, §2.1: the narrowest that sets it); nil
     /// inherits All apps' switch.
     public var useLearned: Bool?
+    /// The profile's rules table (rewrite-rules §1, §2): up to `RewriteLimits.maxRows` rows applied in order, each before the engine or after it.
+    /// Empty is none. Not part of the legacy `appProfiles` shape (`init(from:)` never sees it): it is read and written by `ProfileFile`.
+    public var rewrites: [RewriteRow] = []
+    /// The profile's script (rewrite-rules §1, §3): `before(line, ctx)` and `after(src, dst, ctx)`. nil is none.
+    public var script: RewriteScript?
 
     /// The app the profile is keyed by (design §1.1): the first app condition's bundle ID, or the id when it has no app
     /// condition. Today's app profile keeps its bundle ID here, so the App's call sites read the same.

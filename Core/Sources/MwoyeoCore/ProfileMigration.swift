@@ -14,10 +14,15 @@ public struct ProfileFile: Codable, Equatable, Sendable {
     public var entries: [MemoryEntry]
     public var context: AppContextOverride?
     public var useLearned: Bool?
+    /// The rules table and the script (rewrite-rules §2, §3; `AppProfile.rewrites`, `.script`), written only when set so a profile without them is the
+    /// profile it was, byte for byte. A row this build cannot read is dropped and the rest kept (the lenient decode of §2; the file's read reports it).
+    public var rewrites: [RewriteRow]
+    public var script: RewriteScript?
 
     public init(id: String, name: String, when: [ProfileCondition] = [], source: String, target: String,
                 customEngineID: ProfileEngine? = nil, paragraphReader: ParagraphReader? = nil, note: String = "",
-                entries: [MemoryEntry] = [], context: AppContextOverride? = nil, useLearned: Bool? = nil) {
+                entries: [MemoryEntry] = [], context: AppContextOverride? = nil, useLearned: Bool? = nil,
+                rewrites: [RewriteRow] = [], script: RewriteScript? = nil) {
         self.id = id
         self.name = name
         self.when = when
@@ -29,6 +34,8 @@ public struct ProfileFile: Codable, Equatable, Sendable {
         self.entries = entries
         self.context = context
         self.useLearned = useLearned
+        self.rewrites = rewrites
+        self.script = script
     }
 
     /// The new shape of a profile of today's model (design §5.1).
@@ -36,18 +43,21 @@ public struct ProfileFile: Codable, Equatable, Sendable {
         self.init(id: profile.id, name: profile.name, when: profile.when, source: profile.source, target: profile.target,
                   customEngineID: profile.engine, paragraphReader: profile.paragraphReader, note: profile.note,
                   entries: profile.entries, context: profile.context,
-                  useLearned: profile.useLearned)
+                  useLearned: profile.useLearned, rewrites: profile.rewrites, script: profile.script)
     }
 
     /// The profile of today's model this file shape is (the App's own screens read the model).
     public var profile: AppProfile {
-        AppProfile(bundleID: when.compactMap(\.app).first ?? id, appName: name, source: source, target: target,
-                   paragraphReader: paragraphReader, note: note, entries: entries, context: context,
-                   id: id, name: name, when: when, engine: customEngineID, useLearned: useLearned)
+        var p = AppProfile(bundleID: when.compactMap(\.app).first ?? id, appName: name, source: source, target: target,
+                           paragraphReader: paragraphReader, note: note, entries: entries, context: context,
+                           id: id, name: name, when: when, engine: customEngineID, useLearned: useLearned)
+        p.rewrites = rewrites
+        p.script = script
+        return p
     }
 
     enum CodingKeys: String, CodingKey, CaseIterable {
-        case id, name, when, source, target, customEngineID, paragraphReader, note, entries, context, useLearned
+        case id, name, when, source, target, customEngineID, paragraphReader, note, entries, context, useLearned, rewrites, script
     }
 
     public init(from decoder: Decoder) throws {
@@ -65,6 +75,8 @@ public struct ProfileFile: Codable, Equatable, Sendable {
         entries = ((try? c.decodeIfPresent(LossyArray<MemoryEntry>.self, forKey: .entries)) ?? nil)?.elements ?? []
         context = (try? c.decodeIfPresent(AppContextOverride.self, forKey: .context)) ?? nil
         useLearned = (try? c.decodeIfPresent(Bool.self, forKey: .useLearned)) ?? nil
+        rewrites = ((try? c.decodeIfPresent(LossyArray<RewriteRow>.self, forKey: .rewrites)) ?? nil)?.elements ?? []
+        script = (try? c.decodeIfPresent(RewriteScript.self, forKey: .script)) ?? nil
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -81,6 +93,8 @@ public struct ProfileFile: Codable, Equatable, Sendable {
         try c.encodeIfPresent(context, forKey: .context)
         // Written when set, false too: a profile that does not learn while All apps does has to say so (the top-level key is the one written only when true).
         try c.encodeIfPresent(useLearned, forKey: .useLearned)
+        if !rewrites.isEmpty { try c.encode(rewrites, forKey: .rewrites) }
+        try c.encodeIfPresent(script, forKey: .script)
     }
 }
 

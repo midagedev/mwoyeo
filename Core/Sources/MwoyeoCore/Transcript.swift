@@ -99,6 +99,33 @@ public struct TranscriptRecorder: Sendable {
     }
 }
 
+/// What a log line says about the memory its lens had (design names-and-context §2.2, §7; round agents). Local: written only under
+/// `savesTranscripts`, read by an agent over MCP (`read_translation_log`); nothing of it leaves the Mac.
+public struct TranscriptMemory: Equatable, Sendable {
+    /// The id of the chain's first profile (the one that decides the languages), or `all` when All apps is first (`ChainLink.id`).
+    public var profile: String
+    /// `[src, dst, from]` for each row of the chain whose `src` (or `reading`) occurs in the line: what the memory had for it, with the profile
+    /// the row came from (`MergedRow.from`: a profile id, `all`, or `learned:<id>`). Empty: no row of the memory is in the line.
+    public var names: [[String]]
+
+    public init(profile: String, names: [[String]] = []) {
+        self.profile = profile
+        self.names = names
+    }
+
+    /// The memory of `chain` for the line `original`: its rows that occur in it, then the glossary's pairs that occur and no row of the chain
+    /// hides (All apps' terms, `from` = `all`; a user row with the same `src` wins, design §2.1).
+    public init(original: String, chain: MergedChain) {
+        func occurs(_ src: String, _ reading: String? = nil) -> Bool {
+            ContextText.occurs(src, in: original) || reading.map { ContextText.occurs($0, in: original) } == true
+        }
+        let rows = chain.rows.filter { occurs($0.entry.src, $0.entry.reading) }.map { [$0.entry.src, $0.entry.dst, $0.from] }
+        let taken = Set(chain.rows.map(\.entry.id))
+        let terms = chain.glossary.filter { !taken.contains(MemoryEntry.id(forSource: $0.src)) && occurs($0.src) }.map { [$0.src, $0.dst, AppProfile.allAppsID] }
+        self.init(profile: chain.head.id, names: rows + terms)
+    }
+}
+
 public enum TranscriptFormat {
     public enum Track: Sendable { case source, translation }
 
@@ -128,15 +155,26 @@ public enum TranscriptFormat {
     }
 
     /// One line of the JSON Lines log: an object per translated line, keys in this order, no line break inside. `app` is the
-    /// bundle ID of the app in the lens (null when unknown); `engine` is "apple" or an added engine's name.
+    /// bundle ID of the app in the lens (null when unknown); `engine` is "apple" or an added engine's name. `memory` (design
+    /// names-and-context §2.2, §7; R5): the key `profile` follows `app` while the lens has a chain, and `names` ends the line only when a
+    /// row of the chain occurs in it, so a line without a memory is the line it always was, byte for byte.
+    /// `sent` (rewrite-rules §4) is what the
+    /// engine was sent when a `before` rewrite changed `original`, and is left out otherwise, so a line without rewrites is the line it always was.
+    /// `rules` is "skipped" for a line whose rules were left out because the script service was restarting (§5), and absent otherwise.
     public static func jsonlLine(time: Date, timeZone: TimeZone, lens: String, app: String?, source: String, target: String,
-                                 engine: String, original: String, translation: String) -> String {
+                                 engine: String, original: String, translation: String, memory: TranscriptMemory? = nil,
+                                 sent: String? = nil, rulesSkipped: Bool = false) -> String {
         let f = ISO8601DateFormatter()
         f.timeZone = timeZone
         f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        let fields: [(String, String?)] = [("time", f.string(from: time)), ("lens", lens), ("app", app), ("source", source), ("target", target),
-                                           ("engine", engine), ("original", original), ("translation", translation)]
-        let body = fields.map { "\(json($0.0)):\($0.1.map(json) ?? "null")" }.joined(separator: ",")
+        var fields: [(String, String?)] = [("time", f.string(from: time)), ("lens", lens), ("app", app)]
+        if let memory { fields.append(("profile", memory.profile)) }
+        fields += [("source", source), ("target", target), ("engine", engine), ("original", original)]
+        if let sent, sent != original { fields.append(("sent", sent)) }
+        if rulesSkipped { fields.append(("rules", "skipped")) }
+        fields.append(("translation", translation))
+        var body = fields.map { "\(json($0.0)):\($0.1.map(json) ?? "null")" }.joined(separator: ",")
+        if let memory, !memory.names.isEmpty { body += ",\(json("names")):[" + memory.names.map { "[" + $0.map(json).joined(separator: ",") + "]" }.joined(separator: ",") + "]" }
         return "{\(body)}\n"
     }
 

@@ -82,13 +82,16 @@ extension RequestLayout {
     ///
     /// - `rows`: the sheet's rows (the user's, and the usable learned ones when `options.includeLearned`); the count is how many
     ///   of them fit the engine's row budget if every one of them occurred in the text.
-    /// - `glossary`: the global glossary's pairs. They go whole on the context path, minus those an included user row replaces
-    ///   (`prepare`), and count as the names "of all apps".
+    /// - `glossary`: the global glossary's pairs. Only the pairs that occur go (design §3), as hint rows of the same cap as the app's
+    ///   own, minus those an included user row replaces (`hintRows`); they count as the names "of all apps". The preview has no text, so
+    ///   like the app's rows they count as if every one occurred, within the one row cap and token budget they share.
+    /// - `glossaryApply`: how the glossary is used (design §10). `replace` writes the pairs into the text and tells the engine nothing,
+    ///   so none count.
     /// - An engine that takes no context (`kind.tier == nil`), or options that are Off, are `linesOnly`: the card, the note and
     ///   the rows do not go either.
     public static func sentSummary(options: ContextOptions, kind: LayoutKind, engineName: String? = nil, appName: String?,
                                    domain: String? = nil, note: String = "", rows: [MemoryEntry] = [],
-                                   glossary: [(String, String)] = []) -> SentSummary {
+                                   glossary: [(String, String)] = [], glossaryApply: EntryApply = .hint) -> SentSummary {
         guard options.enabled, let tier = kind.tier else { return SentSummary(mode: .linesOnly, engineName: engineName) }
         let budget = ContextBudget.for(tier)
         let memoryOnly = options.memoryOnly
@@ -106,10 +109,14 @@ extension RequestLayout {
                 case .learned: options.includeLearned && !memoryOnly
                 }
             }.filter { !$0.src.isEmpty && !$0.dst.isEmpty }
-            s.names = selectRows(candidates, items: candidates.map(\.src), surrounding: [], budget: budget, format: options.format).count
-            s.learned = options.includeLearned && !memoryOnly && candidates.contains { $0.origin == .learned }
             let replaced = options.includeUser ? Set(rows.filter { $0.origin == .user }.map(\.id)) : []
-            s.allApps = glossary.filter { !replaced.contains(ContextText.foldedKey($0.0)) }.count
+            let pairs = glossaryApply == .replace ? [] : glossary.filter { !replaced.contains(ContextText.foldedKey($0.0)) }
+                .map { MemoryEntry(src: $0.0, dst: $0.1, kind: .term, origin: .user) }
+            let own = Set(candidates.map(\.id))
+            let picked = selectRows(candidates + pairs, items: (candidates + pairs).map(\.src), surrounding: [], budget: budget, format: options.format)
+            s.names = picked.filter { own.contains($0.id) }.count
+            s.allApps = picked.count - s.names
+            s.learned = options.includeLearned && !memoryOnly && candidates.contains { $0.origin == .learned }
         }
         if !memoryOnly {
             let cap = options.longTranscript ? budget.maxTranscript : min(ContextOptions.shortTranscript, budget.maxTranscript)

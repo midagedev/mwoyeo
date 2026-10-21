@@ -44,7 +44,7 @@ public enum ChatTranslation {
         var body: [String: Any] = [
             "model": model, "stream": false,
             "messages": [["role": "system", "content": system],
-                         ["role": "user", "content": RequestLayout.lastMessage(items: request.items, p)]],
+                         ["role": "user", "content": RequestLayout.lastMessage(items: request.sent, p)]],
         ]
         addQuirkFields(&body, model: model, baseURL: baseURL, thinking: thinking)
         if ModelQuirks.acceptsPromptCache(host: baseURL?.host ?? "") {

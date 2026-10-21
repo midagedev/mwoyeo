@@ -11,13 +11,11 @@ public enum ContextAmount: Equatable, Sendable {
     case nearby
     case conversation(Int)
 
-    /// The amount an app's context override means (design §4.2's table reads the chain's amount).
-    ///
-    /// A `memory` override is a case of the mode of a future build (the App's own screens and the settings-file
-    /// schema follow it); until then the three modes of today map one to one.
+    /// The amount an app's context override means (design §4.2's table reads the chain's amount): the four modes map one to one.
     public init(_ override: AppContextOverride) {
         switch override.mode {
         case .off: self = .off
+        case .memory: self = .memory
         case .nearby: self = .nearby
         case .conversation: self = .conversation(override.previousLines)
         }
@@ -111,6 +109,8 @@ public struct ChainBase: Equatable, Sendable {
     public var learn: Bool
     /// All apps' glossary: the terms every profile's request may use.
     public var glossary: [GlossaryPair]
+    /// How the glossary's pairs are used, one mode for all of them (design §2.1's last rule, §10).
+    public var glossaryApply: EntryApply
     /// The engines that exist. An engine that is not among them is gone, and a profile's choice of it is skipped.
     public var knownEngines: Set<UUID>
     /// The app in front (the lens's app): the key the learned rows keep when All apps is the head (design §2.1).
@@ -118,13 +118,15 @@ public struct ChainBase: Equatable, Sendable {
 
     public init(pair: LanguageChoice = LanguageChoice(source: "auto", target: "en", customEngineID: nil),
                 engine: ProfileEngine? = nil, reader: ParagraphReader? = nil, amount: ContextAmount = .memory,
-                learn: Bool = false, glossary: [GlossaryPair] = [], knownEngines: Set<UUID> = [], bundleID: String? = nil) {
+                learn: Bool = false, glossary: [GlossaryPair] = [], glossaryApply: EntryApply = .hint,
+                knownEngines: Set<UUID> = [], bundleID: String? = nil) {
         self.pair = pair
         self.engine = engine
         self.reader = reader
         self.amount = amount
         self.learn = learn
         self.glossary = glossary
+        self.glossaryApply = glossaryApply
         self.knownEngines = knownEngines
         self.bundleID = bundleID
     }
@@ -170,12 +172,15 @@ public struct MergedChain: Equatable, Sendable {
     public var rows: [MergedRow]
     /// All apps' glossary: the terms every request may use.
     public var glossary: [GlossaryPair]
+    /// How the glossary's pairs are used (design §10): hint, replace or both.
+    public var glossaryApply: EntryApply
     /// The key the learned rows are kept under: the head's id, or the bundle ID when All apps is the head.
     public var learnedKey: String?
 
-    /// The chain has something to send as memory: a note, or a row of the user's.
+    /// The chain has something to send as memory (design §4.2's `memory` row: "hint rows or a note"): a note, or a row of the
+    /// user's that is a hint (a `replace` row is written into the text and tells the engine nothing).
     public var hasMemory: Bool {
-        !note.isEmpty || rows.contains { $0.entry.origin == .user }
+        !note.isEmpty || rows.contains { $0.entry.origin == .user && $0.entry.apply != .replace }
     }
 }
 
@@ -288,7 +293,7 @@ public enum ProfileChain {
 
         let out = MergedChain(links: links, head: head, pair: pair, engine: engine, reader: reader, amount: amount,
                               learn: learn, note: note, rows: order.compactMap { rows[$0] }, glossary: base.glossary,
-                              learnedKey: learnedKey)
+                              glossaryApply: base.glossaryApply, learnedKey: learnedKey)
         return out
     }
 

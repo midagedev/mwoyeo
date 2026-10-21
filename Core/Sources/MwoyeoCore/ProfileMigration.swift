@@ -1,44 +1,5 @@
 import Foundation
 
-/// One row of a profile in the new file shape (design §5.1, §5.3): the row of the sheet plus the mode it is used in.
-public struct ProfileFileEntry: Codable, Equatable, Sendable {
-    /// The row itself (the model's `MemoryEntry`).
-    public var entry: MemoryEntry
-    /// How the row is used (design §10). nil = hint: what a file without the key means.
-    public var apply: EntryApply?
-
-    public init(_ entry: MemoryEntry, apply: EntryApply? = nil) {
-        self.entry = entry
-        self.apply = apply
-    }
-
-    enum CodingKeys: String, CodingKey, CaseIterable { case src, dst, kind, gender, note, reading, addressing, apply }
-
-    public init(from decoder: Decoder) throws {
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        entry = MemoryEntry(src: try c.decode(String.self, forKey: .src),
-                            dst: try c.decode(String.self, forKey: .dst),
-                            kind: (try? c.decodeIfPresent(EntryKind.self, forKey: .kind)) ?? .term,
-                            gender: (try? c.decodeIfPresent(Gender.self, forKey: .gender)) ?? nil,
-                            note: (try? c.decodeIfPresent(String.self, forKey: .note)) ?? "",
-                            reading: (try? c.decodeIfPresent(String.self, forKey: .reading)) ?? nil,
-                            addressing: ((try? c.decodeIfPresent(LossyArray<Addressing>.self, forKey: .addressing)) ?? nil)?.elements ?? [])
-        apply = (try? c.decodeIfPresent(EntryApply.self, forKey: .apply)) ?? nil
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encode(entry.src, forKey: .src)
-        try c.encode(entry.dst, forKey: .dst)
-        try c.encode(entry.kind, forKey: .kind)
-        try c.encodeIfPresent(entry.gender, forKey: .gender)
-        if !entry.note.isEmpty { try c.encode(entry.note, forKey: .note) }
-        try c.encodeIfPresent(entry.reading, forKey: .reading)
-        if !entry.addressing.isEmpty { try c.encode(entry.addressing, forKey: .addressing) }
-        try c.encodeIfPresent(apply, forKey: .apply)
-    }
-}
-
 /// One profile in the new file shape (design §5.1): `id`, `name`, `when`, and what it sets.
 public struct ProfileFile: Codable, Equatable, Sendable {
     public var id: String
@@ -49,13 +10,14 @@ public struct ProfileFile: Codable, Equatable, Sendable {
     public var customEngineID: ProfileEngine?
     public var paragraphReader: ParagraphReader?
     public var note: String
-    public var entries: [ProfileFileEntry]
+    /// The names and terms; each row carries its own `apply` (`MemoryEntry.apply`, design §10: the one owner of the mode).
+    public var entries: [MemoryEntry]
     public var context: AppContextOverride?
     public var useLearned: Bool?
 
     public init(id: String, name: String, when: [ProfileCondition] = [], source: String, target: String,
                 customEngineID: ProfileEngine? = nil, paragraphReader: ParagraphReader? = nil, note: String = "",
-                entries: [ProfileFileEntry] = [], context: AppContextOverride? = nil, useLearned: Bool? = nil) {
+                entries: [MemoryEntry] = [], context: AppContextOverride? = nil, useLearned: Bool? = nil) {
         self.id = id
         self.name = name
         self.when = when
@@ -73,14 +35,14 @@ public struct ProfileFile: Codable, Equatable, Sendable {
     public init(_ profile: AppProfile) {
         self.init(id: profile.id, name: profile.name, when: profile.when, source: profile.source, target: profile.target,
                   customEngineID: profile.engine, paragraphReader: profile.paragraphReader, note: profile.note,
-                  entries: profile.entries.map { ProfileFileEntry($0) }, context: profile.context,
+                  entries: profile.entries, context: profile.context,
                   useLearned: profile.useLearned)
     }
 
     /// The profile of today's model this file shape is (the App's own screens read the model).
     public var profile: AppProfile {
         AppProfile(bundleID: when.compactMap(\.app).first ?? id, appName: name, source: source, target: target,
-                   paragraphReader: paragraphReader, note: note, entries: entries.map(\.entry), context: context,
+                   paragraphReader: paragraphReader, note: note, entries: entries, context: context,
                    id: id, name: name, when: when, engine: customEngineID, useLearned: useLearned)
     }
 
@@ -99,7 +61,8 @@ public struct ProfileFile: Codable, Equatable, Sendable {
         customEngineID = raw.flatMap { ProfileEngine.named($0) }
         paragraphReader = (try? c.decodeIfPresent(ParagraphReader.self, forKey: .paragraphReader)) ?? nil
         note = (try? c.decodeIfPresent(String.self, forKey: .note)) ?? ""
-        entries = ((try? c.decodeIfPresent([ProfileFileEntry].self, forKey: .entries)) ?? nil) ?? []
+        // One bad row is skipped, not the profile (the rule of `AppProfile`).
+        entries = ((try? c.decodeIfPresent(LossyArray<MemoryEntry>.self, forKey: .entries)) ?? nil)?.elements ?? []
         context = (try? c.decodeIfPresent(AppContextOverride.self, forKey: .context)) ?? nil
         useLearned = (try? c.decodeIfPresent(Bool.self, forKey: .useLearned)) ?? nil
     }
@@ -116,7 +79,8 @@ public struct ProfileFile: Codable, Equatable, Sendable {
         if !note.isEmpty { try c.encode(note, forKey: .note) }
         if !entries.isEmpty { try c.encode(entries, forKey: .entries) }
         try c.encodeIfPresent(context, forKey: .context)
-        if useLearned == true { try c.encode(true, forKey: .useLearned) }
+        // Written when set, false too: a profile that does not learn while All apps does has to say so (the top-level key is the one written only when true).
+        try c.encodeIfPresent(useLearned, forKey: .useLearned)
     }
 }
 
@@ -180,7 +144,8 @@ public struct LegacySettings: Codable, Equatable, Sendable {
         glossary = (try? c.decodeIfPresent(String.self, forKey: .glossary)) ?? nil
         paragraphReader = (try? c.decodeIfPresent(ParagraphReader.self, forKey: .paragraphReader)) ?? nil
         appleUsesPinnedTerms = (try? c.decodeIfPresent(Bool.self, forKey: .appleUsesPinnedTerms)) ?? nil
-        appProfiles = (try? c.decodeIfPresent([AppProfile].self, forKey: .appProfiles)) ?? nil
+        // One bad item is skipped, not every profile (the rule of the settings file's own read of `appProfiles`).
+        appProfiles = ((try? c.decodeIfPresent(LossyArray<AppProfile>.self, forKey: .appProfiles)) ?? nil)?.elements
         // An engine this build does not know (a kind it does not have) is left out, as the settings-file read leaves it
         // out today; the other engines are converted.
         engines = ((try? c.decodeIfPresent(LossyArray<EngineConfig>.self, forKey: .engines)) ?? nil)?.elements
@@ -289,6 +254,15 @@ public struct MigratedSettings: Codable, Equatable, Sendable {
     }
 }
 
+extension LegacySettings {
+    /// The file is in 1.1.4's shape (design §5.2): it has none of the new shape's `profiles`, and it says something only 1.1.4 said
+    /// (`appProfiles`, the Apple switch, an engine's own `context`). A file with `profiles` is in the new shape, whatever else it holds.
+    public var isOldShape: Bool {
+        guard profiles == nil else { return false }
+        return appProfiles != nil || appleUsesPinnedTerms != nil || (engines ?? []).contains { $0.context != nil }
+    }
+}
+
 /// The four cases in which a request of a 1.1.4 file is not made again (design §5.2).
 public enum MigrationException: String, Equatable, Sendable, CaseIterable {
     /// (a) A lens over app B while A is in front uses B's pair and engine (Q1).
@@ -372,7 +346,7 @@ public enum ProfileMigration {
 
         // The engines' permissions (design §5.2's fourth and sixth rows). A file that is already in the new shape keeps
         // the permissions it has; only the old shape's `context` is read and turned into them.
-        let alreadyNew = old.profiles != nil
+        let alreadyNew = !old.isOldShape
         let aProfileSendsLines = profiles.contains { p in
             guard let c = p.context else { return false }
             return ContextAmount(c).sendsLines
@@ -396,7 +370,7 @@ public enum ProfileMigration {
         let appleBoth = old.appleUsesPinnedTerms == true
         if appleBoth {
             for i in profiles.indices {
-                profiles[i].entries = profiles[i].entries.map { ProfileFileEntry($0.entry, apply: .both) }
+                profiles[i].entries = profiles[i].entries.map { row in var both = row; both.apply = .both; return both }
             }
         }
 
@@ -408,7 +382,7 @@ public enum ProfileMigration {
                                      profiles: profiles, engines: migratedEngines.isEmpty ? nil : migratedEngines)
 
         // The file is already in the new shape: its own keys are kept.
-        if old.profiles != nil {
+        if alreadyNew {
             value.context = old.context ?? value.context
             value.useLearned = old.useLearned ?? value.useLearned
             value.profilePin = old.profilePin ?? value.profilePin

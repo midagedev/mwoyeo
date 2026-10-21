@@ -216,8 +216,11 @@ import Testing
         for _ in 0..<4 { root.deleteLastPathComponent() }
         let guide = try String(contentsOf: root.appendingPathComponent("docs/settings-for-agents.md"), encoding: .utf8)
         let rows = [
-            "| `note` | text, up to \(AppProfile.maxNoteLength) characters |",
-            "| `entries` | up to \(AppProfile.maxEntries) rows; a second row with the same `src` is left out |",
+            "| `profiles` | up to \(AppProfile.maxProfiles); an item that cannot be read is reported and dropped |",
+            "| `name` | text, 1 to \(AppProfile.maxNameLength) characters; left out, the id |",
+            "| `when` | up to \(AppProfile.maxConditions) conditions; each needs `app` or `titleContains` (up to \(ProfileCondition.maxTitleLength) characters)",
+            "| `note` | text, up to \(AppProfile.maxNoteLength) characters; over \(AppProfile.maxNoteLength) in all, the broadest notes are dropped whole |",
+            "| `entries` | up to \(AppProfile.maxEntries) rows; a second row with the same `src` is left out; of two profiles in use, the narrower one's row wins |",
             "| `entries[].src`, `dst` | text, 1 to \(MemoryEntry.maxName) characters |",
             "| `entries[].note` | text, up to \(MemoryEntry.maxEntryNote) characters |",
             "| `entries[].reading` | text, up to \(MemoryEntry.maxName) characters |",

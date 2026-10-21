@@ -112,6 +112,9 @@ public struct AppContextOverride: Codable, Equatable, Sendable {
     public enum Mode: String, Codable, CaseIterable, Sendable {
         /// No context: today's request, byte for byte.
         case off
+        /// The card, the note and the names, and nothing from the screen (design §1.4's default amount, §4.2's `memory`). A build
+        /// before 1.1.5 reads this mode as no override (the lenient decode of `AppProfile`).
+        case memory
         /// The lines around the text on screen, and no earlier lines.
         case nearby
         /// The nearby lines and the last `previousLines` lines read before.
@@ -156,6 +159,8 @@ public struct AppProfile: Codable, Equatable, Identifiable, Sendable {
     public static let maxNameLength = 40
     /// The cap on a profile's conditions (§1.1, §5.3).
     public static let maxConditions = 8
+    /// The cap on the profiles of a file (§5.3).
+    public static let maxProfiles = 50
     /// The id All apps has (§5.1): a profile may not take it.
     public static let allAppsID = "all"
 
@@ -370,7 +375,13 @@ public enum AppProfiles {
     /// What translates while `frontmost` is in front: the app's profile laid over `base`, or `base` itself when the app has
     /// none. A profile engine that is no longer among `engines` keeps the base choice.
     public static func effective(base: LanguageChoice, profiles: [AppProfile], frontmost: String?, engines: Set<UUID>) -> LanguageChoice {
-        guard let p = profile(for: frontmost, in: profiles) else { return base }
+        effective(base: base, profile: profile(for: frontmost, in: profiles), engines: engines)
+    }
+
+    /// `profile` laid over `base`, or `base` itself with none: the pair of the profile and its engine while that engine exists. The head of a
+    /// pinned chain decides the same way (design §1.3: the first profile decides the languages).
+    public static func effective(base: LanguageChoice, profile: AppProfile?, engines: Set<UUID>) -> LanguageChoice {
+        guard let p = profile else { return base }
         var out = LanguageChoice(source: p.source, target: p.target, customEngineID: base.customEngineID)
         if let id = p.customEngineID, engines.contains(id) { out.customEngineID = id }
         return out

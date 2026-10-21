@@ -420,39 +420,24 @@ extension ContextMemory {
     /// The rows written into the source before translation (design §3 "Hint and replace", §10): the chain's merged user rows whose
     /// `apply` is `.replace` or `.both` (narrow → broad, as given), then the global glossary's pairs whose folded source none of
     /// `rows` has, when `glossaryApply` is not `.hint`. Replace rows cost no tokens, so the row cap never touches them. A learned row
-    /// is a hint and never goes in; a row without a source or a translation is not a row.
+    /// is a hint and never goes in; a row without a source or a translation is not a row. This is the one owner of the rows every
+    /// kind is handed to put into its source: Apple Translation, Foundation Models, a template and a command take only these, and a
+    /// chat or Anthropic engine takes them besides its hint rows.
     public static func replaceRows(rows: [MemoryEntry], glossary: [(String, String)], glossaryApply: EntryApply) -> [MemoryEntry] {
-        mergedReplaceRows(rows, glossary: glossary, newPairApply: glossaryApply == .hint ? nil : glossaryApply) {
-            $0.origin == .user && $0.apply != .hint && !$0.src.isEmpty && !$0.dst.isEmpty
-        }
-    }
-
-    /// The one merge behind `replaceRows` and `applePins`: the rows `include` keeps, then (when `newPairApply` is not nil) the
-    /// glossary pairs with a source none of `rows` has, as user rows of kind `term` with that mode. The order is the rows, then
-    /// the glossary's, as they are written.
-    private static func mergedReplaceRows(_ rows: [MemoryEntry], glossary: [(String, String)], newPairApply: EntryApply?,
-                                          include: (MemoryEntry) -> Bool) -> [MemoryEntry] {
-        var out = rows.filter(include)
-        guard let newPairApply else { return out }
+        var out = rows.filter { $0.origin == .user && $0.apply != .hint && !$0.src.isEmpty && !$0.dst.isEmpty }
+        guard glossaryApply != .hint else { return out }
         var seen = Set(rows.filter { $0.origin == .user }.map(\.id))
         for (src, dst) in glossary {
-            let row = MemoryEntry(src: src, dst: dst, kind: .term, origin: .user, apply: newPairApply)
+            let row = MemoryEntry(src: src, dst: dst, kind: .term, origin: .user, apply: glossaryApply)
             guard !row.src.isEmpty, !row.dst.isEmpty, seen.insert(row.id).inserted else { continue }
             out.append(row)
         }
         return out
     }
 
-    /// The rows Apple Translation pre-inserts into its source (design §1.3, G7, §10): the app's own user rows first, then the global
-    /// glossary's pairs whose source the app's memory does not have. The app's row wins (§1.3: the narrowest user row wins), so a
-    /// glossary pair with a source the app already has is not sent twice. Apple takes no hints, so every user row is a replacement
-    /// row whatever its stored `apply` says; the rows keep that stored value (today's output, byte for byte). A learned row never
-    /// goes in. The order is the app's rows, then the glossary's, as they are written.
-    public static func applePins(appRows: [MemoryEntry], glossary: [(String, String)]) -> [MemoryEntry] {
-        // The pairs keep the default mode: Apple reads `origin`, and today's callers compare the whole row (App/Support/ContextChecks).
-        mergedReplaceRows(appRows, glossary: glossary, newPairApply: .hint) {
-            $0.origin == .user && !$0.src.isEmpty && !$0.dst.isEmpty
-        }
+    /// `replaceRows` of a merged chain (design §2.1, §10): its user rows, narrowest first, and All apps' glossary in its mode.
+    public static func replaceRows(chain: MergedChain) -> [MemoryEntry] {
+        replaceRows(rows: chain.rows.map(\.entry), glossary: chain.glossary.map { ($0.src, $0.dst) }, glossaryApply: chain.glossaryApply)
     }
 
     /// One hint row's cost, the budget's own count (design §10, §3): `approxTokens(renderRow(e)) + 1`.

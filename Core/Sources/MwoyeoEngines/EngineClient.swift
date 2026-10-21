@@ -49,7 +49,7 @@ public actor EngineClient {
     /// command engine gets the lines only. No text is logged.
     public func translate(_ request: ContextRequest, options: ContextOptions,
                           engine: EngineConfig) async throws(EngineError) -> TranslationReply {
-        let lines = request.items
+        let lines = request.sent   // the same count as `items`; a template or a command gets the lines as they are sent (design §10)
         if lines.isEmpty { return TranslationReply(lines: []) }
         if Task.isCancelled { throw .cancelled }
         let source = request.source, target = request.target

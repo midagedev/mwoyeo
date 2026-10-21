@@ -102,6 +102,7 @@ extension ContextOptions {
     /// `base` with one app's context override laid over it. No override is `base`.
     ///
     /// - `off` → `enabled: false`.
+    /// - `memory` → the card, the note and the names and nothing of the screen (`memoryOnly`, no earlier lines).
     /// - `nearby` → `enabled: true` and no earlier lines (`transcriptCount: 0`): the lines around the text on screen only.
     /// - `conversation` → `enabled: true` and the last `previousLines` lines before. More than `shortTranscript` lines need
     ///   `longTranscript`, so it is turned on for those and left as `base` has it otherwise.
@@ -114,6 +115,10 @@ extension ContextOptions {
         switch override.mode {
         case .off:
             out.enabled = false
+        case .memory:
+            out.enabled = true
+            out.transcriptCount = 0
+            out.memoryOnly = true
         case .nearby:
             out.enabled = true
             out.transcriptCount = 0
@@ -128,8 +133,14 @@ extension ContextOptions {
 
 /// Everything one request may carry. The layout picks what fits the engine's budget; the caller does not pre-trim.
 public struct ContextRequest: Sendable {
-    /// The source lines to translate. Their ids are 0..<count in this order.
+    /// The source lines to translate, as the screen has them. Their ids are 0..<count in this order. The hint rows are chosen on these.
     public var items: [String]
+    /// The lines as they are sent, when replace rows were written into them (design §10: `ContextMemory.replaceRows`); nil sends `items`.
+    /// `items` stays the original on purpose: `selectRows` matches a row on it, so rewriting first would drop the hint of every name that
+    /// was replaced (a `both` row is a hint and a replacement; found by the both-bench, 2026-10-21). Same count and order as `items`.
+    public var rewritten: [String]?
+    /// What goes out as the lines to translate: `rewritten`, else `items`.
+    public var sent: [String] { rewritten ?? items }
     /// The lines before (`ContextThread.contextLines`), oldest first.
     public var before: [ContextLine]
     /// The lines after the items on screen.
@@ -266,29 +277,29 @@ public enum RequestLayout {
             switch engine {
             case let .openAICompatible(baseURL, model, thinking, _):
                 if !options.enabled {
-                    return ChatTranslation.requestBody(lines: request.items, source: request.source, target: request.target,
+                    return ChatTranslation.requestBody(lines: request.sent, source: request.source, target: request.target,
                                                        glossary: request.glossary, model: model, baseURL: baseURL, thinking: thinking)
                 }
                 return ChatTranslation.contextRequestBody(prepare(request, options, kind), request: request, model: model,
                                                           baseURL: baseURL, thinking: thinking)
             case let .anthropic(_, model, thinking):
                 if !options.enabled {
-                    return AnthropicTranslation.requestBody(lines: request.items, source: request.source, target: request.target,
+                    return AnthropicTranslation.requestBody(lines: request.sent, source: request.source, target: request.target,
                                                             glossary: request.glossary, model: model, thinking: thinking)
                 }
                 return AnthropicTranslation.contextRequestBody(prepare(request, options, kind), request: request, model: model,
                                                                thinking: thinking)
             case let .deepL(_, formality):
                 if !options.enabled {
-                    return DeepLTranslation.requestBody(lines: request.items, source: request.source, target: request.target,
+                    return DeepLTranslation.requestBody(lines: request.sent, source: request.source, target: request.target,
                                                         formality: formality)
                 }
                 return DeepLTranslation.contextRequestBody(prepare(request, options, kind), request: request, formality: formality,
                                                            instructions: options.deepLInstructions)
             case .command:
-                return CommandEngine.encodeRequest(lines: request.items, source: request.source, target: request.target)
+                return CommandEngine.encodeRequest(lines: request.sent, source: request.source, target: request.target)
             case let .httpTemplate(template):
-                let first = try? HTTPTemplate.requests(template, lines: request.items, source: request.source,
+                let first = try? HTTPTemplate.requests(template, lines: request.sent, source: request.source,
                                                        target: request.target, key: nil).first
                 return first?.body ?? Data()
             }
@@ -527,7 +538,7 @@ public enum RequestLayout {
     /// The reply is plain text, so no `terms` come back from this kind.
     static func foundationModels(request: ContextRequest, options: ContextOptions) -> Data {
         let ask = "Translate into \(Locale(identifier: "en").localizedString(forIdentifier: request.target) ?? request.target):\n"
-        let source = request.items.joined(separator: "\n")
+        let source = request.sent.joined(separator: "\n")
         var instructions = foundationModelsInstructions(source: request.source, target: request.target, glossary: request.glossary)
         var prompt = ask + source
         if options.enabled {

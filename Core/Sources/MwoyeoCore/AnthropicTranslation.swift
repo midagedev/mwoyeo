@@ -77,9 +77,9 @@ public enum AnthropicTranslation {
         if !p.cardNote.isEmpty { system.append(["type": "text", "cache_control": marker, "text": p.cardNote]) }
         var body: [String: Any] = [
             "model": model,
-            "max_tokens": min(8192, maxTokens(for: request.items) + 16 * request.items.count + 256),
+            "max_tokens": min(8192, maxTokens(for: request.sent) + 16 * request.sent.count + 256),
             "system": system,
-            "messages": [["role": "user", "content": RequestLayout.lastMessage(items: request.items, p)]],
+            "messages": [["role": "user", "content": RequestLayout.lastMessage(items: request.sent, p)]],
         ]
         addQuirkFields(&body, model: model, thinking: thinking, schema: contextSchema(wantsTerms: p.wantsTerms))
         return ChatTranslation.encode(body)

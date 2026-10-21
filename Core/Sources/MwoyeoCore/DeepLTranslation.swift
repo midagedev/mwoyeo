@@ -111,7 +111,7 @@ public enum DeepLTranslation {
     static func contextRequestBody(_ p: RequestLayout.Prepared, request: ContextRequest, formality engineFormality: String?,
                                    instructions: Bool) -> Data {
         let target = upper(request.target)
-        var body: [String: Any] = ["text": request.items, "target_lang": target]
+        var body: [String: Any] = ["text": request.sent, "target_lang": target]
         if let source = request.source { body["source_lang"] = upper(source) }
         var formality = engineFormality
         var register: Register?

@@ -29,7 +29,7 @@ import Testing
         #expect(profiles[0].name == "Example Chat")
         #expect(profiles[0].when == [ProfileCondition(app: "com.example.chat")])
         #expect(profiles[0].source == "ja" && profiles[0].target == "en")
-        #expect(profiles[0].note == "casual" && profiles[0].entries.map(\.entry.src) == ["ハク"])
+        #expect(profiles[0].note == "casual" && profiles[0].entries.map(\.src) == ["ハク"])
         #expect(profiles[0].context == AppContextOverride(mode: .nearby))
     }
 
@@ -118,7 +118,8 @@ import Testing
                                  appProfiles: [AppProfile(bundleID: "com.example.chat", appName: "Chat", source: "ja",
                                                           target: "en", entries: [row])])
         let offResult = ProfileMigration.convert(off)
-        #expect(offResult.value.profiles[0].entries.map(\.apply) == [nil])
+        // 2026-10-21, prof-file: the mode is `MemoryEntry.apply` (one owner), so "no mode written" reads `.hint`, the same fact as the `nil` it was.
+        #expect(offResult.value.profiles[0].entries.map(\.apply) == [.hint])
         #expect(offResult.value.glossaryApply == nil)
         #expect(!offResult.exceptions.contains(.applePinsBecomeBoth))
     }

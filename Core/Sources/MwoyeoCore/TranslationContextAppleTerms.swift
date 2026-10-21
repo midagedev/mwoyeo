@@ -1,6 +1,6 @@
 import Foundation
 
-// The user's pinned names and terms for Apple Translation (design §9, choice (a)).
+// The names and terms written into the source before translation: the replace mode (design §10), every kind's, Apple Translation's first.
 //
 // Apple Translation takes no glossary, no context and no instruction. The measured way to give it a word is to put the final
 // word into the source ("The 협력 event starts at 9") and let the engine write the sentence around it: it picks the particle
@@ -9,8 +9,9 @@ import Foundation
 // the language pack and 98 of 102 with Apple Intelligence). Attributes on the word do not help (a marker leaves the answer as it
 // was; `skipsTranslation` makes Apple Intelligence drop the particle), so there are none.
 //
-// This file holds the source side only: what to hand to Apple. Reading the answer (does it hold every target, ask again
-// for a line that does not) stays with the caller. Off by default: the zero-setup default is exactly today's request.
+// This file holds the source side only: what to hand to the engine. Reading the answer (does it hold every target, ask again
+// for a line that does not) stays with the caller. Which rows go is not decided here (`ContextMemory.replaceRows(chain:)`): with no
+// replace row the source is untouched, which is the zero-setup default.
 
 /// A source line prepared for Apple Translation: `source` with every pinned term replaced by its target.
 public struct ApplePreinsertion: Equatable, Sendable {
@@ -33,17 +34,16 @@ public struct ApplePreinsertion: Equatable, Sendable {
     /// The targets put in, in the order they stand in `text`.
     public var targets: [String] { spans.map(\.target) }
 
-    /// Pre-inserts the user's pinned names and terms.
+    /// Writes the replace rows (`ContextMemory.replaceRows(chain:)`) into `source`.
     ///
-    /// With `appleUsesPinnedTerms` false (the default) the result is `source`, untouched. With it true, only the entries
-    /// the user wrote or pinned (`origin == .user`) count; a learned entry is a hint and never goes into a source text.
+    /// Only the entries the user wrote or pinned (`origin == .user`) count; a learned entry is a hint and never goes into a source
+    /// text. No entry, no change.
     ///
     /// A term in Latin letters matches whole words and their plural ("tokens", "boxes"), and one that starts in lowercase
     /// also with a capital, as at the start of a sentence. A term in any other script matches wherever it stands. The
     /// longest term wins where two overlap, and the first entry where two are as long. An entry whose term is its target,
     /// or is empty, is ignored. A plural in the source is replaced together with its term, so the plural is not carried over.
-    public static func insert(into source: String, entries: [MemoryEntry], appleUsesPinnedTerms: Bool = false) -> ApplePreinsertion {
-        guard appleUsesPinnedTerms else { return ApplePreinsertion(source: source, text: source, spans: []) }
+    public static func insert(into source: String, entries: [MemoryEntry]) -> ApplePreinsertion {
         let pairs = entries.filter { $0.origin == .user }.map { ($0.src, $0.dst) }
         return insert(into: source, pairs: pairs)
     }

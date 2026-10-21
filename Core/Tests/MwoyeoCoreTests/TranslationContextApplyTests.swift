@@ -62,18 +62,6 @@ import Testing
         #expect(deduped.count == 1 && deduped.first?.dst == "토큰")
     }
 
-    /// Apple takes no hints: `applePins` is the replace merge with every user row included, and it keeps today's rows as they are.
-    @Test func applePinsIsTheReplaceMergeWithEveryUserRow() {
-        let learned = MemoryEntry(src: "learned", dst: "d", origin: .learned)
-        let hint = MemoryEntry(src: "token", dst: "앱의 토큰")
-        let replace = MemoryEntry(src: "model", dst: "모델", origin: .user, apply: .replace)
-        let pinned = ContextMemory.applePins(appRows: [hint, replace, learned], glossary: [("token", "전역의 토큰"), ("moon", "달")])
-        #expect(pinned.map(\.src) == ["token", "model", "moon"])
-        #expect(pinned.first?.apply == .hint && pinned[1].apply == .replace)
-        // The pairs are created with the default mode: today's calls compare the whole row (App/Support/ContextChecks).
-        #expect(pinned.last?.apply == .hint && pinned.last?.kind == .term)
-    }
-
     // MARK: hint selection and the cap (design §3)
 
     @Test func hintSelectionNeverSendsAReplaceRowAndBothGoesAsAHint() {

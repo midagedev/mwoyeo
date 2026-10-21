@@ -149,6 +149,12 @@ extension ContextOptions {
     /// as the engine allows them. When the engine denies the lines, the request is the memory case.
     private static func linesOptions(chain: MergedChain, allow: EngineAllow, count: Int, kind: LayoutKind) -> ContextOptions {
         guard allow.lines else { return memoryOptions(chain: chain, allow: allow, kind: kind) }
+        // The title (design §4.1): "always" for a server on this Mac, the engine's switch elsewhere. That rule has one owner, the layout's
+        // privacy rule (`ContextPrivacy.includesTitle(onDevice:optedIn:)`: on-device kinds get the title whatever `includeTitle` says), so
+        // `allow.title` is only asked off this Mac and the options of a server on this Mac stay what 1.1.4's were (decided 2026-10-21,
+        // prof-file: copying "always" into `includeTitle` here would change no byte and put a second owner of the rule beside the first).
+        // The lines stay behind `allow.lines` on every kind: its default is on (§4.1's "always"), and the converter turns it off for an
+        // engine that sent none in 1.1.4 (§5.2), which is how that engine's requests stay what they were.
         return ContextOptions(enabled: true, transcriptCount: count, includeLearned: chain.learn,
                               includeTitle: allow.title, deepLInstructions: allow.deepLInstructions,
                               longTranscript: count > shortTranscript)

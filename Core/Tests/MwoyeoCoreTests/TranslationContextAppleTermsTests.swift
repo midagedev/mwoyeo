@@ -10,23 +10,21 @@ import Testing
                                      ("Aldric", "알드릭"), ("route", "루트"), ("map", "맵"), ("speed", "스피드")]
         .map { MemoryEntry(src: $0.0, dst: $0.1, kind: .term) }
 
-    private func insert(_ source: String, _ entries: [MemoryEntry]? = nil, on: Bool = true) -> ApplePreinsertion {
-        ApplePreinsertion.insert(into: source, entries: entries ?? ko, appleUsesPinnedTerms: on)
+    private func insert(_ source: String, _ entries: [MemoryEntry]? = nil) -> ApplePreinsertion {
+        ApplePreinsertion.insert(into: source, entries: entries ?? ko)
     }
 
-    // MARK: the flag
+    // MARK: the rows given
 
-    @Test func theFlagIsOffByDefaultAndOffMeansTheInputUntouched() {
+    /// 2026-10-21, round prof-file: the switch (`appleUsesPinnedTerms`) left this function; which rows go is `ContextMemory.replaceRows`'s
+    /// (design §10), so the default is "no row, no change".
+    @Test func noRowIsTheInputUntouched() {
         let source = "We split the text into tokens before feeding it to the model."
-        // The default: no argument at all.
-        let byDefault = ApplePreinsertion.insert(into: source, entries: ko)
-        #expect(byDefault.text == source && byDefault.source == source && byDefault.isEmpty && byDefault.spans.isEmpty)
-        // Explicitly off, with every entry a user entry that matches.
-        let off = insert(source, on: false)
-        #expect(off.text == source && off.isEmpty && off.targets.isEmpty)
+        let none = ApplePreinsertion.insert(into: source, entries: [])
+        #expect(none.text == source && none.source == source && none.isEmpty && none.spans.isEmpty && none.targets.isEmpty)
     }
 
-    @Test func theFlagOnPutsAPinnedNameIn() {
+    @Test func aReplaceRowPutsANameIn() {
         let g = insert("We split the text into tokens before feeding it to the model.")
         #expect(g.text == "We split the text into 토큰 before feeding it to the 모델.")
         #expect(g.targets == ["토큰", "모델"] && !g.isEmpty)
@@ -109,7 +107,6 @@ import Testing
     @Test func pinnedEntriesFromAnAppProfileGoIn() {
         let profile = AppProfile(bundleID: "a.b", appName: "A", source: "en", target: "ko",
                                  entries: [MemoryEntry(src: "Aldric", dst: "알드릭", kind: .person), MemoryEntry(src: "keep", dst: "성채")])
-        #expect(ApplePreinsertion.insert(into: "Aldric holds the keep.", entries: profile.entries, appleUsesPinnedTerms: true).text == "알드릭 holds the 성채.")
-        #expect(ApplePreinsertion.insert(into: "Aldric holds the keep.", entries: profile.entries).text == "Aldric holds the keep.")
+        #expect(ApplePreinsertion.insert(into: "Aldric holds the keep.", entries: profile.entries).text == "알드릭 holds the 성채.")
     }
 }

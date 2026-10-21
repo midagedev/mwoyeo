@@ -178,7 +178,7 @@ import Testing
 
     @Test func anAnswerHoldsTheTargetsPutIntoTheSource() {
         let entries = [MemoryEntry(src: "token", dst: "토큰", origin: .user), MemoryEntry(src: "raid", dst: "레이드", origin: .user)]
-        let pre = ApplePreinsertion.insert(into: "The raid gives a token", entries: entries, appleUsesPinnedTerms: true)
+        let pre = ApplePreinsertion.insert(into: "The raid gives a token", entries: entries)
         #expect(pre.targets == ["레이드", "토큰"])
         #expect(pre.answerHoldsTargets("레이드는 토큰을 줍니다"))
         #expect(!pre.answerHoldsTargets("레이드는 코인을 줍니다"))
@@ -186,7 +186,7 @@ import Testing
     }
 
     @Test func anUntouchedSourceHasNothingToHold() {
-        let pre = ApplePreinsertion.insert(into: "Hello", entries: [MemoryEntry(src: "raid", dst: "레이드")], appleUsesPinnedTerms: true)
+        let pre = ApplePreinsertion.insert(into: "Hello", entries: [MemoryEntry(src: "raid", dst: "레이드")])
         #expect(pre.isEmpty && pre.answerHoldsTargets("anything"))
     }
 }

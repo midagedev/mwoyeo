@@ -6,6 +6,18 @@ import SwiftUI
 /// The tabs of Settings; the app can open it on one (`AppModel.settingsTab`).
 enum SettingsTab: Hashable {
     case general, translation, appearance, shortcuts, about
+
+    /// The pane's height; the window follows the pane (HIG, Settings: "a settings window accommodates the size of the current pane";
+    /// ui-audit-1-1-5 7.2). General, Translation and Appearance are as tall as their content up to 640 pt, then scroll. About is not a scrolling form, so
+    /// it keeps room for a line that wraps in another language.
+    var height: CGFloat {
+        switch self {
+        case .general, .translation: 640
+        case .appearance: 640   // "Erasing the original" needs ~170 pt below Quick boxes (vision ui-fixes 7.2)
+        case .about: 520
+        case .shortcuts: 480
+        }
+    }
 }
 
 struct SettingsView: View {
@@ -20,7 +32,7 @@ struct SettingsView: View {
             Tab("Shortcuts", systemImage: "command", value: SettingsTab.shortcuts) { ShortcutSettings() }
             Tab("About", systemImage: "info.circle", value: SettingsTab.about) { AboutView() }
         }
-        .frame(width: 560, height: 520)
+        .frame(width: 560, height: model.settingsTab.height)
         // A lens's "Download <language>" (`AppModel.downloadPack`): the system's sheet comes up over this window.
         .packDownload(in: .settings)
     }
@@ -33,41 +45,8 @@ struct GeneralSettings: View {
     var body: some View {
         @Bindable var model = model
         Form {
-            Section("Languages") {
-                Picker("Translate from", selection: $model.settings.sourceLanguage) {
-                    ForEach(Languages.sources, id: \.self) { Text(Languages.name($0)).tag($0) }
-                }
-                Picker("Translate to", selection: $model.settings.targetLanguage) {
-                    ForEach(Languages.targets, id: \.self) { Text(Languages.name($0)).tag($0) }
-                }
-            }
+            // Open at login is not about speed: it heads the pane, with no header of its own (ui-audit-1-1-5 3.3).
             Section {
-                Picker("Display", selection: $model.settings.renderMode) {
-                    ForEach(RenderMode.allCases) { Text($0.title).tag($0) }
-                }
-                .pickerStyle(.segmented)
-                Text(model.settings.renderMode.detail).font(.caption).foregroundStyle(.secondary)
-                if model.settings.renderMode == .adaptive {
-                    LabeledContent("Rewrite after stillness") {
-                        Slider(value: $model.settings.settleDelay, in: 0.2...2, step: 0.1) {
-                            EmptyView()
-                        } minimumValueLabel: { Text("Sooner").font(.caption) } maximumValueLabel: { Text("Later").font(.caption) }
-                    }
-                }
-            } header: {
-                Text("Rendering")
-            }
-            Section {
-                LabeledContent("Screen checks") {
-                    Picker("", selection: $model.settings.framesPerSecond) {
-                        Text("Saver (4 fps)").tag(4.0)
-                        Text("Normal (8 fps)").tag(8.0)
-                        Text("Fast (15 fps)").tag(15.0)
-                    }
-                    .labelsHidden()
-                }
-                Text("Text is read again only when the screen changes. A still screen uses almost no power.")
-                    .font(.caption).foregroundStyle(.secondary)
                 Toggle("Open at login", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, on in
                         do {
@@ -76,52 +55,98 @@ struct GeneralSettings: View {
                             launchAtLogin = SMAppService.mainApp.status == .enabled
                         }
                     }
+            }
+            Section("Languages") {
+                Picker("Translate from", selection: $model.settings.sourceLanguage) {
+                    ForEach(Languages.sources, id: \.self) { Text(Languages.name($0)).tag($0) }
+                }
+                Picker("Translate to", selection: $model.settings.targetLanguage) {
+                    ForEach(Languages.targets, id: \.self) { Text(Languages.name($0)).tag($0) }
+                }
+            }
+            // A caption is the second Text of its control's label: the grouped form draws it as the row's subtitle, not as a row of its own
+            // (ui-audit-1-1-5 3.1).
+            Section {
+                Picker(selection: $model.settings.renderMode) {
+                    ForEach(RenderMode.allCases) { Text($0.title).tag($0) }
+                } label: {
+                    Text("Style")
+                    Text(model.settings.renderMode.detail)
+                }
+                .pickerStyle(.segmented)
+                if model.settings.renderMode == .adaptive {
+                    LabeledContent("Rewrite after stillness") {
+                        Slider(value: $model.settings.settleDelay, in: 0.2...2, step: 0.1) {
+                            EmptyView()
+                        } minimumValueLabel: { Text("Sooner").font(.caption) } maximumValueLabel: { Text("Later").font(.caption) }
+                    }
+                }
+            } header: {
+                Text("Display")
+            }
+            Section {
+                Picker(selection: $model.settings.framesPerSecond) {
+                    Text("Saver (4 fps)").tag(4.0)
+                    Text("Normal (8 fps)").tag(8.0)
+                    Text("Fast (15 fps)").tag(15.0)
+                } label: {
+                    Text("Screen checks")
+                    Text("Text is read again only when the screen changes. A still screen uses almost no power.")
+                }
             } header: {
                 Text("Performance")
             }
             Section {
-                Toggle("Save transcripts", isOn: savesTranscripts)
-                Text("Each lens writes what it reads and its translation to Markdown and SRT files.")
-                    .font(.caption).foregroundStyle(.secondary)
-                Text("The names and terms an engine learns are written to the same folder.")
-                    .font(.caption).foregroundStyle(.secondary)
-                LabeledContent("Folder") {
-                    Text(ExportFolder.shownPath(model.settings).map { ($0 as NSString).abbreviatingWithTildeInPath } ?? String(localized: "None chosen"))
-                        .lineLimit(1).truncationMode(.middle).foregroundStyle(.secondary)
-                    Button("Choose…") { chooseFolder() }
-                        .accessibilityLabel(Text(verbatim: "\(String(localized: "Choose…")), \(String(localized: "Folder"))"))
-                    Button("Show in Finder", action: showFolder).disabled(ExportFolder.shownPath(model.settings) == nil)
-                        .accessibilityLabel(Text(verbatim: "\(String(localized: "Show in Finder")), \(String(localized: "Folder"))"))
+                Toggle(isOn: savesTranscripts) {
+                    Text("Save transcripts")
+                    Text("Each lens writes what it reads and its translation to Markdown and SRT files, with the names and terms an engine learns.")
+                }
+                // Turning saving on already asks for a folder, so the row is for a person who has one (ui-audit-1-1-5 3.5).
+                if model.settings.savesTranscripts {
+                    LabeledContent("Folder") {
+                        Text(ExportFolder.shownPath(model.settings).map { ($0 as NSString).abbreviatingWithTildeInPath } ?? String(localized: "None chosen"))
+                            .lineLimit(1).truncationMode(.middle).foregroundStyle(.secondary)
+                        Button("Choose…") { chooseFolder() }
+                            .accessibilityLabel(Text(verbatim: "\(String(localized: "Choose…")), \(String(localized: "Folder"))"))
+                        Button("Show in Finder", action: showFolder).disabled(ExportFolder.shownPath(model.settings) == nil)
+                            .accessibilityLabel(Text(verbatim: "\(String(localized: "Show in Finder")), \(String(localized: "Folder"))"))
+                    }
                 }
             } header: {
                 Text("Saving")
             }
             Section {
                 LabeledContent("Settings file") {
-                    Button("Open") { model.openSettingsFile() }
-                        .accessibilityLabel(Text(verbatim: "\(String(localized: "Open")), \(String(localized: "Settings file"))"))
-                    Button("Show in Finder") { model.showSettingsFile() }
-                        .accessibilityLabel(Text(verbatim: "\(String(localized: "Show in Finder")), \(String(localized: "Settings file"))"))
-                }
-                .buttonStyle(.borderless)
-                // A borderless button in a form row is drawn grey, like a disabled label; the accent says it is a button.
-                .foregroundStyle(.tint)
-                if let note = issueNote {
-                    Text(note).font(.caption).foregroundStyle(.secondary)
-                }
-                if Distribution.isAppStore { ImportSettingsRow() }
-                Toggle("Connect an agent (MCP)", isOn: $model.settings.agentConnection)
-                Text("Lets an agent such as Claude Code read the translation log, change settings and write each app’s memory.")
-                    .font(.caption).foregroundStyle(.secondary)
-                if model.settings.agentConnection {
-                    LabeledContent("Run in a terminal") {
-                        Button("Copy") { LensText.copy([MCPServer.addCommand()]) }
-                            .accessibilityLabel(Text(verbatim: "\(String(localized: "Copy")), \(String(localized: "Connect an agent (MCP)"))"))
+                    // The accent says these are buttons (a borderless one is drawn grey in a form row); it goes on the buttons, not on the label.
+                    HStack {
+                        Button("Open") { model.openSettingsFile() }
+                            .accessibilityLabel(Text(verbatim: "\(String(localized: "Open")), \(String(localized: "Settings file"))"))
+                        Button("Show in Finder") { model.showSettingsFile() }
+                            .accessibilityLabel(Text(verbatim: "\(String(localized: "Show in Finder")), \(String(localized: "Settings file"))"))
                     }
                     .buttonStyle(.borderless)
                     .foregroundStyle(.tint)
+                }
+                if let note = issueNote {
+                    Label { Text(note).foregroundStyle(.secondary) } icon: { Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.yellow) }
+                        .font(.caption)
+                }
+                if Distribution.isAppStore { ImportSettingsRow() }
+                Toggle(isOn: $model.settings.agentConnection) {
+                    Text("Connect an agent (MCP)")
+                    Text("Lets an agent such as Claude Code read the translation log, change settings and write each app’s memory.")
+                }
+                if model.settings.agentConnection {
+                    LabeledContent("Run in a terminal") {
+                        Button("Copy") { LensText.copy([MCPServer.addCommand()]) }
+                            .buttonStyle(.borderless)
+                            .foregroundStyle(.tint)
+                            .accessibilityLabel(Text(verbatim: "\(String(localized: "Copy")), \(String(localized: "Connect an agent (MCP)"))"))
+                    }
                     Text(MCPServer.addCommand()).font(.caption.monospaced()).foregroundStyle(.secondary).textSelection(.enabled)
                 }
+            } header: {
+                Text("Advanced")
             }
         }
         .formStyle(.grouped)
@@ -239,6 +264,7 @@ struct TranslationSettings: View {
                         .menuStyle(.borderlessButton)
                         .menuIndicator(.hidden)
                         .fixedSize()
+                        .frame(width: 22, height: 22).contentShape(Rectangle())   // ui-audit-1-1-5 X1
                         .help("More actions for \(p.appName)")
                         .accessibilityLabel("More actions for \(p.appName)")
                 } label: {
@@ -288,6 +314,7 @@ struct TranslationSettings: View {
                     }
                 }
                 .pickerStyle(.radioGroup)
+                .labelsHidden()   // the section header says it (ui-audit-1-1-5 4.3); a screen reader still gets "Engine"
                 .contextMenu {
                     ForEach(model.settings.engines) { engine in
                         Section(engine.name) { engineActions(engine) }
@@ -358,9 +385,9 @@ struct TranslationSettings: View {
                     }
                 }
             } header: {
-                Text("Translation memory")
+                Text("Recent translations")
             } footer: {
-                Text("Text seen again is shown from memory instead of being translated again. It is kept only while Mwoyeo runs and is never written to disk.")
+                Text("Text seen again is shown from this list instead of being translated again. The list is kept only while Mwoyeo runs and is never written to disk.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             .onAppear { cached = model.translator.cachedCount }
@@ -379,7 +406,7 @@ struct TranslationSettings: View {
             } header: {
                 Text("Glossary")
             } footer: {
-                Text("One \"original = translation\" per line. Apple Intelligence uses these exactly, and text recognition uses them as hints.")
+                Text("One “original = translation” per line. Apple Intelligence uses these exactly, and text recognition uses them as hints.")
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
@@ -484,7 +511,7 @@ struct AppearanceSettings: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
-                Picker("Colour", selection: $model.settings.lensTint) {
+                Picker("Color", selection: $model.settings.lensTint) {
                     ForEach(LensTint.allCases) { tint in
                         Label { Text(tint.title) } icon: { Image(nsImage: Self.swatch(tint)) }.tag(tint)
                     }
@@ -497,15 +524,19 @@ struct AppearanceSettings: View {
                 }
             }
             Section("Text") {
-                Picker("Font", selection: $model.settings.fontStyle) {
+                Picker(selection: $model.settings.fontStyle) {
                     ForEach(FontStyleChoice.allCases) { Text($0.title).tag($0) }
+                } label: {
+                    Text("Font")
+                    Text("Color, weight and size are matched to the original text.")
                 }
                 .pickerStyle(.segmented)
-                Text("Colour, weight and size are matched to the original text.").font(.caption).foregroundStyle(.secondary)
             }
             Section("Quick boxes") {
                 LabeledContent("Opacity") {
-                    Slider(value: $model.settings.boxOpacity, in: 0.6...1)
+                    Slider(value: $model.settings.boxOpacity, in: 0.6...1) {
+                        EmptyView()
+                    } minimumValueLabel: { Text("Lighter").font(.caption) } maximumValueLabel: { Text("Solid").font(.caption) }
                 }
             }
             Section {
@@ -631,7 +662,7 @@ private struct ShortcutRecorder: View {
             // The row's name is the button's: "Add Lens, ⌃⌥L", not five buttons that all say "Record Shortcut".
             .accessibilityLabel(action.title)
             .accessibilityValue(monitor != nil ? String(localized: "Type a shortcut…") : combo?.display ?? String(localized: "Record Shortcut"))
-            Button { model.settings.shortcuts[action.rawValue] = nil } label: { Image(systemName: "xmark.circle.fill") }
+            Button { model.settings.shortcuts[action.rawValue] = nil } label: { Image(systemName: "xmark.circle.fill").frame(width: 22, height: 22).contentShape(Rectangle()) }
                 .buttonStyle(.borderless).foregroundStyle(.tertiary)
                 .help("Remove Shortcut")
                 .accessibilityLabel(Text(verbatim: "\(String(localized: "Remove Shortcut")), \(action.title)"))
@@ -683,7 +714,7 @@ private struct AboutView: View {
             Text("Translates the screen in place, wherever you put a lens.")
                 .foregroundStyle(.secondary)
             Text("Version \(Updates.version) (\(Updates.build))")
-                .font(.caption).foregroundStyle(.tertiary).textSelection(.enabled)
+                .font(.caption).foregroundStyle(.secondary).textSelection(.enabled)
 
             #if !MAS
             VStack(spacing: 6) {
@@ -720,20 +751,25 @@ private struct AboutView: View {
                 .font(.callout)
 
             Divider().frame(width: 300).padding(.vertical, 6)
+            // The icons share one column, so the lines start at the same place (ui-audit-1-1-5 7.1).
             VStack(alignment: .leading, spacing: 6) {
-                Label("By default, screen text is read, erased and translated on this Mac and never leaves it", systemImage: "lock.shield")
+                privacyLine("By default, screen text is read, erased and translated on this Mac and never leaves it", "lock.shield")
                 #if !MAS
-                Label("Update checks ask GitHub for the latest version and count installs without any identifier", systemImage: "arrow.down.circle")
+                privacyLine("Update checks ask GitHub for the latest version and count installs without any identifier", "arrow.down.circle")
                 #endif
-                Label("Vision · Translation · Apple Intelligence · Core ML", systemImage: "apple.intelligence")
-                Label("Inpainting: MI-GAN (Picsart AI Research, MIT)", systemImage: "paintbrush")
+                privacyLine("Vision · Translation · Apple Intelligence · Core ML", "apple.intelligence")
+                privacyLine("Inpainting: MI-GAN (Picsart AI Research, MIT)", "paintbrush")
             }
             .font(.callout)
             .foregroundStyle(.secondary)
-            Text(verbatim: "© 2026 midagedev · MIT License").font(.caption2).foregroundStyle(.tertiary).padding(.top, 4)
+            Text(verbatim: "© 2026 midagedev · MIT License").font(.caption2).foregroundStyle(.secondary).padding(.top, 4)
         }
         .padding(.vertical, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func privacyLine(_ text: LocalizedStringKey, _ symbol: String) -> some View {
+        Label { Text(text) } icon: { Image(systemName: symbol).frame(width: 18) }
     }
 
     #if !MAS
@@ -775,21 +811,26 @@ private struct AddedEngineLabel<Actions: View>: View {
     @ViewBuilder let actions: Actions
 
     var body: some View {
-        HStack(spacing: 8) {
-            VStack(alignment: .leading) {
+        // The buttons share the title's line, where the radio sits (vision ui-fixes 4.3: centred on both lines they sat 6 pt off it).
+        // An HStack above a Text gets the standard 8 pt, not the text-to-text spacing of the built-in rows; 1 pt keeps their 17 pt rhythm.
+        VStack(alignment: .leading, spacing: 1) {
+            HStack(spacing: 8) {
                 Text(engine.name).lineLimit(1).fixedSize(horizontal: true, vertical: false)
-                TimelineView(.periodic(from: .now, by: 2)) { _ in
-                    Text(detail).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
-                }
+                Spacer(minLength: 0)
+                if engine.needsPermission(model.settings.enginePermissions) { Button("Allow…", action: allow).buttonStyle(.borderless).foregroundStyle(.tint) }
+                Menu { actions } label: { Image(nsImage: .moreActions) }
+                    .menuStyle(.borderlessButton)
+                    .menuIndicator(.hidden)
+                    .fixedSize()
+                    .frame(width: 22, height: 22).contentShape(Rectangle())   // ui-audit-1-1-5 X1
+                    // The 22 pt hit area overhangs the title's line instead of growing it (vision ui-fixes pass 2).
+                    .padding(.vertical, -3)
+                    .help("More actions for \(engine.name)")
+                    .accessibilityLabel("More actions for \(engine.name)")
             }
-            Spacer(minLength: 0)
-            if engine.needsPermission(model.settings.enginePermissions) { Button("Allow…", action: allow).buttonStyle(.borderless).foregroundStyle(.tint) }
-            Menu { actions } label: { Image(nsImage: .moreActions) }
-                .menuStyle(.borderlessButton)
-                .menuIndicator(.hidden)
-                .fixedSize()
-                .help("More actions for \(engine.name)")
-                .accessibilityLabel("More actions for \(engine.name)")
+            TimelineView(.periodic(from: .now, by: 2)) { _ in
+                Text(detail).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
+            }
         }
     }
 
@@ -800,12 +841,12 @@ private struct AddedEngineLabel<Actions: View>: View {
     }
 }
 
-/// "First result 0.3 s · 62% from memory", for the engine in use once it has run a few batches.
+/// "First result 0.3 s · 62% reused", for the engine in use once it has run a few batches.
 private struct SpeedLine: View {
     let summary: SpeedSummary
 
     var body: some View {
-        Text("First result \(String(format: "%.1f", summary.seconds)) s · \(Int((summary.fromMemory * 100).rounded()))% from memory")
+        Text("First result \(String(format: "%.1f", summary.seconds)) s · \(Int((summary.fromMemory * 100).rounded()))% reused")
             .font(.caption).foregroundStyle(.secondary)
     }
 }

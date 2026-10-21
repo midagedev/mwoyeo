@@ -4886,72 +4886,18 @@
         }
       }
     },
-    "Apple Intelligence translates with context. For faster translation, get a language pack in Settings › Translation.": {
+    "Apple Intelligence translates with context. A lens offers a faster language pack when one helps.": {
       "localizations": {
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple Intelligence로 문맥을 살려 번역해요. 더 빠른 번역은 설정 › 번역에서 언어 팩을 받으세요."
+            "value": "Apple Intelligence로 문맥을 살려 번역해요. 언어 팩이 더 빠를 때는 렌즈가 알려 줘요."
           }
         },
         "ja": {
           "stringUnit": {
-            "state": "translated",
-            "value": "Apple Intelligenceは文脈を踏まえて翻訳します。より速く翻訳するには、設定 › 翻訳で言語パックを入手してください。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apple Intelligence 会结合上下文进行翻译。若想更快，请在“设置 › 翻译”中获取语言包。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apple Intelligence 會依據上下文進行翻譯。若想更快，請在「設定 › 翻譯」中取得語言包。"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apple Intelligence übersetzt mit Kontext. Für schnellere Übersetzungen laden Sie unter Einstellungen › Übersetzung ein Sprachpaket."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apple Intelligence traduit en tenant compte du contexte. Pour traduire plus vite, téléchargez un pack de langue dans Réglages › Traduction."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apple Intelligence traduce según el contexto. Para traducir más rápido, descarga un paquete de idioma en Ajustes › Traducción."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apple Intelligence переводит с учётом контекста. Для более быстрого перевода загрузите языковой пакет в Настройки › Перевод."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O Apple Intelligence traduz com contexto. Para traduzir mais rápido, baixe um pacote de idioma em Ajustes › Tradução."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apple Intelligence traduce tenendo conto del contesto. Per tradurre più velocemente, scarica un pacchetto lingua in Impostazioni › Traduzione."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apple Intelligence перекладає з урахуванням контексту. Для швидшого перекладу завантажте мовний пакет у Налаштування › Переклад."
+            "state": "needs_review",
+            "value": "Apple Intelligence translates with context. A lens offers a faster language pack when one helps."
           }
         }
       }
@@ -6988,7 +6934,7 @@
         }
       }
     },
-    "Colour": {
+    "Color": {
       "localizations": {
         "ko": {
           "stringUnit": {
@@ -7058,7 +7004,7 @@
         }
       }
     },
-    "Colour, weight and size are matched to the original text.": {
+    "Color, weight and size are matched to the original text.": {
       "localizations": {
         "ko": {
           "stringUnit": {
@@ -9720,72 +9666,18 @@
         }
       }
     },
-    "Each lens writes what it reads and its translation to Markdown and SRT files.": {
+    "Each lens writes what it reads and its translation to Markdown and SRT files, with the names and terms an engine learns.": {
       "localizations": {
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "렌즈마다 읽은 원문과 번역을 Markdown과 SRT 파일로 남겨요."
+            "value": "렌즈마다 읽은 원문과 번역을 Markdown과 SRT 파일로 남기고, 엔진이 배운 이름과 용어도 함께 저장해요."
           }
         },
         "ja": {
           "stringUnit": {
-            "state": "translated",
-            "value": "レンズごとに、読み取った原文と翻訳をMarkdownとSRTファイルに書き出します。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "每个透镜会把读到的原文和译文写入 Markdown 和 SRT 文件。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "每個透鏡會把讀到的原文和譯文寫入 Markdown 和 SRT 檔案。"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jede Linse schreibt, was sie liest, samt Übersetzung in Markdown- und SRT-Dateien."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chaque loupe écrit ce qu’elle lit et sa traduction dans des fichiers Markdown et SRT."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cada lupa escribe lo que lee y su traducción en archivos Markdown y SRT."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Каждая линза записывает прочитанное и перевод в файлы Markdown и SRT."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cada lente grava o que lê e a tradução em arquivos Markdown e SRT."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ogni lente scrive ciò che legge e la sua traduzione in file Markdown e SRT."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Кожна лінза записує прочитане й переклад у файли Markdown і SRT."
+            "state": "needs_review",
+            "value": "Each lens writes what it reads and its translation to Markdown and SRT files, with the names and terms an engine learns."
           }
         }
       }
@@ -10844,72 +10736,18 @@
         }
       }
     },
-    "First result %@ s · %lld%% from memory": {
+    "First result %@ s · %lld%% reused": {
       "localizations": {
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "첫 결과 %@초 · %lld%%는 메모리에서"
+            "value": "첫 결과 %@초 · %lld%% 재사용"
           }
         },
         "ja": {
           "stringUnit": {
-            "state": "translated",
-            "value": "最初の結果 %@秒 · %lld%%はメモリから"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "首个结果 %@ 秒 · %lld%% 来自内存"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "首個結果 %@ 秒 · %lld%% 來自記憶體"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Erstes Ergebnis %@ s · %lld %% aus dem Speicher"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Premier résultat %@ s · %lld %% depuis la mémoire"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Primer resultado %@ s · %lld %% de memoria"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Первый результат %@ с · %lld%% из памяти"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Primeiro resultado %@ s · %lld%% da memória"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Primo risultato %@ s · %lld%% dalla memoria"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Перший результат %@ с · %lld%% з пам’яті"
+            "state": "needs_review",
+            "value": "First result %@ s · %lld%% reused"
           }
         }
       }
@@ -12502,76 +12340,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Загальні"
-          }
-        }
-      }
-    },
-    "Get Started": {
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "시작하기"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "はじめる"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "开始使用"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "開始使用"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Los geht’s"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Commencer"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Comenzar"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Начать"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Começar"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Inizia"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Почати"
           }
         }
       }
@@ -16435,72 +16203,18 @@
         }
       }
     },
-    "Mwoyeo uses Apple Translation. Get a language pack in Settings › Translation.": {
+    "Mwoyeo uses Apple Translation. A lens offers the language pack it needs.": {
       "localizations": {
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple 번역을 사용해요. 설정 › 번역에서 언어 팩을 받아 주세요."
+            "value": "Apple 번역을 사용해요. 필요한 언어 팩은 렌즈가 알려 줘요."
           }
         },
         "ja": {
           "stringUnit": {
-            "state": "translated",
-            "value": "MwoyeoはApple翻訳を使用します。設定 › 翻訳で言語パックを入手してください。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mwoyeo 使用 Apple 翻译。请在“设置 › 翻译”中获取语言包。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mwoyeo 使用 Apple 翻譯。請在「設定 › 翻譯」中取得語言包。"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mwoyeo verwendet Apple Übersetzung. Laden Sie unter Einstellungen › Übersetzung ein Sprachpaket."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mwoyeo utilise Traduction Apple. Téléchargez un pack de langue dans Réglages › Traduction."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mwoyeo usa Traducción de Apple. Descarga un paquete de idioma en Ajustes › Traducción."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mwoyeo использует Перевод Apple. Загрузите языковой пакет в Настройки › Перевод."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O Mwoyeo usa a Tradução da Apple. Baixe um pacote de idioma em Ajustes › Tradução."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mwoyeo usa Traduzione Apple. Scarica un pacchetto lingua in Impostazioni › Traduzione."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mwoyeo використовує Переклад Apple. Завантажте мовний пакет у Налаштування › Переклад."
+            "state": "needs_review",
+            "value": "Mwoyeo uses Apple Translation. A lens offers the language pack it needs."
           }
         }
       }
@@ -18972,7 +18686,7 @@
         }
       }
     },
-    "One \"original = translation\" per line. Apple Intelligence uses these exactly, and text recognition uses them as hints.": {
+    "One “original = translation” per line. Apple Intelligence uses these exactly, and text recognition uses them as hints.": {
       "localizations": {
         "ko": {
           "stringUnit": {
@@ -23246,76 +22960,6 @@
         }
       }
     },
-    "Rendering": {
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "표시"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "描画"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "渲染"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "算繪"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wiedergabe"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rendu"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Renderizado"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Отрисовка"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Renderização"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rendering"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Рендеринг"
-          }
-        }
-      }
-    },
     "Replace…": {
       "localizations": {
         "ko": {
@@ -27522,72 +27166,18 @@
         }
       }
     },
-    "Text seen again is shown from memory instead of being translated again. It is kept only while Mwoyeo runs and is never written to disk.": {
+    "Text seen again is shown from this list instead of being translated again. The list is kept only while Mwoyeo runs and is never written to disk.": {
       "localizations": {
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "다시 나온 문구는 새로 번역하지 않고 메모리에서 바로 보여 줍니다. Mwoyeo가 실행 중일 때만 보관하며 디스크에는 저장하지 않습니다."
+            "value": "다시 나온 문구는 새로 번역하지 않고 이 목록에서 바로 보여 줍니다. 목록은 Mwoyeo가 실행 중일 때만 보관하며 디스크에는 저장하지 않습니다."
           }
         },
         "ja": {
           "stringUnit": {
-            "state": "translated",
-            "value": "もう一度出てきた文は翻訳し直さず、メモリからすぐに表示します。Mwoyeoの実行中だけ保持し、ディスクには保存しません。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "再次出现的文字会直接从内存显示，不再重新翻译。仅在 Mwoyeo 运行时保留，绝不写入磁盘。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "再次出現的文字會直接從記憶體顯示，不再重新翻譯。僅在 Mwoyeo 執行時保留，絕不寫入磁碟。"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Le texte déjà vu est affiché depuis la mémoire au lieu d’être retraduit. Il n’est conservé que pendant l’exécution de Mwoyeo et n’est jamais écrit sur le disque."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bereits gesehener Text wird aus dem Speicher angezeigt, statt neu übersetzt zu werden. Er bleibt nur, solange Mwoyeo läuft, und wird nie auf die Festplatte geschrieben."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "El texto que vuelve a aparecer se muestra desde la memoria en lugar de traducirse otra vez. Solo se guarda mientras Mwoyeo está abierto y nunca se escribe en el disco."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Il testo già visto viene mostrato dalla memoria invece di essere tradotto di nuovo. Resta solo finché Mwoyeo è aperto e non viene mai scritto su disco."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O texto que aparece de novo é mostrado da memória em vez de ser traduzido outra vez. Ele só fica guardado enquanto o Mwoyeo está aberto e nunca é gravado no disco."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Повторно встретившийся текст показывается из памяти, а не переводится заново. Он хранится, только пока Mwoyeo работает, и никогда не записывается на диск."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Текст, що трапляється знову, показується з пам’яті, а не перекладається вдруге. Він зберігається, лише поки Mwoyeo працює, і ніколи не записується на диск."
+            "state": "needs_review",
+            "value": "Text seen again is shown from this list instead of being translated again. The list is kept only while Mwoyeo runs and is never written to disk."
           }
         }
       }
@@ -28854,76 +28444,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Модель ще завантажується"
-          }
-        }
-      }
-    },
-    "The names and terms an engine learns are written to the same folder.": {
-      "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "엔진이 배운 이름과 용어도 같은 폴더에 저장됩니다."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "エンジンが学習した名前と用語も同じフォルダに保存されます。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "引擎学到的名称和术语也会存到同一个文件夹。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "引擎學到的名稱和術語也會存到同一個資料夾。"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Die von einer Engine gelernten Namen und Begriffe werden im selben Ordner gespeichert."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Les noms et termes appris par un moteur sont enregistrés dans le même dossier."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Los nombres y términos que aprende un motor se guardan en la misma carpeta."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Имена и термины, которые выучивает движок, записываются в ту же папку."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Os nomes e termos que um mecanismo aprende são gravados na mesma pasta."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "I nomi e i termini appresi da un motore vengono salvati nella stessa cartella."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Імена й терміни, які вивчає рушій, записуються в ту саму папку."
           }
         }
       }
@@ -31168,72 +30688,18 @@
         }
       }
     },
-    "Translation memory": {
+    "Recent translations": {
       "localizations": {
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "번역 메모리"
+            "value": "최근 번역"
           }
         },
         "ja": {
           "stringUnit": {
-            "state": "translated",
-            "value": "翻訳メモリ"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "翻译记忆"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "翻譯記憶"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mémoire de traduction"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Übersetzungsspeicher"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Memoria de traducción"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Memoria di traduzione"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Memória de tradução"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Память переводов"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Пам’ять перекладів"
+            "state": "needs_review",
+            "value": "Recent translations"
           }
         }
       }
@@ -32261,72 +31727,18 @@
         }
       }
     },
-    "Use Apple": {
+    "Switch to Apple": {
       "localizations": {
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple 사용"
+            "value": "Apple로 전환"
           }
         },
         "ja": {
           "stringUnit": {
-            "state": "translated",
-            "value": "Appleを使用"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "使用 Apple"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "使用 Apple"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apple verwenden"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Utiliser Apple"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Usar Apple"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Использовать Apple"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Usar Apple"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Usa Apple"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Використати Apple"
+            "state": "needs_review",
+            "value": "Switch to Apple"
           }
         }
       }
@@ -35633,7 +35045,7 @@
         }
       }
     },
-    "Your engine's provider handles that text under its own privacy policy.": {
+    "Your engine’s provider handles that text under its own privacy policy.": {
       "localizations": {
         "de": {
           "stringUnit": {
@@ -35886,6 +35298,86 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "Free plan key from deepl.com/pro-api, ends in :fx"
+          }
+        }
+      }
+    },
+    "Style": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스타일"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Style"
+          }
+        }
+      }
+    },
+    "Mwoyeo Privacy Policy": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mwoyeo 개인정보 처리방침"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Mwoyeo Privacy Policy"
+          }
+        }
+      }
+    },
+    "Add a Translation Engine": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "번역 엔진 추가"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Add a Translation Engine"
+          }
+        }
+      }
+    },
+    "Lighter": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "옅게"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Lighter"
+          }
+        }
+      }
+    },
+    "Solid": {
+      "localizations": {
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "진하게"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Solid"
           }
         }
       }

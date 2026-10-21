@@ -285,3 +285,45 @@ first line 0.7 to 1.0.
 The number was left out: it adds no row and costs a guard. Not done: rows with no sign (49 of 95 pure-keep blocks of the two papers are
 still translated; most hold no sign of mathematics: recognizer garbage, `det Dy`), and the chain "a row next to a kept row".
 Results, speed and the method: [tools/keep-labels/RESULTS-d8-equation-2026-10-21.txt](../../tools/keep-labels/RESULTS-d8-equation-2026-10-21.txt).
+
+### 10.1 A row the reader put into a paragraph (D14, round d14, 2026-10-21)
+
+D8 judges blocks. film3's takes of page 6 of the method paper show a row that no rule ever saw as one: eq (10) `s* = max { s ∈ [smin, smax] : measure(s) ≤ box },`
+was kept by a lens at 150,366,590,400 (pixel diff 0.48, ink 100 %) and drawn as Korean text, with the sentence above it, by a lens at 150,256,590,514 (takes
+`equation-paper-p6` and `-p6b`). The row's own text is kept by the text rules (`isMathHeavy`: 3 signs, share 0.59; the take logged `kept math` for it when it was a block
+of its own). The document reader had put the row into a paragraph, and the rules judge the whole text of a block.
+
+THE STAGE. Both readers glue it, and which one does depends on a pixel of the capture. The take's trace lists the lines of its first block (`ocr-block 0`, Docs) as the seven lines of
+the paragraph and the row (8 lines). Renders of the take's screen (page 6 in Preview, the lens plus its margin, 944x822 pt, cut at 12 offsets from y 99 to 110 pt, both readers,
+build 1d7e0ab) put the row: on the Docs path into the paragraph *below* it in 2 of 12 captures (y 105 and 106: the row is the first of 4 lines), a block of its own in the other
+ten; on the lines path (`ParagraphGrouper`: a line continues a paragraph at a gap of at most 0.6 heights of the taller line) onto the paragraph *above* it in 5 of 12 (y 99, 100, 102, 107, 110:
+the row is the last of 8 lines, the take's shape), a block of its own in seven. There the row stands 0.60 to 0.63 heights under the sentence above (41 px against a limit of 40.8 in the
+captures that did not glue it) and 0.80 to 0.89 above the next paragraph. No rule that works on the read can tell a glued capture from a whole one, so the cut belongs where the blocks are made.
+
+| read | where the row went | row, px (x, y, w x h) | gap above | gap below | in from the left | in from the right |
+|---|---|---|---|---|---|---|
+| film take p6b, Release 1d7e0ab | last of 8 lines | 346, 747, 1077 x 63 | 40 px = 0.69 line heights | none | 51 = 0.88 | 58 = 1.00 |
+| capture at y 105 pt, Debug 1d7e0ab | first of 4 lines | 352, 747, 1062 x 64 | none | 54 = 0.95 | 55 = 0.95 | 60 = 1.04 |
+| capture at y 106 pt | first of 4 lines | 352, 739, 1062 x 64 | none | 64 = 1.16 | 55 = 1.00 | 60 = 1.09 |
+| the lines of a paragraph (41 renders of the paper bench, 384 blocks of two lines or more, 1610 lines) | | | median 0.08, 99 % under 0.33 | | flush (0.0) | |
+
+(Line heights are the median of the block's lines; the "in from" columns are against the left and right edges of the block's other lines.)
+
+OTHER READS. On the blocks of two lines or more that the keep rounds' regionfeeds kept (papers 2401.10066, 2310.06142, 1706.03762 and the code cases, Docs and lines reads: 578 blocks; the H2
+developer screens: 236; the H3 sanity feed: 426) the rule cuts 3, and none on the 384 blocks of the 41 renders of the paper bench. The three are displays that the lines read glued to a
+paragraph: `0 < λ1 = λ2 = λ3 .....` (2401.10066 p3, the last of 4 lines, 0.66 under the line above), `Azu = tv if, and only if, Ip(Cov) = 1Cpv.` (p10, the first of 3, 0.80 above the next
+paragraph) and `âz = â, √1 − a+ê √a,` (2310.06142 p5, the first of 3, 0.68). Their words are labelled keep, apart from the four of `if, and only if,` (translate). Cut, the three rows are kept:
+21 words labelled keep leave the translated blocks, and so do those four (the Docs read of p10 hands the same row over as a block of its own, `isMathHeavy` keeps it, and the labels
+count its four words the same way: D8's translate-to-kept words are of this kind).
+
+THE RULE. `DisplayRow.pieces` (Core), called from `RegionPipeline.readBlocks` before the column break and the joins: a line of a block is a row of mathematics by the text
+rules that already decide (`isFormula`, `isMathHeavy`, and D8's sign + at most one word, `CodeRegion.holdsMathNotProse`), and it stands off the prose of its block as a display
+does: white space of half a line height above and below it, and in from both edges of the prose by as much. The row (a run of rows) becomes a block of its own; the prose
+before and after it stay blocks. Nothing is kept by this rule: the cut row is judged as every block is (`isLiteral`, then D8's `Reason.equation`).
+
+`isEquationRow`'s own test (1.5 line heights in from the body text, a sign, one word) cannot be the rule for a line of a block: eq (10) fails both halves: `shape` counts three prose words in it and it stands 0.9 line
+heights in; it is kept by `isMathHeavy`. So the text half is the three tests the text rules have, and the stand-off is the white space round a
+display, not its distance from the column.
+
+EVERY ADDED GUARD (each one, taken out, fails a test of `DisplayRowTests`; table in the round's report): the three text tests of `isRow`; gap above; gap below; in from the left;
+in from the right; a run of rows is one piece; prose must exist (a block that is all rows is not cut); `layoutRules` (`MWOYEO_LAYOUT=off` switches the cut off with the other layout rules).

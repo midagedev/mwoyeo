@@ -789,6 +789,28 @@ Left open: **G10**, the four pairs on p5, p6, p8 and p9 (a piece that stands bes
 (p2 item 1 comes as three blocks), and the translation's cut points (`FlowSplit` cuts at a space by the share of source characters; only a vision verdict on the p2 and d03 pieces can say whether the slices read well: no vision round was run here).
 
 
+### 11.10 A row of a display inside a paragraph (D14, round d14, 2026-10-21)
+
+The reader sometimes puts the row of a displayed equation into the paragraph beside it (page 6 of the method paper, eq (10): glued to the sentence above in film3's take, to the paragraph
+below in 2 of 12 captures one point apart, a block of its own in the other ten). The rules that keep a row as written judge blocks, so a glued row was translated with its paragraph
+and drawn as text over the typeset equation. The chain gets one more step, before the column break (a cut row is a block of its own, not a piece of a flow) and before the joins (pieces
+half a line height apart share no text row and do not interlock, so `BlockMerge` does not take them back):
+
+```
+readableLines → DisplayRow.pieces [new, Core] → ColumnBreak.pieces → joinSplitLines → splitByStyle → flowed
+```
+
+| Stage | Before | After |
+|---|---|---|
+| Docs paragraph / `ParagraphGrouper` | glue a display to a paragraph (the Docs model by a pixel of the capture; the grouper at a gap of 0.6 heights) | unchanged, the step after them does not care which |
+| `readBlocks` | no step that looks at the rows of a block | `RegionPipeline.displayRows` cuts each block with `DisplayRow.pieces` (the one caller) |
+| `TextRecognizer.verdict`, `CodeKeep` | judge the glued block as prose | judge the row alone: `isLiteral`, then `Reason.equation` (D8) |
+| `flowed` / `FlowSplit` | pieces without a `FlowPart` pass through | the cut pieces are blocks of their own, no `FlowPart` |
+
+`MWOYEO_LAYOUT=off` switches the step off with the other layout rules; the counter is `ocr.display_row` and the trace line `display row: block '<first 24 characters>' → pieces [n, m]`.
+The rule, the numbers and every guard: docs/design/keep-boundary.md section 10.1.
+
+
 ## 12. A bad program cache leaves lines out of every answer (D4, round d4root, 2026-10-21)
 
 **What was seen.** A lens over "Controls and noise." of the method paper (film3) dropped the fourth line of the paragraph: in no log entry, English on the screen between two Korean blocks. The trace listed 22 lines of a frame that holds 26. The four it lacked were the four widest boxes of the frame (aspect 25.0 to 32.4; every line it kept was at most 24.8). Nothing in that run's log named an error, a retry or a low confidence; the Lines service answered rev3 in 507 ms and 229 ms.

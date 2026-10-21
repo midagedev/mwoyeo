@@ -128,9 +128,13 @@ Right-click a lens's name tag to find everything you can do with that lens.
 - **Read Aloud**: speaks the translation with a system voice. If there is no voice for that language, add one in
   System Settings › Accessibility › Spoken Content.
 - **Save Lens Image**: saves the lens as you see it, translation included, as a PNG.
-- **Remember Languages for (app name)**: shown on window lenses only. It ties the current language pair to that app,
-  and the pair switches by itself whenever that app is in front. Only one language pair is in use at a time, so the app
-  in front decides it for every lens. To forget an app, go to Settings › Translation › App profiles.
+- **Remember Languages for (app name)**: shown on window lenses only. It remembers the current language pair as that
+  app's profile. Each lens translates with the profile of the window it covers, so a lens placed over app B uses B's
+  languages and engine even while app A is in front.
+- **Memory for (app name)…**: opens the names, terms and note of the profile this lens uses.
+- **Profile: …**: shown once you have at least one profile. Its submenu pins this lens alone to one profile or puts it
+  back on *Auto*, and *New Profile for This Window…* makes a profile that fits the title of the window under the lens
+  now.
 
 ## Translate an image
 
@@ -174,29 +178,37 @@ are in [tools/engine-bench/RESULTS.md](tools/engine-bench/RESULTS.md)):
 Apple's translation is the fastest. Cloud engines take about a second longer, and in return give translations that
 follow the context.
 
-## When a name changes from line to line: context and memory per app
+## When a name changes from line to line: profiles, context and rewrites
 
 In a game or a chat, the same name can come out differently on each line, because the engine sees one line at a time.
-Mwoyeo has three ways to stop that.
+Mwoyeo has four ways to stop that.
 
 | | For | Where |
 |---|---|---|
 | **Glossary** | Names that are the same in every app (your username, names you see everywhere) | Settings › Translation › Glossary |
-| **Memory per app** | Names and terms of one app, and a note for the translator (a game's cast, its places, how people speak) | Settings › Translation › App profiles, the app's ⋯ › **Memory…** |
-| **Context** | The lines before and the window title go along with each line, so the engine knows who is speaking to whom | An added engine's sheet › **Context** |
+| **Profile** | Languages, engine, names and terms for one app or window only, and a note for the translator (a game's cast, its places, how people speak) | Lens menu › *Memory for (app name)…*, Settings › Translation › Profiles |
+| **Context** | The lines before and the window title go along with each line, so the engine knows who is speaking to whom | An added engine's sheet › **Context**, a profile's *Customize* |
+| **Rewrites** | Change fixed text in the original before translating, or in the result after it (0 tokens) | A profile's *Customize* › Rewrites, script |
 
-- **Memory per app** appears once you remember the app with *Remember Languages for (app name)* in the lens menu.
-  Each name has its original, its translation and a kind (person, place, term). Names an engine learned show faintly;
-  click one to pin it. *Forget Learned* and *Start Fresh* clear them.
-- **Each engine takes it its own way.** Chat servers (Ollama, OpenAI-compatible) and Anthropic get the memory even with
-  Context off. DeepL gets the note and names as DeepL instructions when *Use my notes with DeepL* is on in its sheet.
-  Apple Translation uses your pinned names only when *Use my names and terms with Apple Translation* is on: they are
-  put into the original before it is translated.
-- **The engine sheet's "Sent:" line shows exactly what goes along.** Context and the window title are off by default.
-  With a cloud engine, those lines go to the engine's company too.
-- **Which engines keep the memory?** In our game-scene run, DeepL Free kept every name from the memory on every line
-  (九十九 → 츠쿠모, 8 lines of 8). A small local model (about 4B) can still vary from line to line with the memory.
-  Claude 5 engines have a known issue in 1.1.4 ([release notes](https://github.com/midagedev/mwoyeo/releases/tag/v1.1.4)).
+- **A profile** appears once you enter a name for it in the lens menu or choose *Remember Languages for (app name)*.
+  Give it conditions (an app, a phrase in the window title, or both) and a lens over a matching window picks it by
+  itself. A profile that matches both the window title and the app wins first, then the title, then the app; if nothing
+  matches, *All Apps* applies. You can also pin one by hand from the menu bar or a lens menu. App memories from 1.1.4
+  become profiles as they are.
+- **Pick how each name is used.** *Tell the translator* sends the name along with the lines where it shows up, as a
+  hint (it costs tokens). *Swap into the text* puts the name's translation into the original before translating (free).
+  Swapping is the only way to make Apple Translation keep a name, so we recommend it wherever Apple translates. You can
+  choose both. Names an engine learned while translating show faintly under *Learned*; click one to pin it.
+- **Rewrites**: each profile holds up to 32 find-and-replace rules (regular expressions work). When that is not enough,
+  write `before(line, ctx)` and `after(src, dst, ctx)` in JavaScript. A script runs in a separate service with no
+  network and no files, within 50 ms per line, and is switched off if it goes over.
+- **Each engine takes it its own way.** Chat servers (Ollama, OpenAI-compatible) and Anthropic get the note and names even
+  with Context off. DeepL gets the note and names as DeepL instructions when *Use my notes with DeepL* is on in its
+  sheet. Apple Translation gets only the names swapped into the text.
+- **The "Sent:" line of the engine sheet and of the profile shows exactly what goes along.** Context and the window
+  title are off by default. With a cloud engine, those lines go to the engine's company too.
+- **Which engines keep the names?** In our game-scene run, DeepL Free kept every name from the memory on every line
+  (九十九 → 츠쿠모, 8 lines of 8). A small local model (about 4B) can still vary from line to line even with the names.
 
 If filling in the memory by hand is tedious, an agent such as Claude Code can do it: see
 [Connect an agent (MCP)](#connect-an-agent-mcp). It reads the translation log, finds the names that changed from line to
@@ -207,8 +219,11 @@ line and writes them into that app's memory.
 | Tab | What you can change |
 |---|---|
 | General | Languages · **Display**: *Adaptive* (default: plain boxes while things move, a seamless rewrite once still), *Quick* (always boxes, least battery) or *Seamless* (always rewrites) · how often the screen is checked (4, 8 or 15 fps) · open at login · **Saving**: keep what each lens reads and its translation as Markdown and SRT transcripts, and the folder for transcripts and lens images (default `~/Documents/Mwoyeo`) |
-| Translation | **Engine**: *Automatic* (language pack if installed, Apple Intelligence otherwise), *High fidelity* (always Apple Intelligence: the most natural and the slowest) or *Glossary first* · language packs · **translation memory**: how many translations to keep for reuse (1,000, 5,000 or 20,000; in memory only, cleared when Mwoyeo quits) · a **glossary** of names, one `original = translation` per line · **Add another engine** · **App profiles** (shown only once you have remembered an app from the lens menu) |
+| Translation | **Engine**: *Automatic* (language pack if installed, Apple Intelligence otherwise), *High fidelity* (always Apple Intelligence: the most natural and the slowest) or *Glossary first* · language packs · **translation memory**: how many translations to keep for reuse (1,000, 5,000 or 20,000; in memory only, cleared when Mwoyeo quits) · a **glossary** of names, one `original = translation` per line · **Add another engine** · **Profiles** (shown only once you have one) |
 | Appearance | **Lens style**: *Glow*, *Subtle* (glows only while reading), *Corners* (only the four corners) or *Minimal* (a faint line; the name tag shows on hover) · **colour**: Spectrum, Accent, Ocean, Sunset, Forest, Mono · **name tag**: when it shows (Automatic, Always, On Hover) and where (any corner) · font (default, rounded, serif) · box opacity · AI erasing on photos and artwork |
+
+When a tab has something that differs from its default, *Restore Defaults…* shows at the bottom. It first tells you what
+changes and what stays (permission consents, memory, transcripts), and you can undo right after restoring.
 
 ### Settings file
 
@@ -218,7 +233,7 @@ where it is (`~/Library/Application Support/Mwoyeo/settings.json`), and Settings
 - Mwoyeo watches the file and applies a saved change within a second; the Settings window and the file always agree.
 - `settings.schema.json` next to it describes every key, its allowed values and its limits, inside lists (engines, app
   profiles) too. Editors that read JSON Schema complete and check the keys. `Mwoyeo --settings-schema` prints it.
-- `Mwoyeo --check-settings [path]` prints `ok`, or one line per problem and exits 1:
+- `Mwoyeo --check-settings [path]` prints `ok` (after a one-line conversion note for a 1.1.4 file), or one line per problem and exits 1:
   `settings.json:14: engines[0].thinking: "maybe" is not allowed; use one of off, provider; ignored`. A line is
   `<line>: <path>: <what is wrong>; <what happened>`, with the exact line and JSON path of nested values. An unknown key
   comes with the closest known one.
@@ -256,7 +271,9 @@ claude mcp add mwoyeo -- "/Applications/Mwoyeo.app/Contents/MacOS/Mwoyeo" --mcp
 ```
 
 - `list_apps`, `read_translation_log` and `term_renderings`: the apps in the translation log, their newest lines, and how each name you ask about was translated (needs *Save transcripts* with `jsonl`). The answers are built to cost an agent little context: a log is a table whose constant fields (app, languages, engine) are said once, a line an OCR read in pieces is folded into its fullest read, and a line read again is counted, not repeated.
-- `get_memory` and `set_memory`: an app's note and its names and terms, checked by the same rules as `settings.json`.
+- `get_memory` and `set_memory`: the note, the names and terms, and the rewrite rules and script of an app or a profile, read and written, checked by the same rules as `settings.json`.
+- `test_rules`: runs a profile's rewrite rules and script on a few lines and shows the result. It uses no engine, so the text does not leave this Mac.
+- `reset_settings`: puts one Settings tab back to its defaults. With `dryRun` it only says what would change and what would stay. Permission consents, memory and transcripts are not touched.
 - `translate_text`: a few lines through the lens's own path, with the app's engine, languages and memory, so the agent can check a fix. It says which engine made each line. Text goes to that engine (a cloud engine sees it); a command engine is not run.
 - `get_settings`, `set_settings` and `get_settings_schema`: every setting of the file, read and changed (not the switch itself, and a command engine is added only by you). The schema of one key is one call.
 - A wrong value is refused with its path, and nothing is written. The running app applies a change within a second.
@@ -266,7 +283,7 @@ claude mcp add mwoyeo -- "/Applications/Mwoyeo.app/Contents/MacOS/Mwoyeo" --mcp
 - **Stuck on "Translating…"?** Usually the language pack is missing; download it in Settings › Translation. The very
   first lens after installing also takes a while, because macOS loads its text recognition models once.
 - **Names come out wrong** (characters, places, usernames)? Put names used in every app in the glossary, and names of
-  one game or app in that app's memory ([see above](#when-a-name-changes-from-line-to-line-context-and-memory-per-app)).
+  one game or app in that app's memory ([see above](#when-a-name-changes-from-line-to-line-profiles-context-and-rewrites)).
   With Apple Translation alone, turn on *Use my names and terms with Apple Translation* or choose *Glossary first*.
 - **Nothing shows up after an update?** macOS sometimes asks for Screen Recording again. Check it in System Settings,
   then reopen Mwoyeo.

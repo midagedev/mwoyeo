@@ -36,7 +36,7 @@ mechanical replacement apart from context; a table in the UI and scripts, both; 
   function before(line, ctx) { return line.replace(/（[ぁ-ゖ]+）/gu, "") }         // drop furigana
   function after(src, dst, ctx) { return ctx.target === "ko" ? dst.replace(/\.\.\./g, "…") : dst }
   ```
-- Strict check: over 8,000 characters; a syntax error (parsed in the service at check time, with line and column); neither function.
+- Strict check: over 8,000 characters; a syntax error (parsed in the service at check time, with its line: public JavaScriptCore gives no column); neither function.
 
 ## 4. Order, per line
 1. `before`, broad → narrow over the chain (All apps first); in each profile the table, then the script.
@@ -57,10 +57,14 @@ mechanical replacement apart from context; a table in the UI and scripts, both; 
   the currently shipping OS." So the app times each call itself: **50 ms per line** for a script, and for a profile's regex rows
   together. Over it, the app kills the service, writes `on: false` on that script or regex row (agents see it in the file) and shows
   "Turned off: took longer than 50 ms on a line." The next line starts a fresh service without it.
+- **A restart is not waited for on a lens line.** launchd starts a service job again no sooner than ~10 s after its last start (measured
+  2026-10-21; the Info.plist `ThrottleInterval` is not read), so for that long after a kill a call has no service to go to. A lens
+  line in that time skips its regex rows and scripts: the text passes as it was, nothing is turned off, the line is not cached, and the
+  log line says `"rules":"skipped"`. Only the editor's try and `test_rules` wait the restart out.
 - **Why 50 ms.** A line is ≤ ~300 characters; a replace or a few regexes over it take well under 1 ms, so 50 ms is ≥ 50× headroom and
   still catches a loop or catastrophic backtracking (`(a+)+$`). A 3-line batch (`App/Pipeline/RegionPipeline.swift:1598`) adds at
   most 150 ms against "about 1 s a line" for Apple's slowest model (`App/Model/Settings.swift:31`).
-- **Errors.** A throw or a non-string return leaves that line unchanged for that stage and shows the error with line and column; the
+- **Errors.** A throw or a non-string return leaves that line unchanged for that stage and shows the error with its line (no column: public JavaScriptCore gives none); the
   script stays on. A reply longer than 4 × the input + 200 characters is an error (a guard against runaway output).
 - **Default path.** No regex row and no script in the chain → nothing is loaded and the service never starts. It starts when a chain
   that needs it becomes active, and exits after 60 s idle.
@@ -86,7 +90,7 @@ mechanical replacement apart from context; a table in the UI and scripts, both; 
   translation after." Empty: one borderless "Add Rewrite". A row, left to right: stage pop-up (96 pt: "Original", "Translation"), Find
   (flexible, layout priority 1, prompt "Find"), "→" (tertiary), Replace with (flexible, prompt "Replace with"), ".*" toggle (24 pt; help
   "Treat Find as a pattern (a JavaScript regular expression)"), minus (≥ 20 pt). New rows go last; ≤ 32, at 32 "Add Rewrite" is dimmed
-  with the caption "That is the most: 32." Under its row, in red: a pattern that does not compile ("Pattern error at column n: …"); a row
+  with the caption "That is the most: 32." Under its row, in red: a pattern that does not compile ("Pattern error: …" (no position: JavaScriptCore gives none)); a row
   turned off by the time limit shows dimmed with "Turned off: took longer than 50 ms on a line." and "Turn On".
 - With a Translation row, an orange caption under the table: "Changing the translation can leave a wrong particle (은/는, 이/가) after a
   replaced word. Prefer “Swap into the text” on the name’s row."
@@ -94,17 +98,17 @@ mechanical replacement apart from context; a table in the UI and scripts, both; 
   pt, then it scrolls) whose empty state shows §3's two examples in tertiary as a starting point; counter "n / 8,000" (orange at the
   cap); "Run this script" switch (off until turned on); a sample field filled with the opening lens's last line (else any lens of this
   profile; empty: prompt "A line to test"); "Test" → "Before → …" and "After → …" (callout, monospaced, selectable; on the sample and
-  its last shown translation, else on the sample; nothing is sent). Errors in red with line and column; the same errors go to the log
+  its last shown translation, else on the sample; nothing is sent). Errors in red with their line (no column: public JavaScriptCore gives none); the same errors go to the log
   (category `script`). Every new help tag starts with a verb and stays ≤ 75 characters.
 - Empty and zero setup: a profile without rewrites shows, inside Customize, only "Add Rewrite" and the collapsed Script row (R9's gate);
   with Customize closed, neither. The App Store build hides Script if review objects (§6); the table stays.
 - The power user's walkthrough and R9's capture items are in `profiles-ui-checklist.md` (§3 walkthrough 3; checklist items 7-9).
 
 ## 8. Agents (MCP; one compact text block, `docs/settings-for-agents.md:14`)
-- `set_memory(profile | app, rewrites?, script?)` writes them with the same checks; the result carries `issues` with line and column.
+- `set_memory(profile | app, rewrites?, script?)` writes them with the same checks; the result carries `issues` with their line (no column: public JavaScriptCore gives none).
 - `test_rules {profile | app (+ title), lines: [≤ 20], translate?}` dry-runs the chain without the screen:
   `{"columns":["line","source","translation","shown"],"rows":[[0,"漢字（かんじ）","漢字","한자","한자"]],"errors":[{"stage":"after",
-  "item":0,"line":3,"column":12,"message":"…"}]}`. Without `translate`: only `source` (no engine, nothing leaves this Mac); with it, the
+  "item":0,"line":3,"message":"…"}]}`. Without `translate`: only `source` (no engine, nothing leaves this Mac); with it, the
   translation through `translate_text`'s path. `item` is the rewrite row index, or -1 for the script.
 - `docs/settings-for-agents.md` (R10) documents the two signatures, `ctx`, the limits (32 rows, 200, 8,000, 50 ms, 4 × + 200) and the
   two examples of §3.
@@ -115,4 +119,4 @@ mechanical replacement apart from context; a table in the UI and scripts, both; 
   order of §4 on a two-profile chain; the cache namespace is today's with nothing set.
 - R9: captures of the empty state and of a filled table with an After row; opus vision.
 - R10: `test_rules` on a profile without rewrites returns each line unchanged and starts no service; a syntax error comes back with
-  its line and column.
+  its line.

@@ -3,9 +3,11 @@ import AppKit
 import MwoyeoCore
 import MwoyeoEngines
 
-/// The global glossary with Apple's pinned names (design names-and-context §1.3, G7, the user's Q3): with "Use my names and terms with
-/// Apple Translation" on, the glossary's pairs go into the source like the app's own names, and the app's own row wins when both have
-/// the same source. The switch off is today's path: nothing of the glossary is pre-inserted.
+/// The names and the glossary written into the source (design names-and-context §10, the user's Q3: "Apple's glossary on the mechanical
+/// side"): a row whose `apply` is replace or both, and the glossary's pairs while `glossaryApply` is not hint, go into the source of every kind
+/// that takes no hints (Apple Translation first); the narrowest row wins when two have the same source. Hint, the default, is today's path:
+/// nothing is written. Round prof-file, 2026-10-21: the switch of 1.1.4 (`appleUsesPinnedTerms`, §1.3) is each row's mode and `glossaryApply`
+/// now (the converter, §5.2); these are the checks of the switch, ported to the modes (each says what it was).
 ///
 /// The plan is asked directly (the rows it carries), and the harness Apple (`MWOYEO_FAKE_ENGINE`, which answers "⟦<target>⟧ " + the
 /// text it was given) shows what Apple really receives.
@@ -31,56 +33,79 @@ enum AppleGlossaryChecks {
     /// The glossary the checks use: two pairs, so a row that the app's memory has can win over one of them.
     private static let glossary = "token = 토큰\nother = 다른 것"
 
-    private static func settings(profiles: [AppProfile] = [], pins: Bool = true, glossary: String) -> AppSettings {
+    /// `apply` is the mode of the glossary (`glossaryApply`): `.both` is what the 1.1.4 switch turned on, `.hint` is the default.
+    private static func settings(profiles: [AppProfile] = [], apply: EntryApply = .both, glossary: String) -> AppSettings {
         var s = AppSettings()
         s.sourceLanguage = "en"
         s.targetLanguage = "ko"
         s.glossary = glossary
         s.appProfiles = profiles
-        s.appleUsesPinnedTerms = pins
+        s.glossaryApply = apply
         return s
     }
 
-    private static func profile(_ entries: [MemoryEntry], app: String = "com.example.chat") -> AppProfile {
-        AppProfile(bundleID: app, appName: app, source: "en", target: "ko", entries: entries)
+    /// An app's profile whose rows are `apply` (`.both`: what the switch converted them to).
+    private static func profile(_ entries: [MemoryEntry], app: String = "com.example.chat", apply: EntryApply = .both) -> AppProfile {
+        AppProfile(bundleID: app, appName: app, source: "en", target: "ko", entries: entries.map { var e = $0; e.apply = apply; return e })
     }
 
+    /// The glossary's pair as the plan carries it: a user row of kind term in the glossary's mode.
+    private static func pair(_ src: String, _ dst: String, _ apply: EntryApply = .both) -> MemoryEntry {
+        MemoryEntry(src: src, dst: dst, kind: .term, origin: .user, apply: apply)
+    }
+
+    /// The plan of a lens over `app` (the chain of its window: the app's profile, then All apps).
     private static func plan(_ s: AppSettings, _ p: AppProfile? = nil) -> ContextPlan? {
-        ContextPlan.decide(settings: s, engine: nil, engineRests: false, profile: p)
+        let pairing = ContextRoute.pair(settings: s, lens: p?.bundleID ?? "com.example.chat")
+        return ContextPlan.decide(settings: s, engine: nil, engineRests: false, chain: pairing.chain)
     }
 
     @MainActor
     static func planChecks(_ t: Tally) {
         let only = settings(glossary: glossary)
-        let rows = [MemoryEntry(src: "token", dst: "토큰", kind: .term), MemoryEntry(src: "other", dst: "다른 것", kind: .term)]
-        t.check("the switch on and only a glossary: the plan carries the glossary's rows", plan(only) == .applePins(rows),
+        let rows = [pair("token", "토큰"), pair("other", "다른 것")]
+        t.check("the glossary used both ways and only a glossary: the plan carries the glossary's rows", plan(only) == .replaceOnly(rows),
                 "\(String(describing: plan(only)))")
 
-        t.check("the switch off: the plan is nothing", plan(settings(pins: false, glossary: glossary)) == nil)
-        t.check("the switch on with nothing to insert: the plan is nothing", plan(settings(glossary: "")) == nil)
+        // 1.1.4: "the switch off: the plan is nothing". Now: a glossary that is a hint (the default) writes nothing into the source.
+        t.check("the glossary as a hint, the default: the plan is nothing", plan(settings(apply: .hint, glossary: glossary)) == nil)
+        t.check("nothing to insert: the plan is nothing", plan(settings(glossary: "")) == nil)
+        let replaced = plan(settings(apply: .replace, glossary: glossary))
+        t.check("the glossary used only as a replacement: its rows are replace rows", replaced == .replaceOnly([pair("token", "토큰", .replace), pair("other", "다른 것", .replace)]),
+                "\(String(describing: replaced))")
 
         // The app's own row wins over the glossary's row of the same source; the glossary's other pair still joins.
-        let mine = MemoryEntry(src: "token", dst: "앱의 토큰", kind: .term)
+        let mine = MemoryEntry(src: "token", dst: "앱의 토큰", kind: .term, apply: .both)
         let app = profile([mine])
         t.check("the app's row wins over the glossary's row of the same source",
-                plan(settings(profiles: [app], glossary: glossary), app) == .applePins([mine, rows[1]]),
+                plan(settings(profiles: [app], glossary: glossary), app) == .replaceOnly([mine, rows[1]]),
                 "\(String(describing: plan(settings(profiles: [app], glossary: glossary), app)))")
 
         // The app's rows come first, then the glossary's, each in the order it is written.
-        let alpha = MemoryEntry(src: "alpha", dst: "알파", kind: .term)
+        let alpha = MemoryEntry(src: "alpha", dst: "알파", kind: .term, apply: .both)
         let both = profile([alpha])
         t.check("the app's rows come first, then the glossary's",
-                plan(settings(profiles: [both], glossary: glossary), both) == .applePins([alpha] + rows),
+                plan(settings(profiles: [both], glossary: glossary), both) == .replaceOnly([alpha] + rows),
                 "\(String(describing: plan(settings(profiles: [both], glossary: glossary), both)))")
 
-        // Foundation Models is not Apple Translation: nothing is pre-inserted there.
+        // A row that is a hint writes nothing into the source: a profile of hints, the glossary a hint, is today's path.
+        let hints = profile([MemoryEntry(src: "alpha", dst: "알파", kind: .term)], apply: .hint)
+        t.check("rows that are hints and a glossary that is a hint write nothing into the source",
+                plan(settings(profiles: [hints], apply: .hint, glossary: glossary), hints) == nil)
+
+        // Foundation Models has the glossary in its instructions: the glossary's pairs do not go into its source, a profile's replace rows do
+        // (1.1.4's check said "nothing is pre-inserted there"; §10 gives it the profiles' rows, §5.2's case (d)).
         var foundation = only
         foundation.engine = .customModel
-        t.check("Foundation Models is not Apple Translation: the glossary does not go in", plan(foundation) == nil)
+        t.check("Foundation Models: the glossary does not go into the source", plan(foundation) == nil)
+        var foundationWithRows = settings(profiles: [app], glossary: glossary)
+        foundationWithRows.engine = .customModel
+        t.check("Foundation Models: a profile's replace rows do", plan(foundationWithRows, app) == .replaceOnly([mine]),
+                "\(String(describing: plan(foundationWithRows, app)))")
 
-        // The lens reads the window it covers only where something can use it; the glossary is something (the plan needs a lens).
+        // The lens reads the window it covers only where something can use it; a replace row is something (the plan needs a lens).
         t.check("the lens reads the window for the glossary too",
-                ContextPlan.needsWindow(only) && !ContextPlan.needsWindow(settings(pins: false, glossary: glossary)))
+                ContextPlan.needsWindow(only) && !ContextPlan.needsWindow(settings(apply: .hint, glossary: glossary)))
     }
 
     // MARK: what Apple receives
@@ -103,8 +128,8 @@ enum AppleGlossaryChecks {
         let on = await answer(settings(glossary: glossary))
         t.check("the glossary's pair goes into the source Apple sees", on == "⟦ko⟧ All 토큰 were shuffled.", "\(String(describing: on))")
 
-        let off = await answer(settings(pins: false, glossary: glossary))
-        t.check("the switch off: the source Apple sees is untouched", off == "⟦ko⟧ All tokens were shuffled.", "\(String(describing: off))")
+        let off = await answer(settings(apply: .hint, glossary: glossary))
+        t.check("the glossary as a hint, the default: the source Apple sees is untouched", off == "⟦ko⟧ All tokens were shuffled.", "\(String(describing: off))")
 
         // The app's own row wins in the source too.
         let mine = MemoryEntry(src: "token", dst: "앱의 토큰", kind: .term)

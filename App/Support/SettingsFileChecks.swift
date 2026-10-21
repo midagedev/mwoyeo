@@ -289,7 +289,15 @@ enum SettingsFileChecks {
         let v112Profile = v112Read.settings.appProfiles.first
         check("1.1.2 file, no memory fields: read and saved again it is the same bytes, the fixture's profile comes out as written, and no memory key appears",
               v112Read.issues.isEmpty && SettingsFileFormat.render(v112Read.settings) == v112
-              && (v112Object["appProfiles"] as? NSArray)?.isEqual(to: agentObject["appProfiles"] as? [Any] ?? []) == true
+              // 2026-10-21, prof-file: the profiles are `profiles` now (id = the bundle id); each keeps its pair, engine and reader as written.
+              && { () -> Bool in
+                  let migrated = (v112Object["profiles"] as? [[String: Any]]) ?? [], legacyItems = (agentObject["appProfiles"] as? [[String: Any]]) ?? []
+                  return !migrated.isEmpty && migrated.count == legacyItems.count && zip(migrated, legacyItems).allSatisfy { new, old in
+                      new["id"] as? String == old["bundleID"] as? String && new["source"] as? String == old["source"] as? String
+                          && new["target"] as? String == old["target"] as? String
+                          && ["customEngineID", "paragraphReader"].allSatisfy { (new[$0] as? NSObject)?.isEqual(old[$0] as? NSObject) ?? (old[$0] == nil) }
+                  }
+              }()
               && v112Profile?.note == "" && v112Profile?.entries.isEmpty == true && v112Profile?.context == nil
               && ["\"note\"", "\"entries\"", "\"context\""].allSatisfy { !String(decoding: v112, as: UTF8.self).contains($0) })
 
@@ -400,7 +408,8 @@ enum SettingsFileChecks {
               savedRead.issues.isEmpty && started.boxOpacity == 0.9 && savedRead.settings.boxOpacity == 0.9
               && savedProfile?.note == memoryProfile?.note && savedProfile?.entries == memoryProfile?.entries && savedProfile?.context == memoryProfile?.context
               && memoryProfile?.note.isEmpty == false && memoryProfile?.entries.count == 2 && memoryProfile?.context != nil
-              && (savedObject["appProfiles"] as? NSArray)?.isEqual(to: memoryObject["appProfiles"] as? [Any] ?? []) == true)
+              && ((savedObject["profiles"] as? [[String: Any]])?.first).map { item in ["note", "entries", "context"].allSatisfy {
+                  (item[$0] as? NSObject)?.isEqual((memoryObject["appProfiles"] as? [[String: Any]])?.first?[$0] as? NSObject) == true } } == true)
         // Every value of the enums, the most rows, the most addressing and the longest conversation come back as they went in.
         let everyEntry = EntryKind.allCases.flatMap { kind in Gender.allCases.map { gender in
             MemoryEntry(src: "\(kind)-\(gender)", dst: "d", kind: kind, gender: gender, note: String(repeating: "n", count: MemoryEntry.maxEntryNote),
@@ -505,8 +514,9 @@ enum SettingsFileChecks {
         let everyRead = SettingsFileCheck.read(SettingsFileFormat.render(everyKind), over: AppSettings())
         check("engines of all five kinds: written by the app, read back equal with no issue", everyRead.settings == everyKind && everyRead.issues.isEmpty)
 
-        // Engine context (round T3a-1, 2026-10-19): engines[].context and appleUsesPinnedTerms. Both are off by default; the
-        // schema, the check and the app's save keep them, and a file written before them is saved again as the same bytes.
+        // Engine context (round T3a-1, 2026-10-19): engines[].context and appleUsesPinnedTerms, the keys of 1.1.4. Round prof-file (2026-10-21,
+        // design names-and-context §5.2) reads and converts them (the amount, learning and permissions, the rows' mode) and never writes them;
+        // these are the checks of the old keys, ported: each says what it says now. The fixture is 1.1.4's, unchanged.
         let secondID = "8C4A2D3F-6B5E-4F9C-8D32-4E7A1B2C3D4E"
         let engineContextFile = """
         {
@@ -548,17 +558,25 @@ enum SettingsFileChecks {
         let engineContextObject = (try? JSONSerialization.jsonObject(with: Data(engineContextFile.utf8))) as? [String: Any] ?? [:]
         let qwenContext = EngineContext(enabled: true, previousLines: 6, includeTitle: true, useLearned: true, deepLInstructions: false)
         let deepLContext = EngineContext(enabled: true, previousLines: 0, includeTitle: false, useLearned: false, deepLInstructions: true)
-        check("engine context: a valid file reads without issues, the app keeps both contexts and the flag, and the schema describes every field in it",
-              engineContext.issues.isEmpty && engineContext.settings.appleUsesPinnedTerms
-              && engineContext.settings.engines.map(\.context) == [qwenContext, deepLContext]
+        let qwenAllow = EngineAllow(lines: true, title: true, deepLInstructions: false)
+        let deepLAllow = EngineAllow(lines: true, title: false, deepLInstructions: true)
+        let amountSix = AppContextOverride(mode: .conversation, previousLines: 6)
+        let converted = engineContext.settings
+        check("engine context: a file of 1.1.4 reads without issues and is converted (the amount of the first engine that was on, its learning, each engine's allow, the Apple switch as both), and the schema still describes every old field in it",
+              engineContext.issues.isEmpty && engineContext.convertedFromOldShape
+              && converted.context == amountSix && converted.useLearned && converted.engines.map(\.allow) == [qwenAllow, deepLAllow]
+              && converted.engines.allSatisfy { $0.context == nil } && converted.glossaryApply == .both
               && describedByTheSchema(engineContextObject, ["properties": agentSchema ?? [:]]))
         check("engine context: the file text is the app's own format, so a reload leaves it as written",
               SettingsFileFormat.pretty(engineContextObject) + "\n" == engineContextFile + "\n")
-        check("engine context: settings → file → settings is stable, and the render keeps both engines and the flag as the file had them",
-              SettingsFileCheck.read(SettingsFileFormat.render(engineContext.settings), over: AppSettings()).settings == engineContext.settings
-              && SettingsFileCheck.read(SettingsFileFormat.render(engineContext.settings), over: AppSettings()).issues.isEmpty
-              && ((try? JSONSerialization.jsonObject(with: SettingsFileFormat.render(engineContext.settings))) as? [String: Any])
-                  .map { ($0["engines"] as? NSArray)?.isEqual(to: engineContextObject["engines"] as? [Any] ?? []) == true && $0["appleUsesPinnedTerms"] as? Bool == true } == true)
+        let convertedRender = SettingsFileFormat.render(converted)
+        let convertedObject = (try? JSONSerialization.jsonObject(with: convertedRender)) as? [String: Any]
+        check("engine context: settings → file → settings is stable, and the render writes the new keys (context, useLearned, glossaryApply, each engine's allow) and none of the old ones",
+              SettingsFileCheck.read(convertedRender, over: AppSettings()).settings == converted
+              && SettingsFileCheck.read(convertedRender, over: AppSettings()).issues.isEmpty
+              && (convertedObject?["context"] as? [String: Any])?["previousLines"] as? Int == 6 && convertedObject?["useLearned"] as? Bool == true
+              && convertedObject?["glossaryApply"] as? String == "both" && convertedObject?["appleUsesPinnedTerms"] == nil
+              && ((convertedObject?["engines"] as? [[String: Any]]) ?? []).allSatisfy { $0["context"] == nil && $0["allow"] != nil })
         // The save path: start on this file, change a setting, save with the app's writer, read again.
         let contextSaveURL = dir.appendingPathComponent("context-save/settings.json")
         try? FileManager.default.createDirectory(at: contextSaveURL.deletingLastPathComponent(), withIntermediateDirectories: true)
@@ -568,53 +586,49 @@ enum SettingsFileChecks {
         contextStarted.boxOpacity = 0.9
         contextStore.save(contextStarted)
         let contextSaved = SettingsFileCheck.read((try? Data(contentsOf: contextSaveURL)) ?? Data(), over: AppSettings())
-        let contextSavedObject = (try? JSONSerialization.jsonObject(with: Data(text(contextSaveURL).utf8))) as? [String: Any] ?? [:]
-        check("engine context survives the app's save: start on the file, change a setting, save, read again; both contexts and the flag are the same",
-              contextSaved.issues.isEmpty && contextSaved.settings.boxOpacity == 0.9
-              && contextSaved.settings.engines.map(\.context) == [qwenContext, deepLContext] && contextSaved.settings.appleUsesPinnedTerms
-              && (contextSavedObject["engines"] as? NSArray)?.isEqual(to: engineContextObject["engines"] as? [Any] ?? []) == true
-              && contextSavedObject["appleUsesPinnedTerms"] as? Bool == true)
-        // All five kinds, each with a context at both ends of the range.
-        var everyKindContext = everyKind
-        everyKindContext.engines = everyKind.engines.enumerated().map { i, e in
+        check("engine context survives the app's save: start on the file, change a setting, save, read again; the converted amount, learning, permissions and rows are the same, and the old file is kept beside it",
+              contextSaved.issues.isEmpty && contextSaved.settings.boxOpacity == 0.9 && !contextSaved.convertedFromOldShape
+              && contextSaved.settings.context == amountSix && contextSaved.settings.useLearned && contextSaved.settings.engines.map(\.allow) == [qwenAllow, deepLAllow]
+              && contextSaved.settings.glossaryApply == .both
+              && (try? Data(contentsOf: contextSaveURL.deletingLastPathComponent().appendingPathComponent(SettingsFileStore.oldShapeName))) == Data(engineContextFile.utf8))
+        // All five kinds, each with its permissions.
+        var everyKindAllow = everyKind
+        everyKindAllow.engines = everyKind.engines.enumerated().map { i, e in
             var c = e
-            c.context = EngineContext(enabled: i % 2 == 0, previousLines: i % 2 == 0 ? AppContextOverride.maxPreviousLines : 0, includeTitle: i % 2 == 0,
-                                      useLearned: i % 2 == 0, deepLInstructions: i % 2 == 0)
+            c.allow = EngineAllow(lines: i % 2 != 0, title: true, deepLInstructions: i % 2 == 0)
             return c
         }
-        let everyKindContextRead = SettingsFileCheck.read(SettingsFileFormat.render(everyKindContext), over: AppSettings())
-        check("engine context: engines of all five kinds, each with a context, are written by the app and read back equal with no issue",
-              everyKindContextRead.settings == everyKindContext && everyKindContextRead.issues.isEmpty
-              && everyKindContextRead.settings.engines.allSatisfy { $0.context != nil })
-        // The model: a file with the context is applied, and a change in Settings leaves it in the file.
+        let everyKindAllowRead = SettingsFileCheck.read(SettingsFileFormat.render(everyKindAllow), over: AppSettings())
+        check("engine allow: engines of all five kinds, each with its permissions, are written by the app and read back equal with no issue",
+              everyKindAllowRead.settings == everyKindAllow && everyKindAllowRead.issues.isEmpty && everyKindAllowRead.settings.engines.allSatisfy { $0.allow != .default })
+        // The model: a file of 1.1.4 is applied, and a change in Settings writes the new shape.
         let enginesBefore = model.settings.engines
         let flagBefore = model.settings.appleUsesPinnedTerms
+        let contextBefore = model.settings.context, learnedBefore = model.settings.useLearned, applyBefore = model.settings.glossaryApply
         try? Data(engineContextFile.utf8).write(to: model.settingsFile.url, options: .atomic)
         model.settingsFileChanged()
-        let appliedContexts = model.settings.engines.map(\.context)
+        let appliedAllows = model.settings.engines.map(\.allow)
         model.settings.lensStyle = .subtle
         let contextResaved = (try? JSONSerialization.jsonObject(with: Data(text(model.settingsFile.url).utf8))) as? [String: Any]
-        check("engine context: the file applies to the app and a change in Settings keeps the contexts and the flag in the file",
-              model.settingsIssues.isEmpty && appliedContexts == [qwenContext, deepLContext] && model.settings.appleUsesPinnedTerms
-              && (contextResaved?["engines"] as? NSArray)?.isEqual(to: engineContextObject["engines"] as? [Any] ?? []) == true
-              && contextResaved?["appleUsesPinnedTerms"] as? Bool == true)
-        // Editing an engine in Settings (the sheet builds the engine from its own fields, so it has no context) keeps what an agent
-        // wrote in engines[].context, and a duplicate carries it too.
+        check("engine context: the file of 1.1.4 applies to the app and a change in Settings writes it in the new shape (no engines[].context, no appleUsesPinnedTerms)",
+              model.settingsIssues.isEmpty && appliedAllows == [qwenAllow, deepLAllow] && model.settings.context == amountSix && model.settings.appleUsesPinnedTerms
+              && contextResaved?["appleUsesPinnedTerms"] == nil && (contextResaved?["context"] as? [String: Any])?["previousLines"] as? Int == 6
+              && ((contextResaved?["engines"] as? [[String: Any]]) ?? []).allSatisfy { $0["context"] == nil })
+        // Editing an engine in Settings (the sheet builds the engine from its own fields, so it has no permissions) keeps the stored ones.
         if let edited = model.settings.engines.first {
             model.updateEngine(EngineConfig(id: edited.id, name: "Renamed in Settings", kind: edited.kind))
             let afterEdit = model.settings.engines.first
             model.duplicateEngine(edited.id)
             let copy = model.settings.engines.last
-            let afterEditFile = (try? JSONSerialization.jsonObject(with: Data(text(model.settingsFile.url).utf8))) as? [String: Any]
-            check("engine context: editing the engine in Settings (updateEngine) keeps its context, the name changes; a duplicate carries the context under a new id",
-                  afterEdit?.name == "Renamed in Settings" && afterEdit?.context == qwenContext && afterEdit?.id == edited.id
-                  && model.settings.engines.count == 3 && copy?.id != edited.id && copy?.context == qwenContext
-                  && ((afterEditFile?["engines"] as? [[String: Any]])?.first?["context"] as? [String: Any])?["previousLines"] as? Int == 6)
+            check("engine allow: editing the engine in Settings (updateEngine) keeps its permissions, the name changes; a duplicate carries them under a new id",
+                  afterEdit?.name == "Renamed in Settings" && afterEdit?.allow == qwenAllow && afterEdit?.id == edited.id
+                  && model.settings.engines.count == 3 && copy?.id != edited.id && copy?.allow == qwenAllow)
         } else {
-            check("engine context: editing the engine in Settings keeps its context (the file's engines were not applied)", false)
+            check("engine allow: editing the engine in Settings keeps its permissions (the file's engines were not applied)", false)
         }
         model.settings.engines = enginesBefore
         model.settings.appleUsesPinnedTerms = flagBefore
+        (model.settings.context, model.settings.useLearned, model.settings.glossaryApply) = (contextBefore, learnedBefore, applyBefore)
         model.settings.lensStyle = .glow
 
         // The check: a wrong value inside an engine's context is reported with its path and line, ends in "ignored", and the rest applies.
@@ -638,7 +652,7 @@ enum SettingsFileChecks {
         check("engine context: \"previousLines\": 12 is reported with its path and line and ends in ignored; the engine applies with the default lines",
               tooMany.issues == [SettingsFileIssue(line: 7, message: previousLinesIssue)]
               && tooMany.settings.engines.map(\.name) == ["Local"]
-              && tooMany.settings.engines.first?.context == EngineContext(enabled: true, previousLines: AppContextOverride.defaultPreviousLines))
+              && tooMany.settings.context == AppContextOverride(mode: .conversation, previousLines: AppContextOverride.defaultPreviousLines))
         let mistakes = SettingsFileCheck.read(Data("""
         {
           "engines": [
@@ -667,9 +681,9 @@ enum SettingsFileChecks {
                   SettingsFileIssue(line: 7, message: "unknown key engines[0].context.includeTitel (did you mean includeTitle?)"),
                   SettingsFileIssue(line: 15, message: "engines[1].context: expected an object, got a number; ignored"),
               ]
-              && mistakes.settings.engines.map(\.name) == ["D", "E"]
-              && mistakes.settings.engines.first?.context == EngineContext(enabled: false, useLearned: true) && mistakes.settings.engines.last?.context == nil)
-        // One rule for an engine's context in a file: the validator and the Core decode give the same `EngineConfig.context` for the same text.
+              && mistakes.settings.engines.map(\.name) == ["D", "E"] && mistakes.settings.engines.allSatisfy { $0.context == nil && $0.allow == .default }
+              && mistakes.settings.context == nil && !mistakes.settings.useLearned)
+        // One rule for an engine's context in a file: the file check and the Core converter give the same new-shape values for the same text.
         let engineContextTexts = [
             #"{"enabled":true,"previousLines":12}"#, #"{"enabled":true,"previousLines":9}"#, #"{"enabled":true,"previousLines":-1}"#,
             #"{"enabled":true,"previousLines":5.5}"#, #"{"enabled":true,"previousLines":"many"}"#, #"{"enabled":true,"previousLines":true}"#,
@@ -677,53 +691,60 @@ enum SettingsFileChecks {
             #"{"enabled":true}"#, #"{"enabled":"yes","useLearned":true}"#, #"{"enabled":1}"#, #"{"enabled":null,"includeTitle":true}"#,
             #"{"includeTitle":true,"useLearned":false,"deepLInstructions":true}"#, #"{"future":1,"enabled":true}"#, #"{}"#, #"5"#, #""on""#, #"[true]"#, #"null"#,
         ]
-        let engineContextAgreement = engineContextTexts.map { context -> (text: String, viaFile: EngineContext?, direct: EngineContext?) in
+        struct Converted: Equatable { var context: AppContextOverride?; var learned: Bool; var allow: EngineAllow? }
+        let engineContextAgreement = engineContextTexts.map { context -> (text: String, viaFile: Converted, direct: Converted) in
             let engine = #"{"baseURL":"https://api.deepl.com","kind":"deepL","name":"D","context":\#(context)}"#
-            let viaFile = SettingsFileCheck.read(Data(#"{"engines":[\#(engine)]}"#.utf8), over: AppSettings()).settings.engines.first?.context
-            let direct = try? JSONDecoder().decode(EngineConfig.self, from: Data(engine.utf8)).context
-            return (context, viaFile, direct ?? nil)
+            let file = SettingsFileCheck.read(Data(#"{"engines":[\#(engine)]}"#.utf8), over: AppSettings()).settings
+            let legacy = (try? JSONDecoder().decode(LegacySettings.self, from: Data(#"{"engines":[\#(engine)]}"#.utf8))) ?? LegacySettings()
+            let direct = ProfileMigration.convert(legacy).value
+            return (context, Converted(context: file.context, learned: file.useLearned, allow: file.engines.first?.allow),
+                    Converted(context: direct.context, learned: direct.useLearned ?? false, allow: direct.engines?.first?.allow))
         }
         for row in engineContextAgreement where row.viaFile != row.direct {
-            print("check-logic: engine context \(row.text): the file check gives \(String(describing: row.viaFile)), the Core decode \(String(describing: row.direct))")
+            print("check-logic: engine context \(row.text): the file check gives \(row.viaFile), the Core converter \(row.direct)")
         }
-        check("engine context: a context in a file reads the same through the file check and through a direct Core decode, out-of-range, fractional, wrong-typed and missing values included",
+        check("engine context: a context in a file converts the same through the file check and through the Core converter, out-of-range, fractional, wrong-typed and missing values included",
               engineContextAgreement.allSatisfy { $0.viaFile == $0.direct }
-              && engineContextAgreement[0].viaFile == EngineContext(enabled: true, previousLines: AppContextOverride.defaultPreviousLines)
-              && engineContextAgreement[8].viaFile == EngineContext(enabled: true, previousLines: AppContextOverride.maxPreviousLines)
-              && engineContextAgreement[15].viaFile == EngineContext() && engineContextAgreement[16].viaFile == nil)
+              && engineContextAgreement[0].viaFile.context == AppContextOverride(mode: .conversation, previousLines: AppContextOverride.defaultPreviousLines)
+              && engineContextAgreement[8].viaFile.context == AppContextOverride(mode: .conversation, previousLines: AppContextOverride.maxPreviousLines)
+              && engineContextAgreement[15].viaFile.context == nil && engineContextAgreement[15].viaFile.allow == .default)
         // And the command: an agent running --check-settings sees the documented line.
         let tooManyFileURL = dir.appendingPathComponent("too-many.json")
         try? Data((tooManyFile + "\n").utf8).write(to: tooManyFileURL)
         let tooManyCommand = command(["--check-settings", tooManyFileURL.path])
-        check("engine context: --check-settings prints the previousLines line and exits 1",
-              tooManyCommand.0 == 1 && tooManyCommand.1 == "too-many.json:7: \(previousLinesIssue)\n")
+        check("engine context: --check-settings prints the previousLines line and exits 1 (after the note that the file is converted on the next save)",
+              tooManyCommand.0 == 1 && tooManyCommand.1.hasSuffix("too-many.json:7: \(previousLinesIssue)\n")
+              && tooManyCommand.1.contains("converted on the next save") && tooManyCommand.1.split(separator: "\n").count == 2)
 
-        // appleUsesPinnedTerms is off by default, kept while true, and checked like any other switch.
+        // The Apple switch of 1.1.4 is a glossary mode and each row's mode now; the key is read, never written.
         var pinned = AppSettings()
-        pinned.appleUsesPinnedTerms = true
+        pinned.glossaryApply = .both
         let renderedOff = String(decoding: SettingsFileFormat.render(AppSettings()), as: UTF8.self)
         let renderedOn = String(decoding: SettingsFileFormat.render(pinned), as: UTF8.self)
-        check("appleUsesPinnedTerms is off by default", AppSettings().appleUsesPinnedTerms == false && AppSettings().effective(frontmost: "x").appleUsesPinnedTerms == false)
-        check("appleUsesPinnedTerms: the file leaves it out while it is off, and writes it while it is on",
-              !renderedOff.contains("appleUsesPinnedTerms") && renderedOn.contains("\n  \"appleUsesPinnedTerms\": true,\n"))
-        check("appleUsesPinnedTerms: on → file → on, and an explicit false in a file turns it off",
-              SettingsFileCheck.read(SettingsFileFormat.render(pinned), over: AppSettings()).settings.appleUsesPinnedTerms
-              && SettingsFileCheck.read(Data(#"{"appleUsesPinnedTerms": false}"#.utf8), over: pinned).settings.appleUsesPinnedTerms == false
-              && SettingsFileCheck.read(Data(#"{"appleUsesPinnedTerms": false}"#.utf8), over: pinned).issues.isEmpty)
+        check("appleUsesPinnedTerms is off by default (a view of the glossary's and the rows' mode)", AppSettings().glossaryApply == .hint && AppSettings().appleUsesPinnedTerms == false
+              && AppSettings().effective(frontmost: "x").appleUsesPinnedTerms == false && pinned.appleUsesPinnedTerms)
+        check("glossaryApply: the file leaves it out while it is hint, writes it while it is not, and never writes appleUsesPinnedTerms",
+              !renderedOff.contains("glossaryApply") && renderedOn.contains("\n  \"glossaryApply\": \"both\",\n") && !renderedOn.contains("appleUsesPinnedTerms"))
+        check("glossaryApply: on → file → on, and a 1.1.4 file with the switch false turns it off",
+              SettingsFileCheck.read(SettingsFileFormat.render(pinned), over: AppSettings()).settings.glossaryApply == .both
+              && SettingsFileCheck.read(Data(#"{"appleUsesPinnedTerms": false}"#.utf8), over: pinned).settings.glossaryApply == .hint
+              && SettingsFileCheck.read(Data(#"{"appleUsesPinnedTerms": false}"#.utf8), over: pinned).issues.isEmpty
+              && SettingsFileCheck.read(Data(#"{"appleUsesPinnedTerms": true}"#.utf8), over: AppSettings()).settings.glossaryApply == .both)
         let pinnedWrong = SettingsFileCheck.read(Data("{\n  \"appleUsesPinnedTerms\": \"yes\"\n}\n".utf8), over: pinned)
         check("appleUsesPinnedTerms: a wrong type is reported with its line and keeps the current value",
               pinnedWrong.issues == [SettingsFileIssue(line: 2, message: "appleUsesPinnedTerms: expected true or false, got a string; keeping the current value")]
               && pinnedWrong.settings.appleUsesPinnedTerms)
-        check("appleUsesPinnedTerms: a key the file leaves out keeps the current value, like every other key",
-              SettingsFileCheck.read(Data("{}".utf8), over: pinned).settings.appleUsesPinnedTerms
-              && SettingsFileCheck.changedKeys(AppSettings(), pinned) == ["appleUsesPinnedTerms"])
-        check("appleUsesPinnedTerms: the switch is in SettingSpec, and the schema lists it with its default", {
-            let property = (((try? JSONSerialization.jsonObject(with: SettingsSchema.data())) as? [String: Any])?["properties"] as? [String: Any])?["appleUsesPinnedTerms"] as? [String: Any]
-            return SettingSpec.spec(for: "appleUsesPinnedTerms") != nil && property?["type"] as? String == "boolean" && property?["default"] as? Bool == false
-                && (property?["description"] as? String).map { $0.contains("Off by default.") && $0.contains("Written to the file only when true") } == true
+        check("glossaryApply: a key the file leaves out keeps the current value, like every other key",
+              SettingsFileCheck.read(Data("{}".utf8), over: pinned).settings.glossaryApply == .both
+              && SettingsFileCheck.changedKeys(AppSettings(), pinned) == ["glossaryApply"])
+        check("the schema lists glossaryApply with its default, and appleUsesPinnedTerms as deprecated: read, never written", {
+            let properties = ((try? JSONSerialization.jsonObject(with: SettingsSchema.data())) as? [String: Any])?["properties"] as? [String: Any]
+            let apply = properties?["glossaryApply"] as? [String: Any], old = properties?["appleUsesPinnedTerms"] as? [String: Any]
+            return SettingSpec.spec(for: "glossaryApply") != nil && apply?["enum"] as? [String] == ["hint", "replace", "both"] && apply?["default"] as? String == "hint"
+                && old?["type"] as? String == "boolean" && old?["deprecated"] as? Bool == true && (old?["description"] as? String)?.contains("never written") == true
         }())
-        // A 1.1.2 settings.json: all 24 keys 1.1.2 wrote and none of the later ones. Read and saved again it is the same bytes (the
-        // keys after 1.1.2 are not added to a file that does not use them).
+        // A 1.1.2 settings.json: all 24 keys 1.1.2 wrote and none of the later ones. Read, it is converted (`appProfiles` is `profiles`); saved
+        // again it is the same file with that one key renamed, and the old file is kept beside it (1.1.2 and 1.1.4 wrote the same keys).
         let v112File = """
         {
           "$schema": "settings.schema.json",
@@ -762,9 +783,14 @@ enum SettingsFileChecks {
         try? Data(v112File.utf8).write(to: v112Disk)
         let v112Store = SettingsFileStore(url: v112Disk)
         v112Store.save(v112Store.startup(fallback: AppSettings()))
-        check("a 1.1.2 settings.json (the 24 keys of 1.1.2 and no later one) is read without issues and saved again as the same bytes, by the renderer and by the store",
-              v112Real.issues.isEmpty && String(decoding: SettingsFileFormat.render(v112Real.settings), as: UTF8.self) == v112File
-              && text(v112Disk) == v112File && Set(((try? JSONSerialization.jsonObject(with: Data(v112File.utf8))) as? [String: Any] ?? [:]).keys).count == 25
+        // The same file with `appProfiles` renamed `profiles` (sorted: after paragraphReader, before renderMode).
+        var renamedLines = v112File.components(separatedBy: "\n").filter { $0 != "  \"appProfiles\": []," }
+        if let at = renamedLines.firstIndex(of: "  \"renderMode\": \"adaptive\",") { renamedLines.insert("  \"profiles\": [],", at: at) }
+        let v112Renamed = renamedLines.joined(separator: "\n")
+        check("a 1.1.2 settings.json (the 24 keys of 1.1.2 and no later one) is read without issues and saved again as the same file with appProfiles renamed profiles, by the renderer and by the store; the old file is kept",
+              v112Real.issues.isEmpty && v112Real.convertedFromOldShape && String(decoding: SettingsFileFormat.render(v112Real.settings), as: UTF8.self) == v112Renamed
+              && text(v112Disk) == v112Renamed && Set(((try? JSONSerialization.jsonObject(with: Data(v112File.utf8))) as? [String: Any] ?? [:]).keys).count == 25
+              && (try? String(contentsOf: v112Disk.deletingLastPathComponent().appendingPathComponent(SettingsFileStore.oldShapeName), encoding: .utf8)) == v112File
               && v112Real.settings.engines.isEmpty && v112Real.settings.appleUsesPinnedTerms == false)
 
         // Schema, nested
@@ -806,7 +832,7 @@ enum SettingsFileChecks {
         let populated = AppProfile(
             bundleID: "a", appName: "A", source: "ja", target: "en", customEngineID: engine.id, paragraphReader: .lineGrouping, note: "n",
             entries: [MemoryEntry(src: "s", dst: "d", kind: .person, gender: .f, note: "n", reading: "r",
-                                  addressing: [Addressing(to: "t", register: .polite)])],
+                                  addressing: [Addressing(to: "t", register: .polite)], apply: .both)],
             context: AppContextOverride(mode: .conversation, previousLines: 5))
         let populatedKeys = (try? JSONSerialization.jsonObject(with: JSONEncoder().encode(populated))) as? [String: Any] ?? [:]
         let populatedEntry = (populatedKeys["entries"] as? [[String: Any]])?.first ?? [:]
@@ -816,15 +842,23 @@ enum SettingsFileChecks {
         // the union of the kinds' fields, so the union of the encoded keys must equal it, and `engines[].context` must equal the
         // encoded context.
         let populatedContext = EngineContext(enabled: true, previousLines: 5, includeTitle: true, useLearned: true, deepLInstructions: true)
+        let populatedAllow = EngineAllow(lines: false, title: true, deepLInstructions: true)
         let populatedEngines = [
-            EngineConfig(id: engine.id, name: "a", kind: .openAICompatible(baseURL: URL(string: "http://localhost:8765/v1")!, model: "m", thinking: .provider, extraHeaders: ["X": "1"]), context: populatedContext),
-            EngineConfig(name: "b", kind: .anthropic(baseURL: URL(string: "https://api.anthropic.com")!, model: "m", thinking: .provider), context: populatedContext),
-            EngineConfig(name: "c", kind: .deepL(baseURL: URL(string: "https://api.deepl.com")!, formality: "more"), context: populatedContext),
-            EngineConfig(name: "d", kind: .httpTemplate(HTTPTemplate(url: "http://h/t", resultPath: "r")), context: populatedContext),
-            EngineConfig(name: "e", kind: .command(CommandSpec(executable: "/bin/x")), context: populatedContext),
+            EngineConfig(id: engine.id, name: "a", kind: .openAICompatible(baseURL: URL(string: "http://localhost:8765/v1")!, model: "m", thinking: .provider, extraHeaders: ["X": "1"]), context: populatedContext, allow: populatedAllow),
+            EngineConfig(name: "b", kind: .anthropic(baseURL: URL(string: "https://api.anthropic.com")!, model: "m", thinking: .provider), context: populatedContext, allow: populatedAllow),
+            EngineConfig(name: "c", kind: .deepL(baseURL: URL(string: "https://api.deepl.com")!, formality: "more"), context: populatedContext, allow: populatedAllow),
+            EngineConfig(name: "d", kind: .httpTemplate(HTTPTemplate(url: "http://h/t", resultPath: "r")), context: populatedContext, allow: populatedAllow),
+            EngineConfig(name: "e", kind: .command(CommandSpec(executable: "/bin/x")), context: populatedContext, allow: populatedAllow),
         ]
         let populatedEngineObjects = populatedEngines.compactMap { (try? JSONSerialization.jsonObject(with: JSONEncoder().encode($0))) as? [String: Any] }
         let populatedContextObject = populatedEngineObjects.first?["context"] as? [String: Any] ?? [:]
+        let populatedAllowObject = populatedEngineObjects.first?["allow"] as? [String: Any] ?? [:]
+        // The new shape's profile: the file's own type (`ProfileFile`), fully populated, against the schema of `profiles[]`.
+        let populatedFile = ProfileFile(AppProfile(bundleID: "a", appName: "A", source: "ja", target: "en", customEngineID: engine.id, paragraphReader: .lineGrouping, note: "n",
+                                                   entries: populated.entries, context: AppContextOverride(mode: .conversation, previousLines: 5), id: "a",
+                                                   when: [ProfileCondition(app: "a", titleContains: "t")], useLearned: true))
+        let populatedFileKeys = (try? JSONSerialization.jsonObject(with: JSONEncoder().encode(populatedFile))) as? [String: Any] ?? [:]
+        let fileProfile = at(schemaObject, "properties", "profiles", "items")
         let levels: [(name: String, app: Set<String>, schema: Set<String>)] = [
             ("appProfiles[]", Set(populatedKeys.keys), schemaKeys(profile)),
             ("appProfiles[].entries[]", Set(populatedEntry.keys), schemaKeys(entryItem)),
@@ -832,6 +866,11 @@ enum SettingsFileChecks {
             ("appProfiles[].context", Set((populatedKeys["context"] as? [String: Any] ?? [:]).keys), schemaKeys(at(profile, "properties", "context"))),
             ("engines[]", populatedEngineObjects.reduce(into: Set<String>()) { $0.formUnion($1.keys) }, schemaKeys(engineItem)),
             ("engines[].context", Set(populatedContextObject.keys), schemaKeys(at(engineItem, "properties", "context"))),
+            ("engines[].allow", Set(populatedAllowObject.keys), schemaKeys(at(engineItem, "properties", "allow"))),
+            ("profiles[]", Set(populatedFileKeys.keys), schemaKeys(fileProfile)),
+            ("profiles[].entries[]", Set(((populatedFileKeys["entries"] as? [[String: Any]])?.first ?? [:]).keys), schemaKeys(at(fileProfile, "properties", "entries", "items"))),
+            ("profiles[].when[]", Set(((populatedFileKeys["when"] as? [[String: Any]])?.first ?? [:]).keys), schemaKeys(at(fileProfile, "properties", "when", "items"))),
+            ("profiles[].context", Set((populatedFileKeys["context"] as? [String: Any] ?? [:]).keys), schemaKeys(at(fileProfile, "properties", "context"))),
         ]
         for level in levels {
             check("schema: \(level.name) has exactly the fields the app keeps", !level.app.isEmpty && level.app == level.schema)
@@ -854,10 +893,10 @@ enum SettingsFileChecks {
         let undocumentedProperties = undocumented(schemaObject, "")
         check("schema: every property, nested ones too, has a description", undocumentedProperties.isEmpty)
         if !undocumentedProperties.isEmpty { print("check-logic: without a description: \(undocumentedProperties)") }
-        check("schema: engines and appProfiles carry examples, the profile one with a note, two entries with addressing and a context",
+        check("schema: engines and profiles carry examples, the profile one with a note, two entries with addressing and a context",
               ((at(schemaObject, "properties", "engines", "examples") as? [Any])?.count ?? 0) >= 1
-              && ((at(schemaObject, "properties", "appProfiles", "examples") as? [[[String: Any]]])?.first?.first).map { p in
-                  p["bundleID"] as? String == "com.example.chat" && p["note"] is String && (p["entries"] as? [[String: Any]])?.count == 2
+              && ((at(schemaObject, "properties", "profiles", "examples") as? [[[String: Any]]])?.first?.first).map { p in
+                  p["id"] as? String == "com.example.chat" && p["note"] is String && (p["entries"] as? [[String: Any]])?.count == 2
                   && (p["entries"] as? [[String: Any]])?.allSatisfy { ($0["addressing"] as? [Any])?.isEmpty == false } == true && p["context"] != nil
               } == true)
         let badExamples = SettingSpec.all.flatMap { spec in
@@ -991,10 +1030,12 @@ enum SettingsFileChecks {
               model.settingsIssues.isEmpty && appliedProfile?.note == memoryProfile?.note && appliedProfile?.entries == memoryProfile?.entries
               && appliedProfile?.context == memoryProfile?.context && appliedProfile?.context != nil
               && text(url).contains("\"lensStyle\": \"subtle\"")
-              && (resaved?["appProfiles"] as? NSArray)?.isEqual(to: memoryObject["appProfiles"] as? [Any] ?? []) == true)
+              && ((resaved?["profiles"] as? [[String: Any]])?.first).map { item in ["note", "entries", "context"].allSatisfy {
+                  (item[$0] as? NSObject)?.isEqual((memoryObject["appProfiles"] as? [[String: Any]])?.first?[$0] as? NSObject) == true } } == true)
         model.settings.appProfiles = profilesBefore
         model.settings.checksForUpdates = true
         model.settings.lensStyle = .glow
+        failed += ProfileFileChecks.run(dir: dir)
         return failed
     }
 

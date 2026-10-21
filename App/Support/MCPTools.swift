@@ -114,7 +114,7 @@ enum MCPTool: String, CaseIterable {
     }
 
     private static func short(_ spec: FieldSpec) -> [String: Any] {
-        guard case let .object(fields) = spec.kind else { return spec.schema() }
+        guard case let .object(fields, _) = spec.kind else { return spec.schema() }
         return ["type": "object", "description": spec.doc, "propertyNames": ["enum": fields.map(\.name)]]
     }
 
@@ -163,7 +163,7 @@ enum MCPTool: String, CaseIterable {
 
     /// The kind of one field of an app profile, from the settings file's own tree: its limits are the file's.
     private static func profileKind(_ name: String) -> FieldKind {
-        guard case let .list(.object(fields), _, _, _) = FieldKind.appProfiles else { return .string }
+        guard case let .list(.object(fields, _), _, _, _, _) = FieldKind.profiles else { return .string }
         return fields.first { $0.name == name }?.kind ?? .string
     }
 }

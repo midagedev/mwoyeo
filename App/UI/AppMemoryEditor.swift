@@ -231,6 +231,7 @@ final class AppMemoryEditor {
         switch profile?.context?.mode {
         case nil: .follow
         case .off?: .off
+        case .memory?: .follow   // R4: a choice of its own; this sheet has none for "names and note only"
         case .nearby?: .nearby
         case .conversation?: .conversation
         }

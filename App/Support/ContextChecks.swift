@@ -77,7 +77,45 @@ enum ContextChecks {
             s.engines = [e]
             s.customEngineID = e.id
         }
-        return s
+        // The engines of these fixtures carry 1.1.4's `context` (round prof-file, 2026-10-21): the converter turns it into the new keys, as
+        // it does when a file or the preferences are read, so what the checks say about requests is what a 1.1.4 file would make.
+        return s.convertedFromOldFields()
+    }
+
+    /// 1.1.4-shaped fixtures through the new model: the settings an engine with its own `context` and these profiles convert to, and the engine
+    /// as converted (its `context` is the amount and the permissions now). What the preview and the disclosure are asked about.
+    static func converted(_ e: EngineConfig, _ profiles: [AppProfile], glossary: String = "") -> (settings: AppSettings, engine: EngineConfig) {
+        let s = settings(e, profiles: profiles, glossary: glossary)
+        return (s, s.activeEngineConfig ?? e)
+    }
+
+    static func disclosure(_ e: EngineConfig, _ profiles: [AppProfile]) -> EnginePermissions.ContextDisclosure {
+        let (s, engine) = converted(e, profiles)
+        return EnginePermissions.disclosure(engine, in: s)
+    }
+
+    static func sendsContext(_ e: EngineConfig, _ profiles: [AppProfile]) -> Bool {
+        let (s, engine) = converted(e, profiles)
+        return EnginePermissions.sendsContext(engine, in: s)
+    }
+
+    /// The "Sent:" line of the engine sheet for `e` over these profiles.
+    static func engineSummary(_ e: EngineConfig, _ profiles: [AppProfile]) -> SentSummary {
+        let (s, engine) = converted(e, profiles)
+        return ContextPreview.engineSummary(engine: engine, settings: s, category: { _ in "public.app-category.social-networking" })
+    }
+
+    /// The "Sent:" line of one app's Memory sheet: the engine `e` (nil is Apple) and the chain of a lens over the app of `p`.
+    static func sentSummary(_ e: EngineConfig?, _ p: AppProfile?, glossary: [(String, String)] = [], learned: Int = 0) -> SentSummary {
+        let s = settings(e, profiles: p.map { [$0] } ?? [], glossary: glossary.map { "\($0.0) = \($0.1)" }.joined(separator: "\n"))
+        let chain = ContextRoute.pair(settings: s, lens: p?.bundleID ?? chat).chain
+        return ContextPreview.summary(engine: s.activeEngineConfig, chain: chain, appName: "Example Chat",
+                                      category: "public.app-category.social-networking", learnedUsable: learned)
+    }
+
+    /// The plan of a lens over `app` under `s` (the chain of its window: its profile, then All apps).
+    static func plan(_ s: AppSettings, engine: EngineConfig?, rests: Bool = false, over app: String = chat, title: String? = nil) -> ContextPlan? {
+        ContextPlan.decide(settings: s, engine: engine, engineRests: rests, chain: ContextRoute.pair(settings: s, lens: app, title: title).chain)
     }
 
     static func service(_ s: AppSettings) -> TranslationService {
@@ -98,9 +136,9 @@ enum ContextChecks {
         let plain = engine("openai", base: url)
         func plan(_ e: EngineConfig?, rests: Bool = false, _ p: AppProfile? = nil, pins: Bool = false, engineChoice: TranslationEngineChoice = .auto) -> ContextPlan? {
             var s = settings(e, profiles: p.map { [$0] } ?? [])
-            s.appleUsesPinnedTerms = pins
+            s.appleUsesPinnedTerms = pins   // 1.1.4's switch, as the view of the new model it is: every row and the glossary used both ways
             s.engine = engineChoice
-            return ContextPlan.decide(settings: s, engine: e, engineRests: rests, profile: p)
+            return ContextChecks.plan(s, engine: e, rests: rests)
         }
         let entry = MemoryEntry(src: "token", dst: "토큰")
         t.check("the engine's switch puts the added engine on the context path", plan(on).map { if case .engine = $0 { true } else { false } } == true)
@@ -108,7 +146,7 @@ enum ContextChecks {
         t.check("an app override of off turns an engine's On off", plan(on, profile(context: AppContextOverride(mode: .off))) == nil)
         // Intended (design §9): writing the override in the app's profile is the user's opt-in, so `nearby` alone is On.
         t.check("an app override of nearby alone is On, though the engine says nothing",
-                plan(plain, profile(context: AppContextOverride(mode: .nearby))).map { if case let .engine(_, o, _) = $0 { o.enabled && o.transcriptCount == 0 } else { false } } == true)
+                plan(plain, profile(context: AppContextOverride(mode: .nearby))).map { if case let .engine(_, o, _, _) = $0 { o.enabled && o.transcriptCount == 0 } else { false } } == true)
         t.check("a resting engine is Apple's stand-in: today's path", plan(on, rests: true) == nil)
         let template = EngineConfig(name: "T", kind: .httpTemplate(HTTPTemplate(url: "http://127.0.0.1:1/t", body: "{}", resultPath: "t", batching: .jsonArray)),
                                     context: EngineContext(enabled: true))
@@ -116,9 +154,20 @@ enum ContextChecks {
         // Apple Translation never takes the context path, whatever the override says.
         t.check("Apple Translation with a nearby override is today's path", plan(nil, profile(context: AppContextOverride(mode: .nearby), entries: [entry])) == nil)
         t.check("Apple with pinned terms off is today's path, entries or not", plan(nil, profile(entries: [entry])) == nil)
-        t.check("Apple with pinned terms on and an entry pre-inserts", plan(nil, profile(entries: [entry]), pins: true) == .applePins([entry]))
+        // 2026-10-21, prof-file: the switch is each row's mode (`.both`, what 1.1.4's switch converts to), so the plan carries the row as `both`.
+        let pinned = MemoryEntry(src: "token", dst: "토큰", apply: .both)
+        t.check("Apple with pinned terms on and an entry pre-inserts", plan(nil, profile(entries: [entry]), pins: true) == .replaceOnly([pinned]))
         t.check("Apple with pinned terms on and no entry is today's path", plan(nil, profile(), pins: true) == nil && plan(nil, nil, pins: true) == nil)
-        t.check("Foundation Models is not Apple Translation: no pre-insertion", plan(nil, profile(entries: [entry]), pins: true, engineChoice: .customModel) == nil)
+        // 1.1.4: "Foundation Models is not Apple Translation: no pre-insertion". Now (design §10, §5.2's case (d)): it takes a profile's replace
+        // rows too, and not the glossary, which it already has in its instructions.
+        t.check("Foundation Models takes a profile's replace rows into its source", plan(nil, profile(entries: [entry]), pins: true, engineChoice: .customModel) == .replaceOnly([pinned]))
+        t.check("Foundation Models does not take the glossary's pairs into its source (they are in its instructions)",
+                { () -> Bool in
+                    var s = settings(nil, glossary: "token = 토큰")
+                    s.engine = .customModel
+                    s.glossaryApply = .both
+                    return ContextChecks.plan(s, engine: nil) == nil
+                }())
 
         // A lens reads the window it covers only where something could use it.
         func needs(_ e: EngineConfig?, _ profiles: [AppProfile] = [], pins: Bool = false) -> Bool {
@@ -182,7 +231,7 @@ enum ContextChecks {
         let en = LanguagePair("en", "ko")
         let lines = (1...8).map { "line \($0)" }
         func observe(_ book: inout ContextBook, _ l: LensContext, _ pass: ContextBook.Pass, _ items: [String], at now: TimeInterval) {
-            book.observe(l, key: pass.key, lines: items.map { ($0, nil) }, now: now)
+            book.observe(l, pass: pass, lines: items.map { ($0, nil) }, now: now)
         }
         func before(_ book: ContextBook, _ l: LensContext, _ pass: ContextBook.Pass, items: [String]) -> [String] {
             book.request(l, pass: pass, items: items, source: "en", target: "ko", glossary: []).before.map(\.source)
@@ -261,17 +310,17 @@ enum ContextChecks {
             TranslationReply(lines: ["⟦ko⟧ T_\(src) 번역"], terms: [TermHint(src: src, dst: "T_\(src)")], usage: TokenUsage(prompt: 1000, completion: 50, cached: 800))
         }
         var plain = ContextBook()
-        _ = plain.begin(l1, profile: nil, pair: en, engineID: "e", now: 0)
-        plain.finish(l1, items: ["Alice came"], reply: replying("Alice"), used: [], options: ContextOptions(enabled: true, includeLearned: false), glossary: [])
-        plain.finish(l1, items: ["Alice left"], reply: replying("Alice"), used: [], options: ContextOptions(enabled: true, includeLearned: false), glossary: [])
+        let pp = plain.begin(l1, profile: nil, pair: en, engineID: "e", now: 0)
+        plain.finish(l1, pass: pp, items: ["Alice came"], reply: replying("Alice"), used: [], options: ContextOptions(enabled: true, includeLearned: false), glossary: [])
+        plain.finish(l1, pass: pp, items: ["Alice left"], reply: replying("Alice"), used: [], options: ContextOptions(enabled: true, includeLearned: false), glossary: [])
         t.check("without includeLearned a reply's terms record nothing", plain.learned(for: chat).isEmpty && plain.usage(for: chat).sightings == 0)
         var learning = ContextBook()
         let on = ContextOptions(enabled: true, includeLearned: true)
         let q = learning.begin(l1, profile: nil, pair: en, engineID: "e", now: 0)
-        learning.finish(l1, items: ["Alice came"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        learning.finish(l1, pass: q, items: ["Alice came"], reply: replying("Alice"), used: [], options: on, glossary: [])
         t.check("with it on, one sighting is recorded but not used", learning.learned(for: chat).count == 1
                 && learning.request(l1, pass: q, items: ["x"], source: nil, target: "ko", glossary: []).memory.isEmpty)
-        learning.finish(l1, items: ["Alice left"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        learning.finish(l1, pass: q, items: ["Alice left"], reply: replying("Alice"), used: [], options: on, glossary: [])
         t.check("an entry is usable after 2 sightings", learning.request(l1, pass: q, items: ["x"], source: nil, target: "ko", glossary: []).memory.map(\.src) == ["Alice"])
         t.check("usage sums tokens, cached ones included", learning.usage(for: chat).requests == 2 && learning.usage(for: chat).cached == 1600
                 && learning.usage(for: chat).prompt == 2000 && learning.usage(for: chat).sightings == 2)
@@ -290,11 +339,11 @@ enum ContextChecks {
         var watched = ContextBook()
         watched.learnedChanged = { told.note($0) }
         let w0 = watched.begin(l1, profile: nil, pair: en, engineID: "e", now: 0)
-        watched.finish(l1, items: ["Alice came"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        watched.finish(l1, pass: w0, items: ["Alice came"], reply: replying("Alice"), used: [], options: on, glossary: [])
         t.check("learned rows: a first sighting is no change (the row is not used yet)", told.count == 0)
-        watched.finish(l1, items: ["Alice left"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        watched.finish(l1, pass: w0, items: ["Alice left"], reply: replying("Alice"), used: [], options: on, glossary: [])
         t.check("learned rows: the second sighting makes the row usable, and the book tells once", told.all == [chat])
-        watched.finish(l1, items: ["Alice again"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        watched.finish(l1, pass: w0, items: ["Alice again"], reply: replying("Alice"), used: [], options: on, glossary: [])
         t.check("learned rows: a third sighting changes nothing a file would hold", told.count == 1)
         watched.removeLearned(src: "alice", for: chat)
         t.check("learned rows: removing one tells (the source is matched as the sheet matches it), removing a missing one does not",
@@ -302,12 +351,12 @@ enum ContextChecks {
         watched.removeLearned(src: "Nobody", for: chat)
         watched.forgetLearned(chat)
         t.check("learned rows: forgetting an empty memory tells nothing", told.count == 2)
-        watched.finish(l1, items: ["Alice came"], reply: replying("Alice"), used: [], options: on, glossary: [])
-        watched.finish(l1, items: ["Alice left"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        watched.finish(l1, pass: w0, items: ["Alice came"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        watched.finish(l1, pass: w0, items: ["Alice left"], reply: replying("Alice"), used: [], options: on, glossary: [])
         watched.forgetLearned(chat)
         t.check("learned rows: forgetting usable rows tells", told.count == 4)
-        watched.finish(l1, items: ["Alice came"], reply: replying("Alice"), used: [], options: on, glossary: [])
-        watched.finish(l1, items: ["Alice left"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        watched.finish(l1, pass: w0, items: ["Alice came"], reply: replying("Alice"), used: [], options: on, glossary: [])
+        watched.finish(l1, pass: w0, items: ["Alice left"], reply: replying("Alice"), used: [], options: on, glossary: [])
         let toldBeforePin = told.count
         _ = watched.begin(l1, profile: profile(entries: [MemoryEntry(src: "Alice", dst: "앨리스")]), pair: en, engineID: "e", now: 1)
         t.check("learned rows: a name written (or pinned) in the profile replaces the learned row, and the book tells",
@@ -333,9 +382,9 @@ enum ContextChecks {
         let entries = [MemoryEntry(src: "Alice", dst: "앨리스", kind: .person, gender: .f)]
         let written = profile(entries: entries, note: "casual")
         func plan(_ e: EngineConfig?, _ p: AppProfile?) -> ContextPlan? {
-            ContextPlan.decide(settings: settings(e, profiles: p.map { [$0] } ?? []), engine: e, engineRests: false, profile: p)
+            ContextChecks.plan(settings(e, profiles: p.map { [$0] } ?? []), engine: e)
         }
-        func options(_ p: ContextPlan?) -> ContextOptions? { if case let .engine(_, o, _)? = p { o } else { nil } }
+        func options(_ p: ContextPlan?) -> ContextOptions? { if case let .engine(_, o, _, _)? = p { o } else { nil } }
         t.check("memory only: an app with a note and names puts an engine whose Context is off on the memory path",
                 options(plan(plain, written)).map { $0.enabled && $0.memoryOnly && $0.transcriptCount == 0 } == true
                 && options(plan(plain, profile(note: "casual"))).map(\.memoryOnly) == true
@@ -358,9 +407,7 @@ enum ContextChecks {
                 needs(plain, [written]) && !needs(plain, [profile()]) && !needs(plain, [profile(context: off, entries: entries, note: "x")])
                 && !needs(deepL, [written]) && !needs(nil, [written]))
         let social = "public.app-category.social-networking"
-        func summary(_ e: EngineConfig?, _ p: AppProfile?, learned: Int = 0) -> SentSummary {
-            ContextPreview.summary(engine: e, profile: p, appName: "Example Chat", category: social, learnedUsable: learned)
-        }
+        func summary(_ e: EngineConfig?, _ p: AppProfile?, learned: Int = 0) -> SentSummary { sentSummary(e, p, learned: learned) }
         // 2026-10-21 (round nameslens, design names-and-context §3.3, G15): the names part of the "Sent:" line says whose the names are. It
         // used to be "up to 1 name"; it is "up to 1 name (1 this app)" now. Derivation: `written` holds one name of the app and no glossary
         // pair goes (`summary` passes none), so the total is 1 and the one scope with names is "this app". The three rows below are re-pinned
@@ -377,9 +424,7 @@ enum ContextChecks {
         // The glossary's pairs go whole on the context path and are the names "of all apps"; the app's own row of a source replaces the pair.
         // Derivation: `written` has one row (the app's); two glossary pairs, one of them with the app row's source, leave one pair: 1 + 1.
         let pairs = [(entries[0].src, "other"), ("勇者", "용사")]
-        func withGlossary(_ e: EngineConfig?, _ p: AppProfile?) -> SentSummary {
-            ContextPreview.summary(engine: e, profile: p, appName: "Example Chat", category: social, learnedUsable: 0, glossary: pairs)
-        }
+        func withGlossary(_ e: EngineConfig?, _ p: AppProfile?) -> SentSummary { sentSummary(e, p, glossary: pairs) }
         t.check("sent preview: the glossary's pairs are the names of all apps, minus the pairs an app row replaces, and only where memory reaches the request",
                 withGlossary(plain, written).text == "Sent: Example Chat · social · note · up to 2 names (1 this app, 1 all apps)"
                 && withGlossary(plain, profile()).mode == .linesOnly && withGlossary(nil, written).mode == .linesOnly
@@ -389,29 +434,28 @@ enum ContextChecks {
                 !summary(engine("anthropic", base: url, context: EngineContext(enabled: true)), written).windowTitle
                 && summary(engine("anthropic", base: url, context: EngineContext(enabled: true, includeTitle: true)), written).windowTitle)
         t.check("memory only: the footnote about sent lines is not triggered by written memory",
-                !EnginePermissions.sendsContext(plain, profiles: [written]) && EnginePermissions.sendsContext(on, profiles: [written]))
+                !ContextChecks.sendsContext(plain, [written]) && ContextChecks.sendsContext(on, [written]))
 
         // The disclosure follows what is sent (addendum A1): an engine whose Context is off still names the apps whose memory goes.
-        let seen = EnginePermissions.disclosure(plain, profiles: [written])
+        let seen = ContextChecks.disclosure(plain, [written])
         t.check("disclosure: Context off and an app with written memory is disclosed - the app, no lines",
                 seen.memoryOnly && !seen.lines && !seen.isEmpty && seen.memoryApps == [written.appName])
         let other = profile(mail, entries: entries)
-        let nothing = [EnginePermissions.disclosure(plain, profiles: []), EnginePermissions.disclosure(plain, profiles: [profile(), profile(mail, note: "  ")]),
-                       EnginePermissions.disclosure(plain, profiles: [profile(context: off, entries: entries, note: "x")]),
-                       EnginePermissions.disclosure(deepL, profiles: [written]), EnginePermissions.disclosure(template, profiles: [written])]
+        let nothing = [ContextChecks.disclosure(plain, []), ContextChecks.disclosure(plain, [profile(), profile(mail, note: "  ")]),
+                       ContextChecks.disclosure(plain, [profile(context: off, entries: entries, note: "x")]),
+                       ContextChecks.disclosure(deepL, [written]), ContextChecks.disclosure(template, [written])]
         t.check("disclosure: no memory, an override of off, DeepL and a template say nothing beyond the lines",
                 nothing.allSatisfy { $0.isEmpty })
-        // 2026-10-19 (t3m1, lead's drift fix): this line used to say that an app on another engine says nothing for this one. The request
-        // pairs the engine of the app IN FRONT with the profile of the app UNDER THE LENS (`ContextRoute`), so a lens over that app's window
-        // while an app on this engine is in front sends its memory here: the app is disclosed for every engine that can be in front. FAIL
-        // first: `routeChecks` below shows the old rule against the request itself.
+        // 2026-10-21 (prof-file): this line (2026-10-19, t3m1) said an app on another engine is disclosed for this one too, "a lens over it while
+        // this engine's app is in front" (the cross pairing). A lens has its own engine now (Q1): an app is disclosed for the engine of its own
+        // chain, and an engine that is gone is skipped (design §2.1), so the lens falls back to the base engine, this one. `routeChecks` walks the rest.
         let elsewhere = AppProfile(bundleID: mail, appName: mail, source: "en", target: "ko", customEngineID: UUID(), entries: entries)
-        t.check("disclosure: an app that names another engine is still disclosed for this one (a lens over it while this engine's app is in front)",
-                EnginePermissions.disclosure(plain, profiles: [elsewhere]).memoryApps == [mail])
-        let both = EnginePermissions.disclosure(on, profiles: [written, other, profile(context: off, entries: entries, note: "x")])
+        t.check("disclosure: an app whose own engine is gone falls back to this engine, and is disclosed for it",
+                ContextChecks.disclosure(plain, [elsewhere]).memoryApps == [mail])
+        let both = ContextChecks.disclosure(on, [written, other, profile(context: off, entries: entries, note: "x")])
         t.check("disclosure: an engine that is On says the lines and every app whose memory goes, not the app that turned context off",
                 both.lines && !both.memoryOnly && both.memoryApps == [written.appName, other.appName])
-        func engineLine(_ e: EngineConfig, _ p: [AppProfile]) -> SentSummary { ContextPreview.engineSummary(engine: e, profiles: p, category: { _ in "public.app-category.social-networking" }) }
+        func engineLine(_ e: EngineConfig, _ p: [AppProfile]) -> SentSummary { engineSummary(e, p) }
         t.check("sent preview of an engine: Context off and an app with memory says what that app is sent, not \"lines only\"",
                 engineLine(plain, [written]).text == "Sent: com.example.chat · social · note · up to 1 name (1 this app)" && engineLine(plain, [written]).mode == .memoryOnly
                 && engineLine(plain, []).text == "Sent: lines only" && engineLine(on, []).text == "Sent: Example Chat · social · window title · 2 lines before · 2 lines after")
@@ -824,9 +868,10 @@ enum ContextChecks {
     /// (`EnginePermissions.memoryProfiles`, the Memory sheet's "Also sent to …") must cover what that rule sends.
     ///
     /// 2026-10-21 (round prof-lens, the user's Q1: languages and engine are per lens; design names-and-context §1.3, §8 P1): before it the
-    /// engine was the app in front's and the profile the lens's app's (a "cross pairing"); these checks said so, and `EnginePermissions` still
-    /// discloses for it (round prof-file narrows it). The checks that named the cross pairing now name the lens's own; the walk at the end keeps
-    /// "the disclosure covers what is sent" and adds "what is sent is exactly the memory of the apps whose own engine this is".
+    /// engine was the app in front's and the profile the lens's app's (a "cross pairing"); these checks said so, and `EnginePermissions`
+    /// disclosed for it. Round prof-file narrowed it the same day: the disclosure names the profiles whose own chain names the engine, so the
+    /// walk at the end says "what is sent is exactly the memory of the apps whose own engine this is, and that is what the disclosure says"
+    /// (equality, where it was a superset).
     @MainActor
     static func routeChecks(_ t: Tally) async {
         guard let mock = Mock(mode: "terms"), let mockY = Mock(mode: "terms") else { t.check("route: the mock servers start", false); return }
@@ -845,11 +890,13 @@ enum ContextChecks {
         t.check("route: a lens over B while A is in front pairs B's engine with B's profile",
                 own.engine?.id == y.id && own.profile?.bundleID == mail && own.options.memoryOnly
                 && ContextRoute.pairings(lens: mail, in: s).count == 1)
-        t.check("route: B's memory is disclosed for A's engine (a superset until the disclosure follows the lens's own engine), although B names another engine",
-                EnginePermissions.memoryProfiles(x, profiles: s.appProfiles).map(\.bundleID) == [mail]
-                && EnginePermissions.disclosure(x, profiles: s.appProfiles).memoryApps == ["B Mail"],
-                "\(EnginePermissions.memoryProfiles(x, profiles: s.appProfiles).map(\.bundleID))")
-        t.check("route: B's own engine is disclosed for B too", EnginePermissions.memoryProfiles(y, profiles: s.appProfiles).map(\.bundleID) == [mail])
+        // Before round prof-file this said "B's memory is disclosed for A's engine (a superset)"; the request path never sends it there, so the
+        // disclosure does not say it (design §4.2, Q1). FAIL first: the old rule, every profile with memory for every engine, names B here.
+        t.check("route: B's memory is not disclosed for A's engine: B names another engine, and a lens over B is sent to B's",
+                EnginePermissions.memoryProfiles(x, in: s).isEmpty && EnginePermissions.disclosure(x, in: s).memoryApps.isEmpty,
+                "\(EnginePermissions.memoryProfiles(x, in: s).map(\.bundleID))")
+        t.check("route: B's own engine is disclosed for B", EnginePermissions.memoryProfiles(y, in: s).map(\.bundleID) == [mail]
+                && EnginePermissions.disclosure(y, in: s).memoryApps == ["B Mail"])
         t.check("route: B's sheet names its own engine and no other receiver: A's engine is never sent B's memory",
                 ContextRoute.own(mail, in: s).engine?.id == y.id && ContextRoute.otherReceivers(of: mail, in: s).isEmpty)
         var one = s
@@ -893,15 +940,15 @@ enum ContextChecks {
                                         got.insert(p.bundleID)
                                     }
                                 }
-                                let said = Set(EnginePermissions.memoryProfiles(e, profiles: v.appProfiles).map(\.bundleID))
+                                let said = Set(EnginePermissions.memoryProfiles(e, in: v).map(\.bundleID))
                                 // What is sent is the memory of the apps whose own engine this is (the lens's route), found without `ContextRoute`.
                                 let ownWalk = Set(v.appProfiles.filter { p in
-                                    let options = ContextOptions.requestOptions(engine: e, profile: p)
+                                    let chain = ProfileChain.merge([.profile(p), .allApps], base: v.chainBase(bundleID: p.bundleID))
+                                    let options = ContextOptions.requestOptions(engine: e, chain: chain)
                                     return v.effective(frontmost: p.bundleID).customEngineID == e.id && options.enabled && kind.sendsMemory(options) && p.hasMemory
                                 }.map(\.bundleID))
-                                // The disclosure covers it. It is a superset (every profile with memory, for every engine) until round prof-file
-                                // narrows `EnginePermissions.memoryProfiles` to the lens's own engine; equality returns with it.
-                                let ok = got == ownWalk && got.isSubset(of: said)
+                                // The disclosure says exactly it (equality; it was a superset until round prof-file narrowed it to the lens's own engine).
+                                let ok = got == ownWalk && got == said
                                 if !ok { mismatches += 1; lastMismatch = "base \(base?.name ?? "-") A \(aEngine?.name ?? "-")/\(aHasMemory) B \(bEngine?.name ?? "-")/\(bContext?.mode.rawValue ?? "-") engine \(e.name): walk \(got.sorted()) said \(said.sorted())" }
                             }
                         }
@@ -909,7 +956,7 @@ enum ContextChecks {
                 }
             }
         }
-        t.check("route: over \(variants) states of base engine and two profiles, the memory the request path sends is that of the apps whose own engine it is, and the disclosure covers it",
+        t.check("route: over \(variants) states of base engine and two profiles, the memory the request path sends is that of the apps whose own engine it is, and the disclosure says exactly that",
                 mismatches == 0 && variants == 4 * 4 * 2 * 4 * 3, "\(mismatches) mismatches, last: \(lastMismatch)")
     }
 
@@ -1096,7 +1143,7 @@ enum ContextChecks {
 
         var pinsOn = settings(nil, profiles: [profile(chat, entries: entries)])
         pinsOn.appleUsesPinnedTerms = true
-        let inserted = ApplePreinsertion.insert(into: text, entries: entries, appleUsesPinnedTerms: true)
+        let inserted = ApplePreinsertion.insert(into: text, entries: entries)
         let pinned = await run(pinsOn, context: lens())
         t.check("Apple with pinned terms on and an entry: Core's pre-inserted text goes to Apple", !inserted.isEmpty
                 && inserted.text == "Hello there, 환영 back" && pinned == "⟦ko⟧ \(inserted.text)")

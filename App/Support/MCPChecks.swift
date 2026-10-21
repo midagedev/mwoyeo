@@ -411,8 +411,9 @@ enum MCPChecks {
               && wantedValues["lensStyle"] as? String == "glow" && wantedValues["customEngineID"] is NSNull)
         let everything = client.call("get_settings")
         let everyValue = everything.data["settings"] as? [String: Any] ?? [:]
-        check("get_settings without keys returns every setting of the table, a switch that is off included",
-              Set(everyValue.keys) == Set(SettingSpec.all.map(\.key)) && everyValue["agentConnection"] as? Bool == true && everyValue["appleUsesPinnedTerms"] as? Bool == false)
+        check("get_settings without keys returns every setting of the table the app writes, a switch that is off included, and none of the keys of 1.1.4 (read, never written)",
+              Set(everyValue.keys) == Set(SettingSpec.all.filter { !$0.deprecated }.map(\.key)) && everyValue["agentConnection"] as? Bool == true
+              && everyValue["glossaryApply"] as? String == "hint" && everyValue["appleUsesPinnedTerms"] == nil && everyValue["appProfiles"] == nil)
         let wrongKey = client.call("get_settings", ["keys": ["lensStile"]])
         check("get_settings with a key that is not a setting names where and what is allowed", wrongKey.isError && wrongKey.text.contains("keys[0]") && wrongKey.text.contains("lensStyle"))
         let settingsBefore = bytes()

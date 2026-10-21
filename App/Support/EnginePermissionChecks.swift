@@ -141,8 +141,8 @@ enum EnginePermissionChecks {
         let template = EngineConfig(name: "T", kind: .httpTemplate(HTTPTemplate(url: "https://t.example/x", body: "{}", resultPath: "t", batching: .jsonArray)),
                                     context: EngineContext(enabled: true))
         check("the context line: shown when the engine's switch or an app's override can turn context on, not otherwise",
-              !EnginePermissions.sendsContext(cloud, profiles: []) && EnginePermissions.sendsContext(chat("https://api.example.com/v1", context: EngineContext(enabled: true)), profiles: [])
-              && EnginePermissions.sendsContext(cloud, profiles: [nearby]) && !EnginePermissions.sendsContext(template, profiles: [nearby]))
+              !ContextChecks.sendsContext(cloud, []) && ContextChecks.sendsContext(chat("https://api.example.com/v1", context: EngineContext(enabled: true)), [])
+              && ContextChecks.sendsContext(cloud, [nearby]) && !ContextChecks.sendsContext(template, [nearby]))
 
         // The gate, end to end: the request is not sent, the lens is told with the new error, Apple answers, and a record opens it.
         setenv("MWOYEO_FAKE_ENGINE", "slow:5", 1)

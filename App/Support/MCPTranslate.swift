@@ -66,7 +66,7 @@ enum MCPTranslate {
         }
         var result: [String: Any] = ["columns": ["translation", "engine"], "rows": rows]
         let pairing = ContextRoute.pair(settings: settings, lens: app)
-        let plan = ContextPlan.decide(settings: settings, engine: pairing.engine, engineRests: false, profile: pairing.profile)
+        let plan = ContextPlan.decide(settings: settings, engine: pairing.engine, engineRests: false, chain: pairing.chain)
         // Whether the app's memory was part of what the engine was sent; an app without one has nothing to send.
         if let profile = pairing.profile, profile.hasMemory { result["memory"] = plan == nil ? "not used" : "used" }
         if let issue { result["issue"] = issue.message }

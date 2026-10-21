@@ -120,15 +120,20 @@ enum MemorySheetChecks {
               && AppMemorySummary.showsAppleToggle(model.settings))
         let url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("mwoyeo-memsheet-\(getpid())-\(UUID().uuidString).json")
         defer { try? FileManager.default.removeItem(at: url) }
+        // 2026-10-21, prof-file: the sheet's switch is a view of the glossary's mode and the rows' (design §5.2 case (d)); the file never holds
+        // `appleUsesPinnedTerms` now, it holds `glossaryApply: both` and each row's `apply: both`. R4 removes the switch with the sheet's toggle.
         func fileKey() -> Bool? {
             SettingsFileStore(url: url).save(model.settings)
-            return ((try? JSONSerialization.jsonObject(with: Data(contentsOf: url))) as? [String: Any])?["appleUsesPinnedTerms"] as? Bool
+            let object = (try? JSONSerialization.jsonObject(with: Data(contentsOf: url))) as? [String: Any]
+            guard object?["appleUsesPinnedTerms"] == nil else { return nil }
+            return object?["glossaryApply"] as? String == "both" ? true : nil
         }
         let toggle = AppMemorySummary.appleToggle(model)
         model.settings.appleUsesPinnedTerms = false
         check("the Apple switch is off by default and not in the file", toggle.wrappedValue == false && fileKey() == nil)
         toggle.wrappedValue = true
-        check("turning it on writes `appleUsesPinnedTerms: true` to settings.json", model.settings.appleUsesPinnedTerms && fileKey() == true)
+        check("turning it on writes `glossaryApply: both` (and each name's apply: both) to settings.json, and no appleUsesPinnedTerms",
+              model.settings.appleUsesPinnedTerms && fileKey() == true && model.settings.appProfiles.allSatisfy { $0.entries.allSatisfy { $0.apply == .both } })
         toggle.wrappedValue = false
         check("turning it off takes the key out again", !model.settings.appleUsesPinnedTerms && fileKey() == nil)
 
@@ -167,6 +172,7 @@ enum MemorySheetChecks {
             model.settings.sourceLanguage = "en"
             model.settings.targetLanguage = "ko"
             model.settings.appProfiles = [AppProfile(bundleID: app, appName: "Example Chat", source: "en", target: "ko", note: note, entries: entries)]
+            model.settings = model.settings.convertedFromOldFields()   // the engine above carries 1.1.4's `context`: the converter makes it the amount
             await model.translator.update(settings: model.effectiveSettings)
         }
         func learn(_ names: [String]) async {

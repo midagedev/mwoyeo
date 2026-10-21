@@ -25,11 +25,14 @@ enum EngineContextChecks {
             if !ok { failed += 1 }
         }
         let savedEngines = model.settings.engines, savedSelection = model.settings.customEngineID, savedProfiles = model.settings.appProfiles
+        let savedContext = model.settings.context, savedLearned = model.settings.useLearned
         model.settings.appProfiles = []
         defer {
             model.settings.engines = savedEngines
             model.settings.customEngineID = savedSelection
             model.settings.appProfiles = savedProfiles
+            model.settings.context = savedContext
+            model.settings.useLearned = savedLearned
             Motion.shared.force(nil)
         }
 
@@ -52,41 +55,49 @@ enum EngineContextChecks {
               && EngineContextRules.summary(on3).contains("3") && EngineContextRules.summary(on3) != EngineContextRules.summary(EngineContext(enabled: true, previousLines: 5)))
         EngineContextSent.checks(model) { what, ok, note in check(what, ok, note) }
 
-        // What a control writes: settings.json, live, and the line follows.
+        // What a control writes: settings.json, live, and the line follows. The Context section of the sheet is still the one of 1.1.4 (round
+        // R4 rebuilds it over the new keys; prof-file, 2026-10-21, addendum A3). What these checks pin is what such a control will write: All apps'
+        // `context` (the amount), `useLearned`, and the engine's `allow`, set on the model the way the controls will.
         let e = EngineConfig(name: "Context check", kind: cloud)
         model.settings.engines = [e]
         model.settings.customEngineID = e.id
-        func fileContext() -> [String: Any]? {
-            let object = (try? Data(contentsOf: model.settingsFile.url)).flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
-            return ((object?["engines"] as? [[String: Any]])?.first)?["context"] as? [String: Any]
+        model.settings.context = nil
+        model.settings.useLearned = false
+        func fileObject() -> [String: Any]? {
+            (try? Data(contentsOf: model.settingsFile.url)).flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
         }
+        func fileContext() -> [String: Any]? { fileObject()?["context"] as? [String: Any] }
+        func fileAllow() -> [String: Any]? { ((fileObject()?["engines"] as? [[String: Any]])?.first)?["allow"] as? [String: Any] }
         let lineOff = EngineContextSent.line(for: model.settings.engines[0], in: model)
-        check("an engine with no context starts Off: nothing in the file, no context plan", fileContext() == nil
-              && ContextPlan.decide(settings: model.settings, engine: e, engineRests: false, profile: nil) == nil)
-        EngineContextRules.update(e.id, in: model) { $0.enabled = true }
+        check("an engine with no context starts Off: nothing in the file, no context plan", fileContext() == nil && fileAllow() == nil
+              && ContextChecks.plan(model.settings, engine: model.settings.activeEngineConfig) == nil)
+        model.settings.context = AppContextOverride(mode: .nearby, previousLines: 0)
         let lineOn = EngineContextSent.line(for: model.settings.engines[0], in: model)
         check("Use context on writes settings.json at once, and the Sent line changes with it",
-              fileContext()?["enabled"] as? Bool == true && model.settings.engines[0].context?.enabled == true && lineOn != lineOff && !lineOn.isEmpty,
-              "\(lineOff) → \(lineOn)")
-        EngineContextRules.update(e.id, in: model) { $0.previousLines = 6; $0.includeTitle = true; $0.useLearned = true }
-        let wrote = fileContext()
-        check("each control writes its own key: the lines, the title, learning",
-              wrote?["previousLines"] as? Int == 6 && wrote?["includeTitle"] as? Bool == true && wrote?["useLearned"] as? Bool == true
+              fileContext()?["mode"] as? String == "nearby" && lineOn != lineOff && !lineOn.isEmpty, "\(lineOff) → \(lineOn)")
+        model.settings.context = AppContextOverride(mode: .conversation, previousLines: 6)
+        model.settings.engines[0].allow.title = true
+        model.settings.useLearned = true
+        let wrote = fileContext(), wroteAllow = fileAllow()
+        check("each control writes its own key: the lines (context), the title (the engine's allow), learning (useLearned)",
+              wrote?["mode"] as? String == "conversation" && wrote?["previousLines"] as? Int == 6 && wroteAllow?["title"] as? Bool == true
+              && fileObject()?["useLearned"] as? Bool == true
               && EngineContextSent.line(for: model.settings.engines[0], in: model).contains(String(localized: "window title")))
-        // Turned off again with the rest left as it was: the plan is nil, today's path, and the layout's body is the one an Off engine gets.
-        EngineContextRules.update(e.id, in: model) { $0.enabled = false }
+        // The amount off with the rest left as it was: the plan is nil, today's path, and the layout's body is the one an Off engine gets.
+        model.settings.context = AppContextOverride(mode: .off)
         let afterOff = model.settings.engines[0]
         let request = ContextRequest(items: ["Hello"], before: [ContextLine(source: "Earlier")], after: ["Later"],
                                      card: DocumentCard(appName: "App", domain: "social", title: "T"), target: "ko")
+        let offOptions = ContextOptions.requestOptions(engine: afterOff, chain: ContextRoute.merged(settings: model.settings, lens: nil))
         let offBodies = [cloud, anthropic, deepL].map { kind in
-            RequestLayout.body(kind: kind, request: request, options: .from(engine: afterOff.context))
-                == RequestLayout.body(kind: kind, request: request, options: ContextOptions())
+            RequestLayout.body(kind: kind, request: request, options: offOptions) == RequestLayout.body(kind: kind, request: request, options: ContextOptions())
         }
-        check("turned off again, with its lines, title and learning still set, the engine is Off: the file says so, there is no context plan, and the request is Off's bytes",
-              fileContext()?["enabled"] as? Bool == false && ContextPlan.decide(settings: model.settings, engine: afterOff, engineRests: false, profile: nil) == nil
+        check("the amount off, with the title and learning still set, is Off: the file says so, there is no context plan, and the request is Off's bytes",
+              fileContext()?["mode"] as? String == "off" && ContextChecks.plan(model.settings, engine: model.settings.activeEngineConfig) == nil
               && !offBodies.contains(false), "\(offBodies)")
+        let beforeGone = model.settings.engines
         EngineContextRules.update(UUID(), in: model) { $0.enabled = true }
-        check("a control of an engine that is gone writes nothing", model.settings.engines.count == 1 && model.settings.engines[0].context?.enabled == false)
+        check("a control of an engine that is gone writes nothing", model.settings.engines == beforeGone)
 
         // Reduce Motion.
         Motion.shared.force(true)
@@ -139,6 +150,10 @@ enum EngineContextChecks {
 
         var chat = EngineConfig(name: "Context chat", kind: cloud)
         chat.context = EngineContext(enabled: true, previousLines: 3)
+        // The footnote says that lines go along when All apps' amount sends them (round prof-file: the engine's own switch is All apps' `context`).
+        // An engine is sent lines when a chain that uses it asks for them, so the chat engine is the one in use.
+        model.settings.context = AppContextOverride(mode: .conversation, previousLines: 3)
+        model.settings.customEngineID = chat.id
         let chatSheet = await shown("chat", chat)
         let chatItems = chatSheet.items
         let sentLine = EngineContextSent.line(for: chat, in: model)
@@ -158,6 +173,7 @@ enum EngineContextChecks {
         check("every control of the open chat sheet has a name a screen reader can say, and none is told from another by nothing",
               AccessibilityChecks.unlabeled(chatItems).isEmpty && AccessibilityChecks.ambiguous(chatItems).isEmpty,
               AccessibilityChecks.unlabeled(chatItems).map(\.line).joined(separator: "; "))
+        model.settings.context = nil
 
         var deepLEngine = EngineConfig(name: "Context DeepL", kind: deepL)
         deepLEngine.context = EngineContext(enabled: true, previousLines: 3)

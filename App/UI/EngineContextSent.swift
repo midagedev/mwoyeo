@@ -135,11 +135,30 @@ enum EngineContextSent {
             return e
         }
         func marked(_ kind: EngineKind, _ context: EngineContext?) -> String {
-            said(ContextPreview.engineSummary(engine: engine(kind, context), profiles: [], category: { _ in nil }), in: words)
+            said(ContextChecks.engineSummary(engine(kind, context), []), in: words)   // prof-file: the engine's old `context` goes through the converter
         }
-        let saved = model.settings.appProfiles
-        defer { model.settings.appProfiles = saved }
+        let saved = model.settings.appProfiles, savedEngines = model.settings.engines, savedSelection = model.settings.customEngineID
+        let savedContext = model.settings.context, savedLearned = model.settings.useLearned
+        defer {
+            model.settings.appProfiles = saved
+            model.settings.engines = savedEngines
+            model.settings.customEngineID = savedSelection
+            model.settings.context = savedContext
+            model.settings.useLearned = savedLearned
+        }
         model.settings.appProfiles = []
+        // prof-file (2026-10-21): the engines of these fixtures carry 1.1.4's `context`. The line and the footnote are asked of the settings the
+        // converter makes of them (All apps' amount, learning, and the engine's `allow`), as a file of 1.1.4 would be read.
+        func asked(_ e: EngineConfig) -> EngineConfig {
+            model.settings.engines = [e]
+            model.settings.customEngineID = e.id
+            model.settings.context = nil
+            model.settings.useLearned = false
+            model.settings = model.settings.convertedFromOldFields()
+            return model.settings.engines[0]
+        }
+        func lineOf(_ e: EngineConfig) -> String { line(for: asked(e), in: model) }
+        func footnotesOf(_ e: EngineConfig) -> [String] { footnotes(for: asked(e), in: model) }
 
         // The words.
         check("Off says lines only, for every kind, whatever the other switches hold",
@@ -180,14 +199,14 @@ enum EngineContextSent {
               "missing \(missing) of \(languages)")
 
         // The line and the footnote of the sheet.
-        let lineOff = line(for: engine(cloud, nil), in: model)
-        let lineOn = line(for: engine(cloud, on3), in: model)
+        let lineOff = lineOf(engine(cloud, nil))
+        let lineOn = lineOf(engine(cloud, on3))
         check("the line the sheet shows follows the switches: lines only when off, the sample app and the lines when on",
               lineOff == Words.current.sent(Words.current.linesOnly) && lineOn != lineOff && lineOn.contains("Example Chat"), "\(lineOff) → \(lineOn)")
         let says = String(localized: "Recent lines are sent too, for context.")
         check("the footnote says that lines go along when the engine's context can be on, and nothing when it cannot be",
-              footnotes(for: engine(cloud, on3), in: model) == [says] && footnotes(for: engine(cloud, nil), in: model).isEmpty
-              && footnotes(for: engine(template, on3), in: model).isEmpty)
+              footnotesOf(engine(cloud, on3)) == [says] && footnotesOf(engine(cloud, nil)).isEmpty
+              && footnotesOf(engine(template, on3)).isEmpty)
 
         // Memory only (D1): the apps that wrote a note or names are named, with Context off.
         func profile(_ id: String, name: String, note: String = "", entries: [MemoryEntry] = [], engine: UUID? = nil, context: AppContextOverride? = nil) -> AppProfile {
@@ -196,29 +215,29 @@ enum EngineContextSent {
         let rows = [MemoryEntry(src: "先輩", dst: "선배", kind: .term)]
         let notes = String(localized: "Your notes and names for \(ListFormatter.localizedString(byJoining: ["Mail"])) are sent too.")
         model.settings.appProfiles = [profile("com.example.mail", name: "Mail", note: "formal")]
-        let memoryLine = line(for: engine(cloud, nil), in: model)
+        let memoryLine = lineOf(engine(cloud, nil))
         check("a note written for an app puts its name in the footnote of an engine whose Context is off, and in the line: memory only, no lines",
-              footnotes(for: engine(cloud, nil), in: model) == [notes] && footnotes(for: engine(anthropic, nil), in: model) == [notes]
+              footnotesOf(engine(cloud, nil)) == [notes] && footnotesOf(engine(anthropic, nil)) == [notes]
               && memoryLine.contains("Mail") && memoryLine.contains(Words.current.note) && !memoryLine.contains(Words.current.before(2)), memoryLine)
         model.settings.appProfiles = [profile("com.example.mail", name: "Mail", entries: rows), profile("com.example.chat", name: "Chat", note: "casual")]
         check("names written for an app count as memory too, and the footnote lists every app that has some, in profile order",
-              footnotes(for: engine(cloud, nil), in: model) == [String(localized: "Your notes and names for \(ListFormatter.localizedString(byJoining: ["Mail", "Chat"])) are sent too.")],
-              "\(footnotes(for: engine(cloud, nil), in: model))")
+              footnotesOf(engine(cloud, nil)) == [String(localized: "Your notes and names for \(ListFormatter.localizedString(byJoining: ["Mail", "Chat"])) are sent too.")],
+              "\(footnotesOf(engine(cloud, nil)))")
         model.settings.appProfiles = [profile("com.example.mail", name: "Mail", note: "formal")]
         check("with Context on, the footnote says both: the lines and the apps' memory",
-              footnotes(for: engine(cloud, on3), in: model) == [says, notes], "\(footnotes(for: engine(cloud, on3), in: model))")
+              footnotesOf(engine(cloud, on3)) == [says, notes], "\(footnotesOf(engine(cloud, on3)))")
         model.settings.appProfiles = [profile("com.example.mail", name: "Mail", note: "formal", context: AppContextOverride(mode: .off))]
         check("an app whose context is off sends nothing, memory included: the footnote and the line say lines only",
-              footnotes(for: engine(cloud, nil), in: model).isEmpty && line(for: engine(cloud, nil), in: model) == lineOff)
+              footnotesOf(engine(cloud, nil)).isEmpty && lineOf(engine(cloud, nil)) == lineOff)
         model.settings.appProfiles = [profile("com.example.mail", name: "Mail", note: "formal")]
         check("DeepL and an HTTP template send no memory without their own opt-in, so the footnote does not name the app",
-              footnotes(for: engine(deepL, nil), in: model).isEmpty && footnotes(for: engine(template, nil), in: model).isEmpty)
+              footnotesOf(engine(deepL, nil)).isEmpty && footnotesOf(engine(template, nil)).isEmpty)
         // Whether the memory of an app that names ANOTHER engine is disclosed here is the request path's rule (which engine is in front when a
         // lens covers that app), checked with the request path, so this file does not pin it either way. An app that names this one is
         // disclosed under every rule.
         let own = engine(cloud, nil)
         model.settings.appProfiles = [profile("com.example.mail", name: "Mail", note: "formal", engine: own.id)]
-        check("an app that names this engine as its own has its memory disclosed to it", footnotes(for: own, in: model) == [notes], "\(footnotes(for: own, in: model))")
+        check("an app that names this engine as its own has its memory disclosed to it", footnotesOf(own) == [notes], "\(footnotesOf(own))")
     }
 #endif
 }

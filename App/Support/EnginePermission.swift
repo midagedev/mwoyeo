@@ -59,48 +59,56 @@ struct EnginePermissions: Codable, Equatable {
         for id in hosts.keys where !live.contains(id) { hosts[id] = nil }
     }
 
-    /// Whether this engine could be sent more than the lines: context rows (recent lines of the same window) go along when the engine's
-    /// switch, or an app's override, can turn context on. The same condition that decides whether a lens reads its window at all
-    /// (`ContextPlan.needsWindow`).
-    static func sendsContext(_ engine: EngineConfig, profiles: [AppProfile]) -> Bool {
-        LayoutKind.engine(engine.kind).tier != nil && ContextOptions.couldBeOn(engine: engine, profiles: profiles)
+    /// The chains this engine is the engine of (`ContextRoute.candidates`): a lens uses the engine of its chain (the narrowest profile that
+    /// sets one, else All apps'), so a profile's memory goes to the engine its own chain names, never to another's: there is no cross pairing
+    /// (Q1).
+    private static func chains(of engine: EngineConfig, in settings: AppSettings) -> [(owner: AppProfile?, chain: MergedChain)] {
+        ContextRoute.candidates(settings).filter { $0.chain.engine?.id == engine.id }
     }
 
-    /// The profiles whose written memory goes to `engine` (design §9, D1: writing a note or names is the opt-in): the app has a note
-    /// or names and the request path would send it. The question is put to the request path's own rule (`ContextOptions.requestOptions`),
-    /// so the disclosure cannot drift from what is sent: it covers an engine whose Context is off ("memory only") and one that is on, and
-    /// leaves out an app whose context is `off`, DeepL, and an engine that owns its body.
-    ///
-    /// The profile's own `customEngineID` is not asked: a request pairs the engine of the app in front with the profile of the app under
-    /// the lens (`ContextRoute`), so a lens over app B while app A is in front sends B's memory to A's engine. Any engine can be the one
-    /// in front (the base choice, an app's own, or one the person is about to choose), so every profile with memory is a candidate.
-    /// `ContextChecks` walks `ContextRoute.pairings` against this.
-    static func memoryProfiles(_ engine: EngineConfig, profiles: [AppProfile]) -> [AppProfile] {
+    /// Whether this engine could be sent more than the lines: the lines around the text (and the title with them) go along when the chain's
+    /// amount asks for them and the engine allows them (design §4.2's table, by the request path's own rule). The same condition that decides
+    /// whether a lens reads its window at all (`ContextPlan.needsWindow`).
+    static func sendsContext(_ engine: EngineConfig, in settings: AppSettings) -> Bool {
+        guard LayoutKind.engine(engine.kind).tier != nil else { return false }
+        return chains(of: engine, in: settings).contains { _, chain in
+            let options = ContextOptions.requestOptions(engine: engine, chain: chain)
+            return options.enabled && !options.memoryOnly && chain.amount.sendsLines
+        }
+    }
+
+    /// The profiles whose written memory goes to `engine` (design §4.2, D1: writing a note or names is the opt-in): the profile has a note or
+    /// a name that is a hint, its chain's engine is this one, and the request table sends memory to it. The question is put to the request
+    /// path's own rule (`ContextOptions.requestOptions(engine:chain:)`), so the disclosure cannot drift from what is sent: it covers an engine
+    /// whose amount is `memory` ("memory only") and one that sends lines, and leaves out a profile whose amount is `off`, DeepL without its
+    /// opt-in, and an engine that owns its body. The profile's own engine is asked now (it was not under the cross pairing, when every profile
+    /// with memory was a candidate for every engine): `ContextChecks` walks `ContextRoute.pairings` against this, for equality.
+    static func memoryProfiles(_ engine: EngineConfig, in settings: AppSettings) -> [AppProfile] {
         let kind = LayoutKind.engine(engine.kind)
         guard kind.tier != nil else { return [] }
-        return profiles.filter { p in
-            guard p.hasMemory else { return false }
-            let options = ContextOptions.requestOptions(engine: engine, profile: p)
-            return options.enabled && kind.sendsMemory(options)
+        return chains(of: engine, in: settings).compactMap { owner, chain in
+            guard let owner, chain.hasMemory else { return nil }
+            let options = ContextOptions.requestOptions(engine: engine, chain: chain)
+            return options.enabled && kind.sendsMemory(options) ? owner : nil
         }
     }
 
     /// What `engine` could be sent beyond the lines to translate, for the engine sheet's footnote and its "Sent:" line. One value, two
-    /// kinds of data: the lines of the window (the engine's switch, or an app's override, can turn them on) and the memory the person
-    /// wrote for apps (their names, which the engine can also be sent: the app's name and category, the note, the names in the text).
+    /// kinds of data: the lines of the window (the amount can ask for them) and the memory the person wrote for profiles (their names, which
+    /// the engine can also be sent: the app's name and category, the note, the names in the text).
     struct ContextDisclosure: Equatable {
         /// Recent lines of the window go along (`sendsContext`).
         var lines: Bool
-        /// The apps (profile names, in profile order) whose note and names go along.
+        /// The profiles (their names, in profile order) whose note and names go along.
         var memoryApps: [String]
 
         /// Nothing beyond the lines to translate: the footnote says nothing more.
         var isEmpty: Bool { !lines && memoryApps.isEmpty }
-        /// The memory goes and the lines of the window do not (the engine's Context is off): "memory only".
+        /// The memory goes and the lines of the window do not (the amount is `memory`): "memory only".
         var memoryOnly: Bool { !lines && !memoryApps.isEmpty }
     }
 
-    static func disclosure(_ engine: EngineConfig, profiles: [AppProfile]) -> ContextDisclosure {
-        ContextDisclosure(lines: sendsContext(engine, profiles: profiles), memoryApps: memoryProfiles(engine, profiles: profiles).map(\.appName))
+    static func disclosure(_ engine: EngineConfig, in settings: AppSettings) -> ContextDisclosure {
+        ContextDisclosure(lines: sendsContext(engine, in: settings), memoryApps: memoryProfiles(engine, in: settings).map(\.appName))
     }
 }

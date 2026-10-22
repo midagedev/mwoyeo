@@ -84,4 +84,20 @@ public enum TranslationCarry {
             return best?.index
         }
     }
+
+    /// The old blocks that a new reading leaves out where the page did not change: drawn, unchanged, and no new block stands over any part
+    /// of them. The reader may leave text as written that it read and translated before (round holdfix117: a paragraph that the capture's
+    /// side cuts, translated at one capture size and dropped at the next, `CaptureEdge.cutAtSides`, once the next column also reaches that
+    /// side). The page there is what the old block's translation was made from: it stays as it is. A new block over part of it is not this
+    /// case (two translations would stand over each other, docs/design/lens-hold.md §5b).
+    public static func unread(old: [Old], new: [CGRect]) -> [Int] {
+        old.indices.filter { oi in
+            let o = old[oi]
+            guard o.unchanged, o.shown?.isEmpty == false else { return false }
+            return !new.contains { n in
+                let i = o.rect.intersection(n)
+                return !i.isNull && i.width * i.height > 0
+            }
+        }
+    }
 }

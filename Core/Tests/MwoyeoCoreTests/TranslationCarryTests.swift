@@ -100,4 +100,34 @@ final class TranslationCarryTests: XCTestCase {
         let olds = [old(title, "제목", unchanged: false)], new = [piece]
         XCTAssertEqual(TranslationCarry.fragments(old: olds, new: new, carry: TranslationCarry.assign(old: olds, new: new)), [nil])
     }
+
+    // The old blocks a new reading leaves out (round holdfix117). The case of the check: a long paragraph at the bottom of the capture was read
+    // at one size, and at the next the second column reaches the capture's side as well, so the reader leaves every block cut there as written.
+
+    func testAnOldBlockThatNothingNewStandsOverStays() {
+        let above = CGRect(x: 235, y: 560, width: 766, height: 189), cut = CGRect(x: 235, y: 800, width: 1195, height: 103)
+        XCTAssertEqual(TranslationCarry.unread(old: [old(above, "위"), old(cut, "잘린 문단")], new: [above]), [1])
+    }
+
+    func testAnUnreadBlockOverAChangedPageGoes() {
+        let cut = CGRect(x: 235, y: 800, width: 1195, height: 103)
+        XCTAssertEqual(TranslationCarry.unread(old: [old(cut, "잘린 문단", unchanged: false)], new: []), [])
+    }
+
+    func testAnUnreadBlockThatDrewNothingGoes() {
+        let cut = CGRect(x: 235, y: 800, width: 1195, height: 103)
+        XCTAssertEqual(TranslationCarry.unread(old: [old(cut, nil), old(cut, "")], new: []), [])
+    }
+
+    func testAnOldBlockThatANewOneStandsOverPartlyIsNotUnread() {
+        // Two translations would stand over each other: the case of §5b, left to the carry and the pieces.
+        let was = CGRect(x: 0, y: 0, width: 100, height: 100), across = CGRect(x: 60, y: 0, width: 100, height: 100)
+        XCTAssertEqual(TranslationCarry.unread(old: [old(was, "하나")], new: [across]), [])
+    }
+
+    func testAnOldBlockThatANewOneOnlyBordersIsUnread() {
+        // A neighbour that ends where the old block begins stands over none of it.
+        let was = CGRect(x: 0, y: 100, width: 100, height: 50), above = CGRect(x: 0, y: 0, width: 100, height: 100)
+        XCTAssertEqual(TranslationCarry.unread(old: [old(was, "하나")], new: [above]), [0])
+    }
 }

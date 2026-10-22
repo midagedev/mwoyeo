@@ -23,7 +23,7 @@ import SwiftUI
 /// lens-hint-pack-notfinished and lens-hint-unsupported (the pill in the states a pack or a pair can be in), menu-pack-rows (the panel's lens
 /// rows with each of those lines), menu-pack-banner-ask|downloading|notfinished|unsupported (the panel's banner when no lens says it),
 /// translation-packs-states (Settings › Translation with a row in each state), image-window-pack-ask|downloading|notfinished|unsupported
-/// (the Translate Image window's status line), lens-menu-memory (the lens menu of an app with a memory: its info line, Memory for <App>…, Remember Languages and Forget <App>…), memory-forget-alert (the alert that Forget <App>… asks), memory-sheet-lens (Settings with no profile at all, a lens's "Memory for <App>…" set: the Memory sheet comes up empty; PASS/FAIL), names-lens-checks (only the lens menu's memory block and the first edit of a memory; PASS/FAIL lines), lens-route-checks (only the lens's own route: its app's languages and engine, its own cache and pace; PASS/FAIL lines), memory-profile-row, memory-menu, memory-sheet-empty, memory-sheet-filled, memory-sheet-tall (the filled sheet at 820 pt, every section in view), memory-sheet-fresh (the app profile's row with its memory, its ⋯ menu, and the Memory sheet empty, filled with learned rows, and asking whether to start fresh), check-logic (prints PASS/FAIL for the engine selection and the
+/// (the Translate Image window's status line), text-window-empty|translated|added-engine|pack (the Translate Text window, each in light and dark), text-checks (only the Translate Text checks), lens-menu-memory (the lens menu of an app with a memory: its info line, Memory for <App>…, Remember Languages and Forget <App>…), memory-forget-alert (the alert that Forget <App>… asks), memory-sheet-lens (Settings with no profile at all, a lens's "Memory for <App>…" set: the Memory sheet comes up empty; PASS/FAIL), names-lens-checks (only the lens menu's memory block and the first edit of a memory; PASS/FAIL lines), lens-route-checks (only the lens's own route: its app's languages and engine, its own cache and pace; PASS/FAIL lines), memory-profile-row, memory-menu, memory-sheet-empty, memory-sheet-filled, memory-sheet-tall (the filled sheet at 820 pt, every section in view), memory-sheet-fresh (the app profile's row with its memory, its ⋯ menu, and the Memory sheet empty, filled with learned rows, and asking whether to start fresh), check-logic (prints PASS/FAIL for the engine selection and the
 /// engine notice's dismissal; no window). Run it with `MWOYEO_MEMORY_SECRETS=1` so it does not touch the Keychain. It keeps its
 /// Profile and Restore Defaults screens (round ui-all; the names are the ones of docs/design/profiles-ui-checklist.md §3): settings-translation, settings-general,
 /// settings-appearance and settings-shortcuts at defaults (no Restore Defaults… button), their -changed twins (one preference changed: the button at the foot),
@@ -190,6 +190,7 @@ enum UICapture {
                 MenuPanel.fakeSetup = nil
             case "vision-reads": await visionReads()
             case "image-window": await imageWindow(name, showOriginal: false)
+            case "text-window-empty", "text-window-translated", "text-window-added-engine", "text-window-pack": await textWindow(name)
             case "image-window-original": await imageWindow(name, showOriginal: true)
             case "check-logic": await checkLogic()
             case "pack-checks":
@@ -229,6 +230,10 @@ enum UICapture {
                 // Only the check of the Lines programs (the whole of check-logic takes minutes).
                 let failed = await ProgramChecks.run()
                 report("programs", failed)
+            case "text-checks":
+                // Only the Translate Text checks (the whole of check-logic takes minutes).
+                let failed = await TextChecks.run(model)
+                report("text", failed)
             case "hide-lens-checks":
                 // Only the Hide Lenses checks (the whole of check-logic takes minutes).
                 let failed = await HideLensChecks.run(model)
@@ -572,6 +577,10 @@ enum UICapture {
             failed += MCPChecks.run(model)
             failed += await HideLensChecks.run(model)
             failed += await ProgramChecks.run()
+            // Last: the checks before the script service's timing ones must not lengthen the gap between the Test button's use of the service (PressChecks) and
+            // RewriteChecks, which counts on launchd's respawn throttle still holding (text117, 2026-10-22: with these before them, "a lens call is not queued behind a call
+            // that is waiting out the restart" found the service restarted at once).
+            failed += await TextChecks.run(model)
             report("check-logic", failed)
         }
 
@@ -1280,6 +1289,53 @@ enum UICapture {
 
         /// The Translate Image window's status line in each state a missing pack or an unsupported pair can leave a picture in, over a plain
         /// picture of its own (`--image` when given).
+        /// The Translate Text window (round text117): empty, with a text translated (the call stubbed with a fixed sample: the picture is of the window, not of an
+        /// engine), with an added engine chosen (the Translate button asks), and with a language pack missing; each in light and dark, `<name>-light|dark.png`.
+        private func textWindow(_ name: String) async {
+            let state = String(name.dropFirst("text-window-".count))
+            let sample = "Hi Alice,\n\nThanks for sending the photos. I will look through them tonight and send my notes tomorrow morning.\n\nBest,\nBob"
+            let korean = ["Hi Alice,": "앨리스 님께,",
+                          "Thanks for sending the photos. I will look through them tonight and send my notes tomorrow morning.": "사진을 보내 주셔서 감사합니다. 오늘 밤에 살펴보고 내일 아침에 의견을 보내 드리겠습니다.",
+                          "Best,": "그럼,", "Bob": "밥"]
+            var settings = model.settings
+            settings.sourceLanguage = "en"
+            settings.targetLanguage = "ko"
+            settings.engines = state == "added-engine" ? [EngineConfig(name: "OpenAI", kind: .openAICompatible(baseURL: URL(string: "https://api.openai.com/v1")!, model: "gpt-4o-mini", thinking: .off, extraHeaders: [:]))] : []
+            settings.customEngineID = settings.engines.first?.id
+            // The profile row shows only where a profile exists: the added-engine shot has all three pop-ups.
+            if state == "added-engine" { settings.appProfiles = [AppProfile(bundleID: "com.example.chat", appName: "Chat", source: "en", target: "ko")] }
+            let translator = TextTranslator(settings: { settings }, secrets: { model.secrets })
+            translator.call = { lines, _, _, _, onResult in
+                if state == "pack" {
+                    return TextTranslation.Answer(rows: lines.map { _ in .init(translation: nil, engine: nil) }, translated: false,
+                                                  issue: .languagePackMissing(source: "en", target: "ko"), profile: nil, memory: nil)
+                }
+                for line in lines { if let t = korean[line] { onResult?(line, t) } }
+                return TextTranslation.Answer(rows: lines.map { .init(translation: korean[$0], engine: state == "added-engine" ? "OpenAI" : "Apple") },
+                                              translated: true, issue: nil, profile: nil, memory: nil)
+            }
+            let text = TextTranslationModel(translator: translator, settings: { settings }, pause: TypingPause(delay: 0))
+            if state == "added-engine" { text.anchor(to: "com.example.chat") }
+            if state != "empty" { text.source = sample }
+            if state != "empty" { text.translateNow() }
+            for _ in 0..<100 { if case .working = text.phase { try? await Task.sleep(for: .milliseconds(50)) } else { break } }
+            let saved = model.settings
+            model.settings = settings
+            defer { model.settings = saved }
+            for dark in [false, true] {
+                let w = NSWindow(contentRect: NSRect(origin: .zero, size: CGSize(width: 840, height: 460)), styleMask: [.titled], backing: .buffered, defer: false)
+                w.title = String(localized: "Translate Text")
+                w.appearance = NSAppearance(named: dark ? .darkAqua : .aqua)
+                w.contentView = NSHostingView(rootView: TextTranslationView(model: text).environment(model))
+                w.setFrameTopLeftPoint(NSPoint(x: 80, y: (NSScreen.main?.frame.height ?? 900) - 60))
+                NSApp.activate(ignoringOtherApps: true)
+                w.makeKeyAndOrderFront(nil)
+                try? await Task.sleep(for: .seconds(delay))
+                await capture(window: w, as: "\(name)-\(dark ? "dark" : "light")")
+                w.orderOut(nil)
+            }
+        }
+
         private func imageWindowPackStates(_ name: String) async {
             let state = String(name.dropFirst("image-window-pack-".count))
             let download = PackDownload.shared

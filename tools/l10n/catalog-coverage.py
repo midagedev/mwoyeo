@@ -22,7 +22,8 @@ if not files:
 for f in files:
     d = json.load(open(f))
     for e in d.get("tables", {}).get("Localizable", []):
-        used.setdefault(e["key"], f"{os.path.basename(d['source'])}:{e['location']['startingLine']}")
+        # The App Intents extractor writes a summary string ("Translate ${text}") with no location.
+        used.setdefault(e["key"], f"{os.path.basename(d['source'])}:{e.get('location', {}).get('startingLine', 0)}")
 
 problems = []
 for key, where in sorted(used.items(), key=lambda kv: kv[1]):

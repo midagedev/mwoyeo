@@ -227,7 +227,7 @@ enum AccessibilityChecks {
     }
 
     /// The views the audit covers: Settings (every tab), Onboarding, the menu panel (empty, a lens row), the engine sheet (the list, a form),
-    /// and the image window.
+    /// the image window and the Translate Text window.
     static func audited(_ model: AppModel) async -> [(name: String, items: [Item])] {
         var out: [(String, [Item])] = []
         let savedTab = model.settingsTab
@@ -253,6 +253,8 @@ enum AccessibilityChecks {
                                                                                        model: "gemini-3.1-flash-lite", thinking: .off, extraHeaders: [:]))]
         model.settings.appProfiles = [AppProfile(bundleID: "com.example.a11y", appName: "Example Chat", source: "en", target: "ko")]
         out.append(("settings-translation-rows", await hostedTree(TranslationSettings(), size: CGSize(width: 560, height: 900), model: model, name: "settings-translation-rows", settle: 2)))
+        // The Translate Text window with a profile and an added engine, so that its two pop-ups are on screen.
+        out.append(("text-window", await hostedTree(TextTranslationView(model: TextTranslationModel()), size: CGSize(width: 840, height: 460), model: model, name: "text-window")))
         model.settings.engines = savedEngines
         model.settings.appProfiles = savedApps
         out.append(("engine-sheet", await hostedTree(EngineSheet(), size: CGSize(width: 480, height: 560), model: model, name: "engine-sheet")))

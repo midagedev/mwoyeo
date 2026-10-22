@@ -1,0 +1,21 @@
+--- a/Core/Sources/MwoyeoCore/LensTarget.swift	2026-10-22 11:59:21
++++ b/Core/Sources/MwoyeoCore/LensTarget.swift	2026-10-22 19:16:20
+@@ -64,12 +64,16 @@
+         public var readingColumns: Int { columns.filter { $0.width >= LensTarget.minWidth }.count }
+     }
+ 
+-    /// What the pointer aims at: a lens rect, and the column and member it was chosen from (the held anchor of the next choice).
++    /// What the pointer aims at: a lens rect, and the column and member it was chosen from (the held anchor of the next choice). A content
++    /// shape (`LensShape`, chosen through `choose(...fallback:)`) carries itself in `shape`, with `column` -1 and its own anchor.
+     public struct Target: Sendable, Equatable {
+         public var rect: CGRect
+         public var column: Int
+         public var anchor: Int
+-        public init(rect: CGRect, column: Int, anchor: Int) { self.rect = rect; self.column = column; self.anchor = anchor }
++        public var shape: LensShape.Shape?
++        public init(rect: CGRect, column: Int, anchor: Int, shape: LensShape.Shape? = nil) {
++            self.rect = rect; self.column = column; self.anchor = anchor; self.shape = shape
++        }
+     }
+ 
+     // MARK: - Choosing

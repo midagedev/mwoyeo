@@ -10,23 +10,34 @@
 # (Automatic; the pictures carry no app, so it reads the layout only: `--lens-app <bundleID> [--lens-category <type>]` adds one). Needs the Bash sandbox off (headless --render) and no other --render at the same time on a quiet Neural Engine.
 # Korean sources translate to en, all others to ko (a --tgt equal to --src waits 120 s in SelfTest).
 # One summary line per use case and path (all 40, odd-numbered pictures, even-numbered): score.py.
+# A scene (picture and path) is done when its render finished (`rc=0` in <name>-<path>.load) and answered (an answer line in .out; tools/bench-answered.sh says which), so a cut run resumes and a render that
+# did not answer is made once more. The ones still not done are named at the end, on stderr: `unanswered: <n> <names>` (d08 and d09 read nothing in any path, by the baseline).
 BIN=${1:?usage: bench.sh <Mwoyeo binary> [vn|swift|auto ...]}; shift
 PATHS=${*:-vn swift auto}
 HERE=$(cd "$(dirname "$0")" && pwd); ANE=$HERE/../ane-env.sh
+. "$HERE/../bench-answered.sh"
 PNGS=${PNGS:-/Users/hckim/.cache/mwoyeo-gates/usecases/set}
 OUT=${OUT:-/tmp/usecase-bench}
 mkdir -p "$OUT/out"
-tail -n +2 "$HERE/set/index.tsv" | while IFS=$'\t' read -r n uc l w h; do
+unanswered=()
+while IFS=$'\t' read -r n uc l w h; do
     [[ -n "$ONLY" && "$n" != "$ONLY"* ]] && continue
     T=ko; [ "$l" = ko ] && T=en
     for p in $PATHS; do
         o="$OUT/out/$n-$p"
-        [ -s "$o.out" ] && continue
-        echo "$(uptime | sed 's/.*averages: //' | cut -d' ' -f1)" > "$o.load"
-        env=(MWOYEO_TRACE=1); [ "$p" != auto ] && env+=(MWOYEO_OCR_PATH=$p)
-        [ "$p" = auto ] && [ -n "$LINES" ] && env+=(MWOYEO_TRACE_LINES=1)
-        env "${env[@]}" "$ANE" run pool -- "$BIN" --render "$PNGS/$n.png" "$o.png" --src "$l" --tgt "$T" --no-inpaint --warm --max-wait 120 \
-            > "$o.out" 2> "$o.err" < /dev/null
+        bench_answered "$o" && continue
+        for try in 1 2; do   # a render that did not answer is made once more
+            echo "$(uptime | sed 's/.*averages: //' | cut -d' ' -f1)" > "$o.load"
+            env=(MWOYEO_TRACE=1); [ "$p" != auto ] && env+=(MWOYEO_OCR_PATH=$p)
+            [ "$p" = auto ] && [ -n "$LINES" ] && env+=(MWOYEO_TRACE_LINES=1)
+            env "${env[@]}" "$ANE" run pool -- "$BIN" --render "$PNGS/$n.png" "$o.png" --src "$l" --tgt "$T" --no-inpaint --warm --max-wait 120 \
+                > "$o.out" 2> "$o.err" < /dev/null
+            echo "rc=$?" >> "$o.load"
+            bench_answered "$o" && break
+        done
+        bench_answered "$o" || unanswered+=("$n-$p")
     done
-done
-python3 "$HERE/score.py" "$OUT" $PATHS
+done < <(tail -n +2 "$HERE/set/index.tsv")
+python3 "$HERE/score.py" "$OUT" $PATHS; rc=$?
+bench_unanswered "${unanswered[@]}"
+exit $rc

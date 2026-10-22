@@ -58,64 +58,97 @@ enum RewriteChecks {
         check("plain rows only: they run in the app, and still no connection is made", plainSent == "次へ" && plainShown == "wait… what" && idle.connectionsMade == 0,
               "connections \(idle.connectionsMade): \(plainSent) / \(plainShown)")
 
-        // MARK: The time limit, first death (§5, §9): a loop on a service as young as can be, and the call right after it (round rewrite-run, A3)
+        // MARK: The time limit, first death (§5, §9): a loop on a service as young as can be, and the calls right after it (round rewrite-run, A3; round flake117)
 
-        // The service's first job is the loop, so it is killed as soon as it is up. launchd then holds the next start for what is left of ~10 s
-        // (`ScriptConnection.launchThrottle`, measured 2026-10-21). A call that waits (the editor's try, `test_rules`) is answered after it, not turned away; a lens line (`waits` false,
-        // A3b) is not made and passes as it was. That wait is launchd's: a gate
+        // The service's first job is the loop, so it is killed as soon as it is up. launchd then holds the next start for what is left of ~10 s (`ScriptConnection.launchThrottle`, measured 2026-10-21).
+        // A call that waits (the editor's try, `test_rules`) is answered after it, not turned away; a lens line (`waits` false, A3b) is not made and passes as it was. That wait is launchd's: a gate
         // can shorten the number of times it waits (two deaths in this run, the idle exit after them), not the wait.
-        // The start budget is a parameter, 5 s here: launchd's wait is ~10 s, so a hello that does not allow for it gives up well inside it (without the parameter the two are
-        // within a few ms of each other, and the unfixed code passes by luck).
-        let c = ScriptConnection(startBudget: 5)
+        // The restart is the check's, not a race for launchd's (flake117, 2026-10-22). Before it the calls beside a restart were found by polling `isStarting` and by a stopwatch (50, 150 ms), and 22 of
+        // 69 check-logic logs failed under load 100-350: the poll missed the ~10 s window or launchd's hold was shorter than assumed (it counts from the service's start, the connection from its
+        // first answer, and a slow first start makes the two ~seconds apart), and a lens call that is held in 0 ms took 65-152 ms to come back. `restart` (a `RestartGate`) stops every start after the
+        // first before its hello, so "a call is waiting out the restart" is a state the check sets and awaits, and a lens call beside it is judged by what it did (held; no job sent, no service
+        // started, the waiter still in front), which the stopwatch only stood in for. The connection's `launchThrottle` is 60 s here so that what it believes launchd holds does not run out while a
+        // slow machine gets through these checks, and its `startBudget` 30 s: a patience for a start under load, not a pass criterion. What the hello is allowed is asserted instead (`allowed`: the
+        // throttle's remainder on top of the start budget), which a hello budget of the start's time alone fails whatever the load: the unfixed code of A3, without the check having to give up inside
+        // launchd's 10 s. launchd's hold is still waited out once, when the gate opens: that is the real restart, and the call after it must be answered by a fresh service.
+        let restart = RestartGate()
+        let c = ScriptConnection(startBudget: 30, launchThrottle: 60, startGate: { await restart.pass($0) })
         do {
             let lines = ["one", "two", "three"]
+            // 400 ms, not the product's 50: the lens call below has to come while the loop is in the service, and a pause of the check's own thread under load is longer than 50 ms. The product's
+            // limit is the pipeline's loop (`RewritePipelineChecks`), whose cut is read the same way.
+            let limit = 400.0
+            let began = now()
             let up = await c.start()
             let base = c.jobsSent
-            let began = now()
+            restart.close()
+            let finished = RunFlag()
             let loop = Task { () -> (out: [String], session: RewriteSession) in
-                var s = session([layer("p", script: "function before(line, ctx) { while (true) {} }")], c)
+                var s = session([layer("p", script: "function before(line, ctx) { while (true) {} }")], c, budget: limit)
                 var out: [String] = []
                 for line in lines { out.append(await s.before(line)) }
+                finished.value = true
                 return (out, s)
             }
-            // The looping job is in the service. A lens call that comes now queues behind it (the gate), and when the loop is cut the service is down and launchd holds its
-            // next start (round rewrite-run, A3b): the lens call is not made, it does not wait for the restart.
-            for _ in 0..<200_000 where c.jobsSent == base { await Task.yield() }
+            // The looping job is in the service. A lens call that comes now queues behind it (the gate), and when the loop is cut the service is down and launchd holds its next start (round
+            // rewrite-run, A3b): the lens call is not made, it does not wait for the restart. (A counter the product moves, bounded by the loop's own end.)
+            var waited = 0
+            while c.jobsSent == base && !finished.value && waited < 30_000 { try? await Task.sleep(nanoseconds: 1_000_000); waited += 1 }
             let queuedAt = now()
-            let queued = await c.regex(RewriteRow(.before, "a", "b", regex: true), on: "a", budgetMs: RewriteLimits.lineBudgetMs, waits: false)
+            let queued = await within { await c.regex(RewriteRow(.before, "a", "b", regex: true), on: "a", budgetMs: RewriteLimits.lineBudgetMs, waits: false) }
             let queuedMs = now() - queuedAt
-            let (out, s) = await loop.value
+            let ran = await within { await loop.value }
             let took = now() - began
-            let killed = c.lastKilledPid
-            measured("while(true){} with limit \(Int(RewriteLimits.lineBudgetMs)) ms over \(lines.count) lines: cut after \(Int(took)) ms; the lens call queued behind it came back after \(Int(queuedMs)) ms")
+            let killed = c.lastKilledPid, cut = c.lastCutMs
+            measured("while(true){} with limit \(Int(limit)) ms over \(lines.count) lines: cut after \(cut.map { String(Int($0)) } ?? "never") ms, all three lines \(Int(took)) ms; the lens call queued behind it came back after \(Int(queuedMs)) ms")
             let unit = RewriteUnit(profile: "p", item: RewriteIssue.script)
-            check("while(true){} is cut within \(Int(RewriteLimits.lineBudgetMs)) ms × \(lines.count) lines + \(Int(slackMs)) ms and the lines are as they were", up && took <= RewriteLimits.lineBudgetMs * Double(lines.count) + slackMs && out == lines, "\(Int(took)) ms")
-            check("the looping script is turned off (once, not once per line) and its service is killed", s.turnedOff == [unit] && c.servicesKilled == 1 && killed != nil && s.issues.map(\.message) == [RewriteText.turnedOff],
-                  "\(s.turnedOff) killed \(c.servicesKilled)")
-            check("a lens call queued behind a call that is cut comes back held, within the line budget of the cut, and no service was started for it",
-                  queued.outcome == .held && queuedMs <= RewriteLimits.lineBudgetMs + slackMs && c.servicesStarted == 1, "\(queued.outcome) after \(Int(queuedMs)) ms, started \(c.servicesStarted)")
-            // A lens line right after the kill: unchanged, within the line budget, nothing turned off, and again no service started for it.
-            var lens = session([layer("p", rows: [RewriteRow(.before, "a", "b", regex: true)], script: "function before(l) { return l + '!' }")], c, waits: false)
+            let out = ran?.out ?? [], s = ran?.session
+            // 2026-10-22 (flake117) re-pinned from "all three lines within 50 ms × 3 + 100 ms" (`took`, which holds the check's own task start, the session and the first job's start: 85-349 ms under load
+            // 240, the 3 lines' real cost being the cut once) to the cut call's own time, the app's timer from the send to the cut: [limit, limit + 100 ms]. Derivation: `lastCutMs` was 50-59 ms for the 50 ms
+            // limit in every check-logic log on this machine and in 8 runs under load 240 (the pipeline's loop reads the same number); it cannot be early (`send` takes its `began` before it arms the timer); "once, not once per line"
+            // is `servicesKilled == 1` and `turnedOff == [unit]` below. FAIL-first: a timer armed ×10 late (`budgetMs / 100`) reads 4 s here.
+            check("while(true){} is cut at its limit, \(Int(limit)) ms, and within \(Int(slackMs)) ms of it, and the lines are as they were",
+                  up && ran != nil && cut.map { $0 >= limit && $0 <= limit + slackMs } == true && out == lines, "cut \(String(describing: cut)) ms, \(out)")
+            check("the looping script is turned off (once, not once per line) and its service is killed", s?.turnedOff == [unit] && c.servicesKilled == 1 && killed != nil && s?.issues.map(\.message) == [RewriteText.turnedOff],
+                  "\(String(describing: s?.turnedOff)) killed \(c.servicesKilled)")
+            // 2026-10-22 (flake117): the bounds "within the line budget of the cut" (150 ms) and "within the line budget" (50 ms) of this check and the next two are replaced by what a lens call that did
+            // not wait for the restart has to show: `.held`, no job sent, no service started, and no start at the gate. Derivation: a held call is decided before any await (`send`), so its time is the
+            // check's task hops (65, 81, 152 ms under load 100-350); a call that waited would be a start at the gate (`passes` 2) or a service started. FAIL-first: the mutants "no held test before the
+            // gate" and "none inside it" (the restart held by the gate, so the call is kept: the hang guard `within` turns it into the FAIL).
+            check("a lens call queued behind a call that is cut comes back held, and no job was sent and no service started for it: it did not wait for the restart",
+                  queued?.outcome == .held && c.servicesStarted == 1 && restart.passes == 1 && c.jobsSent == base + 1 && !c.isStarting,
+                  "\(String(describing: queued?.outcome)) started \(c.servicesStarted) at the gate \(restart.passes) jobs \(c.jobsSent - base) starting \(c.isStarting)")
+            // A lens line right after the kill: unchanged, nothing turned off, and again no service started for it.
+            let lensSession = session([layer("p", rows: [RewriteRow(.before, "a", "b", regex: true)], script: "function before(l) { return l + '!' }")], c, waits: false)
             let heldAt = now()
-            let heldText = await lens.before("a")
+            let heldRun = await within { () -> (text: String, session: RewriteSession) in
+                var l = lensSession
+                let text = await l.before("a")
+                return (text, l)
+            }
             let heldMs = now() - heldAt
-            check("a lens line right after a kill passes unchanged within the line budget: not waited for, nothing turned off, no error shown",
-                  heldText == "a" && heldMs <= RewriteLimits.lineBudgetMs && lens.held.count == 2 && lens.turnedOff.isEmpty && lens.issues.isEmpty && c.servicesStarted == 1,
-                  "\(heldText) after \(Int(heldMs)) ms held \(lens.held.count) off \(lens.turnedOff) issues \(lens.issues.count) started \(c.servicesStarted)")
-            // The editor's try and `test_rules` wait. While one of them is waiting for the service, a lens line is not queued behind it.
+            let lens = heldRun?.session
+            check("a lens line right after a kill passes unchanged: not waited for, nothing turned off, no error shown, no job sent and no service started for it",
+                  heldRun?.text == "a" && lens?.held.count == 2 && lens?.turnedOff.isEmpty == true && lens?.issues.isEmpty == true && c.servicesStarted == 1 && restart.passes == 1 && c.jobsSent == base + 1 && !c.isStarting,
+                  "\(String(describing: heldRun?.text)) held \(String(describing: lens?.held.count)) off \(String(describing: lens?.turnedOff)) issues \(String(describing: lens?.issues.count)) started \(c.servicesStarted) at the gate \(restart.passes)")
+            // The editor's try and `test_rules` wait. While one of them is waiting for the service (stopped at the gate, `isStarting` true), a lens line is not queued behind it.
+            let atGate = restart.passes
             let asked = now()
             async let waiting = c.regex(RewriteRow(.before, "a", "b", regex: true), on: "a", budgetMs: 10_000)
-            for _ in 0..<200_000 where !c.isStarting { await Task.yield() }
-            let inFront = c.isStarting
+            let inFront = await restart.arrived(atGate + 1) && c.isStarting
             let behindAt = now()
-            let behind = await c.regex(RewriteRow(.before, "a", "b", regex: true), on: "a", budgetMs: RewriteLimits.lineBudgetMs, waits: false)
+            let behind = await within { await c.regex(RewriteRow(.before, "a", "b", regex: true), on: "a", budgetMs: RewriteLimits.lineBudgetMs, waits: false) }
             let behindMs = now() - behindAt
-            let stillWaiting = c.isStarting
+            let stillWaiting = c.isStarting, startedBeside = c.servicesStarted, allowed = restart.allowed.last
+            restart.open()
             let next = await waiting
-            measured("the call right after the kill was answered after \(Int(now() - asked)) ms; a lens call beside it came back after \(Int(behindMs)) ms")
+            measured("the call right after the kill was answered after \(Int(now() - asked)) ms; a lens call beside it came back after \(Int(behindMs)) ms; the lens line before them after \(Int(heldMs)) ms")
             let dead = await gone(killed)
-            check("a lens call is not queued behind a call that is waiting out the restart: held within the line budget while that call is still waiting",
-                  inFront && stillWaiting && behind.outcome == .held && behindMs <= RewriteLimits.lineBudgetMs, "front \(inFront) \(behind.outcome) after \(Int(behindMs)) ms, waiting \(stillWaiting)")
+            let age = (now() - began) / 1000
+            check("the call that waits for the restart is allowed what is left of launchd's throttle on top of its start budget",
+                  allowed.map { $0 > 0 && $0 <= c.launchThrottle && $0 >= c.launchThrottle - age } == true, "allowed \(String(describing: allowed)) s of \(Int(c.launchThrottle)) s, the service \(Int(age)) s old")
+            check("a lens call is not queued behind a call that is waiting out the restart: held while that call is still waiting, and no service started for it",
+                  inFront && stillWaiting && behind?.outcome == .held && startedBeside == 1, "front \(inFront) \(String(describing: behind?.outcome)), waiting \(stillWaiting), started \(startedBeside)")
             check("the call right after a kill is answered by a fresh service, however young the killed one was", next.outcome == .text("b") && dead && c.servicePid != nil && c.servicePid != killed && c.servicesStarted == 2,
                   "\(next.outcome) old \(String(describing: killed)) gone \(dead), new \(String(describing: c.servicePid)), started \(c.servicesStarted)")
         }

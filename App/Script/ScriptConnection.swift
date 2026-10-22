@@ -47,6 +47,10 @@ final class ScriptConnection: RewriteRunner, @unchecked Sendable {
     /// measured 2026-10-21: a hello after a kill 0.3 s into the service's life answered 10.0 s later, one 3.2 s into it 7.0 s later, one 12.8 s into it
     /// 37 ms later; the key is not read from the service's Info.plist). So the first call after a service that lived less than this waits for the rest of it.
     let launchThrottle: TimeInterval
+    /// Called by a call that is about to wait for a new service (`starting` is true), with what is left of launchd's throttle that its hello is allowed for on top of
+    /// `startBudget` (0 with none), and awaited before the hello is sent. nil in the app. A gate holds a restart in front of its calls with it, as long as it likes
+    /// and for no wall-clock time, so that "a call is waiting out the restart" is a state the gate sets and reads, not one it races (round flake117).
+    let startGate: (@Sendable (TimeInterval) async -> Void)?
 
     private let lock = NSLock()
     private var connection: NSXPCConnection?
@@ -69,11 +73,13 @@ final class ScriptConnection: RewriteRunner, @unchecked Sendable {
     /// The process's connection. Made on first use, and it connects on its first call.
     static let shared = ScriptConnection()
 
-    init(appID: String = Bundle.main.bundleIdentifier ?? "dev.midagedev.mwoyeo", idleAfter: TimeInterval = 60, startBudget: TimeInterval = 10, launchThrottle: TimeInterval = 10) {
+    init(appID: String = Bundle.main.bundleIdentifier ?? "dev.midagedev.mwoyeo", idleAfter: TimeInterval = 60, startBudget: TimeInterval = 10, launchThrottle: TimeInterval = 10,
+         startGate: (@Sendable (TimeInterval) async -> Void)? = nil) {
         self.serviceName = ScriptWire.serviceName(appID: appID)
         self.idleAfter = idleAfter
         self.startBudget = startBudget
         self.launchThrottle = launchThrottle
+        self.startGate = startGate
     }
 
     /// What is left of launchd's throttle after the last start (`launchedAt`, nil = none) at `now`, in seconds.
@@ -244,6 +250,7 @@ final class ScriptConnection: RewriteRunner, @unchecked Sendable {
         if hold > 0 { log.notice("script service starting: launchd's throttle holds it for \(hold, format: .fixed(precision: 1)) s") }
         lock.withLock { self.starting = true }
         defer { lock.withLock { self.starting = false } }
+        await startGate?(hold)
         let hello: Int32? = await withCheckedContinuation { (continuation: CheckedContinuation<Int32?, Never>) in
             let once = Once(continuation)
             let timer = DispatchWorkItem { once.resume(nil) }

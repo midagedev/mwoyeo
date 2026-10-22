@@ -121,3 +121,7 @@ mechanical replacement apart from context; a table in the UI and scripts, both; 
 - R9: captures of the empty state and of a filled table with an After row; opus vision.
 - R10: `test_rules` on a profile without rewrites returns each line unchanged and starts no service; a syntax error comes back with
   its line.
+- Restart gates (flake117, 2026-10-22). Target: no check of the restart waits for launchd's ~10 s hold or races for it. The check owns the restart: `ScriptConnection.startGate`
+  (a `RestartGate` in the checks) stops a call that has to wait for a new service before its hello, `isStarting` true, until the check opens it; a lens call beside it is judged by what
+  it did (held, no job sent, no service started, the waiter still in front), and the cut by the call's own time (`lastCutMs`, [limit, limit + 100 ms]). Gap before: the checks polled
+  `isStarting` and timed the lens calls (50, 150 ms) and 22 of 69 logs failed under load 100-350. The one real restart left is the call after the gate opens: answered by a fresh service.

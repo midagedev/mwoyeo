@@ -157,14 +157,18 @@ enum RewritePipelineChecks {
 
         // MARK: A pattern that never returns is cut at the limit, turned off on the file's row, and the line goes on as it was (§5, §9)
 
-        // On a connection of its own whose service is as young as can be, so launchd's hold on the next start (A3b) is there to be seen whatever the checks before took.
+        // On a connection of its own whose service is as young as can be, so launchd's hold on the next start (A3b) is there to be seen whatever the checks before took. The restart is the check's, not
+        // a race for launchd's (flake117, 2026-10-22; see `RewriteChecks`): the gate keeps the call that waits for it in front until the lens line after the kill has been asked, so that line meets a
+        // service that is down whatever the load did to launchd's hold (22 of 69 check-logic logs failed on it), and the call that waited is answered by the real restart once the gate opens.
         let long = String(repeating: "a", count: 40) + "b"
-        let d = ScriptConnection(startBudget: 5)
+        let restart = RestartGate()
+        let d = ScriptConnection(startBudget: 30, launchThrottle: 60, startGate: { await restart.pass($0) })
         let looped = ContextChecks.settings(engine, profiles: [profile(rows: [RewriteRow(.before, "(a+)+$", "s", regex: true)])])
         let told = Told()
         let (loopSvc, loopRoute) = await service(looped, runner: d)
         await loopSvc.setRewriteHandler { told.add($0) }
         _ = await d.start()
+        restart.close()
         let base = d.jobsSent, killsBefore = d.servicesKilled, startedBefore = d.servicesStarted
         start = mock.bodies.count
         let finished = Done()
@@ -194,7 +198,8 @@ enum RewritePipelineChecks {
         let ends = "I like banana"
         start = mock.bodies.count
         let rightAfter = now()
-        let skipped = await loopSvc.translate([ends], route: loopRoute, context: context)
+        let skippedRun = await within { await loopSvc.translate([ends], route: loopRoute, context: context) }
+        let skipped = skippedRun ?? TranslationOutcome()
         let skippedMs = now() - rightAfter
         let skippedStores = loopSvc.storeCounts.keys.filter { $0.contains("|rw:") }
         measured("a lens line right after the kill: answered after \(Int(skippedMs)) ms with its rule skipped")
@@ -205,7 +210,9 @@ enum RewritePipelineChecks {
               && TranscriptFormat.jsonlLine(time: Date(timeIntervalSince1970: 0), timeZone: TimeZone(identifier: "UTC")!, lens: "L", app: chat, source: "en", target: "ko", engine: "O", original: ends,
                                             translation: "x", sent: loopSvc.sentText(for: ends, route: loopRoute), rulesSkipped: loopSvc.rulesSkipped(for: ends, route: loopRoute)).contains("\"rules\":\"skipped\""),
               "skipped \(loopSvc.rulesSkipped(for: ends, route: loopRoute)) told \(told.calls.count) stores \(skippedStores)")
+        restart.open()
         let answered = await fine
+        measured("the call queued behind the looping one was answered by the fresh service in \(Int(answered.usedMs)) ms (its own limit: \(Int(RewriteLimits.lineBudgetMs)) ms, timed from its send)")
         check("a call queued behind a looping one is not cut with it, and the fresh service answers it", answered.outcome == .text("y") && d.servicesStarted == startedBefore + 1,
               "\(answered.outcome) started \(d.servicesStarted - startedBefore)")
         // The restart is over: the same line is rewritten now, from the engine's point of view too (the line skipped before was not kept, so it is asked again).

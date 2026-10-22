@@ -188,6 +188,10 @@ struct AppSettings: Codable, Equatable {
     var targetLanguage = Languages.preferredTarget
     /// The Apple choice. Apple is what translates unless `customEngineID` names an added engine.
     var engine = TranslationEngineChoice.auto
+    /// A lens's first batch is painted at once with Apple's low-latency translation and replaced by the high-fidelity one when it lands
+    /// (docs/design/first-lens.md §13). It acts where high fidelity is what translates and the language pack is installed; elsewhere it
+    /// changes nothing. Off by default.
+    var fastFirstPaint = false
     /// Engines the user added (keys are in the Keychain, never here).
     var engines: [EngineConfig] = []
     /// The added engine in use; nil, or an id no longer in `engines`, means Apple.
@@ -349,7 +353,7 @@ struct AppSettings: Codable, Equatable {
         case sourceLanguage, targetLanguage, engine, engines, customEngineID, engineRejections, renderMode, useInpaintingModel, glossary
         case framesPerSecond, settleDelay, fontStyle, boxOpacity, lensStyle, lensTint, lensTabVisibility, lensTabPosition, cacheSize, shortcuts
         case checksForUpdates, hasCompletedOnboarding, savesTranscripts, exportFolder, exportBookmark, enginePermissions, transcriptFormats
-        case paragraphReader, agentConnection
+        case paragraphReader, agentConnection, fastFirstPaint
         case profiles, context, useLearned, profilePin, glossaryApply
         case rewrites, script
     }
@@ -384,6 +388,7 @@ struct AppSettings: Codable, Equatable {
         try c.encode(transcriptFormats, forKey: .transcriptFormats)
         try c.encode(paragraphReader, forKey: .paragraphReader)
         try c.encode(agentConnection, forKey: .agentConnection)
+        try c.encode(fastFirstPaint, forKey: .fastFirstPaint)
         try c.encode(appProfiles.map(ProfileFile.init), forKey: .profiles)
         try c.encodeIfPresent(context, forKey: .context)
         try c.encode(useLearned, forKey: .useLearned)
@@ -444,6 +449,7 @@ struct AppSettings: Codable, Equatable {
         script = (try? c.decodeIfPresent(RewriteScript.self, forKey: .script)) ?? nil
         paragraphReader = (try? c.decodeIfPresent(ParagraphReader.self, forKey: .paragraphReader)) ?? d.paragraphReader
         agentConnection = (try? c.decodeIfPresent(Bool.self, forKey: .agentConnection)) ?? d.agentConnection
+        fastFirstPaint = (try? c.decodeIfPresent(Bool.self, forKey: .fastFirstPaint)) ?? d.fastFirstPaint
     }
 }
 

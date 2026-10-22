@@ -244,6 +244,17 @@ enum UICapture {
                 // Only the lens fit's checks: Fit to Column, snap, Auto Fit, the probe (the whole of check-logic takes minutes).
                 let failed = await FitChecks.run(model)
                 report("fit", failed)
+            case "game-shots":
+                // A lens over a game scene with its HUD ignored (outlined and at rest) and with its recent lines, light and dark. Hold /tmp/r117/screen.lock.
+                await GameShots.run(model: model, out: out, wait: delay)
+            case "band-probe":
+                // A moving scene beside a game's text box: how long a changed line takes to be read (`MWOYEO_READ_SCOPE=off` for the lens as it was).
+                await BandProbe.run()
+                report("band-probe", 0)
+            case "game-checks":
+                // Only the checks of games and video (the whole of check-logic takes minutes).
+                let failed = await GameChecks.run(model)
+                report("game", failed)
             case "hide-lens-checks":
                 // Only the Hide Lenses checks (the whole of check-logic takes minutes).
                 let failed = await HideLensChecks.run(model)
@@ -587,6 +598,7 @@ enum UICapture {
             failed += MCPChecks.run(model)
             failed += await HideLensChecks.run(model)
             failed += await FitChecks.run(model)
+            failed += await GameChecks.run(model)
             failed += await ProgramChecks.run()
             // Last: the checks before the script service's timing ones must not lengthen the gap between the Test button's use of the service (PressChecks) and
             // RewriteChecks, which counts on launchd's respawn throttle still holding (text117, 2026-10-22: with these before them, "a lens call is not queued behind a call

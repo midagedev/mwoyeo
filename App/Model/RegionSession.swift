@@ -134,6 +134,14 @@ final class RegionSession {
     private var transcriptBegan: TimeInterval = 0
     private var transcriptTimer: Timer?
     private var transcriptAppChecked: TimeInterval = 0
+    /// What the lens keeps of the lines that left it (`RecentLines`): the lens runs a recorder of its own on the same lines the transcript is
+    /// given, since the transcript's belongs to the writer and runs only while the log is on. The stack shows in a panel just outside the lens.
+    private var recentRecorder = TranscriptRecorder()
+    private var recentLines: RecentLines
+    private var recentPanel: RecentLinesPanel?
+    /// "Ignore Region…" is waiting for a drag (the screen is dimmed except the lens, and the regions show).
+    private let marker = RegionMarker()
+    private var marking = false
 
     /// Hands the pipeline's snapshots to the session once it exists (the pipeline is built inside `init`).
     @MainActor private final class SnapshotTap { var handler: ((OverlaySnapshot) -> Void)? }
@@ -152,6 +160,7 @@ final class RegionSession {
         self.translator = translator
         self.policy = recovery
         self.config = config
+        self.recentLines = RecentLines(capacity: base.recentLineCount)
         self.fps = settings.framesPerSecond
         self.settings = settings
         self.base = base
@@ -237,6 +246,8 @@ final class RegionSession {
         Task { [translator, route] in await translator.prewarm(route: route) }
         panel.prediction = { [weak self] since, now in self?.predictedScroll(since: since, now: now) }
         await pipeline.setVisible(config.rect)
+        await pipeline.setIgnored(config.ignored)
+        panel.setIgnored(config.ignored)
         placeWindows(animated: false)
         chrome.setOriginal(!translationsVisible)
         await startCapture()
@@ -294,6 +305,7 @@ final class RegionSession {
         await capturer.stop()
         panel.orderOut(nil)
         chrome.orderOut(nil)
+        recentPanel?.orderOut(nil)
     }
 
     /// A quiet line on the lens's pill for a few seconds.
@@ -316,6 +328,8 @@ final class RegionSession {
     /// front is not an input: a lens over another app's window does not follow it. The push reads the window once.
     func update(settings new: AppSettings) async {
         base = new
+        recentLines.setCapacity(new.recentLineCount)
+        showRecent()
         let window = appUnderLens(config)
         // With no app profile no owner is known, and none is read for.
         if new.appProfiles.isEmpty { owner = OwnerTracker(nil) } else { _ = takeOwner(of: window) }
@@ -361,6 +375,8 @@ final class RegionSession {
         chrome.setDetail(pillDetail, badge: settings.activeEngineConfig?.badgeSymbol)
         chrome.setAppearance(settings)
         if settings.sourceLanguage != before.sourceLanguage || settings.targetLanguage != before.targetLanguage { targetStreak.reset() }
+        // The lines it kept were translated another way: they are not shown as if they were this one's.
+        if lensPair(before) != lensPair(settings) || settings.activeEngineConfig?.id != before.activeEngineConfig?.id { forgetRecent() }
         // What failed before says nothing about another engine or pair.
         if lensPair(before) != lensPair(settings) || settings.engine != before.engine { translationWait.reset() }
         refreshHint()
@@ -390,6 +406,7 @@ final class RegionSession {
         translationsVisible = visible
         panel.setTranslationsVisible(showsTranslations)
         chrome.setOriginal(!visible)
+        showRecent()
     }
 
     /// The Hide Lenses key over `lenses`: while any is hidden it brings every one back, otherwise it hides every one. True when they are
@@ -570,6 +587,7 @@ final class RegionSession {
         capture = Self.overscan(rect, wide: wideMargins, in: layoutProvider())
         let frame = ScreenGeometry.appKitRect(fromQuartz: rect)
         panel.slide(to: frame)
+        recentPanel?.setLens(frame)
         chrome.setRegion(frame)
         let moved = capture
         Task { [pipeline] in
@@ -698,6 +716,7 @@ final class RegionSession {
         if showedTranslations != !snapshot.blocks.isEmpty { refreshHint() }
         observeTranscript()
         noteColumns(snapshot)
+        observeRecent()
     }
 
     private func lensBlocks() -> [BlockText] {
@@ -794,6 +813,95 @@ final class RegionSession {
         if wait { t.finishAndWait(time: end) } else { t.finish(time: end) }
     }
 
+    // MARK: - Regions that are not read, and the lines that left the lens
+
+    /// "Ignore Region…": the person drags over a part of the lens (a HUD, a name tag, a timer); from then on it is not read, translated or drawn
+    /// over. The region is kept with the lens as fractions of it.
+    func ignoreRegion() async {
+        guard !marking, !offScreen.contains(.userHidden) else { return }
+        marking = true
+        panel.showsIgnored(true)
+        defer {
+            marking = false
+            updateEmphasis(NSEvent.mouseLocation)
+        }
+        guard let dragged = await marker.mark(in: config.rect, existing: config.ignored.map { $0.rect(in: config.rect) }) else { return }
+        addIgnoredRegion(dragged: dragged)
+    }
+
+    /// `dragged` (global Quartz points) as a region of the lens; one that lies outside it or is too small is none.
+    func addIgnoredRegion(dragged: CGRect) {
+        guard let region = IgnoredRegions.region(dragged: dragged, in: config.rect) else { return }
+        setIgnored(IgnoredRegions.adding(region, to: config.ignored))
+    }
+
+    func clearIgnoredRegions() { setIgnored([]) }
+
+    /// The regions the lens does not read, as it keeps them: the pipeline masks them before reading, the panel draws nothing over them and
+    /// outlines them, and the lens is saved with them.
+    private func setIgnored(_ list: [UnitRect]) {
+        guard list != config.ignored else { return }
+        config.ignored = list
+        panel.setIgnored(list)
+        Task { [pipeline] in await pipeline.setIgnored(list) }
+        onConfigChange?(config)
+        chrome.flash(list.isEmpty ? String(localized: "Ignored regions cleared") : String(localized: "Region ignored"))
+    }
+
+    /// The regions' outlines show while the pointer is over the lens, or one is being marked.
+    private func updateIgnoredOutlines(pointer p: NSPoint) {
+        panel.showsIgnored(marking || chrome.regionFrame.insetBy(dx: -16, dy: -16).contains(p))
+    }
+
+    /// "Keep Recent Lines": the lines that leave the lens stay in a small stack just outside it.
+    func setKeepsRecent(_ on: Bool) {
+        guard on != config.keepsRecent else { return }
+        config.keepsRecent = on
+        if on { observeRecent() } else { forgetRecent() }
+        onConfigChange?(config)
+    }
+
+    func toggleKeepsRecent() { setKeepsRecent(!config.keepsRecent) }
+
+    /// The lens's lines as the recorder sees them (a snapshot came, or the lens moved over other lines).
+    private func observeRecent() {
+        guard config.keepsRecent, let s = lastSnapshot else { return }
+        let observed = LensText.observed(s, lens: config.rect)
+        recentLines.observe(recentRecorder.observe(time: ProcessInfo.processInfo.systemUptime, lines: observed), lines: observed)
+        showRecent()
+    }
+
+    /// The stack as the lines say, below the lens or above it; off the screen with no lines, with Show Original, with the lens hidden or covered.
+    private func showRecent() {
+        guard config.keepsRecent, showsTranslations else { recentPanel?.orderOut(nil); return }
+        let panel = recentPanel ?? RecentLinesPanel(lens: ScreenGeometry.appKitRect(fromQuartz: config.rect))
+        recentPanel = panel
+        panel.setLens(ScreenGeometry.appKitRect(fromQuartz: config.rect))
+        panel.show(recentLines.stack)
+    }
+
+    /// The lines the lens kept are forgotten (another language or engine, the option turned off).
+    private func forgetRecent() {
+        recentLines.clear()
+        recentRecorder = TranscriptRecorder()
+        recentPanel?.orderOut(nil)
+    }
+
+    /// For the captures: the lens as it looks once `snapshot` was read (its blocks drawn), as a snapshot of its pipeline would show it.
+    func showForCapture(_ snapshot: OverlaySnapshot) {
+        panel.apply(snapshot)
+        received(snapshot)
+    }
+
+    /// For the captures: the regions' outlines as they show while the pointer is over the lens.
+    func previewIgnoredOutlines(_ on: Bool) { panel.showsIgnored(on) }
+
+    /// The lines the lens keeps now, newest first, for the checks.
+    var keptRecentLines: [RecentLines.Line] { recentLines.stack }
+    /// What the stack's panel shows now, for the checks, and where it is (AppKit coordinates) and on which side of the lens.
+    var recentPanelLines: [String] { recentPanel?.isVisible == true ? recentPanel?.lines ?? [] : [] }
+    var recentPanelPlace: (frame: NSRect, below: Bool)? { recentPanel.map { ($0.frame, $0.isBelow) } }
+
     func contextMenu() -> NSMenu {
         let menu = NSMenu()
         menu.autoenablesItems = false
@@ -811,6 +919,11 @@ final class RegionSession {
         menu.addItem(read)
         menu.addItem(.separator())
         addFitItems(to: menu)
+        menu.addItem(ActionItem(String(localized: "Ignore Region…"), enabled: !marking) { [weak self] in Task { await self?.ignoreRegion() } })
+        menu.addItem(ActionItem(String(localized: "Clear Ignored Regions"), enabled: !config.ignored.isEmpty) { [weak self] in self?.clearIgnoredRegions() })
+        let keep = ActionItem(String(localized: "Keep Recent Lines")) { [weak self] in self?.toggleKeepsRecent() }
+        keep.state = config.keepsRecent ? .on : .off
+        menu.addItem(keep)
         menu.addItem(.separator())
         menu.addItem(ActionItem(String(localized: "Save Lens Image"), enabled: lastSnapshot?.frame != nil) { [weak self] in self?.saveLensImage() })
         addProfileItems(to: menu)
@@ -975,6 +1088,7 @@ final class RegionSession {
         snapMoved(rect)
         // The content stays put, and so do the blocks: only which of them show changes.
         panel.slide(to: appKitFrame)
+        recentPanel?.setLens(appKitFrame)
         fitCapture(allowResize: false)
     }
 
@@ -998,6 +1112,7 @@ final class RegionSession {
         traceFrame("resize", config.rect)
         noteResized()
         panel.slide(to: appKitFrame)
+        recentPanel?.setLens(appKitFrame)
         fitCapture(allowResize: false)
     }
 
@@ -1014,6 +1129,8 @@ final class RegionSession {
         refreshReaderContext()
         onConfigChange?(config)
         updateEmphasis(NSEvent.mouseLocation)
+        // Other lines are in the lens now, and the ones it left are in the stack.
+        observeRecent()
     }
 
     // MARK: - Overscan
@@ -1147,6 +1264,7 @@ final class RegionSession {
         let near = chrome.frame.insetBy(dx: -16, dy: -16).contains(p)
         let interior = chrome.regionFrame.insetBy(dx: 24, dy: 24).contains(p)
         chrome.setEmphasized(dragging || (near && !interior))
+        updateIgnoredOutlines(pointer: p)
     }
 
     // MARK: - Window anchoring
@@ -1188,6 +1306,7 @@ final class RegionSession {
         config.rect = target
         let frame = ScreenGeometry.appKitRect(fromQuartz: target)
         panel.move(to: frame)      // content moved with the window: blocks move along
+        recentPanel?.setLens(frame)
         chrome.setRegion(frame)
         // The capture moves with the window too (slid back onto the display if it would leave it).
         let moved = Self.overscan(target, wide: wideMargins, in: layoutProvider())
@@ -1242,6 +1361,7 @@ final class RegionSession {
         panel.setTranslationsVisible(showsTranslations, animated: animated)
         reasons.isEmpty ? chrome.orderFrontRegardless() : chrome.orderOut(nil)
         reasons.contains(.userHidden) ? panel.orderOut(nil) : panel.orderFrontRegardless()
+        showRecent()
     }
 }
 

@@ -401,6 +401,7 @@ enum GameChecks {
         var settings = AppSettings()
         settings.recentLineCount = 3
         let s = session(rect, model, settings: settings)
+        s.recentHold = 0   // the lines below come one look after another; the wait is the Core tests' (RecentLinesTests, injected times)
         await s.start()
         func say(_ lines: [String]) {
             s.received(OverlaySnapshot(version: 1, blocks: [], animated: false, origin: rect.origin,
@@ -446,6 +447,40 @@ enum GameChecks {
         s.setKeepsRecent(false)
         check("turning the option off keeps nothing", kept().isEmpty && s.recentPanelLines.isEmpty)
         await s.stop()
+
+        // Whole lines only (recent117, film 4 F21): a game types its line out and the lens reads parts of it, one by one; a name over the box and
+        // a HUD read before it was ignored are not lines either.
+        let g = session(rect, model, settings: settings)
+        g.recentHold = 0
+        await g.start()
+        g.setKeepsRecent(true)
+        let tag = CGRect(x: 10, y: 20, width: 80, height: 26), box = CGRect(x: 20, y: 60, width: 280, height: 50)
+        let hud = CGRect(x: 200, y: 4, width: 110, height: 24)
+        func look(_ blocks: [(String, CGRect)]) {
+            g.received(OverlaySnapshot(version: 1, blocks: [], animated: false, origin: rect.origin,
+                                       texts: blocks.map { BlockText(frame: $0.1, source: $0.0, translation: "t:" + $0.0) }))
+        }
+        let one = "はい、シュザンヌ様。足元にお気をつけください", two = "エルヴェ、大丈夫よ。ゆっくり行きましょう", three = "九十九、ここが月影の祠よ。間違いないわ"
+        look([("所持金 1,280 G", hud), ("九十九", tag)])
+        g.addIgnoredRegion(dragged: CGRect(x: rect.minX + 190, y: rect.minY, width: 130, height: 40))
+        look([("九十九", tag), ("ュザ", CGRect(x: 120, y: 62, width: 40, height: 44))])
+        look([("九十九", tag), ("はい、シュザンヌ様。足元にお気をつけ", box), ("い", CGRect(x: 160, y: 84, width: 20, height: 24))])
+        look([("九十九", tag), (one, box)])
+        look([("エルヴェ", tag), (two, box)])
+        look([("シュザンヌ", tag), (three, box)])
+        func keptGame() -> [String] { g.keptRecentLines.map(\.source) }
+        check("the lines a game typed out are kept whole, without their parts, the names or the HUD", keptGame() == [two, one], "\(keptGame())")
+        check("and the panel shows those translations", g.recentPanelLines == ["t:" + two, "t:" + one], "\(g.recentPanelLines)")
+        // A line that left waits `RecentLines.hold` on the lens's own clock (a part can leave a read before the line that holds it shows).
+        let four = "次の行はここです。それから、また別の行が続きます"
+        g.recentHold = 3600
+        look([("九十九", tag), (four, box)])
+        check("a line that left waits the hold before the stack shows it, and the panel stays off the screen", keptGame().isEmpty && g.recentPanelLines.isEmpty,
+              "\(keptGame()) \(g.recentPanelLines)")
+        g.recentHold = 0
+        look([("九十九", tag), (four, box)])
+        check("and shows once it has waited", keptGame() == [three, two, one], "\(keptGame())")
+        await g.stop()
     }
 
     // MARK: A region placed with the keyboard

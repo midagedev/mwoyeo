@@ -230,6 +230,8 @@ final class RegionSession {
         await pipeline.setScrollHandler { [weak self] r in Task { @MainActor in self?.scrolled(r) } }
         await pipeline.setReadHandler { [weak self] tally in Task { @MainActor in self?.read(tally) } }
         outcomeObserver = await translator.observe { [weak self] event in Task { @MainActor in self?.translationEvent(event) } }
+        // The pair of this lens, when it is not the one the launch warmed (an app's profile): its models load while the first read runs.
+        Task { [translator, route] in await translator.prewarm(route: route) }
         panel.prediction = { [weak self] since, now in self?.predictedScroll(since: since, now: now) }
         await pipeline.setVisible(config.rect)
         placeWindows(animated: false)

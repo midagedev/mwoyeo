@@ -28,9 +28,13 @@ enum TextChecks {
         }
 
         // MARK: the entries that need no engine
+        // 2026-10-22 (game117 landing): "readAloud is second to last" became "readAloud keeps its index, 7". game117 adds two lens actions
+        // (ignoreRegion, keepRecentLines) between readAloud and translateText; the hot keys are registered by index (HotKeys.swift:97), so what must
+        // stay is the index of every action registered before, not readAloud's distance from the end. FAIL-first: translateText moved before
+        // readAloud fails both clauses.
         check("Translate Text is a shortcut action with no default key, after the others (so the ids of the registered ones stay)",
               HotKeyAction.translateText.rawValue == "translateText" && HotKeyAction.defaults["translateText"] == nil && HotKeyAction.allCases.last == .translateText
-              && HotKeyAction.addLens.id == "addLens" && HotKeyAction.allCases.firstIndex(of: .readAloud) == HotKeyAction.allCases.count - 2)
+              && HotKeyAction.addLens.id == "addLens" && HotKeyAction.allCases.firstIndex(of: .readAloud) == 7)
         let file = SettingsFileCheck.read(Data(#"{"shortcuts": {"translateText": {"keyCode": 17, "modifiers": 4096, "display": "⌃T"}}}"#.utf8), over: AppSettings())
         let wrong = SettingsFileCheck.read(Data(#"{"shortcuts": {"translateTxt": {"keyCode": 17, "modifiers": 4096, "display": "⌃T"}}}"#.utf8), over: AppSettings())
         check("settings.json takes shortcuts.translateText and refuses a name that is not an action",

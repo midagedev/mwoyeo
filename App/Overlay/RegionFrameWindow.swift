@@ -30,6 +30,15 @@ final class RegionFrameWindow: NSPanel {
     var onPause: (() -> Void)?
     /// What the lens translated, in reading order: VoiceOver reads the start of it. Asked when a screen reader asks, never otherwise.
     var translationLines: (() -> [String])?
+    /// Fit to Column, or its undo: a double-click on the ring, and VoiceOver's action (named by `fitTitle`, as the menu names its row).
+    var onFit: (() -> Void)?
+    var fitTitle: (() -> String)?
+    /// A resize drag's frame as the hand made it, and the frame it takes after the snap (`RegionSession.snapResized`; the same frame when nothing pulls).
+    var onSnapResize: ((NSRect) -> NSRect)?
+    /// A move ended at this frame: the frame it settles on after the snap, nil to stay (`RegionSession.settleFrame`).
+    var onSettle: ((NSRect) -> NSRect?)?
+    /// A resize ended at this frame: the frame it settles on, the rest of the way onto a column's edge (`RegionSession.settleResized`).
+    var onSettleResize: ((NSRect) -> NSRect?)?
 
     private let chrome: FrameChromeView
     private var tabPosition = LensTabPosition.topLeading
@@ -117,6 +126,18 @@ final class RegionFrameWindow: NSPanel {
 
     /// A light sweep across the lens, for when it first comes alive.
     func sweep() { chrome.sweep() }
+
+    /// Takes the region to `target` in `duration` (`FitMotion`: a spring, no overshoot; at once under Reduce Motion), telling `onResize` (the size
+    /// changes) or `onMove` of every frame as a drag does, so the capture and the translations follow as they follow a hand. `completion(true)` after
+    /// the last frame, `completion(false)` when a hand took the lens or `stopAnimating` cut it short, wherever it had got to.
+    func animate(to target: NSRect, duration: TimeInterval = LensMotion.fit, completion: @escaping (_ finished: Bool) -> Void) {
+        chrome.animate(to: target, duration: duration, completion: completion)
+    }
+
+    func stopAnimating() { chrome.stopAnimating() }
+
+    /// An animation (`animate`) is under way.
+    var isAnimating: Bool { chrome.isAnimating }
 }
 
 private final class FrameChromeView: NSView {
@@ -155,6 +176,23 @@ private final class FrameChromeView: NSView {
     /// Follows a move the window server is doing, once per display frame.
     private var moveLink: CADisplayLink?
     private var followed: NSRect?
+    /// ⌘ was down at the last frame of a move: a snap guide is taken down when it goes down, though the lens stands still.
+    private var commandWasDown = false
+    /// The press went down on the ring (not the pill, not the corner), and where releases without a move are counted for a double-click.
+    private var ringDown = false
+    private var taps = DoubleTap()
+    /// A resize's right edge as the person last saw it (screen x), and the system's filter that decides when the alignment tick plays.
+    private var shownRight: CGFloat = 0
+    private let haptic = AlignmentHaptic()
+    /// A fit, a growth or a settle under way (`animate`): its frames come from a display link.
+    private struct Animation {
+        let link: CADisplayLink
+        let from: NSRect, to: NSRect
+        let start: CFTimeInterval, duration: TimeInterval
+        let resizing: Bool
+        let completion: (Bool) -> Void
+    }
+    private var animation: Animation?
     private var emphasized = false
     private var hovering = false
     private var tracking: NSTrackingArea?
@@ -473,9 +511,14 @@ private final class FrameChromeView: NSView {
         if strong, closeHit.contains(p) { window_?.onClose?(); return }
         if showsTab, modeHit.contains(p) { window_?.onToggleFollowing?(); return }
         if let hit = clickableHint, hit.contains(p) { window_?.onHintAction?(); return }
+        // A hand on the lens takes it from a fit or a settle that is moving it: it stays where it has got to.
+        stopAnimating()
         drag = zone(at: p)
+        ringDown = drag == .move && !(showsTab && tabRect.contains(p))
+        Trace.mark("lens press: \(drag.map { "\($0)" } ?? "none") ring=\(ringDown) clicks=\(event.clickCount)", since: Trace.now)
         startMouse = NSEvent.mouseLocation
         startRegion = window_?.regionFrame ?? .zero
+        shownRight = startRegion.maxX
         updateGlow()
         needsDisplay = true
         guard drag == .move, let w = window_ else { return }
@@ -494,17 +537,38 @@ private final class FrameChromeView: NSView {
         guard let w = window_ else { return }
         let m = NSEvent.mouseLocation
         let r = onScreen(startRegion.offsetBy(dx: m.x - startMouse.x, dy: m.y - startMouse.y))
+        let command = NSEvent.modifierFlags.contains(.command)
         guard NSEvent.pressedMouseButtons & 1 != 0 else {
             moveLink?.invalidate()
             moveLink = nil
             // The window server lets a window go past the screen's sides: bring it back.
             if w.regionFrame != r { w.setRegion(r) }
-            if followed != r { w.onMove?(r) }
+            if (followed ?? startRegion) != r { w.onMove?(r) }
             followed = nil
-            finishDrag(at: convert(w.mouseLocationOutsideOfEventStream, from: nil))
+            let pointer = convert(w.mouseLocationOutsideOfEventStream, from: nil)
+            // A release on the ring where the press went down is a click; two in the double-click interval are Fit to Column.
+            let travelled = hypot(m.x - startMouse.x, m.y - startMouse.y)
+            Trace.mark("lens release: moved \(travelled) pt, ring=\(ringDown)", since: Trace.now)
+            if travelled < DoubleTap.slop, ringDown {
+                if taps.tap(at: m, time: ProcessInfo.processInfo.systemUptime, interval: NSEvent.doubleClickInterval) {
+                    Trace.mark("lens double-click on the ring: fit", since: Trace.now)
+                    finishDrag(at: pointer)
+                    w.onFit?()
+                    return
+                }
+            } else {
+                taps.reset()
+            }
+            // A lens let go on a column's edge settles on it.
+            if let settled = w.onSettle?(r), settled != r {
+                animate(to: settled, duration: LensMotion.settle) { [weak self] _ in self?.finishDrag(at: pointer) }
+                return
+            }
+            finishDrag(at: pointer)
             return
         }
-        if followed != r { followed = r; w.onMove?(r) }
+        // A press on the ring that goes nowhere is a click, not a move: the session hears of a frame only when the lens has moved (or ⌘ went up or down).
+        if (followed ?? startRegion) != r || command != commandWasDown { followed = r; commandWasDown = command; w.onMove?(r) }
     }
 
     /// Keeps the lens on the screen it started on: the capture cannot span displays.
@@ -520,18 +584,29 @@ private final class FrameChromeView: NSView {
 
     override func mouseDragged(with event: NSEvent) {
         guard drag == .resize, let w = window_ else { return }
+        haptic.update(with: event)
         let m = NSEvent.mouseLocation
         let dx = m.x - startMouse.x, dy = m.y - startMouse.y
         // Bottom-right corner: the top-left stays put (in AppKit, top = maxY).
         let width = max(80, startRegion.width + dx), height = max(40, startRegion.height - dy)
-        let r = NSRect(x: startRegion.minX, y: startRegion.maxY - height, width: width, height: height)
+        let wanted = NSRect(x: startRegion.minX, y: startRegion.maxY - height, width: width, height: height)
+        // The right edge pulls to a column's edge (the session decides; ⌘ held, it does not).
+        let r = w.onSnapResize?(wanted) ?? wanted
+        haptic.resized(in: self, previousX: shownRight - w.frame.minX, alignedX: r.maxX - w.frame.minX, defaultX: wanted.maxX - w.frame.minX)
+        shownRight = r.maxX
         w.setRegion(r)
         w.onResize?(r)
     }
 
     override func mouseUp(with event: NSEvent) {
         guard drag == .resize else { return }
-        finishDrag(at: convert(event.locationInWindow, from: nil))
+        let pointer = convert(event.locationInWindow, from: nil)
+        // A resize let go within a column's reach settles the rest of the way onto its edge, as a move does.
+        if let w = window_, let settled = w.onSettleResize?(w.regionFrame), settled != w.regionFrame {
+            animate(to: settled, duration: LensMotion.settle) { [weak self] _ in self?.finishDrag(at: pointer) }
+            return
+        }
+        finishDrag(at: pointer)
     }
 
     private func finishDrag(at p: NSPoint) {
@@ -540,6 +615,50 @@ private final class FrameChromeView: NSView {
         updateGlow()
         needsDisplay = true
         window_?.onCommit?()
+    }
+
+    // MARK: - Animation (a fit, a growth, a settle)
+
+    var isAnimating: Bool { animation != nil }
+
+    func animate(to target: NSRect, duration: TimeInterval, completion: @escaping (Bool) -> Void) {
+        stopAnimating()
+        guard let w = window_ else { return completion(false) }
+        let from = w.regionFrame
+        // Reduce Motion, or nowhere to go: the lens is there in one frame.
+        guard !Motion.shared.reduced, from != target else {
+            place(target, resizing: target.size != from.size)
+            return completion(true)
+        }
+        let link = displayLink(target: self, selector: #selector(animationFrame))
+        animation = Animation(link: link, from: from, to: target, start: CACurrentMediaTime(), duration: duration, resizing: target.size != from.size,
+                              completion: completion)
+        link.add(to: .main, forMode: .common)
+    }
+
+    func stopAnimating() { finishAnimation(finished: false) }
+
+    @objc private func animationFrame() {
+        guard let a = animation else { return }
+        let t = CACurrentMediaTime() - a.start
+        guard t < a.duration else { return finishAnimation(finished: true) }
+        place(FitMotion.frame(from: a.from, to: a.to, progress: FitMotion.progress(t, duration: a.duration)), resizing: a.resizing)
+    }
+
+    /// The last frame is the target itself; a cut-short animation leaves the lens where it is.
+    private func finishAnimation(finished: Bool) {
+        guard let a = animation else { return }
+        animation = nil
+        a.link.invalidate()
+        if finished { place(a.to, resizing: a.resizing) }
+        a.completion(finished)
+    }
+
+    /// One frame of an animation: the window, then the session as a drag tells it.
+    private func place(_ r: NSRect, resizing: Bool) {
+        guard let w = window_ else { return }
+        w.setRegion(r)
+        if resizing { w.onResize?(r) } else { w.onMove?(r) }
     }
 
     // MARK: - Drawing (pill, handles)
@@ -649,7 +768,7 @@ extension FrameChromeView {
 
     override func accessibilityCustomActions() -> [NSAccessibilityCustomAction]? {
         let w = window_
-        return [
+        var actions = [
             NSAccessibilityCustomAction(name: original ? String(localized: "Show Translation") : String(localized: "Show Original")) {
                 w?.onToggleOriginal?(); return w?.onToggleOriginal != nil
             },
@@ -657,6 +776,11 @@ extension FrameChromeView {
             NSAccessibilityCustomAction(name: String(localized: "Remove Lens")) { w?.onClose?(); return w?.onClose != nil },
             NSAccessibilityCustomAction(name: String(localized: "Open Lens Menu")) { [weak self] in self?.accessibilityOpenMenu() ?? false },
         ]
+        // Fit to Column (or its undo), where the lens has a session to ask: the double-click's equivalent for a screen reader.
+        if w?.onFit != nil {
+            actions.insert(NSAccessibilityCustomAction(name: w?.fitTitle?() ?? String(localized: "Fit to Column")) { w?.onFit?(); return true }, at: 1)
+        }
+        return actions
     }
 
     /// The lens's translations in reading order, as the session has them now.

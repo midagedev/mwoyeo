@@ -33,8 +33,8 @@ public enum LensTarget {
     public static let titleBarFloor: CGFloat = 120
     public static let titleBar: CGFloat = 28
     /// The preview's glide between targets (and between the ghost and a target): the settling time of the critically damped spring of
-    /// ω = 30 (`LensMotion.quick` of the motion contract, section 3.5: 90 % at 130 ms, at rest at 267 ms), run by `FitMotion.progress`.
-    public static let glide: TimeInterval = 8.0 / 30
+    /// ω = 30 (`LensMotion.settle`, the motion contract's `quick`, section 3.5: 90 % at 130 ms, at rest at 267 ms), run by `FitMotion.progress`.
+    public static let glide: TimeInterval = LensMotion.settle
 
     // MARK: - The map
 

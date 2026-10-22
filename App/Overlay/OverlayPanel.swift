@@ -186,6 +186,8 @@ final class OverlayPanel: NSPanel {
 
 private final class OverlayHostView: NSView {
     private var layersByID: [UUID: CALayer] = [:]
+    /// Each block's translation lines (points relative to its frame), for the lens's top and bottom edges (`LensMask`).
+    private var linesByID: [UUID: [CGRect]] = [:]
     /// Each block's frame as the last snapshot placed it (host coordinates), before any predicted scroll.
     private var placed: [UUID: CGRect] = [:]
     /// The lens, host coordinates. Translations are clipped to it.
@@ -265,6 +267,7 @@ private final class OverlayHostView: NSView {
             block.frame = block.frame.offsetBy(dx: offset.dx, dy: offset.dy)
             seen.insert(block.id)
             placed[block.id] = block.frame
+            linesByID[block.id] = block.lines
             if let l = layersByID[block.id] {
                 if snapshot.animated, (l.contents as AnyObject?) !== block.image {
                     let fade = CATransition()
@@ -295,6 +298,7 @@ private final class OverlayHostView: NSView {
         for (id, l) in layersByID where !seen.contains(id) {
             layersByID[id] = nil
             placed[id] = nil
+            linesByID[id] = nil
             if snapshot.animated {
                 CATransaction.begin()
                 CATransaction.setCompletionBlock { l.removeFromSuperlayer() }
@@ -352,8 +356,11 @@ private final class OverlayHostView: NSView {
         CATransaction.begin()
         CATransaction.setAnimationDuration(animated ? 0.15 : 0)
         CATransaction.setDisableActions(!animated)
-        for l in layersByID.values {
-            let opacity: Float = l.frame.intersects(lens) ? 1 : 0
+        for (id, l) in layersByID {
+            var shows = l.frame.intersects(lens)
+            // A block the lens cuts at its top or bottom shows the lines that stand wholly in it; one wholly inside has no mask.
+            if shows { shows = LensMask.apply(to: l, lines: linesByID[id] ?? [], lens: lens) }
+            let opacity: Float = shows ? 1 : 0
             if l.opacity != opacity { l.opacity = opacity }
         }
         CATransaction.commit()

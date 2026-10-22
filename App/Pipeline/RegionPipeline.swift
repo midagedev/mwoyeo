@@ -103,11 +103,14 @@ struct PipelineOptions: Sendable, Equatable {
 ///   translation in its place ("seamless"), crossfading from the fast boxes.
 actor RegionPipeline {
     private struct Block {
-        let id: UUID
+        var id: UUID
         var rect: CGRect            // image pixels
         var lines: [CGRect]         // image pixels
         var source: String
         var translation: String?
+        /// What this block draws while `translation` is nil: the translations that stood where it stands when it was read again over a page
+        /// that did not change (`TranslationCarry`). Never leaves the pipeline as a translation.
+        var carried: String?
         var appearance: TextAppearance
         /// Font size (pixels) estimated from the original glyphs.
         var fontSize: CGFloat?
@@ -186,13 +189,13 @@ actor RegionPipeline {
     let readerClient: Int
     /// The last pass found no reader (`RecognitionUnavailable`): nothing reads again until the host says one is ready.
     private var readerWaiting = false
+    /// `halt`: the session is gone. In-flight OCR may finish; nothing starts another pass or accepts a frame.
+    private var halted = false
     /// A reader became ready since the running seamless pass began: the frame is read once more when it ends.
     private var layoutStale = false
     private var version = 0
     private var scale: CGFloat = 2
     private var activity = RegionActivity.idle
-    /// Bumped when the capture size changes; a pass that awaited across a bump discards its result.
-    private var geometryEpoch = 0
     /// Content moves applied to the blocks since the running pass started (scrolls, lens recentres): its results, read
     /// from an older frame, are moved the same way instead of being dropped.
     private var moves: [Move] = []
@@ -278,6 +281,7 @@ actor RegionPipeline {
     /// (or `.fast`) while the reader it wanted was not (the recovery re-read, design §10.4). The frame is read once more. Blocks
     /// whose text is unchanged keep their translations.
     func readerReady() {
+        guard !halted else { return }
         readerWaiting = false
         guard latest != nil else { return }
         layoutStale = true
@@ -364,7 +368,7 @@ actor RegionPipeline {
 
     /// Re-translate everything currently on screen (e.g. after the user downloads a language pack).
     func refresh() {
-        for i in blocks.indices { blocks[i].translation = nil; blocks[i].image = nil }
+        for i in blocks.indices { blocks[i].translation = nil; blocks[i].carried = nil; blocks[i].image = nil }
         baseGray = nil
         seamlessDone = false
         // The reason for earlier failures (a missing language pack) may be gone.
@@ -386,6 +390,7 @@ actor RegionPipeline {
     }
 
     func ingest(_ frame: CapturedFrame) {
+        guard !halted else { return }
         if let l = latest, frame.time < l.time { return }
         // Frames of an older capture geometry would put text in the wrong place.
         guard abs(frame.rect.minX - origin.x) < 0.5, abs(frame.rect.minY - origin.y) < 0.5,
@@ -518,13 +523,13 @@ actor RegionPipeline {
     // MARK: - Scheduling
 
     private func kick() {
-        guard !working else { return }
+        guard !halted, !working else { return }
         working = true
         Task { await self.run() }
     }
 
     private func run() async {
-        while let frame = latest {
+        while !halted, let frame = latest {
             let now = ProcessInfo.processInfo.systemUptime
             // A pixel change inside the backoff waits for its end (the timer below kicks again).
             if readBackoff.isWaiting(now: now) { Trace.count("ocr.backoff_wait"); break }
@@ -537,8 +542,9 @@ actor RegionPipeline {
             let wantsSeamless = options.renderMode != .fast && !seamlessDone && (settled || options.renderMode == .seamless)
             if wantsSeamless {
                 // A failed read is not counted as done: it waits out its backoff (`noteReadFailure`) and is read again. So is a read
-                // after which a reader became ready while it ran (`readerReady`).
-                if await seamlessPass(frame) { seamlessDone = lastChange <= frame.time && !layoutStale }
+                // after which a reader became ready while it ran (`readerReady`). A pass rebased onto a resize is that read:
+                // `lastChange` may be newer than its frame without the page having changed.
+                if await seamlessPass(frame), !rebasedThisPass { seamlessDone = lastChange <= frame.time && !layoutStale }
                 continue
             }
             if options.renderMode != .seamless, let dirty = dirtyRect(for: frame, stale) {
@@ -548,6 +554,10 @@ actor RegionPipeline {
             break
         }
         working = false
+        guard !halted else { setActivity(.idle); return }
+        // A resize read was armed and its frame has not arrived. Stay reading so a settle does not
+        // end the step before the pass, and count that pass in the step that asked for it.
+        if readPending { setActivity(.reading); return }
         setActivity(translating && lensPending ? .translating : .idle)
         let now = ProcessInfo.processInfo.systemUptime
         var wait: TimeInterval?
@@ -571,6 +581,13 @@ actor RegionPipeline {
     private struct Staleness {
         var change: ChangeMap?
         var forced: [PixelRect]
+        /// `change` over the pixels the reference had: the strips a larger capture only now shows (`forced`) do not count, nothing is different there.
+        /// Only when there are strips; without them it is `change`.
+        var covered: ChangeMap?
+        /// Whether the page under `r` is not what was read.
+        func edited(_ r: CGRect, step: Int) -> Bool {
+            (covered ?? change).map { $0.intersects(PixelRect(r.applying(CGAffineTransform(scaleX: 1 / CGFloat(step), y: 1 / CGFloat(step))))) } ?? true
+        }
         func touches(_ r: CGRect, step: Int) -> Bool {
             let g = PixelRect(r.insetBy(dx: -1, dy: -1).applying(CGAffineTransform(scaleX: 1 / CGFloat(step), y: 1 / CGFloat(step))))
             // A block cut off at the old capture edge ends right where the uncovered strip begins: touching counts.
@@ -581,10 +598,11 @@ actor RegionPipeline {
 
     private func staleness(for frame: CapturedFrame) -> Staleness {
         guard let base = baseGray, base.width == frame.gray.width, base.height == frame.gray.height else {
-            return Staleness(change: nil, forced: [])
+            return Staleness(change: nil, forced: [], covered: nil)
         }
-        return Staleness(change: churn.masking(FrameDiff.changeMap(from: base, to: frame.gray), at: ProcessInfo.processInfo.systemUptime),
-                         forced: forcedDirty)
+        let now = ProcessInfo.processInfo.systemUptime
+        return Staleness(change: churn.masking(FrameDiff.changeMap(from: base, to: frame.gray), at: now), forced: forcedDirty,
+                         covered: forcedDirty.isEmpty ? nil : churn.masking(FrameDiff.changeMap(from: base, to: frame.gray, ignoring: forcedDirty), at: now))
     }
 
     /// Image-pixel rect needing a re-read, or nil when the blocks still describe the frame.
@@ -674,6 +692,14 @@ actor RegionPipeline {
         var grayArea: PixelRect?
         /// Rows of `grayArea` that scrolled into view.
         var strip: PixelRect?
+        /// Set when the capture itself changed its size or place (`captureResized`): the frame the content now lies in.
+        var resized: Resized?
+
+        struct Resized {
+            /// The new capture, image pixels from its own origin, and its gray canvas.
+            var bounds: CGRect
+            var grayWidth: Int, grayHeight: Int
+        }
 
         /// Where a block belongs to a scrolled area: near the start of its text. A scroll is often found in only part of
         /// a column's width (the side with avatars and line starts; line ends are too sparse to match), and a long
@@ -682,6 +708,7 @@ actor RegionPipeline {
 
         /// The block moved along, or nil when it left the frame or scrolled out of its area (under a fixed header).
         func apply(to b: Block, bounds: CGRect) -> Block? {
+            let bounds = resized?.bounds ?? bounds
             if let area, !area.contains(Self.anchor(b.rect)) { return b }
             var b = b
             b.rect = b.rect.offsetBy(dx: dx, dy: dy)
@@ -708,6 +735,7 @@ actor RegionPipeline {
     /// (zero when a lens is dragged over static content; the window's move when the capture follows a window).
     /// Blocks stay glued to the content, and only the strips the move uncovered are read.
     func captureMoved(to newOrigin: CGPoint, contentDelta: CGVector = .zero) {
+        guard !halted else { return }
         let rel = CGVector(dx: newOrigin.x - origin.x - contentDelta.dx, dy: newOrigin.y - origin.y - contentDelta.dy)
         origin = newOrigin
         guard rel.dx != 0 || rel.dy != 0 else { return }
@@ -736,32 +764,38 @@ actor RegionPipeline {
     }
 
     /// The capture grew or shrank (overscan widened for motion, lens resized). Blocks are kept where they are on
-    /// screen and only the newly covered area is read.
-    func captureResized(to rect: CGRect) {
+    /// screen and only the newly covered area is read. A pass that is reading the old frame follows the resize like
+    /// a move (`Move.resized`): its results land in the new capture, where the page has not changed.
+    /// A grow asked for a read, and the session has not settled on that size yet. `armDeferredResizeRead` starts it.
+    private var deferredUncovered = false
+    /// The settled grow's read has been asked for and the pass has not started. `run` keeps the activity at reading.
+    private var readPending = false
+
+    func captureResized(to rect: CGRect, ticket: Int? = nil, tickets: OSAllocatedUnfairLock<Int>? = nil, deferRead: Bool = false) {
+        // A newer resize was requested while this call waited behind a pass. Applying it would read a size the lens has left.
+        if let ticket, let tickets, tickets.withLock({ $0 }) != ticket {
+            Trace.mark("capture \(Int(rect.width))×\(Int(rect.height)): superseded, not applied", since: Trace.now)
+            return
+        }
+        guard !halted else { return }
         guard rect.size != captureSize || rect.origin != origin else { return }
         let px = (origin.x - rect.minX) * scale, py = (origin.y - rect.minY) * scale
         let size = CGSize(width: (rect.width * scale).rounded(), height: (rect.height * scale).rounded())
+        let was = captureSize
         origin = rect.origin
         captureSize = rect.size
-        geometryEpoch += 1
         readBackoff.reset()
-        churn.reset()
-        lastChange = ProcessInfo.processInfo.systemUptime
-        seamlessDone = false
         latest = nil
         grayShiftX.reset(); grayShiftY.reset()
-        let bounds = CGRect(origin: .zero, size: size)
-        blocks = blocks.compactMap { b in
-            var b = b
-            b.rect = b.rect.offsetBy(dx: px, dy: py)
-            b.lines = b.lines.map { $0.offsetBy(dx: px, dy: py) }
-            return b.rect.intersects(bounds) ? b : nil
-        }
-        reconsider()
+        let step = CGFloat(lastStep)
+        let gx = Int((px / step).rounded()), gy = Int((py / step).rounded())
+        let gw = Int(size.width) / Int(step), gh = Int(size.height) / Int(step)
+        apply(Move(area: nil, dx: px, dy: py, gx: gx, gy: gy, grayArea: nil, strip: nil,
+                   resized: .init(bounds: CGRect(origin: .zero, size: size), grayWidth: gw, grayHeight: gh)))
+        var uncovered = true   // no reference to compare with: read it
         if let base = baseGray {
-            let step = CGFloat(lastStep)
-            let gx = Int((px / step).rounded()), gy = Int((py / step).rounded())
-            let gw = Int(size.width) / Int(step), gh = Int(size.height) / Int(step)
+            let strips = base.uncovered(dx: gx, dy: gy, width: gw, height: gh)
+            uncovered = !strips.isEmpty
             baseGray = base.reframed(dx: gx, dy: gy, width: gw, height: gh)
             // Scroll detection keeps working across the resize, compared only where the old frame had pixels.
             if let prev = prevGray, prev.width == base.width, prev.height == base.height {
@@ -770,10 +804,62 @@ actor RegionPipeline {
             } else {
                 prevGray = nil
             }
-            forcedDirty = forcedDirty.map { PixelRect(x: $0.x + gx, y: $0.y + gy, width: $0.width, height: $0.height) }
-                + base.uncovered(dx: gx, dy: gy, width: gw, height: gh)
+            forcedDirty = forcedDirty.map { PixelRect(x: $0.x + gx, y: $0.y + gy, width: $0.width, height: $0.height) } + strips
         }
-        emit(animated: false)
+        // A capture that grew has something new to read; one that shrank to inside what was read shows what the blocks already describe.
+        // A pass already at work is rebased onto this capture and is not followed by a second whole read.
+        // A deferred grow does not start that read now: the lens may already be on its way to a smaller size.
+        let held = uncovered && !working && deferRead
+        let readAgain = uncovered && !working && !deferRead
+        Trace.mark("capture \(Int(was.width))×\(Int(was.height)) → \(Int(rect.width))×\(Int(rect.height)): "
+                   + (held ? "newly covered, held" : readAgain ? "newly covered area, read" : uncovered ? "pass in flight, rebased" : "nothing new, not read")
+                   + (working ? ", \(moves.count) move(s) for the pass in flight" : ""), since: Trace.now)
+        if !uncovered {
+            // A larger size queued ahead of this one may already have asked for a read. This capture is inside
+            // what the blocks describe, so that ask is done: no settled whole read follows.
+            seamlessDone = true
+            deferredUncovered = false
+            if readPending {
+                readPending = false
+                if !working { setActivity(.idle) }
+            }
+        } else if !working, deferRead {
+            deferredUncovered = true
+        } else if !working {
+            // A pass already at work is rebased onto this capture (`Move.resized` in `moves`) and is that read.
+            // Bumping `lastChange` here would schedule a second whole read of the same page when the pass ends.
+            lastChange = ProcessInfo.processInfo.systemUptime
+            seamlessDone = false
+            deferredUncovered = false
+        } else {
+            deferredUncovered = false
+        }
+    }
+
+    /// The session settled on a size that uncovered new strips. Start the one read `captureResized` held back.
+    func armDeferredResizeRead() {
+        guard !halted, deferredUncovered, !working else { return }
+        deferredUncovered = false
+        readPending = true
+        lastChange = ProcessInfo.processInfo.systemUptime
+        seamlessDone = false
+        settleTask?.cancel()
+        settleTask = nil
+        Trace.mark("resize settled, read", since: Trace.now)
+        setActivity(.reading)
+        if latest != nil { kick() }
+    }
+
+    /// The session has stopped. A pass already inside OCR may finish; no frame and no resize starts another.
+    func halt() {
+        halted = true
+        readPending = false
+        deferredUncovered = false
+        settleTask?.cancel()
+        settleTask = nil
+        stillTask?.cancel()
+        stillTask = nil
+        latest = nil
     }
 
     /// Gray step of the frames (image pixels per gray pixel).
@@ -789,26 +875,35 @@ actor RegionPipeline {
         emit(animated: false)
     }
 
-    /// Where a pass started, so its results can follow content that moved while it awaited.
-    private struct PassStart {
-        let epoch: Int
-    }
+    /// Set by `finishPass` when this pass was rebased onto a resize. `run` then keeps `seamlessDone`.
+    private var rebasedThisPass = false
 
-    /// Passes run one at a time, so the moves since this one started are all the moves there are.
-    private func startPass() -> PassStart {
+    /// Passes run one at a time, so the moves since this one started are all the moves there are: its results, read from the frame it
+    /// started with, follow content that moved (scrolls, a lens recentred) and a capture that changed (`captureResized`) while it awaited.
+    private func startPass(_ kind: String) {
+        Trace.count("pass.read")
+        Trace.mark("pass: \(kind) starts", since: Trace.now)
         moves = []
         unexplained = []
-        return PassStart(epoch: geometryEpoch)
+        rebasedThisPass = false
+        readPending = false
     }
 
-    /// After a pass's await: the moves to apply to its results, or nil if the geometry changed under it.
+    /// Where a rect now is, in the frame the running pass started from: the moves since it started, undone.
+    private func inFrame(_ r: CGRect) -> CGRect { moves.reversed().reduce(r) { $1.undo($0) } }
+
+    /// After a pass's await: the moves to apply to its results.
     /// Also makes the reference what the results, moved, describe: the newest frame, except where it changed in ways
     /// no move explains — there `frame` moved along stays, so those parts read as changed.
-    private func finishPass(_ start: PassStart, frame: CapturedFrame) -> [Move]? {
-        guard start.epoch == geometryEpoch else { return nil }
+    private func finishPass(frame: CapturedFrame) -> [Move] {
         var base = frame.gray, forced: [PixelRect] = []
         for m in moves {
-            if let g = m.grayArea {
+            if let r = m.resized {
+                Trace.count("pass.rebased")
+                forced = forced.map { PixelRect(x: $0.x + m.gx, y: $0.y + m.gy, width: $0.width, height: $0.height) }
+                    + base.uncovered(dx: m.gx, dy: m.gy, width: r.grayWidth, height: r.grayHeight)
+                base = base.reframed(dx: m.gx, dy: m.gy, width: r.grayWidth, height: r.grayHeight)
+            } else if let g = m.grayArea {
                 base = base.shifted(dy: m.gy, within: g)
                 forced = forced.map { $0.cgRect.intersects(g.cgRect) ? PixelRect(x: $0.x, y: $0.y + m.gy, width: $0.width, height: $0.height) : $0 }
                     + [m.strip].compactMap { $0 }
@@ -824,6 +919,11 @@ actor RegionPipeline {
         }
         baseGray = base
         forcedDirty = forced
+        if moves.contains(where: { $0.resized != nil }) {
+            // Rebased onto the capture the resize moved to. The settled whole read would OCR that page again.
+            rebasedThisPass = true
+            seamlessDone = true
+        }
         return moves
     }
 
@@ -835,7 +935,7 @@ actor RegionPipeline {
 
     private func fastPass(_ frame: CapturedFrame, dirty: CGRect, stale: Staleness) async {
         setActivity(.reading)
-        let start = startPass()
+        startPass("fast")
         defer { looks = nil }
         let useFast = options.sourceLanguage != "auto" && Languages.isLatinScript(options.sourceLanguage)
         // Blocks whose pixels did not change stay as they are (seamless ones keep their erased background).
@@ -858,12 +958,12 @@ actor RegionPipeline {
             Trace.mark("fast: OCR failed \(error)", since: t)
             // A transient (a read that timed out, programs not ready) is read again after its backoff; any other failure would just
             // fail again on the same pixels.
-            if noteReadFailure(error) { _ = finishPass(start, frame: frame) }
+            if noteReadFailure(error) { _ = finishPass(frame: frame) }
             return
         }
         readBackoff.success()
         if holdsVerticalText(found) {
-            _ = finishPass(start, frame: frame)
+            _ = finishPass(frame: frame)
             return
         }
         found = readBlocks(found, in: frame.image)
@@ -879,9 +979,11 @@ actor RegionPipeline {
         let full = wantsErase ? RGBAImage(cgImage: frame.image) : nil
         let places = layoutPlaces(of: fresh, among: found, in: frame.image)
         let old = blocks.filter { staleIDs.contains($0.id) }
-        let matches = BlockMatcher.match(old: old.map { .init(rect: $0.rect, text: $0.source) },
+        let oldRects = old.map { inFrame($0.rect) }
+        let matches = BlockMatcher.match(old: old.indices.map { .init(rect: oldRects[$0], text: old[$0].source) },
                                          new: fresh.map { .init(rect: $0.rect, text: $0.text) })
         var made: [Block] = []
+        var took = Set<Int>()   // old blocks whose translation a new block took as it was
         for (i, ocr) in fresh.enumerated() {
             let prior = matches[i].map { old[$0] }
             var b: Block
@@ -896,12 +998,16 @@ actor RegionPipeline {
                 b = Block(id: prior?.id ?? UUID(), rect: boxRect, lines: ocr.lines.map(\.rect), source: ocr.text,
                           appearance: appearance(of: ocr.lines[0].rect, in: frame.image), part: ocr.part)
             }
-            if let prior, prior.source == ocr.text { b.translation = prior.translation }
+            if let oi = matches[i], prior?.source == ocr.text {
+                b.translation = old[oi].translation
+                if b.translation != nil { took.insert(oi) }
+            }
             made.append(b)
         }
         capBodySizes(&made, among: blocks.filter { !staleIDs.contains($0.id) })
-        guard let moved = finishPass(start, frame: frame) else { return }
-        let bounds = CGRect(x: 0, y: 0, width: frame.image.width, height: frame.image.height)
+        let keep = carryTranslations(into: &made, from: oldRects, old: old, took: took, stale: stale, step: frame.grayStep)
+        let moved = finishPass(frame: frame)
+        let bounds = CGRect(x: 0, y: 0, width: captureSize.width * scale, height: captureSize.height * scale)   // the capture now: a resize may have moved on
         // Translations that arrived meanwhile are on the current copies of the old blocks.
         let current = Dictionary(blocks.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         made = made.compactMap { b in
@@ -909,7 +1015,7 @@ actor RegionPipeline {
             if b.translation == nil, let c = current[b.id], c.source == b.source { b.translation = c.translation }
             return b
         }
-        blocks = blocks.filter { !staleIDs.contains($0.id) } + made
+        blocks = blocks.filter { !staleIDs.contains($0.id) || keep.contains($0.id) } + made
         Trace.mark("fast: \(made.count) new blocks (\(wantsErase ? "erased" : "boxed")), \(blocks.count - made.count) kept", since: t)
         fillTranslations()
         renderMissing()
@@ -920,8 +1026,10 @@ actor RegionPipeline {
     private func seamlessPass(_ frame: CapturedFrame) async -> Bool {
         setActivity(.reading)
         layoutStale = false
-        let start = startPass()
+        startPass("seamless")
         defer { looks = nil }
+        // What the blocks of the last reading describe, against this frame: where the page under them changed (`carryTranslations`).
+        let stale = staleness(for: frame)
         var t = Trace.now
         var found: [OCRBlock]
         do {
@@ -935,7 +1043,7 @@ actor RegionPipeline {
             log.error("document OCR failed: \(String(describing: error), privacy: .public)")
             Trace.mark("seamless: OCR failed \(error)", since: t)
             guard noteReadFailure(error) else { return false }
-            _ = finishPass(start, frame: frame)
+            _ = finishPass(frame: frame)
             return true
         }
         readBackoff.success()
@@ -946,7 +1054,7 @@ actor RegionPipeline {
             }
         }
         if holdsVerticalText(found) {
-            guard finishPass(start, frame: frame) != nil else { return true }
+            _ = finishPass(frame: frame)
             blocks = []
             emit(animated: false)
             return true
@@ -963,30 +1071,86 @@ actor RegionPipeline {
         Trace.mark("seamless: frame → RGBA", since: t); t = Trace.now
 
         // Matched in the frame's coordinates: undo any move applied to the blocks since the pass started.
-        let undone = blocks.map { b in moves.reversed().reduce(b.rect) { $1.undo($0) } }
+        let undone = blocks.map { inFrame($0.rect) }
         let matches = BlockMatcher.match(old: blocks.indices.map { .init(rect: undone[$0], text: blocks[$0].source) },
                                          new: found.map { .init(rect: $0.rect, text: $0.text) })
         let prior = blocks
         var next: [Block] = []
+        var took = Set<Int>()   // old blocks whose translation a new block took as it was
         for (i, ocr) in found.enumerated() {
             guard let e = erase(ocr, in: full, place: places[i]) else { continue }
             let id = matches[i].map { prior[$0].id } ?? UUID()
             var b = Block(id: id, rect: e.rect.cgRect, lines: ocr.lines.map(\.rect), source: ocr.text, appearance: e.look,
                           fontSize: e.fontSize, spareWidth: e.spare, textArea: e.textArea, part: ocr.part)
-            if let oi = matches[i], prior[oi].source == ocr.text { b.translation = prior[oi].translation }
+            if let oi = matches[i], prior[oi].source == ocr.text {
+                b.translation = prior[oi].translation
+                if b.translation != nil { took.insert(oi) }
+            }
             b.erased = e.patch
             next.append(b)
         }
         capBodySizes(&next, among: [])
+        let keep = carryTranslations(into: &next, from: undone, old: prior, took: took, stale: stale, step: frame.grayStep)
         Trace.mark("seamless: erase \(next.count) blocks", since: t); t = Trace.now
-        guard let moved = finishPass(start, frame: frame) else { return true }
-        let bounds = CGRect(x: 0, y: 0, width: frame.image.width, height: frame.image.height)
-        blocks = next.compactMap { b in moved.reduce(Optional(b)) { b, m in b.flatMap { m.apply(to: $0, bounds: bounds) } } }
+        let moved = finishPass(frame: frame)
+        let bounds = CGRect(x: 0, y: 0, width: captureSize.width * scale, height: captureSize.height * scale)   // the capture now: a resize may have moved on
+        blocks = blocks.filter { keep.contains($0.id) } + next.compactMap { b in moved.reduce(Optional(b)) { b, m in b.flatMap { m.apply(to: $0, bounds: bounds) } } }
         fillTranslations()
         renderMissing()
         Trace.mark("seamless: render", since: t)
         emit(animated: true)
         return true
+    }
+
+    /// What a block read again shows meanwhile, where the page under the old blocks is as it was (docs/design/lens-hold.md). `rects` are the old
+    /// blocks' places in the frame's space; `took` the old blocks whose translation a new block took already. Only a block that drew something has
+    /// something to hand on. A new block draws until its translation arrives what the old blocks it holds drew (`TranslationCarry.assign`), and
+    /// takes the identity of the largest of them. A new block that is only a piece of an old one (the capture's edge cuts the old one's text) is not
+    /// made: the old block stays as it is. Returns those old blocks.
+    private func carryTranslations(into new: inout [Block], from rects: [CGRect], old: [Block], took: Set<Int>, stale: Staleness, step: Int) -> Set<UUID> {
+        let olds = old.indices.map { i in
+            TranslationCarry.Old(rect: rects[i], shown: took.contains(i) || old[i].image == nil ? nil : old[i].translation ?? old[i].carried,
+                                 unchanged: !stale.edited(rects[i], step: step))
+        }
+        let carry = TranslationCarry.assign(old: olds, new: new.map(\.rect))
+        let oldIDs = Set(old.map(\.id))
+        var used = Set(new.map(\.id))
+        for i in new.indices where new[i].translation == nil {
+            guard let c = carry[i] else { continue }
+            new[i].carried = c.text
+            Trace.count("render.carried")
+            // For the panel the block is the one it stands in the place of: one layer dissolves into its new text, where a block of its own would
+            // fade in over the page while the old one fades out (the page's text shows through both). A block the matcher paired keeps that pairing.
+            let id = old[c.primary].id
+            if !oldIDs.contains(new[i].id), !used.contains(id) {
+                used.remove(new[i].id)
+                new[i].id = id
+                used.insert(id)
+                Trace.count("render.inherited")
+            }
+        }
+        var keep = Set<UUID>(), pieces = Set<Int>()
+        for (i, parent) in TranslationCarry.fragments(old: olds, new: new.map(\.rect), carry: carry).enumerated() {
+            // A boxed old block is not kept for a piece that is erased: the settled reading draws the seamless look.
+            guard let parent, new[i].translation == nil, new[i].erased == nil || old[parent].erased != nil else { continue }
+            keep.insert(old[parent].id)
+            pieces.insert(i)
+        }
+        if !pieces.isEmpty { Trace.count("render.pieces", pieces.count) }
+        if Trace.enabled {
+            // Which blocks that drew something have it to hand on, and which of those the page's change keeps from it.
+            let handing = olds.indices.filter { olds[$0].shown != nil }
+            let edited = handing.filter { !olds[$0].unchanged }.map { "'\(old[$0].source.prefix(14))'" }
+            let taken = Set(carry.compactMap { $0 }.flatMap { $0.from })
+            let left = handing.filter { olds[$0].unchanged && !taken.contains($0) }.map { "'\(old[$0].source.prefix(14))' \(TraceNumber.px(rects[$0].minX)),\(TraceNumber.px(rects[$0].minY)) \(TraceNumber.px(rects[$0].width))x\(TraceNumber.px(rects[$0].height))" }
+            Trace.mark("carry: \(handing.count) old drawn block(s) to hand on, \(edited.count) edited \(edited.joined(separator: ", ")); \(carry.compactMap { $0 }.count) of \(new.count) new carry, \(new.filter { oldIDs.contains($0.id) }.count) with an old id; "
+                       + "no new block holds half of: \(left.joined(separator: " ; ")); new: " + new.map { "'\($0.source.prefix(10))' \(TraceNumber.px($0.rect.minX)),\(TraceNumber.px($0.rect.minY)) \(TraceNumber.px($0.rect.width))x\(TraceNumber.px($0.rect.height))" }.joined(separator: " ; "),
+                       since: Trace.now)
+        }
+        new = new.enumerated().filter { !pieces.contains($0.offset) }.map(\.element)
+        // A block the matcher paired with an old block that stays is another block: one identity is one layer.
+        for i in new.indices where keep.contains(new[i].id) { new[i].id = UUID() }
+        return keep
     }
 
     /// A pass that found no reader (`RecognitionUnavailable`) waits for `readerReady`: no timer, no backoff, and the frame stays
@@ -1430,6 +1594,7 @@ actor RegionPipeline {
         for i in blocks.indices where blocks[i].translation == nil {
             if let hit = translator.cached(blocks[i].source, route: route) {
                 blocks[i].translation = hit
+                blocks[i].carried = nil
                 blocks[i].image = nil
             } else if !strikes.isParked(blocks[i].source) {
                 pending.insert(blocks[i].source)
@@ -1669,6 +1834,7 @@ actor RegionPipeline {
         for i in blocks.indices {
             guard let t = result[blocks[i].source], blocks[i].translation != t else { continue }
             blocks[i].translation = t
+            blocks[i].carried = nil
             blocks[i].image = nil
             changed = true
         }
@@ -1685,7 +1851,7 @@ actor RegionPipeline {
         for i in blocks.indices where blocks[i].image == nil {
             let b = blocks[i]
             // A translation equal to the source means "leave it": no box, no erase, the original stays.
-            guard let translation = b.translation, !translation.isEmpty, translation != b.source else { continue }
+            guard let translation = b.translation ?? b.carried, !translation.isEmpty, translation != b.source else { continue }
             // A piece of a paragraph that goes on in the next column draws its share of the paragraph's one translation.
             let text = b.part.map { FlowSplit.share(of: translation, part: $0) } ?? translation
             guard !text.isEmpty else { continue }
@@ -1722,6 +1888,13 @@ actor RegionPipeline {
             return OverlayBlock(id: b.id, frame: CGRect(x: b.rect.minX / s, y: b.rect.minY / s, width: b.rect.width / s, height: b.rect.height / s),
                                 image: img, seamless: b.erased != nil)
         }
+        // A block that was drawn and is still read but draws nothing now: the lens shows the page's own text where its translation was.
+        let blanked = blocks.filter { $0.image == nil && lastDrawn.contains($0.id) }
+        if !blanked.isEmpty {
+            Trace.count("overlay.blanked", blanked.count)
+            Trace.mark("blanked \(blanked.count) drawn block(s): " + blanked.map { "'\($0.source.prefix(20))' \($0.translation == nil ? "no translation" : "no image")" }.joined(separator: " ; "), since: Trace.now)
+        }
+        lastDrawn = Set(out.map(\.id))
         let texts = blocks.filter(\.startsParagraph).map { BlockText(frame: CGRect(x: $0.rect.minX / s, y: $0.rect.minY / s, width: $0.rect.width / s, height: $0.rect.height / s),
                                            source: $0.source, translation: $0.translation) }
         // What the self-test's layout line counts: every drawn block, in draw order.
@@ -1738,6 +1911,8 @@ actor RegionPipeline {
     }
 
     private var lastDump: TimeInterval = 0
+    /// The blocks the last snapshot drew.
+    private var lastDrawn: Set<UUID> = []
 
     /// MWOYEO_DUMP=dir: writes what the capture saw with the overlay on top (lens outlined), at most twice a second —
     /// to check the live app without screen recording rights of one's own.

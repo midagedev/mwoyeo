@@ -101,10 +101,12 @@ enum LensText {
     static func originals(_ blocks: [BlockText]) -> [String] { blocks.map(\.source) }
     static func translations(_ blocks: [BlockText]) -> [String] { blocks.compactMap(usable) }
 
-    /// What the transcript recorder is fed: every block of the capture, flagged by whether the lens shows it.
+    /// What the transcript recorder is fed: every block of the capture, flagged by whether the lens shows it, and where it stands (points from
+    /// the lens's corner; the recorder does not read it, the stack of recent lines does).
     static func observed(_ snapshot: OverlaySnapshot, lens: CGRect) -> [TranscriptRecorder.Observed] {
         ReadingOrder.sorted(snapshot.texts, frame: \.frame).map {
-            TranscriptRecorder.Observed(source: $0.source, translation: $0.translation, inLens: shown($0, in: snapshot, lens: lens))
+            TranscriptRecorder.Observed(source: $0.source, translation: $0.translation, inLens: shown($0, in: snapshot, lens: lens),
+                                        frame: $0.frame.offsetBy(dx: snapshot.origin.x - lens.minX, dy: snapshot.origin.y - lens.minY))
         }
     }
 

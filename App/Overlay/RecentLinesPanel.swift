@@ -68,6 +68,26 @@ final class RecentLinesPanel: NSPanel {
         place()
     }
 
+    /// The call that shows the next line that waits (`RecentLines.nextLift`): a scene that stays as it is makes no look to do it.
+    private var lift: DispatchWorkItem?
+
+    /// Calls `handler` once in `seconds`, in place of the call before; nil calls nothing. The panel owns it so that the lens's session has no
+    /// clock of its own for the stack: it shows what `RecentLines` says at the time it is asked.
+    func refresh(in seconds: TimeInterval?, _ handler: @escaping @MainActor () -> Void) {
+        lift?.cancel()
+        lift = nil
+        guard let seconds else { return }
+        let work = DispatchWorkItem { MainActor.assumeIsolated(handler) }
+        lift = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + max(seconds, 0) + 0.02, execute: work)
+    }
+
+    override func orderOut(_ sender: Any?) {
+        lift?.cancel()
+        lift = nil
+        super.orderOut(sender)
+    }
+
     /// Shows `kept` (newest first): the translations, faded by age. No lines takes the panel off the screen.
     func show(_ kept: [RecentLines.Line]) {
         lines = kept.map(\.translation)

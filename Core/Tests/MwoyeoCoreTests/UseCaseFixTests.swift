@@ -59,6 +59,17 @@ import Testing
         #expect(LabelRule.labels([item("안녕하세요.", x: 10, y: 10, w: 60, blue), item("본문은 여기에서 시작합니다", x: 10, y: 38, w: 300, black)]).isEmpty)
     }
 
+    @Test func aNameInTheInkOfItsBoxIsANameTagByPlaceAlone() {
+        // Recent117: a game's name has the ink of its box, so `labels` keeps it for the engine; the stack of recent lines asks only where it stands.
+        let black = RGBA(20, 20, 20)
+        let tag = item("九十九", x: 10, y: 10, w: 60, black), box = item("はい、シュザンヌ様。足元にお気をつけください", x: 10, y: 38, w: 300, black)
+        #expect(LabelRule.labels([tag, box]).isEmpty)
+        #expect(LabelRule.nameTags([tag, box]) == [0])
+        #expect(LabelRule.nameTags([item("はい", x: 10, y: 10, w: 60, black)]).isEmpty, "nothing under it: a word that was said")
+        #expect(LabelRule.nameTags([item("安心して。", x: 10, y: 10, w: 60, black), box]).isEmpty, "a sentence is never a name")
+        #expect(LabelRule.nameTags([tag, item("はい、シュザンヌ様。足元にお気をつけください", x: 10, y: 200, w: 300, black)]).isEmpty, "far under it: not its box")
+    }
+
     // MARK: Korean wraps at spaces
 
     @Test func koreanWrapsAtSpacesNotInsideWords() {

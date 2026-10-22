@@ -16,7 +16,9 @@ import re, sys, glob, statistics
 
 LINE = re.compile(r"sweep share (?P<share>[\d.]+) size (?P<size>[\d.]+) full (?P<full>[\d.]+) floor (?P<floor>[\d.]+) clipped (?P<clipped>\d) ellipsis (?P<ellipsis>\d) "
                   r"lines (?P<lines>\d+) wrapped (?P<wrapped>\d+) core (?P<cw>[\d.]+)x(?P<ch>[\d.]+) chars (?P<chars>\d+)")
+INK = re.compile(r"ink line (?P<i>\d+) of (?P<n>\d+) height (?P<h>[\d.]+) size (?P<size>[\d.]+) top (?P<t>[\d. -]+) bottom (?P<b>[\d. -]+) src")
 ALLOWANCE = 0.10
+INK_SHARE = 10   # the share of a line's ink (percent) that an edge may cut and the line still count as whole (the column of `top`/`bottom` that holds it; --ink-share 2|5|10)
 
 def parse(text):
     """Blocks as lists of (share, size, full, floor, cut, lines, wrapped) in the order of the lines: a block starts at share 1.0."""
@@ -51,8 +53,36 @@ def table(blocks, label):
         print(f'  {s:5.2f}  {bad:5d}  {len(rows):5d}  {share_bad:6.1%}   {ratio:5.2f}{mark}')
     return candidate if candidate is not None else prev
 
+def ink_lines(text):
+    """(height, size, top, bottom) per `ink` line: top and bottom are the depths (shares of the box's height) at which an edge has cut 0, 2, 5 and 10 % of the ink."""
+    return [(float(m['h']), float(m['size']), [float(v) for v in m['t'].split()], [float(v) for v in m['b'].split()]) for m in INK.finditer(text)]
+
+def percentile(values, q):
+    values = sorted(values)
+    return values[min(len(values) - 1, max(0, int(q * len(values))))]
+
+def ink_table(lines):
+    """LensWindow.wholeInset: the depth that at most ALLOWANCE of the lines have cut more than INK_SHARE % of their ink by (the 10th percentile of the depth at which the edge has cut 5 %),
+    for the top and for the bottom edge. Prints the distribution by size class and returns (top, bottom)."""
+    col = {0: 0, 2: 1, 5: 2, 10: 3}[INK_SHARE]
+    out = []
+    for name, group in (('all lines', lines), ('size < 30 px', [l for l in lines if l[1] < 30]), ('30 to 44 px', [l for l in lines if 30 <= l[1] < 44]), ('44 px and more', [l for l in lines if l[1] >= 44])):
+        if not group: continue
+        print(f'{name}: {len(group)} lines; depth into the box (share of its height) at which an edge has cut {INK_SHARE} % of the ink; ink starts at')
+        for edge, k in (('top   ', 2), ('bottom', 3)):
+            v = [l[k][col] for l in group]; start = [l[k][0] for l in group]
+            print(f'  {edge} p10 {percentile(v, ALLOWANCE):.3f}  p25 {percentile(v, .25):.3f}  median {percentile(v, .5):.3f}  p90 {percentile(v, .9):.3f}   (ink starts: p10 {percentile(start, ALLOWANCE):.3f} median {percentile(start, .5):.3f})')
+        if name == 'all lines': out = [percentile([l[2][col] for l in group], ALLOWANCE), percentile([l[3][col] for l in group], ALLOWANCE)]
+    return tuple(out)
+
 def main(argv):
+    global INK_SHARE
+    if '--ink-share' in argv:
+        INK_SHARE = int(argv[argv.index('--ink-share') + 1])
     if '--selftest' in argv:
+        # A line whose ink starts at 0.12 of its box and whose first INK_SHARE % (10) is cut at 0.20 (bottom 0.21): the table must say so.
+        fake = [(36.0, 30.0, [0.12, 0.14, 0.17, 0.20], [0.13, 0.15, 0.18, 0.21])] * 20
+        assert ink_table(fake) == (0.20, 0.21), ink_table(fake)
         rows = [(1.0, 20, 20, 10, False, 4, 4), (0.5, 20, 20, 10, False, 5, 4), (0.4, 10, 20, 10, True, 6, 4), (0.3, 10, 20, 10, True, 8, 4)]
         blocks = [rows] * 10
         over = table(blocks, 'selftest')
@@ -61,9 +91,15 @@ def main(argv):
         return 0
     paragraphs = int(argv[argv.index('--paragraphs') + 1]) if '--paragraphs' in argv else 3
     files = sorted(glob.glob(argv[0].rstrip('/') + '/*.err'))
-    blocks = []
+    blocks, inks = [], []
     for f in files:
-        blocks += parse(open(f, errors='replace').read())
+        text = open(f, errors='replace').read()
+        blocks += parse(text)
+        inks += ink_lines(text)
+    if inks and '--ink' in argv:
+        top, bottom = ink_table(inks)
+        print(f'wholeInset candidate: top {top:.3f}, bottom {bottom:.3f} ({len(inks)} lines)')
+        return 0
     if not blocks:
         print(f'sweep.py: no sweep line in {argv[0]} (render with MWOYEO_LENS_SWEEP=1)', file=sys.stderr)
         return 2

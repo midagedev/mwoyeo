@@ -61,17 +61,17 @@ enum LensWindowChecks {
 
     // MARK: 2. The overlay's mask
 
-    private static func stripes() -> CGImage? {
-        guard let ctx = CGContext(data: nil, width: 100, height: 120, bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpace(name: CGColorSpace.sRGB)!,
+    private static func stripes(count: Int = 6) -> CGImage? {
+        guard let ctx = CGContext(data: nil, width: 100, height: count * 20, bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpace(name: CGColorSpace.sRGB)!,
                                   bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
-        for k in 0..<6 {
+        for k in 0..<count {
             ctx.setFillColor(stripeColors[k])
-            ctx.fill(CGRect(x: 0, y: 120 - (k + 1) * 20, width: 100, height: 20))   // the context is y up: stripe 0 is the top one
+            ctx.fill(CGRect(x: 0, y: (count - k - 1) * 20, width: 100, height: 20))   // the context is y up: stripe 0 is the top one
         }
         return ctx.makeImage()
     }
 
-    private static let stripeColors: [CGColor] = [(1, 0, 0), (0, 0.6, 0), (0, 0, 1), (1, 0, 1), (0, 0.8, 0.8), (1, 0.7, 0)].map { CGColor(srgbRed: $0.0, green: $0.1, blue: $0.2, alpha: 1) }
+    private static let stripeColors: [CGColor] = [(1, 0, 0), (0, 0.6, 0), (0, 0, 1), (1, 0, 1), (0, 0.8, 0.8), (1, 0.7, 0), (0.4, 0.4, 0.4)].map { CGColor(srgbRed: $0.0, green: $0.1, blue: $0.2, alpha: 1) }
 
     /// The page's colour at (x, row from the top) of a layer tree drawn into a 300 x 300 picture.
     private static func render(_ root: CALayer) -> [[UInt8]]? {
@@ -88,24 +88,27 @@ enum LensWindowChecks {
 
     private static func colourAt(_ rows: [[UInt8]], x: Int, y: Int) -> [UInt8] { Array(rows[y][(x * 3)..<(x * 3 + 3)]) }
 
-    /// Which of the six stripes (the lines of a block at x 20, y 40, 100 x 120 on a flipped host, as the overlay has it) show: the stripe's own colour.
-    private static func shownStripes(lens: CGRect) -> (shows: Bool, stripes: [Bool], masked: Bool)? {
-        guard let image = stripes() else { return nil }
+    /// Which of the six stripes (the lines of a block at x 20, y 40, 100 x 120 on a flipped host, as the overlay has it) show: the stripe's own colour. `margin`: a seventh
+    /// stripe above the six, which is no line but the block's erased background (the translation does not fill its patch): it is the block's, and shows where the lens cuts no line.
+    private static func shownStripes(lens: CGRect, margin: Bool = false) -> (shows: Bool, stripes: [Bool], masked: Bool)? {
+        let extra = margin ? 1 : 0
+        guard let image = stripes(count: 6 + extra) else { return nil }
         let root = CALayer(), host = CALayer(), block = CALayer()
         root.frame = CGRect(x: 0, y: 0, width: 300, height: 300)
         host.frame = root.bounds
         host.isGeometryFlipped = true   // the overlay's host: block frames are top-left based
-        block.frame = CGRect(x: 20, y: 40, width: 100, height: 120)
+        block.frame = CGRect(x: 20, y: 40, width: 100, height: CGFloat(120 + 20 * extra))
         block.contentsGravity = .resize
         block.contentsScale = 1
         block.contents = image
         root.addSublayer(host)
         host.addSublayer(block)
-        let lines = (0..<6).map { CGRect(x: 0, y: CGFloat($0) * 20, width: 100, height: 20) }
+        let lines = (0..<6).map { CGRect(x: 0, y: CGFloat($0 + extra) * 20, width: 100, height: 20) }
         let shows = LensMask.apply(to: block, lines: lines, lens: lens)
         guard let rows = render(root) else { return nil }
         let own = stripeColors.map { c in c.components!.prefix(3).map { UInt8(($0 * 255).rounded()) } }
-        let seen = (0..<6).map { k in
+        // The stripes of the picture, margin first when there is one; the answer is for the six lines (or, with a margin, seven: the margin first).
+        let seen = (0..<(6 + extra)).map { k in
             let got = colourAt(rows, x: 70, y: 40 + k * 20 + 10)
             return zip(got, own[k]).allSatisfy { abs(Int($0) - Int($1)) <= 3 }
         }
@@ -121,6 +124,12 @@ enum LensWindowChecks {
         // The lens starts at y 70, inside the second line (y 60 to 80).
         if let top = shownStripes(lens: CGRect(x: 0, y: 70, width: 300, height: 200)) {
             check("a lens that cuts the block's top shows the lines below the cut", top.shows && top.stripes == [false, false, true, true, true, true] && top.masked, "\(top)")
+        } else { check("the layer tree is drawn", false) }
+        // F1 (film4, edges117b): the lens cuts the last line at the bottom and no line at the top. The block's margin above the first line is its erased background,
+        // which is the block's own wherever the lens cuts no line: the mask must not take it (the page's English line stood there, whole, above its Korean).
+        if let margin = shownStripes(lens: CGRect(x: 0, y: 30, width: 300, height: 120 + 20), margin: true) {
+            // The lens ends at y 170, inside the last line (the stripe at y 160 to 180); the stripe at y 40 to 60 is the margin.
+            check("a lens that cuts only the bottom shows the block's margin above its first line (the erased background) and the whole lines", margin.stripes == [true, true, true, true, true, true, false] && margin.masked, "\(margin)")
         } else { check("the layer tree is drawn", false) }
         if let inside = shownStripes(lens: CGRect(x: 0, y: 30, width: 300, height: 200)) {
             check("a block wholly inside the lens has no mask and shows every line", inside.shows && inside.stripes == [true, true, true, true, true, true] && !inside.masked, "\(inside)")
@@ -185,13 +194,21 @@ enum LensWindowChecks {
 
         /// A pipeline over `image` (the picture of `capture`) with its lens at `lens`, read and translated; the lens has settled (`settleLensNow`: the session's
         /// wait is not a gate's). `wait`: whether to wait for every text to be translated (a page that is cut has none to wait for).
-        func settled(lens: CGRect, capture: CGRect = capture, image: CGImage = readable, wait: Bool = true) async -> (RegionPipeline, OverlaySnapshot)? {
+        func settled(lens: CGRect, capture: CGRect = capture, image: CGImage = readable, wait: Bool = true,
+                     midway: ((RegionPipeline) async -> Void)? = nil) async -> (RegionPipeline, OverlaySnapshot)? {
             guard let rgba = RGBAImage(cgImage: image) else { return nil }
             let gray = rgba.withBGRA { GrayImage(bgra: $0, width: rgba.width, height: rgba.height, bytesPerRow: rgba.width * 4, step: 4) }
             let p = RegionPipeline(options: PipelineOptions(settings), capture: capture, translator: ContextChecks.service(settings), inpainter: nil, lensSettle: 0.02,
                                    onSnapshot: { latest.put($0) })
             await p.setVisible(lens)
+            _ = Trace.takeCounts()
             await p.ingest(CapturedFrame(image: image, gray: gray, grayStep: 4, scale: scale, rect: capture, time: ProcessInfo.processInfo.systemUptime))
+            if let midway {
+                // `midway` runs while the first pass reads (`pass.read` is counted as it starts, before the reader is awaited).
+                let giveUp = ProcessInfo.processInfo.systemUptime + 30
+                while (Trace.takeCounts()["pass.read"] ?? 0) == 0, ProcessInfo.processInfo.systemUptime < giveUp { try? await Task.sleep(for: .milliseconds(2)) }
+                await midway(p)
+            }
             let until = ProcessInfo.processInfo.systemUptime + 150
             while ProcessInfo.processInfo.systemUptime < until {
                 try? await Task.sleep(for: .milliseconds(50))
@@ -224,8 +241,8 @@ enum LensWindowChecks {
             let own = b.lines.map { $0.offsetBy(dx: b.frame.minX, dy: b.frame.minY) }
             let cut = CGRect(x: lens.minX, y: lens.minY, width: lens.width, height: own[own.count - 2].midY - lens.minY)
             let shown = LensWindow.shown(lines: own, lens: cut)
-            if case let .band(_, bottom) = shown {
-                check("a lens that ends inside the last but one line shows the lines above it", abs(bottom - own[own.count - 3].maxY) < 0.01, "\(shown)")
+            if case let .band(top, bottom) = shown {
+                check("a lens that ends inside the last but one line shows the lines above it, from the top of the block", top == nil && abs((bottom ?? .infinity) - own[own.count - 3].maxY) < 0.01, "\(shown)")
             } else { check("a lens that ends inside the last but one line shows the lines above it", false, "\(shown)") }
         } else { check("the longest block came to three lines at least", false, "\(drawn?.lines.count ?? 0)") }
 
@@ -245,6 +262,27 @@ enum LensWindowChecks {
         check("a lens that grows over the column it left out draws it, laid out in the part it covers", grown.hidden == 0 && grown.narrowed == leftTexts + rightTexts && (latest.snapshot?.blocks.count ?? 0) == leftTexts + rightTexts,
               "narrowed \(grown.narrowed) hidden \(grown.hidden), \(latest.snapshot?.blocks.count ?? 0) of \(leftTexts + rightTexts) drawn")
 
+        // A Fit decides the lens it goes to before the lens gets there (film4 F5): the blocks are laid out for it at once, and the lens itself has not moved. The lens that is
+        // there (100 to 500) leaves the second column out (10 % covered); the one it goes to (100 to 660) covers 90 % of it.
+        if let (p3, s3) = await settled(lens: lens) {
+            let before = await p3.lensWindowState()
+            let drawnBefore = s3.blocks.count
+            let target = CGRect(x: 100, y: 10, width: 560, height: 180)
+            await p3.planLens(for: target)
+            await p3.idle()
+            let after = await p3.lensWindowState()
+            let drawnAfter = latest.snapshot?.blocks.count ?? 0
+            check("a lens planned for (a Fit's end) has the column it will cover laid out before it is there: nothing hidden, both columns drawn",
+                  before.hidden == rightTexts && after.hidden == 0 && drawnAfter == leftTexts + rightTexts && drawnBefore == leftTexts,
+                  "hidden \(before.hidden) -> \(after.hidden), drawn \(drawnBefore) -> \(drawnAfter) of \(leftTexts + rightTexts)")
+            await p3.setVisible(target)
+            await p3.settleLensNow()
+            await p3.idle()
+            let landed = await p3.lensWindowState()
+            check("and the lens that gets there changes nothing of it", landed.hidden == after.hidden && landed.narrowed == after.narrowed && (latest.snapshot?.blocks.count ?? 0) == drawnAfter,
+                  "narrowed \(after.narrowed) -> \(landed.narrowed), hidden \(after.hidden) -> \(landed.hidden)")
+        } else { check("the pipeline reads the page for the planned lens", false) }
+
         // A paragraph that the capture's edge cuts (film4 F16, F17): 600 wide on a capture of 500. Every line ends at the edge, so it is not drawn and not translated; it is
         // where a column stands, and the snapshot says a cut paragraph is under the lens (the session then asks the capture to reach it: `Reach`).
         let cutCapture = CGRect(x: 0, y: 0, width: 500, height: pageSize.height)
@@ -256,6 +294,17 @@ enum LensWindowChecks {
             check("it stands as a column the lens is over, and the snapshot says the capture cut it", cutSnapshot.cut && cutSnapshot.columns.count == 1, "cut \(cutSnapshot.cut), \(cutSnapshot.columns.count) columns")
             check("its column ends where the capture does", abs((cutSnapshot.columns.first?.right ?? 0) - cutCapture.maxX) < 8, "right \(cutSnapshot.columns.first?.right ?? 0)")
         } else { check("the cut paragraph is read", false) }
+
+        // The capture grows while a pass reads (a Reach of the lens, film4 F5): the pass is rebased onto the wider capture, and the strips the growth uncovered are not read. What
+        // was read is the capture the pass was given: the read says so, or Fit to Column takes the edge the capture cut for the column's own (it fitted 35 pt short of the column).
+        if let wide = self.page([(CGRect(x: 40, y: 30, width: 600, height: 120), firstText + " " + secondText)]),
+           let crop = wide.cropping(to: CGRect(x: 0, y: 0, width: cutCapture.width * scale, height: cutCapture.height * scale)),
+           let (grown, _) = await settled(lens: CGRect(x: 100, y: 10, width: 300, height: 180), capture: cutCapture, image: crop, wait: false, midway: { p in await p.captureResized(to: capture) }),
+           let snap = latest.snapshot {
+            _ = grown
+            check("a pass that the capture's growth rebased has read the capture it was given, not the wider one", snap.captureSize == capture.size && snap.read == cutCapture,
+                  "capture \(snap.captureSize) read \(snap.read)")
+        } else { check("the rebased pass is read", false) }
     }
 }
 #endif

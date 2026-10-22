@@ -87,12 +87,24 @@ final class LensWindowTests: XCTestCase {
 
     func testTheLineTheBottomEdgeCutsIsHiddenAndTheOnesAboveStay() {
         // F1: the last Korean line sits on the bottom edge. The lens ends in the middle of line 5 (y 300..320).
-        XCTAssertEqual(LensWindow.shown(lines: lines, lens: CGRect(x: 0, y: 150, width: 900, height: 160)), .band(top: 200, bottom: 300))
+        // The top is not cut (every line starts inside the lens), so the band has no top: the layer shows from its own edge (edges117b, F1).
+        XCTAssertEqual(LensWindow.shown(lines: lines, lens: CGRect(x: 0, y: 150, width: 900, height: 160)), .band(top: nil, bottom: 300))
     }
 
     func testTheLineTheTopEdgeCutsIsHiddenAndTheOnesBelowStay() {
         // The lens starts in the middle of line 1 (y 220..240).
-        XCTAssertEqual(LensWindow.shown(lines: lines, lens: CGRect(x: 0, y: 230, width: 900, height: 300)), .band(top: 240, bottom: 320))
+        XCTAssertEqual(LensWindow.shown(lines: lines, lens: CGRect(x: 0, y: 230, width: 900, height: 300)), .band(top: 240, bottom: nil))
+    }
+
+    func testF1TheBandOfALensThatCutsOnlyTheBottomHasNoTop() {
+        // F1 (film4 take o2-drawn, edges117b): seven Korean lines of 17.5 pt in a block whose patch is a line taller than they are (the paragraph had eight English lines),
+        // the lens ending in the seventh. The erased background above the first line is the block's: the band started at the first line's box and the page's English line
+        // above it showed through, whole, over its own Korean.
+        let seven = (0..<7).map { CGRect(x: 0, y: 22 + CGFloat($0) * 17.5, width: 330, height: 17.5) }
+        let lens = CGRect(x: 0, y: 0, width: 400, height: 22 + 6 * 17.5 + 9)   // ends 9 pt into the seventh line
+        XCTAssertEqual(LensWindow.shown(lines: seven, lens: lens), .band(top: nil, bottom: 22 + 6 * 17.5))
+        // The same block with the lens cutting its top only: the layer shows to its own bottom.
+        XCTAssertEqual(LensWindow.shown(lines: seven, lens: CGRect(x: 0, y: 22 + 17.5 + 9, width: 400, height: 400)), .band(top: 22 + 2 * 17.5, bottom: nil))
     }
 
     func testALensCuttingBothEdgesShowsTheLinesBetween() {
@@ -105,12 +117,31 @@ final class LensWindowTests: XCTestCase {
     }
 
     func testALineOnePointOutIsWholeAndALineHalfOutIsNot() {
-        // The ink of a line stands inside its box (`inkInset`): one point of 20 is empty line box, ten is a cut glyph.
+        // The ink of a line stands inside its box (`wholeInset`): one point of 20 is empty line box, ten is a cut glyph.
         XCTAssertEqual(LensWindow.shown(lines: lines, lens: CGRect(x: 0, y: 201, width: 900, height: 119)), .all)
-        XCTAssertEqual(LensWindow.shown(lines: lines, lens: CGRect(x: 0, y: 210, width: 900, height: 110)), .band(top: 220, bottom: 320))
-        // Where the ink starts to be cut: 12 % of 20 = 2.4.
-        XCTAssertEqual(LensWindow.shown(lines: lines, lens: CGRect(x: 0, y: 202.3, width: 900, height: 200)), .all)
-        XCTAssertEqual(LensWindow.shown(lines: lines, lens: CGRect(x: 0, y: 202.6, width: 900, height: 200)), .band(top: 220, bottom: 320))
+        XCTAssertEqual(LensWindow.shown(lines: lines, lens: CGRect(x: 0, y: 210, width: 900, height: 110)), .band(top: 220, bottom: nil))
+        // Where the top edge starts to cut more than the allowance of the ink: 0.20 of 20 = 4 from the line's top.
+        XCTAssertEqual(LensWindow.shown(lines: lines, lens: CGRect(x: 0, y: 203.9, width: 900, height: 200)), .all)
+        XCTAssertEqual(LensWindow.shown(lines: lines, lens: CGRect(x: 0, y: 204.1, width: 900, height: 200)), .band(top: 220, bottom: nil))
+        // The bottom edge: 0.14 of 20 = 2.8 from the line's bottom (the ink of a Hangul line ends nearer to it than it starts to its top).
+        XCTAssertEqual(LensWindow.shown(lines: lines, lens: CGRect(x: 0, y: 150, width: 900, height: 317.3 - 150)), .all)
+        XCTAssertEqual(LensWindow.shown(lines: lines, lens: CGRect(x: 0, y: 150, width: 900, height: 316.9 - 150)), .band(top: nil, bottom: 300))
+    }
+
+    func testF16ALineWhoseInkStandsOnePointOutsideTheLensIsShown() {
+        // F16 (film4, edges117b): the first Korean line's ink stood 1 pt above the lens (a 18 pt line: 0.055 of its height) and the line was masked, the page's English
+        // showing in its place. The ink starts 0.13 of the box's height from its top (the paper bench's median), so the lens's top edge stood 0.186 inside the box.
+        let box = CGRect(x: 0, y: 100, width: 300, height: 18)
+        let inkTop = box.minY + 0.13 * box.height
+        let lens = CGRect(x: 0, y: inkTop + 1, width: 400, height: 300)
+        XCTAssertEqual(LensWindow.shown(lines: [box], lens: lens), .all)
+        // Deeper cuts stay hidden: an edge 0.25 into the box has cut a quarter of the ink or more; and one at the bottom, 0.20 into the box, likewise.
+        XCTAssertEqual(LensWindow.shown(lines: [box], lens: CGRect(x: 0, y: box.minY + 0.25 * box.height, width: 400, height: 300)), .none)
+        XCTAssertEqual(LensWindow.shown(lines: [box], lens: CGRect(x: 0, y: 0, width: 400, height: box.maxY - 0.20 * box.height)), .none)
+        // What the bench says of the lines: the first line of a block that sticks out of the lens by 0.2 of its height is shown, by 0.3 it is not.
+        let two = [box, box.offsetBy(dx: 0, dy: 17)]
+        XCTAssertEqual(LensWindow.shown(lines: two, lens: CGRect(x: 0, y: box.minY + 0.19 * box.height, width: 400, height: 300)), .all)
+        XCTAssertEqual(LensWindow.shown(lines: two, lens: CGRect(x: 0, y: box.minY + 0.30 * box.height, width: 400, height: 300)), .band(top: 117, bottom: nil))
     }
 
     func testABlockWithNoLinesMasksNothing() {

@@ -19,13 +19,15 @@ enum LensMask {
             if layer.mask != nil { layer.mask = nil }
             return false
         case let .band(top, bottom):
+            // A side the lens cuts no line at ends at the layer's own edge: the erased background there is the block's (F1).
+            let top = max(0, top ?? 0), bottom = min(layer.bounds.height, bottom ?? layer.bounds.height)
             let mask: CALayer
             if let m = layer.mask { mask = m } else {
                 mask = CALayer()
                 mask.backgroundColor = CGColor(gray: 0, alpha: 1)
                 layer.mask = mask
             }
-            let band = CGRect(x: 0, y: top, width: layer.bounds.width, height: bottom - top)
+            let band = CGRect(x: 0, y: top, width: layer.bounds.width, height: max(0, bottom - top))
             if mask.frame != band {
                 CATransaction.begin()
                 CATransaction.setDisableActions(true)

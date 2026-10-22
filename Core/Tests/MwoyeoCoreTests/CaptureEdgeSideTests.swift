@@ -39,14 +39,17 @@ import Testing
 
     @Test func theLinesOfAColumnCutAtTheRightEdgeAreTheOnesThatReachIt() {
         let lines = clear + rightColumn
-        // Four lines end at the edge; the short last line and the lines that end 18 px short of it are whole.
-        #expect(cut(lines) == Set([clear.count, clear.count + 2, clear.count + 3, clear.count + 6]))
+        // Re-pinned 2026-10-23 (round edges117b, `CaptureEdge.rightSlack` 0.7): this expected only the four lines that end 3 px short of the crop's edge and called the two that end 19 and 18 px
+        // short (indices 4 and 5) whole. They are cut: the uncut page of this paper (`p12`) reads the line 'Each result is produced' 656 px wide where the crop's box is 591 px, so
+        // that line goes on past the crop's edge; the document reader's box ended 18 px (0.67 of the 27 px line) short of the glyph the edge cut. Both stand within 0.7 of their height of the edge
+        // (19 of 33 px: 0.58, 18 of 27: 0.67). Only the one-line last paragraph line (ends 184 px short) is whole. FAIL-first: with `rightSlack = 0` this finds four lines, not six.
+        #expect(cut(lines) == Set([clear.count, clear.count + 2, clear.count + 3, clear.count + 4, clear.count + 5, clear.count + 6]))
     }
 
     @Test func bothEdgesAtOnce() {
         let lines = clear + leftColumn + rightColumn
-        let expected = Set(clear.count..<(clear.count + leftColumn.count)).union([clear.count + leftColumn.count, clear.count + leftColumn.count + 2,
-                                                                               clear.count + leftColumn.count + 3, clear.count + leftColumn.count + 6])
+        let right = clear.count + leftColumn.count
+        let expected = Set(clear.count..<right).union([right, right + 2, right + 3, right + 4, right + 5, right + 6])
         #expect(cut(lines) == expected)
     }
 
@@ -67,13 +70,32 @@ import Testing
         let right = [r(600, 400, 1262 - 600, 30), r(600, 440, 1261 - 600, 30), r(600, 480, 1265 - 600, 30)]
         #expect(cut(clear + right) == [clear.count, clear.count + 1, clear.count + 2])
         #expect(cut(clear + [r(4.5, 400, 600, 30), r(5, 440, 600, 30), r(0, 480, 600, 30)]).isEmpty, "4.5 px is not touching")
-        #expect(cut(clear + [r(600, 400, 660.5 - 0, 30), r(600, 440, 660.5, 30), r(600, 480, 660.5, 30)]).isEmpty, "1260.5 px is not touching")
+        // Re-pinned 2026-10-23 (round edges117b, `CaptureEdge.rightSlack`): these right ends stood 4.5 px from the edge and were "not touching" at a tolerance of 4 px. The right edge reaches
+        // 0.7 of a glyph (21 px for these 30 px lines, derived there); the lines that stay clear end 30 px (one line height) short of it.
+        #expect(cut(clear + [r(600, 400, 1235 - 600, 30), r(600, 440, 1235 - 600, 30), r(600, 480, 1235 - 600, 30)]).isEmpty, "1235 px, 30 short of the edge, is not touching")
     }
 
     @Test func aLineSixPixelsFromTheEdgeIsClearOfIt() {
         // The picture's only clear line: with it the column is cut, as it is with any other line (no edge, no tight crop).
         let lines = [r(0, 400, 600, 30), r(2, 440, 600, 30), r(0, 480, 600, 30), r(6, 520, 300, 30)]
         #expect(cut(lines) == [0, 1, 2])
+    }
+
+    @Test func aCutLineOfTheRightEdgeEndsUpToAGlyphShortOfIt() {
+        // F5 (film4 take, edges117b): the lines reader as the app runs it ends the lines of a cut paragraph 1, 10, 16 and 17 px short of the capture's right edge (1000 px) for lines
+        // 28 and 29 px high (`lens-window-checks`' paragraph): one line reached it within the 4 px tolerance, the paragraph was not flagged cut, and its translation was drawn.
+        let capture = CGRect(x: 0, y: 0, width: 1000, height: 400)
+        let heading = r(81, 20, 300, 29)
+        // The ends: 999, 990, 984 and 983 px, 1, 10, 16 and 17 px short of the edge (0.03, 0.36, 0.55 and 0.61 of the lines' 28 and 29 px).
+        let paragraph = [r(81, 67, 918, 29), r(81, 111, 909, 28), r(81, 154, 903, 29), r(81, 199, 902, 28)]
+        let lines = [heading] + paragraph
+        #expect(CaptureEdge.cutAtSides(lines, in: capture) == [1, 2, 3, 4])
+        // The reach grows with the line, the left edge keeps the tolerance, and a small label keeps the floor.
+        #expect(abs(CaptureEdge.reach(r(0, 0, 100, 30), .right) - 21) < 0.001)
+        #expect(CaptureEdge.reach(r(0, 0, 100, 30), .left) == CaptureEdge.tolerance)
+        #expect(CaptureEdge.reach(r(0, 0, 100, 4), .right) == CaptureEdge.tolerance)
+        // A column of vertical text (a tall, narrow box) reaches by its glyph, not by its length: 0.7 of 55 px, not of 914.
+        #expect(abs(CaptureEdge.reach(r(1172, 83, 55, 914), .right) - 38.5) < 0.001)
     }
 
     // MARK: What is not a column cut by the capture
@@ -99,6 +121,23 @@ import Testing
     @Test func aFullWidthLineIsNoSideCut() {
         // The top and bottom rule's own case (`CaptureEdge.cut`): one line across the whole capture.
         #expect(cut(clear + [r(0, 400, 1265, 30)]).isEmpty)
+    }
+
+    // MARK: Which old blocks a capture's cut leaves in place
+
+    @Test func aBlockThatEndsAtTheEdgeWasReadCutAndOneThatGoesOnPastItWasReadWhole() {
+        // F5 (film4, edges117b): the capture is 960 x 1264 px, its right edge runs through a column. The first read drew its line ends ('The predictor keeps ... posi',
+        // 'delivery la') and the later reads, which cut the column, kept them in place for the wide read: they end at the edge (957 of 960), nothing lies beyond to hold for.
+        let frame = CGRect(x: 0, y: 0, width: 960, height: 1264)
+        #expect(!CaptureEdge.continuesPastSide(CGRect(x: 173, y: 239, width: 957 - 173, height: 127), in: frame), "a paragraph read cut ends at the edge")
+        #expect(!CaptureEdge.continuesPastSide(CGRect(x: 793, y: 371, width: 957 - 793, height: 32), in: frame), "so does the fragment 'delivery la'")
+        #expect(!CaptureEdge.continuesPastSide(CGRect(x: 173, y: 239, width: 964 - 173, height: 127), in: frame), "the tolerance of the other rules is 4 px")
+        // A paragraph that the wide capture read whole (it ends at 1201.5 pt, 1039 px from this capture's left edge) is cut by this one: its text goes on.
+        #expect(CaptureEdge.continuesPastSide(CGRect(x: 173, y: 239, width: 1039 - 173, height: 127), in: frame))
+        #expect(CaptureEdge.continuesPastSide(CGRect(x: 173, y: 239, width: 964.5 - 173, height: 127), in: frame), "just past the tolerance")
+        // And the left edge.
+        #expect(CaptureEdge.continuesPastSide(CGRect(x: -200, y: 239, width: 500, height: 127), in: frame))
+        #expect(!CaptureEdge.continuesPastSide(CGRect(x: -1, y: 239, width: 500, height: 127), in: frame))
     }
 
     @Test func theTopAndBottomRuleIsAsBefore() {

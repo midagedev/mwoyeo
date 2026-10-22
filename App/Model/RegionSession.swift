@@ -1564,6 +1564,8 @@ extension RegionSession {
             Trace.mark("fit: \(auto ? "auto" : "manual") column=\(column.left)..\(column.right) lens=\(config.rect.minX)..\(config.rect.maxX) -> \(rect.minX)..\(rect.maxX) steps=1", since: Trace.now)
         }
         fit.animatingTo = rect
+        // The translation is laid out for the lens it will be before it is: the strip it grows over shows Korean when the lens gets there.
+        Task { [pipeline] in await pipeline.planLens(for: rect) }
         chrome.animate(to: ScreenGeometry.appKitRect(fromQuartz: rect), duration: auto ? LensMotion.autoFit : LensMotion.fit) { [weak self] finished in
             guard let self else { return }
             fit.animatingTo = nil

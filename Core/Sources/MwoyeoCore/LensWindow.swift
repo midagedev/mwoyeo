@@ -22,9 +22,14 @@ public enum LensWindow {
     /// The floor for a block whose source has `lines` lines.
     public static func minShare(lines: Int) -> CGFloat { minShares.last { $0.lines <= max(1, lines) }?.share ?? 0 }
 
-    /// The ink of a line stands inside its box: a line box holds the font's ascent and descent, and a Hangul line's ink is 74 % of it with the rest
-    /// empty above and below (measured: 12 % of the box at each end, system font 14 to 36 pt). A line is whole when its ink is in the lens.
-    public static let inkInset: CGFloat = 0.12
+    /// A line is shown when the lens's edge has not cut into its ink by more than a little. The ink of a Hangul line stands inside its box (the line box holds the
+    /// font's ascent and descent: the ink starts 0.13 of the box's height from its top and ends 0.04 from its bottom, medians), and an edge that takes the tops of a few
+    /// glyphs takes next to nothing of what is read. `wholeInset` is how far into a line's box, as a share of its height, the lens's top edge and its bottom edge may
+    /// stand and the line still be shown: the depth at which the edge has cut 10 % of the line's ink, such that at most 10 % of the lines have cut more (the allowance `minShare` is measured with too), measured on the
+    /// translations of the paper bench's pages (968 lines, 13 pages, `tools/lens-window/sweep.py --ink`, docs/design/recognition.md §16.5): the top 0.209, the bottom 0.148,
+    /// rounded down. Round edges117b, film4 F16: with 0.12 at both edges a line whose ink stood 1 pt (0.055 of its height) outside the lens was masked, and the page's English
+    /// line showed in its place, so that the Korean seen started in the middle of the sentence.
+    public static let wholeInset: (top: CGFloat, bottom: CGFloat) = (0.20, 0.14)
 
     /// A translation laid out in the part of its block that the lens covers keeps this far from the lens's edge, in line heights: the first
     /// syllable does not touch the frame, and the lens's clip has a 12 pt corner.
@@ -61,22 +66,28 @@ public enum LensWindow {
     public enum Shown: Equatable, Sendable {
         /// Every line stands in the lens: nothing is masked.
         case all
-        /// The lines that stand in it, from the top of the first to the bottom of the last (they are neighbours: a lens is a rect).
-        case band(top: CGFloat, bottom: CGFloat)
+        /// The lines that stand in it are the band from `top` to `bottom` (the first whole line's top, the last whole line's bottom: they are neighbours, a lens is a rect).
+        /// A side of the lens that cuts no line of the block has no edge in the band: it is nil, and the layer shows to its own end there (round edges117b, film4 F1: a
+        /// lens that cut the block at the bottom only masked its erased background at the top too, and the page's English line above the first Korean line showed).
+        case band(top: CGFloat?, bottom: CGFloat?)
         /// No line does.
         case none
     }
 
-    /// The rule for the lens's top and bottom edges: `lines` are the translation's line boxes, `lens` the lens, in one space.
+    /// The rule for the lens's top and bottom edges: `lines` are the translation's line boxes, `lens` the lens, in one space. A line is shown when it is whole in the
+    /// lens (`wholeInset`); the band ends at a line's box on the side where the lens cuts a line, and nowhere on the side where it does not.
     public static func shown(lines: [CGRect], lens: CGRect) -> Shown {
         guard !lines.isEmpty else { return .all }
-        let whole = lines.filter { l in
-            let ink = l.height * inkInset
-            return l.minY + ink >= lens.minY && l.maxY - ink <= lens.maxY
+        var whole: [CGRect] = [], cutAbove = false, cutBelow = false
+        for l in lines {
+            let above = l.minY + l.height * wholeInset.top < lens.minY, below = l.maxY - l.height * wholeInset.bottom > lens.maxY
+            cutAbove = cutAbove || above
+            cutBelow = cutBelow || below
+            if !above, !below { whole.append(l) }
         }
-        if whole.count == lines.count { return .all }
-        guard let top = whole.map(\.minY).min(), let bottom = whole.map(\.maxY).max() else { return .none }
-        return .band(top: top, bottom: bottom)
+        guard cutAbove || cutBelow else { return .all }
+        guard let first = whole.map(\.minY).min(), let last = whole.map(\.maxY).max() else { return .none }
+        return .band(top: cutAbove ? first : nil, bottom: cutBelow ? last : nil)
     }
 
     /// What the lens does to the blocks it meets, counted (`RegionPipeline` puts it in the trace; the numbers of film4's F1 and F2): of the translation's

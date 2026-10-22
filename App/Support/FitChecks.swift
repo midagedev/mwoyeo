@@ -83,6 +83,13 @@ enum FitChecks {
               abs(width(a) - 330) <= 3 && abs(a.config.rect.minX - (left.x0 - pad)) <= 3, "\(a.config.rect)")
         check("its top and height stay, and it is saved", a.config.rect.minY == before.minY && a.config.rect.height == before.height && saved >= 1, "\(a.config.rect) saved \(saved)")
         check("it is counted (lens.fit.manual), and the lens now has an Undo Fit", c["lens.fit.manual"] == 1 && fitRow(a)?.title == String(localized: "Undo Fit") && fitRow(a)?.isEnabled == true, "\(c) \(menuTitles(a))")
+        // The pipeline is told the lens the fit goes to when the fit starts (`RegionPipeline.planLens`, edges117b, film4 F5): the blocks are laid out for it while the lens moves.
+        var planned = 0
+        for _ in 0..<80 where planned == 0 {
+            try? await Task.sleep(for: .milliseconds(25))
+            planned += Trace.takeCounts()["lens.planned"] ?? 0
+        }
+        check("a fit tells the pipeline the lens it goes to (lens.planned)", planned == 1, "planned \(planned)")
         a.fitToColumn()
         check("a second Fit to Column takes the old rect back exactly", a.config.rect == before && fitRow(a)?.title == String(localized: "Fit to Column"), "\(a.config.rect)")
 

@@ -22,7 +22,7 @@ folded into the fullest read and exact repeats are counted. To check a few names
 Mwoyeo --settings-path
 ```
 
-It prints the path. By default that is `~/Library/Application Support/Mwoyeo/settings.json` (inside the app's container for a sandboxed build). Ask the command; do not guess the path.
+It prints the path. By default that is `~/Library/Application Support/Mwoyeo/settings.json` (inside the app's container for a sandboxed build). Ask the command; do not guess the path. A flag Mwoyeo does not know (`--help` too) prints the usage to stderr and exits 64: it opens no app and writes no file.
 
 `settings.schema.json` sits next to it. The file's `"$schema"` key points at it, so an editor offers completion and checks as you type.
 

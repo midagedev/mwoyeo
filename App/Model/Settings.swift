@@ -218,6 +218,8 @@ struct AppSettings: Codable, Equatable {
     var lensAutoFit = false
     /// Translations kept in memory for reuse.
     var cacheSize = 5000
+    /// Lines a lens that keeps recent lines holds on screen after they leave it (`RecentLines.range`).
+    var recentLineCount = RecentLines.standard
     /// HotKeyAction raw value → combo; an action missing here has no shortcut.
     var shortcuts = HotKeyAction.defaults
     /// Ask GitHub once a day whether a newer version is out.
@@ -355,7 +357,7 @@ struct AppSettings: Codable, Equatable {
     // and `engines[].context` are read (`init(from:)`) and never written (design §5.2).
     enum CodingKeys: String, CodingKey {
         case sourceLanguage, targetLanguage, engine, engines, customEngineID, engineRejections, renderMode, useInpaintingModel, glossary
-        case framesPerSecond, settleDelay, fontStyle, boxOpacity, lensStyle, lensTint, lensTabVisibility, lensTabPosition, lensSnap, lensAutoFit, cacheSize, shortcuts
+        case framesPerSecond, settleDelay, fontStyle, boxOpacity, lensStyle, lensTint, lensTabVisibility, lensTabPosition, lensSnap, lensAutoFit, cacheSize, recentLineCount, shortcuts
         case checksForUpdates, hasCompletedOnboarding, savesTranscripts, exportFolder, exportBookmark, enginePermissions, transcriptFormats
         case paragraphReader, agentConnection, fastFirstPaint
         case profiles, context, useLearned, profilePin, glossaryApply
@@ -384,6 +386,7 @@ struct AppSettings: Codable, Equatable {
         try c.encode(lensSnap, forKey: .lensSnap)
         try c.encode(lensAutoFit, forKey: .lensAutoFit)
         try c.encode(cacheSize, forKey: .cacheSize)
+        try c.encode(recentLineCount, forKey: .recentLineCount)
         try c.encode(shortcuts, forKey: .shortcuts)
         try c.encode(checksForUpdates, forKey: .checksForUpdates)
         try c.encode(hasCompletedOnboarding, forKey: .hasCompletedOnboarding)
@@ -441,6 +444,7 @@ struct AppSettings: Codable, Equatable {
         shortcuts = (try? c.decodeIfPresent([String: KeyCombo].self, forKey: .shortcuts)) ?? d.shortcuts
         checksForUpdates = try c.decodeIfPresent(Bool.self, forKey: .checksForUpdates) ?? d.checksForUpdates
         cacheSize = max(100, try c.decodeIfPresent(Int.self, forKey: .cacheSize) ?? d.cacheSize)
+        recentLineCount = min(max((try? c.decodeIfPresent(Int.self, forKey: .recentLineCount)) ?? d.recentLineCount, RecentLines.range.lowerBound), RecentLines.range.upperBound)
         hasCompletedOnboarding = try c.decodeIfPresent(Bool.self, forKey: .hasCompletedOnboarding) ?? d.hasCompletedOnboarding
         savesTranscripts = try c.decodeIfPresent(Bool.self, forKey: .savesTranscripts) ?? d.savesTranscripts
         exportFolder = try c.decodeIfPresent(String.self, forKey: .exportFolder) ?? d.exportFolder
@@ -482,6 +486,11 @@ struct RegionConfig: Codable, Identifiable, Equatable {
     /// Auto Fit (`AutoFit`): after a read settles, the lens grows to the column it cuts. Each lens keeps its own; `AppSettings.lensAutoFit` is the
     /// default of a lens that is made. Kept with the lens, not in settings.json, like `profilePin`.
     var autoFit = false
+    /// Parts of the lens that are not read or drawn over (a HUD, a name tag, a timer), as fractions of the lens so they follow a move and a
+    /// resize (`IgnoredRegions`, design games-and-video §1).
+    var ignored: [UnitRect] = []
+    /// The lens keeps the last few lines that left it on screen (`RecentLines`, design games-and-video §2).
+    var keepsRecent = false
 
     /// Follows `window` from where the lens is now, or pins it to the screen when nil. The name says which.
     mutating func follow(_ window: WindowInfo?) {
@@ -494,7 +503,7 @@ struct RegionConfig: Codable, Identifiable, Equatable {
 }
 
 extension RegionConfig {
-    /// A lens saved by an earlier build has no `profilePin`; one that cannot be read as a string is Auto too, never a lens lost.
+    /// A lens saved by an earlier build has no `profilePin`, `ignored` or `keepsRecent`; one that cannot be read is Auto, or has none, too, never a lens lost.
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = try c.decode(UUID.self, forKey: .id)
@@ -504,6 +513,8 @@ extension RegionConfig {
         anchor = try c.decodeIfPresent(WindowAnchor.self, forKey: .anchor)
         profilePin = (try? c.decodeIfPresent(String.self, forKey: .profilePin)) ?? nil
         autoFit = (try? c.decodeIfPresent(Bool.self, forKey: .autoFit)) ?? false
+        ignored = IgnoredRegions.sanitized((try? c.decodeIfPresent([UnitRect].self, forKey: .ignored)) ?? [])
+        keepsRecent = (try? c.decodeIfPresent(Bool.self, forKey: .keepsRecent)) ?? false
     }
 }
 

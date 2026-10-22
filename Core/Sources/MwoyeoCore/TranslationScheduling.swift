@@ -44,6 +44,16 @@ public enum TranslationScheduling {
         return sx * lead.dx + sy * lead.dy > 0 ? .leading : .other
     }
 
+    /// What the person sees first comes first (lower is sooner): the lens in reading order (top first), then the overscan, nearest first, the side
+    /// things are heading to (a dragged lens, content scrolling in) counted nearer. The translation queue picks its batches by it, and a pass fills its
+    /// erased patches by it (`EraseSchedule`).
+    public static func priority(of r: CGRect, lens: CGRect, lead: CGVector) -> (Int, CGFloat) {
+        if r.intersects(lens) { return (0, r.minY) }
+        let dx = max(lens.minX - r.maxX, r.minX - lens.maxX, 0), dy = max(lens.minY - r.maxY, r.minY - lens.maxY, 0)
+        let side = CGVector(dx: r.midX < lens.minX ? -1 : r.midX > lens.maxX ? 1 : 0, dy: r.midY < lens.minY ? -1 : r.midY > lens.maxY ? 1 : 0)
+        return (1, hypot(dx, dy) / (1 + max(0, side.dx * lead.dx + side.dy * lead.dy)))
+    }
+
     /// Whether to cancel a running batch.
     /// - Parameters:
     ///   - unfinished: the standing of each source of the batch that has no result yet.

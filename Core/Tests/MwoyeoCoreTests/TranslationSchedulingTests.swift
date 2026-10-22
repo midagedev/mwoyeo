@@ -55,6 +55,18 @@ import Testing
         #expect(S.standing(of: CGRect(x: 0, y: 1400, width: 100, height: 20), lens: lens, lead: .zero) == .other)
     }
 
+    /// The queue's own rule, moved here from `RegionPipeline` unchanged (erase117): the erase order shares it.
+    @Test func priorityIsTheLensInReadingOrderThenTheOverscanNearestFirst() {
+        let a = CGRect(x: 0, y: 1100, width: 100, height: 20), b = CGRect(x: 0, y: 1150, width: 100, height: 20)
+        #expect(S.priority(of: a, lens: lens, lead: .zero) == (0, 1100))
+        #expect(S.priority(of: b, lens: lens, lead: .zero) == (0, 1150))
+        // 200 px below the lens's bottom edge (1300); the side things are heading to counts half as far.
+        let below = CGRect(x: 0, y: 1500, width: 100, height: 20)
+        #expect(S.priority(of: below, lens: lens, lead: .zero) == (1, 200))
+        #expect(S.priority(of: below, lens: lens, lead: CGVector(dx: 0, dy: 1)) == (1, 100))
+        #expect(S.priority(of: below, lens: lens, lead: CGVector(dx: 0, dy: -1)) == (1, 200))
+    }
+
     // MARK: Prediction
 
     @Test func dwellIsTheTimeUntilTheFarEdgePassesTheLensExit() {

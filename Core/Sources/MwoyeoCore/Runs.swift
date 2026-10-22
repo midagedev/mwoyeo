@@ -131,17 +131,29 @@ public enum LabelRule {
             }
         }
         for (i, a) in items.enumerated() where !out.contains(i) && isNameTag(a) {
-            let h = a.lineHeight
-            if items.indices.contains(where: { j in
-                let b = items[j], gap = b.rect.minY - a.rect.maxY
-                let aligned = b.rect.minX < a.rect.maxX + 3 * h && b.rect.maxX > a.rect.minX - 3 * h
-                return j != i && gap > -0.3 * h && gap < 2.5 * h && aligned && b.rect.midY > a.rect.midY
-                    && b.text.count > a.text.count && a.lineHeight <= 1.15 * b.lineHeight && a.color.distance(to: b.color) > 60
-            }) {
+            if items.indices.contains(where: { j in j != i && stands(items[j], under: a) && a.color.distance(to: items[j].color) > 60 }) {
                 out.insert(i)
             }
         }
         return out
+    }
+
+    /// Indices of the name tags of `items` by where they stand alone: a name on a line of its own with a longer text under it (a message
+    /// bubble, a dialogue box). The colour is not asked: a game's name tag has the ink of its box, and `labels` keeps only the ones that
+    /// differ from it.
+    public static func nameTags(_ items: [Item]) -> Set<Int> {
+        Set(items.indices.filter { i in
+            isNameTag(items[i]) && items.indices.contains { j in j != i && stands(items[j], under: items[i]) }
+        })
+    }
+
+    /// Whether `b` stands under `a` the way a message or a dialogue box stands under its name: close below it, over the same columns, with
+    /// more text and a line no smaller.
+    private static func stands(_ b: Item, under a: Item) -> Bool {
+        let h = a.lineHeight, gap = b.rect.minY - a.rect.maxY
+        let aligned = b.rect.minX < a.rect.maxX + 3 * h && b.rect.maxX > a.rect.minX - 3 * h
+        return gap > -0.3 * h && gap < 2.5 * h && aligned && b.rect.midY > a.rect.midY
+            && b.text.count > a.text.count && a.lineHeight <= 1.15 * b.lineHeight
     }
 
     /// A name above a message bubble or a dialogue box: one to three CJK words on a line of their own. Names in

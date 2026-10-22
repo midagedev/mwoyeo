@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 
 /// Turns the per-snapshot stream of what a lens reads into transcript events: an entry when a line
@@ -7,10 +8,13 @@ public struct TranscriptRecorder: Sendable {
         public var source: String
         public var translation: String?
         public var inLens: Bool
-        public init(source: String, translation: String?, inLens: Bool) {
+        /// Where the block stands, in points from the lens's top-left corner (nil: not known). The recorder does not read it; `RecentLines` does.
+        public var frame: CGRect?
+        public init(source: String, translation: String?, inLens: Bool, frame: CGRect? = nil) {
             self.source = source
             self.translation = translation
             self.inLens = inLens
+            self.frame = frame
         }
     }
 
@@ -214,7 +218,7 @@ public struct TranscriptMerger: Sendable {
     public init(hold: TimeInterval = 3) { self.hold = hold }
 
     /// Letters and digits only, lowercased: two readings of a line differ in punctuation and spacing.
-    private static func key(_ s: String) -> String {
+    static func key(_ s: String) -> String {
         String(s.lowercased().filter { $0.isLetter || $0.isNumber })
     }
 

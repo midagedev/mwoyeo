@@ -1,4 +1,5 @@
 import AppKit
+import MwoyeoCore
 import QuartzCore
 
 /// Transparent, click-through panel floating over a region's display. Shows one layer per translated block.
@@ -11,6 +12,9 @@ import QuartzCore
 /// the frames' correction is eased in with a critically damped spring instead of a jump.
 final class OverlayPanel: NSPanel {
     private let host = OverlayHostView()
+    /// Holds the host and the snap guide: the host's layer is clipped to the lens, the guide stands outside it.
+    private let root = NSView()
+    private let guide = NSView()
     private var lastVersion = 0
     /// The lens, AppKit coordinates.
     private var lens: NSRect
@@ -35,8 +39,35 @@ final class OverlayPanel: NSPanel {
         level = .statusBar
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
         animationBehavior = .none
-        contentView = host
+        root.frame = NSRect(origin: .zero, size: Self.display(of: frame).size)
+        root.wantsLayer = true
+        host.frame = root.bounds
+        host.autoresizingMask = [.width, .height]
+        root.addSubview(host)
+        guide.wantsLayer = true
+        guide.alphaValue = 0
+        root.addSubview(guide)
+        contentView = root
         host.lens = hostRect(frame)
+    }
+
+    /// The snap guide (design lens-fit): one point wide, in the accent colour, along `rect` (AppKit coordinates, the column's edge and its extent). It is
+    /// not clipped to the lens, since the edge it marks is a few points from the lens's own.
+    func showGuide(_ rect: NSRect) {
+        let r = rect.offsetBy(dx: -frame.minX, dy: -frame.minY)
+        effectiveAppearance.performAsCurrentDrawingAppearance { guide.layer?.backgroundColor = NSColor.controlAccentColor.cgColor }
+        guide.frame = NSRect(x: r.minX - 0.5, y: r.minY, width: 1, height: r.height)
+        fadeGuide(to: LensMotion.guideAlpha)
+    }
+
+    func hideGuide() { fadeGuide(to: 0) }
+
+    private func fadeGuide(to alpha: CGFloat) {
+        guard guide.alphaValue != alpha else { return }
+        NSAnimationContext.runAnimationGroup { ctx in
+            ctx.duration = LensMotion.seconds(LensMotion.guideFade, reduced: Motion.shared.reduced)
+            guide.animator().alphaValue = alpha
+        }
     }
 
     override var canBecomeKey: Bool { false }

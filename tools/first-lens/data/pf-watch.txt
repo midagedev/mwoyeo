@@ -1,0 +1,5 @@
+{"t":1970126334706041,"ev":"win+","win":72252,"layer":0,"bounds":[0,0,1512,33],"onscreen":false}
+{"t":1970126334706041,"ev":"win+","win":72253,"layer":0,"bounds":[0,0,1512,33],"onscreen":false}
+{"t":1970126334706041,"ev":"win+","win":72251,"layer":0,"bounds":[0,0,1512,33],"onscreen":false}
+{"t":1970126334706041,"ev":"win+","win":72249,"layer":0,"bounds":[40,38,1184,672],"onscreen":true}
+{"t":1970126334706041,"ev":"win+","win":72250,"layer":0,"bounds":[0,0,1512,33],"onscreen":false}

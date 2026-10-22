@@ -1,0 +1,13 @@
+page  columns, auto path           columns, lines+grouper       max |edge diff| pt
+p2    72..398 91..396 420..746     70..399 418..748             2.5  (matched 2 of 3)
+p4    72..398 338..742 421..746    69..400 180..247 336..744 418..748 2.8  (matched 3 of 3)
+p6    72..398 420..746             70..400 418..746             3.0  (matched 2 of 2)
+p7    72..398 420..746             69..399 418..748             3.5  (matched 2 of 2)
+p8    72..397 421..746 434..680    70..88 71..399 72..190 72..330 110..396 133..320 418..748 450..744 207.0  (matched 2 of 3)
+p10   72..398 420..746             69..400 204..240 252..278 288..314 319..376 418..748 436..537 551..572 577..645 658..724 3.2  (matched 2 of 2)
+p11   72..398 421..746 428..746    70..399 419..748 426..746 445..749 2.0  (matched 3 of 3)
+p12   72..398 82..398 99..398 421..745 70..399 81..400 96..400 416..432 419..746 2.5  (matched 4 of 4)
+worst edge difference over matched columns: 207.0 pt
+
+hover target on the lines+grouper blocks (same rule):
+positions 45285, target 100%, default ghost cuts a block at an edge 100%, target cuts 22.9%

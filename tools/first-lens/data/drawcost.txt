@@ -1,0 +1,1 @@
+full-display CoreGraphics redraw: median 15.7 ms, p90 17.8 ms, max 43.6 ms

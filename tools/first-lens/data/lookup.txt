@@ -1,0 +1,5 @@
+blocks  map build (us, median of 200)   choose (ns/call, held anchor, random pointer)
+16	2.6			556	(80 % of positions have a target)
+72	4.7			898	(86 % of positions have a target)
+240	10.8			1279	(88 % of positions have a target)
+960	32.8			1139	(88 % of positions have a target)

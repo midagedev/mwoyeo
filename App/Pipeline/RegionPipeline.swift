@@ -179,6 +179,8 @@ actor RegionPipeline {
     /// box; design games-and-video §3).
     /// ponytail: forgotten on every move, so it re-learns for a second after a scroll; shift it with the move if that shows.
     private var watch: ReadWatch
+    /// The frames handed in (`ingest`, off this actor) and not counted yet: the watch judges still on the time the frames counted reach.
+    private let inbox = OSAllocatedUnfairLock(initialState: ReadWatch.Inbox())
     /// `MWOYEO_READ_SCOPE=off` (for measuring against) counts every changed tile, as before the watch weighed them by their distance from the
     /// text. The App Store build has no such switch.
     #if MAS
@@ -441,7 +443,14 @@ actor RegionPipeline {
          (blocks.filter { $0.rect.intersects(lensRect) }.count, blocks.filter { $0.translation == nil && $0.rect.intersects(lensRect) }.count))
     }
 
-    func ingest(_ frame: CapturedFrame) {
+    /// A frame of the capture: handed in at once, counted (`take`) when this actor gets to it, after a pass that holds it.
+    nonisolated func ingest(_ frame: CapturedFrame) async {
+        inbox.withLock { $0.delivered(frame.time) }
+        await take(frame)
+    }
+
+    private func take(_ frame: CapturedFrame) {
+        inbox.withLock { $0.counted(frame.time) }
         guard !halted else { return }
         var frame = frame
         if let l = latest, frame.time < l.time { return }
@@ -589,10 +598,10 @@ actor RegionPipeline {
     }
 
     private func run() async {
-        // Whether a held tile rests is judged when a run starts and not between its passes: a pass keeps this actor busy for longer than the
-        // watch's hold, the frames that came in meanwhile are not counted yet when it ends, and a tile of a scene that never stops would
-        // rest on the stamp of a frame from before the pass (every pass would be followed by a read of the scene). A run that starts has
-        // the frames that waited behind the last pass counted (`kick` and the timer below come after them), and the wake below judges again.
+        // Whether a held tile rests is judged when a run starts and not between its passes, on the time the frames counted reach (`seen`): a
+        // pass keeps this actor busy for longer than the watch's hold, and the frames that came in meanwhile wait to be counted (a run may
+        // start before the last of them under load). Judged on the wall clock, a tile of a scene that never stops would rest on the stamp of
+        // a frame from before them, and the pass would be followed by a read of the scene.
         var judgesRest = true
         while !halted, let frame = latest {
             let now = ProcessInfo.processInfo.systemUptime
@@ -631,7 +640,7 @@ actor RegionPipeline {
             wait = max(0.05, options.settleDelay - (now - max(lastChange, lensMoved)))
         }
         // An animation, or a scene beside the text, that stops sends no more frames: look again once its tiles count as still.
-        if latest != nil, let c = watch.wake(at: now) { wait = min(wait ?? .infinity, c + 0.05) }
+        if latest != nil, let c = watch.wake(at: seen(at: now)) { wait = min(wait ?? .infinity, c + 0.05) }
         if latest != nil, let r = readBackoff.remaining(now: now) { wait = r + 0.05 }
         if let wait {
             settleTask?.cancel()
@@ -666,12 +675,12 @@ actor RegionPipeline {
         guard let base = baseGray, base.width == frame.gray.width, base.height == frame.gray.height else {
             return Staleness(change: nil, forced: [], covered: nil)
         }
-        let now = ProcessInfo.processInfo.systemUptime
-        return Staleness(change: watch.stale(FrameDiff.changeMap(from: base, to: frame.gray), boxes: Self.weighsChange ? textBoxes(step: frame.grayStep) : nil, at: now),
+        let seen = self.seen(at: ProcessInfo.processInfo.systemUptime)
+        return Staleness(change: watch.stale(FrameDiff.changeMap(from: base, to: frame.gray), boxes: Self.weighsChange ? textBoxes(step: frame.grayStep) : nil, at: seen),
                          forced: forcedDirty,
                          // The page under an old block is judged by the pixels the reference had: the strips a larger capture only now shows
                          // (and the tiles at rest) are new pixels, not a change of what was read (hold117, docs/design/lens-hold.md §2).
-                         covered: forcedDirty.isEmpty ? nil : watch.stale(FrameDiff.changeMap(from: base, to: frame.gray, ignoring: forcedDirty), boxes: Self.weighsChange ? textBoxes(step: frame.grayStep) : nil, at: now))
+                         covered: forcedDirty.isEmpty ? nil : watch.stale(FrameDiff.changeMap(from: base, to: frame.gray, ignoring: forcedDirty), boxes: Self.weighsChange ? textBoxes(step: frame.grayStep) : nil, at: seen))
     }
 
     /// The text the last read found, in gray pixels (what `ReadWatch` weighs a change against); none when nothing was read.
@@ -680,10 +689,18 @@ actor RegionPipeline {
         return blocks.map { PixelRect($0.rect.applying(CGAffineTransform(scaleX: k, y: k))) }
     }
 
+    /// The watch's clock: the time up to which the frames counted show the scene (`ReadWatch.Inbox`), `now` when no frame waits.
+    private func seen(at now: TimeInterval) -> TimeInterval { inbox.withLock { $0.seen(at: now) } }
+
     /// Tiles away from the text that have been still long enough are areas to read like a strip a scroll uncovered: the reference moved on
     /// to the frame of the last read, which had them as they were while they moved.
     private func noteRested(at now: TimeInterval) {
-        let rested = watch.takeRested(at: now)
+        let (seen, waiting) = inbox.withLock { ($0.seen(at: now), $0.count) }
+        if waiting > 0, watch.restsIn(at: now) == 0, watch.restsIn(at: seen) != 0 {
+            Trace.count("watch.rest_waits")
+            Trace.mark("rest held back: \(waiting) frames wait to be counted, the oldest \(Int((now - seen) * 1000)) ms old", since: Trace.now)
+        }
+        let rested = watch.takeRested(at: seen)
         guard !rested.isEmpty else { return }
         Trace.count("watch.rested")
         Trace.mark("held tiles at rest: \(rested.count) areas", since: Trace.now)

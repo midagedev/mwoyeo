@@ -87,6 +87,25 @@ final class RegionCapturer: NSObject, SCStreamOutput, SCStreamDelegate, ScreenCa
         onFrame?(frame)
     }
 
+    /// One picture of the display whose frame is `display` (global Quartz points), with this app's windows left out as a lens's stream leaves
+    /// them out: the picker's map (docs/design/first-lens.md 4.4). The picture is the caller's to read and drop; nothing here keeps it.
+    static func snapshot(of display: CGRect) async throws -> (image: CGImage, scale: CGFloat) {
+        // Not on-screen-only, as `start`: the picker's windows were just ordered in and may not be listed yet.
+        let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)
+        guard let shown = content.displays.first(where: { $0.frame == display }) else { throw CaptureError.displayNotFound }
+        let me = content.applications.filter { $0.processID == getpid() }
+        let filter = SCContentFilter(display: shown, excludingApplications: me, exceptingWindows: [])
+        let scale = CGFloat(filter.pointPixelScale)
+        let c = SCStreamConfiguration()
+        c.width = max(2, Int((display.width * scale).rounded()))
+        c.height = max(2, Int((display.height * scale).rounded()))
+        c.pixelFormat = kCVPixelFormatType_32BGRA
+        c.colorSpaceName = CGColorSpace.sRGB
+        c.showsCursor = false
+        c.captureResolution = .best
+        return (try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: c), scale)
+    }
+
     func stop() async {
         guard let s = stream else { return }
         stream = nil

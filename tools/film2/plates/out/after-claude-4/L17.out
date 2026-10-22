@@ -1,0 +1,30 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Claude claude-sonnet-5-5 anthropic
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=71835 gui pid=71812
+reader: docs pid=71881 gui pid=71812
+warm-up: 1188 ms
+pipeline: 10488 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=4 translate.wasted=0 lens_wait_ms[p50=2525 max=2525 last=2525 n=2] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=1 first=0.36s perLine=0.06s batch[p50=0.42s p90=0.42s n=1] cancelled=0 lines[cached=0 translated=2]
+pace: ja>ko|ext:770796D8:77271425e7e4430 samples=0 first=n/as perLine=n/as batch[p50=n/as p90=n/as n=0] cancelled=0 lines[cached=0 translated=0]
+  エルヴェ
+    → 엘베
+  はい。夜明けの守り手は、月石に宿る光で眠りから覚めると申します
+    → 네. 새벽의 수호자는 달빛에 깃든 빛으로 잠에서 깨어난다고 합니다
+issues=1
+engine_ms[n=0]
+learned=[]
+cache[ja>ko|apple:auto|-5448160427559538051] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=216,1610,269,72 text=216,1606,131,81 size=76.0 lines=1 chars=4 clipped=0 ellipsis=0 "エルヴェ"
+block: core=171,1792,1762,204 text=171,1798,1518,193 size=85.2 lines=2 chars=31 clipped=0 ellipsis=0 "はい。夜明けの守り手は、月石に宿る光で眠りから覚めると申します"
+wrote /Users/hckim/repo/mwoyeo/tools/film2/plates/out/after-claude-4/L17.png
+silence: longest=9806 total=9806
+drain: 0 in-flight=0
+reader: docs state=idle pid=71881 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=17965 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=90 MB gui=107 MB last-ms=575 ms=575
+reader: lines state=idle pid=71835 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=17965 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=148 MB gui=107 MB last-ms=416 ms=462,416
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

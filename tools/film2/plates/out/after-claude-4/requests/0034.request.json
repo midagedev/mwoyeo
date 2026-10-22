@@ -1,0 +1,1 @@
+{"max_tokens":368,"messages":[{"content":"{\"lines\":[\"エルヴェ\",\"九十九、よく無事でいたな。シュザンヌ様を頼んだぞ\"]}","role":"user"}],"model":"claude-sonnet-5-5","system":"Translate each line of the user's JSON into Korean from Japanese. Keep names, numbers, emoji, URLs and @handles unchanged. Give one translation per line, in the same order.\nReply with only {\"translations\": [...]}."}

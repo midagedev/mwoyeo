@@ -1,0 +1,27 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Claude claude-sonnet-5-5 anthropic
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=85735 gui pid=85707
+reader: docs pid=85736 gui pid=85707
+warm-up: 968 ms
+pipeline: 6470 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=1 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=2 translate.wasted=0 lens_wait_ms[p50=1612 max=1612 last=1612 n=1] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=1 first=0.18s perLine=0.18s batch[p50=0.18s p90=0.18s n=1] cancelled=0 lines[cached=0 translated=1]
+pace: ja>ko|ext:17DA1BF0:77271425e7e4430 samples=0 first=n/as perLine=n/as batch[p50=n/as p90=n/as n=0] cancelled=0 lines[cached=0 translated=0]
+  水の底で、月涙石が青く脈打っていた。
+    → 물속 바닥에서 달눈물석이 푸르게 뛰고 있었습니다.
+issues=1
+engine_ms[n=0]
+learned=[]
+cache[ja>ko|apple:auto|8645147013959883284] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=167,1789,1397,100 text=167,1790,1697,99 size=87.5 lines=1 chars=18 clipped=0 ellipsis=0 "水の底で、月涙石が青く脈打っていた。"
+wrote /Users/hckim/repo/mwoyeo/tools/film2/plates/out/after-claude-4/L29.png
+silence: longest=5802 total=5802
+drain: 0 in-flight=0
+reader: docs state=idle pid=85736 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=17807 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=92 MB gui=91 MB last-ms=447 ms=447
+reader: lines state=idle pid=85735 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=17807 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=145 MB gui=91 MB last-ms=274 ms=446,274
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

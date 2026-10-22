@@ -1,0 +1,30 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Claude claude-sonnet-5-5 anthropic
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=69134 gui pid=69110
+reader: docs pid=69159 gui pid=69110
+warm-up: 1092 ms
+pipeline: 10421 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=4 translate.wasted=0 lens_wait_ms[p50=2183 max=2183 last=2183 n=2] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=1 first=0.38s perLine=0.04s batch[p50=0.42s p90=0.42s n=1] cancelled=0 lines[cached=0 translated=2]
+pace: ja>ko|ext:866FAB7F:77271425e7e4430 samples=0 first=n/as perLine=n/as batch[p50=n/as p90=n/as n=0] cancelled=0 lines[cached=0 translated=0]
+  エルヴェ
+    → 엘베
+  夜明けの守り手の話は、古い書物で読んだ覚えがございます
+    → 새벽의 수호자 이야기는 오래된 책에서 읽은 기억이 있습니다.
+issues=1
+engine_ms[n=0]
+learned=[]
+cache[ja>ko|apple:auto|617865565981359940] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=216,1610,269,72 text=216,1606,131,81 size=76.0 lines=1 chars=4 clipped=0 ellipsis=0 "エルヴェ"
+block: core=166,1789,1780,206 text=166,1790,1717,203 size=88.6 lines=2 chars=27 clipped=0 ellipsis=0 "夜明けの守り手の話は、古い書物で読んだ覚えがございます"
+wrote /Users/hckim/repo/mwoyeo/tools/film2/plates/out/after-claude-4/L15.png
+silence: longest=9607 total=9607
+drain: 0 in-flight=0
+reader: docs state=idle pid=69159 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=17972 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=92 MB gui=106 MB last-ms=469 ms=469
+reader: lines state=idle pid=69134 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=17972 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=149 MB gui=106 MB last-ms=495 ms=434,495
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

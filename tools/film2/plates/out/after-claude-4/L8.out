@@ -1,0 +1,27 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Claude claude-sonnet-5-5 anthropic
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=63433 gui pid=63418
+reader: docs pid=63481 gui pid=63418
+warm-up: 966 ms
+pipeline: 8769 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=2 translate.wasted=0 lens_wait_ms[p50=1933 max=1933 last=1933 n=1] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=1 first=0.14s perLine=0.14s batch[p50=0.14s p90=0.14s n=1] cancelled=0 lines[cached=0 translated=1]
+pace: ja>ko|ext:2F78B7FC:77271425e7e4430 samples=0 first=n/as perLine=n/as batch[p50=n/as p90=n/as n=0] cancelled=0 lines[cached=0 translated=0]
+  石段の先に、錆びた門が月明かりに浮かんでいた。
+    → 돌계단 끝에, 녹슨 문이 달빛에 떠 있었습니다.
+issues=1
+engine_ms[n=0]
+learned=[]
+cache[ja>ko|apple:auto|-5415427702342498526] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=166,1782,1687,240 text=166,1852,1522,100 size=88.6 lines=2 chars=23 clipped=0 ellipsis=0 "石段の先に、錆びた門が月明かりに浮かんでいた。"
+wrote /Users/hckim/repo/mwoyeo/tools/film2/plates/out/after-claude-4/L8.png
+silence: longest=8004 total=8004
+drain: 0 in-flight=0
+reader: docs state=idle pid=63481 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=18049 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=90 MB gui=113 MB last-ms=458 ms=458
+reader: lines state=idle pid=63433 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=18049 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=146 MB gui=113 MB last-ms=284 ms=423,284
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

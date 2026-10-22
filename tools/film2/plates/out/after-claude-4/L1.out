@@ -1,0 +1,27 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Claude claude-sonnet-5-5 anthropic
+inpainter: MI-GAN loaded (1 ms)
+reader: lines pid=56753 gui pid=56739
+reader: docs pid=56776 gui pid=56739
+warm-up: 1063 ms
+pipeline: 9062 ms
+work[still]: erase=1 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=1 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=2 translate.wasted=0 lens_wait_ms[p50=2438 max=2438 last=2438 n=1] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=1 first=0.44s perLine=0.44s batch[p50=0.44s p90=0.44s n=1] cancelled=0 lines[cached=0 translated=1]
+pace: ja>ko|ext:5D65533A:77271425e7e4430 samples=0 first=n/as perLine=n/as batch[p50=n/as p90=n/as n=0] cancelled=0 lines[cached=0 translated=0]
+  夕暮れの山道を抜けると、苔むした石段が現れた。
+    → 저녁 무렵 산길을 지나자, 이끼가 낀 돌계단이 나타났습니다.
+issues=1
+engine_ms[n=0]
+learned=[]
+cache[ja>ko|apple:auto|1655122684783793857] stores=1
+layout: blocks=1 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=171,1789,1689,220 text=171,1797,1502,203 size=88.6 lines=2 chars=23 clipped=0 ellipsis=0 "夕暮れの山道を抜けると、苔むした石段が現れた。"
+wrote /Users/hckim/repo/mwoyeo/tools/film2/plates/out/after-claude-4/L1.png
+silence: longest=8405 total=8405
+drain: 0 in-flight=0
+reader: docs state=idle pid=56776 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=18082 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=92 MB gui=108 MB last-ms=448 ms=448
+reader: lines state=idle pid=56753 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=18082 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=148 MB gui=108 MB last-ms=289 ms=439,289
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

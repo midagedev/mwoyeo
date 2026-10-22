@@ -1,0 +1,30 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Claude claude-sonnet-5-5 anthropic
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=60362 gui pid=60326
+reader: docs pid=60369 gui pid=60326
+warm-up: 1059 ms
+pipeline: 10561 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=4 translate.wasted=0 lens_wait_ms[p50=2353 max=2353 last=2353 n=2] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=1 first=0.11s perLine=0.07s batch[p50=0.18s p90=0.18s n=1] cancelled=0 lines[cached=0 translated=2]
+pace: ja>ko|ext:204D3771:77271425e7e4430 samples=0 first=n/as perLine=n/as batch[p50=n/as p90=n/as n=0] cancelled=0 lines[cached=0 translated=0]
+  エルヴェ
+    → 엘베
+  シュザンヌ様、お急ぎになりませぬよう。年寄りの足には堪えますので
+    → 슈잔느님, 서두르지 않으시길 바랍니다. 노인의 발에는 견딜 수 있기 때문에
+issues=1
+engine_ms[n=0]
+learned=[]
+cache[ja>ko|apple:auto|-6491515873232120239] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=216,1610,269,72 text=216,1606,131,81 size=76.0 lines=1 chars=4 clipped=0 ellipsis=0 "エルヴェ"
+block: core=172,1789,1753,208 text=172,1790,1578,205 size=89.8 lines=2 chars=32 clipped=0 ellipsis=0 "シュザンヌ様、お急ぎになりませぬよう。年寄りの足には堪えますので"
+wrote /Users/hckim/repo/mwoyeo/tools/film2/plates/out/after-claude-4/L4.png
+silence: longest=9706 total=9706
+drain: 0 in-flight=0
+reader: docs state=idle pid=60369 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=18073 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=92 MB gui=109 MB last-ms=468 ms=468
+reader: lines state=idle pid=60362 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=18073 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=146 MB gui=109 MB last-ms=297 ms=427,297
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

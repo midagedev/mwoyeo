@@ -1,0 +1,1 @@
+{"mwoyeoEngine": 1, "engine": {"name": "Claude claude-sonnet-5-5", "kind": "anthropic", "baseURL": "http://127.0.0.1:55354", "model": "claude-sonnet-5-5", "thinking": "off"}}

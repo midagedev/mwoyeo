@@ -1,0 +1,7 @@
+render after-claude-4: 36 of 36 rc 0; settings /tmp/film2/claude/take4/settings.json; model claude-sonnet-5-5; app dev.midagedev.film.lumiere
+requests kept: 36; log.jsonl lines: 67
+log lines with app=dev.midagedev.film.lumiere: 67
+verify: 36 renders, rc 0 in 36
+verify: log.jsonl 67 lines, app=dev.midagedev.film.lumiere on 67
+verify: 36 requests; note in 0, memory in 0; memory rows found 0 of 0 expected
+verify: OK

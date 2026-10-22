@@ -40,9 +40,9 @@ enum TextRecognizer {
     /// from the Docs service when it is idle and warm for the key, else as lines + `ParagraphGrouper` (the lens reads again once,
     /// when Docs is ready: `ReadTarget.StandIn.layout`); `automatic` reads the lines first and lets `ReaderDecider` pick from their
     /// layout, and once the plan holds the document model, that model reads alone and its lines feed the decision. `client` is
-    /// the pipeline asking (`ReaderClients`).
+    /// the pipeline asking (`ReaderClients`); `purpose` is who asks, in the host's scheduling order (the picker's map: `.picker`).
     static func blocks(in image: CGImage, roi: CGRect? = nil, languages: [Locale.Language], customWords: [String] = [],
-                       plan: ReaderPlan? = nil, client: Int? = nil) async throws -> [OCRBlock] {
+                       plan: ReaderPlan? = nil, client: Int? = nil, purpose: WorkerJob.Purpose = .lens) async throws -> [OCRBlock] {
         Trace.count("ocr.blocks")
         let key = key(languages)
         let wanted: ParagraphReader = switch RecognitionHost.ocrPath {
@@ -53,6 +53,7 @@ enum TextRecognizer {
         func ask(_ want: RouteRequest.Want) -> ReadAsk {
             var a = makeAsk(want, in: image, roi: roi, languages: languages, ladder: ladder(languages), customWords: customWords, client: client)
             a.layoutWanted = wanted != .lineGrouping
+            a.purpose = purpose
             return a
         }
         var read: [OCRLine]?

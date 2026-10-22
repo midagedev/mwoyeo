@@ -1,0 +1,30 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Claude claude-sonnet-5-5 anthropic
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=58805 gui pid=58791
+reader: docs pid=58909 gui pid=58791
+warm-up: 1075 ms
+pipeline: 15943 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=2 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=4 translate.wasted=0 lens_wait_ms[p50=10862 max=10862 last=10862 n=2] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=1 first=0.51s perLine=0.09s batch[p50=0.60s p90=0.60s n=1] cancelled=0 lines[cached=0 translated=2]
+pace: ja>ko|ext:DD521AAB:77271425e7e4430 samples=0 first=n/as perLine=n/as batch[p50=n/as p90=n/as n=0] cancelled=0 lines[cached=0 translated=0]
+  九十九
+    → 구십구
+  はい、シュザンヌ様。足元にお気をつけください
+    → 네, 슈잔느님. 발밑을 조심해 주세요
+issues=1
+engine_ms[n=0]
+learned=[]
+cache[ja>ko|apple:auto|-1862346789544965237] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=213,1610,212,75 text=213,1607,197,81 size=76.1 lines=1 chars=3 clipped=0 ellipsis=0 "九十九"
+block: core=174,1792,1762,97 text=174,1790,1190,101 size=89.8 lines=1 chars=22 clipped=0 ellipsis=0 "はい、シュザンヌ様。足元にお気をつけください"
+wrote /Users/hckim/repo/mwoyeo/tools/film2/plates/out/after-claude-4/L3.png
+silence: longest=15203 total=15203
+drain: 0 in-flight=0
+reader: docs state=idle pid=58909 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=18078 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=90 MB gui=89 MB last-ms=510 ms=510
+reader: lines state=idle pid=58805 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=18078 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=148 MB gui=89 MB last-ms=315 ms=468,315
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

@@ -27,7 +27,7 @@ struct OnboardingView: View {
 
             VStack(spacing: 10) {
                 StepCard(number: 1, title: String(localized: "Screen Recording"), done: model.hasScreenPermission,
-                         detail: model.hasScreenPermission ? String(localized: "Allowed. Mwoyeo reads only what is under a lens, and never stores or sends it.")
+                         detail: model.hasScreenPermission ? String(localized: "Allowed. Mwoyeo reads the screen only while you place a lens and under a lens, on this Mac, and never stores or sends it.")
                              : String(localized: "Needed to read the text under a lens. You may have to reopen Mwoyeo after allowing it.")) {
                     if !model.hasScreenPermission {
                         // While the permission is missing this is the step to take: Return presses it (ui-audit-1-1-5 8.1).
@@ -41,7 +41,7 @@ struct OnboardingView: View {
                         .frame(width: 230)
                 }
                 StepCard(number: 3, title: String(localized: "Place a Lens"), done: !model.regions.isEmpty,
-                         detail: String(localized: "Press \(model.shortcut(.addLens) ?? "⌃⌥L") anywhere, then drag an area or click. The lens follows the window it lands on; hold ⌥ to pin it to the screen.")) {
+                         detail: String(localized: "Press \(model.shortcut(.addLens) ?? "⌃⌥L") anywhere, point at a paragraph and click, or drag an area. The lens fits the column and follows the window it lands on; hold ⌥ to pin it to the screen.")) {
                     // The step that starts using the app is the prominent one; it is the default once the permission is there (ui-audit-1-1-5 8.1).
                     Button("Try It Now") {
                         finish()
@@ -135,6 +135,10 @@ private struct LensDemo: View {
     }()
 
     private let rowHeight: CGFloat = 50, top: CGFloat = 16
+    /// One beat first, as the picker's click does it: the lens hugs the first message and it reads translated; then the lens takes in the
+    /// next one and glides (docs/design/first-lens.md section 5).
+    private let hug: TimeInterval = 2.4, grow: TimeInterval = 0.4, translateAfter: TimeInterval = 0.6
+    @State private var shown = Date()
 
     var body: some View {
         // Reduce Motion: the lens rests half way down, over two of the messages.
@@ -142,8 +146,10 @@ private struct LensDemo: View {
         TimelineView(.animation(paused: still)) { t in
             GeometryReader { g in
                 // The lens glides down and back over the messages; whatever it covers reads translated, message by message.
-                let phase = still ? 0.5 : (sin(t.date.timeIntervalSinceReferenceDate * 0.6 - .pi / 2) + 1) / 2
-                let lensHeight = rowHeight * 2 + 8
+                let since = t.date.timeIntervalSince(shown)
+                let phase = still ? 0.5 : (sin(max(0, since - hug) * 0.6 - .pi / 2) + 1) / 2
+                let opened = still ? 1 : min(1, max(0, (since - hug) / grow))
+                let lensHeight = rowHeight + 4 + (rowHeight + 4) * opened
                 let lens = CGRect(x: 16, y: top - 4 + phase * (rowHeight * CGFloat(rows.count) - lensHeight + 8),
                                   width: g.size.width - 32, height: lensHeight)
                 ZStack(alignment: .topLeading) {
@@ -155,7 +161,7 @@ private struct LensDemo: View {
                         .offset(x: lens.minX, y: lens.minY)
                     ForEach(Array(rows.enumerated()), id: \.offset) { i, r in
                         let mid = top + rowHeight * (CGFloat(i) + 0.5)
-                        message(r, translated: lens.minY < mid && mid < lens.maxY)
+                        message(r, translated: (still || since > translateAfter) && lens.minY < mid && mid < lens.maxY)
                             .offset(x: 34, y: top + rowHeight * CGFloat(i) + 6)
                     }
                     LensRing(cornerRadius: 14, lineWidth: 2.5, glow: 9, spinning: true, period: 7)

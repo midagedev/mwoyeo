@@ -1,0 +1,30 @@
+profile: dev.midagedev.film.lumiere none (base kept) ja>ko → ja>ko
+engine: Claude claude-sonnet-5-5 anthropic
+inpainter: MI-GAN loaded (0 ms)
+reader: lines pid=81474 gui pid=81450
+reader: docs pid=81510 gui pid=81450
+warm-up: 978 ms
+pipeline: 9867 ms
+work[still]: erase=2 ocr.blocks=1 ocr.blocks.lines=3 ocr.blocks.vn=1 ocr.reader.auto.lineGrouping=1 render=2 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.requests=2 translate.texts=4 translate.wasted=0 lens_wait_ms[p50=1901 max=1901 last=1901 n=2] settle=n/a parked=0
+pace: ja>ko|apple:auto samples=1 first=0.36s perLine=0.04s batch[p50=0.40s p90=0.40s n=1] cancelled=0 lines[cached=0 translated=2]
+pace: ja>ko|ext:F7A05BA5:77271425e7e4430 samples=0 first=n/as perLine=n/as batch[p50=n/as p90=n/as n=0] cancelled=0 lines[cached=0 translated=0]
+  エルヴェ
+    → 엘베
+  お供できず申し訳ございません。ここで月影のをお守りいたします
+    → 동행하지 못해 죄송합니다. 여기서 달의 그림자를 지키겠습니다
+issues=1
+engine_ms[n=0]
+learned=[]
+cache[ja>ko|apple:auto|4163643455823651350] stores=2
+layout: blocks=2 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2160×2160
+block: core=216,1610,269,72 text=216,1606,131,81 size=76.0 lines=1 chars=4 clipped=0 ellipsis=0 "エルヴェ"
+block: core=172,1788,1768,211 text=172,1796,1639,196 size=88.6 lines=2 chars=30 clipped=0 ellipsis=0 "お供できず申し訳ございません。ここで月影のをお守りいたします"
+wrote /Users/hckim/repo/mwoyeo/tools/film2/plates/out/after-claude-4/L25.png
+silence: longest=9105 total=9105
+drain: 0 in-flight=0
+reader: docs state=idle pid=81510 warm=doc:ja-Jpan dispatched=1 answered=1 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=17887 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=89 MB gui=107 MB last-ms=446 ms=446
+reader: lines state=idle pid=81474 warm=rev3:ja-Jpan dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=17887 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=147 MB gui=107 MB last-ms=295 ms=444,295
+reader: host reads=1 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 dropped=

@@ -1,0 +1,1 @@
+{"max_tokens":336,"messages":[{"content":"{\"lines\":[\"夜明けの守り手が、ゆっくりと目を開いた。\"]}","role":"user"}],"model":"claude-sonnet-5-5","system":"Translate each line of the user's JSON into Korean from Japanese. Keep names, numbers, emoji, URLs and @handles unchanged. Give one translation per line, in the same order.\nReply with only {\"translations\": [...]}."}

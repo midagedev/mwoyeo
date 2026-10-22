@@ -26,9 +26,13 @@ public struct DoubleTap: Sendable {
     public mutating func reset() { first = nil }
 }
 
-/// The curve a lens moves to a column or to a snap on: a spring with no overshoot (a lens never leaves the display or the window it was clamped to).
-/// How long it takes is `LensMotion`'s.
+/// How a lens moves to a column or to a snap: a spring with no overshoot (a lens never leaves the display or the window it was clamped to), short
+/// enough that the capture and the translations following it do not fall behind (design lens-fit, "natural": at most a quarter of a second).
 public enum FitMotion {
+    /// A fit, a growth, an undo.
+    public static let fitDuration: TimeInterval = 0.25
+    /// The settle onto a snap after a drop.
+    public static let settleDuration: TimeInterval = 0.12
     /// A critically damped spring from 0 to 1: `1 − (1 + ωt)·e^(−ωt)`, with ω = 8 / `duration`, so that it stands 0.3 % short of 1 at `duration` (the last
     /// frame is the target itself). Zero at 0, rising without overshoot.
     public static func progress(_ t: TimeInterval, duration: TimeInterval) -> CGFloat {

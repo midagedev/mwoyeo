@@ -1257,6 +1257,7 @@ actor RegionPipeline {
         guard !words.isEmpty else { return }
         Trace.count("ocr.hyphen_join", words.count)
         Trace.mark("hyphen join: " + words.joined(separator: " "), since: Trace.now)
+    }
 
     /// What a block read again shows meanwhile, where the page under the old blocks is as it was (docs/design/lens-hold.md). `rects` are the old
     /// blocks' places in the frame's space; `took` the old blocks whose translation a new block took already. Only a block that drew something has

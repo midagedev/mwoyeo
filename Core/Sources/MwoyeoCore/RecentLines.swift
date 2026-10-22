@@ -55,8 +55,9 @@ public struct RecentLines: Sendable, Equatable {
         present = []
     }
 
-    /// How opaque the line `rank` places from the lens (0 = the newest) is drawn of `count`: 1 for the newest, 0.45 for the oldest.
+    /// How opaque the line `rank` places from the lens (0 = the newest) is drawn of `count`: 1 for the newest, 0.6 for the oldest.
+    /// 2026-10-22 (game117 vision): the floor was 0.45, about 2.2:1 on the light popover material; 0.6 reads about 2.9:1 light, 5.4:1 dark.
     public static func opacity(rank: Int, of count: Int) -> Double {
-        1 - 0.55 * Double(min(max(rank, 0), max(count - 1, 0))) / Double(max(count - 1, 1))
+        1 - 0.4 * Double(min(max(rank, 0), max(count - 1, 0))) / Double(max(count - 1, 1))
     }
 }

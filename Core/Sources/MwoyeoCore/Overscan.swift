@@ -41,7 +41,20 @@ public enum Overscan {
         return r
     }
 
-    public static func plan(lens: CGRect, capture: CGRect, wide: Bool, allowResize: Bool, display: CGRect, lead: CGVector = .zero) -> Plan {
+    /// The display's whole width at the lens's rows, the vertical margins as at rest: the one wider read that finds where a column the capture cut
+    /// ends (`ColumnFit`, a probe). Never during a drag; the capture goes back to `rect` when the read is in.
+    public static func band(around lens: CGRect, display d: CGRect) -> CGRect {
+        let m = margins(for: lens.size, wide: false)
+        let rows = lens.insetBy(dx: 0, dy: -m.height)
+        func snap(_ v: CGFloat, _ rule: FloatingPointRoundingRule = .toNearestOrAwayFromZero) -> CGFloat { (v / grid).rounded(rule) * grid }
+        let height = snap(min(rows.height, d.height), .down)
+        return CGRect(x: d.minX, y: min(max(snap(rows.minY), d.minY), d.maxY - height), width: snap(d.width, .down), height: height)
+    }
+
+    /// `band`: the capture is this rect (the `band(around:display:)` a probe took when it began, kept as it was while the lens moves or grows), whatever
+    /// the margins say.
+    public static func plan(lens: CGRect, capture: CGRect, wide: Bool, allowResize: Bool, display: CGRect, lead: CGVector = .zero, band probing: CGRect? = nil) -> Plan {
+        if let want = probing { return want == capture ? .keep : .resize(want) }
         let want = rect(around: lens, wide: wide, display: display, lead: lead)
         let m = margins(for: lens.size, wide: wide)
         // Each side needs 40 % of its margin, or as much as the display allows there.

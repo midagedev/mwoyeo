@@ -35,3 +35,40 @@ import Testing
         #expect(!MenuBarIcon.needsAttention(permissionGranted: false, enabledLenses: 0, lensesDown: 0))
     }
 }
+
+/// Round text2, F14: with the menu bar item hidden, reopening the app is the way in.
+@Suite struct ReopenWindowTests {
+    @Test func reopeningAnAppThatIsSetUpOpensThePanelAsAWindow() {
+        #expect(ReopenWindow.shown(completedWelcome: true, screenAccess: true) == .menu)
+    }
+
+    @Test func reopeningBeforeTheWelcomeIsDoneOrTheGrantIsThereOpensTheWelcome() {
+        #expect(ReopenWindow.shown(completedWelcome: false, screenAccess: true) == .welcome)
+        #expect(ReopenWindow.shown(completedWelcome: true, screenAccess: false) == .welcome)
+        #expect(ReopenWindow.shown(completedWelcome: false, screenAccess: false) == .welcome)
+    }
+}
+
+/// Round text2, F3: a flag the app does not know ends in usage, not in the app.
+@Suite struct LaunchArgumentsTests {
+    private static let known = ["--render", "--mcp", "--relaunched", "--add-region"]
+
+    @Test func anUnknownFlagIsFoundWhereverItStands() {
+        #expect(LaunchArguments.unknown(in: ["--help"], known: Self.known) == "--help")
+        #expect(LaunchArguments.unknown(in: ["-h"], known: Self.known) == "-h")
+        #expect(LaunchArguments.unknown(in: ["--relaunched", "123", "--bogus"], known: Self.known) == "--bogus")
+        #expect(LaunchArguments.unknown(in: ["--"], known: Self.known) == "--")
+    }
+
+    @Test func theAppsOwnFlagsAndTheSystemsLaunchArgumentsAreNoTrouble() {
+        #expect(LaunchArguments.unknown(in: [], known: Self.known) == nil)
+        #expect(LaunchArguments.unknown(in: ["--relaunched", "123"], known: Self.known) == nil)
+        #expect(LaunchArguments.unknown(in: ["--add-region", "1,2,3,4"], known: Self.known) == nil)
+        #expect(LaunchArguments.unknown(in: ["-AppleLanguages", "(ko)", "-NSDocumentRevisionsDebugMode", "YES", "-psn_0_4242", "-translateImage", "/tmp/a.png"], known: Self.known) == nil)
+        #expect(LaunchArguments.unknown(in: ["/tmp/a file.png", "-1,2,3,4", "-help-me"], known: Self.known) == nil)
+    }
+
+    @Test func usageExitsWithEXUSAGE() {
+        #expect(LaunchArguments.usageExit == 64)
+    }
+}

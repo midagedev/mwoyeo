@@ -877,26 +877,27 @@ actor RegionPipeline {
             verdict == .needs && !keptRects.contains { $0.contains(CGPoint(x: ocr.rect.midX, y: ocr.rect.midY)) }
         }.map(\.0)
         let full = wantsErase ? RGBAImage(cgImage: frame.image) : nil
+        noteHyphenJoins(fresh)
         let places = layoutPlaces(of: fresh, among: found, in: frame.image)
         let old = blocks.filter { staleIDs.contains($0.id) }
         let matches = BlockMatcher.match(old: old.map { .init(rect: $0.rect, text: $0.source) },
-                                         new: fresh.map { .init(rect: $0.rect, text: $0.text) })
+                                         new: fresh.map { .init(rect: $0.rect, text: $0.prose) })
         var made: [Block] = []
         for (i, ocr) in fresh.enumerated() {
             let prior = matches[i].map { old[$0] }
             var b: Block
             if let full, let e = erase(ocr, in: full, place: places[i]) {
-                b = Block(id: prior?.id ?? UUID(), rect: e.rect.cgRect, lines: ocr.lines.map(\.rect), source: ocr.text, appearance: e.look,
+                b = Block(id: prior?.id ?? UUID(), rect: e.rect.cgRect, lines: ocr.lines.map(\.rect), source: ocr.prose, appearance: e.look,
                           fontSize: e.fontSize, spareWidth: e.spare, textArea: e.textArea, part: ocr.part)
                 b.erased = e.patch
             } else {
                 let r = ocr.rect, pad = ocr.lines.map(\.rect.height).min() ?? r.height
                 let boxRect = r.insetBy(dx: -max(2, pad * 0.12), dy: -max(1, pad * 0.08))
                     .intersection(CGRect(x: 0, y: 0, width: frame.image.width, height: frame.image.height))
-                b = Block(id: prior?.id ?? UUID(), rect: boxRect, lines: ocr.lines.map(\.rect), source: ocr.text,
+                b = Block(id: prior?.id ?? UUID(), rect: boxRect, lines: ocr.lines.map(\.rect), source: ocr.prose,
                           appearance: appearance(of: ocr.lines[0].rect, in: frame.image), part: ocr.part)
             }
-            if let prior, prior.source == ocr.text { b.translation = prior.translation }
+            if let prior, prior.source == ocr.prose { b.translation = prior.translation }
             made.append(b)
         }
         capBodySizes(&made, among: blocks.filter { !staleIDs.contains($0.id) })
@@ -958,6 +959,7 @@ actor RegionPipeline {
         keptBlocks = kept
         onRead?(TextRecognizer.tally(verdicts))
         found = zip(read, verdicts).filter { $1 == .needs }.map(\.0)
+        noteHyphenJoins(found)
         let places = layoutPlaces(of: found, among: read, in: frame.image)
         guard let full = RGBAImage(cgImage: frame.image) else { return true }
         Trace.mark("seamless: frame → RGBA", since: t); t = Trace.now
@@ -965,15 +967,15 @@ actor RegionPipeline {
         // Matched in the frame's coordinates: undo any move applied to the blocks since the pass started.
         let undone = blocks.map { b in moves.reversed().reduce(b.rect) { $1.undo($0) } }
         let matches = BlockMatcher.match(old: blocks.indices.map { .init(rect: undone[$0], text: blocks[$0].source) },
-                                         new: found.map { .init(rect: $0.rect, text: $0.text) })
+                                         new: found.map { .init(rect: $0.rect, text: $0.prose) })
         let prior = blocks
         var next: [Block] = []
         for (i, ocr) in found.enumerated() {
             guard let e = erase(ocr, in: full, place: places[i]) else { continue }
             let id = matches[i].map { prior[$0].id } ?? UUID()
-            var b = Block(id: id, rect: e.rect.cgRect, lines: ocr.lines.map(\.rect), source: ocr.text, appearance: e.look,
+            var b = Block(id: id, rect: e.rect.cgRect, lines: ocr.lines.map(\.rect), source: ocr.prose, appearance: e.look,
                           fontSize: e.fontSize, spareWidth: e.spare, textArea: e.textArea, part: ocr.part)
-            if let oi = matches[i], prior[oi].source == ocr.text { b.translation = prior[oi].translation }
+            if let oi = matches[i], prior[oi].source == ocr.prose { b.translation = prior[oi].translation }
             b.erased = e.patch
             next.append(b)
         }
@@ -987,6 +989,15 @@ actor RegionPipeline {
         Trace.mark("seamless: render", since: t)
         emit(animated: true)
         return true
+    }
+
+    /// The words that go to the engine whole because their line break was a hyphen (`LineJoin`): counted, and named in the trace. The pieces
+    /// of a paragraph that goes on in the next column share one text, so the first of them stands for the group.
+    private func noteHyphenJoins(_ blocks: [OCRBlock]) {
+        let words = blocks.filter { ($0.part?.index ?? 0) == 0 }.flatMap { $0.joined?.words ?? [] }
+        guard !words.isEmpty else { return }
+        Trace.count("ocr.hyphen_join", words.count)
+        Trace.mark("hyphen join: " + words.joined(separator: " "), since: Trace.now)
     }
 
     /// A pass that found no reader (`RecognitionUnavailable`) waits for `readerReady`: no timer, no backoff, and the frame stays
@@ -1083,18 +1094,24 @@ actor RegionPipeline {
             if let part = parts[i] { members[part.group, default: []].append(i) }
         }
         for positions in members.values {
-            let text = TextRecognizer.makeBlock(positions.flatMap { blocks[$0].lines }).text
-            for i in positions { out[i].text = text }
+            let whole = TextRecognizer.makeBlock(positions.flatMap { blocks[$0].lines })
+            for i in positions { out[i].text = whole.text; out[i].joined = whole.joined }
         }
         return out
     }
 
     /// A line the recognizer could not read across (an inline sum, a fraction) comes back as pieces on one text row, in
     /// separate blocks; a tall line reaches up into the block above. Translated apart, the pieces read badly and their patches
-    /// paint over each other, so blocks that share a text row or interlock (`BlockMerge`) are one block before anything else.
+    /// paint over each other, so blocks that share a text row or interlock (`BlockMerge`) are one block before anything else. The
+    /// one-to-three-character last line of a wrapped paragraph (`WrapTail`) is one with the paragraph too.
     private func joinSplitLines(_ blocks: [OCRBlock]) -> [OCRBlock] {
         guard blocks.count > 1, Self.layoutRules else { return blocks }
-        let groups = BlockMerge.groups(blocks.map { $0.lines.map(\.rect) })
+        let tails = WrapTail.pairs(lines: blocks.map { $0.lines.map(\.rect) }, texts: blocks.map { $0.lines.map(\.text) })
+        for pair in tails {
+            Trace.count("ocr.wrap_tail")
+            Trace.mark("wrap tail: '\(blocks[pair.tail].text)' ends '\(String(blocks[pair.head].text.suffix(12)))'", since: Trace.now)
+        }
+        let groups = BlockMerge.groups(blocks.map { $0.lines.map(\.rect) }, tails: tails)
         if Trace.lineDump { traceRowPairs(blocks, groups: groups) }
         guard groups.contains(where: { $0.count > 1 }) else { return blocks }
         return groups.map { group in
@@ -1124,16 +1141,20 @@ actor RegionPipeline {
     /// The lines of `blocks` that are worth reading as they are; the rest are left on the picture, not translated and not erased.
     /// A line the capture cuts in two (its box reaches the top or bottom of the frame: `CaptureEdge`) is read from half of it, and
     /// its translation, drawn over the visible half, is of half a sentence: the capture is larger than the lens, so it is the
-    /// frame's edge, not the lens's, that cuts, and a pass that holds the whole line reads it whole. A word turned on its side
+    /// frame's edge, not the lens's, that cuts, and a pass that holds the whole line reads it whole. A column the frame's left or right
+    /// edge runs through (`CaptureEdge.cutAtSides`: the next column of a lens that overshoots into it) is read from the start or the end
+    /// of every line, and a paragraph of such lines is left as it is whole, not a piece of it. A word turned on its side
     /// (`VerticalText.isRotatedLine`: the words of a figure) comes out as a column of syllables.
     private func readableLines(_ blocks: [OCRBlock], in image: CGImage) -> [OCRBlock] {
         let bounds = CGRect(x: 0, y: 0, width: image.width, height: image.height)
         let all = blocks.flatMap(\.lines)
         let cut = CaptureEdge.cut(all.map(\.rect), in: bounds)
+        let sides = CaptureEdge.cutAtSides(all.map(\.rect), in: bounds)
         let rotated = VerticalText.rotatedLines(all.map { (box: $0.rect, text: $0.text) })
         var first = 0
         return blocks.compactMap { block in
             defer { first += block.lines.count }
+            if block.lines.indices.contains(where: { sides.contains(first + $0) }) { Trace.count("ocr.cut_side"); return nil }
             let kept = block.lines.indices.filter { i in
                 if cut.contains(first + i) { Trace.count("ocr.cut_line"); return false }
                 let line = block.lines[i]

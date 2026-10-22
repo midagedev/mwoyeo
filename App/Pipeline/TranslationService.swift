@@ -115,6 +115,8 @@ actor TranslationService {
     /// not the engine the lens is set to, which Apple stands in for while it rests. One entry per source text; memory only.
     private let ledger = Memory()
     private var sessions: [String: TranslationSession] = [:]
+    /// The pairs `prewarm` has loaded (pair, engine choice and first-paint setting): a lens that adds one more warms its own once.
+    private var warmed = Set<String>()
     private var pairStatus: [String: LanguageAvailability.Status] = [:]
     private let intelligence = IntelligenceTranslator()
     private var issueHandler: (@Sendable (TranslationIssue?) -> Void)?
@@ -285,24 +287,43 @@ actor TranslationService {
     func invalidateAvailability() {
         pairStatus.removeAll()
         sessions.removeAll()
+        warmed.removeAll()
     }
 
-    func prewarm() async {
-        if let e = activeEngine, isPermitted(e) {
+    /// Loads the models of a pair before a lens needs them. `route`: a lens's own (its pair, engine and setting); nil is the service's own, at launch, which also
+    /// opens the added engine's connection. A lens's route warms Apple only: nothing is sent to an added engine for it, and a pair already warmed is left alone.
+    /// `detected`: the language a picker or a lens found in the text, which is the one worth warming; without it, the source language the settings name,
+    /// and for Detect the language whose model is slowest to load (ja).
+    func prewarm(route given: LensRoute? = nil, source detected: String? = nil) async {
+        let lens = given ?? defaultRoute
+        if given == nil, let e = activeEngine, isPermitted(e) {
             // Opens the connection (TLS) before the first batch; Apple warms up below as the safety net.
             if !enginesSynced { await syncEngines() }
             _ = await withDeadline(Self.deadline(items: 1)) { await self.client.prewarm(e) }
         }
-        if settings.engine == .customModel { intelligence.prewarm(settings: settings); return }
+        if lens.settings.engine == .customModel {
+            if given == nil { intelligence.prewarm(settings: lens.settings) }
+            return
+        }
         // Loading the translation model takes a moment the first time; do it before the first region.
-        let source = settings.sourceLanguage == "auto" ? "ja" : settings.sourceLanguage
-        let outcome = await withDeadline(Self.deadline(items: 1)) { await self.warm(source: source) }
+        let source = detected ?? pageLanguage(lens) ?? "ja"
+        let pair = "\(source)>\(lens.settings.targetLanguage)|\(lens.settings.engine.rawValue)|\(lens.settings.fastFirstPaint)"
+        guard warmed.insert(pair).inserted || given == nil else { return }
+        let outcome = await withDeadline(Self.deadline(items: 1)) { await self.warm(source: source, route: lens) }
         // A model that never answers is dropped, so the first real call starts fresh.
-        if case .value = outcome {} else { dropSessions(source: source, target: settings.targetLanguage) }
+        if case .value = outcome {} else {
+            dropSessions(source: source, target: lens.settings.targetLanguage)
+            warmed.remove(pair)
+        }
     }
 
-    private func warm(source: String) async {
-        if let (session, _) = try? await session(source: source, route: defaultRoute) { _ = try? await session.translate("。") }
+    private func warm(source: String, route lens: LensRoute) async {
+        guard let (session, strategy) = try? await session(source: source, route: lens) else { return }
+        _ = try? await session.translate("。")
+        // The model that answers first beside a high-fidelity final (`fastFirstPaint`): its first batch is 2.1 s cold and 0.23 s warm (first117, trwarm).
+        guard FirstPaintPlan.wants(flag: lens.settings.fastFirstPaint, asked: true, finalIsHighFidelity: strategy == .highFidelity),
+              let quick = await installedSession(source: source, route: lens, strategy: .lowLatency).session else { return }
+        _ = try? await quick.translate("。")
     }
 
     /// 5 s + 2 s per item. Measured high-fidelity worst case: 4.2 s for 3 lines (2026-10-17), so 3 lines get 11 s,
@@ -319,6 +340,7 @@ actor TranslationService {
     private func dropSessions(source: String, target: String) {
         let prefix = "\(source)>\(target)|"
         for k in sessions.keys where k.hasPrefix(prefix) { sessions[k] = nil }
+        warmed = warmed.filter { !$0.hasPrefix(prefix) }
     }
 
     /// Cached translation under `route`'s namespace (the one in use now when none is named), without doing any work.
@@ -374,18 +396,24 @@ actor TranslationService {
     ///
     /// A chain with a rewrite row or a script that is on (rewrite-rules §4) goes through `translateRewritten`, which runs `before` on the lines, this
     /// function on what is left, and `after` on the answers. Nothing set is this function and no more (`AppSettings.hasRewrites`).
+    ///
+    /// `provisional` is a quick first text for a line, told before its translation lands (`fastFirstPaint`, design first-lens §13). It is asked by the lens's
+    /// first batch only and is heard only on the plain Apple path (no rewrites, no context, no added engine): a text told to it is never a result, so it
+    /// is not in `onResult`, in the outcome, in the cache or under a translator's credit.
     func translate(_ texts: [String], route given: LensRoute? = nil, context: LensContext? = nil,
-                   onResult: (@Sendable (String, String) -> Void)? = nil) async -> TranslationOutcome {
+                   onResult: (@Sendable (String, String) -> Void)? = nil,
+                   provisional: (@Sendable (String, String) -> Void)? = nil) async -> TranslationOutcome {
         let lens = given ?? defaultRoute
         if lens.settings.hasRewrites, let rewrite = rewritePlan(for: lens, context: context) {
             return await translateRewritten(texts, plan: rewrite.plan, app: rewrite.app, route: lens, context: context, onResult: onResult)
         }
-        return await translateWithoutRewrites(texts, route: lens, context: context, onResult: onResult)
+        return await translateWithoutRewrites(texts, route: lens, context: context, onResult: onResult, provisional: provisional)
     }
 
     /// The translation of `translate` as it was before rewrites: the lens's cache, the context paths and the engine.
     private func translateWithoutRewrites(_ texts: [String], route lens: LensRoute, context: LensContext?,
-                                          onResult: (@Sendable (String, String) -> Void)?) async -> TranslationOutcome {
+                                          onResult: (@Sendable (String, String) -> Void)?,
+                                          provisional: (@Sendable (String, String) -> Void)? = nil) async -> TranslationOutcome {
         if let context, let plan = contextPlan(for: context, route: lens) {
             switch plan {
             case let .engine(engine, options, chain, replace):
@@ -416,13 +444,7 @@ actor TranslationService {
         guard !todo.isEmpty else { return outcome }
 
         // Group by source language (keeping order) so each session handles one pair.
-        var order: [String] = []
-        var groups: [String: [String]] = [:]
-        for t in todo {
-            let lang = sourceLanguage(for: t, route: lens)
-            if groups[lang] == nil { order.append(lang) }
-            groups[lang, default: []].append(t)
-        }
+        let (order, groups) = groupBySource(todo, route: lens)
 
         // What the lenses' hints hear is one event for the whole call, a result per language group: a batch of three lines that splits in
         // two groups (7 s + 9 s of deadlines) is one slow batch, and two timeouts of it must not read as two. Each result carries the pair
@@ -436,7 +458,7 @@ actor TranslationService {
             let space = lens.namespace
             let target = lens.settings.targetLanguage
             let appleSpace = lens.appleNamespace
-            var run = await attempt(items, source: source, via: routing(for: lens), route: lens, onResult: onResult)
+            var run = await attempt(items, source: source, via: routing(for: lens), route: lens, onResult: onResult, provisional: provisional)
             if case let .added(engine) = run.route {
                 switch run.status {
                 case .value:
@@ -556,7 +578,8 @@ actor TranslationService {
     /// One group through one route, under one deadline. What streamed in before a deadline or a throw is kept.
     /// Every result takes its display form here, whatever engine made it.
     private func attempt(_ items: [String], source: String, via route: Route, route lens: LensRoute,
-                         onResult: (@Sendable (String, String) -> Void)?) async -> Attempt {
+                         onResult: (@Sendable (String, String) -> Void)?,
+                         provisional: (@Sendable (String, String) -> Void)? = nil) async -> Attempt {
         if !enginesSynced { await syncEngines() }
         let streamed = Streamed()
         // Pace is learned from engine output only (text from the cache or kept as is takes no engine time), line by line,
@@ -572,12 +595,15 @@ actor TranslationService {
             streamed.put(s, shown)
             let (delta, isFirst) = arrivals.next(at: ProcessInfo.processInfo.systemUptime)
             book.record(delta, isFirst: isFirst, slot: slot)
+            Trace.mark("service result '\(s.prefix(16))'", since: Trace.now)
             onResult?(s, shown)
         }
+        // A quick text takes its display form here too, and goes to the lens's first paint alone: it does not reach `streamed`.
+        let quick: (@Sendable (String, String) -> Void)? = provisional.map { tell in { @Sendable s, t in tell(s, TranslationCheck.displayForm(t)) } }
         let limit: Duration
         if case .added = route { limit = Self.addedEngineDeadline(items: items.count) } else { limit = Self.deadline(items: items.count) }
         let result = await withDeadline(limit) {
-            try await self.translateGroup(items, source: source, via: route, route: lens, onResult: deliver)
+            try await self.translateGroup(items, source: source, via: route, route: lens, onResult: deliver, provisional: quick)
         }
         var a = Attempt(route: route, translated: streamed.all, status: .value)
         defer { pace.finish(slot: slot, total: ProcessInfo.processInfo.systemUptime - started, ok: a.isOK, cancelled: a.isCancelled) }
@@ -630,16 +656,18 @@ actor TranslationService {
     // MARK: - Engines
 
     private func translateGroup(_ items: [String], source: String, via route: Route, route lens: LensRoute,
-                                onResult: @escaping @Sendable (String, String) -> Void) async throws -> [String: String] {
+                                onResult: @escaping @Sendable (String, String) -> Void,
+                                provisional: (@Sendable (String, String) -> Void)? = nil) async throws -> [String: String] {
         Trace.count("translate.requests")
         Trace.count("translate.texts", items.count)
-        Trace.mark("engine ← \(items.map { $0.debugDescription }.joined(separator: " | "))", since: Trace.now)
+        let began = Trace.now
+        Trace.mark("engine ← \(items.map { $0.debugDescription }.joined(separator: " | "))", since: began)
         if case let .added(engine) = route {
             return try await translateViaEngine(engine, items, source: source, route: lens, onResult: onResult)
         }
         #if !MAS
         if let fake = ProcessInfo.processInfo.environment["MWOYEO_FAKE_ENGINE"] {
-            return try await fakeEngine(fake, items, route: lens, onResult: onResult)
+            return try await fakeEngine(fake, items, route: lens, onResult: onResult, provisional: provisional)
         }
         #endif
         if lens.settings.engine == .customModel {
@@ -651,8 +679,28 @@ actor TranslationService {
             issueHandler?(.intelligenceUnavailable(intelligence.unavailableReason ?? ""))
         }
         guard source != "und" else { throw TranslationIssue.failed(String(localized: "Could not tell which language this is")) }
-        let (session, _) = try await session(source: source, route: lens)
-        return try await stream(items, through: session, route: lens, onResult: onResult)
+        let (session, strategy) = try await session(source: source, route: lens)
+        Trace.mark("session \(strategy == .highFidelity ? "hf" : "ll") ready (\(source))", since: began)
+        Trace.count(strategy == .highFidelity ? "translate.model.hf" : "translate.model.ll")
+        let wants = FirstPaintPlan.wants(flag: lens.settings.fastFirstPaint, asked: provisional != nil, finalIsHighFidelity: strategy == .highFidelity)
+        let quick = wants ? await installedSession(source: source, route: lens, strategy: .lowLatency).session : nil
+        let plan = FirstPaintPlan.decide(flag: lens.settings.fastFirstPaint, asked: provisional != nil, finalIsHighFidelity: strategy == .highFidelity,
+                                         quickInstalled: quick != nil)
+        guard plan == .provisionalThenFinal, let quick, let provisional else {
+            return try await stream(items, through: session, route: lens, onResult: onResult)
+        }
+        Trace.count("translate.first_paint")
+        // The timeline of the two models in the trace (`first-paint ll|hf <what> <ms since the group started>`): where a batch's time went.
+        @Sendable func timed(_ model: String, _ sink: @escaping FirstPaint.Sink) -> FirstPaint.Sink {
+            { source, text in
+                Trace.mark("first-paint \(model) landed '\(source.prefix(16))'", since: began)
+                sink(source, text)
+            }
+        }
+        return try await FirstPaint.run(items: items,
+                                        quick: { items, sink in try await self.stream(items, through: quick, route: lens, onResult: timed("ll", sink)) },
+                                        final: { items, sink in try await self.stream(items, through: session, route: lens, onResult: timed("hf", sink)) },
+                                        provisional: provisional, onFinal: onResult)
     }
 
     /// One call to an added engine for the whole group (the engines translate a batch in one request, so results land
@@ -687,11 +735,13 @@ actor TranslationService {
     /// Headless-harness engine, chosen by `MWOYEO_FAKE_ENGINE`: `hang` never returns and ignores cancellation, `fail`
     /// always throws, `fail-once` throws on the first call then behaves like `slow:100`, `slow:<ms>` waits, then returns
     /// "⟦<target>⟧ " + source for every item, streaming each one. `drop:<text>` is like `slow:100`, but the answer lacks <text>
-    /// (an Apple that dropped a pinned term).
+    /// (an Apple that dropped a pinned term). `first-paint:<quick ms>:<final ms>` is Apple with two models (`fakeFirstPaint`).
     private func fakeEngine(_ mode: String, _ items: [String], route lens: LensRoute,
-                            onResult: @escaping @Sendable (String, String) -> Void) async throws -> [String: String] {
+                            onResult: @escaping @Sendable (String, String) -> Void,
+                            provisional: (@Sendable (String, String) -> Void)? = nil) async throws -> [String: String] {
         fakeCalls += 1
         let target = lens.settings.targetLanguage
+        if mode.hasPrefix("first-paint:") { return try await fakeFirstPaint(mode, items, target: target, lens: lens, onResult: onResult, provisional: provisional) }
         var delay = 100
         var dropped: String?
         switch mode {
@@ -717,6 +767,34 @@ actor TranslationService {
             onResult(s, t)
         }
         return out
+    }
+
+    /// `first-paint:<quick ms>:<final ms>`: Apple with both models, for the harness and the checks. The quick one answers "⟦<target>:ll⟧ " + source after its
+    /// time, the final one "⟦<target>:hf⟧ " + source after its own; a source of ten characters or fewer gets the final text from both (short lines are
+    /// what the two models agree on). The final model answers alone, as it does today, unless the lens asked and `fastFirstPaint` is on (`FirstPaintPlan`).
+    private func fakeFirstPaint(_ mode: String, _ items: [String], target: String, lens: LensRoute,
+                                onResult: @escaping @Sendable (String, String) -> Void,
+                                provisional: (@Sendable (String, String) -> Void)?) async throws -> [String: String] {
+        let ms = mode.dropFirst("first-paint:".count).split(separator: ":").compactMap { Int($0) }
+        let (quickMs, finalMs) = (ms.first ?? 100, ms.last ?? 1500)
+        func model(_ name: String, after delay: Int) -> FirstPaint.Runner {
+            { items, sink in
+                try? await Task.sleep(for: .milliseconds(delay))
+                if Task.isCancelled { throw CancellationError() }
+                var out: [String: String] = [:]
+                for s in items {
+                    let t = "⟦\(target):\(s.count <= 10 ? "hf" : name)⟧ " + s
+                    out[s] = t
+                    sink(s, t)
+                }
+                return out
+            }
+        }
+        let plan = FirstPaintPlan.decide(flag: lens.settings.fastFirstPaint, asked: provisional != nil, finalIsHighFidelity: true, quickInstalled: true)
+        guard plan == .provisionalThenFinal, let provisional else { return try await model("hf", after: finalMs)(items, onResult) }
+        Trace.count("translate.first_paint")
+        return try await FirstPaint.run(items: items, quick: model("ll", after: quickMs), final: model("hf", after: finalMs),
+                                        provisional: provisional, onFinal: onResult)
     }
 
     /// The models the chosen engine may translate with, in the order they are tried. Before macOS 26.4 a session cannot pick its model:
@@ -754,24 +832,33 @@ actor TranslationService {
         var downloadable = false
         let target = lens.settings.targetLanguage
         for strategy in wantedStrategies(for: lens) {
-            let id = "\(source)>\(target)|\(strategy == .highFidelity ? "hf" : "ll")"
-            if let s = sessions[id] { return (s, strategy) }
-            let status: LanguageAvailability.Status
-            if let cached = pairStatus[id] { status = cached } else {
-                status = await availability(strategy)
-                    .status(from: Locale.Language(identifier: source), to: Locale.Language(identifier: target))
-                pairStatus[id] = status
-            }
+            let (session, status) = await installedSession(source: source, route: lens, strategy: strategy)
             if status == .supported { downloadable = true }
-            guard status == .installed else { continue }
-            let s = makeSession(source: Locale.Language(identifier: source), target: Locale.Language(identifier: target), strategy: strategy)
-            sessions[id] = s
-            return (s, strategy)
+            if let session { return (session, strategy) }
         }
         if downloadable {
             throw TranslationIssue.languagePackMissing(source: source, target: target)
         }
         throw TranslationIssue.unsupportedPair(source: source, target: target)
+    }
+
+    /// The session of one model for `source` → target, made when that model is installed; `status` says where the pair stands when none is. Kept
+    /// per model and pair, and the status is asked once (`invalidateAvailability` forgets both).
+    private func installedSession(source: String, route lens: LensRoute, strategy: Strategy)
+        async -> (session: TranslationSession?, status: LanguageAvailability.Status) {
+        let target = lens.settings.targetLanguage
+        let id = "\(source)>\(target)|\(strategy == .highFidelity ? "hf" : "ll")"
+        if let s = sessions[id] { return (s, .installed) }
+        let status: LanguageAvailability.Status
+        if let cached = pairStatus[id] { status = cached } else {
+            status = await availability(strategy)
+                .status(from: Locale.Language(identifier: source), to: Locale.Language(identifier: target))
+            pairStatus[id] = status
+        }
+        guard status == .installed else { return (nil, status) }
+        let s = makeSession(source: Locale.Language(identifier: source), target: Locale.Language(identifier: target), strategy: strategy)
+        sessions[id] = s
+        return (s, status)
     }
 
     private func availability(_ strategy: Strategy) -> LanguageAvailability {
@@ -909,8 +996,24 @@ actor TranslationService {
     /// The service's own configured source language, or the language of `text` when set to auto ("und" if unsure).
     func sourceLanguage(for text: String) -> String { sourceLanguage(for: text, route: defaultRoute) }
 
-    /// The lens's configured source language, or the language of `text` when set to auto ("und" if unsure).
-    func sourceLanguage(for text: String, route lens: LensRoute) -> String {
+    /// `texts` by the language each is read in, in the order they first appear. The page's language is learned from all of them before any is read
+    /// (`learns`), so a short line reads in it whichever side of the long lines it stands: a name that came first was guessed alone ("Priya Shah" as French,
+    /// "# general" as Spanish), a group of its own that fell to the slow model (design first-lens §13.6).
+    private func groupBySource(_ texts: [String], route lens: LensRoute) -> (order: [String], groups: [String: [String]]) {
+        for t in texts { _ = sourceLanguage(for: t, route: lens) }
+        var order: [String] = []
+        var groups: [String: [String]] = [:]
+        for t in texts {
+            let language = sourceLanguage(for: t, route: lens, learns: false)
+            if groups[language] == nil { order.append(language) }
+            groups[language, default: []].append(t)
+        }
+        return (order, groups)
+    }
+
+    /// The lens's configured source language, or the language of `text` when set to auto ("und" if unsure). `learns`: a confident long line counts
+    /// towards the page's language (`seenLanguages`).
+    func sourceLanguage(for text: String, route lens: LensRoute, learns: Bool = true) -> String {
         if lens.settings.sourceLanguage != "auto" { return lens.settings.sourceLanguage }
         let r = NLLanguageRecognizer()
         r.languageConstraints = Languages.sources.filter { $0 != "auto" }.map { NLLanguage($0) }
@@ -922,7 +1025,7 @@ actor TranslationService {
         case .traditionalChinese: "zh-Hant"
         default: lang.rawValue
         }
-        if p > 0.9, text.count >= 20 { seenLanguages[code, default: 0] += 1 }
+        if learns, p > 0.9, text.count >= 20 { seenLanguages[code, default: 0] += 1 }
         return p < 0.75 || text.count < 12 ? page ?? code : code
     }
 }
@@ -1007,13 +1110,7 @@ extension TranslationService {
         }
         guard !todo.isEmpty else { return outcome }
 
-        var order: [String] = []
-        var groups: [String: [String]] = [:]
-        for t in todo {
-            let language = sourceLanguage(for: t, route: route)
-            if groups[language] == nil { order.append(language) }
-            groups[language, default: []].append(t)
-        }
+        let (order, groups) = groupBySource(todo, route: route)
         var results: [TranslationEvent.Group] = []
         defer { if !results.isEmpty { tell(TranslationEvent(groups: results)) } }
         for source in order {

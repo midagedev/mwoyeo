@@ -192,8 +192,8 @@ struct MenuPanel: View {
     }
 
     private func open() {
-        NSApp.activate(ignoringOtherApps: true)
-        openSettings()
+        // The panel may be in a window of its own (a reopen), which no scene owns: the action of the menu bar item's view is the one that opens Settings from anywhere.
+        if !model.openSettings(on: model.settingsTab) { openSettings() }
     }
 }
 
@@ -324,9 +324,7 @@ struct ProfileCaption: View {
             .labelsHidden()
             Divider()
             Button("Profiles in Settings…") {
-                model.settingsTab = .translation
-                NSApp.activate(ignoringOtherApps: true)
-                openSettings()
+                if !model.openSettings(on: .translation) { openSettings() }
             }
         } label: {
             HStack(spacing: 3) {

@@ -207,6 +207,8 @@ final class AppModel {
         HotKeys.shared.setHandler(.copyOriginal) { [weak self] in self?.lensForShortcut()?.copyOriginal() }
         HotKeys.shared.setHandler(.readAloud) { [weak self] in self?.lensForShortcut()?.toggleReadAloud() }
         HotKeys.shared.setHandler(.translateText) { TextTranslationWindow.shared.show() }
+        HotKeys.shared.setHandler(.ignoreRegion) { [weak self] in Task { await self?.lensForShortcut()?.ignoreRegion() } }
+        HotKeys.shared.setHandler(.keepRecentLines) { [weak self] in self?.lensForShortcut()?.toggleKeepsRecent() }
         HotKeys.shared.apply(settings.shortcuts)
         settingsFile.startWatching { [weak self] in self?.settingsFileChanged() }
         // Transcripts written so far are closed before the app goes.
@@ -499,6 +501,8 @@ final class AppModel {
             regions[i].anchor = updated.anchor
             regions[i].name = updated.name
             regions[i].profilePin = updated.profilePin
+            regions[i].ignored = updated.ignored
+            regions[i].keepsRecent = updated.keepsRecent
         }
         s.onCloseRequest = { [weak self] in Task { await self?.remove(config.id) } }
         s.onToggleOriginal = { [weak self] in self?.toggleTranslations() }

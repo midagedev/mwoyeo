@@ -11,7 +11,8 @@ import MwoyeoCore
 /// - a scene that moves beside the text does not make the pipeline read again, and the text changing in the same frame does (`ReadWatch` wired
 ///   into `RegionPipeline`; the rule itself is `ReadWatchTests`);
 /// - the lens keeps its regions and its recent-lines option (menu rows that answer a press, the saved lens, a drag that is too small or outside),
-///   the recent lines stack from what the lens read, and a region placed with the keyboard.
+///   the recent lines stack from what the lens read, and a region placed with the keyboard;
+/// - the marker's hint pills stand clear of the lens and inside the screen's visible frame (`marker-hint-checks` runs only this one: it needs no window).
 ///
 /// Every check was seen to FAIL first on a stub of what it checks (the lines are in the round's report).
 @MainActor
@@ -24,6 +25,7 @@ enum GameChecks {
         await lensOptions(model, check)
         await recentLines(model, check)
         keyboardMarker(check)
+        markerHints(check)
         await markerFocus(check)
         settings(check)
         return check.failed
@@ -467,6 +469,27 @@ enum GameChecks {
         // 140 points from the lens's left edge: fourteen steps of ten reach it.
         for _ in 0..<14 { edge.handle(.move(.left, resize: false, fine: false)) }
         check("fourteen steps left reach the lens's edge and no further", edge.placement.map { $0.rect.minX == $0.bounds.minX } == true, "\(String(describing: edge.placement?.rect))")
+    }
+
+    /// The marker's hint pills are placed against the lens (`MarkerHints`): for a lens at the top right of this Mac's screen, and for one that fills its
+    /// height, no pill is within the ring's room of the lens or outside the visible frame, and the two keep their order and 8 pt (the rule itself is
+    /// `MarkerHintsTests`; this is the view's wiring of it: the fixed place at the screen's middle, 120 points from its top, was over such a lens).
+    static func markerHints(_ check: Check) {
+        guard let screen = NSScreen.main ?? NSScreen.screens.first else { check("a screen to place the hints on", false, "none"); return }
+        let visible = screen.visibleFrame.offsetBy(dx: -screen.frame.minX, dy: -screen.frame.minY)
+        let room = RegionFrameWindow.tabExtra
+        // View coordinates (y up) to the Quartz rect the marker takes.
+        func quartz(_ r: CGRect) -> CGRect { ScreenGeometry.quartzRect(fromAppKit: r.offsetBy(dx: screen.frame.minX, dy: screen.frame.minY)) }
+        let lenses = [("top right", CGRect(x: visible.maxX - 30 - 600, y: visible.maxY - 60 - 340, width: 600, height: 340)),
+                      ("full height", CGRect(x: visible.midX - 210, y: visible.minY, width: 420, height: visible.height))]
+        for (name, lens) in lenses {
+            let view = MarkerView(screen: screen, lens: quartz(lens), existing: [], done: { _ in })
+            let frames = view.hintFrames
+            let clear = frames.allSatisfy { !$0.intersects(lens.insetBy(dx: -room, dy: -room)) }
+            check("the hint pills stand clear of a lens at the \(name) of the screen", frames.count == 2 && clear, "\(frames) against the lens \(lens)")
+            check("and inside the visible frame, the drag hint above the arrow keys one with 8 points between",
+                  frames.count == 2 && frames.allSatisfy({ visible.contains($0) }) && frames[0].minY - frames[1].maxY == MarkerHints.spacing, "\(frames) in \(visible)")
+        }
     }
 
     /// The marker gives the app that was in front its focus back, however it ends: a game with a lens over it is where the person goes on, and

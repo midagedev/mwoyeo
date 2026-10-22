@@ -51,6 +51,7 @@ enum RestoreWords {
         case "lensTabPosition": String(localized: "Name tag position")
         case "lensSnap": String(localized: "Snap to text columns")
         case "lensAutoFit": String(localized: "Auto Fit new lenses")
+        case "recentLineCount": String(localized: "Recent lines kept")
         case "shortcuts": String(localized: "Shortcuts")
         case "checksForUpdates": String(localized: "Check for updates")
         default: key

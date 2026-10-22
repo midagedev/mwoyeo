@@ -426,8 +426,10 @@ final class AppModel {
         config.autoFit = settings.lensAutoFit
         config.follow(result.window)
         regions.append(config)
-        if isPaused { isPaused = false; for r in regions where r.isEnabled && sessions[r.id] == nil { await startSession(r) } }
-        else { await startSession(config) }
+        // The lens's outline takes hold where the click was (the middle of the lens for a key): the picker's spotlight turns into the ring.
+        let click = result.click ?? CGPoint(x: result.rect.midX, y: result.rect.midY)
+        if isPaused { isPaused = false; for r in regions where r.isEnabled && sessions[r.id] == nil { await startSession(r, placedAt: r.id == config.id ? click : nil) } }
+        else { await startSession(config, placedAt: click) }
     }
 
     func remove(_ id: UUID) async {
@@ -489,7 +491,8 @@ final class AppModel {
             ?? regions.last { sessions[$0.id] != nil }.flatMap { sessions[$0.id] }
     }
 
-    private func startSession(_ config: RegionConfig) async {
+    /// `click`: the lens was just placed by the picker there (global Quartz points), so its outline takes hold from its first frame.
+    private func startSession(_ config: RegionConfig, placedAt click: CGPoint? = nil) async {
         guard sessions[config.id] == nil else { return }
         // A saved lens may have been left on a display this Mac no longer has (an unplugged one, a smaller resolution): it comes up on the
         // main display instead of off every screen.
@@ -515,6 +518,7 @@ final class AppModel {
         s.onCloseRequest = { [weak self] in Task { await self?.remove(config.id) } }
         s.onToggleOriginal = { [weak self] in self?.toggleTranslations() }
         sessions[config.id] = s
+        if let click { s.takeHold(at: click) }
         s.setTranslationsVisible(translationsVisible)
         await s.start()
         if moved { s.showNotice(String(localized: "Moved to the main display")) }

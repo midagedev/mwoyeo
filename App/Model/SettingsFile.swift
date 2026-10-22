@@ -48,7 +48,7 @@ struct SettingSpec {
         "rewrites": (.translation, .preference), "script": (.translation, .preference),
         "useInpaintingModel": (.appearance, .preference), "fontStyle": (.appearance, .preference), "boxOpacity": (.appearance, .preference),
         "lensStyle": (.appearance, .preference), "lensTint": (.appearance, .preference), "lensTabVisibility": (.appearance, .preference),
-        "lensTabPosition": (.appearance, .preference), "lensSnap": (.appearance, .preference), "lensAutoFit": (.appearance, .preference),
+        "lensTabPosition": (.appearance, .preference), "lensSnap": (.appearance, .preference), "lensAutoFit": (.appearance, .preference), "recentLineCount": (.appearance, .preference),
         "shortcuts": (.shortcuts, .preference),
         "checksForUpdates": (.about, .consent),
         // 1.1.4's keys: read and converted, never written, shown by no tab; what they were is what they became (`profiles`, `glossaryApply`).
@@ -102,6 +102,8 @@ struct SettingSpec {
         .init(key: "lensAutoFit", kind: .bool,
               doc: "Lenses you add start with Auto Fit on: after a read settles, a lens that cuts the text of its column at the left or right edge grows to the column once. It never makes a lens smaller. Each lens keeps its own choice, in its menu. Written to the file only while true."),
         .init(key: "cacheSize", kind: .integer(100...100_000), doc: "How many translations are kept in memory for reuse."),
+        .init(key: "recentLineCount", kind: .integer(RecentLines.range),
+              doc: "How many lines a lens that keeps recent lines (its menu's Keep Recent Lines, for a chat or a visual novel) holds on screen after they leave it, newest nearest the lens. Older ones fade."),
         .init(key: "shortcuts", kind: .shortcuts,
               doc: "Global keyboard shortcuts by action name; an action left out has no shortcut. Each has a Carbon keyCode, a Carbon modifiers mask and a display text. Easier to set in Settings > Shortcuts."),
         .init(key: "checksForUpdates", kind: .bool, doc: "Ask GitHub once a day whether a newer version is out."),
@@ -455,9 +457,10 @@ enum SettingsFileCheck {
 
     /// Keys added after 1.1.2 whose default is not written: the file holds one only while it differs, so a file from before the key
     /// re-saves byte for byte. The schema still lists it, with its default. A switch is written only while it is true, `glossaryApply`
-    /// only while it is not hint.
+    /// only while it is not hint, `recentLineCount` only while it is not 3.
     static let writtenOnlyWhenSet: [String: NSObject] = ["useLearned": false as NSNumber, "agentConnection": false as NSNumber, "fastFirstPaint": false as NSNumber, "glossaryApply": "hint" as NSString, "rewrites": [] as NSArray,
-                                                         "lensSnap": true as NSNumber, "lensAutoFit": false as NSNumber]
+                                                         "lensSnap": true as NSNumber, "lensAutoFit": false as NSNumber,
+                                                         "recentLineCount": RecentLines.standard as NSNumber]
 
     /// Keys AppSettings writes to the file that `SettingSpec.all` does not describe (the schema would lack them). Every
     /// switch counts, also one the file leaves out while it is off.

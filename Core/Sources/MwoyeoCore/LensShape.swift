@@ -12,6 +12,9 @@ import Foundation
 /// pointer aims at (the anchor), never on where the pointer is inside it; the held anchor stays until another beats it by `switchBy`, as
 /// in `LensTarget`.
 ///
+/// What lies in `bounds` is the content (`Map.within`); what a recogniser takes belongs with the anchor (what is set alike, what stands on the
+/// rows, the block that pairs), so the kind does not change with a point of the read (docs/design/lens-shapes.md section 13).
+///
 /// Pure, in one space with y going down (the picker hands global Quartz points).
 public enum LensShape {
     /// The farthest a block may stand from the pointer and still be aimed at; a new anchor must beat the held one by `switchBy`.
@@ -29,11 +32,13 @@ public enum LensShape {
     /// An edge that reaches into a block by more than this cuts it (the measure of the gates; a box is a little wider than its glyphs).
     public static let cutSlack: CGFloat = 2
 
-    /// One block of the read: the union of its lines, and how many there are (`ColumnFit.Block`'s fields).
+    /// One block of the read: the union of its lines, and how many there are (`ColumnFit.Block`'s fields), and the box of its first line when
+    /// the picker has it (`head`; a read that merged a speaker's name into its lines is told by it).
     public struct Block: Sendable, Equatable {
         public var core: CGRect
         public var lines: Int
-        public init(core: CGRect, lines: Int) { self.core = core; self.lines = lines }
+        public var head: CGRect?
+        public init(core: CGRect, lines: Int, head: CGRect? = nil) { self.core = core; self.lines = lines; self.head = head }
 
         /// One line's glyph height: the box itself for one line; for several, the box less the leading between them.
         public var em: CGFloat { core.height / (1 + LensShape.leading * CGFloat(max(lines, 1) - 1)) }
@@ -85,12 +90,37 @@ public enum LensShape {
         /// The rows each block has a line in.
         let rowsOf: [[Int]]
 
+        /// The index in the read's own map of each block (the identity for that map; `within` keeps what is left of it).
+        let origin: [Int]
+
         public init(blocks: [Block]) {
             let sorted = blocks.sorted { ($0.core.minY, $0.core.minX, $0.core.width) < ($1.core.minY, $1.core.minX, $1.core.width) }
+            self.init(sorted: sorted, origin: Array(sorted.indices))
+        }
+
+        /// The blocks that lie in `bounds` (the hovered window's content; the read is of the display): the title bar, the menu bar and the
+        /// windows beside this one are not what the lens is made of, and a lens can only cover what is inside it. The same map when all are.
+        func within(_ bounds: CGRect) -> Map {
+            let kept = blocks.indices.filter { i in
+                let o = bounds.intersection(blocks[i].core)
+                return !o.isNull && o.width > LensShape.cutSlack && o.height > LensShape.cutSlack
+            }
+            return kept.count == blocks.count ? self : Map(sorted: kept.map { blocks[$0] }, origin: kept.map { origin[$0] })
+        }
+
+        private init(sorted: [Block], origin: [Int]) {
+            self.origin = origin
             self.blocks = sorted
             var parent = Array(sorted.indices)
             func root(_ i: Int) -> Int { var i = i; while parent[i] != i { parent[i] = parent[parent[i]]; i = parent[i] }; return i }
-            for i in sorted.indices { for j in sorted.indices where j > i && LensShape.linked(sorted[i], sorted[j]) { parent[root(j)] = root(i) } }
+            // Sorted by top: a block further below `i` than the largest gap `linked` allows is out of reach of it and of the blocks after it.
+            let farthest = LensShape.stackGap * (sorted.map(\.em).max() ?? 0)
+            for i in sorted.indices {
+                for j in sorted.indices.dropFirst(i + 1) {
+                    if sorted[j].core.minY - sorted[i].core.maxY > farthest { break }
+                    if LensShape.linked(sorted[i], sorted[j]) { parent[root(j)] = root(i) }
+                }
+            }
             group = sorted.indices.map(root)
             var lines: [(block: Int, rect: CGRect)] = []
             for (i, b) in sorted.enumerated() { for k in 0..<max(b.lines, 1) { lines.append((i, b.line(k))) } }
@@ -123,11 +153,35 @@ public enum LensShape {
     /// The shape at `pointer`, or nil (the ghost). `held` is the previous choice: its anchor stays until another block beats it by
     /// `switchBy`. `bounds` is what the lens may cover (`LensTarget.content`).
     public static func choose(_ map: Map, pointer p: CGPoint, bounds: CGRect, held: Shape? = nil, scale: CGFloat = 2) -> Shape? {
-        for a in anchors(map, p, held: held) {
+        pick(map, pointer: p, bounds: bounds, held: held, scale: scale, log: nil)
+    }
+
+    /// Why `choose` answered what it did, line by line, for the trace of the picker and the tests: the blocks inside `bounds`, the block the
+    /// pointer aims at, and for each kind in the order they are tried what it gave (the members it holds and the rect, or that it recognised
+    /// nothing or could not stand whole), the last line the choice. The indices are those of the read's `Map.blocks`.
+    public static func explain(_ map: Map, pointer p: CGPoint, bounds: CGRect, held: Shape? = nil, scale: CGFloat = 2) -> [String] {
+        var lines: [String] = []
+        _ = pick(map, pointer: p, bounds: bounds, held: held, scale: scale, log: { lines.append($0) })
+        return lines
+    }
+
+    private static func pick(_ map: Map, pointer p: CGPoint, bounds: CGRect, held: Shape?, scale: CGFloat, log: ((String) -> Void)?) -> Shape? {
+        let content = map.within(bounds)
+        log?("blocks \(content.blocks.count) of \(map.blocks.count) inside \(bounds)")
+        // The held anchor and the answer's are indices of `map`, the recognisers' those of `content`.
+        let heldHere = held.flatMap { h in content.origin.firstIndex(of: h.anchor).map { Shape(kind: h.kind, rect: h.rect, anchor: $0) } }
+        let aimed = anchors(content, p, held: heldHere)
+        if aimed.isEmpty { log?("no block within \(reach) of \(p)") }
+        for a in aimed {
+            log?("anchor \(content.origin[a]) \(content.blocks[a].core) lines \(content.blocks[a].lines)")
             for kind in Kind.allCases {
-                guard let r = region(of: kind, at: a, in: map, bounds: bounds),
-                      let rect = settled(r.want, holding: r.members, in: map, bounds: bounds, scale: scale) else { continue }
-                return Shape(kind: kind, rect: rect, anchor: a)
+                guard let r = region(of: kind, at: a, in: content, bounds: bounds) else { log?("  \(kind.rawValue): nothing recognised"); continue }
+                let members = r.members.map { content.origin[$0] }
+                guard let rect = settled(r.want, holding: r.members, in: content, bounds: bounds, scale: scale) else {
+                    log?("  \(kind.rawValue): members \(members) cannot stand whole inside the bounds"); continue
+                }
+                log?("  \(kind.rawValue): members \(members) rect \(rect) chosen")
+                return Shape(kind: kind, rect: rect, anchor: content.origin[a])
             }
         }
         return nil
@@ -189,14 +243,19 @@ public enum LensShape {
 
     // Table: lanes of cells side by side, row after row. The anchor's line and the lines beside it on its row (`rowTolerance`), each
     // `cellGap` ems from the next, are the lanes; the anchor's own lane, followed down and up within `tableRowGap` ems, gives the rows;
-    // another lane stays when it has a cell on `laneShare` of them (a page or a chat beside the table meets its rows only now and then).
-    // At least `minRows` rows with a cell in another lane; cells mostly one line (`cellShare`), alike in height down a lane (`laneSpread`).
+    // another lane stays when it has a cell on `laneShare` of them and `laneShare` of its lines down them stand on a row (a page or a chat
+    // beside the table meets its rows only now and then, and has more lines than rows). At least `minRows` rows with a cell in another lane;
+    // cells mostly one line (`cellShare`), the one-line ones alike in height down a lane (`laneSpread`).
     static let cellGap: CGFloat = 1.5
     static let tableRowGap: CGFloat = 3
     static let minRows = 3
     static let laneShare: CGFloat = 0.6
     /// The lines of one lane are alike: their glyph heights within this ratio of the lane's median (a heading in a page's column is not a cell).
-    static let laneSpread: CGFloat = 1.4
+    /// The messages of one thread are alike the same way (a heading over a pane is not a message of it). A box is as tall as its letters: in
+    /// one table's lane the cells' boxes run from digits (10 pt) to words with descenders (18 pt), 1.45 to 1.6 apart with a point of read noise;
+    /// headings stand 1.8 to 2.2 over the text in the film stage's reads (docs/design/lens-shapes.md section 13). 1.7 is between, where 1.4 cut the lane.
+    static let laneSpread: CGFloat = 1.7
+    static func alike(_ a: CGFloat, _ b: CGFloat) -> Bool { a <= b * laneSpread && a * laneSpread >= b }
     /// Cells are mostly one line: at least this share of a table's blocks (the read merges a column's cells into one block now and then;
     /// two columns of a page are blocks of many lines).
     static let cellShare: CGFloat = 0.6
@@ -242,20 +301,24 @@ public enum LensShape {
         while hi + 1 < lane.count, near(lane[hi], lane[hi + 1]) { hi += 1 }
         while lo > 0, near(lane[lo - 1], lane[lo]) { lo -= 1 }
         let rows = Array(lane[lo...hi])
-        // The other lanes, each with its cells on those rows.
+        // The other lanes, each with its cells on those rows, and no more lines than cells down them (a text column beside the table has its
+        // own rhythm and meets a row or two by chance).
+        let down = lines[rows.first!].rect.minY...lines[rows.last!].rect.maxY
         var cells: [[Int]] = []
         for c in row where c != seed {
-            let hits = rows.compactMap { r in lines.indices.first { overlapsX(lines[$0].rect, lines[c].rect) && sameRow($0, r) && !overlapsX(lines[$0].rect, own) } }
-            if CGFloat(hits.count) >= laneShare * CGFloat(rows.count) { cells.append(hits) }
+            func beside(_ l: Int) -> Bool { overlapsX(lines[l].rect, lines[c].rect) && !overlapsX(lines[l].rect, own) }
+            let hits = rows.compactMap { r in lines.indices.first { beside($0) && sameRow($0, r) } }
+            let standing = lines.indices.filter { beside($0) && down.contains(lines[$0].rect.midY) }.count
+            if CGFloat(hits.count) >= laneShare * CGFloat(rows.count), CGFloat(hits.count) >= laneShare * CGFloat(standing) { cells.append(hits) }
         }
         let filled = rows.filter { r in cells.contains { $0.contains { sameRow($0, r) } } }
         guard !cells.isEmpty, filled.count >= minRows else { return nil }
         let top = lines[filled.first!].rect.minY, bottom = lines[filled.last!].rect.maxY
         let held = (rows.filter { lines[$0].rect.minY >= top && lines[$0].rect.maxY <= bottom } + cells.joined())
         for laneLines in cells + [rows] {
-            let h = laneLines.map { lines[$0].rect.height }.sorted()
-            let m = h[h.count / 2]
-            guard h.allSatisfy({ $0 <= m * laneSpread && $0 * laneSpread >= m }) else { return nil }
+            // A merged block's lines have no glyph height of their own (the read gives the box of all of them): its lane is judged by its one-line cells.
+            let h = laneLines.filter { map.blocks[lines[$0].block].lines == 1 }.map { lines[$0].rect.height }.sorted()
+            guard h.isEmpty || h.allSatisfy({ alike($0, h[h.count / 2]) }) else { return nil }
         }
         var members = Array(Set(held.map { lines[$0].block })).sorted()
         guard CGFloat(members.filter { map.blocks[$0].lines == 1 }.count) >= cellShare * CGFloat(members.count) else { return nil }
@@ -273,7 +336,7 @@ public enum LensShape {
     // message under the pointer (or nearest to the name or time under it) keeps to an edge of the pane with others: two-sided when the
     // messages of the other side keep to the opposite edge (bubbles), one-sided when `minMessages` messages of two lines or more (a name
     // over its message) keep to its left edge with ragged right edges. The thread is the messages of the two lanes, one after another
-    // within `messageGap` ems, with the names and times between them; its pane holds nothing else.
+    // within `messageGap` ems, with the names and times between them; its pane holds nothing else. Its messages are set alike (`alike`).
     static let messageLines = 4
     static let messageGap: CGFloat = 4.5
     static let gapBreak: CGFloat = 2
@@ -300,12 +363,14 @@ public enum LensShape {
         let messages = b.indices.filter { b[$0].lines <= messageLines && !small($0) }
         guard let m = small(a) ? messages.min(by: { (apart(a, $0), $0) < (apart(a, $1), $1) }) : a else { return nil }
         let em = b[m].em
+        // Its messages are set like it (`alike`): the pane's other text is not a message of it.
+        let kin = messages.filter { alike(b[$0].em, em) }
         func flush(_ x: CGFloat, _ y: CGFloat) -> Bool { abs(x - y) <= laneTolerance * em }
         // The edge the other side keeps to: the most common one among the messages near this one that stand clear of this side's edge.
         func lane(_ edges: [CGFloat]) -> CGFloat? {
             edges.max { l, r in (edges.filter { flush($0, l) }.count, -l) < (edges.filter { flush($0, r) }.count, -r) }
         }
-        let nearby = messages.filter { abs(b[$0].core.midY - b[m].core.midY) <= neighbourhood * em }
+        let nearby = kin.filter { abs(b[$0].core.midY - b[m].core.midY) <= neighbourhood * em }
         for fromLeft in [true, false] {
             var left = b[m].core.minX, right = b[m].core.maxX
             if fromLeft {
@@ -313,7 +378,7 @@ public enum LensShape {
             } else {
                 left = lane(nearby.filter { b[$0].core.maxX <= right - 2 * em && b[$0].core.minX < left }.map { b[$0].core.minX }) ?? -.infinity
             }
-            let lanes = messages.filter { i in
+            let lanes = kin.filter { i in
                 (flush(b[i].core.minX, left) && (!right.isFinite || b[i].core.maxX <= right - em))
                     || (flush(b[i].core.maxX, right) && (!left.isFinite || b[i].core.minX >= left + em))
             }.sorted { (b[$0].core.minY, $0) < (b[$1].core.minY, $1) }
@@ -353,7 +418,8 @@ public enum LensShape {
     }
 
     // Dialog: a short name (one line, at most `nameWidth` ems) over a body of one to `bodyLines` lines, the name at the body's left edge or a
-    // little inside it, within `nameGap` ems above it; the name no taller than a heading would be. The lens holds both and leaves room for
+    // little inside it, within `nameGap` ems above it; the name no taller than a heading would be. A read that merged the name into the first line
+    // of the body's block gives the box of that line (`Block.head`): the block is split there. The lens holds both and leaves room for
     // the text still being typed: `typing` ems wide (no wider than the mirror of its left margin in the bounds: a dialog box is centred)
     // and three lines of body tall.
     static let nameWidth: CGFloat = 8
@@ -368,30 +434,41 @@ public enum LensShape {
     static let dialogEm: CGFloat = 16
 
     static func dialog(at a: Int, in map: Map, bounds: CGRect) -> Region? {
-        func pair(_ n: Int, _ b: Int) -> Bool {
-            let name = map.blocks[n], body = map.blocks[b]
-            return name.lines == 1 && name.core.width <= nameWidth * name.em && body.lines <= bodyLines && body.em >= dialogEm
+        func pair(_ name: Block, _ body: Block) -> Bool {
+            name.lines == 1 && name.core.width <= nameWidth * name.em && body.lines <= bodyLines && body.em >= dialogEm
                 && body.core.width >= bodyWidth * body.em && name.em < headingRatio * body.em
                 && body.core.minY - name.core.maxY >= -0.2 * body.em && body.core.minY - name.core.maxY <= nameGap * body.em
                 && name.core.minX - body.core.minX >= -0.5 * body.em && name.core.minX - body.core.minX <= 1.5 * body.em
         }
-        // The body is the nearest block below the name; the name the nearest above the body.
-        func below(_ n: Int) -> Int? { map.blocks.indices.filter { map.blocks[$0].core.minY > map.blocks[n].core.maxY - 0.2 * map.blocks[n].em && $0 != n }
-            .min { map.blocks[$0].core.minY < map.blocks[$1].core.minY } }
-        func above(_ b: Int) -> Int? { map.blocks.indices.filter { map.blocks[$0].core.maxY < map.blocks[b].core.minY + 0.2 * map.blocks[b].em && $0 != b }
-            .max { map.blocks[$0].core.maxY < map.blocks[$1].core.maxY } }
-        let found: (name: Int, body: Int)? = if let b = below(a), pair(a, b) { (a, b) } else if let n = above(a), pair(n, a) { (n, a) } else { nil }
-        guard let (n, b) = found else { return nil }
-        let name = map.blocks[n].core, body = map.blocks[b]
+        let blocks = map.blocks
+        // The read now and then merges the name into its lines: one block whose first line (`head`) is the name, over the lines of the body.
+        func split(_ i: Int) -> (name: Block, body: Block)? {
+            let b = blocks[i]
+            guard b.lines >= 2, let head = b.head, head.maxY < b.core.maxY else { return nil }
+            let top = b.core.minY + b.em * leading, rest = CGRect(x: b.core.minX, y: top, width: b.core.width, height: b.core.maxY - top)
+            return (Block(core: head, lines: 1), Block(core: rest, lines: b.lines - 1))
+        }
+        // The nearest block that pairs with this one as its body, else as its name (the nearest block is not enough: it may be the next panel's).
+        let found: (name: Block, body: Block, members: [Int])? = {
+            if let (n, b) = split(a), pair(n, b) { return (n, b, [a]) }
+            if let b = blocks.indices.filter({ $0 != a && pair(blocks[a], blocks[$0]) }).min(by: { blocks[$0].core.minY < blocks[$1].core.minY }) {
+                return (blocks[a], blocks[b], [a, b])
+            }
+            if let n = blocks.indices.filter({ $0 != a && pair(blocks[$0], blocks[a]) }).max(by: { blocks[$0].core.maxY < blocks[$1].core.maxY }) {
+                return (blocks[n], blocks[a], [n, a])
+            }
+            return nil
+        }()
+        guard let (name, body, members) = found else { return nil }
         // The box ends with its body: nothing under it within an em (a list's title over its items is not a name over a line).
         let under = CGRect(x: body.core.minX, y: body.core.maxY, width: body.core.width, height: body.em)
-        guard !map.blocks.indices.contains(where: { $0 != n && $0 != b && map.blocks[$0].core.intersects(under) }) else { return nil }
+        guard !blocks.indices.contains(where: { !members.contains($0) && blocks[$0].core.intersects(under) }) else { return nil }
         let em = body.em
-        let mirror = bounds.maxX - (min(name.minX, body.core.minX) - bounds.minX)
+        let mirror = bounds.maxX - (min(name.core.minX, body.core.minX) - bounds.minX)
         let right = max(body.core.maxX, min(mirror, body.core.minX + typing * em)) + pad
         let bottom = max(body.core.maxY, body.core.minY + em * (1 + 2 * leading)) + pad
-        let box = name.union(body.core)
-        return Region(members: [n, b], want: CGRect(x: box.minX - pad, y: box.minY - pad, width: right - box.minX + pad, height: bottom - box.minY + pad))
+        let box = name.core.union(body.core)
+        return Region(members: members, want: CGRect(x: box.minX - pad, y: box.minY - pad, width: right - box.minX + pad, height: bottom - box.minY + pad))
     }
 
     // Subtitles: one to three lines in blocks stacked within `subtitleGap` ems, their middles within an em of each other, set large

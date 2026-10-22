@@ -576,11 +576,11 @@ enum AccessibilityChecks {
         r.check("pressing the close button asks the app to close the lens", closed)
         closed = false
 
-        // The four actions. They are found by name: "Open Lens Menu" pops a menu up and is never run here.
+        // The five actions (Fit to Column since 1.1.7). They are found by name: "Open Lens Menu" pops a menu up and is never run here.
         func action(_ name: String) -> NSAccessibilityCustomAction? { view.accessibilityCustomActions()?.first { $0.name == name } }
         var actions = view.accessibilityCustomActions() ?? []
-        r.check("the lens offers Show Original, Pause all, Remove Lens and Open Lens Menu",
-                actions.map(\.name) == [String(localized: "Show Original"), String(localized: "Pause all"), String(localized: "Remove Lens"), String(localized: "Open Lens Menu")])
+        r.check("the lens offers Show Original, Fit to Column, Pause all, Remove Lens and Open Lens Menu",
+                actions.map(\.name) == [String(localized: "Show Original"), String(localized: "Fit to Column"), String(localized: "Pause all"), String(localized: "Remove Lens"), String(localized: "Open Lens Menu")])
         let ran = actions.first?.handler?() ?? false
         r.check("Show Original, as an action, flips what the hotkey flips (translations hidden) and the lens says so",
                 ran && model.translationsVisible == !before && value() == String(localized: "Showing original"))

@@ -50,6 +50,13 @@ struct OverlaySnapshot: @unchecked Sendable {
     var scale: CGFloat = 2
     /// The drawn blocks in image pixels, in draw order, for the self-test's layout check.
     var drawn: [DrawnBlock] = []
+    /// The text columns the capture holds (`ColumnFit.columns` of the lines of every block), capture-local points, and the capture's size: what a
+    /// lens snaps to and fits to. Their edges are not marked yet: the session knows the display.
+    var columns: [ColumnFit.Column] = []
+    var captureSize: CGSize = .zero
+    /// The part of the capture (capture-local points) the blocks were read from: a capture that has just grown holds what the last read saw, not the
+    /// strips it uncovered, so a column that reaches this rect's side may go on beyond it (`ColumnFit.marked`).
+    var read: CGRect = .zero
 }
 
 /// Content scrolled by `shift` points (positive = down) in `area` (global Quartz points) between frames captured at
@@ -130,6 +137,9 @@ actor RegionPipeline {
         /// Whether this block stands for its paragraph where blocks are listed to a person or a gate (Copy Text, the self-test's
         /// source/translation pairs): the first piece of a paragraph, or a block that is a paragraph of its own.
         var startsParagraph: Bool { (part?.index ?? 0) == 0 }
+
+        /// The source text: the union of its lines (image pixels).
+        var core: CGRect { lines.dropFirst().reduce(lines.first ?? rect) { $0.union($1) } }
     }
 
     private let translator: TranslationService
@@ -260,6 +270,9 @@ actor RegionPipeline {
     private var origin: CGPoint
     private var captureSize: CGSize
     private var visible: CGRect
+    /// What the blocks were read from, capture-local points (`OverlaySnapshot.read`): the capture whole after a pass, less what a move or a resize of
+    /// the capture has uncovered since. Null while nothing is read.
+    private var readRect = CGRect.null
 
     init(options: PipelineOptions, route: LensRoute? = nil, capture: CGRect, translator: TranslationService, inpainter: Inpainter?,
          onSnapshot: @escaping @Sendable (OverlaySnapshot) -> Void) {
@@ -342,6 +355,7 @@ actor RegionPipeline {
         velocityRegion = nil
         settleFrom = nil
         blocks = []
+        readRect = .null
         baseGray = nil
         prevGray = nil
         forcedDirty = []
@@ -724,6 +738,7 @@ actor RegionPipeline {
         // Blocks move by the exact pixel delta; the gray references only by whole gray pixels, with the
         // fraction carried over so a slow drag never drifts.
         let px = -rel.dx * scale, py = -rel.dy * scale
+        readRect = readRect.offsetBy(dx: -rel.dx, dy: -rel.dy).intersection(CGRect(origin: .zero, size: captureSize))
         let step = CGFloat(lastStep)
         // The last frame shows the old position; the capturer delivers a fresh one once it has moved.
         latest = nil
@@ -751,6 +766,7 @@ actor RegionPipeline {
         guard rect.size != captureSize || rect.origin != origin else { return }
         let px = (origin.x - rect.minX) * scale, py = (origin.y - rect.minY) * scale
         let size = CGSize(width: (rect.width * scale).rounded(), height: (rect.height * scale).rounded())
+        readRect = readRect.offsetBy(dx: origin.x - rect.minX, dy: origin.y - rect.minY).intersection(CGRect(origin: .zero, size: rect.size))
         origin = rect.origin
         captureSize = rect.size
         geometryEpoch += 1
@@ -834,6 +850,9 @@ actor RegionPipeline {
         }
         baseGray = base
         forcedDirty = forced
+        // The pass read the whole frame it was given: the capture as it was, moved with the content since.
+        readRect = moves.filter { $0.area == nil }.reduce(CGRect(origin: .zero, size: captureSize)) { $0.offsetBy(dx: $1.dx / scale, dy: $1.dy / scale) }
+            .intersection(CGRect(origin: .zero, size: captureSize))
         return moves
     }
 
@@ -1803,13 +1822,20 @@ actor RegionPipeline {
         // What the self-test's layout line counts: every drawn block, in draw order.
         let drawn = blocks.compactMap { b -> DrawnBlock? in
             guard b.image != nil else { return nil }
-            let core = b.lines.dropFirst().reduce(b.lines.first ?? b.rect) { $0.union($1) }
             let text = b.ink.map { $0.offsetBy(dx: b.rect.minX, dy: b.rect.minY) } ?? b.rect
-            return DrawnBlock(source: b.source, core: core, patch: b.rect, text: text, fontSize: b.drawnSize, lines: max(1, b.lines.count), clipped: b.clipped,
+            return DrawnBlock(source: b.source, core: b.core, patch: b.rect, text: text, fontSize: b.drawnSize, lines: max(1, b.lines.count), clipped: b.clipped,
                               ellipsis: b.ellipsis)
         }
+        // Where the text columns stand: from every block's lines, translated or not, never from the patches (`ColumnFit`).
+        let columns = ColumnFit.columns(blocks.map { b in
+            ColumnFit.Block(core: CGRect(x: b.core.minX / s, y: b.core.minY / s, width: b.core.width / s, height: b.core.height / s), lines: b.lines.count)
+        })
+        if Trace.enabled {
+            Trace.mark("columns: n=\(columns.count) " + columns.map { "[\(TraceNumber.px($0.left))..\(TraceNumber.px($0.right)) blocks=\($0.blocks) lines=\($0.lines)]" }.joined(separator: " "),
+                       since: Trace.now)
+        }
         onSnapshot(OverlaySnapshot(version: version, blocks: out, animated: animated, origin: origin, time: frameTime,
-                                   texts: texts, frame: latest?.image, scale: s, drawn: drawn))
+                                   texts: texts, frame: latest?.image, scale: s, drawn: drawn, columns: columns, captureSize: captureSize, read: readRect.isNull ? .zero : readRect))
         dump(out)
     }
 

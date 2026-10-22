@@ -190,8 +190,8 @@ enum TextTranslation {
 
 // MARK: - A text in, a text out
 
-/// Translate Text's one entry for a whole text: the units of `TextParagraphs`, the call, the translations put back between the separators of
-/// the source. The window, the Services entry and the Shortcuts action each ask it; it keeps a service while the settings it was made for are
+/// Translate Text's one entry for a whole text: the units of `TextParagraphs` (a line, or the lines of a paragraph that hard line breaks
+/// wrapped), the call, the translations put back between the separators of the source. The window, the Services entry and the Shortcuts action each ask it; it keeps a service while the settings it was made for are
 /// equal, so a text edited in one place translates only what changed (the service's cache) and a person's memory edit starts afresh.
 @MainActor
 final class TextTranslator {
@@ -249,6 +249,8 @@ final class TextTranslator {
         let resolved = try resolve(request)
         let parts = TextParagraphs.split(text)
         let units = TextParagraphs.units(parts)
+        // The hard line breaks of wrapped paragraphs (copied from a PDF or a mail) that were read as no break: what was sent is the paragraph.
+        Trace.count("text.wraps", TextParagraphs.wrapsJoined(parts))
         let secrets = secrets()
         let service: TranslationService
         if let kept, kept.settings == resolved.settings {

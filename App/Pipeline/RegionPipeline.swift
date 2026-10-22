@@ -16,6 +16,11 @@ struct CapturedFrame: @unchecked Sendable {
     let rect: CGRect
     /// `ProcessInfo.systemUptime` at capture.
     let time: TimeInterval
+
+    /// The same frame with another gray (the ignored regions flat in it, `RegionPipeline.ingest`).
+    func replacing(gray: GrayImage) -> CapturedFrame {
+        CapturedFrame(image: image, gray: gray, grayStep: grayStep, scale: scale, rect: rect, time: time)
+    }
 }
 
 /// A translated block ready to show: region-local frame in points (top-left origin) and its rendered image.
@@ -166,9 +171,23 @@ actor RegionPipeline {
     private var baseGray: GrayImage?
     /// Gray-pixel areas the blocks know nothing about (uncovered by a shift or a larger capture).
     private var forcedDirty: [PixelRect] = []
-    /// Tiles that keep changing (animated emoji, typing indicators): their changes are left out until they go still.
+    /// Which of a frame's changes count: tiles that keep changing (animated emoji, typing indicators) are left out until they go still, and
+    /// so are tiles away from the text the last read found until they have been still for a while (a scene that moves beside a game's text
+    /// box; design games-and-video §3).
     /// ponytail: forgotten on every move, so it re-learns for a second after a scroll; shift it with the move if that shows.
-    private var churn = Churn()
+    private var watch: ReadWatch
+    /// `MWOYEO_READ_SCOPE=off` (for measuring against) counts every changed tile, as before the watch weighed them by their distance from the
+    /// text. The App Store build has no such switch.
+    #if MAS
+    private static let weighsChange = true
+    #else
+    private static let weighsChange = !DebugSwitch.isOff("MWOYEO_READ_SCOPE", in: ProcessInfo.processInfo.environment)
+    #endif
+    /// Parts of the lens its person marked not to read (a HUD, a name tag, a timer), as fractions of the lens: they are flat in the gray and
+    /// in the picture the reader gets, so nothing in them is read and nothing in them is a change (design games-and-video §1).
+    private var ignored: [UnitRect] = []
+    /// The gray of `latest` as captured, before the regions were made flat in it (`remask`).
+    private var rawGray: GrayImage?
     private var lastChange: TimeInterval = 0
     /// The lens moving inside the capture changes no pixels, but the settled re-read still waits for it to stop.
     private var lensMoved: TimeInterval = 0
@@ -275,7 +294,8 @@ actor RegionPipeline {
     private var readRect = CGRect.null
 
     init(options: PipelineOptions, route: LensRoute? = nil, capture: CGRect, translator: TranslationService, inpainter: Inpainter?,
-         onSnapshot: @escaping @Sendable (OverlaySnapshot) -> Void) {
+         readHold: Double = ReadWatch.standardHold, onSnapshot: @escaping @Sendable (OverlaySnapshot) -> Void) {
+        self.watch = ReadWatch(hold: readHold)
         self.origin = capture.origin
         self.captureSize = capture.size
         self.visible = capture
@@ -359,7 +379,7 @@ actor RegionPipeline {
         baseGray = nil
         prevGray = nil
         forcedDirty = []
-        churn.reset()
+        watch.reset()
         seamlessDone = false
         pending = []
         lensSeen = [:]
@@ -396,6 +416,14 @@ actor RegionPipeline {
         kick()
     }
 
+    /// For the checks: returns once no pass is running or about to start, the one the last frame began and any it led to.
+    func idle() async {
+        while working { try? await Task.sleep(for: .milliseconds(5)) }
+    }
+
+    /// For the checks: whether tiles away from the text are held, waiting to rest (a timer reads them then; `debugState().busy` does not tell).
+    func holdsTiles() -> Bool { watch.restsIn(at: ProcessInfo.processInfo.systemUptime) != nil }
+
     /// For the headless self-test: the blocks left as written by `CodeKeep`, and why.
     func keptState() -> [CodeKeep.Kept] { keptBlocks }
 
@@ -410,6 +438,7 @@ actor RegionPipeline {
     }
 
     func ingest(_ frame: CapturedFrame) {
+        var frame = frame
         if let l = latest, frame.time < l.time { return }
         // Frames of an older capture geometry would put text in the wrong place.
         guard abs(frame.rect.minX - origin.x) < 0.5, abs(frame.rect.minY - origin.y) < 0.5,
@@ -422,6 +451,8 @@ actor RegionPipeline {
         }
         scale = frame.scale
         lastStep = frame.grayStep
+        rawGray = frame.gray
+        frame = frame.replacing(gray: flat(frame.gray, imageWidth: frame.image.width, imageHeight: frame.image.height, step: frame.grayStep))
         let previous = frameTime
         frameTime = frame.time
         scrollVelocity = nil
@@ -433,11 +464,15 @@ actor RegionPipeline {
             if !raw.isUnchanged {
                 let scrolled = blocks.isEmpty ? [] : FrameDiff.scrollRegions(from: prev, to: gray, change: raw, maxShift: gray.height / 3)
                 if !scrolled.isEmpty { followScroll(scrolled, offset: prevValid, frame: frame, since: previous) }
-                // Small changes that keep coming back are animation; big ones are motion (a scroll it could not follow).
-                else if prevValid == nil, raw.ratio <= 0.2 { churn.add(raw, at: frame.time) }
-                let change = churn.masking(raw, at: frame.time)
+                // Small changes that keep coming back are animation; big ones are motion (a scroll it could not follow). A scroll, or a capture
+                // that grew, moves the text itself: there every change counts.
+                let whole = scrolled.isEmpty && prevValid == nil
+                let noted = watch.frame(raw, boxes: whole && Self.weighsChange ? textBoxes(step: frame.grayStep) : nil, at: frame.time, learns: whole && raw.ratio <= 0.2)
+                let change = noted.counted
+                if noted.held > 0 { Trace.count("watch.held_frame") }
                 Trace.mark("\(Int(captureSize.width))×\(Int(captureSize.height)): changed \(Int(raw.ratio * 100)) %"
-                           + (change.changedCount < raw.changedCount ? " (\(raw.changedCount - change.changedCount) tiles animated)" : "")
+                           + (noted.animated > 0 ? " (\(noted.animated) tiles animated)" : "")
+                           + (noted.held > 0 ? " (\(noted.held) tiles away from the text held)" : "")
                            + (change.dirtyRect.map { " dirty \($0.x),\($0.y) \($0.width)×\($0.height)" } ?? "")
                            + ", scrolled " + scrolled.map { "\($0.dy) in \($0.rect.width)×\($0.rect.height)" }.joined(separator: ", "),
                            since: frame.time)
@@ -448,7 +483,8 @@ actor RegionPipeline {
                 if let d = change.dirtyRect(outside: scrolled.map(\.rect)) {
                     unexplained.append(PixelRect(x: d.x + (prevValid?.x ?? 0), y: d.y + (prevValid?.y ?? 0), width: d.width, height: d.height))
                 }
-                if raw.ratio > 0.2 || !scrolled.isEmpty {
+                // A scene that moves beside the text is not the text moving: motion for the queue is a large change of which some is the text's.
+                if raw.ratio > 0.2 && (noted.held == 0 || !change.isUnchanged) || !scrolled.isEmpty {
                     noteMotion(frame.time)
                     noteMotionFrame(captured: frame.time, velocity: scrollVelocity, region: scrollRect)
                 } else {
@@ -548,12 +584,18 @@ actor RegionPipeline {
     }
 
     private func run() async {
+        // Whether a held tile rests is judged when a run starts and not between its passes: a pass keeps this actor busy for longer than the
+        // watch's hold, the frames that came in meanwhile are not counted yet when it ends, and a tile of a scene that never stops would
+        // rest on the stamp of a frame from before the pass (every pass would be followed by a read of the scene). A run that starts has
+        // the frames that waited behind the last pass counted (`kick` and the timer below come after them), and the wake below judges again.
+        var judgesRest = true
         while let frame = latest {
             let now = ProcessInfo.processInfo.systemUptime
             // A pixel change inside the backoff waits for its end (the timer below kicks again).
             if readBackoff.isWaiting(now: now) { Trace.count("ocr.backoff_wait"); break }
             // No reader took the last pass: the host says when one is ready (`readerReady`), not a timer.
             if readerWaiting { Trace.count("ocr.reader_wait"); break }
+            if judgesRest { noteRested(at: now); judgesRest = false }
             let stale = staleness(for: frame)
             // Seamless mode re-reads on change only, and a tile that stopped animating changed while it was left out.
             if options.renderMode == .seamless, seamlessDone, stale.change?.isUnchanged == false { seamlessDone = false }
@@ -578,8 +620,8 @@ actor RegionPipeline {
         if options.renderMode == .adaptive, !seamlessDone, latest != nil {
             wait = max(0.05, options.settleDelay - (now - max(lastChange, lensMoved)))
         }
-        // An animation that stops sends no more frames: look again once its tiles count as still.
-        if latest != nil, let c = churn.coolsIn(at: now) { wait = min(wait ?? .infinity, c + 0.05) }
+        // An animation, or a scene beside the text, that stops sends no more frames: look again once its tiles count as still.
+        if latest != nil, let c = watch.wake(at: now) { wait = min(wait ?? .infinity, c + 0.05) }
         if latest != nil, let r = readBackoff.remaining(now: now) { wait = r + 0.05 }
         if let wait {
             settleTask?.cancel()
@@ -607,8 +649,74 @@ actor RegionPipeline {
         guard let base = baseGray, base.width == frame.gray.width, base.height == frame.gray.height else {
             return Staleness(change: nil, forced: [])
         }
-        return Staleness(change: churn.masking(FrameDiff.changeMap(from: base, to: frame.gray), at: ProcessInfo.processInfo.systemUptime),
+        let now = ProcessInfo.processInfo.systemUptime
+        return Staleness(change: watch.stale(FrameDiff.changeMap(from: base, to: frame.gray), boxes: Self.weighsChange ? textBoxes(step: frame.grayStep) : nil, at: now),
                          forced: forcedDirty)
+    }
+
+    /// The text the last read found, in gray pixels (what `ReadWatch` weighs a change against); none when nothing was read.
+    private func textBoxes(step: Int) -> [PixelRect] {
+        let k = 1 / CGFloat(step)
+        return blocks.map { PixelRect($0.rect.applying(CGAffineTransform(scaleX: k, y: k))) }
+    }
+
+    /// Tiles away from the text that have been still long enough are areas to read like a strip a scroll uncovered: the reference moved on
+    /// to the frame of the last read, which had them as they were while they moved.
+    private func noteRested(at now: TimeInterval) {
+        let rested = watch.takeRested(at: now)
+        guard !rested.isEmpty else { return }
+        Trace.count("watch.rested")
+        Trace.mark("held tiles at rest: \(rested.count) areas", since: Trace.now)
+        forcedDirty += rested
+        // The areas are read by the next pass, whose frame has them as they rest. `lastChange` stays: it is a frame's time (the pass ends on
+        // `seamlessDone = lastChange <= frame.time`), and the held tiles never moved it.
+        seamlessDone = false
+    }
+
+    /// The ignored regions as areas of the picture of `frame`, the lens being where it is now (none when nothing is ignored).
+    private func ignoredAreas(imageWidth: Int, imageHeight: Int) -> [PixelRect] {
+        guard !ignored.isEmpty else { return [] }
+        return IgnoredRegions.pixels(ignored, lens: visible, capture: CGRect(origin: origin, size: captureSize), scale: scale,
+                                     imageWidth: imageWidth, imageHeight: imageHeight)
+    }
+
+    private struct MaskFailure: Error {}
+
+    /// The picture the reader reads: `frame`'s with the ignored regions flat. Erasing and looks sample the real one. A mask that cannot be made
+    /// reads nothing (a failed pass, like any other), never the real picture.
+    private func readingImage(_ frame: CapturedFrame) throws -> CGImage {
+        let areas = ignoredAreas(imageWidth: frame.image.width, imageHeight: frame.image.height)
+        guard !areas.isEmpty else { return frame.image }
+        guard let image = RGBAImage(cgImage: frame.image)?.filled(areas).cgImage else { throw MaskFailure() }
+        Trace.mark("reading: \(areas.count) ignored areas flat", since: Trace.now)
+        return image
+    }
+
+    /// The regions of the lens its person marked not to read, as fractions of the lens. The newest frame is masked again at once: a tile
+    /// that went flat (or real) differs from what the blocks describe, so the next pass reads those rows and a text that was in a region
+    /// is replaced by what the reader finds now, none.
+    func setIgnored(_ regions: [UnitRect]) {
+        let list = IgnoredRegions.sanitized(regions)
+        guard list != ignored else { return }
+        ignored = list
+        Trace.count("ignore.set")
+        remask()
+    }
+
+    /// The gray of `latest` with the regions as they lie now (the regions changed, or the lens moved over them). Flat and real tiles differ
+    /// from the reference the blocks describe, which is what makes the pass read them.
+    private func remask() {
+        guard let l = latest, let raw = rawGray else { return }
+        let gray = flat(raw, imageWidth: l.image.width, imageHeight: l.image.height, step: l.grayStep)
+        latest = l.replacing(gray: gray)
+        prevGray = gray
+        kick()
+    }
+
+    /// `gray` with the ignored regions flat.
+    private func flat(_ gray: GrayImage, imageWidth: Int, imageHeight: Int, step: Int) -> GrayImage {
+        let hidden = ignoredAreas(imageWidth: imageWidth, imageHeight: imageHeight)
+        return hidden.isEmpty ? gray : gray.filled(IgnoredRegions.gray(hidden, step: step, width: gray.width, height: gray.height))
     }
 
     /// Image-pixel rect needing a re-read, or nil when the blocks still describe the frame.
@@ -683,7 +791,9 @@ actor RegionPipeline {
             lastVisibleChange = now
             readBackoff.reset()
         }
+        let moved = rect != visible
         visible = rect
+        if moved, !ignored.isEmpty { remask() }
         reconsider()
     }
 
@@ -771,7 +881,7 @@ actor RegionPipeline {
         captureSize = rect.size
         geometryEpoch += 1
         readBackoff.reset()
-        churn.reset()
+        watch.reset()
         lastChange = ProcessInfo.processInfo.systemUptime
         seamlessDone = false
         latest = nil
@@ -807,7 +917,7 @@ actor RegionPipeline {
 
     private func apply(_ m: Move) {
         moves.append(m)
-        churn.reset()
+        watch.reset()
         unexplained = unexplained.map { m.apply(to: $0) }
         let bounds = CGRect(x: 0, y: 0, width: captureSize.width * scale, height: captureSize.height * scale)
         blocks = blocks.compactMap { m.apply(to: $0, bounds: bounds) }
@@ -874,12 +984,13 @@ actor RegionPipeline {
         let wantsErase = options.renderMode != .fast
         var found: [OCRBlock]
         do {
+            let reading = try readingImage(frame)
             // Erasing modes read paragraphs, like the seamless pass: the settled re-read then finds the same text and
             // keeps its translations instead of translating everything a second time.
-            found = wantsErase ? (try? await TextRecognizer.blocks(in: frame.image, roi: dirty, languages: ocrLanguages,
+            found = wantsErase ? (try? await TextRecognizer.blocks(in: reading, roi: dirty, languages: ocrLanguages,
                                                                    customWords: options.glossaryTerms, plan: readerPlan, client: readerClient)) ?? [] : []
             if found.isEmpty {
-                found = try await TextRecognizer.lines(in: frame.image, roi: dirty, languages: ocrLanguages, fast: useFast,
+                found = try await TextRecognizer.lines(in: reading, roi: dirty, languages: ocrLanguages, fast: useFast,
                                                        customWords: options.glossaryTerms, client: readerClient).map { TextRecognizer.makeBlock([$0]) }
             }
         } catch {
@@ -931,6 +1042,7 @@ actor RegionPipeline {
         }
         capBodySizes(&made, among: blocks.filter { !staleIDs.contains($0.id) })
         guard let moved = finishPass(start, frame: frame) else { return }
+        watch.didRead(PixelRect(dirty.applying(CGAffineTransform(scaleX: 1 / CGFloat(frame.grayStep), y: 1 / CGFloat(frame.grayStep)))), frameTime: frame.time)
         let bounds = CGRect(x: 0, y: 0, width: frame.image.width, height: frame.image.height)
         // Translations that arrived meanwhile are on the current copies of the old blocks.
         let current = Dictionary(blocks.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
@@ -955,10 +1067,11 @@ actor RegionPipeline {
         var t = Trace.now
         var found: [OCRBlock]
         do {
-            found = try await TextRecognizer.blocks(in: frame.image, languages: ocrLanguages, customWords: options.glossaryTerms,
+            let reading = try readingImage(frame)
+            found = try await TextRecognizer.blocks(in: reading, languages: ocrLanguages, customWords: options.glossaryTerms,
                                                     plan: readerPlan, client: readerClient)
             if found.isEmpty {
-                found = try await TextRecognizer.lines(in: frame.image, languages: ocrLanguages, fast: false, client: readerClient)
+                found = try await TextRecognizer.lines(in: reading, languages: ocrLanguages, fast: false, client: readerClient)
                     .map { TextRecognizer.makeBlock([$0]) }
             }
         } catch {
@@ -1011,6 +1124,7 @@ actor RegionPipeline {
         capBodySizes(&next, among: [])
         Trace.mark("seamless: erase \(next.count) blocks", since: t); t = Trace.now
         guard let moved = finishPass(start, frame: frame) else { return true }
+        watch.didRead(nil, frameTime: frame.time)
         let bounds = CGRect(x: 0, y: 0, width: frame.image.width, height: frame.image.height)
         blocks = next.compactMap { b in moved.reduce(Optional(b)) { b, m in b.flatMap { m.apply(to: $0, bounds: bounds) } } }
         fillTranslations()

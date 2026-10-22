@@ -262,9 +262,11 @@ enum UICapture {
                 let failed = await GameChecks.run(model)
                 report("game", failed)
             case "band-pass-checks":
-                // Only the scene that goes on after a pass that outlasts the watch's hold (no window: needs no screen lock).
+                // Only the scene that goes on after a pass that outlasts the watch's hold, and the text that appears in a scene that never stops
+                // (no window: needs no screen lock).
                 let check = GameChecks.Check()
                 await GameChecks.movingBandDuringAPass(check)
+                await GameChecks.neverStill(check)
                 report("band pass", check.failed)
             case "marker-hint-checks":
                 // Only where the marker's hint pills go (no window; the whole of game-checks puts lenses on the screen).
@@ -1190,7 +1192,7 @@ enum UICapture {
                 if let app { session.appUnderLens = { _ in app } }
                 var m = session.contextMenu()
                 // The Profile item's submenu on its own, as it opens beside the item (a menu cannot be asked to open a submenu without a pointer).
-                if submenu, let holder = m.items.first(where: { $0.submenu != nil }), let sub = holder.submenu {
+                if submenu, let holder = m.items.first(where: { $0.submenu != nil && $0.title != RegionSession.gamesTitle }), let sub = holder.submenu {
                     holder.submenu = nil
                     m = sub
                 }

@@ -299,8 +299,9 @@ actor RegionPipeline {
     private var readRect = CGRect.null
 
     init(options: PipelineOptions, route: LensRoute? = nil, capture: CGRect, translator: TranslationService, inpainter: Inpainter?,
-         readHold: Double = ReadWatch.standardHold, onSnapshot: @escaping @Sendable (OverlaySnapshot) -> Void) {
-        self.watch = ReadWatch(hold: readHold)
+         readHold: Double = ReadWatch.standardHold, readHeldInterval: Double = ReadWatch.standardHeldReadInterval,
+         onSnapshot: @escaping @Sendable (OverlaySnapshot) -> Void) {
+        self.watch = ReadWatch(hold: readHold, heldReadInterval: readHeldInterval)
         self.origin = capture.origin
         self.captureSize = capture.size
         self.visible = capture

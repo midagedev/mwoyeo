@@ -320,8 +320,8 @@ enum ProfileUIChecks {
             s.onConfigChange = { reported.config = $0 }
             return s
         }
-        /// The one item of a lens menu that holds a submenu: "Profile: …".
-        func profileItem(_ menu: NSMenu) -> NSMenuItem? { menu.items.first { $0.submenu != nil } }
+        /// The one item of a lens menu that holds a submenu besides "Games & Video": "Profile: …".
+        func profileItem(_ menu: NSMenu) -> NSMenuItem? { menu.items.first { $0.submenu != nil && $0.title != RegionSession.gamesTitle } }
         func click(_ item: NSMenuItem?) {
             if let item, let action = item.action { _ = NSApp.sendAction(action, to: item.target, from: item) }
         }
@@ -329,7 +329,7 @@ enum ProfileUIChecks {
         // MARK: the default path (§8): nothing set up shows nothing of profiles
         start()
         let plain = session(over: read).contextMenu()
-        check("with no profile the lens menu has no Profile item and no submenu at all", profileItem(plain) == nil && !plain.items.contains { $0.submenu != nil },
+        check("with no profile the lens menu has no Profile item and no submenu at all", profileItem(plain) == nil && !plain.items.contains { $0.submenu != nil && $0.title != RegionSession.gamesTitle },
               plain.items.map(\.title).joined(separator: " | "))
 
         // MARK: the lens menu at L1
@@ -340,7 +340,7 @@ enum ProfileUIChecks {
         let item = profileItem(menu)
         let memoryAt = menu.items.firstIndex { $0.title == String(localized: "Memory for \("月涙譚")…") }
         check("with a profile the lens menu has one \"Profile: …\" item after Memory for …, naming the head of the lens's chain (the title profile first)",
-              item?.title == String(localized: "Profile: \("月涙譚")") && memoryAt.map { menu.items.firstIndex(of: item!) == $0 + 1 } == true && menu.items.filter { $0.submenu != nil }.count == 1,
+              item?.title == String(localized: "Profile: \("月涙譚")") && memoryAt.map { menu.items.firstIndex(of: item!) == $0 + 1 } == true && menu.items.filter { $0.submenu != nil && $0.title != RegionSession.gamesTitle }.count == 1,
               menu.items.map(\.title).joined(separator: " | "))
         let subTitles = item?.submenu?.items.map { $0.isSeparatorItem ? "-" : $0.title } ?? []
         let expected = [String(localized: "Auto picks \("月涙譚"): \(String(localized: "title has “\("月涙譚")”"))"), String(localized: "Auto"), "-",

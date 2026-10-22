@@ -220,7 +220,7 @@ New keys (all 11 languages in `Localizable.xcstrings`, `catalog-coverage.py` →
 | haptic filtering for events | `NSAlignmentFeedbackFilter` (https://developer.apple.com/documentation/appkit/nsalignmentfeedbackfilter), macOS 10.11+: `update(with:)`, `alignmentFeedbackTokenForHorizontalMovement(in:previousX:alignedX:defaultX:)`, `performFeedback`; "if null is returned ... the cursor is moving too fast or the distance is not significant" | fetched. It needs events: usable for resize, not for the window-server move. |
 | snap on release with a preview | macOS Sequoia window tiling: a preview while dragging, snap on release, a System Settings switch | secondary sources (MacMost, iBoysoft, Computerworld); not Apple's page |
 | double-click an edge or corner expands that side to the screen edge; the green button toggles | MacMost "Mac Basics: Moving And Resizing Windows"; Eclectic Light "Window controls in Big Sur" | secondary |
-| Reduce Motion | `Motion.shared.reduced` (`App/Support/Motion.swift`): the animation is a jump | project rule |
+| Reduce Motion | `Motion.shared.reduced` (`App/Support/Motion.swift`): the animation is a jump; Low Power Mode counts as Reduce Motion there (untrans117, 2026-10-23) | project rule |
 | Apple HIG "Windows", "Drag and drop", "Motion" | the pages did not load through the fetch tool (client-rendered); **not verified this round** | open |
 
 ## 11. Failure modes

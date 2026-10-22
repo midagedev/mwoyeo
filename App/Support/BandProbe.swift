@@ -5,7 +5,8 @@ import MwoyeoCore
 
 /// A probe, not a check (round game117, 2026-10-22): how long the lens takes to read a line of text that changes in a game's text box while a
 /// scene moves in the band above it, run as `--capture-ui <dir> band-probe` (`MWOYEO_READ_SCOPE=off` runs it as the lens did before the watch
-/// weighed a change by its distance from the text). The frames are fed as a capture feeds them: 8 a second on the real clock, each in a task of
+/// weighed a change by its distance from the text; `MWOYEO_READ_CAP=off` runs it with no cap on how long a tile that keeps changing is held,
+/// as the watch was before untrans117, 2026-10-23). The frames are fed as a capture feeds them: 8 a second on the real clock, each in a task of
 /// its own that does not wait for the pipeline (a pass that takes longer than a frame leaves frames behind it), rendered ahead by other threads
 /// as a game renders itself. Every 3 s the line changes; the latency is the time from the frame that shows a new line to the snapshot that holds
 /// it as read text. The engine is not there: translation is the same either way, and Apple Translation would need the main queue.
@@ -79,12 +80,14 @@ enum BandProbe {
     nonisolated static func lineIndex(of k: Int) -> Int { k < lead ? 0 : min(lines.count - 1, 1 + (k - lead) / between) }
 
     static func run(runs: Int = 3) async {
-        let scope = ProcessInfo.processInfo.environment["MWOYEO_READ_SCOPE"] == "off" ? "off" : "on"
+        let scope = (ProcessInfo.processInfo.environment["MWOYEO_READ_SCOPE"] == "off" ? "off" : "on")
+            + (ProcessInfo.processInfo.environment["MWOYEO_READ_CAP"] == "off" ? " cap=off" : "")
+        let interval = ProcessInfo.processInfo.environment["MWOYEO_READ_CAP"] == "off" ? Double.infinity : ReadWatch.standardHeldReadInterval
         let total = lead + between * (lines.count - 1) + tail
         var medians: [Double] = []
         for run in 1...runs {
             let reads = GameChecks.ReadCounter(), latency = Latencies()
-            let p = await GameChecks.pipeline(reads, mode: .adaptive, onSnapshot: { latency.snapshot($0) })
+            let p = await GameChecks.pipeline(reads, mode: .adaptive, readHeldInterval: interval, onSnapshot: { latency.snapshot($0) })
             // The first line is read before the clock starts (a cold reader takes long).
             await p.ingest(GameChecks.stamped(frame(line: 0, band: 0)))
             _ = await reads.wait(beyond: 0)

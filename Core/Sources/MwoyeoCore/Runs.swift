@@ -116,6 +116,10 @@ public enum LabelRule {
     /// the same row, at most 2.5 line heights away (room for an emoji), by text in another colour. Names and badges
     /// lead a row and the timestamp ends it, so a word at the end ("Yesterday", "5時間前") is still translated, as
     /// is a word alone on its row ("Today", "INFO") or among same-style neighbours (tabs, buttons).
+    ///
+    /// A HUD's word is not a label: "Gold" before "540" in the colour of a value, "体力" before "120", is the text to translate, and what
+    /// follows it only a figure (`isFigure`: a number, a price, a ratio, a time), which a name is not followed by. Nor is a heading over a
+    /// list (`headsList`). untrans117, 2026-10-23: both stayed as written.
     public static func labels(_ items: [Item]) -> Set<Int> {
         var out = Set<Int>()
         for (i, a) in items.enumerated() where isWordShaped(a.text) {
@@ -125,12 +129,12 @@ public enum LabelRule {
                 let overlap = min(a.rect.maxY, b.rect.maxY) - max(a.rect.minY, b.rect.minY)
                 let gap = b.rect.minX - a.rect.maxX
                 return j != i && overlap > 0.5 * min(h, b.rect.height) && gap > -0.5 * h && gap < 2.5 * h
-                    && a.color.distance(to: b.color) > 60
+                    && a.color.distance(to: b.color) > 60 && !isFigure(b.text)
             }) {
                 out.insert(i)
             }
         }
-        for (i, a) in items.enumerated() where !out.contains(i) && isNameTag(a) {
+        for (i, a) in items.enumerated() where !out.contains(i) && isNameTag(a) && !headsList(a, in: items) {
             if items.indices.contains(where: { j in j != i && stands(items[j], under: a) && a.color.distance(to: items[j].color) > 60 }) {
                 out.insert(i)
             }
@@ -146,6 +150,40 @@ public enum LabelRule {
             isNameTag(items[i]) && items.indices.contains { j in j != i && stands(items[j], under: items[i]) }
         })
     }
+
+    /// A number, a price, a ratio or a time and nothing else: digits, their separators and a currency sign, and at most one letter for the
+    /// unit ("540", "1,280 G", "120/300", "00:45", "35%", "x12", "480円"). "8:12 PM", "5時間前" and "3 replies" are words.
+    static func isFigure(_ text: String) -> Bool {
+        var digits = 0, letters = 0
+        for u in text.unicodeScalars {
+            if CharacterSet.decimalDigits.contains(u) { digits += 1 }
+            else if CharacterSet.letters.contains(u) { letters += 1 }
+            else if !CharacterSet.whitespaces.contains(u), !",.:/%+-×$€£¥₩".unicodeScalars.contains(u) { return false }
+        }
+        return digits > 0 && letters <= 1
+    }
+
+    /// The rows a list needs to be one, under its heading.
+    static let listRows = 3
+
+    /// Whether `a` stands over a list: `listRows` or more rows under it, each close under the one before (from `a` for the first), in one
+    /// colour, one short line each and no sentence in them. A name stands over a line of speech or two, and the speech has its stops.
+    static func headsList(_ a: Item, in items: [Item]) -> Bool {
+        var row = a, rows: [Item] = []
+        for b in items.filter({ $0.rect.midY > a.rect.midY }).sorted(by: { $0.rect.minY < $1.rect.minY }) {
+            let gap = b.rect.minY - row.rect.maxY, h = row.lineHeight
+            guard gap > -0.3 * h, gap < 2.5 * h, abs(b.rect.minX - (rows.first ?? a).rect.minX) < 3 * h,
+                  b.rect.height <= 1.6 * b.lineHeight, b.text.count <= 24, !b.text.contains(where: { sentenceMarks.contains($0) }),
+                  rows.first.map({ $0.color.distance(to: b.color) <= 60 }) ?? (a.color.distance(to: b.color) > 60)
+            else { continue }
+            rows.append(b)
+            row = b
+        }
+        return rows.count >= listRows
+    }
+
+    /// The marks a sentence has, and a name or a list row does not.
+    private static let sentenceMarks = "。、，．！？!?,.~…:："
 
     /// Whether `b` stands under `a` the way a message or a dialogue box stands under its name: close below it, over the same columns, with
     /// more text and a line no smaller.
@@ -163,7 +201,7 @@ public enum LabelRule {
         let t = a.text.trimmingCharacters(in: .whitespaces)
         guard a.rect.height <= 1.6 * a.lineHeight, t.count <= 8, t.split(separator: " ").count <= 3,
               t.unicodeScalars.contains(where: TranslationFilter.isCJK),
-              !t.contains(where: { "。、，．！？!?,.~…:：".contains($0) }), !t.unicodeScalars.contains(where: CharacterSet.decimalDigits.contains)
+              !t.contains(where: { sentenceMarks.contains($0) }), !t.unicodeScalars.contains(where: CharacterSet.decimalDigits.contains)
         else { return false }
         return true
     }

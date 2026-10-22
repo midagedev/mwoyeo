@@ -939,15 +939,31 @@ final class RegionSession {
         menu.addItem(read)
         menu.addItem(.separator())
         addFitItems(to: menu)
-        menu.addItem(ActionItem(String(localized: "Ignore Region…"), enabled: !marking) { [weak self] in Task { await self?.ignoreRegion() } })
-        menu.addItem(ActionItem(String(localized: "Clear Ignored Regions"), enabled: !config.ignored.isEmpty) { [weak self] in self?.clearIgnoredRegions() })
-        let keep = ActionItem(String(localized: "Keep Recent Lines")) { [weak self] in self?.toggleKeepsRecent() }
-        keep.state = config.keepsRecent ? .on : .off
-        menu.addItem(keep)
+        addGameItems(to: menu)
         menu.addItem(.separator())
         menu.addItem(ActionItem(String(localized: "Save Lens Image"), enabled: lastSnapshot?.frame != nil) { [weak self] in self?.saveLensImage() })
         addProfileItems(to: menu)
         return menu
+    }
+
+    /// The title of the lens menu's one submenu that is not the profile's.
+    static var gamesTitle: String { String(localized: "Games & Video") }
+
+    /// What a game or a video asks of a lens, in one submenu (progressive disclosure: a lens over a page shows one row for it, not three): Ignore
+    /// Region…, Clear Ignored Regions (only while a region is ignored) and Keep Recent Lines.
+    private func addGameItems(to menu: NSMenu) {
+        let sub = NSMenu()
+        sub.autoenablesItems = false
+        sub.addItem(ActionItem(String(localized: "Ignore Region…"), enabled: !marking) { [weak self] in Task { await self?.ignoreRegion() } })
+        if !config.ignored.isEmpty {
+            sub.addItem(ActionItem(String(localized: "Clear Ignored Regions")) { [weak self] in self?.clearIgnoredRegions() })
+        }
+        let keep = ActionItem(String(localized: "Keep Recent Lines")) { [weak self] in self?.toggleKeepsRecent() }
+        keep.state = config.keepsRecent ? .on : .off
+        sub.addItem(keep)
+        let item = NSMenuItem(title: Self.gamesTitle, action: nil, keyEquivalent: "")
+        item.submenu = sub
+        menu.addItem(item)
     }
 
     /// The app under the lens: the window it follows, else the topmost window under its centre (`LensWatch.window(of:)`). The check harness

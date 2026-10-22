@@ -877,7 +877,9 @@ final class RegionSession {
     private func observeRecent() {
         guard config.keepsRecent, let s = lastSnapshot else { return }
         let observed = LensText.observed(s, lens: config.rect)
-        recentLines.observe(recentRecorder.observe(time: ProcessInfo.processInfo.systemUptime, lines: observed), lines: observed)
+        let ignored = config.ignored.map { $0.rect(in: CGRect(origin: .zero, size: config.rect.size)) }
+        let now = ProcessInfo.processInfo.systemUptime
+        recentLines.observe(recentRecorder.observe(time: now, lines: observed), lines: observed, ignored: ignored, at: now)
         showRecent()
     }
 
@@ -887,7 +889,10 @@ final class RegionSession {
         let panel = recentPanel ?? RecentLinesPanel(lens: ScreenGeometry.appKitRect(fromQuartz: config.rect))
         recentPanel = panel
         panel.setLens(ScreenGeometry.appKitRect(fromQuartz: config.rect))
-        panel.show(recentLines.stack)
+        let now = ProcessInfo.processInfo.systemUptime
+        panel.show(recentLines.stack(at: now))
+        Trace.mark("recent shows: \(recentLines.report(at: now))", since: Trace.now)
+        panel.refresh(in: recentLines.nextLift(at: now)) { [weak self] in self?.showRecent() }
     }
 
     /// The lines the lens kept are forgotten (another language or engine, the option turned off).
@@ -906,6 +911,11 @@ final class RegionSession {
     /// For the captures: the regions' outlines as they show while the pointer is over the lens.
     func previewIgnoredOutlines(_ on: Bool) { panel.showsIgnored(on) }
 
+    /// How long a line that left waits before the stack shows it (`RecentLines.hold`); the checks that feed lines one look after another run it at 0.
+    var recentHold: TimeInterval {
+        get { recentLines.hold }
+        set { recentLines.hold = newValue }
+    }
     /// The lines the lens keeps now, newest first, for the checks.
     var keptRecentLines: [RecentLines.Line] { recentLines.stack }
     /// What the stack's panel shows now, for the checks, and where it is (AppKit coordinates) and on which side of the lens.

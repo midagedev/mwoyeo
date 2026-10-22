@@ -1,0 +1,12 @@
+{
+  "about": "shapes117: the pointer's planned path over index.html (stage points, y down, 1512 x 945). The pointer rests `dwell` s at each point and takes `move` s (smoothstep) to the next. Six kinds: a heading with its lede (group), a column of the article (LensTarget), the chat (thread), the table, the subtitle (subtitles), the game's dialog box (dialog).",
+  "fps": 30,
+  "points": [
+    {"label": "heading", "x": 240, "y": 64, "dwell": 0.6, "move": 0.6},
+    {"label": "column", "x": 462, "y": 300, "dwell": 0.55, "move": 0.6},
+    {"label": "thread", "x": 770, "y": 176, "dwell": 0.6, "move": 0.6},
+    {"label": "table", "x": 1236, "y": 140, "dwell": 0.6, "move": 0.45},
+    {"label": "subtitles", "x": 1240, "y": 492, "dwell": 0.6, "move": 0.5},
+    {"label": "dialog", "x": 1180, "y": 850, "dwell": 0.8, "move": 0}
+  ]
+}

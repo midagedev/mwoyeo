@@ -1,0 +1,174 @@
+<!doctype html>
+<!-- shapes117: the one-click lens's demo stage (docs/design/lens-shapes.md). One page, 1512 x 945 pt at 1x, that holds side by side the
+     kinds of content the lens takes a shape for: an article with a heading and two columns, a sidebar note, a figure with its caption, a
+     chat thread, a code block, a table, a list, a video still with a subtitle and a game dialog box. All the text is ours (the article
+     is from tools/paper-own's Mwoyeo method paper), all pictures are drawn here, fonts are the system's. path.json beside it is the
+     pointer's planned path. Opens from file:// in Safari; tools/keep-labels' `snap` draws it to a PNG at 2x. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1512">
+<title>Lens shapes stage</title>
+<style>
+  :root {
+    --desk: #ecebe7; --panel: #ffffff; --ink: #1d1d1f; --soft: #5f6368; --rule: #d9d7d2;
+    --accent: #2f6fde; --bubble: #e8e8ec; --note: #fbf3cf; --code: #f3f4f7;
+  }
+  html, body { margin: 0; padding: 0; }
+  body { width: 1512px; height: 945px; background: var(--desk); color: var(--ink); position: relative; overflow: hidden;
+         font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
+  .panel { position: absolute; background: var(--panel); border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 6px 18px rgba(0,0,0,.06); }
+  .abs { position: absolute; }
+
+  /* the article: heading + lede, then two justified columns */
+  h1 { position: absolute; margin: 0; font: 600 26px/32px -apple-system, "SF Pro Display", sans-serif; letter-spacing: -0.2px; }
+  .lede { position: absolute; margin: 0; font: 400 15px/22px -apple-system, sans-serif; color: #333; }
+  .col { position: absolute; font: 400 13.5px/20px "New York", "Iowan Old Style", Georgia, serif; text-align: justify; hyphens: auto; }
+  .col p { margin: 0 0 12px 0; }
+
+  /* the sidebar note */
+  .note { position: absolute; background: var(--note); border-radius: 10px; padding: 14px 16px; box-sizing: border-box; }
+  .note b { display: block; font: 600 14px/20px -apple-system, sans-serif; margin-bottom: 4px; }
+  .note span { font: 400 13px/19px -apple-system, sans-serif; color: #3b3a33; }
+
+  /* the figure and its caption */
+  .caption { position: absolute; margin: 0; font: italic 400 13px/19px "New York", Georgia, serif; color: #333; }
+
+  /* the chat thread */
+  .bubble { position: absolute; font: 400 14px/19px -apple-system, sans-serif; padding: 8px 12px; border-radius: 16px; max-width: 214px; }
+  .in { background: var(--bubble); color: var(--ink); border-bottom-left-radius: 5px; }
+  .out { background: var(--accent); color: #fff; border-bottom-right-radius: 5px; }
+
+  /* the code block and the sentence that leads into it */
+  .lead { position: absolute; margin: 0; font: 400 14px/20px -apple-system, sans-serif; }
+  pre { position: absolute; margin: 0; background: var(--code); border-radius: 8px; padding: 10px 14px; box-sizing: border-box;
+        font: 400 12.5px/18px "SF Mono", Menlo, monospace; color: #24292f; }
+
+  /* the table */
+  table { position: absolute; border-collapse: collapse; font: 400 13.5px/18px -apple-system, sans-serif; }
+  th { font-weight: 600; text-align: left; padding: 6px 14px 6px 0; border-bottom: 1.5px solid #bdbab3; }
+  td { padding: 6px 14px 6px 0; border-bottom: 1px solid #e6e4df; }
+  td.n, th.n { text-align: right; }
+  .ttitle { position: absolute; margin: 0; font: 600 15px/20px -apple-system, sans-serif; }
+
+  /* the list */
+  .lhead { position: absolute; margin: 0; font: 600 15px/20px -apple-system, sans-serif; }
+  ul { position: absolute; margin: 0; padding-left: 18px; font: 400 14px/22px -apple-system, sans-serif; }
+
+  /* the video still and its subtitle */
+  .still { position: absolute; border-radius: 10px; overflow: hidden;
+           background: linear-gradient(180deg, #27305a 0%, #6a4b7d 38%, #d9825b 66%, #f2b56b 74%, #3b3550 75%, #232033 100%); }
+  .sun { position: absolute; width: 74px; height: 74px; border-radius: 50%; background: radial-gradient(circle, #fff3c4 0%, #ffcf7a 60%, rgba(255,190,110,0) 72%); }
+  .hill { position: absolute; background: #1e1b2b; }
+  .sub { position: absolute; left: 0; right: 0; text-align: center; color: #fff; font: 500 21px/27px -apple-system, sans-serif;
+         text-shadow: 0 0 3px #000, 0 0 3px #000, 0 1px 2px #000; }
+
+  /* the game scene and its dialog box */
+  .game { position: absolute; border-radius: 10px; overflow: hidden;
+          background: radial-gradient(ellipse at 70% 20%, #3d5a8a 0%, #1b2a4a 45%, #0e1528 100%); }
+  .moon { position: absolute; width: 46px; height: 46px; border-radius: 50%; background: #f4f1de; box-shadow: 0 0 24px 6px rgba(244,241,222,.35); }
+  .tree { position: absolute; background: #0a1220; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+  .box { position: absolute; background: rgba(14,18,34,.88); border: 2px solid rgba(214,224,255,.55); border-radius: 12px; box-sizing: border-box; }
+  .name { position: absolute; font: 700 16px/20px -apple-system, sans-serif; color: #ffd98a; }
+  .say { position: absolute; font: 400 18px/27px -apple-system, sans-serif; color: #f5f7ff; }
+</style>
+</head>
+<body>
+
+<!-- ============ the article: heading + lede, two columns ============ -->
+<div class="panel" style="left:24px; top:20px; width:588px; height:566px"></div>
+<h1 style="left:44px; top:40px; width:548px">Translation that stays on the page</h1>
+<p class="lede" style="left:44px; top:82px; width:420px">Reading a screen in another language usually means leaving it for a
+  pop-up or a side panel. Mwoyeo paints the translation back in place, in the same size and colour.</p>
+<div class="col" style="left:44px; top:176px; width:260px">
+  <p>The patch has to cover exactly the old glyphs and nothing else, the new text has to fit the room the old text had, it has to
+    look like the page it sits on, and it has to stay put when the page moves. Mwoyeo does this for the area under a movable lens.</p>
+  <p>The last requirement is the one that separates a demonstration from a tool. A lens over a chat or a feed is used while the
+    person scrolls it, and every stage works on a frame that the display has already left behind.</p>
+</div>
+<div class="col" style="left:332px; top:176px; width:260px">
+  <p>Left alone, the translations trail the text by the speed of the scroll times the age of the frame; the eye reads that as a
+    shimmer, and in the worst case a translation sits on the wrong line.</p>
+  <p>A scroll predictor places each translation where the content will be by the time it is shown, from wheel and trackpad events
+    alone, and learns how far one wheel unit moves the page under the pointer.</p>
+</div>
+
+<!-- ============ the sidebar note and the figure with its caption ============ -->
+<div class="note" style="left:24px; top:606px; width:298px; height:146px">
+  <b>Note</b>
+  <span>The predictor needs nothing from the page itself: it reads only the wheel events the system already delivers to every
+    window.</span>
+</div>
+<div class="panel" style="left:342px; top:606px; width:270px; height:319px"></div>
+<svg class="abs" style="left:356px; top:620px" width="242" height="226" viewBox="0 0 274 226" preserveAspectRatio="none">
+  <rect x="0" y="0" width="274" height="226" rx="6" fill="#f6f5f2"/>
+  <g stroke="#dcd9d2" stroke-width="1"><line x1="20" y1="40" x2="262" y2="40"/><line x1="20" y1="90" x2="262" y2="90"/>
+    <line x1="20" y1="140" x2="262" y2="140"/><line x1="20" y1="190" x2="262" y2="190"/></g>
+  <path d="M20 190 C 70 186, 90 120, 140 104 S 220 60, 262 52" fill="none" stroke="#2f6fde" stroke-width="3"/>
+  <path d="M20 190 C 60 170, 100 170, 140 150 S 220 150, 262 132" fill="none" stroke="#e07a3f" stroke-width="3" stroke-dasharray="7 5"/>
+  <rect x="120" y="70" width="70" height="96" rx="10" fill="none" stroke="#2f6fde" stroke-width="2.5" opacity=".55"/>
+  <circle cx="140" cy="104" r="5" fill="#2f6fde"/><circle cx="140" cy="150" r="5" fill="#e07a3f"/>
+</svg>
+<p class="caption" style="left:356px; top:858px; width:242px">Figure 2. With the predictor, each translation stays on its own line
+  while the page scrolls beneath the lens.</p>
+
+<!-- ============ the chat thread ============ -->
+<div class="panel" style="left:632px; top:20px; width:336px; height:326px"></div>
+<div class="bubble in"  style="left:648px; top:36px">Did the new build fix the scroll drift?</div>
+<div class="bubble out" style="right:560px; top:86px">Mostly. Lines stay put now, even on a fast flick.</div>
+<div class="bubble in"  style="left:648px; top:150px">What about a chat that grows from the bottom?</div>
+<div class="bubble out" style="right:560px; top:214px">That works too. The lens keeps up with the newest message.</div>
+<div class="bubble in"  style="left:648px; top:278px">Great, I will try it on the paper tonight.</div>
+
+<!-- ============ the code block ============ -->
+<div class="panel" style="left:632px; top:378px; width:336px; height:208px"></div>
+<p class="lead" style="left:648px; top:402px; width:304px">Build the index once, then query it:</p>
+<pre style="left:648px; top:424px; width:304px; height:146px">$ mwoyeo index --dir papers/
+indexed 42 pages in 3.1 s
+$ mwoyeo query "scroll drift"
+sections/scroll.tex:12
+sections/measure.tex:88
+sections/limits.tex:31</pre>
+
+<!-- ============ the list ============ -->
+<div class="panel" style="left:632px; top:606px; width:336px; height:174px"></div>
+<p class="lhead" style="left:648px; top:622px">Before you start</p>
+<ul style="left:648px; top:650px; width:300px">
+  <li>Allow screen recording once</li>
+  <li>Pick the language you read</li>
+  <li>Hold Option to pin a lens to the screen</li>
+  <li>Press Escape to close the picker</li>
+</ul>
+
+<!-- ============ the table ============ -->
+<div class="panel" style="left:988px; top:20px; width:500px; height:206px"></div>
+<p class="ttitle" style="left:1004px; top:34px">Time to the first translated line</p>
+<table style="left:1004px; top:62px; width:468px">
+  <tr><th>Page</th><th class="n">Lines</th><th class="n">First line</th><th class="n">Whole lens</th></tr>
+  <tr><td>Paper, two columns</td><td class="n">54</td><td class="n">0.3 s</td><td class="n">1.9 s</td></tr>
+  <tr><td>Chat window</td><td class="n">12</td><td class="n">0.2 s</td><td class="n">0.6 s</td></tr>
+  <tr><td>Slides</td><td class="n">19</td><td class="n">0.2 s</td><td class="n">0.5 s</td></tr>
+  <tr><td>Terminal</td><td class="n">31</td><td class="n">0.3 s</td><td class="n">0.9 s</td></tr>
+</table>
+
+<!-- ============ the video still with its subtitle ============ -->
+<div class="still" style="left:988px; top:246px; width:500px; height:281px">
+  <div class="sun" style="left:300px; top:150px"></div>
+  <div class="hill" style="left:-40px; top:196px; width:330px; height:140px; border-radius: 50% 50% 0 0"></div>
+  <div class="hill" style="left:210px; top:206px; width:360px; height:140px; border-radius: 50% 50% 0 0; background:#2a2538"></div>
+  <div class="sub" style="top:216px">I left the light on for you.<br>Come home before the rain does.</div>
+</div>
+
+<!-- ============ the game scene with its dialog box ============ -->
+<div class="game" style="left:988px; top:547px; width:500px; height:378px">
+  <div class="moon" style="left:380px; top:34px"></div>
+  <div class="tree" style="left:20px; top:120px; width:90px; height:170px"></div>
+  <div class="tree" style="left:90px; top:150px; width:70px; height:140px"></div>
+  <div class="tree" style="left:350px; top:130px; width:100px; height:160px"></div>
+  <div class="box" style="left:16px; top:236px; width:468px; height:128px"></div>
+  <div class="name" style="left:36px; top:250px">Mira</div>
+  <div class="say" style="left:36px; top:274px; width:440px">The bridge was here yesterday, I am sure of it.<br>Someone must have moved it in the night.</div>
+</div>
+
+</body>
+</html>

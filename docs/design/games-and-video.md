@@ -78,3 +78,22 @@ Gate: `GameChecks.markerFocus` (a drag, Esc and the keys each give the app that 
 
 The lens that lags a changed line (film4 F8) is not this round's: it is on main too (a resize of the capture throws away the pass that began before it, `RegionPipeline.captureResized`/`finishPass`) and belongs to
 round hold117; the handover with the trace and a first fix is `/tmp/r117/game117-F8-handover.md`.
+
+## 5. The marker's hint pills avoid the lens (gamepill, 2026-10-22)
+
+The two hint pills ("Drag over what the lens should not read", "Arrow keys move …") were drawn at the screen's middle at a fixed distance from its top, whatever the lens was: opus vision on the
+game117 shots found the arrow-keys pill over the lens's top-right ring by ~9 pt, and a lens near the top or the right of the screen is where they always collide.
+
+Target (contract): a pill never overlaps the lens frame (ring included, and the room of its name tag), stays fully inside the screen's visible frame (menu bar and Dock excluded), and the two
+keep their order (the drag hint above the arrow-keys one) with 8 pt between them. Above the lens when the pair fits there, else below it, else beside it (right, then left); when no side has room
+(a lens that fills the visible frame) they sit just inside the top of it, the one place the contract cannot hold.
+
+| Piece | Before | Now | Owner |
+|---|---|---|---|
+| Where the pills go | `MarkerView.draw`: `bounds.maxY - 120` and `- 164`, centred on the screen | `MarkerHints.place(pills:lens:visible:clearance:)`, a pure function of the sizes, the lens and the visible frame; `MarkerView.hintFrames` is its one call | `Core/MarkerHints.swift`, `RegionMarker` |
+| Clearance | none | `RegionFrameWindow.tabExtra` (40 pt: the ring, its glow and the name tag, which sits above or below by setting) on every side | `RegionMarker` |
+| The arrow-keys pill appears | it was placed on its own | both pills are always placed, one pair, so the drag hint does not move when the second appears | `MarkerView.hintFrames` |
+| The shot | `GameShots` cut the pills at the capture's edge and showed the real desktop around the stage | the capture is the lens and the pills with 20 pt around (16 asked; the ring and its glow count as the lens), over a stage that covers all of it; light and dark | `GameShots` |
+
+Gates: `MarkerHintsTests` (Core: a centred lens, near the top, near the right edge, full height, a lens that fills the screen, and a sweep of 2 120 lenses up to 1000 × 600), `GameChecks.markerHints` (the view's
+frames for a lens at the top right of this Mac's screen), seen to FAIL on the fixed placement.

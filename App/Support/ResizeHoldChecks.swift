@@ -113,6 +113,8 @@ enum ResizeHoldChecks {
         let snapshot: OverlaySnapshot
         /// Where the drawn blocks are on the screen (Quartz points).
         var rects: [CGRect] { snapshot.blocks.map { $0.frame.offsetBy(dx: snapshot.origin.x, dy: snapshot.origin.y) } }
+        /// Where the lens leaves a block out on purpose (`OverlaySnapshot.leftOut`).
+        var leftOut: [CGRect] { snapshot.leftOut.map { $0.offsetBy(dx: snapshot.origin.x, dy: snapshot.origin.y) } }
         /// How many of them stand in the lens.
         var inLens: Int { rects.filter { $0.intersects(lens) }.count }
         /// Every text the lens holds has its translation.
@@ -214,7 +216,13 @@ enum ResizeHoldChecks {
             // The overlay's pixels of the lens as it is now, of both snapshots.
             let wasMask = changed(by: before.snapshot, in: after.lens, over: page), hasMask = changed(by: after.snapshot, in: after.lens, over: page)
             let was = wasMask.mask.filter { $0 }.count, has = hasMask.mask.filter { $0 }.count
-            let back = lumas(of: after.snapshot, in: after.lens, over: page).map { worstRestored(before.rects, in: after.lens, now: $0) } ?? 1
+            // 2026-10-23 (edges117, docs/design/recognition.md §16.3): a block the lens covers too little of (`LensWindow.minShare`) is left out on purpose, and the page's own text
+            // shows there, whole, as it does beside the lens: that is the rule (film4 F1, F2: a few syllables of a translation over the English that goes on beside the lens), not
+            // a block that went. Derivation: a block of `before` that `after` lists as left out (half of it or more under one of the rects it lists) is no block that "was
+            // drawn and is not": the pipeline says why it is not. FAIL-first: without the listing, snapshot v21 of this check reads 1.00 (blocks 4 in lens, texts 6).
+            let leftOut = after.leftOut
+            let drawnBefore = before.rects.filter { r in !leftOut.contains { o in let i = o.intersection(r); return !i.isNull && i.width * i.height >= 0.5 * r.width * r.height } }
+            let back = lumas(of: after.snapshot, in: after.lens, over: page).map { worstRestored(drawnBefore, in: after.lens, now: $0) } ?? 1
             let ink = was == 0 ? 1 : Double(has) / Double(was)
             j.count += 1
             if back > j.worstBack { j.worstBack = back; j.worstAt = i }
@@ -335,7 +343,7 @@ enum ResizeHoldChecks {
             ("shrink", CGSize(width: 330, height: 220)), ("grow past the margin", CGSize(width: 760, height: 520)),
             ("shrink to the start", CGSize(width: 420, height: 290))]
         var unsettled: [String] = []
-        var total: [String: Int] = [:], passesIn: [String: Int] = [:]
+        var total: [String: Int] = [:], passesIn: [String: Int] = [:], scoutsIn: [String: Int] = [:], reachesIn: [String: Int] = [:]
         func drain() -> [String: Int] {
             let c = Trace.takeCounts()
             for (k, v) in c { total[k, default: 0] += v }
@@ -345,14 +353,17 @@ enum ResizeHoldChecks {
         for (label, size) in steps {
             await drag(session, lens, rec, to: size, label: label)
             if await settle(session, rec, ready: { $0.inLens >= 1 && $0.translated }) == false { unsettled.append(label) }
-            passesIn[label] = drain()["pass.read", default: 0]
+            let counts = drain()
+            passesIn[label] = counts["pass.read", default: 0]
+            scoutsIn[label] = counts["lens.fit.scout", default: 0]
+            reachesIn[label] = counts["lens.reach", default: 0]
         }
         check("after every resize the lens reads its page again and every text in it is translated", unsettled.isEmpty, "not settled after: \(unsettled)")
         // A lens made smaller shows what the blocks already describe: nothing is read again (film4 F8: every narrowing of a game lens's overscan
         // was a whole read of 3 to 5 s, in the way of the next line of text).
         let readAgain = ["shrink", "shrink to the start"].reduce(0) { $0 + passesIn[$1, default: 0] }
         check("a lens that shrinks to inside what was read is not read again (\(readAgain) passes)", readAgain == 0,
-              "passes per step: \(steps.map { "\($0.label) \(passesIn[$0.label, default: 0])" })")
+              "passes per step: \(steps.map { "\($0.label) \(passesIn[$0.label, default: 0])" }); scouts \(steps.map { scoutsIn[$0.label, default: 0] }), reaches \(steps.map { reachesIn[$0.label, default: 0] })")
 
         // Snapshot by snapshot, from the settled one: what the lens had drawn stays drawn. A translation that is replaced by the one the engine
         // answers (the old one is shown meanwhile) changes the pixels of its block, and is not a block gone: the page's own text must not come
@@ -434,6 +445,11 @@ enum ResizeHoldChecks {
             var fit: [String: Int] = [:], undo: [String: Int] = [:]
             func gather(into counts: inout [String: Int]) { for (k, v) in Trace.takeCounts() { counts[k, default: 0] += v } }
             _ = Trace.takeCounts()
+            // 2026-10-23 (edges117, addenda A2 and A3): this lens is the film's F16, a lens short of its column by more than its capture's margin. The paragraphs that run past the
+            // capture are left out of the read (`CaptureEdge.cutAtSides`), and the session now makes the capture the band before the lens is touched (`Reach`,
+            // `RegionSession.reachColumns`), so that the first read holds the column whole and the lens shows it. The Fit then has no strip to uncover: it reads
+            // what the capture uncovered, or the capture already reached the page's right edge.
+            let reachedBefore = session3.captureRect.maxX >= pageOrigin.x + pageSize.width - 20
             await drag(session3, lens3, rec3, to: CGSize(width: 860, height: narrow.height), label: "fit", steps: 1)
             // The read of what the Fit uncovered has begun before anything else is waited for: a machine that is slow to deliver the frame of
             // the new capture does not make the Undo come first.
@@ -463,8 +479,10 @@ enum ResizeHoldChecks {
                 let marks = rec3.marks.map { String(format: "%6.0f ms mark %@", $0.time * 1000, $0.label) }
                 try? (j.timeline + marks).joined(separator: "\n").write(toFile: path + ".fit", atomically: true, encoding: .utf8)
             }
-            check("Fit to Column reads what its capture uncovered, and the lens ends translated (\(fit["pass.read", default: 0]) pass(es), \(fit["render.carried", default: 0]) blocks carried a translation)",
-                  fitted && fit["pass.read", default: 0] >= 1, "fitted \(fitted)")
+            // Derivation of the second term: before the Fit the capture's right edge is at or past the page's text (980 of 980), so there is nothing to uncover; FAIL-first: the
+            // run of 2026-10-23 03:21 before this change printed "(0 pass(es), 0 blocks carried a translation) [fitted true]" with the first term alone.
+            check("Fit to Column reads what its capture uncovered (or the capture reached the page's right edge before it: \(reachedBefore)), and the lens ends translated (\(fit["pass.read", default: 0]) pass(es), \(fit["render.carried", default: 0]) blocks carried a translation)",
+                  fitted && (fit["pass.read", default: 0] >= 1 || reachedBefore), "fitted \(fitted)")
             check("the Undo takes the lens back and nothing is read again (\(undo["pass.read", default: 0]) passes)", undone && undo["pass.read", default: 0] == 0, "undone \(undone)")
             check("moving the lens reads what it uncovered and the lens ends translated (\(move["pass.read", default: 0]) pass(es), \(move["render.carried", default: 0]) blocks carried a translation)",
                   moved && move["pass.read", default: 0] >= 1, "moved \(moved)")

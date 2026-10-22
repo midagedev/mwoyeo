@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Mwoyeo 1.1.5 — script film</title>
+<!-- film3-motion: the film as a pure function of time. shoot.mjs opens this page with ?data=<work>/data.js (written by prep.py), calls
+     __film.seek(t) for every frame (and sub-frame) and captures it. Nothing moves on its own: no CSS animation, no clock. -->
+<style>
+  :root {
+    --red: #ff453a; --red-soft: rgba(255, 69, 58, 0.17); --red-text: #ff8f86;
+    --teal: #2dd4bf; --teal-deep: #0d9488; --teal-soft: rgba(45, 212, 191, 0.18);
+    --ink: rgba(255, 255, 255, 0.94); --ink-2: rgba(255, 255, 255, 0.62);
+    --chip: rgba(15, 17, 23, 0.95);
+    --ui: -apple-system, "SF Pro Display", "Apple SD Gothic Neo", sans-serif;
+  }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #05070f; }
+  body { font-family: var(--ui); -webkit-font-smoothing: antialiased; color: var(--ink); }
+  #stage { position: absolute; inset: 0; overflow: hidden;
+    background:
+      radial-gradient(1300px 820px at 50% 30%, rgba(38, 58, 128, 0.42) 0%, rgba(20, 30, 70, 0.20) 40%, rgba(5, 7, 15, 0) 72%),
+      radial-gradient(900px 600px at 88% 96%, rgba(84, 52, 150, 0.16) 0%, rgba(5, 7, 15, 0) 70%),
+      #05070f; }
+  #cam { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+  #world { position: absolute; inset: 0; perspective: 2400px; perspective-origin: 960px 540px; }
+  .obj { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .glass { position: absolute; inset: 0; overflow: hidden; background: #fff; }
+  .glass img { position: absolute; left: 0; top: 0; display: block; }
+  .rim { position: absolute; inset: 0; pointer-events: none; }
+  .corner { position: absolute; width: 1px; height: 1px; }
+  /* marks: a marker sweep under the word (bar) over a soft band (hl) */
+  .mark { position: absolute; }
+  .mark .hl, .mark .bar { position: absolute; left: 0; transform-origin: 0 50%; }
+  .mark .hl { top: 0; bottom: 0; border-radius: 6px; }
+  .mark .bar { height: 6px; border-radius: 3px; }
+  /* M2: the word a term replaced, small above the new word (ruby) */
+  .ruby { position: absolute; white-space: nowrap; color: #6e6e73; font-weight: 600; letter-spacing: -0.1px; text-align: center; transform-origin: 50% 100%; }
+  .ruby .strike { position: absolute; left: -2px; right: -2px; top: 54%; height: 2px; margin-top: -1px; background: rgba(110, 110, 115, 0.9);
+    border-radius: 1px; transform-origin: 0 50%; }
+  .probe { position: absolute; visibility: hidden; }
+  /* callouts */
+  .chip { position: absolute; height: 46px; perspective: 600px; }
+  .chip .face { position: absolute; left: 0; top: 0; height: 46px; padding: 0 16px; border-radius: 12px; box-sizing: border-box;
+    display: flex; align-items: center; gap: 10px; white-space: nowrap; background: var(--chip); backface-visibility: hidden;
+    font-size: 25px; font-weight: 600; letter-spacing: -0.2px; box-shadow: 0 10px 28px rgba(0,0,0,0.30), inset 0 0 0 1px rgba(255,255,255,0.10); }
+  .chip .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .chip .shown { color: var(--red-text); position: relative; }
+  .chip .strike { position: absolute; left: -3px; right: -3px; top: 50%; height: 3px; margin-top: -1px; background: var(--red); border-radius: 2px; transform-origin: 0 50%; }
+  .chip .arrow { color: var(--ink-2); font-weight: 500; }
+  .chip .right { color: #fff; }
+  .chip .back .right { color: #bff5ea; }
+  /* equations (paper beat) */
+  .eq { position: absolute; }
+  .eq svg { position: absolute; overflow: visible; }
+  .tag { position: absolute; height: 30px; padding: 0 12px 0 10px; border-radius: 15px; background: rgba(13, 148, 136, 0.96); color: #fff;
+    font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 6px; white-space: nowrap; transform-origin: 100% 50%;
+    box-shadow: 0 8px 20px rgba(13, 80, 74, 0.25); }
+  /* the settings window and its Script card (the UI take) */
+  .mask { position: absolute; }
+  .pairhl { position: absolute; border-radius: 6px; mix-blend-mode: screen; background: rgb(255, 106, 95); }
+  #caret { position: absolute; width: 3px; border-radius: 1.5px; background: #5b9bff; }
+  #toggle { position: absolute; }
+  #toggle .knob { position: absolute; box-shadow: 0 1px 3px rgba(0,0,0,0.35); }
+  .ring { position: absolute; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.95); background: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18), 0 0 18px rgba(255, 255, 255, 0.35); opacity: 0; pointer-events: none; }
+  /* screen space */
+  #hud { position: absolute; inset: 0; pointer-events: none; }
+  #wires { position: absolute; left: 0; top: 0; overflow: visible; }
+  .cap { position: absolute; left: 96px; bottom: 84px; padding: 22px 30px 22px 30px; border-radius: 24px; box-sizing: border-box;
+    background: rgba(12, 14, 20, 0.70); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.10); }
+  .cap .kr { font-size: 46px; font-weight: 650; letter-spacing: -0.6px; line-height: 1.18; white-space: nowrap; }
+  .cap .en { font-size: 26px; font-weight: 450; color: rgba(255,255,255,0.66); margin-top: 8px; letter-spacing: 0.1px; white-space: nowrap; }
+  .w { display: inline-block; white-space: pre; }
+  #tally { position: absolute; height: 64px; padding: 0 24px 0 18px; border-radius: 32px; display: flex; align-items: center; gap: 14px;
+    background: rgba(12, 14, 20, 0.74); backdrop-filter: blur(22px) saturate(150%); box-shadow: 0 18px 50px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.10); }
+  #tally .num { font-size: 34px; font-weight: 650; font-variant-numeric: tabular-nums; letter-spacing: -0.2px; display: flex; }
+  #tally .digit { position: relative; display: inline-block; width: 0.62em; height: 1.2em; overflow: hidden; }
+  #tally .digit span { position: absolute; left: 0; right: 0; text-align: center; line-height: 1.2em; }
+  #end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  #end img { width: 176px; height: 176px; }
+  #end .kr { font-size: 76px; font-weight: 700; letter-spacing: -1.6px; margin-top: 34px; }
+  #end .en { font-size: 30px; font-weight: 450; color: rgba(255,255,255,0.70); margin-top: 14px; letter-spacing: 0.2px; }
+  #end .ver { font-size: 24px; font-weight: 600; color: rgba(255,255,255,0.46); margin-top: 40px; letter-spacing: 3px; }
+  #end .ch { display: inline-block; white-space: pre; }
+  #fade { position: absolute; inset: 0; background: #05070f; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="cam"><div id="world"></div></div>
+  <div id="hud"><svg id="wires" width="1920" height="1080"></svg></div>
+  <div id="fade"></div>
+</div>
+<script>document.write('<script src="' + new URLSearchParams(location.search).get("data") + '"><\/script>');</script>
+<script>
+"use strict";
+const qs = new URLSearchParams(location.search);
+const $ = (tag, cls, parent, css) => { const e = document.createElement(tag); if (cls) e.className = cls; if (css) Object.assign(e.style, css); if (parent) parent.appendChild(e); return e; };
+const px = (v) => v + "px";
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, u) => a + (b - a) * u;
+
+// ---- easing (never linear for motion)
+const E = {
+  lin: (u) => u,
+  cubicInOut: (u) => u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2,
+  cubicOut: (u) => 1 - Math.pow(1 - u, 3),
+  quintOut: (u) => 1 - Math.pow(1 - u, 5),
+  cubicIn: (u) => u * u * u,
+  expoOut: (u) => u >= 1 ? 1 : 1 - Math.pow(2, -10 * u),
+  expoIn: (u) => u <= 0 ? 0 : Math.pow(2, 10 * u - 10),
+  expoInOut: (u) => u <= 0 ? 0 : u >= 1 ? 1 : u < 0.5 ? Math.pow(2, 20 * u - 10) / 2 : (2 - Math.pow(2, -20 * u + 10)) / 2,
+  sineInOut: (u) => -(Math.cos(Math.PI * u) - 1) / 2,
+};
+// a damped spring from 0 to 1 over `dur` seconds (zeta < 1 overshoots once, softly)
+function spring(t, dur, zeta = 0.62, cycles = 1.15) {
+  if (t <= 0) return 0;
+  const w = 2 * Math.PI * cycles / dur, wd = w * Math.sqrt(1 - zeta * zeta);
+  return 1 - Math.exp(-zeta * w * t) * (Math.cos(wd * t) + (zeta * w / wd) * Math.sin(wd * t));
+}
+const seg = (t, t0, t1, ease = E.cubicInOut) => t <= t0 ? 0 : t >= t1 ? 1 : ease((t - t0) / (t1 - t0));
+// keys: [[t, {prop: v}], [t, {prop: v}, ease], ...]: each property eases on the segment that ends at the key that names it
+function keyed(t, keys) {
+  const out = {};
+  for (const name of Object.keys(keys[0][1])) {
+    let prev = keys[0], v = keys[0][1][name];
+    for (let i = 1; i < keys.length; i++) {
+      const k = keys[i];
+      if (!(name in k[1])) continue;
+      if (t >= k[0]) { prev = k; v = k[1][name]; continue; }
+      if (t > prev[0]) v = lerp(prev[1][name], k[1][name], (k[2] || E.cubicInOut)((t - prev[0]) / (k[0] - prev[0])));
+      break;
+    }
+    out[name] = v;
+  }
+  return out;
+}
+
+// ---- data
+const F = window.FILM;
+const C = F.cfg, TL = C.timeline, FPS = C.fps;
+const W = F.whip;                                    // the whip back to the paragraph (typing end + whip_after_type)
+const T = {
+  open: 0, paper: TL.paper_xfade, paperEnd: TL.paper_end, defect: TL.defect_start, dX: TL.defect_xfade, marks: TL.marks_at,
+  fix: TL.fix_start, type: TL.type_start, whip: W, whipEnd: W + TL.whip_dur, aX: W + TL.after_xfade, resolve: W + TL.resolve,
+  easeOut: W + TL.ease_out, end: W + TL.end_start, stop: F.duration, st: TL.stagger, menu: TL.fix_start + C.ui.menu.open,
+};
+const WORK = "file://" + C.work + "/";
+const FRAME_W = C.frame_width;
+
+// ---- objects in the world. Each has a size (its own px) and a pose: centre (x, y) in world px, z, rx, ry (deg), s (scale), o (opacity)
+const world = document.getElementById("world"), cam = document.getElementById("cam"), hud = document.getElementById("hud");
+function makeObj(w, h, radius, shadow) {
+  const el = $("div", "obj", world, { width: px(w), height: px(h) });
+  const glass = $("div", "glass", el, { borderRadius: px(radius), boxShadow: shadow });
+  const rim = $("div", "rim", el, { borderRadius: px(radius), boxShadow: "inset 0 0 0 " + px(radius / 11) + " rgba(255,255,255,0.16)" });
+  const corners = [[0, 0], [w, 0], [0, h], [w, h], [w / 2, h / 2]].map(([x, y]) => $("div", "corner", el, { left: px(x), top: px(y) }));
+  return { el, glass, rim, corners, w, h };
+}
+function pose(obj, p) {
+  obj.el.style.transform = `translate3d(${p.x}px, ${p.y}px, ${p.z || 0}px) rotateX(${p.rx || 0}deg) rotateY(${p.ry || 0}deg) scale(${p.s}) translate(${-obj.w / 2}px, ${-obj.h / 2}px)`;
+  obj.el.style.opacity = p.o == null ? 1 : p.o;
+  obj.el.style.visibility = (p.o == null || p.o > 0.001) ? "visible" : "hidden";
+  obj.pose = p;
+}
+
+// frame A: the paper (M1)
+const P = F.paper;
+const fa = makeObj(P.w, P.h, 26, "0 50px 140px rgba(0,0,0,0.55), 0 14px 40px rgba(0,0,0,0.30)");
+let faEn, faKo, faImg;
+if (P.placeholder) {
+  faEn = $("img", "", fa.glass); faEn.src = WORK + "paper-en.png";
+  faKo = $("img", "", fa.glass); faKo.src = WORK + "paper-ko.png";
+} else {
+  faImg = $("img", "", fa.glass);
+}
+const faS = FRAME_W / fa.w;
+const eqLayer = $("div", "", fa.el, { position: "absolute", inset: 0 });
+// the outline sits in the white rows around the equation (prep's room: rows above / below before any prose ink), never across the prose; the tag rides
+// the border on the side with room for half its height, else it sits inside the top-right corner
+const TAG_H = 30;
+const eqs = P.equations.map((b, i) => {
+  const [up, down] = P.room[i];
+  const padX = 12, padT = clamp(Math.floor(up / 3), 2, 10), padB = clamp(Math.floor(down / 3), 2, 10);
+  const x = b[0] - padX, y = b[1] - padT, w = b[2] + 2 * padX, h = b[3] + padT + padB;
+  const box = $("div", "eq", eqLayer, { left: px(x), top: px(y), width: px(w), height: px(h) });
+  box.innerHTML = `<svg width="${w}" height="${h}"><rect x="1" y="1" width="${w - 2}" height="${h - 2}" rx="10" ry="10" fill="rgba(45,212,191,0.07)" stroke="#14b8a6" stroke-width="2"/></svg>`;
+  const rect = box.querySelector("rect");
+  const len = 2 * (w - 2 + h - 2);
+  rect.style.strokeDasharray = len + " " + len;
+  const side = up - padT >= TAG_H / 2 + 4 ? "top" : down - padB >= TAG_H / 2 + 4 ? "bottom" : "inside";
+  const tag = $("div", "tag", eqLayer, { left: px(x + w - 18), top: px(side === "bottom" ? y + h : side === "top" ? y : y + 6) });
+  tag.dataset.side = side;
+  tag.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18"><path d="M3.5 9.5l3.6 3.4L14.5 5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>${C.captions.equation_tag}</span>`;
+  return { box, rect, len, tag, b };
+});
+// M5: fragments the take kept in English (D3); the hold frames them under the caption pill, and measure.py checks it from these boxes
+const hideEls = (C.paper.hide || []).map(([x, y, w, h]) => $("div", "", eqLayer, { position: "absolute", left: px(x), top: px(y), width: px(w), height: px(h) }));
+
+// frame B: the paragraph (before / after takes)
+const fb = makeObj(F.before.w, F.before.h, 30, "0 56px 150px rgba(0,0,0,0.58), 0 16px 44px rgba(0,0,0,0.32)");
+const fbImg = $("img", "", fb.glass);
+const fbS = FRAME_W / fb.w;
+const markLayer = $("div", "", fb.el, { position: "absolute", inset: 0 });
+function makeMark(m, ref, colour, soft) {
+  // x from Vision's box of the word; y from the ink line it sits on (Vision's boxes are taller than the glyphs, and unevenly so)
+  // the band and the bar: prep's band_over and bar_under (the final takes set lines 7-13 px apart: neither reaches a neighbour line)
+  const pad = 5;
+  const el = $("div", "mark", markLayer, { left: px(m.x - pad), top: px(m.hl[0]), width: px(m.w + 2 * pad), height: px(m.hl[1] - m.hl[0]) });
+  const hl = $("div", "hl", el, { width: "100%", background: soft, borderRadius: "6px 6px 2px 2px" });
+  const bar = $("div", "bar", el, { width: "100%", top: px(m.bar[0] - m.hl[0]), height: px(m.bar[1]), borderRadius: px(m.bar[1] / 2), background: colour });
+  return { el, hl, bar, m };
+}
+const marksB = F.refs.before.marks.map((m) => makeMark(m, F.refs.before, "var(--red)", "var(--red-soft)"));
+const marksA = F.refs.after.marks.map((m) => makeMark(m, F.refs.after, "var(--red)", "var(--red-soft)"));
+const marksAok = F.refs.after.marks.map((m) => makeMark(m, F.refs.after, "var(--teal)", "var(--teal-soft)"));
+
+// M2: the replaced word written small above its new word. The lines are too close for it (7-21 px apart), so the after take's lens opens:
+// it is cut at a blank row above each corrected line (prep's ruby.cuts) into strips of the footage; each strip moves down by the openings
+// above it, and each opening is its cut row stretched (blank lens + its two borders). No pixel inside a line is repainted or moved apart.
+const RB = F.ruby, ALINES = F.refs.after.lines;
+const stripLayer = $("div", "", fb.glass, { position: "absolute", inset: 0, display: "none" });
+const RBW = RB.x1 - RB.x0, Dcum = RB.cuts.map((c, k) => RB.cuts.slice(0, k + 1).reduce((a, x) => a + x.open, 0)), Dall = Dcum[Dcum.length - 1];
+const fillers = RB.cuts.map((c) => {
+  const cv = $("canvas", "", stripLayer, { position: "absolute", left: px(RB.x0), top: px(c.row), width: px(RBW), height: px(Math.max(1, c.open)), transformOrigin: "0 0" });
+  cv.width = RBW; cv.height = 1;
+  return cv;
+});
+// an opening is its cut row stretched: inside the lens the row is flattened to its median colour, since the frames are JPEG and their faint
+// block noise (a few levels) reads as vertical streaks once one row is stretched 40 px tall; the lens's two borders keep their own pixels
+function flatten(ctx, keep = 24) {
+  const d = ctx.getImageData(0, 0, RBW, 1), p = d.data, med = [0, 1, 2].map((ch) => {
+    const v = []; for (let i = keep; i < RBW - keep; i++) v.push(p[4 * i + ch]);
+    return v.sort((a, b) => a - b)[v.length >> 1];
+  });
+  for (let i = keep; i < RBW - keep; i++) for (let ch = 0; ch < 3; ch++) p[4 * i + ch] = med[ch];
+  ctx.putImageData(d, 0, 0);
+}
+const strips = RB.cuts.map((c, k) => {
+  const top = c.row - 2, bottom = (k + 1 < RB.cuts.length ? RB.cuts[k + 1].row : RB.bottom) + 2;   // 2 px over the openings: blank rows hide the seams
+  const el = $("div", "", stripLayer, { position: "absolute", left: px(RB.x0), top: px(top), width: px(RBW), height: px(bottom - top), overflow: "hidden" });
+  // the last strip carries the lens's bottom border and its glow over the page: the glow fades out instead of ending in a hard edge
+  if (k === RB.cuts.length - 1) el.style.webkitMaskImage = el.style.maskImage = "linear-gradient(to bottom, #000 calc(100% - 14px), transparent)";
+  return { el, img: $("img", "", el, { left: px(-RB.x0), top: px(-top) }) };
+});
+const lineShift = (li) => RB.cuts.reduce((d, c, k) => (c.line <= li ? Dcum[k] : d), 0);   // take px a line moves when the lens is open
+const rubyOpen = (t) => seg(t, T.resolve + 0.15, T.resolve + 0.6, E.expoInOut);
+const rubyLayer = $("div", "", fb.el, { position: "absolute", inset: 0 });
+// the lens on screen, header pill to (grown) bottom: measure.py keeps it 48 px inside the screen during the holds
+const LENS = F.refs.after.lens, LENS_TOP = Math.min(LENS[1], RB.cuts[0].above ? RB.cuts[0].above[1] : LENS[1]);
+const lensProbe = $("div", "probe", rubyLayer, { left: px(LENS[0]), top: px(LENS_TOP), width: px(LENS[2]), height: px(LENS[1] + LENS[3] - LENS_TOP) });
+const RUBY_H = Math.round(RB.font_px * 1.15);
+const rubies = F.refs.after.marks.map((m, i) => {
+  const li = m.lineIndex, cut = RB.cuts.find((c) => c.line === li), top = ALINES[li][0] - RB.margin - RUBY_H;
+  const el = $("div", "ruby", rubyLayer, { top: px(top), height: px(RUBY_H), lineHeight: px(RUBY_H), fontSize: px(RB.font_px) });
+  const word = $("span", "", el); word.textContent = F.callouts[i].shown;
+  const strike = $("i", "strike", word);
+  word.style.position = "relative";
+  // the boxes measure.py checks it against: what is above it (the previous line's text box, or the lens chrome) and its own new word
+  const a = cut.above, above = $("div", "probe", rubyLayer, { left: px(a[0]), top: px(a[1]), width: px(a[2]), height: px(a[3]) });
+  const wordBox = $("div", "probe", rubyLayer, { left: px(m.x), top: px(ALINES[li][0]), width: px(m.w), height: px(ALINES[li][1] - ALINES[li][0]) });
+  return { el, strike, above, wordBox, m, li, aboveLine: cut.aboveLine, cx: m.x + m.w / 2 };
+});
+
+// callouts: margin notes. One column left of the lens, each note on the row of its word (rows from the ink lines read on the frame), on a
+// frosted strip that hides the other column's text. Same rows before and after, so the notes resolve in place.
+const notes = $("div", "", fb.el, { position: "absolute", borderRadius: "22px", background: "rgba(244, 245, 249, 0.90)",
+  backdropFilter: "blur(14px)", boxShadow: "0 18px 50px rgba(20, 24, 40, 0.18), inset 0 0 0 2px rgba(255,255,255,0.7)", transformOrigin: "100% 50%" });
+const chipLayer = $("div", "", fb.el, { position: "absolute", inset: 0 });
+function chipFace(parent, kind, c) {
+  const f = $("div", "face " + kind, parent);
+  if (kind === "front") f.innerHTML = `<span class="dot" style="background:var(--red)"></span><span class="shown">${c.shown}<i class="strike"></i></span><span class="arrow">→</span><span class="right">${c.right}</span>`;
+  else f.innerHTML = `<svg width="24" height="24" viewBox="0 0 22 22" style="flex:none"><circle cx="11" cy="11" r="11" fill="#14b8a6"/><path d="M6.2 11.4l3.2 3.1 6.5-7" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="right">${c.right}</span>`;
+  return f;
+}
+function makeChips(marks, ref) {
+  return marks.map((mk, i) => {
+    const c = F.callouts[i];
+    const el = $("div", "chip", chipLayer);
+    const front = chipFace(el, "front", c), back = chipFace(el, "back", c);
+    return { el, front, back, m: mk.m, c, ref, strike: front.querySelector(".strike") };
+  });
+}
+const chipsB = makeChips(marksB, F.refs.before), chipsA = makeChips(marksA, F.refs.after);
+let notesBox = null, notesLeft = 0;
+function layoutChips(chips) {
+  const lens = chips[0].ref.lens, gap = 30, h = 46;
+  const wmax = Math.max(...[...chipsB, ...chipsA].map((ch) => Math.max(ch.front.offsetWidth, ch.back.offsetWidth)));
+  for (const ch of chips) {
+    const w = Math.max(ch.front.offsetWidth, ch.back.offsetWidth), line = ch.ref.lines[ch.m.lineIndex], cy = (line[0] + line[1]) / 2;
+    const x = lens[0] - gap - w, y = cy - h / 2;      // right-aligned against the lens: the note's row is the word's row
+    ch.box = [x, y, w, h];
+    Object.assign(ch.el.style, { left: px(x), top: px(y), width: px(w) });
+    ch.front.style.width = ch.back.style.width = px(w);
+  }
+  notesBox = [0, lens[1], lens[0] - 14, lens[3]];   // the whole other column, as tall as the lens
+  notesLeft = lens[0] - gap - wmax;
+  Object.assign(notes.style, { left: px(notesBox[0]), top: px(notesBox[1]), width: px(notesBox[2]), height: px(notesBox[3]) });
+}
+
+// M4: the lens menu (the UI take's own, over the marks it covers): it opens on the lens before the frame slides aside, the item is clicked,
+// then it fades as in the take
+const UC = C.ui, U = F.ui;
+const MR = U.menu.rect;
+const rect = (r, extra) => Object.assign({ left: px(r[0]), top: px(r[1]), width: px(r[2]), height: px(r[3]) }, extra || {});
+const menuWrap = $("div", "", fb.el, { position: "absolute", inset: 0, filter: "drop-shadow(0 10px 26px rgba(0, 0, 0, 0.30))",
+  transformOrigin: `${MR[0]}px ${MR[1]}px`, opacity: 0 });
+const menuImg = $("img", "", menuWrap, { position: "absolute", left: 0, top: 0,
+  clipPath: `inset(${MR[1]}px ${fb.w - MR[0] - MR[2]}px ${fb.h - MR[1] - MR[3]}px ${MR[0]}px round 22px)` });
+menuImg.src = WORK + "ui/menu.jpg";
+const menuRing = $("div", "ring", fb.el);
+function drawRing(el, x, y, d, r0, r1) {
+  if (d < 0 || d > 0.4) { el.style.opacity = 0; return; }
+  const r = lerp(r0, r1, E.expoOut(d / 0.4));
+  Object.assign(el.style, { left: px(x - r), top: px(y - r), width: px(2 * r), height: px(2 * r), opacity: 1 - E.cubicIn(d / 0.4) });
+}
+
+// the settings window (the UI take): it flies in beside frame B and steps from the Memory sheet to the Script row (the take's states, a short
+// fade for an expand and a short slide for a scroll); then its clip closes on the Script card as the camera dives in. While the script is
+// typed, each film frame shows the take's frame with at least that many characters (prep keeps only frames laid out as the final text) and
+// hides the rest by the final layout's cells. The editor is the app's: no syntax colours.
+const UW = U.win, TY = U.typing, TG = U.toggle;
+const pn = makeObj(UW.w, UW.h, UC.radius, "0 50px 130px rgba(0,0,0,0.6), 0 14px 40px rgba(0,0,0,0.35)");
+Object.assign(pn.glass.style, { inset: "auto", background: U.viewport_bg });
+pn.rim.style.inset = "auto";
+const pnIn = $("div", "", pn.glass, { position: "absolute", left: 0, top: 0, width: px(UW.w), height: px(UW.h) });
+const winImgs = [$("img", "", pnIn), $("img", "", pnIn)];
+const vp = $("div", "", pnIn, rect(UC.viewport, { position: "absolute", overflow: "hidden", background: U.viewport_bg, display: "none" }));
+const vpImgs = [0, 1].map(() => $("img", "", vp, { left: px(-UC.viewport[0]), top: px(-UC.viewport[1]) }));
+const winRings = U.clicks.map(() => $("div", "ring", pnIn));
+const CARD = UC.card;
+const typ = $("div", "", pnIn, rect(CARD, { position: "absolute", overflow: "hidden", display: "none" }));
+const typImg = $("img", "", typ);
+const ED_R = UC.editor[0] + UC.editor[2];
+const lineSpan = TY.lines.map((l, li) => {   // the first and last character on each line
+  const ids = TY.cells.map((c, i) => (c && c[0] === li ? i : -1)).filter((i) => i >= 0);
+  return [ids[0], ids[ids.length - 1]];
+});
+const masks = TY.lines.map(() => $("div", "mask", typ, { background: TY.bg }));
+// the character count, drawn live over the take's (whose frame may be ahead of the typing): the system font sized in ready() so the final
+// count is as wide as the take's, right-aligned, on its baseline (0.856 em under the line box's top at line-height 1). The Run row (switch,
+// count) sits TY.dy px higher until the script's last line lands, as in the take
+const CT = TY.counter;
+let CT_F = CT[3];
+const CT_X0 = Math.max(CT[0] - 30, TG.track[0] + TG.track[2] + 4);
+const ctMask = $("div", "mask", typ, rect([CT_X0, CT[1] - 6, CT[0] + CT[2] + 6 - CT_X0, CT[3] + 12], { background: TY.bg }));
+const count = $("div", "", typ, { position: "absolute", right: px(CARD[2] - CT[0] - CT[2]), color: TY.counter_rgb, fontFamily: "system-ui, -apple-system",
+  fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" });
+const caret = $("div", "", typ); caret.id = "caret";
+const toggle = $("div", "", typ, rect(TG.track, { borderRadius: px(TG.track[3] / 2), display: "none" })); toggle.id = "toggle";
+const knob = $("div", "knob", toggle, { width: px(TG.knob_on[2]), height: px(TG.knob_on[3]), top: px(TG.knob_on[1] - TG.track[1]), borderRadius: px(TG.knob_on[3] / 2) });
+const hexRgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+const mixRgb = (a, b, u) => `rgb(${hexRgb(a).map((v, i) => Math.round(lerp(v, hexRgb(b)[i], u))).join(", ")})`;
+// each pair ["a", "b"]: its cells, one highlight per line it sits on (the first is the connector's anchor)
+const pairRuns = [];
+(function () {
+  const re = /\["[^"]+", "[^"]+"\]/g; let m;
+  while ((m = re.exec(F.script))) {
+    const segs = [];
+    for (let i = m.index; i < m.index + m[0].length; i++) {
+      const c = TY.cells[i]; if (!c) continue;
+      const g = segs.find((q) => q.li === c[0]);
+      if (g) g.x1 = c[2]; else segs.push({ li: c[0], x0: c[1], x1: c[2] });
+    }
+    const els = segs.map((q) => $("div", "pairhl", typ, rect([q.x0 - 4, TY.lines[q.li][0] - 5, q.x1 - q.x0 + 8, TY.lines[q.li][1] - TY.lines[q.li][0] + 10], { opacity: 0 })));
+    pairRuns.push({ el: els[0], els, start: m.index, end: m.index + m[0].length - 1 });
+  }
+})();
+const MOVES = UC.moves.map(([a, d, kind]) => ({ a: TL.fix_start + a, d, kind }));
+const SCROLL = 150;   // window px a scroll's slide travels
+
+// typing times: a seeded jitter around 1/cps, short pauses after a pair and at line ends, then scaled so the mean is exactly cps
+const typeAt = (function () {
+  let seed = 1151;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const s = F.script, gaps = [];
+  for (let i = 0; i < s.length; i++) {
+    let g = 0.62 + 0.76 * rnd();
+    if (s[i - 1] === "\n") g += 1.6;
+    if (s[i - 1] === "," && s[i - 2] === "]") g += 1.1;
+    if (s[i] === " ") g *= 0.7;
+    gaps.push(g);
+  }
+  const total = gaps.reduce((a, b) => a + b, 0), span = s.length / TL.type_cps;
+  let t = T.type; const at = [];
+  for (const g of gaps) { t += g / total * span; at.push(t); }
+  return at;
+})();
+const typeEnd = typeAt[typeAt.length - 1];
+const line1End = typeAt[F.script.indexOf("\n")];
+const linkAt = F.pairs.map((p, i) => typeAt[pairRuns[i].end]);
+
+// the screen: captions, tally, end card, connectors
+function makeCaption(kr, en) {
+  const el = $("div", "cap", hud);
+  const k = $("div", "kr", el), e = $("div", "en", el);
+  const words = (text, host) => text.split(/(\s+)/).filter((w) => w.length).map((w) => { const s = $("span", "w", host); s.textContent = w; return s; });
+  return { el, kw: words(kr, k), ew: words(en, e) };
+}
+const caps = {
+  paper: [makeCaption(...C.captions.paper), T.paper + 0.5, T.paperEnd - 0.02],   // the pill covers the D3 fragment until the whip moves the page, then leaves with it
+  defect: [makeCaption(...C.captions.defect), T.dX + 0.5, T.fix - 0.15],
+  fix: [makeCaption(...C.captions.fix), T.type + 0.15, T.whip - 0.12],
+  resolve: [makeCaption(...C.captions.resolve), T.resolve + 0.1, T.end - 0.2],
+};
+const tally = $("div", "", hud); tally.id = "tally";
+tally.innerHTML = `<svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="4"/><circle id="ring" cx="17" cy="17" r="14" fill="none" stroke="#2dd4bf" stroke-width="4" stroke-linecap="round" transform="rotate(-90 17 17)" stroke-dasharray="0 88"/></svg><div class="num"><span class="digit" id="d0"></span><span style="opacity:.5">/</span><span>${F.counter.n}</span></div>`;
+const ring = tally.querySelector("#ring"), digit = tally.querySelector("#d0");
+for (let v = 0; v <= F.counter.n; v++) { const s = $("span", "", digit); s.textContent = v; s.style.top = (v * 1.2) + "em"; }
+const endEl = $("div", "", hud); endEl.id = "end";
+const endImg = $("img", "", endEl); endImg.src = WORK + "icon.png";
+const endLines = C.captions.end.map((text, i) => { const d = $("div", ["kr", "en", "ver"][i], endEl); return [...text].map((c) => { const s = $("span", "ch", d); s.textContent = c; return s; }); });
+const wires = document.getElementById("wires");
+const NS = "http://www.w3.org/2000/svg";
+const links = [];
+F.pairs.forEach((p, i) => p.marks.forEach((k) => {
+  const path = document.createElementNS(NS, "path"), dot = document.createElementNS(NS, "circle");
+  path.setAttribute("fill", "none"); path.setAttribute("stroke", "#ff6a5f"); path.setAttribute("stroke-width", "2.5"); path.setAttribute("stroke-linecap", "round");
+  path.style.filter = "drop-shadow(0 0 6px rgba(255,90,80,0.55))";
+  dot.setAttribute("r", "6"); dot.setAttribute("fill", "#ff6a5f");
+  wires.appendChild(path); wires.appendChild(dot);
+  links.push({ pair: i, mark: k, path, dot, at: linkAt[i] + 0.04 * p.marks.indexOf(k) });
+}));
+
+// ---- world layout
+const A_C = { x: 960, y: 540 };                 // frame A's centre
+const B_C = { x: 960, y: 540 + 1400 };          // frame B's centre (below A: the camera travels down to it)
+const lens = F.refs.before.lens;
+const toWorldB = (x, y, s = fbS) => ({ x: B_C.x + (x - fb.w / 2) * s, y: B_C.y + (y - fb.h / 2) * s });
+let lensC = toWorldB(lens[0] + lens[2] / 2, lens[1] + lens[3] / 2);   // the defect/resolve framing: re-centred on notes + lens once the notes are laid out
+const camAt = (p) => ({ x: A_C.x + (p[1] - fa.w / 2) * faS, y: A_C.y + (p[2] - fa.h / 2) * faS, z: p[3] });
+
+// where the Script card's editor sits once the camera has dived in: frame B aside on the left (lens visible), the card on the right
+const PANEL = { x: B_C.x + 340, y: B_C.y + 10, s: 1.1 };   // its right edge (the character count) 48+ px inside the screen
+const FB_ASIDE = { x: B_C.x - 643, y: B_C.y + 20, z: -240, ry: 16, rx: 0, s: fbS * 0.685 };
+// the camera on the paragraph (defect and resolve): 1.5, or less so that notes + lens keep 100 px from the screen's sides even at the hold's
+// slow push (+0.04); set once the notes are laid out (the final takes' lens fills 71 % of the crop's width)
+let TIGHT = 1.5;
+const fitTight = () => Math.min(1.5, (1920 - 2 * 100) / ((lens[0] + lens[2] + 12 - notesLeft) * fbS) - 0.04);
+
+function camera(t) {
+  // [x, y] = the world point at the screen centre, z = zoom
+  if (t < T.paperEnd) {
+    const keys = C.paper.camera.map((k) => [k[0], camAt(k), E.cubicInOut]);
+    keys.unshift([0, camAt(C.paper.camera[0])]);
+    return keyed(t, keys);
+  }
+  const startA = camAt(C.paper.camera[C.paper.camera.length - 1]);
+  const defectWide = { x: B_C.x, y: B_C.y, z: 1.0 };
+  const defectTight = { x: lensC.x, y: lensC.y, z: TIGHT };
+  const fixWide = { x: B_C.x + 20, y: B_C.y, z: 1.0 };
+  const dive1 = { x: B_C.x + 20, y: B_C.y + 10, z: 1.025 };
+  const dive2 = { x: PANEL.x + 20, y: PANEL.y + 20, z: 1.3 };
+  const resolveTight = { x: lensC.x, y: lensC.y, z: TIGHT };
+  // the whole frame, its top 56 px under the screen's top: the open lens ends above the caption's row
+  const endWide = { x: B_C.x, y: B_C.y - fb.h * fbS / 2 + (540 - 56) / 0.9, z: 0.9 };
+  const c = keyed(t, [
+    [T.paperEnd, startA],
+    [T.defect, defectWide, E.expoInOut],
+    [T.defect + 0.1, defectWide],
+    [T.marks + 0.1, defectTight, E.expoInOut],
+    [T.fix, { x: lensC.x, y: lensC.y, z: TIGHT + 0.04 }, E.sineInOut],
+    [T.fix + 1.0, fixWide, E.expoInOut],
+    [T.type - 0.6, fixWide],
+    [T.type, dive1, E.expoOut],
+    [line1End + 0.25, { x: dive1.x + 15, y: dive1.y, z: 1.045 }, E.sineInOut],
+    [line1End + 1.25, dive2, E.expoInOut],
+    [T.whip, { x: dive2.x + 25, y: dive2.y + 6, z: 1.33 }, E.sineInOut],
+    [T.whipEnd, resolveTight, E.expoInOut],
+    [T.easeOut, { x: lensC.x, y: lensC.y, z: TIGHT + 0.03 }, E.sineInOut],
+    [T.easeOut + 1.5, endWide, E.expoInOut],
+    [T.end, { x: endWide.x, y: endWide.y, z: 0.89 }, E.sineInOut],
+  ]);
+  // M2: while the lens is open (taller by Dall) the tight framing eases back a little and centres the lens, header pill to grown bottom, in
+  // the band between the 48 px top margin and 10 px above the caption's top (y 860); the wide framing needs neither
+  const ro = rubyOpen(t) * (1 - seg(t, T.easeOut, T.easeOut + 1.5, E.expoInOut));
+  if (ro > 0) {
+    const L = F.refs.after.lens, top = Math.min(L[1], RB.cuts[0].above ? RB.cuts[0].above[1] : L[1]) - 8, bottom = L[1] + L[3] + Dall;
+    const zh = Math.min(TIGHT - 0.12, (850 - 48 - 12) / ((bottom - top) * fbS));   // the open lens, header pill to grown bottom, fits the band
+    const yc = toWorldB(0, (top + bottom) / 2).y + (540 - (48 + 850) / 2) / zh;
+    c.z = lerp(c.z, zh, ro); c.y = lerp(c.y, yc, ro);
+  }
+  return c;
+}
+
+function poseA(t) {
+  const k = keyed(t, [
+    [0.1, { z: -900, ry: -14, rx: 6, s: 0.86, o: 0 }],
+    [0.55, { o: 1 }, E.cubicOut],
+    [2.25, { z: 0, ry: -6, rx: 0, s: 1 }, E.expoOut],
+    [T.paper, { ry: -5 }, E.sineInOut],
+    [T.paper + 1.75, { ry: -1.5 }, E.cubicInOut],
+    [T.paperEnd, { ry: -1, rx: 0 }, E.sineInOut],
+    [T.defect, { ry: 3, rx: -8, z: -160 }, E.expoInOut],
+  ]);
+  return { x: A_C.x, y: A_C.y, z: k.z, rx: k.rx, ry: k.ry, s: faS * k.s, o: t > T.defect + 0.05 ? 0 : k.o };
+}
+function poseB(t) {
+  if (t < T.fix) {
+    const k = keyed(t, [
+      [T.paperEnd, { rx: 12, ry: -7, z: -200 }],
+      [T.defect + 0.2, { rx: 0, ry: -5, z: 0 }, E.expoOut],   // settles fast: the whip reads as one move (measure: 3-6 proxy frames >= 40 %)
+      [T.marks + 0.1, { ry: -1.2 }, E.expoInOut],
+      [T.fix, { ry: -0.8 }],
+    ]);
+    return { x: B_C.x, y: B_C.y, z: k.z, rx: k.rx, ry: k.ry, s: fbS, o: t < T.paperEnd - 0.05 ? 0 : 1 };
+  }
+  if (t < T.whip) {
+    const k = keyed(t, [
+      [T.fix, { x: B_C.x, y: B_C.y, z: 0, ry: -0.8, s: fbS }],
+      [T.fix + 1.1, { x: FB_ASIDE.x, y: FB_ASIDE.y, z: FB_ASIDE.z, ry: FB_ASIDE.ry, s: FB_ASIDE.s }, E.expoInOut],
+      [line1End + 0.25, { x: FB_ASIDE.x + 12 }, E.sineInOut],
+      [line1End + 1.25, { x: FB_ASIDE.x - 430, z: FB_ASIDE.z - 120, ry: FB_ASIDE.ry + 3 }, E.expoInOut],
+      [T.whip, { x: FB_ASIDE.x - 445 }, E.sineInOut],
+    ]);
+    return { x: k.x, y: k.y, z: k.z, rx: 0, ry: k.ry, s: k.s, o: 1 };
+  }
+  // the whip: back to the centre, flat; the turn settles on a spring (the release)
+  const u = seg(t, T.whip, T.whipEnd, E.expoInOut);
+  const from = { x: FB_ASIDE.x - 445, z: FB_ASIDE.z - 120, s: FB_ASIDE.s };
+  const ry0 = FB_ASIDE.ry + 3;
+  const ry = ry0 * (1 - spring(t - T.whip, 0.95, 0.5, 1.0));
+  // the recede: gone (opacity) before the icon arrives at T.end + 0.6, so the two never overlap
+  const k = keyed(t, [[T.end, { z: 0, ry: 0, rx: 0 }], [T.end + 0.95, { z: -1300, ry: 9, rx: 4 }, E.cubicIn]]);
+  const o = 1 - seg(t, T.end + 0.1, T.end + 0.6, E.cubicInOut);
+  return { x: lerp(from.x, B_C.x, u), y: lerp(FB_ASIDE.y, B_C.y, u), z: lerp(from.z, 0, u) + k.z, rx: k.rx, ry: t < T.end ? ry : k.ry, s: lerp(from.s, fbS, u), o };
+}
+// the Memory sheet whole (its 1277 px at 0.72: 919 px tall at the fix's wide camera), then the pull to the Script card at PANEL; the keys move the
+// card's centre (DC from the window's), so the pull is a straight dive into the card while the clip closes on it
+const S_WIN = 0.72;
+const SHEET = UC.sheet;
+const DC = { x: CARD[0] + CARD[2] / 2 - UW.w / 2, y: CARD[1] + CARD[3] / 2 - UW.h / 2 };
+const WIN = { x: PANEL.x + 40, y: B_C.y + 8 + (CARD[1] + CARD[3] / 2 - (SHEET[1] + SHEET[3] / 2)) * S_WIN };   // the sheet centred on the screen's row
+const PULL = [T.fix + 1.68, T.type + 0.05];
+function posePanel(t) {
+  const k = keyed(t, [
+    [T.fix + 0.2, { x: WIN.x + 1300, y: WIN.y + 80, z: -700, ry: -38, s: S_WIN, o: 0 }],
+    [T.fix + 0.45, { o: 1 }, E.cubicOut],
+    [T.fix + 1.2, { x: WIN.x, y: WIN.y, z: 0, ry: -11 }, E.expoOut],
+    [PULL[0], { x: WIN.x, y: WIN.y, s: S_WIN }],
+    [PULL[1], { x: PANEL.x, y: PANEL.y, s: PANEL.s, ry: -10 }, E.expoInOut],
+    [line1End + 1.25, { ry: -5 }, E.expoInOut],
+    [T.whip, { x: PANEL.x, ry: -4.5, o: 1 }, E.sineInOut],
+    [T.whipEnd, { x: PANEL.x + 1500, z: -350, ry: -24, o: 1 }, E.expoInOut],
+    [T.whipEnd + 0.05, { o: 0 }, E.lin],
+  ]);
+  return { x: k.x - DC.x * k.s, y: k.y - DC.y * k.s, z: k.z, rx: 0, ry: k.ry, s: k.s, o: t < T.fix + 0.2 ? 0 : k.o };
+}
+
+// ---- footage
+const frameUrl = (part, t) => {
+  const d = F[part], i = clamp(Math.round((t + d.off - d.t0) * FPS), 0, d.n - 1);
+  return WORK + part + "/" + String(i).padStart(5, "0") + ".jpg";
+};
+async function setSrc(img, url) {
+  if (img.dataset.src === url) return;
+  img.dataset.src = url; img.src = url;
+  await img.decode();
+}
+
+// ---- the frame at time t
+let reportState = {};
+async function seek(t) {
+  const rep = { t };
+  const camr = camera(t);
+  cam.style.transform = `translate(960px, 540px) scale(${camr.z}) translate(${-camr.x}px, ${-camr.y}px)`;
+  world.style.perspectiveOrigin = `${camr.x}px ${camr.y}px`;   // the lens axis follows the camera: no keystone off-axis
+  rep.cam = camr;
+  document.getElementById("fade").style.opacity = 1 - seg(t, 0, 0.45, E.cubicOut) + seg(t, T.stop - 0.45, T.stop, E.cubicInOut);
+
+  // frame A (paper)
+  const pa = poseA(t); pose(fa, pa);
+  if (pa.o > 0) {
+    if (P.placeholder) {
+      const u = seg(t, T.paper, T.paper + 0.3, E.sineInOut);
+      faKo.style.opacity = u; faEn.style.opacity = 1;
+    } else await setSrc(faImg, frameUrl("paper", t));
+    eqs.forEach((q, i) => {
+      const a = eqAt[i];
+      const draw = seg(t, a, a + 0.7, E.expoOut), pop = spring(t - a - 0.3, 0.55, 0.55);
+      q.rect.style.strokeDashoffset = q.len * (1 - draw);
+      q.box.style.opacity = draw > 0 ? 1 : 0;
+      q.tag.style.transform = `translate(-100%, ${q.tag.dataset.side === "inside" ? 0 : -50}%) scale(${0.82 + 0.18 * pop})`;
+      // a tag dims as its equation glides toward the screen edge: gone by 48 px from it (the safe margin)
+      const r = q.tag.getBoundingClientRect(), edge = Math.min(r.left, r.top, 1920 - r.right, 1080 - r.bottom);
+      q.tag.style.opacity = clamp(pop * 1.4, 0, 1) * seg(edge, 48, 96, E.sineInOut);
+    });
+  }
+
+  // frame B (paragraph)
+  const pb = poseB(t); pose(fb, pb);
+  if (t >= T.paperEnd - 0.1 && pb.o > 0) {
+    const part = t < T.whip + (T.whipEnd - T.whip) * 0.5 ? "before" : "after";
+    await setSrc(fbImg, frameUrl(part, t));
+    rep.take = part;
+  }
+  // M2: the lens opens for the rubies (after take only)
+  const ru = rep.take === "after" && pb.o > 0 ? rubyOpen(t) : 0;
+  stripLayer.style.display = ru > 0 ? "" : "none";
+  if (ru > 0) {
+    await Promise.all(strips.map((st) => setSrc(st.img, fbImg.dataset.src)));
+    RB.cuts.forEach((c, k) => {
+      const ctx = fillers[k].getContext("2d");
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(fbImg, RB.x0, c.row, RBW, 1, 0, 0, RBW, 1);
+      flatten(ctx);
+      fillers[k].style.transform = `translateY(${(k ? Dcum[k - 1] : 0) * ru}px) scaleY(${ru})`;
+      strips[k].el.style.transform = `translateY(${Dcum[k] * ru}px)`;
+    });
+  }
+  rep.rubyOpen = Math.round(ru * 1000) / 1000;
+  // marks on the before take: one by one, then held through the fix; gone with the whip
+  marksB.forEach((mk, i) => {
+    const a = T.marks + T.st * i;
+    const sweep = seg(t, a, a + 0.32, E.expoOut);
+    const out = 1 - seg(t, T.whip, T.whip + 0.12, E.lin);
+    mk.el.style.opacity = sweep > 0 ? out : 0;
+    mk.bar.style.transform = `scaleX(${sweep})`;
+    mk.hl.style.transform = `scaleX(${seg(t, a + 0.05, a + 0.42, E.expoOut)})`;
+    // a pulse when a connector reaches it
+    const hit = links.filter((l) => l.mark === i).map((l) => t - (l.at + 0.36)).filter((d) => d >= 0 && d < 0.5)[0];
+    mk.hl.style.background = hit != null ? `rgba(255,69,58,${0.17 + 0.35 * (1 - hit / 0.5)})` : "var(--red-soft)";
+  });
+  {
+    const a = T.marks - 0.12, open = seg(t, a, a + 0.45, E.expoOut) * (1 - seg(t, T.fix, T.fix + 0.3, E.cubicOut));
+    const open2 = seg(t, T.resolve - 0.2, T.resolve + 0.25, E.expoOut) * (1 - seg(t, T.easeOut, T.easeOut + 0.45, E.cubicOut));
+    const u = Math.max(open, open2);
+    notes.style.opacity = clamp(u * 1.6, 0, 1); notes.style.transform = `scaleX(${0.2 + 0.8 * u})`;
+    if (notesBox) notes.style.height = px(notesBox[3] + Dall * ru);   // as tall as the lens while it is open (M2)
+    lensProbe.style.height = px(LENS[1] + LENS[3] - LENS_TOP + Dall * ru);
+  }
+  chipsB.forEach((ch, i) => {
+    const a = T.marks + 0.12 + T.st * i;
+    const pop = spring(t - a, 0.5, 0.55);
+    const out = 1 - seg(t, T.fix, T.fix + 0.25, E.cubicOut);
+    ch.el.style.opacity = clamp(pop * 1.3, 0, 1) * out;
+    ch.el.style.transform = `translateY(${(1 - pop) * 10}px) scale(${0.86 + 0.14 * pop})`;
+    ch.back.style.display = "none";
+    ch.strike.style.transform = "scaleX(0)";
+  });
+  // after the whip: the after take's words, each resolving: red mark + callout, the old word struck, the callout flips to the term, the mark turns teal
+  let done = 0;
+  marksA.forEach((mk, i) => {
+    const a = T.resolve + T.st * i, flip = a + 0.6;
+    const sweep = seg(t, a, a + 0.28, E.expoOut);
+    const ok = seg(t, flip + 0.1, flip + 0.3, E.cubicInOut);
+    const out = 1 - seg(t, T.end, T.end + 0.5, E.cubicOut);
+    mk.el.style.opacity = (sweep > 0 ? 1 - ok : 0) * out;
+    mk.bar.style.transform = mk.hl.style.transform = `scaleX(${sweep})`;
+    const dy = lineShift(mk.m.lineIndex) * ru;
+    mk.el.style.transform = marksAok[i].el.style.transform = `translateY(${dy}px)`;
+    const g = marksAok[i];
+    g.el.style.opacity = ok * out; g.bar.style.transform = g.hl.style.transform = "scaleX(1)";
+    const ch = chipsA[i];
+    const pop = spring(t - a - 0.04, 0.5, 0.55);
+    const fade = 1 - seg(t, T.easeOut, T.easeOut + 0.4, E.cubicOut);
+    ch.el.style.opacity = clamp(pop * 1.3, 0, 1) * fade;
+    ch.el.style.transform = `translateY(${(1 - pop) * 10 + dy}px) scale(${0.86 + 0.14 * pop})`;
+    ch.strike.style.transform = `scaleX(${seg(t, a + 0.36, a + 0.52, E.cubicOut)})`;
+    // the ruby: once the term has flipped, the word it replaced settles above it, then is struck through
+    const r = rubies[i], show = seg(t, flip + 0.36, flip + 0.71, E.expoOut);
+    r.el.style.opacity = show;
+    r.el.style.left = px(r.cx - r.el.offsetWidth / 2);
+    r.el.style.transform = `translateY(${dy}px) scale(${0.9 + 0.1 * show})`;   // grows in place from its bottom: never over the word or the line above
+    r.strike.style.transform = `scaleX(${seg(t, flip + 0.5, flip + 0.75, E.cubicOut)})`;
+    r.wordBox.style.transform = `translateY(${dy}px)`;
+    r.above.style.transform = `translateY(${(r.aboveLine >= 0 ? lineShift(r.aboveLine) : 0) * ru}px)`;
+    const f = seg(t, flip, flip + 0.34, E.cubicInOut);
+    ch.front.style.transform = `rotateX(${f * 180}deg)`;
+    ch.back.style.transform = `rotateX(${f * 180 - 180}deg)`;
+    ch.back.style.display = "";
+    if (t >= flip + 0.17) done++;
+  });
+  rep.resolved = done;
+
+  // M4: the lens menu on frame B
+  {
+    const m0 = T.menu, d = t - m0, f = UC.menu.fade;
+    const o = seg(t, m0, m0 + 0.06, E.cubicOut) * (1 - seg(t, T.fix + f[0], T.fix + f[1], E.cubicInOut));
+    menuWrap.style.opacity = o;
+    menuWrap.style.display = o > 0 ? "" : "none";
+    menuWrap.style.transform = `scale(${0.97 + 0.03 * E.expoOut(clamp(d / 0.14, 0, 1))})`;
+    drawRing(menuRing, U.menu.click[0], U.menu.click[1], t - (T.fix + UC.menu.click[0]), 10, 40);
+    rep.menu = Math.round(o * 100) / 100;
+  }
+  // the settings window, then its Script card
+  const pp = posePanel(t); pose(pn, pp);
+  if (pp.o > 0) {
+    // the clip: the whole window, closing on the card over the pull
+    const u = seg(t, PULL[0], PULL[1], E.expoInOut);
+    let shown = 0;
+    while (shown < typeAt.length && typeAt[shown] <= t) shown++;
+    const onAt = typeEnd + 0.18, on = spring(t - onAt, 0.42, 0.7), flipped = t >= onAt + 0.42;
+    const nk = shown === 0 ? 0 : TY.ns.find((n) => n >= shown), dyk = flipped ? 0 : TY.dy[nk];
+    const cardNow = [CARD[0], CARD[1], CARD[2], CARD[3] + dyk];   // the card as tall as the frame shown sets it
+    const cl = [0, 1, 2, 3].map((i) => lerp(SHEET[i], cardNow[i], u)), rad = lerp(UC.radius, UC.card_radius, u);
+    Object.assign(pn.glass.style, rect(cl, { borderRadius: px(rad) }));
+    Object.assign(pn.rim.style, rect(cl, { borderRadius: px(rad), boxShadow: "inset 0 0 0 " + px(lerp(3, 2, u)) + " rgba(255,255,255,0.16)" }));
+    pnIn.style.transform = `translate(${-cl[0]}px, ${-cl[1]}px)`;
+    [[cl[0], cl[1]], [cl[0] + cl[2], cl[1]], [cl[0], cl[1] + cl[3]], [cl[0] + cl[2], cl[1] + cl[3]], [cl[0] + cl[2] / 2, cl[1] + cl[3] / 2]]
+      .forEach(([x, y], i) => Object.assign(pn.corners[i].style, { left: px(x), top: px(y) }));
+    // the window's state: k moves done; one in progress fades (an expand) or slides (a scroll)
+    let k = 0;
+    while (k < MOVES.length && t >= MOVES[k].a + MOVES[k].d) k++;
+    const mv = MOVES[k], p = mv && t >= mv.a ? E.cubicInOut((t - mv.a) / mv.d) : -1;
+    const stateUrl = (i) => WORK + "ui/" + UW.states[i] + ".jpg";
+    await setSrc(winImgs[0], stateUrl(k));
+    winImgs[1].style.opacity = 0; vp.style.display = "none";
+    if (p >= 0 && mv.kind === "fade") {
+      await setSrc(winImgs[1], stateUrl(k + 1));
+      winImgs[1].style.opacity = p;
+    } else if (p >= 0) {
+      await Promise.all([setSrc(vpImgs[0], stateUrl(k)), setSrc(vpImgs[1], stateUrl(k + 1))]);
+      vp.style.display = "";
+      Object.assign(vpImgs[0].style, { transform: `translateY(${-SCROLL * p}px)`, opacity: 1 - p });
+      Object.assign(vpImgs[1].style, { transform: `translateY(${SCROLL * (1 - p)}px)`, opacity: p });
+    }
+    U.clicks.forEach(([at, , x, y], i) => drawRing(winRings[i], x, y, t - (T.fix + at), 14, 56));
+    // the card: the take's frame with at least `shown` characters, the rest hidden; the Run switch flips, then the take's own "on" frame
+    const editing = k >= MOVES.length;
+    typ.style.display = editing ? "" : "none";
+    if (editing) await setSrc(typImg, WORK + "ui/" + (flipped ? "on.jpg" : "typ/" + nk + ".jpg"));
+    masks.forEach((el, li) => {
+      const [a, b] = lineSpan[li], l = TY.lines[li];
+      if (flipped || shown > b || nk === shown) { el.style.display = "none"; return; }
+      const x0 = shown <= a ? UC.editor_x0 - 8 : TY.cells[shown][1];
+      Object.assign(el.style, rect([x0, l[0] - 4, ED_R - x0, l[1] - l[0] + 8]), { display: "" });
+    });
+    pairRuns.forEach((r, i) => {
+      const lit = t - linkAt[i], o = lit >= 0 && lit < 1.2 && F.pairs[i].marks.length ? 0.3 * (1 - lit / 1.2) : 0;
+      r.els.forEach((el) => (el.style.opacity = o));
+    });
+    // the caret: solid while typing, blinking when idle
+    const cc = TY.cells[shown], cp = shown > 0 ? TY.cells[shown - 1] || TY.cells[shown - 2] : null;
+    const at = cc ? [cc[0], cc[1]] : cp ? [cp[0], cp[2]] : [0, UC.editor_x0];
+    const l = TY.lines[at[0]];
+    Object.assign(caret.style, { left: px(at[1] - 1), top: px(l[0] - 2), height: px(l[1] - l[0] + 4) });
+    const idle = shown === 0 ? t - T.type : t - typeAt[shown - 1];
+    caret.style.opacity = t < T.type - 0.1 ? 0 : idle < 0.5 ? 1 : (Math.floor((idle - 0.5) / 0.53) % 2 === 0 ? 0 : 1);
+    toggle.style.display = t >= onAt && !flipped ? "" : "none";
+    knob.style.left = px(lerp(TG.knob_off[0], TG.knob_on[0], on) - TG.track[0]);
+    toggle.style.background = mixRgb(TG.off, TG.on, clamp(on, 0, 1));
+    knob.style.background = mixRgb(TG.knob_off_rgb, TG.knob_on_rgb, clamp(on, 0, 1));
+    count.textContent = shown.toLocaleString("en-US") + " / 8,000";
+    Object.assign(count.style, { fontSize: px(CT_F), lineHeight: px(CT_F), top: px(TY.counter_baseline - 0.856 * CT_F + dyk) });
+    ctMask.style.top = px(CT[1] - 6 + dyk);
+    rep.typed = shown; rep.typFrame = editing ? (flipped ? -1 : nk) : null; rep.winState = k;
+  }
+  // connectors: screen space, from the pair just typed to its mark(s) on frame B
+  links.forEach((l) => {
+    const d = t - l.at;
+    const life = d < 0 ? 0 : 1 - seg(t, line1End + 0.6, line1End + 1.3, E.cubicOut);
+    if (life <= 0 || pp.o <= 0) { l.path.style.opacity = 0; l.dot.style.opacity = 0; return; }
+    // from the card's left edge on the pair's row (the wire never crosses the code), to the end of the word's mark
+    const a = pairRuns[l.pair].el.getBoundingClientRect(), b = marksB[l.mark].bar.getBoundingClientRect();   // the pair's first line
+    const tl = pn.corners[0].getBoundingClientRect(), bl = pn.corners[2].getBoundingClientRect();
+    const sy = a.top + a.height / 2, sx = lerp(tl.left, bl.left, clamp((sy - tl.top) / (bl.top - tl.top), 0, 1)) - 3, ex = b.right + 4, ey = b.top + b.height / 2 - 6;
+    const dx = Math.max(80, (sx - ex) * 0.45);
+    l.path.setAttribute("d", `M ${sx} ${sy} C ${sx - dx} ${sy}, ${ex + dx} ${ey}, ${ex} ${ey}`);
+    const len = l.path.getTotalLength(), draw = seg(t, l.at, l.at + 0.38, E.expoOut);
+    l.path.style.strokeDasharray = `${len} ${len}`; l.path.style.strokeDashoffset = len * (1 - draw);
+    const dim = 1 - 0.55 * seg(t, l.at + 0.9, l.at + 1.4, E.cubicInOut);
+    l.path.style.opacity = life * dim;
+    l.dot.setAttribute("cx", ex); l.dot.setAttribute("cy", ey);
+    const pop = spring(t - l.at - 0.34, 0.4, 0.5);
+    l.dot.setAttribute("r", 6 * clamp(pop, 0, 1.3));
+    l.dot.style.opacity = draw >= 1 ? life * dim : 0;
+  });
+
+  // captions: words rise in from a soft blur, staggered; out together
+  for (const [name, [cp, a, b]] of Object.entries(caps)) {
+    const vis = t >= a - 0.05 && t <= b + 0.3;
+    cp.el.style.display = vis ? "" : "none";
+    if (!vis) continue;
+    const pillIn = seg(t, a, a + 0.45, E.expoOut), out = seg(t, b, b + 0.28, E.cubicIn);
+    cp.el.style.opacity = pillIn * (1 - out);
+    cp.el.style.transform = `translateY(${(1 - pillIn) * 18 + out * 10}px)`;
+    const word = (w, k, base) => { const u = seg(t, base + 0.045 * k, base + 0.045 * k + 0.5, E.expoOut); w.style.opacity = u; w.style.transform = `translateY(${(1 - u) * 16}px)`; w.style.filter = `blur(${(1 - u) * 6}px)`; };
+    cp.kw.forEach((w, k) => word(w, k, a + 0.05));
+    cp.ew.forEach((w, k) => word(w, k, a + 0.25));
+  }
+  // the tally 0/5 -> 5/5
+  // beside the resolve caption, in with it (whole before the first tick at +0.68) and out with it
+  const tIn = seg(t, T.resolve + 0.2, T.resolve + 0.6, E.expoOut), tOut = seg(t, T.end - 0.2, T.end + 0.08, E.cubicIn);
+  tally.style.opacity = tIn * (1 - tOut); tally.style.transform = `translateY(${(1 - tIn) * 18 + tOut * 10}px)`;
+  let roll = 0;
+  marksA.forEach((_, i) => { roll += seg(t, T.resolve + T.st * i + 0.6 + 0.08, T.resolve + T.st * i + 0.6 + 0.3, E.expoOut); });
+  digit.querySelectorAll("span").forEach((s) => { s.style.transform = `translateY(${-roll * 1.2}em)`; });
+  ring.setAttribute("stroke-dasharray", `${88 * roll / F.counter.n} 88`);
+  digit.style.color = roll >= F.counter.n - 0.01 ? "#7ff0dc" : "#fff";
+  rep.tally = Math.round(roll * 100) / 100;
+
+  // the end card
+  const icon = seg(t, T.end + 0.6, T.end + 1.5, E.expoOut);
+  endEl.style.display = t >= T.end + 0.55 ? "" : "none";
+  endImg.style.opacity = icon; endImg.style.transform = `scale(${0.9 + 0.1 * icon})`; endImg.style.filter = `blur(${(1 - icon) * 10}px) drop-shadow(0 18px 50px rgba(110, 80, 255, ${0.28 * icon}))`;
+  endLines.forEach((chs, li) => {
+    const base = T.end + [0.8, 1.1, 1.35][li];
+    chs.forEach((c, k) => { const u = seg(t, base + 0.035 * k, base + 0.035 * k + 0.6, E.expoOut); c.style.opacity = u; c.style.transform = `translateY(${(1 - u) * 22}px)`; c.style.filter = `blur(${(1 - u) * 8}px)`; });
+  });
+
+  // what the driver and measure.py read
+  rep.points = [fa, fb, pn].filter((o) => (o.pose.o == null || o.pose.o > 0.05)).flatMap((o) => o.corners.map((c) => { const r = c.getBoundingClientRect(); return [Math.round(r.left * 10) / 10, Math.round(r.top * 10) / 10]; }));
+  reportState = rep;
+  return rep;
+}
+
+// equation outlines: drawn through the take's cross-fade (M5: the equation is held while the prose turns Korean around it), from where the
+// camera shows the box whole (sampled along the camera path)
+const eqAt = eqs.map((q, i) => {
+  const [x, y, w, h] = q.b;
+  for (let t = T.paper - 0.25 + 0.3 * i; t < T.paperEnd; t += 1 / FPS) {
+    const c = camera(t), s = faS * c.z;
+    const sx0 = 960 + (A_C.x + (x - fa.w / 2) * faS - c.x) * c.z, sy0 = 540 + (A_C.y + (y - fa.h / 2) * faS - c.y) * c.z;
+    if (sx0 > 60 && sy0 > 80 && sx0 + w * s < 1860 && sy0 + h * s < 860) return t;
+  }
+  return T.paperEnd + 1;
+});
+
+// ---- report: geometry measure.py checks (screen px)
+function boxOf(el) { const r = el.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)]; }
+function report() {
+  const rep = Object.assign({}, reportState);
+  const vis = (el) => parseFloat(getComputedStyle(el).opacity) > 0.5 && el.style.display !== "none";
+  rep.caps = Object.entries(caps).filter(([, c]) => vis(c[0].el)).map(([n, c]) => [n, boxOf(c[0].el)]);
+  rep.chips = [...chipsB, ...chipsA].filter((c) => vis(c.el)).map((c) => boxOf(c.el));
+  rep.marks = [...marksB, ...marksA, ...marksAok].filter((m) => vis(m.el)).map((m) => boxOf(m.bar));
+  rep.tags = eqs.filter((q) => parseFloat(q.tag.style.opacity) > 0.5 && fa.pose.o > 0.5).map((q) => boxOf(q.tag));
+  const pc = caps.paper[0].el, pcOn = pc.style.display !== "none";
+  rep.hide = fa.pose.o > 0.5 && hideEls.length ? { boxes: hideEls.map(boxOf), pill: pcOn ? boxOf(pc) : null, o: pcOn ? parseFloat(pc.style.opacity || "1") : 0 } : null;
+  rep.tallyBox = parseFloat(tally.style.opacity) > 0.5 ? boxOf(tally) : null;
+  rep.lensBox = fb.pose.o > 0.5 ? boxOf(lensProbe) : null;
+  rep.cardBox = pn.pose.o > 0.5 ? boxOf(pn.glass) : null;
+  // the Korean cap height on screen: the take's Hangul height (Vision's line box ~ 1.18 x the glyph) x the frame's scale x the camera
+  rep.scaleB = fb.pose.s * (rep.cam ? rep.cam.z : 1);
+  rep.scaleA = fa.pose.s * (rep.cam ? rep.cam.z : 1);
+  rep.editorFont = pn.pose.o > 0.5 ? TY.font_px * pn.pose.s * rep.cam.z : null;
+  const r3 = (p) => p && { ry: Math.round(p.ry * 100) / 100, rx: Math.round((p.rx || 0) * 100) / 100, s: Math.round(p.s * 1000) / 1000, z: Math.round(p.z || 0), o: Math.round((p.o == null ? 1 : p.o) * 100) / 100 };
+  rep.poses = { A: r3(fa.pose), B: r3(fb.pose), P: r3(pn.pose) };
+  // the share of the screen a take covers (its projected bounding box, clipped): "footage on screen"
+  const area = (o) => {
+    if (!(o.pose.o == null || o.pose.o > 0.5)) return 0;
+    const pts = o.corners.slice(0, 4).map((c) => c.getBoundingClientRect());
+    const x0 = clamp(Math.min(...pts.map((r) => r.left)), 0, 1920), x1 = clamp(Math.max(...pts.map((r) => r.left)), 0, 1920);
+    const y0 = clamp(Math.min(...pts.map((r) => r.top)), 0, 1080), y1 = clamp(Math.max(...pts.map((r) => r.top)), 0, 1080);
+    return Math.round((x1 - x0) * (y1 - y0) / (1920 * 1080) * 1000) / 1000;
+  };
+  rep.footage = { A: area(fa), B: area(fb), P: area(pn) };
+  rep.typedChars = rep.typed;
+  rep.rubies = rubies.map((r) => ({ o: Math.round(parseFloat(r.el.style.opacity || 0) * 100) / 100, box: boxOf(r.el), above: boxOf(r.above), word: boxOf(r.wordBox) }));
+  rep.rubyFontPx = RB.font_px;
+  return rep;
+}
+// chip overlap with the paragraph's ink (take px), checked once
+function chipOverlaps() {
+  const out = [];
+  for (const [chips, ref] of [[chipsB, F.refs.before], [chipsA, F.refs.after]]) for (const ch of chips) {
+    const [x, y, w, h] = ch.box;
+    for (const l of ref.lines) if (x < l[3] && x + w > l[2] && y < l[1] && y + h > l[0]) out.push([ch.c.shown, ch.m.place, l]);
+  }
+  return out;
+}
+
+window.__film = {
+  ready: (async () => {
+    await document.fonts.ready;
+    await Promise.all([...document.images].map((i) => i.decode().catch(() => {})));
+    layoutChips(chipsB); layoutChips(chipsA);
+    {   // measured in a plain box outside the world's transforms
+      const probe = $("span", "", document.body, { position: "absolute", fontFamily: count.style.fontFamily, fontVariantNumeric: "tabular-nums",
+        whiteSpace: "nowrap", fontSize: "100px", visibility: "hidden" });
+      probe.textContent = TY.counter_text;
+      CT_F = 100 * CT[2] / probe.offsetWidth;
+      probe.remove();
+    }
+
+    TIGHT = fitTight();
+    // the tally sits beside the resolve caption, centred on its row: the lower third holds both, so neither lands on the paragraph
+    const ce = caps.resolve[0].el;
+    ce.style.display = "";
+    Object.assign(tally.style, { left: px(96 + ce.offsetWidth + 16), top: px(1080 - 84 - ce.offsetHeight / 2 - 32) });
+    ce.style.display = "none";
+    // notes + lens centred across; the lens, header pill to bottom, centred in the band between the 48 px top margin and the caption's row
+    lensC = { x: toWorldB((notesLeft + lens[0] + lens[2]) / 2, 0).x, y: toWorldB(0, (LENS_TOP + lens[1] + lens[3]) / 2).y + (540 - (48 + 850) / 2) / TIGHT };
+    // frame B aside (the fix): its lens (the marks the connectors reach) from 104 px off the screen's left to 12 px short of the Script card,
+    // measured at the beat's closest camera; scale, then shift, three rounds (the turn and the perspective make it not quite linear)
+    for (let i = 0; i < 3; i++) {
+      await seek(line1End + 0.25);
+      FB_ASIDE.s *= (pn.glass.getBoundingClientRect().left - 12 - 104) / lensProbe.getBoundingClientRect().width;
+      await seek(line1End + 0.25);
+      const r = lensProbe.getBoundingClientRect();
+      FB_ASIDE.x += (104 - r.left) * lens[2] * FB_ASIDE.s / r.width;
+    }
+    return true;
+  })(),
+  seek, report, chipOverlaps,
+  shutter: (t) => (t > T.paperEnd && t < T.defect) || (t > T.whip && t < T.whipEnd + 0.05) ? 1.0 : 0.5,
+  duration: F.duration, fps: FPS,
+  times: () => ({ ...T, typeEnd, line1End, links: linkAt, eqAt, typeAt: [typeAt[0], typeEnd], chars: typeAt.length }),
+};
+</script>
+</body>
+</html>

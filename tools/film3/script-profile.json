@@ -1,0 +1,19 @@
+{
+  "profiles": [
+    {
+      "id": "moon-shrine",
+      "name": "月涙譚",
+      "source": "ja",
+      "target": "ko",
+      "when": [
+        {
+          "app": "com.google.Chrome"
+        }
+      ],
+      "script": {
+        "source": "function before(line, ctx) { return line.replace(/（[ぁ-ゖ]+）/gu, \"\") }              // drop the furigana\nfunction after(src, dst, ctx) { return dst.replace(/구십구/g, \"츠쿠모\") }       // 九十九 is a name, not 99\n",
+        "on": true
+      }
+    }
+  ]
+}

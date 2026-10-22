@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Moon Shrine (film 3: furigana in brackets)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  Film 2's game scene: the 36 lines of tools/translation-bench/sequences/film-ja-ko-1.json as the dialogue of a story-driven JRPG, on a
+  living night scene of our own (ART.md says how every image was made). The app under test OCRs this page off the screen.
+    game.html?line=<id>                 that line, still once its reveal is over (click, Enter or Space goes to the next line)
+    game.html?play=1&dwell=<s>[&from=<id>]   steps through every line, <s> seconds each, from <id>, and loops
+    &clock=manual                       the page waits for __stage.advanceTo(ms) to draw a frame (shoot.mjs: exact stills and video frames)
+    &hide=text                          the text and the name in transparent ink: the panel alone, which check.py measures the contrast on
+  Self-contained: this file, assets/art.js (the plate and its depth map as data URLs, so WebGL may read them from file://) and the four
+  portraits in assets/; no network, no font file (the Japanese is the system Hiragino).
+  Layout contract, in design units (u): the stage is 1280 x 1280 u and fills the window's square, so 1 u = 1 CSS px at 1280 and 0.75 at 960.
+    panel   x 48..1232, y 988..1232, radius 26; glass over a part of the scene that never moves (the shader freezes the panel's rect and
+            72 u around it, so the blur under the text is still); the text block's pixels change only while the line is revealed.
+    text    x 108..1152, 44 u (33 CSS px at 960), tracking 0.08 em, line height 1.6, two lines at most (21 characters a line; the
+            longest line has 32), ink #f6f2ea, solid: no shadow, glow or gradient on any glyph.
+    tag     the speaker's name, 32 u, tracking 0.02 em (at 0.08 em the OCR did not read the two kana of ハク as a word), in the SAME ink
+            as the text (a differently coloured name plate is kept as written by the app: Core/Sources/MwoyeoCore/Runs.swift
+            LabelRule.isNameTag), on the panel's top edge at the LEFT for every speaker, over the text's start: on the right, the
+            OCR's document reader dropped the two kana of ハク on all four of its lines (L10, L14, L19, L33); on the left it reads them.
+    next    the advance indicator, a soft gem at the panel's bottom right, its glow and bob clear of the text block by 20 u (a stroked
+            chevron was read as く and translated; a glow reaching into the text block changed its pixels).
+    portrait 600 x 600 u behind the panel at the speaker's side (left: シュザンヌ, エルヴェ; right, mirrored: 九十九, ハク), its foot under the glass.
+  Motion: the reveal is <= 0.39 s a line (characters fade in, then the text is one plain text node); a portrait enters in 0.32 s.
+  Cost: the canvas is at most 1800 px a side and redraws only the rows above the still panel rect; 4.0 ms a frame (draw + read back)
+  at 1280 x 1280 @2 on an M1 Pro, 60.0 fps paced by the display (shoot.mjs fps; 4.7 ms and 60.0 fps at 960 @2.25).
+-->
+<style>
+  :root {
+    --u: calc(min(100vw, 100vh) / 1280);
+    --ink: #f6f2ea;
+    --accent: #e8c88c;
+    --glass-top: rgba(17, 23, 46, 0.86);
+    --glass-bottom: rgba(8, 11, 25, 0.92);
+  }
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #03050b; }
+  #stage {
+    position: absolute; overflow: hidden; width: calc(1280 * var(--u)); height: calc(1280 * var(--u));
+    left: calc((100vw - 1280 * var(--u)) / 2); top: calc((100vh - 1280 * var(--u)) / 2);
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif; -webkit-font-smoothing: antialiased;
+    background: #070b1a center / cover no-repeat;
+  }
+  #bg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .portrait {
+    position: absolute; bottom: calc(180 * var(--u)); width: calc(600 * var(--u)); height: calc(600 * var(--u)); opacity: 0;
+    -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 99%); mask-image: linear-gradient(to bottom, #000 78%, transparent 99%);
+    filter: drop-shadow(0 calc(10 * var(--u)) calc(26 * var(--u)) rgba(2, 4, 12, 0.55)) saturate(0.94) brightness(0.97);
+    pointer-events: none; user-select: none;
+  }
+  .portrait.left { left: calc(40 * var(--u)); }
+  .portrait.right { right: calc(40 * var(--u)); }
+  #panel {
+    position: absolute; left: calc(48 * var(--u)); right: calc(48 * var(--u)); bottom: calc(48 * var(--u)); height: calc(244 * var(--u));
+    box-sizing: border-box; border-radius: calc(26 * var(--u)); border: 1px solid rgba(208, 222, 255, 0.17);
+    background: linear-gradient(180deg, var(--glass-top), var(--glass-bottom));
+    -webkit-backdrop-filter: blur(calc(22 * var(--u))) saturate(1.3); backdrop-filter: blur(calc(22 * var(--u))) saturate(1.3);
+    box-shadow: 0 calc(18 * var(--u)) calc(50 * var(--u)) rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  }
+  #panel::before {   /* the hairline of light along the glass's top edge */
+    content: ""; position: absolute; left: calc(26 * var(--u)); right: calc(26 * var(--u)); top: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(232, 200, 140, 0.55) 30%, rgba(200, 220, 255, 0.45) 70%, transparent);
+  }
+  #text {
+    position: absolute; left: calc(60 * var(--u)); right: calc(80 * var(--u)); top: calc(56 * var(--u)); margin: 0;
+    color: var(--ink); font-size: calc(44 * var(--u)); line-height: 1.6; font-weight: 500; letter-spacing: 0.08em; line-break: strict;
+    word-break: auto-phrase; text-wrap: pretty;   /* breaks between phrases (lang ja), and no one-character last line ("…ください"
+                                                     left "い" alone at 21 characters a line) */
+  }
+  #tag {
+    position: absolute; top: 0; left: calc(48 * var(--u)); transform: translateY(-50%); height: calc(56 * var(--u)); box-sizing: border-box;
+    padding: 0 calc(30 * var(--u)); display: flex; align-items: center; border-radius: calc(28 * var(--u));
+    background: linear-gradient(180deg, rgba(24, 30, 56, 0.97), rgba(12, 16, 34, 0.97)); border: 1px solid rgba(232, 200, 140, 0.6);
+    box-shadow: 0 calc(6 * var(--u)) calc(18 * var(--u)) rgba(0, 0, 0, 0.4);
+    color: var(--ink); font-size: calc(32 * var(--u)); line-height: 1; font-weight: 600; letter-spacing: 0.02em; white-space: nowrap; opacity: 0;
+  }
+  /* the advance indicator: a small glowing gem, soft at every edge. A stroked chevron was read by the OCR as the letter く and
+     translated; a blurred diamond has no stroke to read (at worst a symbol, which the app leaves alone). */
+  #next { position: absolute; right: calc(34 * var(--u)); bottom: calc(24 * var(--u)); width: calc(16 * var(--u)); height: calc(16 * var(--u)); opacity: 0; }
+  #next::before {
+    content: ""; position: absolute; inset: 0; transform: rotate(45deg) scale(0.7); border-radius: calc(3 * var(--u));
+    background: radial-gradient(circle at 35% 35%, #fff4dc, var(--accent) 50%, rgba(232, 200, 140, 0.25) 100%);
+    box-shadow: 0 0 calc(8 * var(--u)) calc(1 * var(--u)) rgba(232, 200, 140, 0.45); filter: blur(calc(0.8 * var(--u)));
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="bg"></canvas>
+  <img class="portrait" data-name="シュザンヌ" src="../../film2/stage2/assets/p-suzanne.webp" alt="">
+  <img class="portrait" data-name="九十九" src="../../film2/stage2/assets/p-tsukumo.webp" alt="">
+  <img class="portrait" data-name="エルヴェ" src="../../film2/stage2/assets/p-herve.webp" alt="">
+  <img class="portrait" data-name="ハク" src="../../film2/stage2/assets/p-haku.webp" alt="">
+  <div id="panel">
+    <div id="tag"></div>
+    <p id="text"></p>
+    <div id="next" aria-hidden="true"></div>
+  </div>
+</div>
+<script src="../../film2/stage2/assets/art.js"></script>
+<script type="application/json" id="lines">[{"id":1,"speaker":null,"text":"夕暮れの山道を抜けると、苔むした石段が現れた。"},{"id":2,"speaker":"シュザンヌ","text":"九十九（つくも）、ここが月影（つきかげ）の祠（ほこら）よ。間違いないわ"},{"id":3,"speaker":"九十九","text":"はい、シュザンヌ様。足元にお気をつけください"},{"id":4,"speaker":"エルヴェ","text":"シュザンヌ様、お急ぎになりませぬよう。年寄りの足には堪えますので"},{"id":5,"speaker":"シュザンヌ","text":"エルヴェ、大丈夫よ。ゆっくり行きましょう"},{"id":6,"speaker":"九十九","text":"エルヴェさん、肩をお貸ししますよ"},{"id":7,"speaker":"エルヴェ","text":"九十九（つくも）、お前こそ剣を落とすなよ"},{"id":8,"speaker":null,"text":"石段の先に、錆びた門が月明かりに浮かんでいた。"},{"id":9,"speaker":"シュザンヌ","text":"見て、九十九（つくも）。門の奥で何かが光ってる"},{"id":10,"speaker":"ハク","text":"待っておったぞ、旅の者たち。我はこの月影（つきかげ）の祠（ほこら）の番人（ばんにん）、ハクじゃ"},{"id":11,"speaker":"エルヴェ","text":"シュザンヌ様、あれが祠の番人（ばんにん）ですか。獣の姿をしておりますな"},{"id":12,"speaker":"シュザンヌ","text":"ハクと言ったわね。九十九（つくも）、剣から手を離しなさい"},{"id":13,"speaker":"九十九","text":"はい、ですがシュザンヌ様、ハクという者から月涙石（げつるいせき）の気配がします"},{"id":14,"speaker":"ハク","text":"月涙石（げつるいせき）を持つ者だけが、夜明けの守（まも）り手（て）に会える。それが祠の掟じゃ"},{"id":15,"speaker":"エルヴェ","text":"夜明けの守（まも）り手（て）の話は、古い書物で読んだ覚えがございます"},{"id":16,"speaker":"シュザンヌ","text":"それなら話が早いわ。エルヴェ、続きを聞かせて"},{"id":17,"speaker":"エルヴェ","text":"はい。夜明けの守（まも）り手（て）は、月涙石（げつるいせき）に宿る光で眠りから覚めると申します"},{"id":18,"speaker":null,"text":"ハクの尻尾が、青白く揺れた。"},{"id":19,"speaker":"ハク","text":"月涙石（げつるいせき）は月影（つきかげ）の祠（ほこら）の奥、水鏡（みずかがみ）の底に沈んでおる。取ってこられるかな"},{"id":20,"speaker":"九十九","text":"エルヴェさん、水鏡（みずかがみ）って冷たいんですか"},{"id":21,"speaker":"エルヴェ","text":"冷たいだけならよいがな。底は、触れた者の迷いを映すのじゃ"},{"id":22,"speaker":"シュザンヌ","text":"九十九（つくも）、私が行くわ。この月影（つきかげ）の祠（ほこら）は私の家の先祖が建てたのよ"},{"id":23,"speaker":"九十九","text":"シュザンヌ様、いけません。水鏡（みずかがみ）には私が参ります"},{"id":24,"speaker":"シュザンヌ","text":"頑固ね。じゃあ、二人で行きましょう"},{"id":25,"speaker":"エルヴェ","text":"お供できず申し訳ございません。ここで月影（つきかげ）の祠（ほこら）をお守りいたします"},{"id":26,"speaker":null,"text":"二人は水鏡（みずかがみ）の縁に立った。月の光が、静かに揺れてい"},{"id":27,"speaker":"九十九","text":"シュザンヌ様、私の手をお取りください"},{"id":28,"speaker":"シュザンヌ","text":"ありがとう、九十九（つくも）。行くわよ"},{"id":29,"speaker":null,"text":"水の底で、月涙石（げつるいせき）が青く脈打っていた。"},{"id":30,"speaker":"九十九","text":"シュザンヌ様、ありました。これが月涙石（げつるいせき）です"},{"id":31,"speaker":"シュザンヌ","text":"持ち上げて、九十九（つくも）。ゆっくりよ"},{"id":32,"speaker":null,"text":"石が光を放ち、月影（つきかげ）の祠（ほこら）全体が低く震え出した。"},{"id":33,"speaker":"ハク","text":"よくやった。目覚めの時じゃ、夜明けの守（まも）り手（て）よ"},{"id":34,"speaker":"エルヴェ","text":"九十九（つくも）、よく無事でいたな。シュザンヌ様を頼んだぞ"},{"id":35,"speaker":"九十九","text":"はい、エルヴェさんのおかげです"},{"id":36,"speaker":null,"text":"夜明けの守（まも）り手（て）が、ゆっくりと目を開いた。"}]</script>
+<script id="vs" type="x-shader/x-vertex">#version 300 es
+in vec2 aPos;
+void main() { gl_Position = vec4(aPos, 0.0, 1.0); }
+</script>
+<script id="fs" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+// The scene: the painted plate moved by its depth map (near things slide more than far ones), with drifting cloud, mist and motes,
+// the moon's breathing glow and rays, flickering lanterns and a shimmering pool on top. uv is 0..1 with y down, as the plate is.
+uniform sampler2D uPlate;
+uniform sampler2D uDepth;
+uniform vec2 uRes;
+uniform float uTime;
+uniform vec4 uFreeze;     // the panel's rect and its margin (uv): there the scene is drawn at time 0, so nothing behind the glass moves
+uniform float uFeather;   // how far outside that rect the still scene fades into the moving one (uv)
+uniform float uLod;       // the plate's mip level for this canvas: sampled with textureLod, as the branches below break implicit derivatives
+out vec4 outColor;
+
+const vec2 MOON = vec2(0.739, 0.174);
+const float MOON_R = 0.105;
+const vec2 LAMP_L = vec2(0.369, 0.672);
+const vec2 LAMP_R = vec2(0.769, 0.688);
+const vec2 POOL = vec2(0.627, 0.668);
+const vec2 POOL_R = vec2(0.100, 0.022);
+
+float h12(vec2 p) { vec3 q = fract(vec3(p.xyx) * 0.1031); q += dot(q, q.yzx + 33.33); return fract((q.x + q.y) * q.z); }
+vec2 h22(vec2 p) { vec3 q = fract(vec3(p.xyx) * vec3(0.1031, 0.1030, 0.0973)); q += dot(q, q.yzx + 33.33); return fract((q.xx + q.yz) * q.zy); }
+float vnoise(vec2 p) {
+  vec2 i = floor(p), f = fract(p), u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(h12(i), h12(i + vec2(1.0, 0.0)), u.x), mix(h12(i + vec2(0.0, 1.0)), h12(i + vec2(1.0, 1.0)), u.x), u.y);
+}
+float fbm(vec2 p) {
+  float s = 0.0, a = 0.5;
+  for (int i = 0; i < 5; i++) { s += a * vnoise(p); p = mat2(1.6, 1.2, -1.2, 1.6) * p + vec2(3.1, 1.7); a *= 0.5; }
+  return s;
+}
+// Soft points on a drifting grid: one at most per cell, a random share of the cells lit, each wandering and twinkling.
+float motes(vec2 uv, float t, float cells, vec2 drift, float seed, float size, float share) {
+  vec2 q = uv * cells + drift * t, id = floor(q), f = fract(q);
+  float acc = 0.0;
+  for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
+    vec2 o = vec2(float(i), float(j)), h = h22(id + o + seed);
+    if (h.x > share) continue;
+    vec2 c = o + 0.5 + 0.36 * vec2(sin(t * 0.37 + h.y * 6.283), cos(t * 0.29 + h.x * 31.0));
+    float r = length(f - c), tw = 0.55 + 0.45 * sin(t * (0.7 + 1.6 * h.y) + h.x * 40.0);
+    acc += tw * (smoothstep(size, 0.0, r) + 0.3 * smoothstep(size * 4.0, 0.0, r));
+  }
+  return acc;
+}
+
+vec3 scene(vec2 uv, float t) {
+  vec2 cam = vec2(0.0042 * sin(t * 0.105) + 0.0022 * sin(t * 0.043 + 1.1), 0.0026 * sin(t * 0.077 + 2.2));
+  float push = 0.005 * (1.0 - cos(t * 0.031));
+  vec2 p = uv;
+  for (int i = 0; i < 3; i++) { float d = textureLod(uDepth, p, 0.0).r; p = uv - cam * (d - 0.3) - (uv - 0.5) * push * d; }
+  float d = textureLod(uDepth, p, 0.0).r;
+  vec3 col = textureLod(uPlate, p, uLod).rgb;
+
+  float sky = 1.0 - smoothstep(0.04, 0.12, d);
+  float cloud = fbm(vec2(uv.x * 2.2 - t * 0.006, uv.y * 6.0));
+  col += vec3(0.55, 0.68, 0.85) * sky * smoothstep(0.55, 0.85, cloud) * 0.10 * clamp(1.0 - uv.y * 1.4, 0.0, 1.0);
+
+  vec2 mv = uv - MOON;
+  float mr = length(mv);
+  col += vec3(0.62, 0.80, 1.0) * (0.09 + 0.025 * sin(t * 0.6)) * exp(-mr * mr * 55.0);
+  float rays = pow(vnoise(vec2(atan(mv.y, mv.x) * 9.0, t * 0.05)), 3.0) * smoothstep(MOON_R * 0.95, MOON_R * 1.7, mr) * exp(-mr * 2.6);
+  col += vec3(0.45, 0.65, 0.85) * rays * 0.20 * (1.0 - 0.7 * d);
+
+  vec2 pv = (uv - POOL) / POOL_R;
+  float pool = 1.0 - smoothstep(0.7, 1.0, length(pv));
+  col += vec3(0.75, 0.88, 1.0) * pool * pow(vnoise(vec2(uv.x * 240.0 + sin(t * 0.7) * 3.0, uv.y * 70.0 - t * 0.5)), 6.0) * 0.55;
+
+  float fl = 0.8 + 0.2 * vnoise(vec2(t * 5.3, 1.0)), fr = 0.8 + 0.2 * vnoise(vec2(t * 4.7, 7.0));
+  vec2 dl = uv - LAMP_L, dr = uv - LAMP_R;
+  col += vec3(1.0, 0.64, 0.30) * (fl * exp(-dot(dl, dl) * 800.0) + fr * exp(-dot(dr, dr) * 800.0)) * 0.20;
+
+  float behind = 1.0 - smoothstep(0.55, 0.75, d);
+  float m1 = fbm(vec2(uv.x * 3.0 + t * 0.010, uv.y * 9.0 - t * 0.004));
+  float band1 = smoothstep(0.30, 0.48, uv.y) * (1.0 - smoothstep(0.62, 0.80, uv.y));
+  col = mix(col, vec3(0.62, 0.72, 0.86), smoothstep(0.45, 0.85, m1) * band1 * behind * 0.26);
+  float m2 = fbm(vec2(uv.x * 2.2 - t * 0.016, uv.y * 5.0 + 3.0));
+  col = mix(col, vec3(0.55, 0.66, 0.82), smoothstep(0.5, 0.9, m2) * smoothstep(0.60, 0.82, uv.y) * 0.20);
+
+  float far = motes(uv, t, 22.0, vec2(0.10, -0.22), 3.0, 0.05, 0.30) * behind;
+  float near = motes(uv, t, 9.0, vec2(0.06, -0.12), 11.0, 0.035, 0.22);
+  col += vec3(0.70, 0.86, 1.0) * far * 0.5 + vec3(1.0, 0.90, 0.78) * near * 0.4;
+
+  float v = length((uv - 0.5) * vec2(1.0, 1.1));
+  col *= 1.0 - 0.36 * smoothstep(0.35, 0.85, v);
+  return col;
+}
+
+void main() {
+  vec2 uv = vec2(gl_FragCoord.x / uRes.x, 1.0 - gl_FragCoord.y / uRes.y);
+  vec2 out2 = max(max(uFreeze.xy - uv, uv - uFreeze.zw), 0.0);
+  float still = 1.0 - smoothstep(0.0, uFeather, length(out2));
+  vec3 col;
+  if (still >= 1.0) col = scene(uv, 0.0);
+  else if (still <= 0.0) col = scene(uv, uTime);
+  else col = mix(scene(uv, uTime), scene(uv, 0.0), still);
+  outColor = vec4(col, 1.0);
+}
+</script>
+<script>
+(function () {
+  "use strict";
+  var LINES = JSON.parse(document.getElementById("lines").textContent);
+  var SIDE = { "シュザンヌ": "left", "九十九": "right", "エルヴェ": "left", "ハク": "right" };
+  var REVEAL = 0.34, FADE = 0.05, ENTER = 0.32, LEAVE = 0.22, SLIDE = 28;   // seconds; SLIDE in u
+  var q = new URLSearchParams(location.search);
+  var manual = q.get("clock") === "manual", play = q.get("play") === "1";
+  var dwell = Math.max(1, parseFloat(q.get("dwell") || "4"));
+  if (q.get("hide") === "text") document.documentElement.style.setProperty("--ink", "transparent");
+  function indexOf(id) { for (var i = 0; i < LINES.length; i++) if (String(LINES[i].id) === String(id)) return i; return 0; }
+  var first = indexOf(q.get("line") || q.get("from") || "1");
+
+  var stage = document.getElementById("stage"), panel = document.getElementById("panel"), tag = document.getElementById("tag");
+  var text = document.getElementById("text"), next = document.getElementById("next"), canvas = document.getElementById("bg");
+  var portraits = {};
+  Array.prototype.forEach.call(document.querySelectorAll(".portrait"), function (el) {
+    var name = el.getAttribute("data-name");
+    el.classList.add(SIDE[name]);
+    portraits[name] = { el: el, side: SIDE[name], from: 0, to: 0, t0: -1 };
+  });
+
+  // ---- the clock: real time, or the time the driver sets
+  var t0 = performance.now(), manualT = 0;
+  function now() { return manual ? manualT : (performance.now() - t0) / 1000; }
+
+  // ---- the dialogue
+  var shown = -1, lineStart = 0, spans = null, plain = false, lastSpeaker, unit = 1;
+  var tagFade = { from: 0, to: 0, t0: -1, enter: 0.2, leave: 0.2 };
+  function setLine(i, t) {
+    var line = LINES[i];
+    shown = i; lineStart = t; plain = false;
+    text.textContent = "";
+    spans = [];
+    Array.from(line.text).forEach(function (ch) {
+      var s = document.createElement("span");
+      s.textContent = ch; s.style.opacity = "0";
+      text.appendChild(s); spans.push(s);
+    });
+    var lh = parseFloat(getComputedStyle(text).lineHeight);
+    document.documentElement.setAttribute("data-lines", String(Math.round(text.getBoundingClientRect().height / lh)));
+    var who = line.speaker;
+    Object.keys(portraits).forEach(function (name) {
+      var p = portraits[name], want = name === who ? 1 : 0;
+      if (p.to !== want) { p.from = alpha(p, t); p.to = want; p.t0 = t; }
+    });
+    if (who !== lastSpeaker) {   // a new name fades in from nothing; the narrator's line lets the last name fade out
+      tagFade.from = who ? 0 : alpha(tagFade, t); tagFade.to = who ? 1 : 0; tagFade.t0 = t;
+      if (who) tag.textContent = who;
+    }
+    lastSpeaker = who;
+  }
+  function ease(x) { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); }
+  function alpha(p, t) {
+    if (p.t0 < 0) return p.to;
+    return p.from + (p.to - p.from) * ease((t - p.t0) / (p.to ? p.enter || ENTER : p.leave || LEAVE));
+  }
+  function update(t) {
+    var i = play ? (first + Math.floor(t / dwell)) % LINES.length : shown < 0 ? first : shown;
+    if (i !== shown) setLine(i, play ? Math.floor(t / dwell) * dwell : t);
+    var local = t - lineStart, n = spans ? spans.length : 0, dur = Math.min(REVEAL, 0.025 * n);
+    if (!plain) {
+      if (local >= dur + FADE) { text.textContent = LINES[shown].text; spans = null; plain = true; }
+      else for (var k = 0; k < n; k++) spans[k].style.opacity = String(Math.min(1, Math.max(0, (local - dur * k / n) / FADE)));
+    }
+    Object.keys(portraits).forEach(function (name) {
+      var p = portraits[name], a = alpha(p, t), dx = (1 - a) * SLIDE * (p.side === "left" ? -1 : 1) * unit;
+      p.el.style.opacity = a.toFixed(3);
+      p.el.style.transform = "translateX(" + dx.toFixed(2) + "px)" + (p.side === "right" ? " scaleX(-1)" : "");
+    });
+    tag.style.opacity = alpha(tagFade, t).toFixed(3);
+    var shownNext = plain ? ease((local - dur - FADE - 0.1) / 0.25) : 0;
+    next.style.opacity = (0.85 * shownNext).toFixed(3);
+    next.style.transform = "translateY(" + (Math.sin(t * Math.PI * 2 / 1.4) * 3 * unit).toFixed(2) + "px)";
+  }
+  function advance() { if (!play && shown >= 0) setLine((shown + 1) % LINES.length, now()); }
+  document.addEventListener("click", advance);
+  document.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") advance(); });
+
+  // ---- the scene
+  var gl = canvas.getContext("webgl2", { antialias: false, alpha: false, preserveDrawingBuffer: true, powerPreference: "high-performance" });
+  var prog, loc = {}, glName = "none", plateSize = 2048;
+  // The canvas's backing store is capped: the plate holds 1024 px of detail and everything sharp (text, portraits) is DOM, so 1800 px
+  // look the same as 2560 at a third of the cost. Under the panel the scene is still (drawn at time 0), so it is drawn once and each
+  // frame redraws only the rows above it (liveFrom: the first GL row, counted from the bottom, that moves).
+  var CANVAS_MAX = 1800, liveFrom = 0, stillDrawn = false;
+  function compile(type, src) {
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    return s;
+  }
+  function texture(img, mip) {
+    var tx = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tx);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+    if (mip) gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, mip ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    return tx;
+  }
+  function decode(src) { var img = new Image(); img.src = src; return img.decode().then(function () { return img; }); }
+  function setupGL(plate, depth) {
+    prog = gl.createProgram();
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER, document.getElementById("vs").textContent));
+    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, document.getElementById("fs").textContent));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+    gl.useProgram(prog);
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    var a = gl.getAttribLocation(prog, "aPos");
+    gl.enableVertexAttribArray(a);
+    gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 0, 0);
+    ["uPlate", "uDepth", "uRes", "uTime", "uFreeze", "uFeather", "uLod"].forEach(function (k) { loc[k] = gl.getUniformLocation(prog, k); });
+    gl.activeTexture(gl.TEXTURE0); texture(plate, true); plateSize = plate.naturalWidth;
+    gl.activeTexture(gl.TEXTURE1); texture(depth, false);
+    gl.uniform1i(loc.uPlate, 0); gl.uniform1i(loc.uDepth, 1);
+    var info = gl.getExtension("WEBGL_debug_renderer_info");
+    glName = info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+  }
+  function resize() {
+    var r = stage.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    unit = r.width / 1280;
+    var k = Math.min(1, CANVAS_MAX / (r.width * dpr)), w = Math.round(r.width * dpr * k), h = Math.round(r.height * dpr * k);
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; stillDrawn = false; }
+    if (!prog) return;
+    var p = panel.getBoundingClientRect(), g = tag.getBoundingClientRect(), m = 72 * unit;
+    var x0 = Math.min(p.left, g.left) - r.left - m, y0 = Math.min(p.top, g.top) - r.top - m;
+    var x1 = p.right - r.left + m, y1 = p.bottom - r.top + m;
+    gl.viewport(0, 0, w, h);
+    gl.uniform2f(loc.uRes, w, h);
+    gl.uniform4f(loc.uFreeze, x0 / r.width, y0 / r.height, x1 / r.width, y1 / r.height);
+    gl.uniform1f(loc.uFeather, 0.03);
+    gl.uniform1f(loc.uLod, Math.max(0, Math.log2(plateSize / w)));
+    var band = x0 <= 0 && x1 >= r.width && y1 >= r.height;   // the still rect spans the width down to the bottom: the moving part is a band on top
+    liveFrom = band ? Math.max(0, Math.floor((1 - y0 / r.height) * h) - 2) : 0;
+    stillDrawn = false;
+  }
+  function draw(t) {
+    if (!prog) return;
+    gl.uniform1f(loc.uTime, t);
+    if (stillDrawn && liveFrom > 0) { gl.enable(gl.SCISSOR_TEST); gl.scissor(0, liveFrom, canvas.width, canvas.height - liveFrom); }
+    else gl.disable(gl.SCISSOR_TEST);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    stillDrawn = true;
+  }
+  function frame(t) { update(t); draw(t); }
+
+  var art = window.STAGE2_ART || {};
+  var ready = Promise.all([
+    document.fonts.ready,
+    gl && art.plate ? Promise.all([decode(art.plate), decode(art.depth)]).then(function (im) { setupGL(im[0], im[1]); }) : Promise.resolve(),
+  ].concat(Array.prototype.map.call(document.querySelectorAll(".portrait"), function (el) { return el.decode().catch(function () {}); })))
+    .then(function () {
+      if (!prog) { canvas.style.display = "none"; if (art.plate) stage.style.backgroundImage = "url(" + art.plate + ")"; }
+      setLine(first, 0); resize(); frame(now());
+      if (!manual) requestAnimationFrame(function loop() { frame(now()); requestAnimationFrame(loop); });
+      return true;
+    });
+  window.addEventListener("resize", function () { resize(); if (manual) frame(manualT); });
+
+  function rect(el) { var b = el.getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height }; }
+  window.__stage = {
+    ready: ready,
+    get gl() { return glName; },
+    advanceTo: function (ms) { manualT = ms / 1000; frame(manualT); return manualT; },
+    report: function () {
+      var line = LINES[shown];
+      return { id: line.id, speaker: line.speaker, lines: +document.documentElement.getAttribute("data-lines"), revealed: plain,
+               t: +now().toFixed(4), local: +(now() - lineStart).toFixed(4), text: rect(text), panel: rect(panel), tag: rect(tag) };
+    },
+    // Frame pacing with the real clock (rAF intervals), then the cost of one full-screen draw, read back before the next one.
+    measure: function (ms) {
+      return new Promise(function (resolve) {
+        var stamps = [], start = performance.now();
+        requestAnimationFrame(function tick(ts) {
+          stamps.push(ts);
+          if (performance.now() - start < ms) return requestAnimationFrame(tick);
+          var iv = stamps.slice(1).map(function (s, k) { return s - stamps[k]; }).sort(function (a, b) { return a - b; });
+          var n = 60, px = new Uint8Array(4), s0 = performance.now();   // readPixels waits for the draw to finish on the GPU
+          for (var k = 0; k < n; k++) { draw(now() + k / 60); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); }
+          resolve({ frames: stamps.length, fps: (stamps.length - 1) / ((stamps[stamps.length - 1] - stamps[0]) / 1000),
+                    p95: iv[Math.floor(iv.length * 0.95)], drawMs: (performance.now() - s0) / n, canvas: canvas.width + "x" + canvas.height });
+        });
+      });
+    },
+  };
+})();
+</script>
+</body>
+</html>

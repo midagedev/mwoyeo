@@ -1,0 +1,116 @@
+{
+ "_": "film3-motion: every input of the motion film. Swap the takes (and their moments) here when film3's final takes land; no code changes. Times in film seconds unless named *_at (a take second). Paths absolute or relative to the repo root.",
+ "work": "/tmp/film3/motion/work",
+ "out": "/tmp/film3/motion/out",
+ "fps": 60,
+ "size": [1920, 1080],
+ "frame_width": 1500,
+ "_frame_width": "a take's frame is shown this wide (screen px) at camera 1.0",
+ "paper": {
+  "_": "M1 beat (a paper reads well: prose Korean, equations as typeset). M5: film3's equation take (Release 1d7e0ab, page 4 right column, display equation (6) kept, the prose below one Korean block). korean_at = the take second its lens cross-fade starts (measured on the take: 5.90 s; takes.json's 12.82 s is another clock), xfade_s how long it takes (to 6.12 s); crop = the take region (lens 770,340,600,530 pt + the page around it, above the Dock); equations = takes.json's equation_box_pt in the crop's px. For the placeholder (placeholder true) en/ko are the page and the app's render, crop the page region.",
+  "placeholder": false,
+  "en": "/tmp/film3/paper-build/pages/p6.png",
+  "ko": "/tmp/film3/mrender/p6.png",
+  "take": "/tmp/film3/takes/equation-paper-final.mp4",
+  "korean_at": 5.89,
+  "crop": [1500, 540, 1280, 1240],
+  "equations": [[50, 130, 1180, 256]],
+  "xfade_s": 0.23,
+  "_hide": "fragments the take kept in English (D3: the hyphen-split noth-ing), crop px, measured on the Korean frame: the hold keeps them under the caption pill (measure.py checks it)",
+  "hide": [[385, 681, 215, 46]],
+  "_camera": "glide keys [film second, x, y, zoom] in the crop's px: the point at the screen centre and the camera zoom. Wide for the cross-fade, up to the equation, then down to the hold (6.4 s on): the equation, its tag and the first two Korean lines whole (inline D(R)), lines from 104 px off the left; the third line, which keeps the hyphen fragment noth-ing in English (D3, paper.hide), sits under the caption pill (measured on the probe: the fragment's screen box inside the pill 96-745 x 859-996 from 6.4 s until the whip; 800/397.5 left its top 11 px above the pill)",
+  "camera": [[2.75, 640, 620, 0.66], [4.3, 700, 290, 0.95], [6.4, 805.5, 384.5, 0.981], [9.12, 805.5, 384.5, 0.994]]
+ },
+ "before": {
+  "take": "/tmp/film3/takes/before-paper.mp4",
+  "_crop": "the take's region shown in the frame [x, y, w, h] (take px), or null for the whole take",
+  "crop": [1210, 556, 1700, 956],
+  "korean_at": 39.15,
+  "ref_at": 45.41,
+  "log": "/tmp/film3/takes/before-paper.jsonl",
+  "_spans": "[span as read on the frame, the word to mark inside it]: each word gets a mark, and a margin note on its row",
+  "spans": [["제어 및 소음", "제어"], ["컨트롤이며", "컨트롤"], ["컨트롤은", "컨트롤"], ["제어가 35", "제어"], ["사인 테스트는", "사인 테스트"]]
+ },
+ "after": {
+  "take": "/tmp/film3/takes/after-paper.mp4",
+  "crop": [1210, 556, 1700, 956],
+  "korean_at": 40.22,
+  "ref_at": 46.42,
+  "log": "/tmp/film3/takes/after-paper.jsonl",
+  "spans": [["대조군 및 소음", "대조군"], ["대조군이며", "대조군"], ["대조군은", "대조군"], ["대조군이 35", "대조군"], ["부호 검정은", "부호 검정"]]
+ },
+ "script": "tools/film3/terms/script.js",
+ "count_terms": "tools/film3/terms/count-terms.py",
+ "ui": {
+  "_": "M4: the UI take (Release, AX only; takes.json \"ui\"): the lens menu, the Memory sheet, Customize, the Script row, the typing, the Run switch. Take seconds. window = the settings window's crop of the screen (take px); sheet (the Memory sheet: the panel shows it whole, then closes on the card), card (the Script section: header, editor, the Run row), editor (the code's area) and viewport (the sheet's scrolling area) in the window's / the card's px. Film times (menu.open/fade/click, moves, clicks) are seconds from timeline.fix_start; a move takes the window from one state to the next (fade = expand, scroll = a short slide). The Test step (182.5 s) is skipped (D12); typing is retimed to timeline.type_cps.",
+  "take": "/tmp/film3/takes/ui-paper.mp4",
+  "menu": {
+   "at": 94.5,
+   "closed_at": 95.98,
+   "open": -0.6,
+   "fade": [-0.12, 0.05],
+   "click": [-0.27, "미리보기 메모리"]
+  },
+  "window": [79, 219, 1122, 1458],
+  "sheet": [41, 180, 1041, 1277],
+  "radius": 28,
+  "card": [81, 738, 960, 444],
+  "card_radius": 22,
+  "editor": [10, 80, 940, 290],
+  "editor_x0": 32,
+  "latin_adv": 16,
+  "viewport": [43, 295, 1036, 1049],
+  "states": [["sheet", 97.6], ["customize", 112.6], ["scrolled", 146.5], ["row", 147.5], ["editor", 155.5]],
+  "moves": [[0.78, 0.12, "fade"], [1.12, 0.22, "scroll"], [1.46, 0.1, "fade"], [1.6, 0.2, "scroll"]],
+  "clicks": [[0.68, "sheet", "사용자화"], [1.36, "scrolled", "스크립트"]],
+  "typing": [155.3, 170.7],
+  "on_at": 181.7
+ },
+ "icon": "App/Assets.xcassets/AppIcon.appiconset/icon_512x512@2x.png",
+ "captions": {
+  "paper": ["수식은 그대로, 문장만 한국어로", "Equations stay as they are; the sentences turn Korean"],
+  "defect": ["학술 용어가 일상어로 풀립니다", "Established terms come out as everyday words"],
+  "fix": ["스크립트 몇 줄로 바로잡습니다", "A few lines of script set it right"],
+  "resolve": ["같은 문단, 제대로 된 용어", "The same paragraph, the right terms"],
+  "end": ["번역을 내 방식대로", "Translation, your way", "Mwoyeo 1.1.5"],
+  "equation_tag": "수식 그대로"
+ },
+ "_ruby": "M2: the replaced word written small above its new word in the resolution (take px of the after take); the lens opens line gaps for it",
+ "ruby": {
+  "font_px": 24,
+  "margin": 4
+ },
+ "_marks": "the marker bar under a word: bar_gap px under its ink, bar_h tall; prep thins and centres it where the next line is closer",
+ "marks": {
+  "bar_gap": 7,
+  "bar_h": 6
+ },
+ "timeline": {
+  "_": "film seconds; after the typing everything is relative to the whip (= typing end + whip_after_type)",
+  "open_end": 2.75,
+  "paper_xfade": 2.75,
+  "paper_end": 9.12,
+  "defect_start": 9.5,
+  "defect_xfade": 9.75,
+  "marks_at": 11.0,
+  "stagger": 0.125,
+  "fix_start": 14.3,
+  "type_start": 16.3,
+  "type_cps": 25.5,
+  "whip_after_type": 0.9,
+  "whip_dur": 0.42,
+  "after_xfade": 0.75,
+  "resolve": 1.15,
+  "ease_out": 4.35,
+  "end_start": 6.65,
+  "end_dur": 3.9
+ },
+ "music": {
+  "path": "/tmp/film2/music/pick/trailer-s1001.flac",
+  "sha256": "edf0e5e344c5b0778e6a7a1112174d58c2be28f5c4fd036a02ad8c2b45aa0585",
+  "_": "film 2's bed (cut2-sources.draft2.json). start = the clip second at film 0: its beats fall on film x.0 / x.5: the toggle flips on the beat at 25.5 s, beat 64 (the drop, +10 dB) lands on the middle of the script -> paragraph whip (26.5 s = typing end 25.40 + 0.9 + 0.21), beat 31 (the groove) as the defect paragraph's Korean settles (10.0 s). First beat 0.2465 s, period 0.49999 s.",
+  "start": 5.7465,
+  "gain_db": -3.0,
+  "fade_out": 1.6
+ }
+}

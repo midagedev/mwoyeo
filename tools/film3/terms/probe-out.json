@@ -1,0 +1,416 @@
+[
+ {
+  "term": "ground truth",
+  "i": 0,
+  "line": "Each word gets its label from the typeset source, which serves as the ground truth.",
+  "dst": "각 단어는 기본 진리 역할을 하는 조판 소스로부터 라벨을 얻습니다."
+ },
+ {
+  "term": "ground truth",
+  "i": 1,
+  "line": "The scorer compares every block with the ground truth.",
+  "dst": "채점자는 모든 블록을 기본 진실과 비교합니다."
+ },
+ {
+  "term": "ground truth",
+  "i": 2,
+  "line": "We treat the labels of the LaTeX source as ground truth.",
+  "dst": "우리는 LaTeX 소스의 라벨을 기본 진실로 간주합니다."
+ },
+ {
+  "term": "baseline",
+  "i": 0,
+  "line": "The rules of one block are the baseline against which the region rule is measured.",
+  "dst": "한 블록의 규칙은 영역 규칙이 측정되는 기준선입니다."
+ },
+ {
+  "term": "baseline",
+  "i": 1,
+  "line": "Condition A, today's request, is the baseline.",
+  "dst": "조건 A, 오늘의 요청은 기준선입니다."
+ },
+ {
+  "term": "baseline",
+  "i": 2,
+  "line": "Against this baseline the memory moves the probes from 15.1% to 55.6%.",
+  "dst": "이 기준에 대해 메모리는 프로브를 15.1%에서 55.6%로 이동시킵니다."
+ },
+ {
+  "term": "ablation",
+  "i": 0,
+  "line": "An ablation of the region rule shows what it adds to the rules of one block.",
+  "dst": "지역 규칙의 어블레이션은 하나의 블록 규칙에 추가되는 내용을 보여줍니다."
+ },
+ {
+  "term": "ablation",
+  "i": 1,
+  "line": "In the ablation study we remove one rule at a time and score the held-out set again.",
+  "dst": "절제 연구에서는 한 번에 하나씩 규칙을 제거하고, 보류된 세트를 다시 채점합니다."
+ },
+ {
+  "term": "ablation",
+  "i": 2,
+  "line": "Each ablation changes exactly one rule.",
+  "dst": "각 절제는 정확히 하나의 규칙을 바꿉니다."
+ },
+ {
+  "term": "development set",
+  "i": 0,
+  "line": "The constants were fitted on the development set.",
+  "dst": "상수들은 개발 세트에 적합되었습니다."
+ },
+ {
+  "term": "development set",
+  "i": 1,
+  "line": "Papers and cases each have a development set and a held-out set.",
+  "dst": "논문과 케이스는 각각 개발 세트와 보류된 세트를 가지고 있습니다."
+ },
+ {
+  "term": "development set",
+  "i": 2,
+  "line": "Recall on the development set rises from 0.56 to 0.91.",
+  "dst": "개발 세트에 대한 리콜이 0.56에서 0.91로 상승합니다."
+ },
+ {
+  "term": "held-out set",
+  "i": 0,
+  "line": "The held-out set was not used to choose any constant.",
+  "dst": "보류된 집합은 어떤 상수도 선택하는 데 사용되지 않았습니다."
+ },
+ {
+  "term": "held-out set",
+  "i": 1,
+  "line": "On the held-out set the region rule changes nothing.",
+  "dst": "보류된 집합에서는 지역 규칙이 아무것도 변경되지 않습니다."
+ },
+ {
+  "term": "held-out set",
+  "i": 2,
+  "line": "The result on the held-out set is the one we report.",
+  "dst": "보류된 세트에 대한 결과가 우리가 보고하는 것입니다."
+ },
+ {
+  "term": "recall",
+  "i": 0,
+  "line": "Recall is low because the reader garbles formulas before the rule sees them.",
+  "dst": "기억이 낮은 이유는 독자가 규칙이 보기 전에 수식을 오갈기하기 때문입니다."
+ },
+ {
+  "term": "recall",
+  "i": 1,
+  "line": "Adding the region rule raises recall from 0.78 to 1.00.",
+  "dst": "지역 규칙을 추가하면 리콜이 0.78에서 1.00으로 증가합니다."
+ },
+ {
+  "term": "recall",
+  "i": 2,
+  "line": "The one-block rules reach a recall of 0.59 on the paper.",
+  "dst": "한 블록 규칙이 논문에서 0.59의 리콜에 도달했습니다."
+ },
+ {
+  "term": "precision",
+  "i": 0,
+  "line": "Precision stays at 1.00 while recall rises.",
+  "dst": "정밀도는 1.00에 머무르고 기억은 상승합니다."
+ },
+ {
+  "term": "precision",
+  "i": 1,
+  "line": "The precision of the rule is 0.90 on the held-out paper.",
+  "dst": "보류된 종이에서 규칙의 정밀도는 0.90입니다."
+ },
+ {
+  "term": "precision",
+  "i": 2,
+  "line": "We report precision and recall for the keep decision.",
+  "dst": "우리는 정확성과 기억을 유지 결정에 대해 보고합니다."
+ },
+ {
+  "term": "false positive",
+  "i": 0,
+  "line": "The rules keep 26 of 44 true blocks at three false positives.",
+  "dst": "규칙은 44개의 true 블록 중 26개를 세 개의 오탐으로 유지합니다."
+ },
+ {
+  "term": "false positive",
+  "i": 1,
+  "line": "A false positive leaves a sentence untranslated.",
+  "dst": "거짓 양성은 문장을 번역하지 않은 상태로 남깁니다."
+ },
+ {
+  "term": "false positive",
+  "i": 2,
+  "line": "The region rule produced one false positive on the cases.",
+  "dst": "지역 규칙이 사례에 대해 하나의 오탐을 일으켰습니다."
+ },
+ {
+  "term": "upper bound",
+  "i": 0,
+  "line": "The oracle that replays the references gives an upper bound of 312 of 312.",
+  "dst": "참조를 재현하는 오라클은 312의 상한을 312로 제공합니다."
+ },
+ {
+  "term": "upper bound",
+  "i": 1,
+  "line": "This score is an upper bound, not a result.",
+  "dst": "이 점수는 상한선이며 결과가 아닙니다."
+ },
+ {
+  "term": "upper bound",
+  "i": 2,
+  "line": "The oracle sets the upper bound for every condition.",
+  "dst": "오라클은 모든 조건에 대한 상한을 설정합니다."
+ },
+ {
+  "term": "sign test",
+  "i": 0,
+  "line": "A sign test on the probes where the two runs disagree gives p < 0.0001.",
+  "dst": "두 번의 실행이 일치하지 않는 프로브에 대한 부호 검정은 p < 0.0001을 나타냅니다."
+ },
+ {
+  "term": "sign test",
+  "i": 1,
+  "line": "We use a sign test because the probes are paired.",
+  "dst": "우리는 프로브가 짝을 이루고 있기 때문에 사인 테스트를 사용합니다."
+ },
+ {
+  "term": "sign test",
+  "i": 2,
+  "line": "The sign test is computed over the discordant probes only.",
+  "dst": "사인 테스트는 불일관 프로브에 대해서만 계산됩니다."
+ },
+ {
+  "term": "controls",
+  "i": 0,
+  "line": "The controls are probes that any engine should get right.",
+  "dst": "제어 장치는 모든 엔진이 올바르게 작동해야 하는 프로브입니다."
+ },
+ {
+  "term": "controls",
+  "i": 1,
+  "line": "The memory leaves the controls unchanged.",
+  "dst": "메모리는 컨트롤을 그대로 유지합니다."
+ },
+ {
+  "term": "controls",
+  "i": 2,
+  "line": "On the controls the two conditions are within noise.",
+  "dst": "컨트롤에서 두 조건은 노이즈 범위 내에 있습니다."
+ },
+ {
+  "term": "cold start",
+  "i": 0,
+  "line": "On a cold start the document reader compiles its model, which can take tens of seconds.",
+  "dst": "갑작스러울 때 문서 리더는 모델을 컴파일하며, 이는 수십 초가 걸릴 수 있습니다."
+ },
+ {
+  "term": "cold start",
+  "i": 1,
+  "line": "After a cold start the first read is slow.",
+  "dst": "차가운 시작 후에 첫 번째 읽기가 느립니다."
+ },
+ {
+  "term": "cold start",
+  "i": 2,
+  "line": "A cold start of the service is the worst case for the first line.",
+  "dst": "서비스의 냉전 시작은 첫 번째 라인에 가장 최악의 경우입니다."
+ },
+ {
+  "term": "warm cache",
+  "i": 0,
+  "line": "With a warm cache the same read answers in a fraction of a second.",
+  "dst": "따뜻한 캐시를 사용하면 동일한 읽기 응답이 순식간에 일분수에 불과합니다."
+ },
+ {
+  "term": "warm cache",
+  "i": 1,
+  "line": "Once the compile cache is warm, the reader answers at once.",
+  "dst": "컴파일 캐시가 따뜻해지면, 리더가 즉시 응답합니다."
+ },
+ {
+  "term": "warm cache",
+  "i": 2,
+  "line": "A warm cache removes the compile from the path.",
+  "dst": "워밍 캐시가 경로에서 컴파일을 제거합니다."
+ },
+ {
+  "term": "cache hit rate",
+  "i": 0,
+  "line": "We do not report a cache hit rate, because no committed result measures it.",
+  "dst": "우리는 캐시 히트율을 보고하지 않습니다, 왜냐하면 커밋된 결과가 이를 측정하지 않기 때문입니다."
+ },
+ {
+  "term": "cache hit rate",
+  "i": 1,
+  "line": "The cache hit rate of a scroll through a feed depends on how many lines repeat.",
+  "dst": "피드를 스크롤할 때 캐시 히트율은 반복되는 줄 수에 따라 달라집니다."
+ },
+ {
+  "term": "cache hit rate",
+  "i": 2,
+  "line": "A higher cache hit rate means fewer requests to the engine.",
+  "dst": "캐시 히트율이 높을수록 엔진에 대한 요청이 적어집니다."
+ },
+ {
+  "term": "throughput",
+  "i": 0,
+  "line": "The throughput of the capture path is bounded by the frame interval.",
+  "dst": "캡처 경로의 처리량은 프레임 간격에 의해 제한됩니다."
+ },
+ {
+  "term": "throughput",
+  "i": 1,
+  "line": "Batching three lines raises the throughput of the engine.",
+  "dst": "세 줄을 배치하면 엔진의 처리량이 증가합니다."
+ },
+ {
+  "term": "throughput",
+  "i": 2,
+  "line": "We measure throughput in lines per second.",
+  "dst": "우리는 처리량을 초당 라인 단위로 측정합니다."
+ },
+ {
+  "term": "tail latency",
+  "i": 0,
+  "line": "The committed results give medians and say nothing about the tail latency.",
+  "dst": "커밋된 결과는 중앙값을 제공하고 꼬리 지연 시간에 대해 아무것도 말하지 않습니다."
+ },
+ {
+  "term": "tail latency",
+  "i": 1,
+  "line": "Tail latency matters more than the median for a lens over a scroll.",
+  "dst": "테일 지연 시간이 스크롤 위에 렌즈의 중앙값보다 더 중요합니다."
+ },
+ {
+  "term": "tail latency",
+  "i": 2,
+  "line": "The tail latency of the document reader is set by its cold start.",
+  "dst": "문서 리더기의 꼬리 지연 시간은 콜드 스타트에 의해 설정됩니다."
+ },
+ {
+  "term": "back-off",
+  "i": 0,
+  "line": "The service is put to rest with an exponential back-off of 1, 2, 4 up to 30 s.",
+  "dst": "서비스는 1, 2, 4의 지수적 백오프를 사용하여 30초까지 종료됩니다."
+ },
+ {
+  "term": "back-off",
+  "i": 1,
+  "line": "The back-off keeps a slow reader from being asked again at once.",
+  "dst": "백오프는 느린 독자가 한 번에 다시 질문을 받는 것을 방지합니다."
+ },
+ {
+  "term": "back-off",
+  "i": 2,
+  "line": "After each late answer the back-off doubles.",
+  "dst": "각 늦은 답변마다 백오프가 두 배가 됩니다."
+ },
+ {
+  "term": "overfitting",
+  "i": 0,
+  "line": "Fitting constants on the development set risks overfitting.",
+  "dst": "개발 세트에 상수를 맞추는 것은 과적합 위험이 있습니다."
+ },
+ {
+  "term": "overfitting",
+  "i": 1,
+  "line": "The held-out set guards against overfitting.",
+  "dst": "유지된 세트는 과적합을 방지하기 위해 경계를 설정했습니다."
+ },
+ {
+  "term": "overfitting",
+  "i": 2,
+  "line": "Overfitting would show as a gap between the two sets.",
+  "dst": "과적합은 두 집합 사이의 간격으로 나타납니다."
+ },
+ {
+  "term": "noise",
+  "i": 0,
+  "line": "Differences under about 0.3 are noise.",
+  "dst": "약 0.3 이하의 차이는 잡음입니다."
+ },
+ {
+  "term": "noise",
+  "i": 1,
+  "line": "A second run of A gives the noise floor of the bench.",
+  "dst": "A의 두 번째 실행은 벤치의 소음 바닥을 제공합니다."
+ },
+ {
+  "term": "noise",
+  "i": 2,
+  "line": "The change is within the noise.",
+  "dst": "변화는 소음 안에 있습니다."
+ },
+ {
+  "term": "confidence interval",
+  "i": 0,
+  "line": "With 312 probes the confidence interval is about plus or minus five points.",
+  "dst": "312개의 프로브를 사용하면 신뢰 구간은 약 ±5점입니다."
+ },
+ {
+  "term": "confidence interval",
+  "i": 1,
+  "line": "We report no confidence interval for the engine bench.",
+  "dst": "엔진 벤치에 대해 신뢰 구간이 없음을 보고합니다."
+ },
+ {
+  "term": "confidence interval",
+  "i": 2,
+  "line": "The confidence interval of the difference excludes zero.",
+  "dst": "차이의 신뢰 구간은 0을 제외합니다."
+ },
+ {
+  "term": "calibration",
+  "i": 0,
+  "line": "Calibration items that are the same text twice must come back as ties.",
+  "dst": "동일한 텍스트가 두 번 포함된 보정 항목은 타이로 반환되어야 합니다."
+ },
+ {
+  "term": "calibration",
+  "i": 1,
+  "line": "The judge passes the calibration when it ties identical texts.",
+  "dst": "판사는 동일한 텍스트를 연결하면 교정을 통과합니다."
+ },
+ {
+  "term": "calibration",
+  "i": 2,
+  "line": "We run a calibration before every judging round.",
+  "dst": "우리는 모든 심사 라운드 전에 보정을 진행합니다."
+ },
+ {
+  "term": "median",
+  "i": 0,
+  "line": "The warm median of a batch of three lines is 0.15 s.",
+  "dst": "세 줄 배치의 따뜻한 중앙값은 0.15초입니다."
+ },
+ {
+  "term": "median",
+  "i": 1,
+  "line": "We report the median over twelve lines.",
+  "dst": "우리는 중앙값을 열두 줄에 걸쳐 보고합니다."
+ },
+ {
+  "term": "median",
+  "i": 2,
+  "line": "The median hides the slowest batches.",
+  "dst": "중앙값은 가장 느린 배치를 숨깁니다."
+ },
+ {
+  "term": "regression",
+  "i": 0,
+  "line": "A regression in the scroll predictor shows as drift.",
+  "dst": "스크롤 예측기에서의 회귀는 드리프트로 표시됩니다."
+ },
+ {
+  "term": "regression",
+  "i": 1,
+  "line": "The gate fails on any regression of the held-out score.",
+  "dst": "보류된 점수의 회귀가 발생하면 게이트가 실패합니다."
+ },
+ {
+  "term": "regression",
+  "i": 2,
+  "line": "We check each change for regressions.",
+  "dst": "우리는 각 변경에 대해 회귀를 확인합니다."
+ }
+]

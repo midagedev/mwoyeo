@@ -1,0 +1,21 @@
+# film3/motion: the 1.1.5 clip as motion graphics, composed as code
+Round film3-motion (2026-10-21). The takes (film3's `live/`) are framed in a 3D stage, the UI take (M4) carries the fix beat (lens menu, Memory sheet, Script row, the
+real `terms/script.js` typed, Run on), and the marks come from Vision boxes on the takes. Every take path and moment is an input of `film.json`; swapping in a final take is a config edit, then `make.py`.
+
+| path | what |
+|---|---|
+| `film.json` | the one config: takes (path, optional crop of a whole-screen take, the second the Korean shows, the reference frame, the spans to mark), the paper beat (M5: film3's equation take; `hide` = fragments the take kept in English, which the hold keeps under the caption pill), the UI take (`ui`: window, sheet, card, editor and viewport rects, the states and when the film steps between them, the clicks' labels), captions (the lead's words), timeline, music bed (film 2's, by sha256) |
+| `prep.py` | config -> `<work>/data.js` + the takes' frames as JPEG: lens box, ink lines, Vision marks (`locate.swift`) with their marker bar and band fitted between the lines, callouts checked against `count-terms.py`'s table and the logs' counts, script pairs and links, equation boxes (placeholder: English page vs the app's Korean render) and the white rows around them, the ruby room (M2: where the after take's lens is cut and how far it opens so the replaced word fits above the new one), the UI take (M4: the menu patch from the take with the menu open vs closed, the click labels by Vision, the editor's layout solved on the final typed frame, one card frame per typed count laid out as the final text (re-wrapped frames dropped), the Run row's offset per frame, the switch's geometry and colours) |
+| `film.html` | the composition: a pure function of time (`__film.seek(t)`), frames A (paper) and B (paragraph), the lens menu, the settings sheet that closes on its Script card (each frame: the take's card with at least the typed characters, the rest hidden by the final layout's cells; the count and the switch's slide drawn over it), wires, chips, the rubies (M2: the lens opens line gaps; strips of the footage, nothing repainted), captions, end card; `__film.report()` is the geometry `measure.py` checks |
+| `shoot.mjs` | headless Chrome over DevTools: `stills`, `probe` (per frame: report + how far things move), `film` (frames, with sub-frames where they move > 3 px) |
+| `blend.py` | sub-frames -> one frame, mean in linear light (motion blur from the motion itself) |
+| `make.py` | end to end: `<out>/film.mp4` (1080p60, crf 16, music) and `<out>/proxy-720p30.mp4` |
+| `measure.py` | the self-check on the proxy + probe: whips (changed pixels per frame), typing speed, the typed card never short of the typed characters (M4), caption and mark holds (a mark until the lens menu covers it), marker bars clear of the footage's glyphs, Korean glyph height, edge margin (the lens too, during the holds), footage share, runtime, the rubies (held together, clear of the line above and of their word, centred), the equation outline drawn through the take's cross-fade and the kept-English fragment under the caption pill while the paper beat holds (M5); `--self-test` is its FAIL-first |
+| `locate.swift` | Vision's box of a part inside a span on a frame |
+
+Run: `python3 -I make.py` (about 9 min: prep 1, probe 0.5, frames and encode 7.5), then `python3 -I measure.py`. Renders need the Bash sandbox off (Chrome, Vision).
+The final BEFORE/AFTER takes (M3) are whole-screen captures: `crop` picks the region the frame shows (take px), and every box after that is in the
+cropped frame's px. The paper take (film3's A8) replaces the placeholder in `film.json` alone: `paper.placeholder` false, `take`, `crop` (the take's
+region, or null; while a placeholder, `crop` is the page region), `korean_at` (the take second its cross-fade starts), `xfade_s` (how long it takes), `equations`, `hide` and `camera` (all in
+the cropped take's px); prep then measures the white rows around each box on the take's own Korean frame. The tight zoom on the paragraph is fitted
+to the lens and notes (100 px from the sides), so a take with another lens size needs no camera edit.

@@ -1,0 +1,28 @@
+\subsection{What the numbers do not show}\label{sec:threats}
+
+\paragraph{Ground truth.} The keep-label bench takes its ground truth from the typeset source, not from a person: a word is a keep when the
+mathematics of the \LaTeX{} file or the typewriter fonts of the PDF say so. That makes the labels cheap and repeatable, and it ties them to the
+source. A word that the source does not mark but that a reader would still keep as written gets the label translate, and a rule that keeps it is
+scored as a false positive. We have not measured how often this happens, so the precision in Table~\ref{tab:keep} is to be read with that in mind,
+and the recall as the share of the labelled keeps that the rules find.
+
+\paragraph{Controls and noise.} In the translation bench, 53 of the 312 probes are controls: lines that any engine should get right, with context or
+without. A control shows whether a change moves something it should leave alone. In Table~\ref{tab:probes} the controls go from 35 to 37 correct
+(66.0\% to 69.8\%) when the memory is added; the second run of the baseline sets the noise floor against which that difference is read. The sign test
+counts only the probes on which the two runs disagree, 5 for A and 56 for M.
+
+\paragraph{Cold start and warm cache.} The document reader is the one part whose cost depends on the state of the machine. On a cold start it compiles
+its model, which can take tens of seconds; with a warm cache the same read is fast. That is the reason the lens does not wait for it
+(Section~\ref{sec:overview}), and the reason the numbers of this section are warm numbers: the engine bench reports a warm median of
+$0.15$\,s for a batch of three lines, and the committed results hold no tail latency and no cold-start figure. When successive answers are late, an
+exponential back-off puts the service to rest for 1, 2, 4, up to 30\,s before the next request.
+
+\paragraph{Baselines and bounds.} Every table compares a change with a baseline that we also run: the rules of one block before \code{CodeRegion} is
+added, and condition A before the memory. Two bounds frame the numbers. The oracle that replays the references scores 312 of 312 under each of its
+conditions, which is the upper bound of the probes; the small model is a floor, not a recommendation. We do not compare with another screen
+translator: the benches measure what the screen adds to the translation problem, not how well any one engine translates.
+
+\paragraph{Held-out sets.} Papers and cases each have a development set and a held-out set. The constants of the rules were fitted on the development
+set, and the held-out set decides what we report; a gap between the two is the only measure of overfitting we can offer. On the cases the held-out set
+scores higher than the development set (recall $1.00$ against $0.91$ once the region rule is added), the opposite of what overfitting would show. We read
+that as a sign that the held-out cases are the easier ones, not as a result: 40 keep blocks are a small set.

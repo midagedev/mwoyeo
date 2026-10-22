@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<title>月涙譚</title>
+<!--
+  The live recording's player: the stage page (tools/film3/stage/game.html: film 2's scene, furigana in brackets) stepping through the lines of film-ja-ko-1 like a
+  game, in a Chrome window, for the real app's lens to read. Served by serve.py from tools/ (one origin with the stage and the sequence).
+    ?stage=film2/stage/scene.html  the page, relative to tools/: `?line=<id>` shows line <id>, `?line=0` the empty box
+    &size=960                      its CSS size (square); it is zoomed to fill the window, so the look is the stage's at any window size
+    &align=center                  where the square sits across the window: center, left or right
+    &dwell=6&lead=2&tail=4         seconds each line stays on screen; of the empty box before the first line; and after the last
+    &from=1&to=36                  the line ids played, in the sequence's order; or &ids=2,7,9 (with steps=self: any order, repeats too)
+    &ctl=1                         wait for the server's /go, and report rect / line / end to /ev (serve.py); without it, play at once
+    &pace=1                        (with ctl) `dwell` is the least a line stays: it goes when the server's /next says the lens settled
+    &blank=1                       no stage: the window's dark colour only, reported rect included (the backdrop of record.sh log)
+    &steps=self                    the page steps itself (tools/film2/stage2/game.html: Enter goes to the next line, `--ink: transparent`
+                                   leaves the panel empty): one frame, sized to the square (the page scales itself), its scene never reloads
+    &scene=still                   (with steps=self) the page's clock runs only while a line comes in (`move` s, 1), so the scene stands
+                                   still while the lens reads: the page's &clock=manual, driven here at real speed
+  Otherwise two frames take turns: the next line loads in the hidden one while the current one shows, and the swap is one frame, so a line
+  change on screen is a text change only (no blank page, no reload flash), and the time reported is the swap's.
+-->
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #05070f; }
+  iframe { position: absolute; left: 0; top: 0; border: 0; display: block; }
+  iframe.off { visibility: hidden; }
+</style>
+</head>
+<body>
+<iframe id="a" scrolling="no"></iframe><iframe id="b" class="off" scrolling="no"></iframe>
+<script>
+(async function () {
+  var q = new URLSearchParams(location.search);
+  var stage = "/" + (q.get("stage") || "film3/stage/game.html");
+  var size = +(q.get("size") || 960), dwell = +(q.get("dwell") || 6), lead = +(q.get("lead") || 2), tail = +(q.get("tail") || 4);
+  var across = { left: 0, center: 0.5, right: 1 }[q.get("align") || "center"];
+  var ctl = q.get("ctl") === "1", pace = ctl && q.get("pace") === "1", self = q.get("steps") === "self";
+  var still = self && q.get("scene") === "still", move = +(q.get("move") || 1);
+  var seq = await (await fetch("/film3/sequence/film3-ja-ko.json")).json();
+  var from = +(q.get("from") || 1), to = +(q.get("to") || seq.lines.length);
+  var ids = q.get("ids") ? q.get("ids").split(",").map(Number)
+          : seq.lines.map(function (l) { return l.id; }).filter(function (id) { return id >= from && id <= to; });
+  var frames = [document.getElementById("a"), document.getElementById("b")], shown = 0;
+
+  function report(k, fields) {
+    if (!ctl) return Promise.resolve();
+    return fetch("/ev?" + new URLSearchParams(Object.assign({ k: k }, fields || {}))).catch(function () {});
+  }
+  // The stage is the largest centred square of the window; the rest of the window stays the stage's night colour, so the lens's
+  // overscan (it reads around itself) sees nothing but the game.
+  function fit() {
+    var side = Math.min(innerWidth, innerHeight), z = side / size, k = self ? 1 : z;
+    frames.forEach(function (f) {
+      f.style.width = side / k + "px"; f.style.height = side / k + "px"; f.style.zoom = k;
+      f.style.left = (innerWidth - side) * across / k + "px"; f.style.top = (innerHeight - side) / 2 / k + "px";
+    });
+    return z;
+  }
+  function load(frame, id) {
+    return new Promise(function (done) { frame.onload = function () { done(); }; frame.src = stage + "?line=" + id + (still ? "&clock=manual" : ""); });
+  }
+  // The page's clock with &scene=still: it advances at real speed until `movingUntil`, then holds.
+  var pageT = 0, movingUntil = 0, lastTick = 0;
+  function tick(ts) {
+    if (lastTick && ts < movingUntil) { pageT += Math.min(ts, movingUntil) - lastTick; page.__stage.advanceTo(pageT); }
+    lastTick = ts;
+    requestAnimationFrame(tick);
+  }
+  function until(t) { return new Promise(function (done) { setTimeout(done, Math.max(0, t - performance.now())); }); }
+  function nextFrame() { return new Promise(function (done) { requestAnimationFrame(function () { requestAnimationFrame(done); }); }); }
+
+  // A page that steps itself starts on the line before the first one (the sequence wraps), its text hidden: the lead-in is the empty
+  // panel, and the first line then comes in with its own reveal.
+  var page = null;
+  function ink(on) { page.document.documentElement.style.setProperty("--ink", on ? "" : "transparent"); }
+  var zoom = fit();
+  addEventListener("resize", fit);
+  if (q.get("blank") === "1") frames.forEach(function (f) { f.classList.add("off"); });   // a dark backdrop only (record.sh log)
+  else if (self) {
+    var all = seq.lines.map(function (l) { return l.id; });
+    await load(frames[0], all[(all.indexOf(ids[0]) + all.length - 1) % all.length]);
+    page = frames[0].contentWindow;
+    await page.__stage.ready;
+    ink(false);
+    if (still) requestAnimationFrame(tick);
+  }
+  else await load(frames[0], 0);
+  // Where the stage square sits on screen, in points (a Chrome app window: the content is the window minus its title bar).
+  var side = Math.min(innerWidth, innerHeight);
+  await report("rect", { x: screenX + (innerWidth - side) * across, y: screenY + outerHeight - innerHeight + (innerHeight - side) / 2,
+                         side: side, zoom: zoom.toFixed(4), size: size });
+  if (q.get("blank") === "1") return;
+  if (ctl) { while ((await fetch("/go")).status !== 200) await until(performance.now() + 100); }
+
+  // After the last line the box empties again (id 0), as a scene ends: the app then closes that line's cue and writes its entry.
+  // A line stays `dwell` s; with &pace=1 that is the least, and it goes once the server says the lens settled on it (/next).
+  var steps = ids.concat([0]), due = performance.now() + lead * 1000;
+  var pending = self ? Promise.resolve() : load(frames[1], steps[0]);
+  for (var i = 0; i < steps.length; i++) {
+    await pending;
+    await until(due);
+    if (self) {
+      if (steps[i]) {   // to the line (Enter as often as it takes: one task, so no line between is drawn), and the ink back on
+        var hops = (all.indexOf(steps[i]) - all.indexOf(page.__stage.report().id) + all.length) % all.length || all.length;
+        for (var h = 0; h < hops; h++) page.document.dispatchEvent(new page.KeyboardEvent("keydown", { key: "Enter" }));
+        ink(true);
+      } else ink(false);
+      if (still) { movingUntil = performance.now() + move * 1000; page.__stage.advanceTo(pageT); }
+    } else {
+      var next = 1 - shown;
+      frames[next].classList.remove("off");
+      frames[shown].classList.add("off");
+      shown = next;
+    }
+    var swapped = performance.now();
+    await nextFrame();
+    var extra = self && steps[i] && page.__stage.report().id !== steps[i] ? { page: page.__stage.report().id } : {};
+    report("line", Object.assign({ id: steps[i], ms: Date.now() }, extra));   // `page`: the page showed another line (record.sh fails)
+    if (!steps[i]) break;
+    if (!self) pending = load(frames[1 - shown], steps[i + 1]);
+    due = swapped + dwell * 1000;
+    if (pace) {
+      await until(due);
+      while ((await fetch("/next?id=" + steps[i])).status !== 200) await until(performance.now() + 150);
+      due = performance.now();
+    }
+  }
+  await until(performance.now() + tail * 1000);
+  report("end", { ms: Date.now() });
+})();
+</script>
+</body>
+</html>

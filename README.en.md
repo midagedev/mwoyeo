@@ -105,6 +105,7 @@ Ukrainian.
 
 The menu bar icon lists your lenses: switch each one on or off, remove it, or add a new one. It also has
 **Show Original**, **Pause** and Settings.
+If a crowded menu bar hides the icon, open Mwoyeo again: the same panel opens in a window.
 
 ### Shortcuts
 

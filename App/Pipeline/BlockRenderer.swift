@@ -31,6 +31,9 @@ enum BlockRenderer {
         /// Where in the image the text is laid out (pixels, top-left origin): the source text and its margin. The image may
         /// reach further down for descenders of the source that are erased; the translation does not use that strip.
         var textArea: CGRect?
+        /// The translation is laid out between these x (pixels of the image), the part of its block a lens covers (`LensWindow.Plan.narrowed`):
+        /// the text box is cut to it, and the room on the right that a longer translation may spill into with it. nil: the block's own box.
+        var window: ClosedRange<CGFloat>?
     }
 
     /// A drawn block: its image and where the translation sits in it.
@@ -38,8 +41,12 @@ enum BlockRenderer {
         var image: CGImage
         /// The translation's extent in the image (pixels, top-left origin), cut to the image.
         var text: CGRect
-        /// The size the translation was drawn at (pixels, em).
+        /// The line boxes of the translation in the image (pixels, top-left origin): the line's full ascent and descent, from the origin of its
+        /// text to its end. What a lens that cuts the block's top or bottom hides lines by (`LensWindow.shown`).
+        var lines: [CGRect] = []
+        /// The size the translation was drawn at (pixels, em), and the smallest the fitter would draw this block at (`LensSweep` reads where they meet).
         var fontSize: CGFloat = 0
+        var floorSize: CGFloat = 0
         /// The translation needed more height than the image has at the smallest size.
         var clipped = false
         /// It was cut to what fits and ends in "…" (`TextFitter.truncating`): more than the glyphs' leading past the image.
@@ -75,8 +82,19 @@ enum BlockRenderer {
         // The text box is the original block; `spareWidth` on the right is only used if the text needs it.
         let area = input.textArea.map { CGRect(x: $0.minX, y: CGFloat(h) - $0.maxY, width: $0.width, height: $0.height).intersection(bounds) }
             .flatMap { $0.isNull || $0.isEmpty ? nil : $0 } ?? bounds
-        let full = area.insetBy(dx: padX, dy: padY)
-        let original = CGRect(x: full.minX, y: full.minY, width: max(1, full.width - input.spareWidth), height: full.height)
+        var full = area.insetBy(dx: padX, dy: padY)
+        var original = CGRect(x: full.minX, y: full.minY, width: max(1, full.width - input.spareWidth), height: full.height)
+        var spare = input.spareWidth
+        if let window = input.window {
+            // Laid out in the part the lens covers: the text box and the room beside it are cut to that.
+            func cut(_ r: CGRect) -> CGRect {
+                let lower = max(r.minX, window.lowerBound), upper = min(r.maxX, window.upperBound)
+                return CGRect(x: lower, y: r.minY, width: max(1, upper - lower), height: r.height)
+            }
+            original = cut(original)
+            full = cut(full)
+            spare = max(0, full.width - original.width)
+        }
         let outline = input.appearance.outlineColor?.cgColor
         // Outlined text keeps its own fill: the outline, not the background, is what it is read against.
         let textColor = outline != nil ? input.appearance.textColor.cgColor : legibleTextColor(input.appearance)
@@ -105,7 +123,7 @@ enum BlockRenderer {
             }
         } else {
             size = TextFitter.fitFontSize(in: box.size, minSize: minSize, maxSize: maxSize) { TextFitter.measure(make($0), width: box.width) }
-            if TextFitter.measure(make(size), width: box.width).height > box.height + 0.5, input.spareWidth > 0, !input.centered {
+            if TextFitter.measure(make(size), width: box.width).height > box.height + 0.5, spare > 0, !input.centered {
                 box.size.width = full.width
                 size = TextFitter.fitFontSize(in: box.size, minSize: minSize, maxSize: maxSize) { TextFitter.measure(make($0), width: box.width) }
             }
@@ -159,7 +177,22 @@ enum BlockRenderer {
         guard let image = ctx.makeImage() else { return nil }
         let inkWidth = min(measured.width, pathWidth), inkX = input.centered ? textRect.midX - inkWidth / 2 : textRect.minX
         let ink = CGRect(x: inkX, y: CGFloat(h) - textRect.maxY, width: inkWidth, height: textRect.height).intersection(bounds)
-        return Rendered(image: image, text: ink.isNull ? .zero : ink, fontSize: size, clipped: clipped, ellipsis: ellipsis)
+        return Rendered(image: image, text: ink.isNull ? .zero : ink, lines: lineBoxes(of: frame, in: path, imageHeight: CGFloat(h)), fontSize: size,
+                        floorSize: minSize, clipped: clipped, ellipsis: ellipsis)
+    }
+
+    /// The boxes of the lines `frame` laid out in `path` (CoreText's space, y up), in image pixels (top-left origin): a line's origin is its
+    /// baseline's start, relative to the path's lower left.
+    private static func lineBoxes(of frame: CTFrame, in path: CGPath, imageHeight: CGFloat) -> [CGRect] {
+        let lines = CTFrameGetLines(frame) as? [CTLine] ?? []
+        var origins = [CGPoint](repeating: .zero, count: lines.count)
+        CTFrameGetLineOrigins(frame, CFRange(location: 0, length: 0), &origins)
+        let base = path.boundingBox.origin
+        return zip(lines, origins).map { line, origin in
+            var ascent: CGFloat = 0, descent: CGFloat = 0, leading: CGFloat = 0
+            let width = CTLineGetTypographicBounds(line, &ascent, &descent, &leading)
+            return CGRect(x: base.x + origin.x, y: imageHeight - (base.y + origin.y + ascent), width: CGFloat(width), height: ascent + descent)
+        }
     }
 
     private static func attributed(_ text: String, size: CGFloat, weight: NSFont.Weight, style: FontStyleChoice,

@@ -820,3 +820,204 @@ The rule, the numbers and every guard: docs/design/keep-boundary.md section 10.1
 **Owner and fix.** The Lines service is the process that owns the cache, so it reads the check page (`VisionExec.checkPicture`, 33 drawn lines) once after its programs exist (`ReaderWorker.verifyPrograms`). The verdict is `ProgramCheck.verdict` (Core: more than 3 missing is bad). A bad cache is dropped (`E5Programs.reset`, counted in a mark beside it) and the service exits; the host sees a lost service, restarts it and reads again, and the next process compiles fresh. After 2 resets it serves what it has and logs it. A cache that read well is marked beside it (`<Caches>/<id>/programs-verified`: the system clears what it did not write from its own cache directory, measured 2026-10-21), naming the compiled programs by name and birth and the system and service builds, so the page is drawn once per cache, not once per launch; a cache compiled again, or one that got a program, is another list. `check-logic` draws the same page through the host (`program-checks`), so a bad cache of a gate's id is a FAIL there.
 
 **What is not done.** The Docs service has a cache of its own that may fail the same way; its answer has no drawn page to compare with. A lens that starts before the warm-up never gets Docs for the process (`ReaderWarmup.want`); not changed here. The read-again of a hole between two lines of a column (a strip read) was built and dropped: the failure is in the detector, so a second read of the strip gets the same answer from a bad cache, and it costs 60 to 120 ms per false hole on a good one.
+
+
+## 13. A word the typesetter broke at the end of a line (item 1, round read117, 2026-10-22)
+
+**What was seen.** Film3's take of page 6 of the method paper showed "noth-ing": the reader gives the lines of a paragraph, `TextRecognizer.makeBlock` joined them with a space, none after a hyphen ("noth-" + "ing" → "noth-ing"), and the engine got the word in two pieces. The paper bench's sources carried 98 of them (`tools/paper-bench/hyphens.py`: a token `stem-rest` whose joined form is an English word of `/usr/share/dict/words`, over the 41 renders of `paper-115`), among them "con-text", "ma-chine", "lo-cal", "Sec-tion", "mini-mum".
+
+**Owner.** `TextRecognizer.makeBlock` is the one place that joins lines (both reader paths, `joinSplitLines`, `columnBreak`, `flowed` and `splitByStyle` all remake blocks through it), so the rule is there, in Core as `LineJoin` (pure; the caller says which characters are CJK and which strings are words). Not a pass of its own: a pass after `readBlocks` would see the text of a block, not its lines.
+
+**The rule.** The hyphen at the end of a line is dropped when all of these hold, else it stays as before (the join of 1.1.6, bit for bit):
+
+| Table row | Reason it is a row |
+|---|---|
+| the stem is two or more ASCII letters, the first may be a capital, the rest lowercase, and it starts at a space, a bracket or the start of the text | `readNoth-` (camelCase), `foo_bar-`, `--no-`, `src/some-`, `a.b-` and `state-of-the-` are code or names, not stems |
+| the first word of the next line is two or more lowercase letters and ends at a space or at marks of a clause (`, . ; : ) ] ! ? " ” ’`), after a possessive `'s` if there is one | a continuation that is capitalised, a digit, `-`, `_`, `/`, `@` or `.swift` is a compound or a name ("Berkeley-Parser", "COVID-19", "to-German", "ing.swift") |
+| the joined form is an English word (`EnglishWords`: `NSSpellChecker`, the system's local dictionary, language named `en`) | "sequence-aligned", "position-wise", "co-occurrence", "x-ray" and "Ko-ray" are not words once joined, so their hyphen stays; a Mac without the dictionary says no to everything, which is the join of before |
+
+`OCRBlock.text` stays as the lines read (the keep rules, `CodeRegion`, `InlineLiteral`, `TranslationFilter` judge it as before: a hyphen that sits in code is never dropped, the stem and continuation rows see to that); `OCRBlock.prose` is what goes to the engine, the cache key and the `BlockMatcher`. So the rules that keep a block as written see no change and the translation sees a whole word. The pipeline counts `ocr.hyphen_join` and traces `hyphen join: <words>` (the first piece of a paragraph that goes on in the next column stands for the group).
+
+**Gap table.**
+
+| Piece | Before | After |
+|---|---|---|
+| `TextRecognizer.makeBlock` | text = lines + " ", none after "-" | `text` as before; `joined` = the words whose hyphen was dropped, `prose` = the text of them |
+| `RegionPipeline` (source of `Block`, `BlockMatcher` input, cache identity) | `ocr.text` | `ocr.prose` (`readBlocks` result, both passes) |
+| `flowed` (a paragraph's pieces share one text) | `makeBlock(all lines).text` | also `joined` |
+| `TranslationFilter`, `CodeKeep`, `InlineLiteral`, `restoreSourceTokens` | judge `text` | judge `text` (unchanged) |
+| Gate | none | `LineJoinTests` (16 cases; every row of the table is a guard that fails when removed, see the report); `tools/paper-bench/hyphens.py` (exit 1 when a broken word is left) |
+
+**Numbers.** `hyphens.py` on the paper bench (41 renders of our own paper): broken words left 98 (`paper-115`) and 94 (`paper-read117base`, main `dd652f0`) → 6 (build with this item), and the six are the paper's own hyphens ("non-linear" twice, "fall-back", "re-set" three times: a real hyphen is a word once joined, and the tool cannot tell it from a break); 122 words joined by the reader. `tools/paper-bench/attribute.py` (blocks paired by source text): 88 of 937 matched blocks differ, every one by a hyphen taken out of a word, none in another way (`other 0`); the 86 blocks that cannot be matched are the reader cutting the text another way, which a render of the same build does as well (`paper-115` against `paper-read117base`, the same code: 81 such blocks).
+
+**Not done.** The dictionary is English: a German or French page keeps its hyphens as before (the checker could take the page's language). A word broken at a hyphen of its own ("self-" "attention") is a compound and stays by design.
+
+
+## 14. The last line of a wrapped message (item 2, round read117, 2026-10-22)
+
+**What was seen.** A chat render read the message "マジでここが今までで一番いいコミュニテイだわ" as two blocks, "マジでここが今までで一番いいコミュニテ" and "イだわ", and translated the tail alone. The tail is a line of one to three characters under a full line of the same message. The document reader (Vision's document model, `reader auto → documentLayout`, the default path) cuts it off in some captures and keeps it in others; `ParagraphGrouper` (the lines reader) would take it in (a gap of 0.28 heights, left edges 3 px apart). The use-case bench has no scene that shows it: `tailcand.py` over its 156 renders finds three candidate pairs and none under a full line. The case was reproduced on a picture of our own, a Discord-like page in Japanese at three type sizes (14, 15 and 16 px, `/tmp/r117/item2`): the tail is a block of its own at 15 and 16 px, and at 14 px it is inside the paragraph in one pass and a block of its own in the next.
+
+**Owner.** `BlockMerge` (`BlockLayout.swift`), the rule that says which recognised blocks are one block, run by `RegionPipeline.joinSplitLines` for both reader paths and for the lens and the seamless pass alike. The new row is `WrapTail` (Core), the rule for the tail of a wrapped message; `ParagraphGrouper.continuation` stays the one geometry of "the next line" and `WrapTail` calls it, so the two readers cannot disagree about what a next line is.
+
+**The rule.** The block `t` is the tail of the block `h` when all of these hold:
+
+| Row | Guards against |
+|---|---|
+| `t` is one line of one to three characters, at least one a letter, the others letters or the marks that close a sentence or quotation | a time ("20:21"), a number, a sign ("G＜6": a fragment of a formula that the paper bench has), a list marker, a lone mark |
+| the last line `L` of `h` and the tail pass `ParagraphGrouper.continuation` (heights within 1.5, gap from -0.4 to 0.6 heights, left edges within 1.25 heights or centres within 0.5, no list marker) and the tail is no wider than `L` | a message of its own below another (a gap of 0.7 heights and more), an indented line, a heading |
+| the text of `L` does not end in a sentence end (`.!?…:;` and the full-width ones) | a short answer under a message that ended |
+| `L` is full: the lines of the column (those that overlap `L` by half of the narrower) end at one edge, `L` ends within one height of it, and at least one other line does | a list or a log, where the longest line is not wrapped; the other column of a page |
+| one tail for one head | |
+
+**Gap table.**
+
+| Piece | Before | After |
+|---|---|---|
+| `BlockMerge.groups` | interlock and the lone piece beside a last line | also takes `tails: [WrapTail.Pair]` |
+| `RegionPipeline.joinSplitLines` | `BlockMerge.groups(rects)` | `WrapTail.pairs(lines:texts:)` first, then `groups(rects, tails:)`; counter `ocr.wrap_tail`, trace `wrap tail: '<tail>' ends '<12 characters>'` |
+| `ParagraphGrouper` | the grouper's own joins | unchanged |
+| Gate | none | `WrapTailTests` (11 cases on the real coordinates of the picture; every row is a guard that fails when it is removed, see the report) |
+
+**Numbers.** The use-case bench: `ocr.wrap_tail` fires in none of the 156 renders (no scene has the tail), and no row of the bench moves on its account. On the picture of our own (`/tmp/r117/item2`, 14, 15 and 16 px, the same picture before and after): before, "イだわ" is a block of its own at 15 and 16 px (and inside the paragraph at 14 px in that run); after, it is one block with the line above at all three sizes, `ocr.wrap_tail=1` and the trace `wrap tail: 'イだわ' ends 'までで一番いいコミュニテ'` in each (at 14 px the reader cut it off in this run, which is the variation the rule is for).
+
+
+## 15. Names inside a sentence (item 3, round read117, 2026-10-22)
+
+**What was seen.** The App Store screenshot renders of 2026-10-19 showed camelCase and code names in running prose coming back in another case ("readme" as "REaDME", "gemma3" as "geMMA3", "Transactions" as "TrAnsActions", paper bench p12). Guards for a whole line existed (`TranslationFilter.isIdentifier`, bf0232b; `isFormula`; `CodeKeep`); nothing guarded a name in the middle of a sentence except one step after the translation, `TranslationCleanup.restoreSourceTokens` (the source's own spelling of every Latin token is put back where the translation holds it in another case).
+
+**Causes found, in the order the data showed them** (`tools/paper-bench/names.py` over the outputs: a name is exact, recased, or lost):
+
+| # | Cause | State |
+|---|---|---|
+| 1 | `restoreSourceTokens` replaced case-insensitively inside other words: the "A" of "A threshold" turned "Man" into "MAn" | fixed 2026-10-20, 818bc80 (the screenshot renders predate it) |
+| 2 | A token took the sentence's full stop: the source token of "…to fitFontSize." is `fitFontSize.`, which the translation never holds ("fitfontsize에"), so a name that ends a sentence was never given back | fixed here: the tokens of a name-shaped word end at a letter, a digit or an underscore (`withoutClosingMark`; a plain word keeps its mark as before) |
+| 3 | A one-word token matched the start or end of a name: the word "core" of "The core of ScrollPredictor, Core/Sources/MwoyeoCore/ScrollPredictor" turned the path into `core/Sources/...` (paper p9, p9-c1); the word "i" of a line of code turned `I.asgignnent` into `i.asgignnent` (p5) | fixed here: a range next to `.`, `/` or `-` followed by a letter or digit is part of a name, not a word (`standsAlone`) |
+| 4 | The engine translates or splits a name ("ledgerline" → "원장 라인", `Array. prototype. flat ()` cut into two sentences at the OCR's space after a dot, `FrameDiff. swift` → "프레임디프. 스위프트") | not a case, so not fixable after the fact: the name has to be protected in the request |
+
+**Why a name inside a paragraph is not protected on the default path (cause 4).** The one protection in the request is `ProtectedSpans`: a range of the source marked `skipsTranslation` in the attributed string of the request (Apple Translation, macOS 26.4 and later, `TranslationService.protectedSpans`). It is behind `MWOYEO_INLINE_MATH=1` (never in the App Store build), and what it marks is `InlineMath.spans`, which is formulas only: "deliberately narrow", no name, path or flag. `InlineLiteral` (Core: URLs, e-mail addresses, paths, commands, flags, identifiers, hashes, versions, config files, hotkeys; round H3, 2026-10-20: recall 0.89, 2 % false positives, 3.7 µs a word) is called by no app code at all. What it finds in the sentences of the bench that lost a name (a throwaway Core test, 2026-10-22):
+
+| sentence | `InlineLiteral.spans` | `InlineMath.spans` |
+|---|---|---|
+| "Settings live in ~/.ledgerrc and it reads main.py first." | `~/.ledgerrc`, `main.py` | none |
+| "Run it with --month 2026-09 …" | `--month` | none |
+| "Call fitFontSize when the stepDuration is set, and kept_ok stays 0." | `fitFontSize`, `stepDuration`, `kept_ok` | `kept_ok` |
+| "…ScrollPredictor, Core/Sources/MwoyeoCore/ScrollPredictor.swift, lines 31-68" | `ScrollPredictor`, the path | none |
+| "FrameDiff. swift reads the frame and TextErase. swift paints." | `FrameDiff. swift`, `TextErase. swift` (the OCR split is handled) | none |
+| "ledgerline reads plain text journals …" | none (a plain word has no shape) | none |
+| "you can call Array.prototype.flat()." | none (only `ES2019`) | none |
+| "(TextFitter.fitFontSize); when nothing fits" | none | none |
+
+**What the flag changes on the benches** (this round's build, with and without `MWOYEO_INLINE_MATH=1`, paper bench and the `auto` renders of the use-case bench): the flag is live (`translate.marked` counts sources sent with their formulas marked in 30 of 41 paper renders, `translate.span_unresolved` those that did not come back), and the text does not move: of the 1027 blocks matched by source, the translation is equal in all 1027 (`attribute.py`, `other 0`, `case 0`), and the 370 `auto` blocks of the use-case bench are equal too. It protects formulas, not names, and nothing draws what it protects yet, so there is nothing to flip on the strength of these benches.
+
+**Proposal, not done.** No flip of `MWOYEO_INLINE_MATH`. The step that closes cause 4 is its own round: `ProtectedSpans.Kind.literal` fed by `InlineLiteral.spans` behind the same flag (so the Apple default path stays byte-identical until a no-regression gate on both benches says otherwise), with the three misses above as new rows of the table (a dotted call, a name in brackets), and the case of the markers the engine returns first (the order the lead noted after H3). Cases 2 and 3 do not wait for it: they are in the default path now and change only text that came back in another case.
+
+**Gap table.**
+
+| Piece | Before | After |
+|---|---|---|
+| `restoreSourceTokens` tokens | `[A-Za-z][A-Za-z0-9_/.-]*`, a closing `.`, `-` or `/` part of the token | the same, a closing mark cut off a name-shaped token (`isNameShaped`: a capital after the first letter, a digit, `_`, `.` or `/` inside) |
+| `standsAlone` | no letter, digit or `_` touches the range | and no `.`, `/` or `-` that is followed (or preceded) by a letter or a digit |
+| Gate | the `restoresSourceTokenCase` cases | `NameCaseTests` (7 cases; every guard fails when removed, see the report); `tools/paper-bench/names.py` (exit 1 when a name comes back recased) with `check-text-tools.sh` for its FAIL-first |
+
+
+## 16. A paragraph that crosses an edge of the capture or of the lens (item 4 and A5/F1/F2, round read117, 2026-10-22; the capture's side edges done, the lens's four edges design only)
+
+**Two edges.** A lens is shown inside a larger capture (`Overscan.margins`: 80 to 240 pt a side at rest, 30 % of the lens, 40 % while content moves; clipped at the display). The pipeline reads and erases the capture; the overlay shows the lens. Text is cut at both, and the two are different edges with different fixes:
+
+| Edge | What it cuts | Seen as | Owner today |
+|---|---|---|---|
+| capture, top and bottom | a line is read from its visible half | D3 (1.1.6) | `CaptureEdge.cut`, called by `RegionPipeline.readableLines`: the line is left as it is |
+| capture, left and right | the starts or ends of every line of the column the edge runs through are read, and translated word by word | **F2** | none until this round: `CaptureEdge.cutAtSides` |
+| lens, top and bottom | the lines of a translation that stand on the edge are cut through their glyphs; a paragraph that starts above the lens is read whole (it starts inside the margin) and drawn at its whole rect | item 4, d14, **F1** (bottom) | the overlay's one mask, the lens rect with a 12 pt corner (`OverlayPanel.swift:143`, `:157`) |
+| lens, left and right | a paragraph wider than the lens: every Korean line starts or ends outside, its first and last syllables cut | **F1** | the same mask |
+
+One rule for the four edges of each kind, in the owner of that kind: **a line is read whole or not at all (capture); a line is shown whole or not at all (lens).**
+
+**What was seen** (film4 take `t0r-oldway`, main 5272f82 Release, page 6 of the method paper at ⌘0; `/tmp/film4/defects.md`). F1: a lens [339, 266, 354, 139] pt, 30 pt inside the paragraph's left edge, 50 pt short of its right edge and 30 pt short of its bottom. The paragraph (432 pt wide) lies inside the capture, is read whole, is drawn at 432 pt, and the mask cuts 30 pt at each side; the last Korean line sits on the bottom edge. F2: the lens dragged 95 pt right, to [339, 266, 453, 173]: its right edge stands 22 pt inside the next column. The capture reaches about 90 pt further and ends inside that column, so the column's lines are read from their first 112 pt: `render 'The predict (tk, dk, Ck)' patch 1256,285 224x180`, `render 'application an k that is' patch 1258,493 216x94` (app.err of the take). Each fragment is a block, translated word by word and drawn over the English; the lens shows the first 22 pt of each patch, and the English line goes on beside it, untranslated.
+
+### 16.1 The capture's side edges (done)
+
+**Owner and cause.** `CaptureEdge` (Core) is the rule for lines the capture cuts; it knew the top and bottom only ("the sides are not this rule", `PaperQualityTests`). The top and bottom rule tells a cut line by its height (the visible half is about half as tall as a whole line). A line cut at a side is as tall as a whole one and has no width to compare with (a cut line is as wide as a whole one in a justified column and wider than a short last line). What shows the cut is the edge itself: the lines of the column it runs through all reach it.
+
+**The rule** (`CaptureEdge.cutAtSides`, called by `readableLines` beside `cut`):
+
+| Row | Guards against |
+|---|---|
+| a line whose box reaches the left or right edge within 4 px (`tolerance`, the one of the top and bottom: a cut line ends 3 px short of the edge as often as at it) | a line that ends 5 px short of the edge is whole (tested at 4.5 and 5) |
+| three or more lines reach the same side (`sideColumn`) | a heading, or two, at the edge of a picture cropped to the top left of a page: the use-case bench has five such lines in four pictures (d01, d02, d04, d05), never three |
+| at least one line reaches neither side | a picture cropped to its text: every line reaches both sides, and a justified paragraph looks the same |
+| a block that holds one cut line is left whole, not the line (`readableLines` returns no block; counter `ocr.cut_side`) | the last line of a cut paragraph, whole and short, translated alone as the fragment of a sentence |
+
+The blocks are left on the picture as the lines of the top and bottom rule are: not translated, not erased. In F2 the English line starts stay as they were and the lens shows them.
+
+**Census** (`/tmp/r117/read117/sidecensus.py`, the line boxes that the 197 renders of the benches trace, `ocr-block N lines:`): lines that reach a side edge within 4 px: paper 59, all in the two side-cut crops (`p7-s1` 41, `p12-s1` 18); use-case bench 5 in 4 pictures. So the rule changes the renders of those two crops and no other: the pages and the other crops have no line that reaches a side, and no picture of the use-case bench has three.
+
+**Numbers.** The side-cut crops of the paper bench (words cut at the left and right edge), build `read117g` against `read117base` (same sources, `tools/paper-bench/score.py`): `side_cut` 20 → 0 (10 and 10); blocks `p7-s1` 14 → 3, `p12-s1` 21 → 6 (12 blocks left as written in each: `ocr.cut_side=12`); `edge_cut` of the two crops 4 → 0 (the blocks that the crop's top or bottom cut stood at a side too). The film's F2, as a crop of page 6 whose right edge stands 300 px (112 pt) inside the right column (`/tmp/r117/read117/f2crop/p6-f2.png`): 13 blocks → 7; the fragments `The predictor keeps the (tk, dk, Ck) with Ck € 1P moving the content dowr path from an event to t`, `1 = 16 ms, and the durat`, `application animates one k that is on screen at tim`, `Figure 2. The two curve equations, not measured: tl`, `(Eq. 11 with 1 = 16 ms, 1`, `A precise delta is a stej`, `time s` are no longer translated. A live lens in the film's geometry needs the screen lock, Preview and a vision verdict: not run here; the crop is the same capture, read by the same pipeline.
+
+**Not done.** A column cut by fewer than three lines at the edge is left as before. A paragraph that the capture's edge cuts only in some of its lines (a ragged paragraph whose short lines end before the edge) is dropped whole only when the document reader put those lines in one block; where it gave each line a block (`p12-s1`), the short whole lines of the paragraph are translated as before. The lens's own left and right edges are 16.2.
+
+### 16.2 The lens's four edges (design only)
+
+**What the person should see.** The lens is a window on the translated page. What stands outside it is not wanted; what stands in it must be whole and be where the English was; the translation of a paragraph must not jump or reflow while the lens moves over it. Four things follow.
+1. A line of text is shown whole or not at all: half a line is a glitch, a missing first line is only the window.
+2. The translation keeps its place while the lens moves (no reflow per frame of a drag: the overscan was built so that a move is no re-read and no re-render).
+3. The Korean line next to an English line that is erased is the paragraph's translation at that place.
+4. A lens narrower than its paragraph still shows a translation: a lens 50 pt short of the paragraph's edge that shows nothing would look broken.
+
+**Options for the top and bottom edges** (the 1 above):
+
+| | what the lens shows | cost | against the four |
+|---|---|---|---|
+| O1 (today) | the whole translation at the whole rect; the mask cuts it | none | 1 fails at the edge line |
+| O2 share | only the lines inside: the translation split by the share of lines that are inside (`FlowSplit`) and laid out again in the part inside | a re-split and re-render of the paragraph per lens move | 1 holds; 2 fails; 3 fails at the cut (the split falls on a Korean word, not on the English line break) |
+| O3 shift | the translation moved so that its first line starts at the lens edge | none in the pipeline; a block image moved per lens move | 1 holds; 3 fails (the beginning of the translation over the middle of the English) |
+| O4 whole lines | O1, with the lines that the edge cuts hidden: the block's layer carries a mask of the lines that stand wholly in the lens | `BlockRenderer.Rendered` returns the translation's line boxes (the `CTFrame` has them); the overlay sets a mask per block from the lens rect and moves it with the lens: no re-read, no re-render | 1, 2, 3 hold; costs a strip under one line high at the edge where the erased background shows |
+| O5 soft edge | O1, the mask a gradient one line high at the top and bottom | one `CAGradientLayer` | 1 holds only as a scroll edge effect; the half line is still there, dimmer |
+
+**Pick for the top and bottom: O4.** It makes the unit a lens frame shows what the person reads, a line, with data that exist, and needs no new input and no re-render per frame.
+
+**Options for the left and right edges** (every Korean line of a paragraph wider than the lens crosses the edge, so O4's unit gives nothing here):
+
+| | what the lens shows | against the four |
+|---|---|---|
+| S1 (today) | the lines at the paragraph's width, the mask cuts them | 1 fails on every line (F1) |
+| S2 hide | the paragraph is not drawn while it crosses a side edge; the English shows | 1, 2, 3 hold; 4 fails: a lens a few points short of the paragraph shows nothing |
+| S3 visible width | the block is laid out again in the part of its rect that the lens covers; lines whole; the lens's top and bottom edges then work as O4 | 1, 3, 4 hold; 2 holds if the layout waits for the lens to settle (during the move the standing image is clipped as today: F7) and costs a re-render of the blocks that cross a side edge once per settle |
+| S4 fit | the lens is fitted to the paragraph: Fit to Column (fit117) | not a rendering rule: the person gets what the film's F4 and F5 are about; no nag, no first-run step |
+
+**Pick for the left and right: S3, with S2 below a floor.** S3 is the only one that holds 1 and 4. A translation laid out in a strip of a few words a line is no reading, so a block whose covered share of its width is below `minShare` (to be measured with the fitter: the width at which `BlockRenderer` returns the smallest size, on the paper bench's blocks) is not drawn (S2). S4 stays what the person does when they want the whole column. F1's lens covers 354 of 432 pt (82 %).
+
+**The one rule, in one owner.** A pure function in Core (`LensWindow`): given a block's rect and the lens rect, the width the translation is laid out in (S3) and the line boxes of the translation that end inside the lens (O4). `RegionPipeline` has the lens (`setVisible`, `RegionPipeline.swift:643`; `lensRect` `:1599`; it is used for the scheduling and the wait stats), and the blocks themselves stay lens-independent while the lens moves inside the capture: the layout at the visible width is a second image of the block, made when `motion stopped` and the lens crosses the block's side edge. A block wholly inside the lens is untouched (byte-identical).
+
+**Gap table (main `dd652f0`).**
+
+| Piece | Today | Needs |
+|---|---|---|
+| `BlockRenderer.Rendered` (`App/Pipeline/BlockRenderer.swift:37-47`) | `text`: one ink rect for the whole translation | `lines: [CGRect]`, the line boxes in the image (from the `CTFrame`); a render entry that takes a width |
+| `RegionPipeline.Block` / `OverlayBlock` (`RegionPipeline.swift:22-27`, `:105-135`) | `frame`, `image`, `seamless` | `lines`, copied through the snapshot; `nil` for a box block (whole or off); the second image for S3 |
+| `RegionPipeline` on `setVisible` + `motion stopped` | scheduling and wait stats only | the blocks that cross a side edge of the lens get the layout at the visible width (S3), once per settle |
+| `OverlayHostView.updateVisibility` (`OverlayPanel.swift:264-275`) | `opacity` 1 when the frame meets the lens, 0 otherwise | for a block whose frame crosses the top or bottom edge: a `mask` on the block's layer, the union of the lines inside the lens, moved with the lens; none for a block wholly inside |
+| Core `LensWindow` (new, pure) | none | cases: a block crossing the top, the bottom, both, a side, a corner; no lines; a line one point out; a lens wider than the block; a share below `minShare` |
+| Gate | none | the Core cases; an app check that a block crossing the edge gets a mask and one inside none; one vision verdict (opus: half lines and cut syllables at the four edges, before and after, on the film repro and on a chat) with the screen lock |
+| Debuggability | none | `overlay.line_masked` and `layout.visible_width` counters in the panel's stats |
+
+Open: whether the hidden strip should show the English line it stood over (the erased background shows there in the seamless mode, which is the lens's default; the box mode draws a box per block and needs no mask).
+
+
+## 17. `ParagraphGrouper.maxGap` 0.6, measured (round read117, 2026-10-22; no change)
+
+**Question.** A display that lies 0.60 to 0.63 line heights from the line above flips between "one paragraph" and "two blocks" from capture to capture. Does a different limit separate the lines of a paragraph from lines of separate blocks?
+
+**Measured** (`tools/paper-bench/gap-census.py`: the gap from a line to the nearest line below it in its column, in heights, with the grouper's own tests for height ratio and alignment; a list marker is not tested here):
+
+| gap | paper bench: same block / different blocks (the document reader's own blocks, 13 pages) | use-case bench: same unit / different units (the expected units of the 40 pictures, `auto` renders) |
+|---|---|---|
+| below 0.40 | 523 / 295 | 39 / 44 |
+| 0.40 to 0.50 | 4 / 21 | 3 / 11 |
+| 0.50 to 0.60 | 0 / 8 | 2 / 13 |
+| 0.60 to 0.65 | 1 / 9 | 0 / 4 |
+| 0.65 to 0.70 | 0 / 13 | 1 / 5 |
+| 0.70 and more (below 1.5) | 3 / 103 | 0 / 77 |
+| largest same gap | 1.38 | 0.67 |
+
+**Reading.** No limit separates them: the gaps of two blocks lie at every value from -0.3 up (tables, lists and navigation rows stand close; the grouper keeps them apart by its other rows, a list marker above all), so the gap alone is a weak test and the limit only decides the band between 0.4 and 0.7. In that band the lines of one paragraph are rare: 11 of 95 pairs on the two benches, 4 of them in 0.50 to 0.70. The bin that holds the flip zone (0.60 to 0.65) has 1 pair of one paragraph and 13 of two blocks. A limit of 0.5 would lose 2 pairs of the 45 of the use-case bench (0.50 to 0.60) and none of the paper reader's 531, and would keep 21 pairs of two blocks apart that 0.6 lets through where the other rows pass. That is a direction, not a result: the number that decides is the use-case bench's `merged` and `split` of the `vn` path at 0.5 (a run with the limit as a parameter). It is not run here, and the default path reads documents with the document reader, whose grouping the grouper does not decide.

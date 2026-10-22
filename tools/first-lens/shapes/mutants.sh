@@ -1,6 +1,7 @@
 #!/bin/bash
-# shapes117 FAIL-first: LensShapeTests against a stub (choose finds nothing) and named mutants of LensShape.swift. Every mutant must fail at
-# least one named test; the unmutated source must pass. Runs on a scratch copy of Core (never edits the tree). Each mutated line must exist
+# shapes117 FAIL-first: LensShapeTests against a stub (choose finds nothing) and named mutants of LensShape.swift; shapestab (2026-10-22) adds
+# LensShapeStabilityTests (the film stage's reads, shifted and jittered) and the mutants that take one rule of docs/design/lens-shapes.md
+# section 9 out. Every mutant must fail at least one named test; the unmutated source must pass. Runs on a scratch copy of Core (never edits the tree). Each mutated line must exist
 # exactly once in the source: a refactor that moves one fails here, not silently.
 #   usage: mutants.sh [scratch dir (default /tmp/r117/shapes117/mut)] [mutant names...]
 set -u
@@ -18,7 +19,7 @@ python3 - "$1" "$SCR/LensShape.orig" "$SRC" <<'EOF'
 import sys
 name, src, dst = sys.argv[1:4]
 M = {
- 'stub': [('for a in anchors(map, p, held: held) {', 'for a in [Int]() {')],
+ 'stub': [('for a in aimed {', 'for a in [Int]() {')],
  'no-hysteresis': [('guard let held, map.blocks.indices.contains(held.anchor) else { return taken }', 'guard let held = Optional<Shape>.none else { return taken }')],
  'cut-a-block-allowed': [('for _ in map.blocks.indices {\n            guard let i = map.blocks.indices.first(where: { !members.contains($0) && cuts(r, map.blocks[$0].core) }) else { break }', 'for _ in 0..<0 {\n            guard let i = map.blocks.indices.first(where: { !members.contains($0) && cuts(r, map.blocks[$0].core) }) else { break }'),
                          ('guard out.width >= minSize.width - 1 / grid, out.height >= minSize.height - 1 / grid,\n              !map.blocks.indices.contains(where: { !members.contains($0) && !map.blocks[$0].core.intersects(core) && cuts(out, map.blocks[$0].core) })', 'guard out.width >= minSize.width - 1 / grid, out.height >= minSize.height - 1 / grid')],
@@ -28,6 +29,15 @@ M = {
  'reach-unbounded': [('public static let reach: CGFloat = 40', 'public static let reach: CGFloat = 4000')],
  'label-takes-held-lens': [('taken + [held.anchor]', 'taken')],
  'table-without-min-rows': [('static let minRows = 3', 'static let minRows = 1')],
+ 'content-not-scoped': [('let content = map.within(bounds)', 'let content = map')],
+ 'messages-not-alike': [('let kin = messages.filter { alike(b[$0].em, em) }', 'let kin = messages')],
+ 'dialog-nearest-above-only': [('if let n = blocks.indices.filter({ $0 != a && pair(blocks[$0], blocks[a]) }).max(by: { blocks[$0].core.maxY < blocks[$1].core.maxY }) {',
+                                'if let n = blocks.indices.filter({ $0 != a && blocks[$0].core.maxY < blocks[a].core.minY + 0.2 * blocks[a].em }).max(by: { blocks[$0].core.maxY < blocks[$1].core.maxY }), pair(blocks[n], blocks[a]) {')],
+ 'merged-name-not-split': [('if let (n, b) = split(a), pair(n, b) { return (n, b, [a]) }', '')],
+ 'lane-without-precision': [('CGFloat(hits.count) >= laneShare * CGFloat(standing)', 'true')],
+ 'lane-spread-tight': [('static let laneSpread: CGFloat = 1.7', 'static let laneSpread: CGFloat = 1.4')],
+ 'name-of-any-width': [('name.lines == 1 && name.core.width <= nameWidth * name.em && body.lines <= bodyLines', 'name.lines == 1 && body.lines <= bodyLines')],
+ 'merged-lines-judged-by-height': [('let h = laneLines.filter { map.blocks[lines[$0].block].lines == 1 }.map { lines[$0].rect.height }.sorted()', 'let h = laneLines.map { lines[$0].rect.height }.sorted()')],
 }[name]
 s = open(src).read()
 for old, new in M:
@@ -44,13 +54,13 @@ run() { # name
     mutate "$1" || { echo "$1: BAD MUTANT" >> "$OUT"; return; }
     cmp -s "$SRC" "$SCR/LensShape.orig" && { echo "$1: unchanged source" >> "$OUT"; return; }
   fi
-  (cd "$SCR/Core" && swift test --filter LensShapeTests > "$SCR/$1.log" 2>&1; echo $? > "$SCR/$1.rc")
+  (cd "$SCR/Core" && swift test --filter LensShape > "$SCR/$1.log" 2>&1; echo $? > "$SCR/$1.rc")
   rc=$(cat "$SCR/$1.rc")
   failed=$(grep -o "^✘ Test [A-Za-z0-9_]*()" "$SCR/$1.log" | sed 's/✘ Test //; s/()//' | sort -u | tr '\n' ' ')
   echo "$1: rc=$rc failing: ${failed:-none}" >> "$OUT"
 }
 
-names=("$@"); [ ${#names[@]} -eq 0 ] && names=(original stub no-hysteresis cut-a-block-allowed heading-is-dialog page-line-is-subtitle no-pad reach-unbounded label-takes-held-lens table-without-min-rows)
+names=("$@"); [ ${#names[@]} -eq 0 ] && names=(original stub no-hysteresis cut-a-block-allowed heading-is-dialog page-line-is-subtitle no-pad reach-unbounded label-takes-held-lens table-without-min-rows content-not-scoped messages-not-alike dialog-nearest-above-only merged-name-not-split lane-without-precision lane-spread-tight merged-lines-judged-by-height name-of-any-width)
 for n in "${names[@]}"; do run "$n"; done
 cp "$SCR/LensShape.orig" "$SRC"
 cat "$OUT"

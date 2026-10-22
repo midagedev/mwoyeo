@@ -154,6 +154,10 @@ struct MenuPanel: View {
             Spacer(minLength: 0)
             // 22 × 22 pt hit areas, the glyphs as they were (ui-audit-1-1-5 X1); ⌘, and ⌘Q as every Mac app has them (1.2). The icons keep
             // their room first and the labels next, so a long label is cut before an icon is pushed out.
+            Button { TextTranslationWindow.shared.show() } label: { Image(systemName: "character.bubble").frame(width: 22, height: 22).contentShape(Rectangle()) }
+                .help(withShortcut(String(localized: "Translate Text…"), .translateText))
+                .accessibilityLabel("Translate Text…")
+                .layoutPriority(2)
             Button { ImageTranslation.shared.chooseImage() } label: { Image(systemName: "photo").frame(width: 22, height: 22).contentShape(Rectangle()) }
                 .help("Translate Image… — a file or the clipboard")
                 .accessibilityLabel("Translate Image…")

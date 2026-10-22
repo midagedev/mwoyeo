@@ -206,6 +206,7 @@ final class AppModel {
         HotKeys.shared.setHandler(.saveLensImage) { [weak self] in self?.lensForShortcut()?.saveLensImage() }
         HotKeys.shared.setHandler(.copyOriginal) { [weak self] in self?.lensForShortcut()?.copyOriginal() }
         HotKeys.shared.setHandler(.readAloud) { [weak self] in self?.lensForShortcut()?.toggleReadAloud() }
+        HotKeys.shared.setHandler(.translateText) { TextTranslationWindow.shared.show() }
         HotKeys.shared.apply(settings.shortcuts)
         settingsFile.startWatching { [weak self] in self?.settingsFileChanged() }
         // Transcripts written so far are closed before the app goes.

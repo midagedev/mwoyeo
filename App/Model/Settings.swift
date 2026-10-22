@@ -518,6 +518,20 @@ enum Languages {
         return Locale(identifier: Bundle.main.preferredLocalizations.first ?? "en").localizedString(forIdentifier: id) ?? id
     }
 
+    /// The language a person named: a code (`ko`, `zh-Hans`, `pt`), or a name in the app's language, in English or in the language itself
+    /// ("Korean", "한국어"). nil when it is none of `targets`.
+    static func code(for text: String, among ids: [String] = targets) -> String? {
+        let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !t.isEmpty else { return nil }
+        func same(_ a: String, _ b: String) -> Bool { a.compare(b, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame }
+        let english = Locale(identifier: "en")
+        if let id = ids.first(where: { same($0, t) }) { return id }
+        if let id = ids.first(where: { same(name($0), t) || same(english.localizedString(forIdentifier: $0) ?? $0, t)
+            || same(Locale(identifier: $0).localizedString(forIdentifier: $0) ?? $0, t) }) { return id }
+        let language = Locale.Language(identifier: t).languageCode?.identifier
+        return ids.first { Locale.Language(identifier: $0).languageCode?.identifier == language }
+    }
+
     /// Scripts Vision's fast recognizer handles; everything else needs the accurate recognizer.
     static func isLatinScript(_ id: String) -> Bool {
         ["en", "fr", "de", "es", "it", "pt", "nl", "sv", "da", "nb", "nn", "no", "fi", "pl", "cs", "ro", "tr", "id", "ms", "vi"]

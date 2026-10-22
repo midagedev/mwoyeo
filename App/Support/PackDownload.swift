@@ -11,10 +11,12 @@ enum PackHost: Sendable {
     case settings
     /// The image window, over the picture that needs the pack.
     case image
+    /// The Translate Text window, over the text that needs the pack.
+    case text
 }
 
 /// "Download <language> (once)": the one owner of every language pack download, whoever asks (a lens, the menu panel, a row in
-/// Settings, the image window), and of what became of it (`PackLedger`) for all of them to say. Each window that can host the sheet
+/// Settings, the image window, the text window), and of what became of it (`PackLedger`) for all of them to say. Each window that can host the sheet
 /// applies `packDownload(in:)` and shows it when its pair is set.
 @MainActor @Observable
 final class PackDownload {
@@ -22,6 +24,7 @@ final class PackDownload {
 
     private(set) var settings: PackPair?
     private(set) var image: PackPair?
+    private(set) var text: PackPair?
     /// Which pairs are downloading, and which ended without the pack.
     private(set) var ledger = PackLedger()
     /// Counts the downloads that ended (installed, or the user said no), so that a list of packs reads its status again.
@@ -41,12 +44,19 @@ final class PackDownload {
         switch host {
         case .settings: settings = pair
         case .image: image = pair
+        case .text: text = pair
         }
         Trace.count("pack.download.requested")
         AppModel.shared.refreshHints()
     }
 
-    func pair(for host: PackHost) -> PackPair? { host == .settings ? settings : image }
+    func pair(for host: PackHost) -> PackPair? {
+        switch host {
+        case .settings: settings
+        case .image: image
+        case .text: text
+        }
+    }
 
     private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "packs")
 
@@ -59,6 +69,7 @@ final class PackDownload {
             switch host {
             case .settings: settings = nil
             case .image: image = nil
+            case .text: text = nil
             }
         }
         ended += 1

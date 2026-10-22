@@ -45,6 +45,8 @@ enum HotKeyAction: String, Codable, CaseIterable, Identifiable {
     case addLens, toggleOriginal, hideLenses, pause, refresh
     /// Lens actions, no default combo; they act on the lens under the pointer, else the newest one.
     case saveLensImage, copyOriginal, readAloud
+    /// Opens the Translate Text window; no default combo, and no lens to act on.
+    case translateText
 
     var id: String { rawValue }
     var title: String {
@@ -57,6 +59,7 @@ enum HotKeyAction: String, Codable, CaseIterable, Identifiable {
         case .saveLensImage: String(localized: "Save Lens Image")
         case .copyOriginal: String(localized: "Copy Original Text")
         case .readAloud: String(localized: "Read Aloud")
+        case .translateText: String(localized: "Translate Text")
         }
     }
 

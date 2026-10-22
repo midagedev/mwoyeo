@@ -62,6 +62,12 @@ struct MwoyeoApp: App {
             SettingsView()
                 .environment(model)
         }
+        .commands {
+            // The app menu, while one of Mwoyeo's windows is in front (the menu bar item and the shortcut work from anywhere).
+            CommandGroup(after: .appInfo) {
+                Button("Translate Text…") { TextTranslationWindow.shared.show() }
+            }
+        }
     }
 
     private var icon: MenuBarIcon {
@@ -83,6 +89,7 @@ private struct SettingsOpener: View {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         Task { @MainActor in await AppModel.shared.bootstrap() }
+        ServicesProvider.register()
         // `MWOYEO_PREVIEW=menu|onboarding` shows that window on launch, for screenshots. `pack` does what a lens's "Download <language>"
         // does (Settings on Translation, the pack's download for ja → en: nothing to ask for when it is installed), `relaunch` what
         // its "Restart Mwoyeo" does; both after 3 s, for gates.

@@ -25,6 +25,10 @@ struct LensFit {
 
     /// The snap a drag is in (`ColumnFit.snap`), for its hysteresis and for the guide; nil outside a snap.
     var snap: ColumnFit.Snap?
+    /// Where a resize shows its right edge while the guide is up (`LiveSnap`: instant, or the taper with a dwell capture), and the clock it reads (the
+    /// checks give a fake one).
+    var live = LiveSnap(feel: RegionSession.snapFeel)
+    var now: () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }
     /// The rect the lens had before the last fit, kept until the next drag, resize or close: what Undo Fit goes back to.
     var undo: CGRect?
     /// The rect a fit animation is going to; the lens is animating while it is not nil.

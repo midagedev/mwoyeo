@@ -37,7 +37,8 @@ final class RegionFrameWindow: NSPanel {
     var onSnapResize: ((NSRect) -> NSRect)?
     /// A move ended at this frame: the frame it settles on after the snap, nil to stay (`RegionSession.settleFrame`).
     var onSettle: ((NSRect) -> NSRect?)?
-    /// A resize ended at this frame: the frame it settles on, the rest of the way onto a column's edge (`RegionSession.settleResized`).
+    /// A resize ended at this frame: the frame it settles on, the rest of the way onto a column's edge (`RegionSession.settleResized`); nil when the edge is
+    /// on it already (a snap took it there: `LiveSnap`).
     var onSettleResize: ((NSRect) -> NSRect?)?
     /// The ring's outline changed with no change of frame (the skin settling after a fit, a drag or a commit): the panel cuts its clip by it again.
     var onOutline: (() -> Void)?
@@ -218,6 +219,8 @@ private final class FrameChromeView: NSView {
     /// A resize's right edge as the person last saw it (screen x), and the system's filter that decides when the alignment tick plays.
     private var shownRight: CGFloat = 0
     private let haptic = AlignmentHaptic()
+    /// The frame the hand made at the last `mouseDragged`, before the snap: asked again on each display frame of the drag.
+    private var lastWanted: NSRect?
     /// A fit, a growth or a settle under way (`animate`): its frames come from the display link, `elapsed` seconds of them so far.
     private struct Animation {
         let from: NSRect, to: NSRect
@@ -364,11 +367,20 @@ private final class FrameChromeView: NSView {
         }
     }
 
+    /// The pill's words, and what they measure: kept while the words stay the same. A frame of a resize or an animation draws the pill again and asks for its
+    /// rects a dozen times, and measuring the text was 43 of the 233 main-thread samples over one Auto Fit (Time Profiler, round snap117).
+    private struct TabWords: Equatable { var name: String, longest: String, badge: Bool }
+    private var measured: (words: TabWords, title: CGFloat, sub: CGFloat)?
+
     private var tabRect: NSRect {
-        let title = (name as NSString).size(withAttributes: [.font: Self.titleFont]).width
-        let longest = [detail, notice ?? "", hintLine ?? ""].max { $0.count < $1.count } ?? ""
-        let sub = longest.isEmpty ? 0 : (longest as NSString).size(withAttributes: [.font: Self.detailFont]).width + 10 + (badge == nil ? 0 : 14)
-        let w = min(regionRect.width, title + sub + 40 + 20 + (strong ? 22 : 0))
+        let words = TabWords(name: name, longest: [detail, notice ?? "", hintLine ?? ""].max { $0.count < $1.count } ?? "", badge: badge != nil)
+        if measured?.words != words {
+            let title = (words.name as NSString).size(withAttributes: [.font: Self.titleFont]).width
+            let sub = words.longest.isEmpty ? 0 : (words.longest as NSString).size(withAttributes: [.font: Self.detailFont]).width + 10 + (words.badge ? 14 : 0)
+            measured = (words, title, sub)
+            Trace.count("lens.tab.measure")
+        }
+        let w = min(regionRect.width, measured!.title + measured!.sub + 40 + 20 + (strong ? 22 : 0))
         let width = max(72, w)
         return NSRect(x: tabPosition.isTrailing ? regionRect.maxX - width : regionRect.minX,
                       y: tabPosition.isBottom ? regionRect.minY - 6 - RegionFrameWindow.tabHeight : regionRect.maxY + 6,
@@ -565,10 +577,14 @@ private final class FrameChromeView: NSView {
     /// One display frame of whatever moves the lens and of the outline settling after it. The frame and the skin step on this one tick, so the ring,
     /// the clip and the window always come from one frame.
     @objc private func tick(_ l: CADisplayLink) {
+        // A frame of ours that takes over 4 ms is named in the trace: its own cost shows in the next frame's gap (`tools/lens-fit/frame-gaps.py`).
+        let began = Trace.now
+        defer { if Trace.enabled, Trace.now - began > 0.004 { Trace.mark("lens tick slow: \(animation != nil ? "animation" : drag != nil ? "drag" : "settling")", since: began) } }
         let dt = frameDT(l)
         if animation != nil {
             animationFrame(dt)
         } else {
+            if drag == .resize, let wanted = lastWanted { resize(to: wanted, ticked: true) }
             stepSkin(dt, toward: window_?.regionFrame ?? .zero, hand: drag == .resize ? .corner : .none)
         }
         finishFrame()
@@ -706,6 +722,7 @@ private final class FrameChromeView: NSView {
         startMouse = NSEvent.mouseLocation
         startRegion = window_?.regionFrame ?? .zero
         shownRight = startRegion.maxX
+        lastWanted = nil
         updateGlow()
         needsDisplay = true
         if drag == .resize {
@@ -780,15 +797,24 @@ private final class FrameChromeView: NSView {
     }
 
     override func mouseDragged(with event: NSEvent) {
-        guard drag == .resize, let w = window_ else { return }
+        guard drag == .resize, window_ != nil else { return }
         haptic.update(with: event)
         let m = NSEvent.mouseLocation
         let dx = m.x - startMouse.x, dy = m.y - startMouse.y
         // Bottom-right corner: the top-left stays put (in AppKit, top = maxY).
         let width = max(80, startRegion.width + dx), height = max(40, startRegion.height - dy)
         let wanted = NSRect(x: startRegion.minX, y: startRegion.maxY - height, width: width, height: height)
-        // The right edge pulls to a column's edge (the session decides; ⌘ held, it does not).
+        lastWanted = wanted
+        resize(to: wanted)
+    }
+
+    /// The lens at the frame the hand made, after the snap (the session decides; ⌘ held, it pulls nothing). `ticked`: a display frame in which the hand holds
+    /// still (a hand that holds sends no `mouseDragged`, and a snap that takes the edge in while it holds, `LiveSnap`, has frames to show): nothing to do
+    /// unless the edge has moved.
+    private func resize(to wanted: NSRect, ticked: Bool = false) {
+        guard let w = window_ else { return }
         let r = w.onSnapResize?(wanted) ?? wanted
+        if ticked, r.maxX == shownRight { return }
         haptic.resized(in: self, previousX: shownRight - w.frame.minX, alignedX: r.maxX - w.frame.minX, defaultX: wanted.maxX - w.frame.minX)
         shownRight = r.maxX
         w.driveRegion(r)
@@ -798,6 +824,7 @@ private final class FrameChromeView: NSView {
     override func mouseUp(with event: NSEvent) {
         guard drag == .resize else { return }
         let pointer = convert(event.locationInWindow, from: nil)
+        lastWanted = nil
         // A resize let go within a column's reach settles the rest of the way onto its edge, as a move does.
         if let w = window_, let settled = w.onSettleResize?(w.regionFrame), settled != w.regionFrame {
             animate(to: settled, duration: LensMotion.settle, moment: .drop) { [weak self] _ in self?.finishDrag(at: pointer) }
@@ -907,10 +934,11 @@ private final class FrameChromeView: NSView {
         hintHit = nil
         var x = dot.maxX + 8
         let title = NSAttributedString(string: name, attributes: [.font: Self.titleFont, .foregroundColor: NSColor.white])
+        let titleSize = title.size()
         let limit = tab.maxX - x - (strong ? 48 : 30)
-        title.draw(with: NSRect(x: x, y: tab.midY - title.size().height / 2 + 1, width: limit, height: title.size().height),
+        title.draw(with: NSRect(x: x, y: tab.midY - titleSize.height / 2 + 1, width: limit, height: titleSize.height),
                    options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])
-        x += title.size().width + 10
+        x += titleSize.width + 10
         // A notice and the original's label are the pill's own words; the hint stands where the languages would.
         let hinted = notice == nil && !original ? hint : nil
         if original || !detail.isEmpty || notice != nil || hinted != nil, x < tab.maxX - 50 {
@@ -918,31 +946,25 @@ private final class FrameChromeView: NSView {
             let sub = NSAttributedString(string: line, attributes: [.font: Self.detailFont,
                                                                     .foregroundColor: NSColor.white.withAlphaComponent(hinted == nil ? 0.6 : hintActionable ? 0.95 : 0.8)])
             // An added engine's mark: a cloud for a remote one, a Mac for one on this Mac.
-            if let badge, notice == nil, !original, hinted == nil,
-               let icon = NSImage(systemSymbolName: badge, accessibilityDescription: nil)?.withSymbolConfiguration(.init(pointSize: 9, weight: .medium)) {
+            if let badge, notice == nil, !original, hinted == nil, let icon = whiteSymbol(badge, pointSize: 9, weight: .medium, alpha: 0.6) {
                 let s = icon.size
-                icon.tinted(.white.withAlphaComponent(0.6))
-                    .draw(in: NSRect(x: x, y: tab.midY - s.height / 2 + 1, width: s.width, height: s.height))
+                icon.draw(in: NSRect(x: x, y: tab.midY - s.height / 2 + 1, width: s.width, height: s.height))
                 x += s.width + 4
             }
             let room = tab.maxX - x - (strong ? 48 : 30)
-            sub.draw(with: NSRect(x: x, y: tab.midY - sub.size().height / 2 + 1, width: room, height: sub.size().height),
+            let subSize = sub.size()
+            sub.draw(with: NSRect(x: x, y: tab.midY - subSize.height / 2 + 1, width: room, height: subSize.height),
                      options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine])
-            if hinted != nil { hintHit = NSRect(x: x - 4, y: tab.minY, width: min(sub.size().width, room) + 8, height: tab.height) }
+            if hinted != nil { hintHit = NSRect(x: x - 4, y: tab.minY, width: min(subSize.width, room) + 8, height: tab.height) }
         }
 
-        if let icon = NSImage(systemSymbolName: following ? "macwindow" : "pin.fill", accessibilityDescription: modeHelp)?
-            .withSymbolConfiguration(.init(pointSize: 11, weight: .semibold)) {
+        if let icon = whiteSymbol(following ? "macwindow" : "pin.fill", pointSize: 11, weight: .semibold, alpha: strong ? 0.9 : 0.6) {
             let m = modeRect, s = icon.size
-            icon.tinted(.white.withAlphaComponent(strong ? 0.9 : 0.6))
-                .draw(in: NSRect(x: m.midX - s.width / 2, y: m.midY - s.height / 2, width: s.width, height: s.height))
+            icon.draw(in: NSRect(x: m.midX - s.width / 2, y: m.midY - s.height / 2, width: s.width, height: s.height))
         }
 
         guard strong else { return }
-        if let xmark = NSImage(systemSymbolName: "xmark.circle.fill", accessibilityDescription: String(localized: "Close"))?
-            .withSymbolConfiguration(.init(pointSize: 13, weight: .regular)) {
-            xmark.tinted(.white.withAlphaComponent(0.8)).draw(in: closeRect)
-        }
+        if let xmark = whiteSymbol("xmark.circle.fill", pointSize: 13, weight: .regular, alpha: 0.8) { xmark.draw(in: closeRect) }
 
         // Resize grip: two short diagonal strokes in the corner.
         let g = NSBezierPath()
@@ -1101,18 +1123,42 @@ extension FrameChromeView: NSViewToolTipOwner {
             : String(localized: "Pinned to the screen. Click to follow the window underneath.")
     }
 
+    /// The pill's symbols, each baked once (name, size, weight, alpha, the window's scale): `draw` blits them. A frame of a resize used to render each through a
+    /// drawing handler, a render of the symbol and a fill, which was 41 of the 233 main-thread samples over one Auto Fit (Time Profiler, round snap117).
+    private static var baked: [String: NSImage] = [:]
+
+    private func whiteSymbol(_ name: String, pointSize: CGFloat, weight: NSFont.Weight, alpha: CGFloat) -> NSImage? {
+        let scale = window?.backingScaleFactor ?? 2
+        let key = "\(name)|\(pointSize)|\(weight.rawValue)|\(alpha)|\(scale)"
+        if let hit = Self.baked[key] { return hit }
+        guard let symbol = NSImage(systemSymbolName: name, accessibilityDescription: nil)?.withSymbolConfiguration(.init(pointSize: pointSize, weight: weight)) else { return nil }
+        let image = symbol.tinted(.white.withAlphaComponent(alpha), scale: scale)
+        Self.baked[key] = image
+        Trace.count("lens.tab.bake")
+        return image
+    }
+
     func view(_ view: NSView, stringForToolTip tag: NSView.ToolTipTag, point: NSPoint, userData data: UnsafeMutableRawPointer?) -> String {
         modeHelp
     }
 }
 
 private extension NSImage {
-    func tinted(_ color: NSColor) -> NSImage {
-        NSImage(size: size, flipped: false) { rect in
-            self.draw(in: rect)
-            color.set()
-            rect.fill(using: .sourceAtop)
-            return true
-        }
+    /// This image in `color` (its alpha kept), as a bitmap of `scale` pixels to the point.
+    func tinted(_ color: NSColor, scale: CGFloat) -> NSImage {
+        let rect = NSRect(origin: .zero, size: size)
+        guard let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: Int(ceil(size.width * scale)), pixelsHigh: Int(ceil(size.height * scale)), bitsPerSample: 8,
+                                         samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0) else { return self }
+        rep.size = size
+        guard let context = NSGraphicsContext(bitmapImageRep: rep) else { return self }
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = context
+        draw(in: rect)
+        color.set()
+        rect.fill(using: .sourceAtop)
+        NSGraphicsContext.restoreGraphicsState()
+        let baked = NSImage(size: size)
+        baked.addRepresentation(rep)
+        return baked
     }
 }

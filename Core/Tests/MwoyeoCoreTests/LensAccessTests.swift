@@ -12,6 +12,21 @@ import Testing
         #expect(p.rect.midX == screen.midX && p.rect.midY == screen.midY)
     }
 
+    @Test func aRegionInsideALensStartsSmallAndMayShrinkToItsOwnMinimum() {
+        // `RegionMarker` (game117): a part of a lens that is not read, placed with the keyboard inside the lens.
+        let lens = CGRect(x: 200, y: 100, width: 400, height: 200)
+        var p = KeyboardLens(bounds: lens, size: CGSize(width: 120, height: 48), minimum: CGSize(width: 8, height: 8))
+        #expect(p.rect.size == CGSize(width: 120, height: 48) && p.rect.midX == lens.midX && p.rect.midY == lens.midY)
+        for _ in 0..<11 { p.press(.left, resize: true) }
+        #expect(p.rect.width == 10, "ten points left of 120 after eleven steps is 10: \(p.rect.width)")
+        let narrower = p.press(.left, resize: true)
+        #expect(!narrower, "narrower than the region's own minimum")
+        var plain = KeyboardLens(bounds: lens)
+        #expect(plain.rect.size == CGSize(width: 400, height: 200), "the lens's default size is cut by its bounds")
+        for _ in 0..<33 { plain.press(.left, resize: true) }
+        #expect(plain.rect.width == 80, "the default minimum is still the lens's (80): \(plain.rect.width)")
+    }
+
     @Test func aSmallScreenShrinksTheDefaultToFit() {
         let p = KeyboardLens(bounds: CGRect(x: 100, y: 50, width: 400, height: 200))
         #expect(p.rect == CGRect(x: 100, y: 50, width: 400, height: 200))

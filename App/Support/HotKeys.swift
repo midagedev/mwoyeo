@@ -44,7 +44,7 @@ struct KeyCombo: Codable, Equatable {
 enum HotKeyAction: String, Codable, CaseIterable, Identifiable {
     case addLens, toggleOriginal, hideLenses, pause, refresh
     /// Lens actions, no default combo; they act on the lens under the pointer, else the newest one.
-    case saveLensImage, copyOriginal, readAloud
+    case saveLensImage, copyOriginal, readAloud, ignoreRegion, keepRecentLines
     /// Opens the Translate Text window; no default combo, and no lens to act on.
     case translateText
 
@@ -60,6 +60,8 @@ enum HotKeyAction: String, Codable, CaseIterable, Identifiable {
         case .copyOriginal: String(localized: "Copy Original Text")
         case .readAloud: String(localized: "Read Aloud")
         case .translateText: String(localized: "Translate Text")
+        case .ignoreRegion: String(localized: "Ignore Region")
+        case .keepRecentLines: String(localized: "Keep Recent Lines")
         }
     }
 

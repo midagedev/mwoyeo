@@ -145,50 +145,148 @@ enum FitChecks {
         st.received(snapshot(wholePage))
         check("a newer one that holds the lens is", fitRow(st)?.isEnabled == true)
 
-        // MARK: Snap on resize
+        // MARK: The pill is measured and its symbols baked once per change, not once a frame (round snap117: the main thread's time over an Auto Fit)
 
-        let r = await lens(narrow)
-        r.received(snapshot(wholePage))
-        let onResize = window(r)?.onSnapResize
-        func resized(toRight x: Double) -> NSRect { var f = frame(r); f.size.width = x - narrow.minX; return f }
+        // Every frame of a resize or an animation draws the lens window's view again. Over one Auto Fit 140 of the 233 busy main-thread samples were the pill: its
+        // text measured a dozen times a draw and its symbols rendered through a drawing handler. Drawing the same words again measures and bakes nothing.
+        let pill = await lens(narrow)
+        let pillView = window(pill)?.contentView
+        /// One draw of the lens window's view into a bitmap (the window need not be on screen for it).
+        func drawn(_ times: Int = 1) {
+            guard let v = pillView, let rep = v.bitmapImageRepForCachingDisplay(in: v.bounds) else { return }
+            for _ in 0..<times { v.cacheDisplay(in: v.bounds, to: rep) }
+        }
+        window(pill)?.setName("Pill A")
+        _ = Trace.takeCounts()
+        drawn()
+        c = Trace.takeCounts()
+        check("a new name is measured by the next draw (once)", c["lens.tab.measure"] == 1, "\(c)")
+        drawn(5)
+        c = Trace.takeCounts()
+        check("five more draws of the same pill measure nothing and bake nothing", (c["lens.tab.measure"] ?? 0) == 0 && (c["lens.tab.bake"] ?? 0) == 0, "\(c)")
+        window(pill)?.setDetail("English → Korean", badge: "cloud")
+        drawn(2)
+        c = Trace.takeCounts()
+        check("a new detail with an engine's badge is measured once, and its symbol baked once, however many draws show it", c["lens.tab.measure"] == 1 && c["lens.tab.bake"] == 1, "\(c)")
+
+        // MARK: The feel's switch
+
+        check("the snap's feel is read from MWOYEO_SNAP=instant|dwell and nothing else (standard \(LiveSnap.standard.rawValue))",
+              DebugSwitch.snapFeel(in: ["MWOYEO_SNAP": "dwell"]) == .dwell && DebugSwitch.snapFeel(in: ["MWOYEO_SNAP": "instant"]) == .instant
+              && DebugSwitch.snapFeel(in: [:]) == LiveSnap.standard && DebugSwitch.snapFeel(in: ["MWOYEO_SNAP": "on"]) == LiveSnap.standard
+              && DebugSwitch.snapFeel(in: ["MWOYEO_PREDICT": "dwell"]) == LiveSnap.standard)
+        check("the process default follows the environment", RegionSession.snapFeel == DebugSwitch.snapFeel(in: ProcessInfo.processInfo.environment))
+
+        // MARK: Snap on resize: instant (the standard feel, motion contract 3.1)
+
+        // 2026-10-23 (snap117, addendum A2): the edge is on the column's in the frame the guide comes up and under the hand in the frame it goes down. These lines
+        // replace fit117's "5 pt short it is pulled 3.5 pt of the way", which became the `dwell` feel's below. Each call is a display frame: the clock moves 1/60 s.
+        var clock = 0.0
         let edge = left.x1 + 1.3 + pad      // the right edge a lens snaps to: the column's, 1.3 pt wide as read, and the pad
         func maxX(_ f: NSRect?) -> Double? { f.map { ScreenGeometry.quartzRect(fromAppKit: $0).maxX } }
+        func snapLens(_ feel: LiveSnap.Feel, settings: AppSettings = AppSettings()) async -> RegionSession {
+            let s = await lens(narrow, settings: settings)
+            s.received(snapshot(wholePage))
+            s.fit.live = LiveSnap(feel: feel)
+            s.fit.now = { clock }
+            return s
+        }
+        /// The hand puts the right edge `short` pt short of the column's edge (negative: past it): one display frame, the lens's frame as the snap shows it.
+        func hand(_ s: RegionSession, short: Double) -> NSRect? {
+            clock += 1.0 / 60
+            var f = frame(s)
+            f.size.width = edge - short - narrow.minX
+            return window(s)?.onSnapResize?(f)
+        }
+        func handFrame(_ s: RegionSession, short: Double) -> NSRect {
+            var f = frame(s)
+            f.size.width = edge - short - narrow.minX
+            return f
+        }
+        let r = await snapLens(.instant)
         _ = Trace.takeCounts()
-        let near = onResize?(resized(toRight: edge - 3))
+        let near = hand(r, short: 3)
         c = Trace.takeCounts()
-        check("a resize 3 pt short of the column's edge (within the plateau) puts the lens's edge on it (right edge \(edge))", maxX(near).map { abs($0 - edge) < 0.01 } == true && c["lens.snap.enter"] == 1,
-              "\(String(describing: near)) \(c)")
-        let pulled = onResize?(resized(toRight: edge - 5))
+        check("instant: a resize 3 pt short of the column's edge puts the lens's edge on it (right edge \(edge)) and the guide comes up once",
+              maxX(near).map { abs($0 - edge) < 0.01 } == true && c["lens.snap.enter"] == 1, "\(String(describing: near)) \(c)")
+        _ = hand(r, short: 16)
+        check("16 pt short the guide is down", r.fit.snap == nil)
+        let reach = hand(r, short: 7.9)
+        check("instant: 7.9 pt short, in the frame the guide comes up, the lens's edge is on the column's (not 4.5 pt off it: the taper)",
+              maxX(reach).map { abs($0 - edge) < 0.01 } == true && r.fit.snap != nil, "\(String(describing: maxX(reach)))")
+        let held = hand(r, short: 11.5)
+        check("11.5 pt short the guide is still up (hysteresis) and so is the edge's capture", maxX(held).map { abs($0 - edge) < 0.01 } == true && r.fit.snap != nil, "\(String(describing: maxX(held)))")
+        let free = hand(r, short: 12.5)
+        check("and in the frame the hand passes 12 pt the edge is under it again and the guide is down", free == handFrame(r, short: 12.5) && r.fit.snap == nil, "\(String(describing: free))")
+        let far = hand(r, short: 20)
+        check("20 pt away it was never caught", far == handFrame(r, short: 20))
+        var growing: [Double] = [], shrinking: [Double] = []
+        for k in stride(from: 16.0, through: -16.0, by: -1.0) { growing.append(maxX(hand(r, short: k)) ?? 0) }          // short of the edge, then past it
+        for k in stride(from: -16.0, through: 16.0, by: 1.0) { shrinking.append(maxX(hand(r, short: k)) ?? 0) }
+        let grew = growing.map { abs($0 - edge) < 0.01 }, shrank = shrinking.map { abs($0 - edge) < 0.01 }
+        let growsFrom = grew.firstIndex(of: true).map { 16 - Double($0) }, growsTo = grew.lastIndex(of: true).map { 16 - Double($0) }
+        let shrinksFrom = shrank.firstIndex(of: true).map { Double($0) - 16 }, shrinksTo = shrank.lastIndex(of: true).map { Double($0) - 16 }
+        check("a hand 1 pt a frame growing the lens past the column: the edge is on it from the frame 8 pt short to the frame 12 pt past (\(String(describing: growsFrom)) to \(String(describing: growsTo)))",
+              growsFrom == 8 && growsTo == -12, "\(growing)")
+        check("and shrinking it back: from the frame 8 pt past to 12 pt short (\(String(describing: shrinksFrom)) to \(String(describing: shrinksTo)))", shrinksFrom == -8 && shrinksTo == 12, "\(shrinking)")
+        _ = hand(r, short: 7)
+        let letGo = hand(r, short: 7)
+        let rest = letGo.flatMap { window(r)?.onSettleResize?($0) }
+        check("let go 7 pt short (the guide up) the lens stays where it shows, on the edge: nothing glides after the mouse-up", rest == nil && maxX(letGo).map { abs($0 - edge) < 0.01 } == true && !r.fit.settling, "\(String(describing: rest)) \(String(describing: maxX(letGo)))")
+        window(r)?.onCommit?()
+        check("and the snap is over once it is dropped", r.fit.snap == nil && !r.fit.settling)
+        let second = hand(r, short: 5)
+        check("a second drag within reach from its first frame has the edge on the column's", maxX(second).map { abs($0 - edge) < 0.01 } == true && r.fit.snap != nil, "\(String(describing: maxX(second)))")
+        window(r)?.onCommit?()
+        r.fit.commandDown = { true }
+        let command = hand(r, short: 3)
+        check("with ⌘ held a resize does not snap", command == handFrame(r, short: 3))
+        r.fit.commandDown = { false }
+        var off = AppSettings()
+        off.lensSnap = false
+        let o = await snapLens(.instant, settings: off)
+        let offSnap = hand(o, short: 3)
+        check("and with Snap to text columns off it does not either", offSnap == handFrame(o, short: 3))
+
+        // MARK: Snap on resize: dwell (fit117 decision 16 as built, and a capture while the hand holds still)
+
+        let dw = await snapLens(.dwell)
+        _ = Trace.takeCounts()
+        let dNear = hand(dw, short: 3)
+        c = Trace.takeCounts()
+        check("dwell: a resize 3 pt short of the column's edge (within the plateau) puts the lens's edge on it and the guide comes up once",
+              maxX(dNear).map { abs($0 - edge) < 0.01 } == true && c["lens.snap.enter"] == 1, "\(String(describing: dNear)) \(c)")
+        let pulled = hand(dw, short: 5)
         check("5 pt short it is pulled 3.5 pt of the way: the pull tapers, the edge does not jump under the hand", maxX(pulled).map { abs($0 - (edge - 1.5)) < 0.01 } == true, "\(String(describing: maxX(pulled)))")
-        let held = onResize?(resized(toRight: edge - 11.5))
-        check("11.5 pt short the pull is a quarter of a point and the guide is still up (hysteresis)", maxX(held).map { abs($0 - (edge - 11.25)) < 0.01 } == true && r.fit.snap != nil, "\(String(describing: maxX(held)))")
-        let free = onResize?(resized(toRight: edge - 12.5))
-        check("and beyond 12 pt there is none, and the guide is down", free == resized(toRight: edge - 12.5) && r.fit.snap == nil, "\(String(describing: free))")
-        let far = onResize?(resized(toRight: edge - 20))
-        check("20 pt away it was never caught", far == resized(toRight: edge - 20))
+        let dHeld = hand(dw, short: 11.5)
+        check("11.5 pt short the pull is a quarter of a point and the guide is still up (hysteresis)", maxX(dHeld).map { abs($0 - (edge - 11.25)) < 0.01 } == true && dw.fit.snap != nil, "\(String(describing: maxX(dHeld)))")
+        let dFree = hand(dw, short: 12.5)
+        check("and beyond 12 pt there is none, and the guide is down", dFree == handFrame(dw, short: 12.5) && dw.fit.snap == nil, "\(String(describing: dFree))")
         // A hand moving 1 pt at a time from 16 pt short to the edge: the lens's edge moves between 0 and 1.5 pt in a step, never more (no pop on entering).
         var worst = 0.0, lastShown = 0.0
         for k in stride(from: 16.0, through: 0.0, by: -1.0) {
-            let x = maxX(onResize?(resized(toRight: edge - k))) ?? 0
+            let x = maxX(hand(dw, short: k)) ?? 0
             if k < 16 { worst = max(worst, abs(x - lastShown)) }
             lastShown = x
         }
         check("a hand moving 1 pt at a time from 16 pt short onto the edge: the lens's edge never moves more than 1.5 pt in a step (worst \(worst))", worst <= 1.5 + 1e-9 && abs(lastShown - edge) < 0.01)
-        let letGo = onResize?(resized(toRight: edge - 6))
-        let rest = letGo.flatMap { window(r)?.onSettleResize?($0) }
-        check("let go 6 pt short (the guide up), the lens glides the rest of the way onto the edge", maxX(rest).map { abs($0 - edge) < 0.01 } == true && r.fit.settling, "\(String(describing: maxX(rest)))")
-        window(r)?.onCommit?()
-        check("and the snap is over once it is dropped", r.fit.snap == nil && !r.fit.settling)
-        r.fit.commandDown = { true }
-        let command = onResize?(resized(toRight: edge - 3))
-        check("with ⌘ held a resize does not snap", command == resized(toRight: edge - 3))
-        r.fit.commandDown = { false }
-        var off = AppSettings()
-        off.lensSnap = false
-        let o = await lens(narrow, settings: off)
-        o.received(snapshot(wholePage))
-        let offSnap = window(o)?.onSnapResize?(resized(toRight: edge - 3))
-        check("and with Snap to text columns off it does not either", offSnap == resized(toRight: edge - 3))
+        let dLetGo = hand(dw, short: 6)
+        let dRest = dLetGo.flatMap { window(dw)?.onSettleResize?($0) }
+        check("let go 6 pt short while it moves (the guide up), the lens glides the rest of the way onto the edge", maxX(dRest).map { abs($0 - edge) < 0.01 } == true && dw.fit.settling, "\(String(describing: maxX(dRest)))")
+        window(dw)?.onCommit?()
+        check("and the snap is over once it is dropped", dw.fit.snap == nil && !dw.fit.settling)
+        // The hand arrives 7 pt short and holds: no `mouseDragged` comes, only display frames (the chrome asks again each one). 2026-10-23 (snap117, A1).
+        for k in stride(from: 20.0, through: 7.0, by: -1.0) { _ = hand(dw, short: k) }
+        var holdEdge = maxX(hand(dw, short: 7)) ?? 0
+        let tapered = holdEdge
+        for _ in 0..<30 { holdEdge = maxX(hand(dw, short: 7)) ?? 0 }                      // 0.5 s
+        check("dwell: the hand arrives 7 pt short, the taper has the edge \(String(format: "%.2f", edge - tapered)) pt off the column's; held for 0.5 s it is on it before the release", edge - tapered > 4 && abs(holdEdge - edge) < 0.01 && dw.fit.live.capturing, "\(tapered) -> \(holdEdge)")
+        let heldFrame = hand(dw, short: 7)
+        check("and let go there nothing glides after the mouse-up", heldFrame.flatMap { window(dw)?.onSettleResize?($0) } == nil && !dw.fit.settling)
+        window(dw)?.onCommit?()
+        let dSecond = hand(dw, short: 5)
+        check("a second drag starts on the taper: its first frame is not captured", maxX(dSecond).map { abs($0 - (edge - 1.5)) < 0.01 } == true && !dw.fit.live.capturing, "\(String(describing: maxX(dSecond)))")
+        window(dw)?.onCommit?()
 
         // MARK: Snap on a move: the guide, the tick once, the settle
 

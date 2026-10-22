@@ -1,7 +1,7 @@
 # Lens fit: snap, Fit to Column, Auto Fit (1.1.7 design)
 
-Round fit117, 2026-10-22. Design and measurement only; no product code was written. The lead moves this file to `docs/design/lens-fit.md`.
-Source of every number: `tools/lens-fit/data/*.txt` (run `tools/lens-fit/probe/run-all.sh`; the probes move to `tools/lens-fit/`, section 13).
+Round fit117, 2026-10-22: design and measurement (sections 0 to 15); round fit117impl, the same day: as built (section 16).
+Source of every number: `tools/lens-fit/data/*.txt` (run `tools/lens-fit/probe/run-all.sh`, section 13).
 
 User, in their words: "논문 같은거 볼때 단에 맞춰서 렌즈 영역이 자동 확장되거나 하게 만들고 싶거든 ... 뭔가 스냅같은걸 주고 싶기도 하고".
 
@@ -70,7 +70,7 @@ Share of one axis within the 8 pt reach of a target (`data/eval5.txt`): x, colum
 ## 2. Target behaviour
 
 **Snap (on by default, setting `lensSnap`).** The lens's left edge pulls to a column's left edge, its right edge to a column's right edge (left to left, right to right), pad included (6 pt), within a reach of 8 pt (enter), left again beyond 12 pt (hysteresis, so a guide does not flicker). The closer of the two edges wins; the other follows. ⌘ held: no snapping at all, no guide, no haptic.
-- Resize (corner drag): the right edge snaps live in `mouseDragged`; the guide shows; the haptic is `NSAlignmentFeedbackFilter` (events exist here).
+- Resize (corner drag): the right edge is pulled live in `mouseDragged` (as built it tapers and never jumps, section 16 item 16); the guide shows; the haptic is `NSAlignmentFeedbackFilter` (events exist here).
 - Move (drag by the ring or the pill): the lens moves with the pointer, free. When an edge is within reach, the **guide** (a 1 pt line, accent colour, at the column's edge, along the column's height) appears and `NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)` fires once, on entering. On release the lens glides to the aligned position (at most 8 pt, 120 ms ease-out; at once under Reduce Motion). Without a Force Touch trackpad the haptic does nothing; the guide is the signal.
 - No column known (chat, game, nothing read yet): no guide, no pull. Nothing changes from today.
 
@@ -90,7 +90,7 @@ What a fit does not do: change the lens's height or top; follow a column that sc
 | a probe read: capture = `Overscan.band` (display width x lens band) for one read | same snapshot path | one read: 0.3 to 0.6 s warm (document read 320 ms, OCR 586 ms on a 480 x 410 capture; a 1512 x 600 band is about 3x the area: an estimate of 1.5 s, not measured) | the whole display width at the lens's rows | only when an edge is unknown, only on Fit / Auto Fit, never during a drag |
 | `texts` / `OverlayBlock.frame` | | | | **not used**: patch rects with spare width; second flow pieces missing |
 
-Vertical scrolling does not move a column's x edges, so a snapshot's `columns` stay valid under a scroll; a zoom, a window resize or a sideways scroll changes them and the next snapshot replaces them. A snapshot older than the last content motion (`lastMotion`) is not trusted for a fit (the row is disabled for that moment, the double-click says "Reading...").
+Vertical scrolling does not move a column's x edges, so a snapshot's `columns` stay valid under a scroll; a zoom, a window resize or a sideways scroll changes them and the next snapshot replaces them. A snapshot that does not hold the lens, or is older than the last motion of the *content* (`LensFit.contentMovedAt`: the pipeline's motion handler and scroll reports, not the lens's own drags), is not trusted for a fit (the row is disabled for that moment, the double-click says "Reading..."). The design said `lastMotion`; a click on the ring or a drag inside the capture sets that too, and a still page then sends no newer snapshot, so the row would have stayed disabled (found by the live double-click test, section 16).
 
 ## 4. Owners (single owner each; nothing duplicated)
 
@@ -299,3 +299,53 @@ Open questions for the lead: (1) the ±3 pt tolerance instead of ±2 (evidence 1
 ## 15. Reproduce
 
 `tools/lens-fit/probe/run-all.sh` writes `data/eval1.txt` (edge accuracy against the PDF), `eval1b.txt` (width), `eval2.txt` (real cut captures), `eval3.txt` (Preview shots and the film3 take), `eval4.txt` (use-case scenes), `eval5.txt` (stickiness), `eval6.txt` (zoomed Preview containment), `eval7.txt` (constants), `sim1.txt` (lens positions). Renders: `probe/run-pv.sh`, `probe/run-cut.sh` (headless, sandbox off, build `dd-d14main`, pool id `pool4`); inputs `pv-pages/`, `cut-pages/` (made by `probe/mkcrops.py`), outputs `pv-out/`, `cut-out/`.
+
+## 16. As built (round fit117impl, 2026-10-22)
+
+Everything of sections 2 to 9 is in; deferred as the design says: fit height, paragraph snap, CJK line-block pages, ragged right edges, the `fitLens` shortcut, left-edge resize.
+
+| what | owner as built |
+|---|---|
+| columns, `under`, `fitted`, snap targets and `snap`, unknown edges (`marked`) | `Core/Sources/MwoyeoCore/ColumnFit.swift`, pure; the estimator is `probe/columns.py`, ported (median of an even count is the mean of the two middle lefts, as Python's) |
+| Auto Fit's table (`step`, `evaluate`) | `Core/.../AutoFit.swift`: the states of section 7 and the events of its rows; every row is a test |
+| the ring's double-click, the spring | `Core/.../LensGesture.swift`: `DoubleTap` (two releases that did not move within the system's double-click interval and 4 pt), `FitMotion` (a critically damped spring: 0.382 s a fit (response 0.30 s, the motion contract's, addendum A9), 0.25 s an Auto Fit, 0.12 s a settle, all from `LensMotion`; 0.3 % short of the target at its end, the last frame is the target) |
+| probe capture | `Overscan.band`, `Overscan.plan(band:)`; `CaptureEdge.touchesSide` |
+| columns in the snapshot | `RegionPipeline.emit`: `OverlaySnapshot.columns` (capture-local points) and `captureSize`; trace `columns: n=2 [72..398 blocks=6 lines=42]` |
+| session | `RegionSession` extension (end of the file) over `LensFit` (`App/Model/LensFit.swift`): the snapshot's columns to screen points, the pull, the settle, Fit / Undo Fit, the probe, Auto Fit's carrying-out of an `AutoFit` action; hooks in `received`, `setActivity`, `lensMoved`, `lensResized`, `lensDropped`, `fitCapture`, `contextMenu`, `wireChrome` |
+| gestures, animation | `RegionFrameWindow`: the tap on the ring in `followMove`'s release path, the live right-edge snap and the filtered haptic in `mouseDragged`, `animate(to:)` on a display link calling `onResize`/`onMove` per frame, VoiceOver's custom action |
+| guide | `OverlayPanel`: a 1 pt accent-coloured layer-backed view above the clipped host view (the host's mask is the lens, the guide lies outside it); 0.1 s fade, none under Reduce Motion |
+| tick | `AlignmentHaptic` |
+| settings | `lensSnap`, `lensAutoFit` (`Settings.swift`, `SettingsFile.swift`, `RestoreDefaultsSheet.swift`, `RestorePlanChecks.swift`, `SettingsView.swift`); `RegionConfig.autoFit` per lens, set from `lensAutoFit` where a lens is made (`AppModel`) |
+
+Decisions where the design was silent or the code said otherwise:
+
+1. **Double-click detection.** `clickCount` is not used (the window server takes the second mouse-up of a `performDrag`): a release that did not move on the ring, twice within `NSEvent.doubleClickInterval`. A press that goes nowhere is not reported to the session as a move (`followMove` compares with `startRegion`): before, any click on the ring ran `lensMoved` once. A live test with posted mouse events (`--capture-ui <dir> lens-fit-click`, needs the accessibility grant) passes: the second click fits, the first does not.
+2. **Freshness**: section 3, above.
+3. **Unknown edge tolerance** is `ColumnFit.edgeTolerance` = 2.5 pt (the simulated value, `touchesSide(tolerance:)`), not the lines' 4 px.
+4. **The fit is undoable after an Auto Fit too**: the menu row says Undo Fit; an unwanted growth is one click from gone.
+5. **Auto Fit with one cut side at the bound** (a window lens at its window's edge) grows the other side; `skip(atEdge)` is when no cut side can move. `Skip.unknown`: a probe whose snapshot still has an unknown edge ends (never nested).
+6. **Probe wait** is `LensFit.probeTimeout`, see decision 13 (the design's 1.5 s was an estimate; the lapse restores the capture and, for Fit to Column, flashes "Reading...").
+7. **Snapshots out of order**: the session ignores a snapshot older than the newest (snapshots hop to the main actor one task each).
+8. **A manual resize turns Auto Fit off; a move re-arms it** (`dragged`); the first frame of a hand's move or resize also drops the held undo, and ends a probe.
+9. **VoiceOver's action** is added where the lens has a session (`onFit` set), after Show Original; its name is Undo Fit while the old rect is held.
+10. **The tick on a move** plays once as an edge enters its reach (`lens.snap.enter` counts it); on a resize the system's `NSAlignmentFeedbackFilter` decides. No trackpad, no tick: the guide is the signal.
+
+11. **An edge is known against what was read, not against the capture** (film4 F4 and F5, found live on the first build, 2026-10-22). The capture grows before its read does (`captureResized` emits at once, with the old blocks, which stop where the old read did), so a snapshot whose capture was wide but whose blocks were not re-read marked the column's cut edge *known*: the snap aimed at it (the right target stood 44 pt inside the column, no guide at the true edge) and the probe took that snapshot for its answer. The pipeline now keeps `readRect`, the part of the capture (capture-local points) the blocks were read from: the whole capture after a pass, moved with the capture and cut by it afterwards; `OverlaySnapshot.read` ships it; `ColumnFit.marked` and the probe's arrival test use it. The snap's targets are the known edges only (`Targets(columns:)`).
+12. **A resize reads the band once, at its start (scout).** The capture does not follow a corner drag (`fitCapture(allowResize: false)`), so the right edge of a column 133 pt beyond the lens is never in what is read while the hand drags towards it, and with decision 11 the snap would have no target there. The first frame of a hand's resize, with a column near the lens whose right edge is unknown (`ColumnFit.unknownEdges`) and Snap on, makes the capture the band for one read (`Probe.Reason.scout`: no pill, no fit, no timeout); the band is the rect taken at that frame and kept while the lens grows (`Overscan.plan(band: CGRect?)`), and the drop ends it. This is the one read the design said never to start during a drag; the evidence says the snap needs it. Counted as `lens.fit.scout`.
+13. **The probe waits longer** (`LensFit.probeTimeout`, 10 s; the design said 1.5 s, the first build 3 s): a band is three times a lens's area, and on a Mac with the Neural Engine busy one read took 8 s (film4 t2r-fit). The pill is busy meanwhile and a hand on the lens ends it.
+14. **One table for the numbers of motion** (`LensMotion`, Core; addendum A3): fit, Auto Fit, settle, the guide's fade and opacity. `FitMotion` is the curve. The motion contract's values drop in as an edit of the table: `fit` is the contract's spring since addendum A9 (response 0.30 s, settles in 0.382 s; it was the design's 0.25 s), the rest are still the design's.
+15. **Feel gates** (addendum A2): `LensFeelTests` drives the session's own functions with synthetic paths and a fake clock: `ColumnFit.snap` with its previous snap and `ColumnFit.change` (the guide and the tick are the session's reading of it), `FitMotion` at 60 and 120 Hz, and `AutoFit.SettleGate` (the "once per settle, never while the page scrolls or a hand is on the lens" rule the session asks before `step` sees a `settled`).
+
+16. **The live pull of a resize tapers; it never jumps** (feel, addendum A2, measured on the first live take, 10-22: the lens's right edge jumped 8.5 pt in the frame the pull took hold and 12.0 pt in the frame it let go, against the user's "never jumps under the hand"). The guide, the tick and the hysteresis are as designed (from 8 pt, kept to 12). The edge the hand holds follows `ColumnFit.livePull`: on the target while the hand is within 4 pt of it (the plateau), the pull tapering linearly to nothing at 12 pt, from the nearest target taken from 12 pt (no hysteresis in the position, so none in the motion): the edge moves 0 to 1.5 pt for each point the hand moves, and never more than 4 pt away from where the hand puts it. A resize let go while the guide is up glides the rest of the way onto the edge (at most 4 pt, `LensMotion.settle`), as a move does. `snap`'s `entry` parameter is the distance a new target is taken from (`reach` for the guide, `release` for the pull).
+
+What was run (numbers in the round's report, `/tmp/r117/fit117-REPORT.md`): Core tests (`ColumnFitTests`, `AutoFitTests`, `LensGestureTests`; FAIL-first on a stub, 22 guard mutants), the `fit-checks` of `check-logic` (46 lines; FAIL-first on a build whose `ColumnFit` and `AutoFit` are stubs: 23 of the first 43 lines FAILED), the live double-click, the paper and use-case benches against a same-day base, `lens-fit-shots` for the vision verdict. The app checks drive geometry (block cores at the true column edges plus the measured 1.3 pt right-edge bias, cut to the capture), not the reader: what the reader makes of a drawn page is the paper bench's (`columns:` in each `.err`) and `tools/lens-fit`'s.
+
+| gap row of section 14 | now |
+|---|---|
+| column geometry in Core, `columns` in the snapshot, probe band | done |
+| guide, haptic, live snap on resize, settle on release | done (the move's pull is a guide and a settle, as designed) |
+| double-click, menu rows, VoiceOver action | done |
+| Auto Fit state | done |
+| settings rows, schema, strings | done (12 strings x 11 languages) |
+| `fitLens` shortcut, fit height / paragraph snap, left-edge resize, CJK and ragged edges | not done, as the design defers them |
+| a real drag A/B of "snap on release" feel | the guide and the fit are captured (`lens-fit-shots`) and a live take (`/tmp/r117/fit117-try/a2.mp4`); the drag's feel is the lead's to try |

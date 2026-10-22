@@ -255,6 +255,11 @@ enum UICapture {
                 // Only the checks of games and video (the whole of check-logic takes minutes).
                 let failed = await GameChecks.run(model)
                 report("game", failed)
+            case "marker-hint-checks":
+                // Only where the marker's hint pills go (no window; the whole of game-checks puts lenses on the screen).
+                let check = GameChecks.Check()
+                GameChecks.markerHints(check)
+                report("marker hints", check.failed)
             case "hide-lens-checks":
                 // Only the Hide Lenses checks (the whole of check-logic takes minutes).
                 let failed = await HideLensChecks.run(model)

@@ -920,7 +920,7 @@ The rule, the numbers and every guard: docs/design/keep-boundary.md section 10.1
 | Gate | the `restoresSourceTokenCase` cases | `NameCaseTests` (7 cases; every guard fails when removed, see the report); `tools/paper-bench/names.py` (exit 1 when a name comes back recased) with `check-text-tools.sh` for its FAIL-first |
 
 
-## 16. A paragraph that crosses an edge of the capture or of the lens (item 4 and A5/F1/F2, round read117, 2026-10-22; the capture's side edges done, the lens's four edges design only)
+## 16. A paragraph that crosses an edge of the capture or of the lens (item 4 and A5/F1/F2, round read117, 2026-10-22; the capture's side edges done, the lens's four edges built in round edges117, 2026-10-23: §16.3)
 
 **Two edges.** A lens is shown inside a larger capture (`Overscan.margins`: 80 to 240 pt a side at rest, 30 % of the lens, 40 % while content moves; clipped at the display). The pipeline reads and erases the capture; the overlay shows the lens. Text is cut at both, and the two are different edges with different fixes:
 
@@ -956,7 +956,7 @@ The blocks are left on the picture as the lines of the top and bottom rule are: 
 
 **Not done.** A column cut by fewer than three lines at the edge is left as before. A paragraph that the capture's edge cuts only in some of its lines (a ragged paragraph whose short lines end before the edge) is dropped whole only when the document reader put those lines in one block; where it gave each line a block (`p12-s1`), the short whole lines of the paragraph are translated as before. The lens's own left and right edges are 16.2.
 
-### 16.2 The lens's four edges (design only)
+### 16.2 The lens's four edges (design; built in §16.3)
 
 **What the person should see.** The lens is a window on the translated page. What stands outside it is not wanted; what stands in it must be whole and be where the English was; the translation of a paragraph must not jump or reflow while the lens moves over it. Four things follow.
 1. A line of text is shown whole or not at all: half a line is a glitch, a missing first line is only the window.
@@ -1002,6 +1002,51 @@ The blocks are left on the picture as the lines of the top and bottom rule are: 
 | Debuggability | none | `overlay.line_masked` and `layout.visible_width` counters in the panel's stats |
 
 Open: whether the hidden strip should show the English line it stood over (the erased background shows there in the seamless mode, which is the lens's default; the box mode draws a box per block and needs no mask).
+
+
+### 16.3 The lens's four edges, built (round edges117, 2026-10-23; the numbers are of the Debug build of this round on the Mac of the film)
+
+**Owner.** `LensWindow` (Core, pure): `plan(text:lens:lineHeight:lines:)` for the left and right edges (`.whole`, `.narrowed(x range)`, `.hidden`), `shown(lines:lens:)` for the top and bottom (`.all`, `.band`, `.none`), `minShare(lines:)`, `census` (what the trace counts), and `sitsIn` and `Reach.wants` (§16.4 below). `LensWindowTests` has 20 cases; each fails on a stub that answers `.whole` and `.all` (14 assertions in 10 of the first 13 cases).
+
+| Edge | Rule as built | Where it runs |
+|---|---|---|
+| top, bottom | the lines of the translation that stand wholly in the lens are shown, the others masked; a line is whole when its ink is: the box less `inkInset` 0.12 of its height at each end (measured: a Hangul line's ink is 74 % of its box, system font 14 to 36 pt, 12 to 13 % empty at each end) | `LensMask` on the block's layer, at every `updateVisibility` (every step of a drag): no re-read, no re-render. The host's geometry is flipped and so is the mask's frame (a mask laid out y up showed the mirror image of the band: the first run of `lens-window-checks`) |
+| left, right | the block whose source text the lens crosses a side of is laid out again between the lens's sides, `edgeInset` 0.3 line heights in from each side it cuts (`BlockRenderer.Input.window`); one covered by less than `minShare(lines:)` of its text's width is drawn as it stands and left out of the snapshot (its page shows) | `RegionPipeline.renderMissing` (the plan of the lens as it is) and `settleLens`: `lensSettle` 0.4 s after the lens last changed (`setVisible`) or when content stops (`refreshMotion`); a block whose plan did not change is not touched. During a move the image drawn stays, clipped (F7) |
+| none | a block whose text lies in the lens, or none of it, is laid out as it always was | headless renders (the lens is the capture): byte-identical, below |
+
+**`minShare`, measured** (`MWOYEO_LENS_SWEEP=1`, `tools/lens-window/sweep.py`; the paper bench's 29 renders: pages p1 to p13 and their crops, 983 blocks, 940 of which read at the full width). The block is drawn again in a window of 100 % to 10 % of its source text's width; it "reads" while the fitter stays above the smallest size it may return (`TextFitter.fitFontSize` returns `minSize` when nothing fits) and the translation is not cut to "…". The paragraphs (237 blocks of three lines and more, 236 reading at the full width) stop reading as follows: 0.40 → 2 (0.8 %), 0.35 → 14 (5.9 %), 0.30 → 67 (28.4 %), 0.25 → 186 (78.8 %); the median size is 0.68, 0.64, 0.59, 0.55 of the full-width size. By the lines of the source, the narrowest share down to which at most 10 % of the blocks stop reading: one line **0.70** (581 blocks), two **0.45** (123), three to five **0.35** (149), six and more **0.35** (87). So the floor is a table by lines, not one number: a block of one line cannot wrap its translation into the room and shrinks it. (A first run on pages 1, 3 and 6 gave 0.35 to 0.40 for the paragraphs: 53 of them, not 237.)
+
+**film4 F1 and F2** (page 6 of the method paper at ⌘0, scroll 0.55, the lens rects of `/tmp/film4/defects.md`; one binary, `MWOYEO_LENS_WINDOW=off` against the rule on; the base build 7c58403 draws the same blocks as the switch off: same patches and ink rects in the trace). Lines of the translation that the lens meets, and how many it cuts and shows:
+
+| Case | rule off (= base) | rule on |
+|---|---|---|
+| F1, lens 354 × 139 pt, 30 pt inside the paragraph's left edge, 50 short of its right, 30 short of its bottom | 6 lines, **6 cut** at a side, 6 shown cut | 7 lines, 1 cut (the last, on the bottom edge: masked), **0 shown cut** |
+| F2, lens dragged 95 pt right to 453 × 173 pt | 6 lines, **6 cut**, 6 shown | 6 lines, **0 cut** |
+| fragments drawn over outside English in F2 | film's build 5272f82: 3 blocks drawn over the right column's cut line starts (`render` lines between the drag and its still: `The predictor keel (tk, …` 321 × 174 px, `1 = 16 ms, and the` 308 × 43, `application animates k t` 319 × 90, at x 1127 to 1130 px); base and rule off: **0** (`CaptureEdge.cutAtSides` of §16.1 leaves them out: the capture's edge cuts the column's lines at 112 pt); rule on: **0** | |
+
+So §16.1 already drops all of F2's fragments in the film's geometry; what S2 adds is the column the capture holds whole: a lens that covers 20 of a 200 pt column draws nothing of it (`lens-window-checks`: the second column of a page, 10 % covered, is not drawn and is drawn again, laid out in the part covered, when the lens grows over 90 % of it).
+
+**Default path.** Pages 1 and 6 of the paper bench and their crops (six renders), the base build against this one at one scratch `MWOYEO_APP_ID`, warmed: the PNGs are byte-identical, the blocks are 25 and 36 in both (the noise in the backlog is p1 25 to 28, p6 36 to 41), and the layout and block lines of `.out` are identical.
+
+**Debuggability.** Trace (`MWOYEO_TRACE=1`): `render … lens window a..b size s lines n`, `lens settled: n block(s) laid out again, m shown or hidden`, `lens edges: …` per snapshot (`LensWindow.census`), `pipeline emit vN: k blocks drawn of n, c cut`. Counters: `layout.visible_width`, `layout.share_hidden`, `layout.settled`, `overlay.line_masked`, `lens.reach`, `render.held_cut`. `MWOYEO_LENS_WINDOW=off` draws every block as it stands (and is the FAIL-first of the app check). `lens-window-checks` (also in `check-logic`): the renderer's window and line boxes, the mask on a layer tree, a real pipeline on a two-column page.
+
+### 16.4 A lens short of its paragraph by more than the capture's margin (film4 F16, F17, F5; addenda A2 and A3)
+
+**Cause.** The lines that F16 loses are not cut by the lens. A hand lens 138 pt short of its column on the film's page (`--add-region 307,515,300,250`) has a capture 90 pt wider on each side (`Overscan.margins`: 30 % of 300); every line of the paragraph runs 48 pt past it. All of them end at the capture's right edge (5 of the 8 blocks of the read, all lines 776 px wide, x 181 to 957), `CaptureEdge.cutAtSides` (§16.1) leaves them out (`keep: 3 blocks, 3 lines`, the two headings), and `lens columns: n=0`: the blocks that survive hold no column, so Fit to Column finds none (F17). The text beyond the capture was never read, so it cannot be laid out for the lens; translating the cut line starts is F2's fragments.
+
+**Rule** (addendum A3: widen, do not translate prefixes). `RegionPipeline` keeps the paragraphs `readableLines` leaves out as `cutLayout` (never drawn, translated, logged or transcribed): the ones the lens sits in (`LensWindow.sitsIn`: the lens holds `ColumnFit.need` (0.4) of its own width of the paragraph's read part, the share `ColumnFit.under` calls "under the lens", and `plan` does not hide it) stand in `ColumnFit.columns`, so a column the capture cut is a column with an unknown edge (Fit finds it and probes), and `OverlaySnapshot.cut` says one is there. A cut column the lens only touches does not: it would be a column to snap to and to scout on every hand resize, a whole read each (measured on hold117's gate: a lens ending 71 pt into a cut column, 14 % of the lens's width but 44 % of the part read, took the capture to the display's width at the first resize frame, `lens.fit.scout 1, lens.reach 1`, and the capture then stepped down in three reconfigurations after the shrink, with a read after each; the share of the lens's width is the rule, the share of the part read is not, since the part read is cut by the capture's own margin). `RegionSession.reachColumns` then makes the capture the band (`Overscan.band`: the display's width at the lens's rows, as a probe's): once (`Reach.wants`), never during a hand on the lens, and a read that is still cut (a column that runs past the display) does not ask again; a move or a resize of the lens gives the band up. The lens does not move or resize. Old blocks that drew a translation where the narrower capture now cuts a paragraph, on a page that did not change, stay drawn until the wider read replaces them (`heldByCut`, through hold117's `keep`): no Korean to English and back.
+
+**Measured** (Debug build of this round, the film's page 6 at 0.55 scroll, `MWOYEO_TRACE`, the machine shared with other rounds; base is main 7c58403).
+
+| | base | edges117 |
+|---|---|---|
+| F16, lens `307,515,300,250`, 138 pt short of its column: Korean lines in the lens | 0 in all 5 snapshots (`keep: 3 blocks, 3 lines`, the two headings; `lens columns: n=0`) | 0 in the first snapshot (the fast read cut the paragraph), then 7 lines (6 whole, the 7th on the bottom edge, masked) from the snapshot 245 ms after the reach, in every snapshot after; `lens columns: n=1 [309..694]` |
+| A2 repro, lens `772,250,300,395`: what the lens shows per snapshot | the fast read's blocks stand in the lens for 5 snapshots (lens column of 5 blocks, 17 lines), then none for 5 (the seamless read keeps 8 blocks, 8 lines; `n=0`): the flash of film4's A2 | blocks drawn 10, 11, 11, 12, 12, 13 over the six snapshots of the reach (never fewer than the snapshot before), 14 to 15 lines in the lens, 0 cut |
+| double-click on the ring (F5) | `fit: no column under the lens (0 columns)` | `fit: manual column=771.5..1160.5 lens=772.0..1072.0 -> 765.5..1166.5 steps=1` |
+| OCR of the wider read, F16 | fast read 960x820 px 883 ms (376 ms in the base take: other rounds' load) | the band 3024x820 px 3247 ms (3.7 times), the document reader 478 ms whatever the capture |
+| OCR of the wider read, A2 repro | fast read 960x1264 px 1997 ms | the band 3024x1264 px 5784 ms (2.9 times), the document reader 691 ms |
+
+On a page the document reader reads (a PDF page here) the Korean stands 0.25 s after the reach, before the wide fast read (which ends 3 to 6 s later and changes nothing in the lens). On a screen that only the fast read sees, the lens waits for the wide read, 2.4 s (F16) to 3.8 s (A2 repro) longer than the narrow one on this build: that is the price of showing a column the capture cut, paid once per settle and never twice (`lens.reach` 1 in each take). The gate that caught the over-eager version is `resize-hold-checks` (its counts `scouts` and `reaches` per step are in the detail of its "not read again" line).
 
 
 ## 17. `ParagraphGrouper.maxGap` 0.6, measured (round read117, 2026-10-22; no change)

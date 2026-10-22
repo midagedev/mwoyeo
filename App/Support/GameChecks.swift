@@ -230,7 +230,7 @@ enum GameChecks {
     /// injected (0.6 s) and the pass is held for 0.8 s from inside its snapshot, as a long erase holds it; a thread feeds the scene (a frame
     /// every 10 ms, each in a task of its own, as a capture does) from the start of the pass until the reads are counted, 60 frames made after the
     /// pass was let go have been counted. The reads counted are those up to then: the scene has not rested (only a gap of 0.6 s between two frames would make it).
-    private static func movingBandDuringAPass(_ check: Check) async {
+    static func movingBandDuringAPass(_ check: Check) async {
         let box = 250.0, hold = 0.6
         let first = "Press the green button to open the door", second = "Take the silver key from the old table"
         let counter = ReadCounter(), gate = OnNextSnapshot(), feed = Feed()
@@ -262,7 +262,9 @@ enum GameChecks {
         let during = counter.count - baseline
         let stall = feed.stall
         feed.stop()
-        print(String(format: "game-note: the scene after the pass: longest gap %.0f ms, longest count %.0f ms (hold %.0f ms), %d read", stall.gap * 1000, stall.lag * 1000, hold * 1000, during))
+        let backlog = feed.backlog
+        print(String(format: "game-note: the scene after the pass: longest gap %.0f ms, longest count %.0f ms (hold %.0f ms), %d read; %d frames waited behind the pass, counted in %.0f ms",
+                     stall.gap * 1000, stall.lag * 1000, hold * 1000, during, backlog.frames, (backlog.drain ?? .nan) * 1000))
         check("a pass that outlasts the hold is not followed by a read of the scene while the scene goes on (\(during) read: the new text)",
               started && readSecond && during == 1, "\(during) reads, longest gap \(Int(stall.gap * 1000)) ms, longest count \(Int(stall.lag * 1000)) ms")
         // The scene stops; what has rested by then is read, and the pipeline goes quiet with the new text.
@@ -275,14 +277,16 @@ enum GameChecks {
     private final class Feed: @unchecked Sendable {
         private let lock = NSLock()
         private var created = 0, ingested = 0, stopped = false, passLetGo: Int?
-        private var letGoTime: Double?
+        private var letGoTime: Double?, backlogAtLetGo = 0, drainedAt: Double?
         /// The frames stamped after the pass was let go: when each was stamped and when the pipeline had counted it.
         private var after: [(stamp: Double, done: Double)] = []
         var count: Int { lock.withLock { ingested } }
         var isLetGo: Bool { lock.withLock { passLetGo != nil } }
         /// How many frames had been made when the pass was let go: the frames that waited behind it are among them.
         var letGoAt: Int { lock.withLock { passLetGo ?? 0 } }
-        func letGo() { lock.withLock { passLetGo = created; letGoTime = ProcessInfo.processInfo.systemUptime } }
+        func letGo() { lock.withLock { passLetGo = created; letGoTime = ProcessInfo.processInfo.systemUptime; backlogAtLetGo = created - ingested } }
+        /// The frames that waited behind the pass when it was let go, and how long the pipeline took to count them (nil: not yet).
+        var backlog: (frames: Int, drain: Double?) { lock.withLock { (backlogAtLetGo, drainedAt.flatMap { d in letGoTime.map { d - $0 } }) } }
         /// What the machine did to the scene after the pass: the longest time between two frames, and the longest a frame took to be counted.
         /// A scene counts as one that goes on only while both stay under the watch's hold (a gap of the hold is a scene that stopped).
         var stall: (gap: Double, lag: Double) {
@@ -308,6 +312,7 @@ enum GameChecks {
                         let done = ProcessInfo.processInfo.systemUptime
                         lock.withLock {
                             ingested += 1
+                            if let g = passLetGo, drainedAt == nil, ingested >= g { drainedAt = done }
                             if let t = letGoTime, f.time >= t { after.append((f.time, done)) }
                         }
                     }

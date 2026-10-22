@@ -255,6 +255,11 @@ enum UICapture {
                 // Only the checks of games and video (the whole of check-logic takes minutes).
                 let failed = await GameChecks.run(model)
                 report("game", failed)
+            case "band-pass-checks":
+                // Only the scene that goes on after a pass that outlasts the watch's hold (no window: needs no screen lock).
+                let check = GameChecks.Check()
+                await GameChecks.movingBandDuringAPass(check)
+                report("band pass", check.failed)
             case "marker-hint-checks":
                 // Only where the marker's hint pills go (no window; the whole of game-checks puts lenses on the screen).
                 let check = GameChecks.Check()

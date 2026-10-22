@@ -276,6 +276,10 @@ enum UICapture {
                 // Only the checks of a lens resized over a still page (the whole of check-logic takes minutes).
                 let failed = await ResizeHoldChecks.run(model)
                 report("resize hold", failed)
+            case "erase-checks":
+                // Only the checks of when an erased block is drawn (the whole of check-logic takes minutes).
+                let failed = await EraseChecks.run(model)
+                report("erase", failed)
             case "trust-checks":
                 // Only the trust1 checks: the secret store of scratch runs, who translated a line, a line that reaches a busy engine.
                 var t = ContextChecks.Tally()
@@ -620,6 +624,7 @@ enum UICapture {
             failed += await FitChecks.run(model)
             failed += await GameChecks.run(model)
             failed += await ResizeHoldChecks.run(model)
+            failed += await EraseChecks.run(model)
             failed += await ProgramChecks.run()
             // Last: the checks before the script service's timing ones must not lengthen the gap between the Test button's use of the service (PressChecks) and
             // RewriteChecks, which counts on launchd's respawn throttle still holding (text117, 2026-10-22: with these before them, "a lens call is not queued behind a call

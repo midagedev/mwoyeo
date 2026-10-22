@@ -128,7 +128,8 @@ actor RegionPipeline {
         var fontSize: CGFloat?
         /// Free background to the right of the text, included in `rect`, that a longer translation may use.
         var spareWidth: CGFloat = 0
-        var erased: RGBAImage?      // seamless background covering `rect`
+        /// What the translation is drawn over.
+        var ground: Ground = .box
         var image: CGImage?
         /// Where the translation is drawn in `image`, relative to `rect` (pixels).
         var ink: CGRect?
@@ -148,6 +149,37 @@ actor RegionPipeline {
 
         /// The source text: the union of its lines (image pixels).
         var core: CGRect { lines.dropFirst().reduce(lines.first ?? rect) { $0.union($1) } }
+    }
+
+    /// What a block's translation is drawn over (erase117, docs/design/first-lens.md §14).
+    private enum Ground: Sendable {
+        /// A plain box in the text's background colour (the fast mode, or a block whose erase found nothing to erase).
+        case box
+        /// The page with the text erased: the erase is planned and its fill has not come back yet. The block draws nothing meanwhile. Only a pass
+        /// that installs its blocks as their patches are filled (`EraseSchedule.Install.eachWhenFilled`) puts one up, and that pass fills them all
+        /// before it ends, so no other pass meets one.
+        case erasing(EraseJob)
+        /// The page with the text erased, covering `rect`.
+        case erased(RGBAImage)
+
+        var boxed: Bool { if case .box = self { true } else { false } }
+    }
+
+    /// The slow half of a block's erase, planned with the pass (`erasePlan`) and filled off the actor (`fill`): the patch's rect in the frame,
+    /// the glyph mask over it (1 = erase), and how it is filled.
+    private struct EraseJob: @unchecked Sendable {
+        var rect: PixelRect
+        var mask: [UInt8]
+        var fill: Fill
+
+        enum Fill {
+            /// Onion-peel and smoothing from the pixels around (flat backgrounds, or no model).
+            case flat
+            /// The inpainting model (textured backgrounds).
+            case model(Inpainter)
+            /// `MWOYEO_ERASE_ONLY=mask`: the mask painted red, to see what is erased.
+            case mark
+        }
     }
 
     private let translator: TranslationService
@@ -1122,6 +1154,11 @@ actor RegionPipeline {
         let full = wantsErase ? RGBAImage(cgImage: frame.image) : nil
         noteHyphenJoins(fresh)
         let places = layoutPlaces(of: fresh, among: found, in: frame.image)
+        // Erased blocks that replace none go up before their patches are filled, so their text goes to the translator now (`EraseSchedule`).
+        let install = EraseSchedule.install(replacing: staleIDs.count)
+        var erased: [Erased?] = fresh.map { _ in nil }
+        if let full { erased = await erases(of: fresh, places: places, in: full, install: install) }
+        // The old blocks as they are now: what landed on them while the patches were filled is theirs to hand on.
         let old = blocks.filter { staleIDs.contains($0.id) }
         let oldRects = old.map { inFrame($0.rect) }
         let matches = BlockMatcher.match(old: old.indices.map { .init(rect: oldRects[$0], text: old[$0].source) },
@@ -1131,10 +1168,10 @@ actor RegionPipeline {
         for (i, ocr) in fresh.enumerated() {
             let prior = matches[i].map { old[$0] }
             var b: Block
-            if let full, let e = erase(ocr, in: full, place: places[i]) {
+            if let e = erased[i] {
                 b = Block(id: prior?.id ?? UUID(), rect: e.rect.cgRect, lines: ocr.lines.map(\.rect), source: ocr.prose, appearance: e.look,
                           fontSize: e.fontSize, spareWidth: e.spare, textArea: e.textArea, part: ocr.part)
-                b.erased = e.patch
+                b.ground = e.ground
             } else {
                 let r = ocr.rect, pad = ocr.lines.map(\.rect.height).min() ?? r.height
                 let boxRect = r.insetBy(dx: -max(2, pad * 0.12), dy: -max(1, pad * 0.08))
@@ -1165,6 +1202,7 @@ actor RegionPipeline {
         fillTranslations()
         renderMissing()
         emit(animated: false)
+        if install == .eachWhenFilled, let full { await fillEach(from: full) }
     }
 
     @discardableResult
@@ -1216,8 +1254,13 @@ actor RegionPipeline {
         let places = layoutPlaces(of: found, among: read, in: frame.image)
         guard let full = RGBAImage(cgImage: frame.image) else { return true }
         Trace.mark("seamless: frame → RGBA", since: t); t = Trace.now
+        // A read over blocks that are up fills its patches before it takes their place, and they take what lands meanwhile; a read over none puts
+        // its blocks up first, each drawn when its patch is in (`EraseSchedule`).
+        let install = EraseSchedule.install(replacing: blocks.count)
+        let erased = await erases(of: found, places: places, in: full, install: install)
 
-        // Matched in the frame's coordinates: undo any move applied to the blocks since the pass started.
+        // Matched in the frame's coordinates: undo any move applied to the blocks since the pass started. The blocks as they are now: what
+        // landed on them while the patches were filled is theirs to hand on.
         let undone = blocks.map { inFrame($0.rect) }
         let matches = BlockMatcher.match(old: blocks.indices.map { .init(rect: undone[$0], text: blocks[$0].source) },
                                          new: found.map { .init(rect: $0.rect, text: $0.prose) })
@@ -1225,7 +1268,7 @@ actor RegionPipeline {
         var next: [Block] = []
         var took = Set<Int>()   // old blocks whose translation a new block took as it was
         for (i, ocr) in found.enumerated() {
-            guard let e = erase(ocr, in: full, place: places[i]) else { continue }
+            guard let e = erased[i] else { continue }
             let id = matches[i].map { prior[$0].id } ?? UUID()
             var b = Block(id: id, rect: e.rect.cgRect, lines: ocr.lines.map(\.rect), source: ocr.prose, appearance: e.look,
                           fontSize: e.fontSize, spareWidth: e.spare, textArea: e.textArea, part: ocr.part)
@@ -1233,7 +1276,7 @@ actor RegionPipeline {
                 b.translation = prior[oi].translation
                 if b.translation != nil { took.insert(oi) }
             }
-            b.erased = e.patch
+            b.ground = e.ground
             next.append(b)
         }
         capBodySizes(&next, among: [])
@@ -1247,6 +1290,7 @@ actor RegionPipeline {
         renderMissing()
         Trace.mark("seamless: render", since: t)
         emit(animated: true)
+        if install == .eachWhenFilled { await fillEach(from: full) }
         return true
     }
 
@@ -1289,7 +1333,7 @@ actor RegionPipeline {
         var keep = Set<UUID>(), pieces = Set<Int>()
         for (i, parent) in TranslationCarry.fragments(old: olds, new: new.map(\.rect), carry: carry).enumerated() {
             // A boxed old block is not kept for a piece that is erased: the settled reading draws the seamless look.
-            guard let parent, new[i].translation == nil, new[i].erased == nil || old[parent].erased != nil else { continue }
+            guard let parent, new[i].translation == nil, new[i].ground.boxed || !old[parent].ground.boxed else { continue }
             keep.insert(old[parent].id)
             pieces.insert(i)
         }
@@ -1502,7 +1546,7 @@ actor RegionPipeline {
     #endif
 
     /// What one block may paint and how far right it may write.
-    private struct Place {
+    private struct Place: Sendable {
         /// The block's patch before it is widened into free space to the right: its text, margins and a strip for descenders,
         /// less what a neighbouring block takes (`Territory`).
         var territory: CGRect
@@ -1612,9 +1656,10 @@ actor RegionPipeline {
 
     // MARK: - Erasing
 
-    private struct Erased {
+    private struct Erased: Sendable {
         var rect: PixelRect
-        var patch: RGBAImage
+        /// `.erasing` until its fill is in, then `.erased`.
+        var ground: Ground
         var look: TextAppearance
         var fontSize: CGFloat?
         var spare: CGFloat
@@ -1622,11 +1667,13 @@ actor RegionPipeline {
         var textArea: CGRect
     }
 
-    /// Erases a block's text: builds the glyph mask per line, then fills it (flat backgrounds) or inpaints it
-    /// (textured ones). The patch also takes in free background to the right for longer translations, up to the
-    /// right edge of the block's column, and covers the descenders of its lines; it stays inside the block's `place`.
-    private func erase(_ block: OCRBlock, in full: RGBAImage, place: Place) -> Erased? {
+    /// Plans the erase of a block's text: builds the glyph mask per line, and says how it is to be filled: from the pixels around it (flat
+    /// backgrounds) or by the model (textured ones); `fill` does that. The patch also takes in free background to the right for longer
+    /// translations, up to the right edge of the block's column, and covers the descenders of its lines; it stays inside the block's `place`.
+    /// `model`: the inpainting model when the settings use it. Static: a pass plans its blocks side by side, off the actor (`erases`).
+    private static func erasePlan(_ block: OCRBlock, in full: RGBAImage, place: Place, model: Inpainter?) -> Erased? {
         Trace.count("erase")
+        let t = Trace.now
         let lineHeight = block.lines.map(\.rect.height).sorted()[block.lines.count / 2]
         let ring = BlockRenderer.eraseMargin(lineHeight: lineHeight)
         let below = place.below
@@ -1655,7 +1702,6 @@ actor RegionPipeline {
         let reach = place.columnRight.map { max(0, Int($0 - block.rect.maxX)) }
         let spare = freeWidth(rightOf: rect, in: full, background: look.backgroundColor, atMost: reach)
         rect.width += spare
-        var patch = full.cropped(to: rect)
         var mask = [UInt8](repeating: 0, count: rect.width * rect.height)
         for (lr, m) in masks {
             for y in 0..<lr.height {
@@ -1666,33 +1712,20 @@ actor RegionPipeline {
             }
         }
 
-        TextEraser.fillEnclosedHoles(&mask, width: rect.width, height: rect.height)
         let flat = masks.allSatisfy(\.1.appearance.isFlatBackground)
         #if MAS
         let maskOnly = false
         #else
         let maskOnly = ProcessInfo.processInfo.environment["MWOYEO_ERASE_ONLY"] == "mask"
         #endif
-        if maskOnly {
-            for i in mask.indices where mask[i] != 0 { patch.set(x: i % rect.width, y: i / rect.width, RGBA(255, 0, 0)) }
-        } else if !flat, options.useInpainting, let inpainter {
-            do {
-                Trace.count("inpaint")
-                patch = try inpainter.inpaint(frame: full, rect: rect, mask: mask)
-            } catch {
-                log.error("inpainting failed: \(error.localizedDescription)")
-                TextEraser.fill(&patch, mask: mask)
-            }
-        } else {
-            TextEraser.fill(&patch, mask: mask)
-        }
+        let fill: EraseJob.Fill = if maskOnly { .mark } else if !flat, let model { .model(model) } else { .flat }
         #if !MAS
-        // `MWOYEO_FILM_DUMP=erase` (tools/film/DESIGN.md, H2): what the erase saw per line (the noise that decides flat or patterned) and what it did. The
-        // dilation is the median line's; `fill` is the branch taken above (a model that throws falls back to the flat fill without saying so here).
+        // `MWOYEO_FILM_DUMP=erase` (tools/film/DESIGN.md, H2): what the erase saw per line (the noise that decides flat or patterned) and what it does. The
+        // dilation is the median line's; `fill` is the branch `fill` takes (a model that throws falls back to the flat fill without saying so here).
         FilmDump.emit("erase") {
             ["block": FilmDump.box(block.rect), "patch": FilmDump.box(rect), "ring": ring, "dilation": max(1, Int(lineHeight * 0.07)),
              "lines": masks.map { ["crop": FilmDump.box($0.0), "noise": $0.1.appearance.backgroundNoise, "flat": $0.1.appearance.isFlatBackground] as [String: Any] },
-             "fill": maskOnly ? "mask" : !flat && options.useInpainting && inpainter != nil ? "inpaint" : "fill"]
+             "fill": maskOnly ? "mask" : !flat && model != nil ? "inpaint" : "fill"]
         }
         #endif
         let glyph = glyphHeights.isEmpty ? nil : glyphHeights.sorted()[glyphHeights.count / 2]
@@ -1701,12 +1734,96 @@ actor RegionPipeline {
         }
         let area = Territory.textArea(core: block.rect, ring: CGFloat(ring), spare: CGFloat(spare), in: rect.cgRect)
             .offsetBy(dx: -CGFloat(rect.x), dy: -CGFloat(rect.y))
-        return Erased(rect: rect, patch: patch, look: look, fontSize: glyph.map { Self.emSize(glyphHeight: $0, text: block.text) },
-                      spare: CGFloat(spare), textArea: area)
+        Trace.sample("erase.plan_ms", (Trace.now - t) * 1000)
+        return Erased(rect: rect, ground: .erasing(EraseJob(rect: rect, mask: mask, fill: fill)), look: look,
+                      fontSize: glyph.map { Self.emSize(glyphHeight: $0, text: block.text) }, spare: CGFloat(spare), textArea: area)
+    }
+
+    /// For the checks (`EraseChecks`): called with each patch's rect (image pixels) before its fill, off the actor; it may block, as a slow fill
+    /// does, to hold the fill back.
+    private var fillGate: (@Sendable (CGRect) -> Void)?
+    func setFillGate(_ gate: (@Sendable (CGRect) -> Void)?) { fillGate = gate }
+
+    /// The slow half of an erase: the job's mask filled from the page around it, or by the model. Off the actor (erase117): a translation that
+    /// lands meanwhile is drawn at once, on a block whose patch is in.
+    @concurrent private nonisolated func fill(_ job: EraseJob, in full: RGBAImage, gate: (@Sendable (CGRect) -> Void)?) async -> RGBAImage {
+        gate?(job.rect.cgRect)
+        let t = Trace.now
+        var mask = job.mask
+        TextEraser.fillEnclosedHoles(&mask, width: job.rect.width, height: job.rect.height)
+        var patch = full.cropped(to: job.rect)
+        switch job.fill {
+        case .mark:
+            for i in mask.indices where mask[i] != 0 { patch.set(x: i % job.rect.width, y: i / job.rect.width, RGBA(255, 0, 0)) }
+        case .model(let inpainter):
+            do {
+                Trace.count("inpaint")
+                patch = try inpainter.inpaint(frame: full, rect: job.rect, mask: mask)
+            } catch {
+                log.error("inpainting failed: \(error.localizedDescription)")
+                TextEraser.fill(&patch, mask: mask)
+            }
+        case .flat:
+            TextEraser.fill(&patch, mask: mask)
+        }
+        Trace.sample("erase.fill_ms", (Trace.now - t) * 1000)
+        return patch
+    }
+
+    /// The erases of the blocks a pass read, planned off the actor, side by side (each block's plan is its own work). Filled too, one block at
+    /// a time off the actor, when the pass installs its blocks all at once (`EraseSchedule.Install.allAtOnce`): the blocks on the screen stay
+    /// and take the translations that land meanwhile. Otherwise left `.erasing` for `fillEach` once the blocks are up.
+    private func erases(of found: [OCRBlock], places: [Place], in full: RGBAImage, install: EraseSchedule.Install) async -> [Erased?] {
+        var t = Trace.now
+        let model = options.useInpainting ? inpainter : nil
+        var out = await withTaskGroup(of: (Int, Erased?).self) { group in
+            for i in found.indices {
+                let block = found[i], place = places[i]
+                group.addTask { (i, Self.erasePlan(block, in: full, place: place, model: model)) }
+            }
+            var plans = [Erased?](repeating: nil, count: found.count)
+            for await (i, plan) in group { plans[i] = plan }
+            return plans
+        }
+        Trace.mark("erase: \(out.compactMap { $0 }.count) planned off the actor (\(install == .allAtOnce ? "filled before they are up" : "each up when filled"))", since: t)
+        guard install == .allAtOnce else { return out }
+        t = Trace.now
+        for i in out.indices {
+            guard case .erasing(let job)? = out[i]?.ground else { continue }
+            out[i]?.ground = .erased(await fill(job, in: full, gate: fillGate))
+        }
+        Trace.mark("erase: \(out.compactMap { $0 }.count) filled, off the actor", since: t)
+        return out
+    }
+
+    /// Fills the patches of the blocks this pass put up `.erasing`, one at a time off the actor, in `EraseSchedule.next`'s order: each block is
+    /// drawn the moment its patch is in, with its translation when that has landed (the first Korean waits for its own block's fill only).
+    private func fillEach(from full: RGBAImage) async {
+        let t = Trace.now
+        var filled = 0
+        while !halted {
+            let waiting = blocks.indices.filter { if case .erasing = blocks[$0].ground { true } else { false } }
+            let order = waiting.map { EraseSchedule.Candidate(rect: blocks[$0].rect, translated: blocks[$0].translation != nil) }
+            guard let k = EraseSchedule.next(order, lens: lensRect, lead: lead), case .erasing(let job) = blocks[waiting[k]].ground else { break }
+            let id = blocks[waiting[k]].id
+            let patch = await fill(job, in: full, gate: fillGate)
+            filled += 1
+            // Gone meanwhile: moved off the capture, or the lens was reset.
+            guard let i = blocks.firstIndex(where: { $0.id == id }) else { continue }
+            blocks[i].ground = .erased(patch)
+            blocks[i].image = nil
+            renderMissing()
+            guard blocks[i].image != nil else { continue }
+            // Its translation was in before its patch: the erase was the later of the two.
+            Trace.count("erase.drawn_on_fill")
+            Trace.mark("erase: '\(blocks[i].source.prefix(24))' drawn as its patch came in (\(waiting.count - 1) still to fill)", since: t)
+            emit(animated: true)
+        }
+        Trace.mark("erase: \(filled) filled, each up when filled", since: t)
     }
 
     /// Columns to the right of `rect` that hold nothing but the background colour (up to 80 % more width, and `atMost`).
-    private func freeWidth(rightOf rect: PixelRect, in full: RGBAImage, background: RGBA, atMost: Int? = nil) -> Int {
+    private static func freeWidth(rightOf rect: PixelRect, in full: RGBAImage, background: RGBA, atMost: Int? = nil) -> Int {
         let limit = min(full.width - (rect.x + rect.width), Int(Double(rect.width) * 0.8), atMost ?? .max)
         guard limit > 0 else { return 0 }
         var free = 0
@@ -1976,15 +2093,9 @@ actor RegionPipeline {
         return Array(ordered.prefix(3))
     }
 
-    /// What the lens shows comes first, in reading order; then the overscan, nearest first.
-    private func priority(_ r: CGRect) -> (Int, CGFloat) {
-        let lens = lensRect
-        if r.intersects(lens) { return (0, r.minY) }
-        let dx = max(lens.minX - r.maxX, r.minX - lens.maxX, 0), dy = max(lens.minY - r.maxY, r.minY - lens.maxY, 0)
-        // Text on the side things are heading to (a dragged lens, content scrolling in) reaches the lens first.
-        let side = CGVector(dx: r.midX < lens.minX ? -1 : r.midX > lens.maxX ? 1 : 0, dy: r.midY < lens.minY ? -1 : r.midY > lens.maxY ? 1 : 0)
-        return (1, hypot(dx, dy) / (1 + max(0, side.dx * lead.dx + side.dy * lead.dy)))
-    }
+    /// What the lens shows comes first, in reading order; then the overscan, nearest first (`TranslationScheduling.priority`, which the erase
+    /// order shares).
+    private func priority(_ r: CGRect) -> (Int, CGFloat) { TranslationScheduling.priority(of: r, lens: lensRect, lead: lead) }
 
     /// One result streamed from the engine; counts it as wasted when its text left the capture meanwhile.
     private func streamed(_ source: String, _ translated: String, epoch: Int, flight id: Int) {
@@ -2068,8 +2179,13 @@ actor RegionPipeline {
             guard !text.isEmpty else { continue }
             let heights = b.lines.map(\.height).sorted()
             let lineHeight = heights.isEmpty ? b.rect.height : heights[heights.count / 2]
-            let background: BlockRenderer.Background = b.erased.map { .erased($0) }
-                ?? .box(b.appearance.backgroundColor, opacity: options.boxOpacity)
+            let background: BlockRenderer.Background
+            switch b.ground {
+            case .box: background = .box(b.appearance.backgroundColor, opacity: options.boxOpacity)
+            case .erased(let patch): background = .erased(patch)
+            // Nothing to draw it over yet: it is drawn when its patch is in (`fillEach`).
+            case .erasing: continue
+            }
             Trace.count("render")
             let rendered = BlockRenderer.render(.init(
                 size: b.rect.size, text: text, background: background, appearance: b.appearance,
@@ -2098,7 +2214,7 @@ actor RegionPipeline {
         let out = blocks.compactMap { b -> OverlayBlock? in
             guard let img = b.image else { return nil }
             return OverlayBlock(id: b.id, frame: CGRect(x: b.rect.minX / s, y: b.rect.minY / s, width: b.rect.width / s, height: b.rect.height / s),
-                                image: img, seamless: b.erased != nil)
+                                image: img, seamless: !b.ground.boxed)
         }
         // A block that was drawn and is still read but draws nothing now: the lens shows the page's own text where its translation was.
         let blanked = blocks.filter { $0.image == nil && lastDrawn.contains($0.id) }

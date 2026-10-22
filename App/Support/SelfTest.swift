@@ -446,6 +446,10 @@ enum SelfTest {
             parts.append(summary("first_paint", "translate.first_paint_ms"))
             parts.append(summary("provisional_shown", "translate.provisional_shown_ms"))
         }
+        // The erases (erase117): each block's plan and its fill, both off the pipeline's actor; with their sums. Only when there were some.
+        for (name, key) in [("erase_plan", "erase.plan_ms"), ("erase_fill", "erase.fill_ms")] where samples[key] != nil {
+            parts.append(summary(name, key) + String(format: " %@_sum_ms=%.0f", name, (samples[key] ?? []).reduce(0, +)))
+        }
         if let pipeline { parts.append("parked=\(await pipeline.debugState().parked)") }
         print("work[\(phase)]: " + parts.joined(separator: " "))
     }

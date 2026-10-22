@@ -513,4 +513,57 @@ final class LensSkinTests: XCTestCase {
             XCTAssertLessThan(skin.outline(around: frame).deviation, 0.01, "released at speed: no ghost bow")
         }
     }
+
+    // MARK: - Wiring (round skinland117, 2026-10-23): what the lens window and the panel's clip take from the skin
+
+    /// The lens window draws the ring in its own space and the panel cuts its clip in another: `moved` is the same shape elsewhere, point for point,
+    /// and `rigid` is today's rounded rect (what Reduce Motion and the corner brackets draw).
+    func testAnOutlineMovedIsTheSameShapeElsewhere() {
+        let frame = CGRect(x: 100, y: 200, width: 300, height: 200)
+        var skin = LensSkin(frame: frame)
+        skin.begin(.fit)
+        for _ in 0..<12 { skin.step(1 / 240, target: frame.insetBy(dx: -40, dy: 0), hand: .none) }
+        let o = skin.outline(around: frame), delta = CGVector(dx: -100, dy: -200), moved = o.moved(by: delta)
+        XCTAssertGreaterThan(o.deviation, 1, "the scene bows")
+        XCTAssertEqual(moved.frame, o.frame.offsetBy(dx: delta.dx, dy: delta.dy))
+        XCTAssertEqual(moved.bows, o.bows)
+        XCTAssertEqual(moved.radius, o.radius)
+        XCTAssertEqual(moved.deviation, o.deviation)
+        let a = Self.elements(moved.path(outset: 1)), b = Self.elements(o.path(outset: 1))
+        XCTAssertEqual(a.count, b.count)
+        for (p, q) in zip(a, b) {
+            XCTAssertEqual(p.points.count, q.points.count)
+            for (x, y) in zip(p.points, q.points) {
+                XCTAssertEqual(x.x - y.x, delta.dx, accuracy: 1e-9)
+                XCTAssertEqual(x.y - y.y, delta.dy, accuracy: 1e-9)
+            }
+        }
+        let rigid = LensOutline.rigid(frame)
+        XCTAssertTrue(rigid.isRigid && rigid.deviation == 0 && rigid.radius == LensSkin.radius && rigid.frame == frame)
+        // `land`: when the link stops because the skin is at rest, the outline is the rounded rect itself (the edges were within 0.05 pt, not on it).
+        var late = LensSkin(frame: frame)
+        late.begin(.fit)
+        for _ in 0..<(240 * 2) { late.step(1 / 240, target: frame.insetBy(dx: -40, dy: 0), hand: .none) }
+        let wide = frame.insetBy(dx: -40, dy: 0)
+        XCTAssertTrue(late.isAtRest)
+        XCTAssertGreaterThan(late.outline(around: wide).deviation, 0, "within 0.05 pt of the rect, not on it")
+        late.land()
+        XCTAssertEqual(late.outline(around: wide).deviation, 0)
+        XCTAssertEqual(late.outline(around: wide).path(outset: 1).boundingBoxOfPath, wide.insetBy(dx: -1, dy: -1))
+        var moving = LensSkin(frame: frame)
+        for _ in 0..<6 { moving.step(1 / 240, target: wide, hand: .none) }
+        moving.land()
+        XCTAssertGreaterThan(moving.outline(around: wide).deviation, 1, "land does nothing while the edges are still travelling")
+        XCTAssertEqual(skin.outline(around: frame).frame, frame, "a bowed outline is drawn around the rigid frame, not instead of it")
+    }
+
+    /// The one-click commit's times (§3.5, §9.4, §10): the ring is in at once, the accent stroke of the picker goes in 0.10 s, the dim in 0.20 s,
+    /// the pill comes in in 0.20 s and the glow in 0.35 s.
+    func testTheCommitTimesAreTheContracts() {
+        XCTAssertEqual(LensSkin.commitRingIn, 0.02)
+        XCTAssertEqual(LensSkin.commitAccentIn, 0.10)
+        XCTAssertEqual(LensSkin.commitDimOut, 0.20)
+        XCTAssertEqual(LensSkin.commitPillIn, 0.20)
+        XCTAssertEqual(LensSkin.commitGlowIn, 0.35)
+    }
 }

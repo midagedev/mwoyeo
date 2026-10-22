@@ -39,6 +39,8 @@ final class RegionFrameWindow: NSPanel {
     var onSettle: ((NSRect) -> NSRect?)?
     /// A resize ended at this frame: the frame it settles on, the rest of the way onto a column's edge (`RegionSession.settleResized`).
     var onSettleResize: ((NSRect) -> NSRect?)?
+    /// The ring's outline changed with no change of frame (the skin settling after a fit, a drag or a commit): the panel cuts its clip by it again.
+    var onOutline: (() -> Void)?
 
     private let chrome: FrameChromeView
     private var tabPosition = LensTabPosition.topLeading
@@ -78,7 +80,14 @@ final class RegionFrameWindow: NSPanel {
                       width: frame.width - 2 * Self.margin, height: frame.height - Self.margin - Self.tabExtra)
     }
 
+    /// The lens is at `r` and nobody animated it there (it followed its window, changed display, came up): the outline rests on it.
     func setRegion(_ r: NSRect) {
+        driveRegion(r)
+        chrome.seat()
+    }
+
+    /// The lens goes to `r` as a hand or an animation steps it: the outline (`LensSkin`) lags that frame, so it is not put at rest.
+    func driveRegion(_ r: NSRect) {
         setFrame(Self.windowFrame(for: r, position: tabPosition), display: true)
     }
 
@@ -129,19 +138,44 @@ final class RegionFrameWindow: NSPanel {
 
     /// Takes the region to `target` in `duration` (`FitMotion`: a spring, no overshoot; at once under Reduce Motion), telling `onResize` (the size
     /// changes) or `onMove` of every frame as a drag does, so the capture and the translations follow as they follow a hand. `completion(true)` after
-    /// the last frame, `completion(false)` when a hand took the lens or `stopAnimating` cut it short, wherever it had got to.
-    func animate(to target: NSRect, duration: TimeInterval = LensMotion.fit, completion: @escaping (_ finished: Bool) -> Void) {
-        chrome.animate(to: target, duration: duration, completion: completion)
+    /// the last frame, `completion(false)` when a hand took the lens or `stopAnimating` cut it short, wherever it had got to. `moment` is the row of
+    /// `LensSkin.choreography` the ring's outline plays over the frame.
+    func animate(to target: NSRect, duration: TimeInterval = LensMotion.fit, moment: LensSkin.Moment, completion: @escaping (_ finished: Bool) -> Void) {
+        chrome.animate(to: target, duration: duration, moment: moment, completion: completion)
     }
 
     func stopAnimating() { chrome.stopAnimating() }
 
     /// An animation (`animate`) is under way.
     var isAnimating: Bool { chrome.isAnimating }
+
+    /// The lens was placed by the picker's click (AppKit coordinates): from its first frame the outline takes hold, the side nearest the click
+    /// first, and the pill comes in (motion contract 3.5, 9.4). A lens that is only restored does not.
+    func takeHold(at click: CGPoint) { chrome.takeHold(at: click) }
+
+    /// The ring's outline now, relative to the region's bottom-left (y up). The panel's clip is cut by the same one.
+    func outline() -> LensOutline { chrome.outline() }
+
+    /// One line for the lens's own log and the checks: the bows (left, top, right, bottom, pt) and what the outline has done in its moment.
+    func stats() -> String { chrome.stats() }
+
+    /// What the outline has done in the moment under way (peak bow, when it rested), and how far the pill has come in (0 to 1) after a hold.
+    var meter: LensSkin.Meter { chrome.meter }
+    var introAlpha: CGFloat { chrome.introAlpha }
+
+    /// A moment of the outline begins, and one frame of it as the display link makes it; the checks make theirs by hand, on a fake clock: the skin steps
+    /// `dt` towards `target` under `hand`, the window goes to `frame` when given, and the ring and the panel follow.
+    func beginOutline(_ moment: LensSkin.Moment) { chrome.beginMoment(moment) }
+    func stepOutline(_ dt: TimeInterval, toward target: NSRect, to frame: NSRect? = nil, hand: LensSkin.Hand = .none) {
+        chrome.stepOutline(dt, toward: target, to: frame, hand: hand)
+    }
+
+    /// The ring's mask path as drawn (view coordinates, y up), for the checks.
+    var ringPath: CGPath? { chrome.ringPath }
 }
 
 private final class FrameChromeView: NSView {
-    weak var window_: RegionFrameWindow?
+    weak var window_: RegionFrameWindow? { didSet { seat() } }
     var name: String { didSet { needsDisplay = true } }
     var detail = "" { didSet { needsDisplay = true } }
     var badge: String? { didSet { needsDisplay = true } }
@@ -184,15 +218,31 @@ private final class FrameChromeView: NSView {
     /// A resize's right edge as the person last saw it (screen x), and the system's filter that decides when the alignment tick plays.
     private var shownRight: CGFloat = 0
     private let haptic = AlignmentHaptic()
-    /// A fit, a growth or a settle under way (`animate`): its frames come from a display link.
+    /// A fit, a growth or a settle under way (`animate`): its frames come from the display link, `elapsed` seconds of them so far.
     private struct Animation {
-        let link: CADisplayLink
         let from: NSRect, to: NSRect
-        let start: CFTimeInterval, duration: TimeInterval
+        var elapsed: TimeInterval
+        let duration: TimeInterval
         let resizing: Bool
         let completion: (Bool) -> Void
     }
     private var animation: Animation?
+    /// The membrane over the rigid frame (`LensSkin`, motion contract section 9), in the space of `regionFrame`. The frame is the window's and keeps its
+    /// own springs; this is how the ring and the panel's clip bow around it. Stepped on the tick of whatever moves the lens, and put at rest by
+    /// `seat` when nobody did.
+    private var skin = LensSkin(frame: .zero)
+    /// The display link of a hand's resize, an animation, a commit, and the skin settling after them; nil while the lens rests. A move has its own
+    /// (`moveLink`), which steps the skin too.
+    private var link: CADisplayLink?
+    private var linkStamp: CFTimeInterval = 0
+    /// The rest line of the moment under way has been written (`noteRest`).
+    private var restNoted = true
+    /// What the masks hold, so a tick that changes nothing (a move, with the bows off) does not draw them again.
+    private var drawn: (outline: LensOutline, region: NSRect, corners: Bool)?
+    /// Where the picker's click was, until the first frame the lens shows takes hold of it (`takeHold`).
+    private var pendingHold: CGPoint?
+    /// The pill comes in over `LensSkin.commitPillIn`: seconds of it left.
+    private var introLeft: TimeInterval = 0
     private var emphasized = false
     private var hovering = false
     private var tracking: NSTrackingArea?
@@ -249,7 +299,10 @@ private final class FrameChromeView: NSView {
             MainActor.assumeIsolated { if self?.tint == .accent { self?.applyStyle() } }
         }
         motionObserver = NotificationCenter.default.addObserver(forName: Motion.changed, object: nil, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.updateGlow() }
+            MainActor.assumeIsolated {
+                self?.skin.reduceMotion = Motion.shared.reduced
+                self?.updateGlow()
+            }
         }
         applyStyle()
     }
@@ -257,6 +310,7 @@ private final class FrameChromeView: NSView {
     deinit {
         accentObserver.map(NotificationCenter.default.removeObserver)
         motionObserver.map(NotificationCenter.default.removeObserver)
+        link?.invalidate()
     }
 
     private func applyStyle() {
@@ -269,6 +323,7 @@ private final class FrameChromeView: NSView {
         case .subtle, .minimal: 1.0
         }
         for mask in [ringMask, glowMask] { mask.lineCap = style == .corners ? .round : .butt }
+        drawn = nil
         needsLayout = true
         updateGlow()
         needsDisplay = true
@@ -358,11 +413,12 @@ private final class FrameChromeView: NSView {
 
     override func layout() {
         super.layout()
+        if let click = pendingHold {
+            pendingHold = nil
+            beginHold(at: click)
+        }
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        let outline = regionRect.insetBy(dx: -1, dy: -1)
-        let path = style == .corners ? Self.brackets(in: outline, radius: radius)
-            : CGPath(roundedRect: outline, cornerWidth: radius, cornerHeight: radius, transform: nil)
         let diagonal = hypot(bounds.width, bounds.height)
         for (container, mask, gradient) in [(glow, glowMask, glowGradient), (ring, ringMask, ringGradient)] {
             container.frame = bounds
@@ -371,9 +427,9 @@ private final class FrameChromeView: NSView {
             gradient.position = CGPoint(x: regionRect.midX, y: regionRect.midY)
             // The mask lives in the gradient's coordinates; this frame puts the path back in the view's.
             mask.frame = CGRect(origin: CGPoint(x: -gradient.frame.minX, y: -gradient.frame.minY), size: bounds.size)
-            mask.path = path
             container.rasterizationScale = window?.backingScaleFactor ?? 2
         }
+        drawOutline()
         sweepClip.frame = bounds
         sweepMask.frame = bounds
         sweepLayer.bounds = CGRect(x: 0, y: 0, width: regionRect.width * 0.6, height: regionRect.height)
@@ -406,6 +462,137 @@ private final class FrameChromeView: NSView {
         p.addArc(tangent1End: CGPoint(x: r.minX, y: r.maxY), tangent2End: CGPoint(x: r.minX, y: r.maxY - radius), radius: radius)
         p.addLine(to: CGPoint(x: r.minX, y: r.maxY - radius - ay))
         return p
+    }
+
+    // MARK: - Outline (LensSkin)
+
+    /// The ring's outline now, relative to the region's bottom-left (y up). The corner brackets stay the rigid frame, and the panel's clip with them.
+    func outline() -> LensOutline {
+        let region = window_?.regionFrame ?? .zero
+        return (style == .corners ? LensOutline.rigid(region) : skin.outline(around: region)).moved(by: CGVector(dx: -region.minX, dy: -region.minY))
+    }
+
+    var ringPath: CGPath? { ringMask.path }
+
+    /// The ring and the glow take the outline when it is not what they hold already: a move changes nothing of it, so the window server draws
+    /// the cached raster again; a resize, a fit and a commit change it every frame, as they changed the rounded rect's size.
+    private func drawOutline() {
+        let o = outline(), region = regionRect, corners = style == .corners
+        guard drawn.map({ $0.outline != o || $0.region != region || $0.corners != corners }) ?? true else { return }
+        drawn = (o, region, corners)
+        let path = corners ? Self.brackets(in: region.insetBy(dx: -1, dy: -1), radius: radius)
+            : o.moved(by: CGVector(dx: region.minX, dy: region.minY)).path(outset: 1)
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        ringMask.path = path
+        glowMask.path = path
+        CATransaction.commit()
+    }
+
+    /// The outline at rest on the window's region: nobody animated the lens there (it followed its window, changed display, came up).
+    func seat() {
+        guard let region = window_?.regionFrame else { return }
+        skin = LensSkin(frame: region)
+        skin.reduceMotion = Motion.shared.reduced
+        restNoted = true
+        drawOutline()
+        window_?.onOutline?()
+    }
+
+    func beginMoment(_ moment: LensSkin.Moment) {
+        // A moment the next one cuts short (a resize let go within a column's reach glides on as a drop) still says what it did.
+        if !restNoted { Trace.mark(skin.meter.summary + " (cut by \(moment.rawValue))", since: Trace.now) }
+        skin.begin(moment)
+        restNoted = false
+    }
+
+    /// The skin steps `dt` towards `target` (where the frame is heading: the hand's frame, or an animation's end).
+    private func stepSkin(_ dt: TimeInterval, toward target: NSRect, hand: LensSkin.Hand) {
+        skin.step(dt, target: target, hand: hand)
+        skin.land()   // at rest the outline is the rounded rect itself, and nothing ticks
+        guard introLeft > 0 else { return }
+        introLeft = max(0, introLeft - dt)
+        setNeedsDisplay(tabRect.insetBy(dx: -16, dy: -16))
+    }
+
+    /// After the frame is where this frame puts it: the meter sees the outline, the ring and the panel take it.
+    private func finishFrame() {
+        skin.record(skin.outline(around: window_?.regionFrame ?? .zero))
+        drawOutline()
+        window_?.onOutline?()
+        noteRest()
+    }
+
+    func stepOutline(_ dt: TimeInterval, toward target: NSRect, to frame: NSRect?, hand: LensSkin.Hand) {
+        stepSkin(dt, toward: target, hand: hand)
+        if let frame { window_?.driveRegion(frame) }
+        finishFrame()
+    }
+
+    var meter: LensSkin.Meter { skin.meter }
+
+    /// The pill's alpha while it comes in after a hold; 1 otherwise.
+    var introAlpha: CGFloat { introLeft > 0 ? 1 - CGFloat(introLeft / LensSkin.commitPillIn) : 1 }
+
+    /// Once per moment, when the outline has landed: `skin: fit peak=4.00 rest=344ms` (Trace prints only while `MWOYEO_TRACE` is set).
+    private func noteRest() {
+        guard !restNoted, skin.isAtRest, animation == nil, drag == nil, introLeft == 0 else { return }
+        restNoted = true
+        Trace.mark(skin.meter.summary, since: Trace.now)
+    }
+
+    func stats() -> String {
+        "bows=" + outline().bows.map { String(format: "%.2f", Double($0)) }.joined(separator: ",") + " " + skin.meter.summary
+    }
+
+    // MARK: Driving it
+
+    private func ensureLink() {
+        guard link == nil, moveLink == nil else { return }
+        let l = displayLink(target: self, selector: #selector(tick(_:)))
+        l.add(to: .main, forMode: .common)
+        link = l
+        linkStamp = 0
+    }
+
+    /// The seconds since this link's last frame (the first frame: one display frame).
+    private func frameDT(_ l: CADisplayLink) -> TimeInterval {
+        let dt = linkStamp > 0 ? l.targetTimestamp - linkStamp : 0
+        linkStamp = l.targetTimestamp
+        return dt > 0 ? dt : l.duration
+    }
+
+    /// One display frame of whatever moves the lens and of the outline settling after it. The frame and the skin step on this one tick, so the ring,
+    /// the clip and the window always come from one frame.
+    @objc private func tick(_ l: CADisplayLink) {
+        let dt = frameDT(l)
+        if animation != nil {
+            animationFrame(dt)
+        } else {
+            stepSkin(dt, toward: window_?.regionFrame ?? .zero, hand: drag == .resize ? .corner : .none)
+        }
+        finishFrame()
+        guard animation == nil, drag == nil, introLeft == 0, skin.isAtRest else { return }
+        l.invalidate()
+        link = nil
+    }
+
+    /// The picker's click placed this lens (`RegionFrameWindow.takeHold`): the outline takes hold from the first frame the window shows.
+    func takeHold(at click: CGPoint) {
+        pendingHold = click
+        needsLayout = true
+    }
+
+    private func beginHold(at click: CGPoint) {
+        guard let region = window_?.regionFrame else { return }
+        skin.commit(target: region, click: click)
+        restNoted = false
+        introLeft = LensSkin.commitPillIn
+        let appear = CABasicAnimation(keyPath: "opacity")
+        appear.fromValue = 0
+        appear.duration = LensSkin.commitGlowIn
+        glow.add(appear, forKey: "commitIn")
+        ensureLink()
     }
 
     /// Calm at rest; brighter under the pointer, and breathing while reading or translating.
@@ -521,20 +708,30 @@ private final class FrameChromeView: NSView {
         shownRight = startRegion.maxX
         updateGlow()
         needsDisplay = true
+        if drag == .resize {
+            beginMoment(.cornerDrag)
+            ensureLink()
+        }
         guard drag == .move, let w = window_ else { return }
         // The window server moves the window, in step with the pointer however busy this app or the window server
         // is. Moving it here took a round trip to the window server per event: the lens fell behind and jumped.
         // `performDrag` returns at once and the mouse-up goes to the window server, so a display link follows the
-        // move (the translations and the capture go where the lens is) and notices the button going up.
+        // move (the translations and the capture go where the lens is) and notices the button going up. That link
+        // steps the skin too, with every edge held to the frame (the hand carries the lens: nothing bows).
         NSCursor.closedHand.set()
         w.performDrag(with: event)
-        let link = displayLink(target: self, selector: #selector(followMove))
+        self.link?.invalidate()
+        self.link = nil
+        linkStamp = 0
+        let link = displayLink(target: self, selector: #selector(followMove(_:)))
         link.add(to: .main, forMode: .common)
         moveLink = link
     }
 
-    @objc private func followMove() {
+    @objc private func followMove(_ l: CADisplayLink) {
         guard let w = window_ else { return }
+        stepSkin(frameDT(l), toward: w.regionFrame, hand: .move)
+        finishFrame()
         let m = NSEvent.mouseLocation
         let r = onScreen(startRegion.offsetBy(dx: m.x - startMouse.x, dy: m.y - startMouse.y))
         let command = NSEvent.modifierFlags.contains(.command)
@@ -561,7 +758,7 @@ private final class FrameChromeView: NSView {
             }
             // A lens let go on a column's edge settles on it.
             if let settled = w.onSettle?(r), settled != r {
-                animate(to: settled, duration: LensMotion.settle) { [weak self] _ in self?.finishDrag(at: pointer) }
+                animate(to: settled, duration: LensMotion.settle, moment: .drop) { [weak self] _ in self?.finishDrag(at: pointer) }
                 return
             }
             finishDrag(at: pointer)
@@ -594,7 +791,7 @@ private final class FrameChromeView: NSView {
         let r = w.onSnapResize?(wanted) ?? wanted
         haptic.resized(in: self, previousX: shownRight - w.frame.minX, alignedX: r.maxX - w.frame.minX, defaultX: wanted.maxX - w.frame.minX)
         shownRight = r.maxX
-        w.setRegion(r)
+        w.driveRegion(r)
         w.onResize?(r)
     }
 
@@ -603,7 +800,7 @@ private final class FrameChromeView: NSView {
         let pointer = convert(event.locationInWindow, from: nil)
         // A resize let go within a column's reach settles the rest of the way onto its edge, as a move does.
         if let w = window_, let settled = w.onSettleResize?(w.regionFrame), settled != w.regionFrame {
-            animate(to: settled, duration: LensMotion.settle) { [weak self] _ in self?.finishDrag(at: pointer) }
+            animate(to: settled, duration: LensMotion.settle, moment: .drop) { [weak self] _ in self?.finishDrag(at: pointer) }
             return
         }
         finishDrag(at: pointer)
@@ -615,41 +812,45 @@ private final class FrameChromeView: NSView {
         updateGlow()
         needsDisplay = true
         window_?.onCommit?()
+        // The outline goes on settling after the hand lets go.
+        if !skin.isAtRest { ensureLink() }
     }
 
     // MARK: - Animation (a fit, a growth, a settle)
 
     var isAnimating: Bool { animation != nil }
 
-    func animate(to target: NSRect, duration: TimeInterval, completion: @escaping (Bool) -> Void) {
+    func animate(to target: NSRect, duration: TimeInterval, moment: LensSkin.Moment, completion: @escaping (Bool) -> Void) {
         stopAnimating()
         guard let w = window_ else { return completion(false) }
         let from = w.regionFrame
-        // Reduce Motion, or nowhere to go: the lens is there in one frame.
+        // Reduce Motion, or nowhere to go: the lens is there in one frame, and its outline at rest on it.
         guard !Motion.shared.reduced, from != target else {
             place(target, resizing: target.size != from.size)
+            seat()
             return completion(true)
         }
-        let link = displayLink(target: self, selector: #selector(animationFrame))
-        animation = Animation(link: link, from: from, to: target, start: CACurrentMediaTime(), duration: duration, resizing: target.size != from.size,
-                              completion: completion)
-        link.add(to: .main, forMode: .common)
+        beginMoment(moment)
+        animation = Animation(from: from, to: target, elapsed: 0, duration: duration, resizing: target.size != from.size, completion: completion)
+        ensureLink()
     }
 
     func stopAnimating() { finishAnimation(finished: false) }
 
-    @objc private func animationFrame() {
-        guard let a = animation else { return }
-        let t = CACurrentMediaTime() - a.start
-        guard t < a.duration else { return finishAnimation(finished: true) }
-        place(FitMotion.frame(from: a.from, to: a.to, progress: FitMotion.progress(t, duration: a.duration)), resizing: a.resizing)
+    /// One frame: the skin steps towards the end, then the window goes where the spring has it (the outline reads that frame).
+    private func animationFrame(_ dt: TimeInterval) {
+        guard var a = animation else { return }
+        a.elapsed += dt
+        animation = a
+        stepSkin(dt, toward: a.to, hand: .none)
+        guard a.elapsed < a.duration else { return finishAnimation(finished: true) }
+        place(FitMotion.frame(from: a.from, to: a.to, progress: FitMotion.progress(a.elapsed, duration: a.duration)), resizing: a.resizing)
     }
 
-    /// The last frame is the target itself; a cut-short animation leaves the lens where it is.
+    /// The last frame is the target itself; a cut-short animation leaves the lens where it is. The outline goes on settling either way.
     private func finishAnimation(finished: Bool) {
         guard let a = animation else { return }
         animation = nil
-        a.link.invalidate()
         if finished { place(a.to, resizing: a.resizing) }
         a.completion(finished)
     }
@@ -657,7 +858,7 @@ private final class FrameChromeView: NSView {
     /// One frame of an animation: the window, then the session as a drag tells it.
     private func place(_ r: NSRect, resizing: Bool) {
         guard let w = window_ else { return }
-        w.setRegion(r)
+        w.driveRegion(r)
         if resizing { w.onResize?(r) } else { w.onMove?(r) }
     }
 
@@ -675,6 +876,14 @@ private final class FrameChromeView: NSView {
         bandPath.fill()
 
         guard showsTab else { return }
+        // A lens just placed brings the pill in over `LensSkin.commitPillIn`, the whole of it at one alpha.
+        let alpha = introAlpha
+        let ctx = NSGraphicsContext.current?.cgContext
+        if alpha < 1 {
+            ctx?.setAlpha(alpha)
+            ctx?.beginTransparencyLayer(auxiliaryInfo: nil)
+        }
+        defer { if alpha < 1 { ctx?.endTransparencyLayer() } }
         // Name pill: dark glass with a gradient dot that pulses while busy.
         let tab = tabRect
         let pill = NSBezierPath(roundedRect: tab, xRadius: tab.height / 2, yRadius: tab.height / 2)

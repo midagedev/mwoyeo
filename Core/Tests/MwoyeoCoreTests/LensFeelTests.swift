@@ -90,12 +90,20 @@ import Testing
 
     // MARK: the glide after a release, Reduce Motion
 
-    @Test func theGlideAfterAReleaseStartsOnTheNextFrameAndEndsWithinOneHundredTwentyMilliseconds() {
-        #expect(LensMotion.settle <= 0.12)
+    @Test func theGlideAfterAReleaseIsTheContractsQuickSpring() {
+        // 2026-10-23 (skinland117, addendum A1, contract section 2): `settle` is the critically damped spring of response 2π / 30 s (stiffness 900, the block
+        // correction's own), which `FitMotion.progress` runs for the time it takes to settle to 0.3 %: 8 · response / 2π = 8 / 30 s. It replaces fit117's
+        // 0.12 s (ω = 66.7, 90 % in 58 ms), whose 7 pt glide read as a jump. The contract's 90 % is at 130 ms.
+        let response = 2 * Double.pi / 30, settles = 8 * response / (2 * Double.pi)
+        #expect(abs(LensMotion.settle - settles) < 1e-9, "settle is \(LensMotion.settle) s, the contract's is \(settles) s")
+        #expect(FitMotion.progress(0.13, duration: LensMotion.settle) >= 0.9 && FitMotion.progress(0.129, duration: LensMotion.settle) < 0.9)
         for hz in [60.0, 120.0] {
             let frame = 1 / hz
-            let first = FitMotion.progress(frame, duration: LensMotion.settle)
-            #expect(first > 0.05, "the first frame at \(hz) Hz is \(first) of the way")           // it moves at once: not an ease-in that looks like nothing
+            // It moves at once, no ease-in. Closed form 1 − (1 + x)e^(−x), x = ω · frame: 0.090 at 60 Hz (the contract's 0.63 pt of 7), 0.027 at 120 Hz:
+            // a critically damped spring starts from rest, so a frame half as long covers a quarter of the way (the 0.05 of fit117 holds at 60 Hz only).
+            let x = 30 * frame, first = FitMotion.progress(frame, duration: LensMotion.settle)
+            #expect(abs(first - (1 - (1 + x) * exp(-x))) < 1e-9)
+            #expect(first > (hz == 60 ? 0.05 : 0.02), "the first frame at \(hz) Hz is \(first) of the way")
             var last: CGFloat = 0
             var t = frame
             while t < LensMotion.settle {
@@ -104,7 +112,7 @@ import Testing
                 last = p
                 t += frame
             }
-            // The first frame at or past the duration is the target itself (`RegionFrameWindow.animationFrame`), within one frame of 120 ms.
+            // The first frame at or past the duration is the target itself (`RegionFrameWindow.animationFrame`), within one frame of 267 ms.
             #expect(t - LensMotion.settle < frame + 1e-9 && t <= LensMotion.settle + frame + 1e-9)
         }
     }
@@ -124,8 +132,14 @@ import Testing
         #expect(abs(FitMotion.progress(response, duration: LensMotion.fit) - (1 - (1 + 2 * Double.pi) * exp(-2 * Double.pi))) < 1e-9)
     }
 
-    @Test func theOtherMotionsStayUnderAQuarterOfASecond() {
-        #expect(LensMotion.autoFit <= 0.25 && LensMotion.settle <= 0.25 && LensMotion.guideFade <= 0.25)
+    @Test func autoFitIsTheContractsCalmSpringAndTheGuideFadeStaysShort() {
+        // 2026-10-23 (skinland117, addendum A1, contract section 2 and 3.4): `autoFit` is the critically damped spring of response 0.50 s (SwiftUI's `.smooth`),
+        // settling to 0.3 % in 8 · 0.50 / 2π = 0.637 s, 90 % by 310 ms (`1 − (1 + x)e^(−x) = 0.9` at x = 3.89, ω = 4π: 0.3095 s). It replaces 0.25 s,
+        // which showed 12.3 pt in the first frame of a 122 pt growth that the person did not start; `calm` shows 2.3 pt.
+        let response = 0.50, settles = 8 * response / (2 * Double.pi)
+        #expect(abs(LensMotion.autoFit - settles) < 1e-9, "autoFit is \(LensMotion.autoFit) s, the contract's is \(settles) s")
+        #expect(FitMotion.progress(0.31, duration: LensMotion.autoFit) >= 0.9 && FitMotion.progress(0.309, duration: LensMotion.autoFit) < 0.9)
+        #expect(LensMotion.guideFade <= 0.25)
     }
 
     // MARK: Auto Fit never fires while the page scrolls or a hand is on the lens, and never twice for one settle

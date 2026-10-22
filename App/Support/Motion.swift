@@ -19,6 +19,9 @@ final class Motion {
     var reduced: Bool { override ?? system }
 
     private init() {
+        #if !MAS
+        if DebugSwitch.isOn("MWOYEO_REDUCE_MOTION", in: ProcessInfo.processInfo.environment) { override = true }
+        #endif
         NSWorkspace.shared.notificationCenter.addObserver(forName: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification,
                                                           object: nil, queue: .main) { _ in
             MainActor.assumeIsolated { Motion.shared.refresh() }

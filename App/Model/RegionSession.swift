@@ -1088,6 +1088,14 @@ final class RegionSession {
         chrome.onSnapResize = { [weak self] in self?.snapResized($0) ?? $0 }
         chrome.onSettle = { [weak self] in self?.settleFrame(for: $0) }
         chrome.onSettleResize = { [weak self] in self?.settleResized($0) }
+        // The ring's outline bows and settles over the frame; the panel's clip is cut by the very same one (`LensSkin`, motion contract 9.5).
+        panel.outline = { [weak chrome] in chrome?.outline() }
+        chrome.onOutline = { [weak panel] in panel?.restyle() }
+    }
+
+    /// The picker's click (global Quartz points) placed this lens: its outline takes hold from the first frame it shows (`RegionFrameWindow.takeHold`).
+    func takeHold(at click: CGPoint) {
+        chrome.takeHold(at: ScreenGeometry.appKitRect(fromQuartz: CGRect(origin: click, size: .zero)).origin)
     }
 
     private func lensMoved(_ appKitFrame: NSRect) {
@@ -1562,7 +1570,9 @@ extension RegionSession {
             Trace.mark("fit: \(auto ? "auto" : "manual") column=\(column.left)..\(column.right) lens=\(config.rect.minX)..\(config.rect.maxX) -> \(rect.minX)..\(rect.maxX) steps=1", since: Trace.now)
         }
         fit.animatingTo = rect
-        chrome.animate(to: ScreenGeometry.appKitRect(fromQuartz: rect), duration: auto ? LensMotion.autoFit : LensMotion.fit) { [weak self] finished in
+        // The ring's outline plays this moment over the frame (`LensSkin.choreography`): an undo fits nothing.
+        let moment: LensSkin.Moment = auto ? .autoFit : edges == nil ? .undoFit : .fit
+        chrome.animate(to: ScreenGeometry.appKitRect(fromQuartz: rect), duration: auto ? LensMotion.autoFit : LensMotion.fit, moment: moment) { [weak self] finished in
             guard let self else { return }
             fit.animatingTo = nil
             if finished {

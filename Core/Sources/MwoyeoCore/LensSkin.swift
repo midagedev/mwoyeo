@@ -23,6 +23,9 @@ public struct LensSkin: Sendable {
     public static let capOut: CGFloat = 4, capIn: CGFloat = 8, capHand: CGFloat = 4   // pt
     /// §10: the ring is at full opacity in 0.02 s at the commit (one frame, no double outline); the accent outline fades in 0.10 s.
     public static let commitRingIn: TimeInterval = 0.02, commitAccentIn: TimeInterval = 0.10
+    /// §3.5, §9.4: at a one-click commit the pill comes in linearly in 0.20 s, the glow in 0.35 s (the existing glow transaction); the picker's dim goes
+    /// out in `commitDimOut` (ease-out), its accent stroke and label in `commitAccentIn`.
+    public static let commitPillIn: TimeInterval = 0.20, commitGlowIn: TimeInterval = 0.35, commitDimOut: TimeInterval = 0.20
     /// The frame's corner radius (RegionFrameWindow's `radius`).
     public static let radius: CGFloat = 12
     /// Auto Fit is not started by the person: its bows are this much of Fit's (§3.4, §9.4).
@@ -135,7 +138,7 @@ public struct LensSkin: Sendable {
     /// What to draw around `frame` (the rigid frame the window is at, in the space of `step`'s targets): a bow per edge, or the whole grown rect
     /// while taking hold. At rest, today's rounded rect.
     public func outline(around frame: CGRect) -> LensOutline {
-        guard !reduceMotion else { return LensOutline(frame: frame, bows: [0, 0, 0, 0], radius: Self.radius, deviation: 0) }
+        guard !reduceMotion else { return .rigid(frame) }
         let rigid = Self.edges(of: frame)
         let inward = hand == .none ? Self.capIn * amplitude : Self.capHand
         let lag = Edge.allCases.map { edge -> CGFloat in
@@ -151,6 +154,14 @@ public struct LensSkin: Sendable {
     /// Every edge is within `restDistance` of its target and slower than `restSpeed`: the display link may stop (the frame permitting).
     public var isAtRest: Bool {
         takeLeft == 0 && Edge.allCases.allSatisfy { abs(edges[$0.rawValue] - goals[$0.rawValue]) < Self.restDistance && abs(velocities[$0.rawValue]) < Self.restSpeed }
+    }
+
+    /// The display link stops because the skin is at rest: every edge goes exactly onto its target, so the outline is the rounded rect itself and not a
+    /// rounded rect within `restDistance` of it (§9.5: "at rest the outline equals today's rounded rect").
+    public mutating func land() {
+        guard isAtRest else { return }
+        edges = goals
+        velocities = [0, 0, 0, 0]
     }
 
     /// Feeds the meter the outline just drawn (its peak, and the last frame it was off the rigid ring).
@@ -211,6 +222,16 @@ public struct LensOutline: Sendable, Equatable {
 
     /// No bow at all: the path is the rounded rect.
     public var isRigid: Bool { bows.allSatisfy { abs($0) < 0.01 } }
+
+    /// The rounded rect: today's lens, and what Reduce Motion and the corner brackets draw.
+    public static func rigid(_ frame: CGRect) -> LensOutline {
+        LensOutline(frame: frame, bows: [0, 0, 0, 0], radius: LensSkin.radius, deviation: 0)
+    }
+
+    /// The same outline `delta` away: the lens window and the panel's clip place one outline in their own spaces.
+    public func moved(by delta: CGVector) -> LensOutline {
+        LensOutline(frame: frame.offsetBy(dx: delta.dx, dy: delta.dy), bows: bows, radius: radius, deviation: deviation)
+    }
 
     /// The sine of the largest tilt of an edge at its ends: 30°. An edge shorter than about 75 pt reaches it, and then its bow is smaller than asked.
     private static let maxSine: CGFloat = 0.5

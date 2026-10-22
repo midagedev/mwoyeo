@@ -62,5 +62,5 @@ reason), **shipped** (version).
 
 | Idea | Why (evidence) | Status |
 |---|---|---|
-| Translation hub: Services menu, Shortcuts/Intents, a CLI or MCP server, a local API | Lets other apps and agents use the same engines; selection and typed-text translation is a gap against desktop translators | MCP server shipped (1.1.4); `translate_text` **next** (1.1.5); Services, Shortcuts, local API open |
+| Translation hub: Services menu, Shortcuts/Intents, a CLI or MCP server, a local API | Lets other apps and agents use the same engines; selection and typed-text translation is a gap against desktop translators | MCP server shipped (1.1.4); `translate_text` shipped (1.1.5); Translate Text window, Services entry and Shortcuts action built for 1.1.7 (text117, docs/design/text-translation.md); local API open |
 | Positioning line: free, follows live text, papers in place | The in-place niche has new paid entrants with few ratings and no clear winner | open (store copy, site) |

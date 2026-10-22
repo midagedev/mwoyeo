@@ -118,6 +118,7 @@ elsewhere, record a different one. The defaults stay clear of window managers su
 | ⌃⌥O | Show the original / the translation |
 | none | Pause all lenses, Translate again (in the menu; give them keys in Settings if you like) |
 | none | Copy Original Text, Read Aloud, Save Lens Image (they act on the lens under the pointer, else the newest lens) |
+| none | Translate Text (opens the text window) |
 
 ### Lens menu
 
@@ -141,6 +142,20 @@ Right-click a lens's name tag to find everything you can do with that lens.
 Click the photo icon at the bottom of the menu bar panel (**Translate Image…**) to open the image window. Drop an image
 file on it, or paste one with ⌘V, and Mwoyeo erases the original text and paints the translation in, the same way a
 lens does. Copy the result as an image or as text, or save it.
+
+## Translate text
+
+Not everything you want to read is under a lens. Click the speech-bubble icon at the bottom of the menu bar panel
+(**Translate Text…**, which the app menu has too) and type or paste into the left pane. The translation
+appears on the right, shaped like the text you gave it, and **Copy** takes it away. With the default Apple engine it
+translates when you pause typing; with an engine you added, ⌘↩ or **Translate** sends it, so a half-typed sentence is never
+sent to a server. The window follows the profile of the app you came from, with the same languages, engine, names and
+rewrites a lens there would use, and a pop-up picks another profile.
+
+In any app, select text and choose **Translate with Mwoyeo** from the Services menu (under the app's menu, or in the context menu).
+In Shortcuts, the **Translate Text** action takes text and an optional target language and returns the translation, so
+Spotlight and your own shortcuts can use it too. Give the window a shortcut in Settings › Shortcuts if you like; it has none
+by default.
 
 ## Add another translation engine
 

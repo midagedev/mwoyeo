@@ -13,6 +13,11 @@ struct OCRBlock: Sendable {
     /// Set on each of the blocks a paragraph that goes on in the next column was cut into (`ColumnBreak`): `text` is then the whole
     /// paragraph's, translated once, and the block draws its share of the translation (`FlowSplit`).
     var part: FlowPart?
+    /// The lines joined with the hyphens of broken words taken out (`LineJoin`), when there were any. `text` is as the lines read, for the
+    /// rules that keep code, formulas and names as written; what is translated is `prose`.
+    var joined: LineJoin.Joined?
+    /// What is translated: `text`, or the words it holds with the break of a line taken out.
+    var prose: String { joined?.text ?? text }
 }
 
 /// What the pipelines call to read a picture. A facade over `RecognitionHost`: the Vision requests run in the reader services
@@ -231,17 +236,15 @@ enum TextRecognizer {
         notice.withLock { $0.handler = h }
     }
 
-    /// Lines → block, joining text the way the script expects (no spaces between CJK lines).
+    /// Lines → block, joining text the way the script expects (no spaces between CJK lines). A word the typesetter broke at the end of
+    /// a line is one word in `prose`, not in `text` (`LineJoin`).
     static func makeBlock(_ lines: [OCRLine]) -> OCRBlock {
         let rect = lines.dropFirst().reduce(lines[0].rect) { $0.union($1.rect) }
-        var text = ""
-        for line in lines {
-            if let last = text.last, let first = line.text.first, !(isCJK(last) || isCJK(first)) {
-                text += last == "-" ? "" : " "
-            }
-            text += line.text
-        }
-        return OCRBlock(rect: rect, lines: lines, text: text)
+        let texts = lines.map(\.text)
+        var block = OCRBlock(rect: rect, lines: lines, text: LineJoin.text(texts, isCJK: isCJK))
+        let words = LineJoin.join(texts, hyphens: .word(isWord: EnglishWords.contains), isCJK: isCJK)
+        if !words.words.isEmpty { block.joined = words }
+        return block
     }
 
     /// What a block of text is to the lens.

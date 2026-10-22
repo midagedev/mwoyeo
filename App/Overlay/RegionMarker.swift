@@ -89,6 +89,8 @@ private final class MarkerWindow: NSWindow {
 
 final class MarkerView: NSView {
     private let screenFrame: NSRect
+    /// The screen's visible frame (the menu bar and the Dock excluded), in view coordinates: where the hint pills may be.
+    private let visible: NSRect
     private let lens: NSRect
     private let existing: [NSRect]
     private let done: (CGRect?) -> Void
@@ -103,6 +105,7 @@ final class MarkerView: NSView {
 
     init(screen: NSScreen, lens: CGRect, existing: [CGRect], done: @escaping (CGRect?) -> Void) {
         screenFrame = screen.frame
+        visible = screen.visibleFrame.offsetBy(dx: -screen.frame.minX, dy: -screen.frame.minY)
         self.done = done
         func local(_ q: CGRect) -> NSRect { ScreenGeometry.appKitRect(fromQuartz: q).offsetBy(dx: -screen.frame.minX, dy: -screen.frame.minY) }
         self.lens = local(lens)
@@ -203,10 +206,7 @@ final class MarkerView: NSView {
         let accent = NSColor.controlAccentColor
         for r in existing { outline(r, color: accent.withAlphaComponent(0.6), fill: accent.withAlphaComponent(0.12)) }
         if let r = selection ?? placement?.rect { outline(r, color: .white, fill: accent.withAlphaComponent(0.25), width: 2) }
-        hintPill(String(localized: "Drag over what the lens should not read  ·  esc to cancel"), y: bounds.maxY - 120)
-        if placement != nil {
-            hintPill(String(localized: "Arrow keys move  ·  ⇧ resizes  ·  ⌥ steps 1 pt  ·  ↩ places  ·  esc cancels"), y: bounds.maxY - 164)
-        }
+        for (text, pill) in zip(hints, hintFrames).prefix(placement == nil ? 1 : 2) { hintPill(text, in: pill) }
     }
 
     private func outline(_ r: NSRect, color: NSColor, fill: NSColor, width: CGFloat = 1) {
@@ -218,16 +218,33 @@ final class MarkerView: NSView {
         p.stroke()
     }
 
-    private func hintPill(_ text: String, y: CGFloat) {
+    // MARK: - Hint pills
+
+    /// The two pills' words: the drag hint, and the keys once one is pressed.
+    private var hints: [String] {
+        [String(localized: "Drag over what the lens should not read  ·  esc to cancel"),
+         String(localized: "Arrow keys move  ·  ⇧ resizes  ·  ⌥ steps 1 pt  ·  ↩ places  ·  esc cancels")]
+    }
+
+    private static let hintAttributes: [NSAttributedString.Key: Any] = [
+        .font: NSFont.systemFont(ofSize: 13, weight: .medium),
+        .foregroundColor: NSColor.white,
+    ]
+
+    /// Where the pills are (view coordinates), the drag hint first. Both are always placed, as one pair against the lens, so the drag hint
+    /// does not move when the second one appears; the name tag's room is kept clear as well as the ring (`MarkerHints`).
+    var hintFrames: [NSRect] {
+        let sizes = hints.map { text -> CGSize in
+            let s = NSAttributedString(string: text, attributes: Self.hintAttributes).size()
+            return CGSize(width: s.width + 32, height: s.height + 16)
+        }
+        return MarkerHints.place(pills: sizes, lens: lens, visible: visible, clearance: RegionFrameWindow.tabExtra)
+    }
+
+    private func hintPill(_ text: String, in pill: NSRect) {
         guard screenFrame.contains(NSEvent.mouseLocation) || NSScreen.screens.count == 1 else { return }
-        let s = NSAttributedString(string: text, attributes: [
-            .font: NSFont.systemFont(ofSize: 13, weight: .medium),
-            .foregroundColor: NSColor.white,
-        ])
-        let size = s.size()
-        let pill = NSRect(x: bounds.midX - (size.width + 32) / 2, y: y, width: size.width + 32, height: size.height + 16)
         NSColor(white: 0.12, alpha: 0.88).setFill()
         NSBezierPath(roundedRect: pill, xRadius: pill.height / 2, yRadius: pill.height / 2).fill()
-        s.draw(at: NSPoint(x: pill.minX + 16, y: pill.minY + 8))
+        NSAttributedString(string: text, attributes: Self.hintAttributes).draw(at: NSPoint(x: pill.minX + 16, y: pill.minY + 8))
     }
 }

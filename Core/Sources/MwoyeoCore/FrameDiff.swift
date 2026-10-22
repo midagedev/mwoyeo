@@ -106,7 +106,10 @@ public enum FrameDiff {
     /// A tile counts as changed when at least `minPixels` of its pixels moved by more than `delta` luma levels.
     /// Counting strong pixel changes (instead of averaging) keeps a single edited glyph from being diluted
     /// by the rest of the tile, while ignoring dithering/compression noise.
-    public static func changeMap(from a: GrayImage, to b: GrayImage, tile: Int = 16, delta: Int = 24, minPixels: Int = 2) -> ChangeMap {
+    /// `ignoring`: pixels that do not count (the strips a larger capture only now shows: there `a` has no content, so they differ without the page
+    /// having changed). A tile that the strip cuts is judged by its other pixels.
+    public static func changeMap(from a: GrayImage, to b: GrayImage, tile: Int = 16, delta: Int = 24, minPixels: Int = 2,
+                                 ignoring: [PixelRect] = []) -> ChangeMap {
         guard a.width == b.width, a.height == b.height else {
             return .allChanged(width: b.width, height: b.height, tile: tile)
         }
@@ -117,7 +120,9 @@ public enum FrameDiff {
                 for y in 0..<b.height {
                     let rowBase = (y / tile) * cols
                     let o = y * b.width
+                    let skips = ignoring.isEmpty ? [] : ignoring.filter { y >= $0.y && y < $0.y + $0.height }
                     for x in 0..<b.width where abs(Int(pa[o + x]) - Int(pb[o + x])) > delta {
+                        if !skips.isEmpty, skips.contains(where: { x >= $0.x && x < $0.x + $0.width }) { continue }
                         counts[rowBase + x / tile] += 1
                     }
                 }

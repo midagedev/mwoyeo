@@ -67,6 +67,11 @@ final class RegionSession {
     private var captureUpdatePending = false
     /// The next pass of the capture's updates starts the stream again instead of reconfiguring it.
     private var captureRestartPending = false
+    /// Resize tasks pile up behind a pass. Only the capture as it is when one runs is applied, so a size
+    /// that was already replaced (grown, then shrunk) is not read. The ticket moves on every request; a call
+    /// that was queued for an older one applies nothing.
+    private let resizeTicket = OSAllocatedUnfairLock(initialState: 0)
+    private var pipelineResizeRunning = false
     /// What the capture does when it stops or the displays change (`CaptureRecovery`), and its state: restarts tried since the stream
     /// last ran healthy, when it last started, whether a restart is waiting or running, the display event settling.
     private let policy: CaptureRecoveryPolicy
@@ -285,6 +290,7 @@ final class RegionSession {
     func stop() async {
         stopped = true
         recovering = false
+        await pipeline.halt()
         if let id = outcomeObserver { await translator.stopObserving(id) }
         outcomeObserver = nil
         troubleClock?.invalidate()
@@ -710,9 +716,13 @@ final class RegionSession {
     /// Whether the lens (global Quartz points) is under `point`.
     func contains(_ point: CGPoint) -> Bool { config.rect.contains(point) }
 
+    /// Every snapshot the pipeline makes, as the panel got it (the checks watch what the lens shows, snapshot by snapshot).
+    var snapshotObserver: ((OverlaySnapshot) -> Void)?
+
     func received(_ snapshot: OverlaySnapshot) {
         let showedTranslations = lastSnapshot?.blocks.isEmpty == false
         lastSnapshot = snapshot
+        snapshotObserver?(snapshot)
         if showedTranslations != !snapshot.blocks.isEmpty { refreshHint() }
         observeTranscript()
         noteColumns(snapshot)
@@ -1123,6 +1133,7 @@ final class RegionSession {
         setLead(.zero)
         noteDropped()
         fitCapture(allowResize: true)
+        Task { await armResizeRead() }
         // A window lens follows whichever window it was dropped on (off every window, it stays where it is).
         // A screen lens stays pinned.
         if config.anchor != nil { follow(windowUnderLens()) }
@@ -1157,7 +1168,7 @@ final class RegionSession {
             Task { await pipeline.captureMoved(to: r.origin); scheduleCaptureUpdate() }
         case .resize(let r):
             capture = r
-            Task { await pipeline.captureResized(to: r); scheduleCaptureUpdate() }
+            schedulePipelineResize()
         }
         Task { [pipeline] in await pipeline.setVisible(lens) }
     }
@@ -1224,6 +1235,39 @@ final class RegionSession {
     private func predictedScroll(since: TimeInterval, now: TimeInterval) -> (area: CGRect, dy: CGFloat)? {
         guard Self.predicts, let area = scrollArea, now - lastWheel < 1 else { return nil }
         return (area, CGFloat(predictor.offset(from: since, to: now)))
+    }
+
+    /// One pipeline resize at a time, always the capture as it is when the call runs. A call queued for a
+    /// size the lens has already left applies nothing, and the capturer is reconfigured once, for the size that remains.
+    private func schedulePipelineResize() {
+        resizeTicket.withLock { $0 += 1 }
+        guard !pipelineResizeRunning else { return }
+        pipelineResizeRunning = true
+        Task {
+            var saw = -1
+            while !stopped {
+                let ticket = resizeTicket.withLock { $0 }
+                let r = capture
+                await pipeline.captureResized(to: r, ticket: ticket, tickets: resizeTicket, deferRead: true)
+                saw = ticket
+                if saw == resizeTicket.withLock({ $0 }) { break }
+            }
+            pipelineResizeRunning = false
+            if stopped { return }
+            if saw != resizeTicket.withLock({ $0 }) { schedulePipelineResize() }
+            else {
+                await armResizeRead()
+                scheduleCaptureUpdate()
+            }
+        }
+    }
+
+    /// The read of a grow that `captureResized` held back (`deferRead`) starts once the lens rests on its size: not while a drag goes on (the
+    /// drop calls this), not while a resize is still being applied (its end calls this). A jump of the lens (Fit to Column) ends its resize
+    /// before its drop, and its drop finds the capture already at its size.
+    private func armResizeRead() async {
+        guard !dragging, !pipelineResizeRunning else { return }
+        await pipeline.armDeferredResizeRead()
     }
 
     /// Coalesces capture reconfiguration: at most one in flight, always ending on the latest rect.

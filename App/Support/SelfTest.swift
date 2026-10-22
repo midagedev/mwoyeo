@@ -188,6 +188,9 @@ enum SelfTest {
         default: .seamless
         }
         settings.engine = TranslationEngineChoice(rawValue: option("--engine") ?? "auto") ?? .auto
+        // `--first-paint`: the setting `fastFirstPaint` on. `--first-paint-log`: what it did, line by line (`FirstPaintProbe`). `--prewarm`: the app's launch
+        // warm-up of the translation session first, so the first batch meets a warm model as a lens placed after launch does.
+        settings.fastFirstPaint = args.contains("--first-paint")
         settings.useInpaintingModel = !args.contains("--no-inpaint")
         // `--glossary "co-op=협력;raid=레이드"` sets the glossary (one `term=translation` per `;`).
         if let g = option("--glossary") { settings.glossary = g.replacingOccurrences(of: ";", with: "\n") }
@@ -253,18 +256,42 @@ enum SelfTest {
             let ended = await instruments.waitForWarmUp(loading)
             print("warm-up: \(ended ? "" : "timeout ")\(ms(w)) ms")
         }
-        let still = StillTranslation(decoded, settings: settings, translator: translator, inpainter: inpainter, lensApp: lensApp)
-        let pipeline = still.pipeline
-        await pipeline.setLensContext(lensContext(app: option("--lens-app") ?? option("--profile-app"), category: option("--lens-category"), settings: settings))
+        // `--prewarm-source <code>`: the same, for the language a picker or an earlier lens saw (`prewarm(source:)`), instead of `ja` for a Detect source.
+        if args.contains("--prewarm") || option("--prewarm-source") != nil {
+            let w = Date()
+            await translator.prewarm(source: option("--prewarm-source"))
+            print("prewarm: \(ms(w)) ms")
+        }
+        let firstPaintProbe = args.contains("--first-paint-log") ? FirstPaintProbe(start: Trace.now) : nil
+        let keepingAll = Keeping(settings: settings, option: option, args: args)
         let capture = CGRect(x: 0, y: 0, width: CGFloat(image.width) / scale, height: CGFloat(image.height) / scale)
+        let lensRect = lensOption(option, default: capture)
+        let clock = Date()
+        // With the probe on, the translation log is fed every snapshot, as the app feeds it, so a quick text shown for a while would be heard.
+        let still = StillTranslation(decoded, settings: settings, translator: translator, inpainter: inpainter, lensApp: lensApp, onSnapshot: firstPaintProbe.map { probe in
+            { @Sendable snapshot in
+                probe.note(snapshot)
+                keepingAll.observe(snapshot, lens: lensRect, time: Date().timeIntervalSince(clock))
+            }
+        })
+        let pipeline = still.pipeline
+        // The app looks again every second, so a line that stays put is one entry and not many (`RegionSession.observeTranscript`).
+        let looking = firstPaintProbe == nil ? nil : Task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1))
+                keepingAll.observe(still.latest, lens: lensRect, time: Date().timeIntervalSince(clock))
+            }
+        }
+        defer { looking?.cancel() }
+        await pipeline.setLensContext(lensContext(app: option("--lens-app") ?? option("--profile-app"), category: option("--lens-category"), settings: settings))
         // The silence timeline runs from here (the start of the lens pass) to the exit.
         await pipeline.setReadHandler { tally in instruments.streak.read(tally); instruments.trouble.read(tally) }
         instruments.startSampling(source: settings.sourceLanguage, target: settings.targetLanguage, engine: settings.activeEngineConfig?.id,
                                   drawn: { still.latest?.blocks.isEmpty == false })
         let start = Date()
+        firstPaintProbe?.begin()
         await still.ingest()
-        let keeping = Keeping(settings: settings, option: option, args: args)
-        let lensRect = lensOption(option, default: capture)
+        let keeping = keepingAll
         var phase = 0.0
 
         // Wait for reading + translation to finish (or give up after `--max-wait`, 120 s by default).
@@ -323,6 +350,14 @@ enum SelfTest {
             }
         }
         printPace(translator)
+        if let firstPaintProbe {
+            let state = await pipeline.firstPaintState()
+            for line in firstPaintProbe.report(lines: state.lines, stats: state.stats, firstFlightAt: state.firstFlightAt) { print(line) }
+            // What the translator kept for each line (its cache): the final text only, never a quick one.
+            for (source, _) in await pipeline.debugState().blocks {
+                if let cached = translator.cached(source) { print("fp-cache: \"\(source.prefix(40).replacingOccurrences(of: "\n", with: " "))\" → \"\(cached)\"") }
+            }
+        }
         for (source, translation) in await pipeline.debugState().blocks { print("  \(source)\n    → \(translation ?? "(no translation)")") }
         // The blocks left as written (code regions) are listed as shown, with a third line that names the reason.
         for kept in await pipeline.keptState() { print("  \(kept.text)\n    → \(kept.text)\n    kept: \(kept.reason.rawValue)") }
@@ -406,6 +441,11 @@ enum SelfTest {
         parts.append(summary("lens_wait", "translate.lens_wait_ms"))
         // From the stop of the motion to every block in the lens being translated.
         parts.append(summary("settle", "translate.settle_ms"))
+        // The first paint (`fastFirstPaint`): from the text standing in the lens to its quick text, and how long that stayed. Only when there was one.
+        if samples["translate.first_paint_ms"] != nil {
+            parts.append(summary("first_paint", "translate.first_paint_ms"))
+            parts.append(summary("provisional_shown", "translate.provisional_shown_ms"))
+        }
         if let pipeline { parts.append("parked=\(await pipeline.debugState().parked)") }
         print("work[\(phase)]: " + parts.joined(separator: " "))
     }

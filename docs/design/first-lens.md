@@ -389,3 +389,86 @@ So "low latency first, high fidelity upgrade" on a Mac that has the pack (case A
 - **Why the inpainting take shows no swap.** A text that lands is drawn by the pipeline actor, and the seamless pass (`RegionPipeline.swift:991`: the erase loop, then `blocks = next`) runs on that actor in one piece (4.2 to 7.3 s with the inpainting model here). In the p6 take the quick text landed at 14.1 s and was drawn at 23.1 s, when the pass ended; the final text, which landed 8 s after the quick one, was drawn in the same second. Without the inpainting model the pass is shorter and began after the quick text was drawn, so the swap shows (rows 1 and 2). Today's final text waits for the pass in the same way.
 - **What this means for the flag**: a live lens draws its first Korean at the later of the erase pass and the model's answer, so the flag brings the first Korean forward only by what hf takes beyond the erase pass: 4.0 s (c01) and 8.6 s (p6) with the inpainting model off, 0 s with it on at this load (rows above); and only for an explicit high-fidelity engine (13.4, 1). The default-path win of this round is 13.6 (the first batch of a default lens, 1.8 s to 0.15 s on c01).
 - **Not done, and why**: letting a landed text draw on the fast-erased background while the seamless erase runs (a yield point per block, or the erase pass moved off the actor) would move every first Korean, flag or not, by up to the erase time; it is a change of the pipeline's concurrency, outside this round's owner. The picker-open `prewarm(source: detected)` (13.4, 4) is first117's.
+
+## 14. The first Korean is drawn when its own block is erased (round erase117)
+
+**The defect (13.8).** A pass's erase ran on the pipeline actor in one piece: every block's plan (glyph masks per line, look, spare width) and fill (onion peel and 12 smoothing passes, or the MI-GAN
+model) one after the other, then the blocks went up. A lens's first read sent its batch only after the whole erase, and a translation that landed during the settled read's erase was drawn only when it
+ended (p6 live take: the quick text landed 14.1 s after the click and was drawn at 23.1 s).
+
+**Target.** A block's Korean is drawn as soon as its translation and its own patch are both in. A read that replaces no block (a lens's first read, a read after a reset, a strip a scroll uncovered) puts its
+blocks up before their patches are filled, so their text goes to the translator at once, and draws each block when its patch comes in; patches are filled one at a time off the actor, the top of the lens
+first and a block whose translation has landed before the others. A read over blocks that are up (the settled re-read) fills its patches off the actor before it takes their place: the blocks on the screen
+stay, take the translations that land meanwhile, and are swapped all at once, as before. Same erase work (each block planned once and filled once), same final frame.
+
+| target | before | gap | owner |
+|---|---|---|---|
+| when a read's erased blocks go up, and the order their patches are filled in | the whole pass, then all blocks | `EraseSchedule.install(replacing:)`, `EraseSchedule.next` (Core, pure, tested) | `RegionPipeline.fastPass` / `seamlessPass` call it |
+| what a block is drawn over | `erased: RGBAImage?` | `Ground`: `.box`, `.erasing(EraseJob)` (planned, fill not in: drawn nowhere), `.erased(patch)` | `RegionPipeline.Block` |
+| the plan off the actor | on the actor, block after block | `erasePlan` is static; a pass plans its blocks side by side in a task group (`erases`) | `RegionPipeline` |
+| the fill off the actor | on the actor | `fill` is `@concurrent nonisolated`; `fillEach` (first read) or `erases` (re-read) awaits it one block at a time | `RegionPipeline` |
+| erase order = what the person sees first | - | `TranslationScheduling.priority(of:lens:lead:)`, which the translation queue already used, moved to Core and shared | Core |
+| seeing it | the pass's one mark | trace `erase: N planned off the actor (...)`, `erase: '<text>' drawn as its patch came in (N still to fill)`, `erase: N filled, ...`; counter `erase.drawn_on_fill`; samples `erase_plan_ms`, `erase_fill_ms` (p50, max, n, sum) in the harness's work line | `RegionPipeline`, `SelfTest` |
+
+### 14.1 Paper decomposition (before the code; Debug build, this Mac, `--render`, en > ko, inpainting model on)
+Terms per pass, from the code and the traces of fast117 (13.8) and this round's first render (p6 1634x2114 px, 37 blocks erased; c01 12 blocks):
+- R, the read (OCR + `readBlocks`): p6 5.6 s, c01 1.4 s. P_i, a block's erase plan: p6 p50 58 ms, sum 4.1 s on one core. F_i, its fill: p6 p50 174 ms, sum 10.6 s; c01 sum about 3 s for plan and fill.
+  T, the first batch's answer: ll 0.3 to 1 s (`auto` with the pack), hf about 7.8 s on p6 and 1.5 s on c01. D, the draw of a block: tens of ms.
+- **The inpainting model is not a term on these pages.** p6 and c01 have flat backgrounds: every patch takes the flat fill, the model is never asked (`inpaint` = 0 in every run). The 4 to 7 s fast117
+  measured are the CPU erase of a Debug build under load (Release: 10 blocks in 156 ms, filmhero). The model runs on `.cpuAndGPU` (`Inpainter.swift:58`; BENCH: 12 to 13 ms per 512 window on the GPU), is
+  loaded at the first fill (0.06 to 0.1 s) and kept 60 s, and was already called once per block: filling per block adds no load and no call (14.4).
+- **Before:** first request = R + sum(P + F); first Korean = R + sum(P + F) + T + D. A settled re-read holds every landed text until its R2 + prep + sum(P + F) ends.
+- **After:** first request = R + sum(P)/k (k cores planning); first Korean = R + sum(P)/k + max(T, F_first) + D, F_first being the fill of the first block in `EraseSchedule.next`'s order.
+  A settled re-read no longer holds landed texts during its fills (its read and prep still do: 14.5).
+- **Predicted** (first Korean, s after the lens): p6 `auto` 20.7 before, 7.5 after; p6 hf 40.5 before (the text lands during the settled read and waits for it), 15.3 after; c01 `auto` 4.7 before, 2.0 after;
+  c01 hf 8.8 before, 3.4 after.
+
+### 14.2 Measured (headless `--render --mode adaptive --first-paint-log --warm --prewarm`, en > ko, inpainting model on, base = main 7c58403 built the same way; base and this round interleaved, the order flipped each repetition; seconds from the lens to its first Korean drawn, base → this round; load average at the start of each run)
+| build | page, engine | before | after | per run (load) |
+|---|---|---|---|---|
+| Debug | p6, `auto` (ll) | 20.9 | **8.5** | 20.9→8.4 (49/34), 27.3→8.8 (11/15), 21.8→19.8 (18/19: the round's own Release build ran beside it, OCR 13.4 s), 20.5→8.5 (22/14), 20.5→8.4 (20/12) |
+| Debug | c01, `auto` | 4.6 | **1.9** | 4.6→1.9, 4.6→1.9, 5.5→3.0 (load 41) |
+| Debug | p6, hf | 42.4 | **14.6** | 42.4→14.6, 47.0→13.9, 41.6→14.7 (load 9 to 43) |
+| Debug | c01, hf | 9.3 | **3.1** | 8.8→2.3, 9.3→3.5, 9.5→3.1 |
+| Release | p6, `auto` | 1.9 | **1.7** | 1.9→1.8, 1.9→1.7, 1.9→1.6 (load 4) |
+| Release | c01, `auto` | 0.7 | **0.6** | 0.7→0.7, 0.7→0.6, 0.8→0.6 (load 4) |
+| Release | p6, hf | 7.4 | **7.1** | 7.3→7.1, 7.5→8.2, 7.4→7.1 (load 4 to 74: other rounds) |
+| Release | c01, hf | 1.2 | **1.1** | 1.2→1.1, 1.3→1.2, 1.2→1.1 |
+- **Live takes** (`rec.py` as in 13.8: a page window, the hot key and one click place the lens, Debug builds, engine hf, Detect, `fastFirstPaint` off, the inpainting model on; under the screen queue,
+  base and this round interleaved; seconds after the click; the input synthesis was the lead's exception for this round): p6 22.6 → 7.3, 20.6 → 7.0, 21.9 → 7.7; c01 5.2 → 2.1, 5.3 → 1.8, 5.2 → 1.7
+  (load 6 to 130 from other rounds). The batch went out at 10.9 to 11.8 s (base) against 4.9 to 5.3 s (p6), 2.9 s against 1.2 to 1.6 s (c01). 13.8 measured p6 today at 22.8 s.
+- **Against the prediction (Debug):** p6 `auto` 20.7 → 7.5 predicted, 20.9 → 8.5 measured (the first block in the lens is the page's longest paragraph: its fill is 1.0 s, not the 0.17 s median); c01 4.7 → 2.0 predicted, 4.6 → 1.9; p6 hf 40.5 → 15.3 predicted, 42.4 → 14.6; c01 hf 8.8 → 3.4 predicted, 9.3 → 3.1.
+  The terms, p6 `auto`: read 5.5 s; plans side by side 1.7 s (37 blocks, sum 4.1 s on one core); first fill 1.0 s; so the batch goes out at 7.4 s (base 20.7 s: the read, then 15 s of plans and fills on the actor).
+- **Release (what the film and the person run):** the erase is small: p6's fast pass spent 0.47 s on the actor between the read and the batch (base) and 0.17 s now; the settled re-read's erase was 0.32 s on the actor and its prep 0.25 s.
+  The change brings the first Korean forward by 0.1 to 0.3 s there at load 4; the 12 to 28 s of the Debug rows are a debug build's erase (unoptimized Swift loops: p6's fast-pass erase 15 s against 0.47 s, about 30 times), which is what fast117's live takes (13.8) measured. Under load the Release erase grows with the CPU it gets, and it no longer holds a text that landed.
+- **Everything is done sooner too:** the last final text, Debug p6 `auto` 42 to 49 s → 18 to 19 s (the batch goes out 13 s earlier and the settled re-read no longer blocks the queue's draws).
+- **Final frame unchanged** (`MWOYEO_FAKE_ENGINE=slow:100`, the same deterministic text for base and this round; p1, p6, c01, `adaptive` and `seamless`; 26 renders): each of this round's 10 frames is byte-identical to a frame of base, with the same counts. The base differed from itself in 4 of 6
+  groups of the first round, and every time the read differed: OCR 202 lines against 200 (p6), 101 against 99, "payment f low" read as one block (c01), one settled read against two. Where the read is the same the frames are the same, byte for byte.
+- **Same erase work:** plans = fills = the `erase` count in each of this round's 36 runs, and base and this round count the same in all 52 series runs (p6 74 = 37 x 2: the settled re-read erases every block again, as before; c01 26).
+
+### 14.3 Gates (none waits on a wall clock)
+- **`EraseChecks`** (`--capture-ui … check-logic`, alone `erase-checks`): a real pipeline over the page of `ResizeHoldChecks` with a mock engine, and a gate on its fills (`RegionPipeline.setFillGate`)
+  that holds each fill until the check lets it go; what is checked is the order of events. 8 checks: the first read's text is translated with every fill held; nothing is drawn before its own patch; fills go
+  one at a time, the top of the lens first; the first Korean is drawn when its own patch is in while the next is held; a re-read's fills leave the actor free (a font change redraws the blocks that are up while
+  a fill is held); the blocks that are up stay up; the lens ends with every block drawn and translated; every erase planned is filled once.
+  FAIL-first, one mutant each: install always all at once (checks 1 to 4 and 6 FAIL); an erasing block drawn as a box (2, 4); the fill on the actor (1, 2, 4, 5); the order reversed (3); install always each
+  when filled (5, 6); a fill done twice (8).
+- **Core**: `EraseScheduleTests` (11) and `TranslationSchedulingTests.priorityIsTheLensInReadingOrderThenTheOverscanNearestFirst`. FAIL-first: install always all at once, order reversed, translated ignored,
+  translated before the lens, lead ignored: each fails at least one test.
+- **`resize-hold-checks`** (hold117's), base and this round interleaved, 3 runs each, one scratch id, after the e5 warm-up: base FAILs the same two checks in every run (the page's text back under a block, 1.00; the narrow lens
+  of the Fit reads one block that needs translating where the check wants three), and so does this round in runs 2 and 3. This round's run 1 FAILed three more (a snapshot with no block in the lens, then two
+  passes after "shrink to the start"): a reset, which the check's sessions get when the app behind its page window at the lens's centre changes between two drops (they read the real desktop:
+  no `appUnderLens` stub, unlike `FitChecks`); holdfix117 changes what that change does.
+
+### 14.4 One block-sized inpainting call (`--capture-ui … inpaint-footprint`, Debug build, a 400 x 80 hole over a gradient, load 21)
+The model runs on `.cpuAndGPU` (`Inpainter.swift:58`; BENCH: GPU fastest at 512, 12 to 13 ms a window; `.all` 4 times slower). First fill of the process 2487 ms (load and GPU specialization); fills 2 to 20 median 166.7 ms, max 168.9 ms (the
+window's packing in a debug build; the model itself is 13 ms); after the idle release (4 s in the check, 60 s in the app) a fill reloads in 228.5 ms. Graphics 225 MB while loaded. The pipeline already called it once per block: filling per block, off the actor, adds no load and no call;
+fills follow one another well inside the idle release. Neither p6 nor c01 asks the model (flat backgrounds: `inpaint` = 0 in every run), so the 4 to 7 s of 13.8 were the CPU erase of a debug build, not the model.
+
+### 14.5 What is left on the actor (the next terms)
+- The settled read's prep (`seamless: frame → RGBA`: `readBlocks`, `CodeKeep.apply`, `layoutPlaces`, the RGBA copy) runs on the actor: p6 5.1 to 5.5 s in Debug (2.9 s in the 13.8 take), 0.25 s in Release. A text that lands then waits for it. The same move as `erasePlan` (static, off the actor) closes it.
+- The first read's `readBlocks` (part of R) is on the actor too; nothing is up yet, so nothing waits for it but the batch.
+- **A resize while a first read's patches are filled** (`fillEach`, after `finishPass`): `captureResized` sees `working` and takes it for a pass in flight that will be rebased, which this one no longer is. The
+  blocks move with it as always and the strips it uncovered are read with the next frame (`forcedDirty`), but `deferredUncovered` and `readPending` are not armed, so the lens may say idle until that frame comes.
+  The window is the fills' time (p6: 0.3 s Release, 11 s Debug). Closing it is one predicate, "a pass that has not installed its blocks" for `working` in `captureResized` and `armDeferredResizeRead`;
+  left for the lead, since holdfix117 is changing the lens-hold path now.

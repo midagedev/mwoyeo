@@ -3152,6 +3152,82 @@
         }
       }
     },
+    "Press %@ anywhere, point at a paragraph and click, or drag an area. The lens fits the column and follows the window it lands on; hold ⌥ to pin it to the screen.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drücke %@ irgendwo, zeige auf einen Absatz und klicke, oder ziehe einen Bereich. Die Linse passt sich der Spalte an und folgt dem Fenster, auf dem sie landet; halte ⌥ gedrückt, um sie am Bildschirm zu fixieren."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Press %@ anywhere, point at a paragraph and click, or drag an area. The lens fits the column and follows the window it lands on; hold ⌥ to pin it to the screen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pulsa %@ en cualquier lugar, señala un párrafo y haz clic, o arrastra un área. La lente se ajusta a la columna y sigue la ventana en la que aterriza; mantén ⌥ para fijarla en la pantalla."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appuyez sur %@ n’importe où, pointez un paragraphe et cliquez, ou faites glisser une zone. La lentille s’ajuste à la colonne et suit la fenêtre où elle se pose ; maintenez ⌥ pour l’épingler à l’écran."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Premi %@ ovunque, punta un paragrafo e fai clic, oppure trascina un’area. La lente si adatta alla colonna e segue la finestra su cui si posa; tieni premuto ⌥ per fissarla allo schermo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "どこでも %@ を押す、段落を指してクリックする、範囲をドラッグする、どれでも構いません。レンズは段組みに合わせて置いたウィンドウに追従し、⌥ を押しながら置くと画面に固定されます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아무 곳에서나 %@을(를) 누르거나, 문단을 가리켜 클릭하거나, 영역을 드래그하세요. 렌즈는 단에 맞춰지고 놓인 창을 따라가요. ⌥를 누른 채 놓으면 화면에 고정돼요."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pressione %@ em qualquer lugar, aponte para um parágrafo e clique, ou arraste uma área. A lente se ajusta à coluna e segue a janela em que pousa; segure ⌥ para fixá-la na tela."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нажмите %@ где угодно, укажите на абзац и щёлкните или растяните область. Линза подгоняется под колонку и следует за окном, на котором оказалась; удерживайте ⌥, чтобы закрепить её на экране."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Натисніть %@ будь-де, вкажіть на абзац і клацніть або витягніть область. Лінза підганяється під колонку і слідує за вікном, на якому опинилася; утримуйте ⌥, щоб закріпити її на екрані."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "随处按 %@、指向段落并点按，或拖出一个范围。透镜会贴合栏宽并跟随所在的窗口；按住 ⌥ 放置可固定在屏幕上。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隨處按 %@、指向段落並點按，或拖出一個範圍。透鏡會貼合欄寬並跟隨所在的視窗；按住 ⌥ 放置可固定在螢幕上。"
+          }
+        }
+      }
+    },
     "That is the most names this profile keeps.": {
       "localizations": {
         "ko": {
@@ -4622,72 +4698,78 @@
         }
       }
     },
-    "Allowed. Mwoyeo reads only what is under a lens, and never stores or sends it.": {
+    "Allowed. Mwoyeo reads the screen only while you place a lens and under a lens, on this Mac, and never stores or sends it.": {
       "localizations": {
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "허용됨. 렌즈 아래 글자만 읽고, 아무것도 저장하거나 보내지 않아요."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "許可されています。Mwoyeoはレンズの下の内容だけを読み取り、保存も送信もしません。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已允许。Mwoyeo 只会读取透镜下方的内容，绝不存储或发送。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已允許。Mwoyeo 只會讀取透鏡下方的內容，絕不儲存或傳送。"
-          }
-        },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erlaubt. Mwoyeo liest nur, was unter einer Linse liegt, und speichert oder sendet nichts."
+            "value": "Erlaubt. Mwoyeo liest den Bildschirm nur, während du eine Linse platzierst, und unter einer Linse, auf diesem Mac, und speichert ihn nie und sendet ihn nie."
           }
         },
-        "fr": {
+        "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Autorisé. Mwoyeo ne lit que ce qui se trouve sous une loupe, et ne l’enregistre ni ne l’envoie jamais."
+            "value": "Allowed. Mwoyeo reads the screen only while you place a lens and under a lens, on this Mac, and never stores or sends it."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Permitido. Mwoyeo solo lee lo que hay bajo una lupa y nunca lo guarda ni lo envía."
+            "value": "Permitido. Mwoyeo lee la pantalla solo mientras colocas una lente y bajo una lente, en este Mac, y nunca la almacena ni la envía."
           }
         },
-        "ru": {
+        "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Разрешено. Mwoyeo читает только то, что находится под линзой, и ничего не сохраняет и не отправляет."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Permitido. O Mwoyeo lê apenas o que está sob uma lente e nunca armazena nem envia."
+            "value": "Autorisé. Mwoyeo ne lit l’écran que pendant que vous placez une lentille et sous une lentille, sur ce Mac, et ne le stocke ni ne l’envoie jamais."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Consentito. Mwoyeo legge solo ciò che si trova sotto una lente e non lo salva né lo invia mai."
+            "value": "Consentito. Mwoyeo legge lo schermo solo mentre posi una lente e sotto una lente, su questo Mac, e non lo archivia mai né lo invia."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "許可されます。Mwoyeo はレンズを置く間とレンズの下の画面だけをこの Mac で読み取り、保存も送信もしません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "허용돼요. Mwoyeo는 렌즈를 놓는 동안과 렌즈 아래의 화면만 이 Mac에서 읽고, 저장하거나 보내지 않아요."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permitido. O Mwoyeo lê a tela apenas enquanto você posiciona uma lente e sob uma lente, neste Mac, e nunca a armazena nem a envia."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Разрешено. Mwoyeo читает экран, только пока вы размещаете линзу и под линзой, на этом Mac, и никогда не сохраняет его и не отправляет."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Дозволено. Mwoyeo читає лише те, що під лінзою, і нічого не зберігає й не надсилає."
+            "value": "Дозволено. Mwoyeo читає екран, лише коли ви розміщуєте лінзу та під лінзою, на цьому Mac, і ніколи не зберігає його й не надсилає."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已允许。Mwoyeo 只在放置透镜时和透镜下方读取这台 Mac 的屏幕，绝不存储或发送。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已允許。Mwoyeo 只在放置透鏡時和透鏡下方讀取這台 Mac 的螢幕，絕不儲存或傳送。"
           }
         }
       }

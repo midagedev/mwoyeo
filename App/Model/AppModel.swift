@@ -231,15 +231,17 @@ final class AppModel {
                                                store: { AppModel.shared.chooseExportFolder($1, bookmark: $0) },
                                                records: { await AppModel.shared.translator.learnedRows(for: $0) })
         await translator.setLearnedHandler { bundleID in Task { @MainActor in AppModel.shared.learnedRowsChanged(bundleID) } }
-        await translator.prewarm()
-        inpainter = await Task.detached(priority: .userInitiated) { Inpainter.load() }.value
-        inpaintingAvailable = inpainter != nil
         // The warm-up starts at launch, granted or not, and stays so (lens-robust, 2026-10-18; tools/ocr-probe/relaunch-cold.sh). A relaunch
         // restarts the cold compile (killed at 30 s: 62.0 s after the relaunch, against 64.3 s undisturbed), so one could wait for the
         // grant of Screen Recording. Waiting never shortens a first wait: someone who must relaunch after granting pays the 64 s from the
         // relaunch either way (the compile of the first process is lost in both), and someone who need not relaunch pays the time they
-        // took to grant on top of it. Someone who granted before launching starts it at once in both.
+        // took to grant on top of it. Someone who granted before launching starts it at once in both. It starts before the translator's
+        // prewarm and the inpainter's load, which it never waited for (a detached task): the cold compile started 1.2 to 9.7 s after
+        // launch behind them (docs/design/first-lens.md 3.2).
         Self.warmUpVision(settings.sourceLanguage)
+        await translator.prewarm()
+        inpainter = await Task.detached(priority: .userInitiated) { Inpainter.load() }.value
+        inpaintingAvailable = inpainter != nil
 
         if !settings.hasCompletedOnboarding || !hasScreenPermission {
             WindowPresenter.shared.showOnboarding()
@@ -409,6 +411,12 @@ final class AppModel {
         }
         picking = true
         defer { picking = false }
+        // The picker's map of the display (docs/design/first-lens.md 4.4): read once per open; the language it finds is warmed when the
+        // source is detected.
+        let source = settings.sourceLanguage
+        let translator = translator
+        picker.readMap = PickerMap.live(languages: source == "auto" ? [] : [Locale.Language(identifier: source)], target: settings.targetLanguage,
+                                        detects: source == "auto") { language in await translator.prewarm(route: nil, source: language) }
         guard let result = await picker.pick() else { return }
         RegionSession.setHiding(false, in: sessions.values)   // a lens added while the others are hidden brings them back
         var config = RegionConfig(name: "", rect: result.rect)

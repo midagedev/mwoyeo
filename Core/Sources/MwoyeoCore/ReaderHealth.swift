@@ -40,9 +40,10 @@ public enum ReadVia: String, Sendable, CaseIterable, Hashable {
 
 /// One request as health sees it.
 public struct WorkerJob: Equatable, Sendable {
-    /// Who asked. The order is the scheduling priority: lens, then the image window (and a headless render), then warm-up.
+    /// Who asked. The order is the scheduling priority: lens, then the picker's map of the display (one read per picker open,
+    /// docs/design/first-lens.md 4.4: a running lens is never starved by it), then the image window (and a headless render), then warm-up.
     public enum Purpose: Int, Sendable, Comparable {
-        case lens, image, warmup
+        case lens, picker, image, warmup
         public static func < (a: Purpose, b: Purpose) -> Bool { a.rawValue < b.rawValue }
     }
 

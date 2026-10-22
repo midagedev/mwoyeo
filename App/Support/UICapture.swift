@@ -18,7 +18,7 @@ import SwiftUI
 /// still shows the toggle's two states), appearance (Settings › Appearance), lens-gallery (every lens style in every tint on a dark and
 /// a light backdrop: one PNG each, lens-<style>-<tint>-<dark|light>.png, and a grid per backdrop), lens-tab-positions (the name tag
 /// in its four places, one carrying a notice), lens-reading (the default glow while the lens reads), sheet-pick, sheet-preset-deepl-free (the DeepL Free row chosen, key field empty), sheet-config, sheet-config-remote (the box that allows sending to the host, unticked), sheet-config-remote-allowed (ticked), sheet-config-remote-context (ticked, with the context caption), sheet-context-collapsed-off, sheet-context-collapsed-on, sheet-context-chat, sheet-context-chat-off, sheet-context-local, sheet-context-deepl, sheet-context-template and sheet-context-memory (the sheet of an engine already added, its Context section collapsed or open, the last with Context off and a note written for an app; `--lang ko` for Korean), engine-context-checks (only that section's checks; `--dump` also writes the accessibility trees it read, a11y-engine-context-*.txt), profile-file-checks (only the settings.json profile checks), translation-engines-permission (the list with an engine that needs the person's permission), about-privacy (Settings › About), lens-badge, lens-notice, lens-menu, add-flow (adds an
-/// engine through the sheet, prints where the key is), pack-checks (only the language pack flow's PASS/FAIL lines), lens-hint-disk (the pill
+/// engine through the sheet, prints where the key is), pack-checks (only the language pack flow's PASS/FAIL lines), picker-checks (only the one-click picker's PASS/FAIL lines), lens-hint-disk (the pill
 /// when the Mac has no room to prepare text recognition), lens-hint-pack-downloading,
 /// lens-hint-pack-notfinished and lens-hint-unsupported (the pill in the states a pack or a pair can be in), menu-pack-rows (the panel's lens
 /// rows with each of those lines), menu-pack-banner-ask|downloading|notfinished|unsupported (the panel's banner when no lens says it),
@@ -196,6 +196,9 @@ enum UICapture {
             case "pack-checks":
                 let failed = await PackChecks.run(model)
                 report("pack", failed)
+            case "picker-checks":
+                // Only the one-click picker's checks (the whole of check-logic takes minutes).
+                report("picker", await PickerChecks.run(model))
             case "menu-pack-rows": await menuPackRows(name)
             case "menu-pack-banner-ask", "menu-pack-banner-downloading", "menu-pack-banner-notfinished", "menu-pack-banner-unsupported":
                 await menuPackBanner(name)
@@ -568,6 +571,9 @@ enum UICapture {
             failed += await RestoreChecks.run(model)
             failed += await NamesLensChecks.run(model)
             failed += await LensRouteChecks.run(model)
+            // Not between PressChecks and RewriteChecks: its reads of drawn pages lengthen the gap RewriteChecks counts on (oneclick117, 2026-10-22:
+            // there, "a lens call is not queued behind a call that is waiting out the restart" found the service restarted at once).
+            failed += await PickerChecks.run(model)
             failed += await AccessibilityChecks.run(model)
             failed += await PressChecks.run(model)
             failed += await PackChecks.run(model)

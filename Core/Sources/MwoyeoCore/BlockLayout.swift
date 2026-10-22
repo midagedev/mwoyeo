@@ -301,6 +301,18 @@ public enum CaptureEdge {
         line.minY <= bounds.minY + tolerance || line.maxY >= bounds.maxY - tolerance
     }
 
+    public enum Side: Sendable { case left, right }
+
+    /// Whether `box` (a column's, a block's) reaches the left or right edge of `bounds` within `tolerance`: the capture ends there, and whatever
+    /// the box belongs to may go on beyond it. `tolerance` is in the box's units (points for a column: `ColumnFit.edgeTolerance`, measured on the
+    /// column edges of a cut capture, where the pixel `tolerance` above is for the lines' tops and bottoms).
+    public static func touchesSide(_ box: CGRect, _ side: Side, in bounds: CGRect, tolerance: CGFloat = tolerance) -> Bool {
+        switch side {
+        case .left: box.minX <= bounds.minX + tolerance
+        case .right: box.maxX >= bounds.maxX - tolerance
+        }
+    }
+
     /// The indices of the lines of one capture that it cuts. With no line clear of the edges there is nothing to compare with,
     /// and none is cut.
     public static func cut(_ lines: [CGRect], in bounds: CGRect) -> Set<Int> {

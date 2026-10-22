@@ -22,7 +22,13 @@ ap.add_argument('--out', required=True); ap.add_argument('--key-after', type=flo
 ap.add_argument('--wait', type=float, default=420.0); ap.add_argument('--page', default=f'{ROOT}/data/page-b.png')
 ap.add_argument('--no-key', action='store_true'); ap.add_argument('--sample-stalls', action='store_true'); ap.add_argument('--no-frames', action='store_true'); ap.add_argument('--picker-loop', type=int, default=0); ap.add_argument('--settings-extra', default='{}'); ap.add_argument('--rm-mark', action='store_true'); ap.add_argument('--extra', default='')
 ap.add_argument('--second', action='store_true', help='after the first Korean, open the picker again and place a second lens (warm numbers on a running app)')
+# oneclick117: the build, the tools and the scratch names are arguments, so a later round measures its own build the same way.
+ap.add_argument('--app', default=APP, help='the Mwoyeo binary to start')
+ap.add_argument('--root', default=ROOT, help='holds tools/{pagewin,post,watch} (built from tools/first-lens/tools/*.swift) and data/cold-id.txt')
+ap.add_argument('--suite', default='first117', help='prefix of the scratch defaults suite')
+ap.add_argument('--wrapper', default='', help='a launch wrapper that refuses without scratch env and runs ane-env.sh itself (MWOYEO_ANE_KIND=cold|pool)')
 a = ap.parse_args()
+ROOT, APP = a.root, a.app
 os.makedirs(a.out, exist_ok=True)
 APPID = open(f'{ROOT}/data/cold-id.txt').read().strip()
 ev = []                      # (t_ns, source, dict)
@@ -52,7 +58,7 @@ log('plan', click=[px, py], lens=lens)
 
 # --- caches, settings
 caches = os.path.expanduser('~/Library/Caches')
-subprocess.run(['defaults', 'delete', f'first117.{a.label}'], stderr=subprocess.DEVNULL)   # no saved lens from an earlier run of this label
+subprocess.run(['defaults', 'delete', f'{a.suite}.{a.label}'], stderr=subprocess.DEVNULL)   # no saved lens from an earlier run of this label
 if a.mode == 'cold':
     for suffix in ('', '.reader.lines', '.reader.docs'):
         subprocess.run(['rm', '-rf', f'{caches}/{APPID}{suffix}'])
@@ -62,9 +68,9 @@ if a.rm_mark:
     try: os.remove(f'{caches}/{APPID}.reader.lines/programs-verified')
     except FileNotFoundError: log('note', msg='no programs-verified mark to remove')
 env = dict(os.environ, MWOYEO_TRACE='1', MWOYEO_MEMORY_SECRETS='1', MWOYEO_SETTINGS_FILE=f'{a.out}/settings.json',
-           MWOYEO_DEFAULTS_SUITE=f'first117.{a.label}')
+           MWOYEO_DEFAULTS_SUITE=f'{a.suite}.{a.label}', MWOYEO_ANE_KIND='cold' if a.mode == 'cold' else 'pool')
 kind = 'cold' if a.mode == 'cold' else 'pool'
-cmd = [ANE, 'run', kind, '--', APP] + (a.extra.split() if a.extra else [])
+cmd = ([a.wrapper, APP] if a.wrapper else [ANE, 'run', kind, '--', APP]) + (a.extra.split() if a.extra else [])
 
 # --- the app
 t_spawn = now()

@@ -11,7 +11,7 @@ enum RestorePlanChecks {
     /// §9, preference rows: what "Restore Defaults…" of a tab sets back.
     private static let preferences: [SettingSpec.Tab: Set<String>] = [
         .general: ["sourceLanguage", "targetLanguage", "renderMode", "settleDelay", "framesPerSecond", "transcriptFormats"],
-        .translation: ["engine", "customEngineID", "cacheSize", "paragraphReader", "profilePin"],
+        .translation: ["engine", "fastFirstPaint", "customEngineID", "cacheSize", "paragraphReader", "profilePin"],
         .appearance: ["useInpaintingModel", "fontStyle", "boxOpacity", "lensStyle", "lensTint", "lensTabVisibility", "lensTabPosition"],
         .shortcuts: ["shortcuts"],
         .about: [],
@@ -35,6 +35,7 @@ enum RestorePlanChecks {
         s.framesPerSecond = 15
         s.transcriptFormats = [.jsonl]
         s.engine = .customModel
+        s.fastFirstPaint = true
         let engine = EngineConfig(name: "Local", kind: .openAICompatible(baseURL: URL(string: "http://localhost:11434/v1") ?? URL(fileURLWithPath: "/"),
                                                                          model: "m", thinking: .off, extraHeaders: [:]))
         s.engines = [engine]

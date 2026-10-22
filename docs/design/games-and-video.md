@@ -35,7 +35,7 @@ window (`RecentLinesPanel`), click-through, that follows the lens.
 |---|---|---|---|
 | What changed | `TranscriptRecorder` turns snapshots into entries (first usable translation of a line) for the transcript writer, only under `savesTranscripts` | the lens runs a recorder of its own on the same `LensText.observed` feed; `RecentLines` (Core) reads its `.entry` events and the lines in the lens now. Nothing re-detects a change | Core `RecentLines.swift`, `RegionSession.received` |
 | What the stack holds | – | lines whose source is not in the lens now, newest first, a fragment of a line folded into the fuller reading (`TranscriptMerger.related`), at most N | `RecentLines.stack` |
-| Fading | – | `RecentLines.opacity(rank:count:)`: 1.0 for the newest, 0.45 for the Nth | same |
+| Fading | – | `RecentLines.opacity(rank:count:)`: 1.0 for the newest, 0.6 for the Nth (0.45 read about 2.2:1 on light, vision 10-22) | same |
 | Option | – | `RegionConfig.keepsRecent`, lens menu "Keep Recent Lines" (checkmark), `HotKeyAction.keepRecentLines`, no default; the number is the setting `recentLineCount` (file only, 1…8, default 3; the Appearance tab's Restore Defaults sets it back) | `RegionSession.contextMenu`, `AppSettings` |
 | Cleared when | – | the languages or engine change, the option is turned off, the lens closes. Show Original only takes the stack off the screen (it is a peek, and a peek must not cost the history) | session |
 

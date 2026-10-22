@@ -13,19 +13,6 @@ enum MCPTranslate {
     static let maxLines = 20
     static let maxLineLength = 2000
 
-    /// What the service said while it ran: which engine answered which language group, and the newest issue it raised (nil when the last
-    /// word was "fine").
-    private final class Heard: @unchecked Sendable {
-        private let lock = NSLock()
-        private var routes: [TranslationRoute] = []
-        private var latest: TranslationIssue?
-        func answered(_ event: TranslationEvent) {
-            lock.withLock { routes += event.groups.filter { $0.kind == .answered }.map(\.route) }
-        }
-        func issue(_ issue: TranslationIssue?) { lock.withLock { latest = issue } }
-        var all: (routes: [TranslationRoute], issue: TranslationIssue?) { lock.withLock { (routes, latest) } }
-    }
-
     static func run(_ a: [String: Any], _ world: MCPWorld) throws -> [String: Any] {
         let lines = a["lines"] as? [String] ?? []
         if lines.isEmpty { throw MCPToolError("translate_text was not run: lines holds no line") }
@@ -36,86 +23,45 @@ enum MCPTranslate {
     /// The translation of `lines` the way a lens over the window `a` names (`app`, `title`, `profile`, `engine`) does it: a row `[translation, engine]` for each
     /// line, and what else the answer says (the profile that decided, whether its memory was used, the service's issue). `test_rules` asks the same for the
     /// lines `before` left, with `withRewrites` off: it applies the rewrites itself, so the service must not apply them a second time.
+    /// The request path is `TextTranslation`'s (the Translate Text window is its other caller); the words of a refusal are this tool's.
     static func translate(_ lines: [String], _ a: [String: Any], _ world: MCPWorld, tool: String = "translate_text",
                           withRewrites: Bool = true) throws -> (rows: [[Any]], extra: [String: Any]) {
-        let app = a["app"] as? String, profile = a["profile"] as? String, title = a["title"] as? String
-        var settings = world.settings()
-        if !withRewrites {
-            settings.rewrites = []
-            settings.script = nil
-            for i in settings.appProfiles.indices {
-                settings.appProfiles[i].rewrites = []
-                settings.appProfiles[i].script = nil
-            }
+        let request = TextTranslation.Request(app: a["app"] as? String, title: a["title"] as? String, profile: a["profile"] as? String, engine: a["engine"] as? String)
+        let resolved: TextTranslation.Resolved
+        do {
+            resolved = try TextTranslation.resolve(request, base: world.settings(), asker: .agent, secrets: world.secrets, withRewrites: withRewrites)
+        } catch let refusal as TextTranslation.Refusal {
+            throw MCPToolError(words(refusal, tool: tool))
         }
-        if let profile {
-            guard MCPProfiles.profile(profile, in: settings) != nil else {
-                throw MCPToolError("\(tool) was not run: profile: no profile has the id \(profile); list_apps lists them")
-            }
-            // As if every lens were pinned to it: the chain is that profile and All apps, and no condition is asked (design §1.3).
-            settings.profilePin = profile
+        let answer = MCPAsync.wait { await TextTranslation.run(lines, resolved, secrets: world.secrets) }
+        guard answer.translated else {
+            throw MCPToolError("\(tool) could not translate: " + (answer.issue?.message ?? "no engine answered"))
         }
-        // The window's chain decides the languages and the engine, whichever app is in front (design §1.3, Q1). With no profile it is the base.
-        let chain = ContextRoute.merged(settings: settings, lens: app, title: title)
-        settings.sourceLanguage = chain.pair.source
-        settings.targetLanguage = chain.pair.target
-        settings.customEngineID = chain.pair.customEngineID
-        if let choice = a["engine"] as? String { try choose(choice, in: &settings) }
-        if let engine = settings.activeEngineConfig {
-            if case .command = engine.kind {
-                throw MCPToolError("\(tool) does not run command engines (programs of the person's own); name apple or another engine")
-            }
-            // The Keychain may be out of reach of this process; saying so is better than an engine that fails as if it had no key.
-            do { _ = try world.secrets.secret(for: engine.id) } catch {
-                throw MCPToolError("\(tool) cannot use \(engine.name): its API key is in the Keychain and this process cannot read it (\(error)). Use apple, or ask the person to translate with it in Mwoyeo")
-            }
-        }
-
-        let lens = app == nil && profile == nil && title == nil ? nil
-            : LensContext(bundleID: app ?? chain.head.profile?.bundleID ?? "",
-                          appName: app.map { AppProfiles.profile(for: $0, in: settings.appProfiles)?.appName ?? $0 } ?? chain.head.profile?.name ?? "",
-                          categoryWord: nil, confirmedTitle: title, lensID: "mcp")
-        let service = TranslationService(settings: settings, secrets: world.secrets)
-        let heard = Heard()
-        let (outcome, languages) = MCPAsync.wait { () -> (TranslationOutcome, [String]) in
-            await service.setIssueHandler { heard.issue($0) }
-            _ = await service.observe { heard.answered($0) }
-            let outcome = await service.translate(lines, context: lens)
-            var languages: [String] = []
-            for line in lines { languages.append(await service.sourceLanguage(for: line)) }
-            return (outcome, languages)
-        }
-        let (routes, issue) = heard.all
-        guard !outcome.translations.isEmpty else {
-            throw MCPToolError("\(tool) could not translate: " + (issue?.message ?? "no engine answered"))
-        }
-
-        // A line the service left as it was (a counter, a name already in the target script) was not sent to the engine: no engine.
-        let rows = lines.indices.map { i -> [Any] in
-            let translation = outcome.translations[lines[i]]
-            let engine = translation == nil || translation == lines[i] ? nil : routes.last(where: { $0.source == languages[i] })?.engineName
-            return [translation ?? NSNull(), engine ?? NSNull()]
-        }
+        let rows = answer.rows.map { [$0.translation ?? NSNull(), $0.engine ?? NSNull()] as [Any] }
         var result: [String: Any] = [:]
-        let pairing = ContextRoute.pair(settings: settings, lens: app, title: title)
-        let plan = ContextPlan.decide(settings: settings, engine: pairing.engine, engineRests: false, chain: pairing.chain)
-        // The profile that decided the languages (a title or a pin may have picked another than the app's own), and whether the chain's memory was
-        // part of what the engine was sent; a chain without one has nothing to send.
-        if let head = pairing.profile { result["profile"] = head.id }
-        if pairing.chain.hasMemory { result["memory"] = plan == nil ? "not used" : "used" }
-        if let issue { result["issue"] = issue.message }
+        if let profile = answer.profile { result["profile"] = profile }
+        if let memory = answer.memory { result["memory"] = memory }
+        if let issue = answer.issue { result["issue"] = issue.message }
         return (rows, result)
     }
 
     /// `engine`: "apple", or the id of an added engine.
     static func choose(_ choice: String, in settings: inout AppSettings) throws {
-        if choice.lowercased() == "apple" {
-            settings.customEngineID = nil
-        } else if let engine = settings.engines.first(where: { $0.id.uuidString.caseInsensitiveCompare(choice) == .orderedSame }) {
-            settings.customEngineID = engine.id
-        } else {
-            let known = ["apple"] + settings.engines.map { "\($0.id.uuidString) (\($0.name))" }
-            throw MCPToolError("translate_text was not run: engine: \"\(choice)\" is not an engine; use one of \(known.joined(separator: ", "))")
+        do { try TextTranslation.choose(choice, in: &settings) } catch let refusal as TextTranslation.Refusal {
+            throw MCPToolError(words(refusal, tool: "translate_text"))
+        }
+    }
+
+    private static func words(_ refusal: TextTranslation.Refusal, tool: String) -> String {
+        switch refusal {
+        case let .noSuchProfile(id):
+            "\(tool) was not run: profile: no profile has the id \(id); list_apps lists them"
+        case let .noSuchEngine(choice, known):
+            "translate_text was not run: engine: \"\(choice)\" is not an engine; use one of \(known.joined(separator: ", "))"
+        case .commandEngine:
+            "\(tool) does not run command engines (programs of the person's own); name apple or another engine"
+        case let .keyUnreachable(engine, reason):
+            "\(tool) cannot use \(engine): its API key is in the Keychain and this process cannot read it (\(reason)). Use apple, or ask the person to translate with it in Mwoyeo"
         }
     }
 }

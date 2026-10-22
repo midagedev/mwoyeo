@@ -349,21 +349,44 @@ actor RegionPipeline {
 
     /// What this lens translates with from now on (`RegionSession.pushRoute`). Called before `update(options:)`: a pair that changed with the
     /// route resets the queue there, and the next batch is for the new route.
-    func setRoute(_ new: LensRoute?) { route = new }
+    func setRoute(_ new: LensRoute?) {
+        // Another engine, pair or glossary (`namespace`): what is drawn is another route's translation, and the `update(options:)` that follows
+        // starts from nothing, also when the app under the lens is all that changed with it.
+        if new?.namespace != route?.namespace { routeChanged = true }
+        route = new
+    }
+
+    /// Set by `setRoute` when the route translates otherwise; read and cleared by the next `update(options:)`.
+    private var routeChanged = false
 
     /// The app this lens was last told it covers (for the checks and the debug ring).
     var lensApp: ReaderContext { options.lensApp }
 
     func update(options new: PipelineOptions) {
+        let routeChanged = self.routeChanged
+        self.routeChanged = false
         guard new != options else { return }
         var restyled = options
         restyled.fontStyle = new.fontStyle
         restyled.boxOpacity = new.boxOpacity
         restyled.settleDelay = new.settleDelay
-        let reread = restyled != new, redraw = new.fontStyle != options.fontStyle || new.boxOpacity != options.boxOpacity
+        // Another app under the lens (a lens dropped with its centre over another window) is the same page for another reader: it is read
+        // again as when a reader becomes ready (`readerReady`), and what is drawn stays until the new reading has its own (`carryTranslations`,
+        // round holdfix117). What changes the translation itself (languages, glossary, render mode, the route) starts from nothing.
+        var reread = restyled
+        reread.paragraphReader = new.paragraphReader
+        reread.lensApp = new.lensApp
+        let startsOver = reread != new || routeChanged, readsAgain = reread != restyled
+        let redraw = new.fontStyle != options.fontStyle || new.boxOpacity != options.boxOpacity
         options = new
         readerPlan.configure(setting: new.paragraphReader, context: new.lensApp)
-        if reread { reset(); return }
+        if startsOver { reset(); return }
+        if readsAgain {
+            Trace.count("reader.context_reread")
+            layoutStale = true
+            seamlessDone = false
+            if latest != nil { kick() }
+        }
         guard redraw else { return }
         // Only the look changed: redraw what is already read, erased and translated.
         for i in blocks.indices { blocks[i].image = nil }
@@ -910,7 +933,7 @@ actor RegionPipeline {
         }
         if let base = baseGray, gx != 0 || gy != 0 {
             baseGray = base.shifted(dx: gx, dy: gy)
-            forcedDirty = forcedDirty.map { PixelRect(x: $0.x + gx, y: $0.y + gy, width: $0.width, height: $0.height) }
+            forcedDirty = PixelRect.moved(forcedDirty, dx: gx, dy: gy, width: base.width, height: base.height)
                 + base.vacatedStrips(dx: gx, dy: gy)
         }
         apply(Move(area: nil, dx: px, dy: py, gx: gx, gy: gy, grayArea: nil, strip: nil))
@@ -960,7 +983,7 @@ actor RegionPipeline {
             } else {
                 prevGray = nil
             }
-            forcedDirty = forcedDirty.map { PixelRect(x: $0.x + gx, y: $0.y + gy, width: $0.width, height: $0.height) } + strips
+            forcedDirty = PixelRect.moved(forcedDirty, dx: gx, dy: gy, width: gw, height: gh) + strips
         }
         // A capture that grew has something new to read; one that shrank to inside what was read shows what the blocks already describe.
         // A pass already at work is rebased onto this capture and is not followed by a second whole read.
@@ -969,6 +992,7 @@ actor RegionPipeline {
         let readAgain = uncovered && !working && !deferRead
         Trace.mark("capture \(Int(was.width))×\(Int(was.height)) → \(Int(rect.width))×\(Int(rect.height)): "
                    + (held ? "newly covered, held" : readAgain ? "newly covered area, read" : uncovered ? "pass in flight, rebased" : "nothing new, not read")
+                   + (forcedDirty.isEmpty ? "" : ", strips to read " + forcedDirty.map { "\($0.x),\($0.y) \($0.width)×\($0.height)" }.joined(separator: " ; "))
                    + (working ? ", \(moves.count) move(s) for the pass in flight" : ""), since: Trace.now)
         if !uncovered {
             // A larger size queued ahead of this one may already have asked for a read. This capture is inside
@@ -1056,7 +1080,7 @@ actor RegionPipeline {
         for m in moves {
             if let r = m.resized {
                 Trace.count("pass.rebased")
-                forced = forced.map { PixelRect(x: $0.x + m.gx, y: $0.y + m.gy, width: $0.width, height: $0.height) }
+                forced = PixelRect.moved(forced, dx: m.gx, dy: m.gy, width: r.grayWidth, height: r.grayHeight)
                     + base.uncovered(dx: m.gx, dy: m.gy, width: r.grayWidth, height: r.grayHeight)
                 base = base.reframed(dx: m.gx, dy: m.gy, width: r.grayWidth, height: r.grayHeight)
             } else if let g = m.grayArea {
@@ -1064,7 +1088,7 @@ actor RegionPipeline {
                 forced = forced.map { $0.cgRect.intersects(g.cgRect) ? PixelRect(x: $0.x, y: $0.y + m.gy, width: $0.width, height: $0.height) : $0 }
                     + [m.strip].compactMap { $0 }
             } else if m.gx != 0 || m.gy != 0 {
-                forced = forced.map { PixelRect(x: $0.x + m.gx, y: $0.y + m.gy, width: $0.width, height: $0.height) }
+                forced = PixelRect.moved(forced, dx: m.gx, dy: m.gy, width: base.width, height: base.height)
                     + base.vacatedStrips(dx: m.gx, dy: m.gy)
                 base = base.shifted(dx: m.gx, dy: m.gy)
             }
@@ -1280,7 +1304,7 @@ actor RegionPipeline {
     /// blocks' places in the frame's space; `took` the old blocks whose translation a new block took already. Only a block that drew something has
     /// something to hand on. A new block draws until its translation arrives what the old blocks it holds drew (`TranslationCarry.assign`), and
     /// takes the identity of the largest of them. A new block that is only a piece of an old one (the capture's edge cuts the old one's text) is not
-    /// made: the old block stays as it is. Returns those old blocks.
+    /// made: the old block stays as it is, and so does an old block that the new reading leaves out with nothing over it. Returns those old blocks.
     private func carryTranslations(into new: inout [Block], from rects: [CGRect], old: [Block], took: Set<Int>, stale: Staleness, step: Int) -> Set<UUID> {
         let olds = old.indices.map { i in
             TranslationCarry.Old(rect: rects[i], shown: took.contains(i) || old[i].image == nil ? nil : old[i].translation ?? old[i].carried,
@@ -1311,6 +1335,10 @@ actor RegionPipeline {
             pieces.insert(i)
         }
         if !pieces.isEmpty { Trace.count("render.pieces", pieces.count) }
+        // A drawn block that the new reading leaves out, nothing of it standing over it, stays as it is (`TranslationCarry.unread`).
+        let unread = TranslationCarry.unread(old: olds, new: new.map(\.rect))
+        for oi in unread { keep.insert(old[oi].id) }
+        if !unread.isEmpty { Trace.count("render.unread", unread.count) }
         if Trace.enabled {
             // Which blocks that drew something have it to hand on, and which of those the page's change keeps from it.
             let handing = olds.indices.filter { olds[$0].shown != nil }
@@ -1318,7 +1346,7 @@ actor RegionPipeline {
             let taken = Set(carry.compactMap { $0 }.flatMap { $0.from })
             let left = handing.filter { olds[$0].unchanged && !taken.contains($0) }.map { "'\(old[$0].source.prefix(14))' \(TraceNumber.px(rects[$0].minX)),\(TraceNumber.px(rects[$0].minY)) \(TraceNumber.px(rects[$0].width))x\(TraceNumber.px(rects[$0].height))" }
             Trace.mark("carry: \(handing.count) old drawn block(s) to hand on, \(edited.count) edited \(edited.joined(separator: ", ")); \(carry.compactMap { $0 }.count) of \(new.count) new carry, \(new.filter { oldIDs.contains($0.id) }.count) with an old id; "
-                       + "no new block holds half of: \(left.joined(separator: " ; ")); new: " + new.map { "'\($0.source.prefix(10))' \(TraceNumber.px($0.rect.minX)),\(TraceNumber.px($0.rect.minY)) \(TraceNumber.px($0.rect.width))x\(TraceNumber.px($0.rect.height))" }.joined(separator: " ; "),
+                       + "no new block holds half of: \(left.joined(separator: " ; ")); kept unread: \(unread.map { "'\(old[$0].source.prefix(14))'" }.joined(separator: ", ")); new: " + new.map { "'\($0.source.prefix(10))' \(TraceNumber.px($0.rect.minX)),\(TraceNumber.px($0.rect.minY)) \(TraceNumber.px($0.rect.width))x\(TraceNumber.px($0.rect.height))" }.joined(separator: " ; "),
                        since: Trace.now)
         }
         new = new.enumerated().filter { !pieces.contains($0.offset) }.map(\.element)

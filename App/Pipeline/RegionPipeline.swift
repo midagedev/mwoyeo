@@ -220,6 +220,13 @@ actor RegionPipeline {
     }
     private var flight: Flight?
     private var flightID = 0
+    /// What each source shows until its translation lands, for the lens's first batch (`fastFirstPaint`, design first-lens §13): the quick text the service
+    /// tells, replaced by the translation. It is never a block's `translation`: the log, Copy and Save read that, and the queue's "waiting" is its nil.
+    private var firstPaint = FirstPaintBook()
+    /// The lens has had no translation yet: its batches ask the service for a first paint. Closed by the first batch that lands; `reset()` opens it.
+    private var firstPaintOpen = true
+    /// When the first batch of this lens went to the translator (the end of the read is before it), for the self-test's `--first-paint-log`.
+    private var firstFlightAt: TimeInterval?
     private var lastCutByLens = false
     /// When a block that waits for translation was first seen inside the lens, to measure how long the lens waited.
     private var lensSeen: [UUID: TimeInterval] = [:]
@@ -346,6 +353,9 @@ actor RegionPipeline {
         // A batch still running belongs to the old settings: its results are dropped, and a new queue may start.
         translationEpoch += 1
         translating = false
+        firstPaint.removeAll()
+        firstPaintOpen = true
+        firstFlightAt = nil
         clearRecovery()
         emit(animated: false)
         if latest != nil { kick() }
@@ -1490,10 +1500,12 @@ actor RegionPipeline {
             let id = flightID, service = translator, lens = route
             let context = documentContext(around: batch)
             // A task of its own, so a batch the lens no longer needs can be cancelled while this one awaits it.
+            let quick = provisionalSink(epoch: epoch)
+            if firstFlightAt == nil { firstFlightAt = t }
             let task = Task {
-                await service.translate(batch, route: lens, context: context) { source, translated in
+                await service.translate(batch, route: lens, context: context, onResult: { source, translated in
                     Task { await self.streamed(source, translated, epoch: epoch, flight: id) }
-                }
+                }, provisional: quick)
             }
             flight = Flight(id: id, batch: batch, started: ProcessInfo.processInfo.systemUptime, afterLensPreemption: lastCutByLens, task: task)
             reconsider()
@@ -1506,6 +1518,7 @@ actor RegionPipeline {
             // Settings changed meanwhile: `reset()` already cleared the queue state, and this result is for the old ones.
             guard epoch == translationEpoch else { return }
             receive(outcome.translations, epoch: epoch)
+            if !outcome.cancelled, !outcome.translations.isEmpty { firstPaintOpen = false }
             for source in batch {
                 // A cut batch's unfinished sources stay queued; `nextBatch` drops those that left the screen.
                 if outcome.cancelled, outcome.translations[source] == nil { continue }
@@ -1674,6 +1687,7 @@ actor RegionPipeline {
 
     /// One result streamed from the engine; counts it as wasted when its text left the capture meanwhile.
     private func streamed(_ source: String, _ translated: String, epoch: Int, flight id: Int) {
+        Trace.mark("pipeline streamed '\(source.prefix(16))'", since: Trace.now)
         guard epoch == translationEpoch else { return }
         if flight?.id == id { flight?.done.insert(source) }
         let lens = lensRect
@@ -1684,12 +1698,52 @@ actor RegionPipeline {
         receive([source: translated], epoch: epoch)
     }
 
+    /// Where the service tells a quick text, while the lens has had no translation yet; nil once it has (`firstPaintOpen`).
+    private func provisionalSink(epoch: Int) -> (@Sendable (String, String) -> Void)? {
+        guard firstPaintOpen else { return nil }
+        return { source, text in Task { await self.provisionalLanded(source, text, epoch: epoch) } }
+    }
+
+    /// The first paint's book, for the self-test's `--first-paint-log`.
+    func firstPaintState() -> (lines: [String: FirstPaintBook.Line], stats: FirstPaintBook.Stats, firstFlightAt: TimeInterval?) {
+        (firstPaint.lines, firstPaint.stats, firstFlightAt)
+    }
+
+    /// A quick text for `source`: shown in its blocks while their translation has not landed. Only a block that waits for one takes it, so a quick text
+    /// that lands after the translation (the two reach the pipeline by tasks of their own) draws nothing.
+    private func provisionalLanded(_ source: String, _ text: String, epoch: Int) {
+        Trace.mark("pipeline provisional '\(source.prefix(16))'", since: Trace.now)
+        guard epoch == translationEpoch, firstPaintOpen else { return }
+        let waiting = blocks.indices.filter { blocks[$0].source == source && blocks[$0].translation == nil }
+        guard !waiting.isEmpty, firstPaint.offer(text, for: source, at: Trace.now) != nil else { return }
+        for i in waiting {
+            blocks[i].image = nil
+            if let seen = lensSeen[blocks[i].id] {
+                Trace.sample("translate.first_paint_ms", (Trace.now - seen) * 1000)
+                Trace.mark("first paint '\(source.prefix(24))'", since: seen)
+            }
+        }
+        renderMissing()
+        emit(animated: true)
+    }
+
     private func receive(_ result: [String: String], epoch: Int) {
         guard epoch == translationEpoch else { return }
+        // A source that showed a quick text meets its translation here, once: when it is the same text the screen is right and nothing is drawn again.
+        var shownAlready = Set<String>()
+        for (source, t) in result where firstPaint.shown(for: source) != nil {
+            let shown = Trace.now - (firstPaint.lines[source]?.paintedAt ?? Trace.now)
+            let settled = firstPaint.settle(t, for: source, at: Trace.now)
+            if settled == .keep { shownAlready.insert(source) }
+            Trace.count(settled == .keep ? "first_paint.kept" : "first_paint.repainted")
+            Trace.sample("translate.provisional_shown_ms", shown * 1000)
+        }
         var changed = false
         for i in blocks.indices {
             guard let t = result[blocks[i].source], blocks[i].translation != t else { continue }
             blocks[i].translation = t
+            if shownAlready.contains(blocks[i].source), blocks[i].image != nil { continue }
+            if firstPaint.lines[blocks[i].source]?.provisional != nil { Trace.count("first_paint.redrawn") }
             blocks[i].image = nil
             changed = true
         }
@@ -1706,7 +1760,7 @@ actor RegionPipeline {
         for i in blocks.indices where blocks[i].image == nil {
             let b = blocks[i]
             // A translation equal to the source means "leave it": no box, no erase, the original stays.
-            guard let translation = b.translation, !translation.isEmpty, translation != b.source else { continue }
+            guard let translation = b.translation ?? firstPaint.shown(for: b.source), !translation.isEmpty, translation != b.source else { continue }
             // A piece of a paragraph that goes on in the next column draws its share of the paragraph's one translation.
             let text = b.part.map { FlowSplit.share(of: translation, part: $0) } ?? translation
             guard !text.isEmpty else { continue }
@@ -1737,6 +1791,7 @@ actor RegionPipeline {
 
     private func emit(animated: Bool) {
         version += 1
+        Trace.mark("pipeline emit v\(version)", since: Trace.now)
         let s = scale
         let out = blocks.compactMap { b -> OverlayBlock? in
             guard let img = b.image else { return nil }

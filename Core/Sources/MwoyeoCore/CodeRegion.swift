@@ -368,6 +368,18 @@ public enum CodeRegion {
         return Double(withEvidence) / Double(content.count) >= K.denseShare
     }
 
+    /// What the text of a region says on its own: a terminal prompt, two strong features, or one with another beside it in a region of several blocks.
+    static func textKeeps(_ f: Features, several: Bool) -> Bool {
+        (several && f.strong >= 1 && f.all >= 2) || f.prompt || f.strong >= 2
+    }
+
+    /// Whether `lines`, the lines of one block of text with no boxes (typed or copied text), read as code, a log or a terminal: `verdict`'s clauses
+    /// that need nothing but the text, and a log or a diff on its own (a region of boxes needs more, a block of text has nothing else to show it).
+    static func readsAsCode(_ lines: [String]) -> Bool {
+        let f = features(of: lines, fixedPitch: false, tinted: false)
+        return textKeeps(f, several: lines.count > 1) || f.log || f.diff
+    }
+
     static func verdict(_ members: [Info]) -> Reason? {
         let tinted = members.contains { $0.tinted }
         let measured = members.compactMap(\.pitch)       // two blocks or more can be measured, and every one of them is set in a fixed pitch
@@ -376,9 +388,7 @@ public enum CodeRegion {
         let weak = f.all - f.strong
         let keeps = (tinted && (f.strong >= 1 || weak >= 2))
             || (container && f.strong >= 1)
-            || (members.count > 1 && f.strong >= 1 && f.all >= 2)
-            || f.prompt
-            || f.strong >= 2
+            || textKeeps(f, several: members.count > 1)
         guard keeps, hasDensity(members, tinted: tinted) else { return nil }
         if f.prompt { return .terminal }
         if f.diff { return .diff }

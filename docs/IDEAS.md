@@ -37,9 +37,9 @@ reason), **shipped** (version).
 
 | Idea | Why (evidence) | Status |
 |---|---|---|
-| Ignore a region inside a lens (HUD, name tag, timer) | Asked in several game-overlay tools (7 communities for overlay manners) | **next** (1.1.5) |
+| Ignore a region inside a lens (HUD, name tag, timer) | Asked in several game-overlay tools (7 communities for overlay manners) | built in 1.1.7 (game117; docs/design/games-and-video.md §1) |
 | One key to hide every lens | Same group of requests; ⌃⌥O shows the original but keeps the lens | **next** (1.1.5) |
-| Keep the last few translated lines visible (on-screen history) | Asked for chat and visual novels; today the history is only in transcript files | **next** (1.1.5) |
+| Keep the last few translated lines visible (on-screen history) | Asked for chat and visual novels; today the history is only in transcript files | built in 1.1.7 (game117; docs/design/games-and-video.md §2) |
 | Gamepad control | Asked by console-style players | parked (narrow audience) |
 | Audio to subtitles, dual subtitles on streaming sites | Real demand, but a different product (audio pipeline) | parked |
 

@@ -10,6 +10,7 @@ import SwiftUI
 ///                                             there are issues. Without a path it checks the real file.
 ///   `Mwoyeo --mcp`                            an MCP server on stdin and stdout (see MCPServer): the translation log and each app's memory
 ///                                             for an agent. No window; it ends when stdin does. In the App Store build too.
+/// Any other flag (`--help` too) prints the usage to stderr and exits 64 (`CommandLineUsage`, the table of every flag): the app is not opened.
 @main
 enum Entry {
     static func main() {
@@ -36,6 +37,8 @@ enum Entry {
         if let first = CommandLine.arguments.dropFirst().first, first == "--settings-path" || first == "--settings-schema" || first == "--check-settings" {
             SettingsFileCommand.run(Array(CommandLine.arguments.dropFirst()))
         }
+        // Nothing below has run yet: no settings path was read, no file written.
+        if let flag = CommandLineUsage.unknown() { CommandLineUsage.refuse(flag) }
         MwoyeoApp.main()
     }
 }
@@ -113,16 +116,47 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        Task { @MainActor in WindowPresenter.shared.showOnboarding() }
+        Task { @MainActor in WindowPresenter.shared.showForReopen() }
         return true
     }
 }
 
-/// Opens AppKit-hosted windows (onboarding) and the Settings scene for a menu-bar-only app.
+/// Opens AppKit-hosted windows (onboarding, the menu panel) and the Settings scene for a menu-bar-only app.
 @MainActor
 final class WindowPresenter {
     static let shared = WindowPresenter()
     private var onboarding: NSWindow?
+    private var menu: NSWindow?
+
+    /// The app opened again while it runs (`ReopenWindow`): a window, since the menu bar item may be out of reach.
+    func showForReopen(completedWelcome: Bool? = nil, screenAccess: Bool? = nil) {
+        let model = AppModel.shared
+        switch ReopenWindow.shown(completedWelcome: completedWelcome ?? model.settings.hasCompletedOnboarding, screenAccess: screenAccess ?? model.hasScreenPermission) {
+        case .welcome: showOnboarding()
+        case .menu: showMenu()
+        }
+    }
+
+    /// The panel of the menu bar item in a window of its own, one at a time; it is the same view, so it shows what the item shows.
+    func showMenu() {
+        NSApp.activate(ignoringOtherApps: true)
+        if let w = menu {
+            w.makeKeyAndOrderFront(nil)
+            return
+        }
+        let w = NSWindow(contentViewController: NSHostingController(rootView: MenuPanel().environment(AppModel.shared)))
+        w.title = "Mwoyeo"
+        w.styleMask = [.titled, .closable]
+        w.isReleasedWhenClosed = false
+        w.center()
+        w.makeKeyAndOrderFront(nil)
+        menu = w
+    }
+
+    func closeMenu() {
+        menu?.close()
+        menu = nil
+    }
 
     func showOnboarding() {
         NSApp.activate(ignoringOtherApps: true)

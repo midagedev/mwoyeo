@@ -5,7 +5,7 @@ import MwoyeoCore
 
 /// The captures of games and video (round game117, 2026-10-22), `--capture-ui <dir> game-shots`: a lens over a game-like scene (a HUD at the
 /// top right, a dialogue box at the bottom) with the HUD ignored, while the pointer is over the lens (the regions outlined) and at rest, and
-/// a lens that keeps its recent lines, each on a light and a dark backdrop. The lens is a real session on a fake capture; the translation in
+/// a lens that keeps its recent lines, and the marker over the lens with its hint pills, each on a light and a dark backdrop. The lens is a real session on a fake capture; the translation in
 /// the box is drawn as a block of a snapshot. The pointer of whoever uses the screen must stay away from the lens (it is click-through here,
 /// and the outlines are put up by the capture, not by the pointer). Hold /tmp/r117/screen.lock while it runs.
 @MainActor
@@ -20,6 +20,8 @@ enum GameShots {
     }
 
     private static let sceneSize = CGSize(width: 600, height: 340)
+    /// Around the lens and the hint pills in the marker's shot.
+    private static let margin: CGFloat = 20
 
     /// The scene as a picture (top-left origin): sky and ground, a HUD at the top right, a name tag and a dialogue box at the bottom.
     private static func scene(dark: Bool) -> NSImage {
@@ -67,8 +69,9 @@ enum GameShots {
     private static func shoot(model: AppModel, out: URL, dark: Bool, wait: Double) async {
         let suffix = dark ? "dark" : "light"
         let screen = NSScreen.main?.frame ?? NSRect(x: 0, y: 0, width: 1512, height: 982)
-        // The lens covers the scene; the backdrop has room below it for the stack of recent lines.
-        let lensQuartz = CGRect(x: 160, y: 160, width: sceneSize.width, height: sceneSize.height)
+        // The lens covers the scene; the backdrop has room below it for the stack of recent lines, and above it for the marker's hint pills (they
+        // stand 40 points from the lens and 72 tall, and the marker's shot is `margin` more: under the menu bar).
+        let lensQuartz = CGRect(x: 160, y: 200, width: sceneSize.width, height: sceneSize.height)
         let lens = ScreenGeometry.appKitRect(fromQuartz: lensQuartz)
         let page = NSWindow(contentRect: lens.insetBy(dx: -30, dy: 0).union(lens.offsetBy(dx: 0, dy: -150)).insetBy(dx: 0, dy: -30), styleMask: [.borderless],
                             backing: .buffered, defer: false)
@@ -129,24 +132,32 @@ enum GameShots {
         s.setKeepsRecent(false)
 
         // The marker over the lens: the screen dims except the lens, the region already ignored is outlined, and one is being placed with the keyboard.
-        if !dark {
-            let marker = RegionMarker()
-            let marking = Task { await marker.mark(in: lensQuartz, existing: s.config.ignored.map { $0.rect(in: lensQuartz) }) }
-            try? await Task.sleep(for: .seconds(0.6))
-            (marker.view as? MarkerView)?.handle(.engage)
-            (marker.view as? MarkerView)?.handle(.move(.left, resize: false, fine: false))
+        // The shot is the lens and both hint pills with `margin` points around them (16 asked; the ring and its glow count as the lens), and the stage
+        // (`page`) is made as big as that: no pixel of the desktop.
+        let marker = RegionMarker()
+        let marking = Task { await marker.mark(in: lensQuartz, existing: s.config.ignored.map { $0.rect(in: lensQuartz) }) }
+        try? await Task.sleep(for: .seconds(0.6))
+        if let view = marker.view as? MarkerView, let window = view.window {
+            view.handle(.engage)
+            view.handle(.move(.left, resize: false, fine: false))
+            let pills = view.hintFrames.map { $0.offsetBy(dx: window.frame.minX, dy: window.frame.minY) }
+            let area = pills.reduce(lens) { $0.union($1) }.insetBy(dx: -margin, dy: -margin)
+            page.setFrame(area, display: true)
+            picture.frame = NSRect(x: lens.minX - area.minX, y: lens.minY - area.minY, width: lens.width, height: lens.height)
+            let visible = window.screen?.visibleFrame ?? .zero
+            print("game-note: marker shot \(suffix): pills \(pills.map { "\(Int($0.minX)),\(Int($0.minY)) \(Int($0.width))x\(Int($0.height))" }), area inside the visible frame: \(visible.contains(area))")
             try? await Task.sleep(for: .seconds(wait))
-            let r = page.frame, top = 100.0
+            let q = ScreenGeometry.quartzRect(fromAppKit: area)
             let path = out.appendingPathComponent("game-marker-\(suffix).png").path
             let p = Process()
             p.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
-            p.arguments = ["-x", "-R", "\(Int(r.minX)),\(Int(top)),\(Int(r.width)),\(Int(screen.height - r.minY - top))", path]
+            p.arguments = ["-x", "-R", "\(Int(q.minX)),\(Int(q.minY)),\(Int(q.width)),\(Int(q.height))", path]
             try? p.run()
             p.waitUntilExit()
             print("wrote \(path)")
-            (marker.view as? MarkerView)?.handle(.cancel)
-            _ = await marking.value
         }
+        (marker.view as? MarkerView)?.handle(.cancel)
+        _ = await marking.value
         await s.stop()
         page.orderOut(nil)
     }

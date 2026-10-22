@@ -29,6 +29,7 @@ enum RestoreWords {
         case "exportFolder": String(localized: "Folder")
         case "agentConnection": String(localized: "Connect an agent (MCP)")
         case "engine": String(localized: "Apple Translation")
+        case "fastFirstPaint": String(localized: "Quick first translation")
         case "customEngineID": String(localized: "Translation engine")
         case "cacheSize": String(localized: "Recent translations")
         case "paragraphReader": String(localized: "Paragraphs")
@@ -78,7 +79,7 @@ enum RestoreWords {
         case "lensTabVisibility": return choice(LensTabVisibility.self, \.title)
         case "lensTabPosition": return choice(LensTabPosition.self, \.title)
         case "glossaryApply": return choice(EntryApply.self, applyWords)
-        case "savesTranscripts", "agentConnection", "useLearned", "useInpaintingModel":
+        case "savesTranscripts", "agentConnection", "useLearned", "useInpaintingModel", "fastFirstPaint":
             return (v as? NSNumber)?.boolValue == true ? String(localized: "on") : String(localized: "off")
         case "settleDelay": return String(localized: "\((v as? NSNumber)?.doubleValue ?? 0, specifier: "%.1f") s")
         case "framesPerSecond":

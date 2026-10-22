@@ -14,12 +14,15 @@ public struct KeyboardLens: Equatable, Sendable {
     public static let minSize = CGSize(width: 80, height: 40)
 
     public let bounds: CGRect
+    public let minimum: CGSize
     public private(set) var rect: CGRect
 
-    /// The default lens, centred in `bounds` (shrunk to fit a smaller one).
-    public init(bounds: CGRect) {
+    /// The default lens, centred in `bounds` (shrunk to fit a smaller one). A region inside a lens (`RegionMarker`) passes a smaller `size` and
+    /// `minimum`.
+    public init(bounds: CGRect, size: CGSize = KeyboardLens.defaultSize, minimum: CGSize = KeyboardLens.minSize) {
         self.bounds = bounds
-        let size = CGSize(width: min(Self.defaultSize.width, bounds.width), height: min(Self.defaultSize.height, bounds.height))
+        self.minimum = minimum
+        let size = CGSize(width: min(size.width, bounds.width), height: min(size.height, bounds.height))
         rect = CGRect(x: bounds.midX - size.width / 2, y: bounds.midY - size.height / 2, width: size.width, height: size.height)
     }
 
@@ -35,7 +38,7 @@ public struct KeyboardLens: Equatable, Sendable {
             case .down: r.origin.y -= d; r.size.height += d   // the bottom edge goes down, the top stays
             case .up: r.origin.y += d; r.size.height -= d
             }
-            guard r.width >= Self.minSize.width, r.height >= Self.minSize.height,
+            guard r.width >= minimum.width, r.height >= minimum.height,
                   r.maxX <= bounds.maxX, r.minY >= bounds.minY else { return false }
         } else {
             switch key {

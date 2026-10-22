@@ -161,6 +161,14 @@ targets:
         NSScreenCaptureUsageDescription: "Mwoyeo reads the text under your lenses so it can translate it in place."
         # Only HTTPS to a host the person typed in; no encryption of our own.
         ITSAppUsesNonExemptEncryption: false
+        # The Services menu: "Translate with Mwoyeo" on selected text in any app (App/Support/TextEntryPoints.swift, `ServicesProvider`; docs/design/text-translation.md §3).
+        # The title is localized in App/Resources/InfoPlist.xcstrings under its own words. The port is the app's name, as the system asks.
+        NSServices:
+          - NSMenuItem:
+              default: "Translate with Mwoyeo"
+            NSMessage: translateSelection
+            NSPortName: Mwoyeo
+            NSSendTypes: [NSStringPboardType, public.utf8-plain-text]
         # An engine the person added may be a server on their network (Ollama, LM Studio on another Mac).
         NSLocalNetworkUsageDescription: "Mwoyeo connects to a translation server on your network only if you add one as an engine."
     settings:

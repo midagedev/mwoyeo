@@ -39,5 +39,24 @@
 	<string>Mwoyeo connects to a translation server on your network only if you add one as an engine.</string>
 	<key>NSScreenCaptureUsageDescription</key>
 	<string>Mwoyeo reads the text under your lenses so it can translate it in place.</string>
+	<key>NSServices</key>
+	<array>
+		<dict>
+			<key>NSMenuItem</key>
+			<dict>
+				<key>default</key>
+				<string>Translate with Mwoyeo</string>
+			</dict>
+			<key>NSMessage</key>
+			<string>translateSelection</string>
+			<key>NSPortName</key>
+			<string>Mwoyeo</string>
+			<key>NSSendTypes</key>
+			<array>
+				<string>NSStringPboardType</string>
+				<string>public.utf8-plain-text</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

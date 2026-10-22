@@ -352,7 +352,7 @@ touched; deleted per item with its own confirmation. Each `SettingSpec` gets `ta
 |---|---|---|
 | general | preference | `sourceLanguage`, `targetLanguage`, `renderMode`, `settleDelay`, `framesPerSecond`, `transcriptFormats` (file only) |
 | general | consent | `savesTranscripts`, `exportFolder` (a chosen folder; a bookmark in the App Store build), `agentConnection` |
-| translation | preference | `engine`, `customEngineID` (back to Apple; engines are kept), `cacheSize`, `paragraphReader` (file only), `profilePin` (Auto) |
+| translation | preference | `engine`, `fastFirstPaint` (file only; first-lens §13), `customEngineID` (back to Apple; engines are kept), `cacheSize`, `paragraphReader` (file only), `profilePin` (Auto) |
 | translation | consent | `context` (All apps' amount: what leaves this Mac), `useLearned` (an opt-in, context-translation §9) |
 | translation | data | `engines` (with `allow`), `glossary`, `glossaryApply` (was the consent `appleUsesPinnedTerms`), `profiles` (was `appProfiles`), `rewrites`, `script` |
 | appearance | preference | `useInpaintingModel`, `fontStyle`, `boxOpacity`, `lensStyle`, `lensTint`, `lensTabVisibility`, `lensTabPosition` |

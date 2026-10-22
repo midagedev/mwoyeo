@@ -10,11 +10,18 @@ import QuartzCore
 ///
 /// While the page scrolls, blocks in the scrolling area are moved ahead of the captured frames by `prediction`, and
 /// the frames' correction is eased in with a critically damped spring instead of a jump.
+///
+/// Parts of the lens its person marked not to read (`IgnoredRegions`) are cut out of the clip, so no translation is drawn over them, and
+/// outlined while the pointer is over the lens (`setIgnored`, `showsIgnored`). The outlines are in a view of their own: the clip would cut
+/// them away with the translations.
 final class OverlayPanel: NSPanel {
     private let host = OverlayHostView()
     /// Holds the host and the snap guide: the host's layer is clipped to the lens, the guide stands outside it.
     private let root = NSView()
     private let guide = NSView()
+    private let outlines = IgnoredOutlinesView()
+    /// The regions as the session has them (fractions of the lens); `lens` below is where they lie.
+    private var ignored: [UnitRect] = []
     private var lastVersion = 0
     /// The lens, AppKit coordinates.
     private var lens: NSRect
@@ -41,9 +48,11 @@ final class OverlayPanel: NSPanel {
         animationBehavior = .none
         root.frame = NSRect(origin: .zero, size: Self.display(of: frame).size)
         root.wantsLayer = true
-        host.frame = root.bounds
-        host.autoresizingMask = [.width, .height]
-        root.addSubview(host)
+        for view in [host, outlines] {
+            view.frame = root.bounds
+            view.autoresizingMask = [.width, .height]
+            root.addSubview(view)
+        }
         guide.wantsLayer = true
         guide.alphaValue = 0
         root.addSubview(guide)
@@ -68,6 +77,22 @@ final class OverlayPanel: NSPanel {
             ctx.duration = LensMotion.seconds(LensMotion.guideFade, reduced: Motion.shared.reduced)
             guide.animator().alphaValue = alpha
         }
+    }
+
+    /// The regions of the lens that are not read or drawn over, as fractions of it.
+    func setIgnored(_ regions: [UnitRect]) {
+        ignored = regions
+        placeIgnored()
+    }
+
+    /// Whether the outlines of the regions show (the pointer is over the lens, or one is being marked).
+    func showsIgnored(_ on: Bool) { outlines.setShown(on && !ignored.isEmpty) }
+
+    /// The regions in the host's coordinates, for the clip and the outlines.
+    private func placeIgnored() {
+        let rects = ignored.map { $0.rect(in: host.lens) }
+        host.ignored = rects
+        outlines.regions = rects
     }
 
     override var canBecomeKey: Bool { false }
@@ -123,6 +148,7 @@ final class OverlayPanel: NSPanel {
         }
         if d.dx != 0 || d.dy != 0 { host.offsetBlocks(by: d) }
         host.lens = hostRect(newLens)
+        placeIgnored()
         CATransaction.commit()
         host.updateVisibility(animated: contentDelta == .zero)
     }
@@ -168,10 +194,23 @@ private final class OverlayHostView: NSView {
             CATransaction.begin()
             CATransaction.setDisableActions(true)
             clip.frame = lens
+            cutIgnored()
+            CATransaction.commit()
+        }
+    }
+    /// Parts of the lens (host coordinates) where nothing is drawn.
+    var ignored: [CGRect] = [] {
+        didSet {
+            guard ignored != oldValue else { return }
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            cutIgnored()
             CATransaction.commit()
         }
     }
     private let clip = CALayer()
+    /// The clip with the ignored parts cut out of it (even-odd), used only while there are any: a lens with none keeps the plain clip.
+    private let holes = CAShapeLayer()
     /// Capture time of the frame the blocks were placed from.
     private(set) var time: TimeInterval = 0
     private var prediction: (area: CGRect, dy: CGFloat)?
@@ -185,7 +224,24 @@ private final class OverlayHostView: NSView {
         clip.backgroundColor = .black
         clip.cornerRadius = 12 // the lens frame's
         clip.cornerCurve = .continuous
+        holes.fillColor = .black
+        holes.fillRule = .evenOdd
         layer?.mask = clip
+    }
+
+    /// The mask is the lens, less the ignored regions inside it.
+    private func cutIgnored() {
+        let inside = ignored.map { $0.intersection(lens) }.filter { !$0.isNull && !$0.isEmpty }
+        guard !inside.isEmpty else {
+            if layer?.mask !== clip { layer?.mask = clip }
+            return
+        }
+        let path = CGMutablePath()
+        path.addRoundedRect(in: lens, cornerWidth: 12, cornerHeight: 12)
+        inside.forEach { path.addRect($0) }
+        holes.frame = CGRect(origin: .zero, size: CGSize(width: max(bounds.width, lens.maxX), height: max(bounds.height, lens.maxY)))
+        holes.path = path
+        if layer?.mask !== holes { layer?.mask = holes }
     }
 
     required init?(coder: NSCoder) { fatalError("not used") }
@@ -308,6 +364,64 @@ private final class OverlayHostView: NSView {
         for (id, l) in layersByID {
             l.position = CGPoint(x: l.position.x + d.dx, y: l.position.y + d.dy)
             placed[id] = placed[id]?.offsetBy(dx: d.dx, dy: d.dy)
+        }
+    }
+}
+
+/// The outlines of the regions a lens does not read: a hatched fill and a thin edge in the accent colour, over whatever the screen shows, only
+/// while the pointer is over the lens. Click-through like the panel.
+private final class IgnoredOutlinesView: NSView {
+    var regions: [CGRect] = [] {
+        didSet {
+            guard regions != oldValue else { return }
+            needsDisplay = true
+        }
+    }
+    private var shown = false
+
+    override var isFlipped: Bool { true }
+    override func hitTest(_ point: NSPoint) -> NSView? { nil }
+    override func isAccessibilityElement() -> Bool { false }
+
+    override init(frame: NSRect) {
+        super.init(frame: frame)
+        wantsLayer = true
+        alphaValue = 0
+    }
+
+    required init?(coder: NSCoder) { fatalError("not used") }
+
+    func setShown(_ on: Bool) {
+        guard on != shown else { return }
+        shown = on
+        NSAnimationContext.runAnimationGroup { ctx in
+            ctx.duration = 0.15
+            animator().alphaValue = on ? 1 : 0
+        }
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        guard let ctx = NSGraphicsContext.current?.cgContext else { return }
+        let accent = NSColor.controlAccentColor
+        for r in regions where r.intersects(dirtyRect) {
+            ctx.saveGState()
+            ctx.clip(to: r)
+            accent.withAlphaComponent(0.10).setFill()
+            ctx.fill(r)
+            accent.withAlphaComponent(0.45).setStroke()
+            ctx.setLineWidth(1)
+            var x = r.minX - r.height
+            while x < r.maxX {
+                ctx.move(to: CGPoint(x: x, y: r.maxY))
+                ctx.addLine(to: CGPoint(x: x + r.height, y: r.minY))
+                x += 7
+            }
+            ctx.strokePath()
+            ctx.restoreGState()
+            accent.withAlphaComponent(0.9).setStroke()
+            let edge = NSBezierPath(roundedRect: r.insetBy(dx: 0.5, dy: 0.5), xRadius: 3, yRadius: 3)
+            edge.lineWidth = 1
+            edge.stroke()
         }
     }
 }

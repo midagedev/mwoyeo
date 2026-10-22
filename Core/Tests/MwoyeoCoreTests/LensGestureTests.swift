@@ -45,7 +45,8 @@ import Testing
             #expect(last >= 0.995)                                                        // at the end it stands within 0.5 % of the target
             #expect(FitMotion.progress(duration / 2, duration: duration) > 0.9)           // and is most of the way at the half: a spring, not a ramp
         }
-        #expect(LensMotion.fit <= 0.4 && LensMotion.autoFit <= 0.25 && LensMotion.settle <= 0.25)
+        // 2026-10-23 (skinland117, addendum A1): the contract's springs settle in 0.382 s (fit), 0.637 s (calm, Auto Fit) and 0.267 s (quick, the settle).
+        #expect(LensMotion.fit <= 0.4 && LensMotion.autoFit <= 0.64 && LensMotion.settle <= 0.27)
     }
 
     @Test func aFrameInBetweenKeepsTheLensesRowsAndInterpolatesTheColumns() {

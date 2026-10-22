@@ -126,6 +126,8 @@ final class RegionSession {
     var route: LensRoute { routeState.withLock { $0 } }
     /// The newest snapshot: what the lens's own actions (copy, save, transcripts) work from.
     private var lastSnapshot: OverlaySnapshot?
+    /// The columns around the lens and its fit (snap, Fit to Column, Auto Fit): the transitions are the extension at the end of this file.
+    var fit = LensFit()
     private var transcript: TranscriptWriter?
     /// The "choose a folder" notice shows once until a transcript can be written.
     private var transcriptFolderFlashed = false
@@ -179,6 +181,7 @@ final class RegionSession {
         }
         capturer.onStop = { [weak self] error in Task { @MainActor in self?.captureStopped(error) } }
         wireChrome()
+        fit.machine = AutoFit.Machine(state: config.autoFit ? .armed : .off)
         tap.handler = { [weak self] in self?.received($0) }
         chrome.onHintAction = { [weak self] in self?.performHint() }
         // The lens's wait for a reader (`ReadWait`) changes outside the model: the pill is told when it does.
@@ -226,7 +229,7 @@ final class RegionSession {
     func start() async {
         await pipeline.setActivityHandler { [weak self] a in Task { @MainActor in self?.setActivity(a) } }
         await pipeline.setNoticeHandler { [weak self] text in Task { @MainActor in self?.showNotice(text) } }
-        await pipeline.setMotionHandler { [weak self] in Task { @MainActor in self?.noteMotion() } }
+        await pipeline.setMotionHandler { [weak self] in Task { @MainActor in self?.fit.contentMovedAt = ProcessInfo.processInfo.systemUptime; self?.noteMotion() } }
         await pipeline.setScrollHandler { [weak self] r in Task { @MainActor in self?.scrolled(r) } }
         await pipeline.setReadHandler { [weak self] tally in Task { @MainActor in self?.read(tally) } }
         outcomeObserver = await translator.observe { [weak self] event in Task { @MainActor in self?.translationEvent(event) } }
@@ -283,6 +286,7 @@ final class RegionSession {
         calmTimer = nil
         busyTimer?.invalidate()
         busyTimer = nil
+        stopFit()
         mouseMonitors.forEach { NSEvent.removeMonitor($0) }
         mouseMonitors = []
         finishTranscript()
@@ -447,6 +451,7 @@ final class RegionSession {
         activity = a
         settleBusy()
         onChange?()
+        if a == .idle { fitSettled() }
     }
 
     private func settleBusy() {
@@ -692,6 +697,7 @@ final class RegionSession {
         lastSnapshot = snapshot
         if showedTranslations != !snapshot.blocks.isEmpty { refreshHint() }
         observeTranscript()
+        noteColumns(snapshot)
     }
 
     private func lensBlocks() -> [BlockText] {
@@ -803,6 +809,8 @@ final class RegionSession {
                               enabled: reading || (voice != nil && !LensText.translations(blocks).isEmpty)) { [weak self] in self?.toggleReadAloud() }
         if voice == nil { read.toolTip = String(localized: "No voice for \(Languages.name(settings.targetLanguage)) is installed. Add one in System Settings › Accessibility › Spoken Content.") }
         menu.addItem(read)
+        menu.addItem(.separator())
+        addFitItems(to: menu)
         menu.addItem(.separator())
         menu.addItem(ActionItem(String(localized: "Save Lens Image"), enabled: lastSnapshot?.frame != nil) { [weak self] in self?.saveLensImage() })
         addProfileItems(to: menu)
@@ -942,6 +950,11 @@ final class RegionSession {
         chrome.onToggleOriginal = { [weak self] in self?.onToggleOriginal?() }
         chrome.onPause = { Task { await AppModel.shared.togglePause() } }
         chrome.translationLines = { [weak self] in LensText.translations(self?.lensBlocks() ?? []) }
+        chrome.onFit = { [weak self] in self?.fitToColumn() }
+        chrome.fitTitle = { [weak self] in self?.fitTitle ?? String(localized: "Fit to Column") }
+        chrome.onSnapResize = { [weak self] in self?.snapResized($0) ?? $0 }
+        chrome.onSettle = { [weak self] in self?.settleFrame(for: $0) }
+        chrome.onSettleResize = { [weak self] in self?.settleResized($0) }
     }
 
     private func lensMoved(_ appKitFrame: NSRect) {
@@ -958,6 +971,8 @@ final class RegionSession {
         }
         if !dragging { dragging = true; noteMotion() }
         config.rect = rect
+        traceFrame("move", rect)
+        snapMoved(rect)
         // The content stays put, and so do the blocks: only which of them show changes.
         panel.slide(to: appKitFrame)
         fitCapture(allowResize: false)
@@ -980,6 +995,8 @@ final class RegionSession {
     private func lensResized(_ appKitFrame: NSRect) {
         dragging = true
         config.rect = ScreenGeometry.quartzRect(fromAppKit: appKitFrame)
+        traceFrame("resize", config.rect)
+        noteResized()
         panel.slide(to: appKitFrame)
         fitCapture(allowResize: false)
     }
@@ -989,6 +1006,7 @@ final class RegionSession {
         dragging = false
         lastLens = nil
         setLead(.zero)
+        noteDropped()
         fitCapture(allowResize: true)
         // A window lens follows whichever window it was dropped on (off every window, it stays where it is).
         // A screen lens stays pinned.
@@ -1014,7 +1032,7 @@ final class RegionSession {
 
     private func fitCapture(allowResize: Bool) {
         let lens = config.rect
-        switch Overscan.plan(lens: lens, capture: capture, wide: wideMargins, allowResize: allowResize, display: display(of: lens), lead: lead) {
+        switch Overscan.plan(lens: lens, capture: capture, wide: wideMargins, allowResize: allowResize, display: display(of: lens), lead: lead, band: fit.band) {
         case .keep: break
         case .move(let r):
             capture = r
@@ -1077,6 +1095,7 @@ final class RegionSession {
 
     /// The frames showed content scrolled: learn how far scroll events move it, and read ahead where it comes from.
     private func scrolled(_ r: ScrollReport) {
+        fit.contentMovedAt = ProcessInfo.processInfo.systemUptime
         setLead(CGVector(dx: 0, dy: r.shift < 0 ? 1 : -1))
         let p = ScreenGeometry.quartzRect(fromAppKit: NSRect(origin: NSEvent.mouseLocation, size: .zero)).origin
         guard r.area.contains(p) else { return }
@@ -1223,6 +1242,386 @@ final class RegionSession {
         panel.setTranslationsVisible(showsTranslations, animated: animated)
         reasons.isEmpty ? chrome.orderFrontRegardless() : chrome.orderOut(nil)
         reasons.contains(.userHidden) ? panel.orderOut(nil) : panel.orderFrontRegardless()
+    }
+}
+
+// MARK: - Fit to Column, snap, Auto Fit (docs/design/lens-fit.md)
+
+/// Where the columns are is `ColumnFit` (Core); when a lens acts on them is `AutoFit`'s table; this is what the session carries out: it takes the
+/// columns of each snapshot to screen points, answers the drag's questions (the pull of a column's edge, where a drop settles), animates the lens
+/// to a column through the frame window (so the capture and the translations follow as they follow a hand), and reads wider once (a probe) where
+/// the capture cut a column.
+extension RegionSession {
+    /// What a double-click says while the newest snapshot is older than the last motion of the content.
+    private static var reading: String { String(localized: "Reading…") }
+
+    // MARK: Columns
+
+    /// A snapshot's columns, in global points with their edges marked (`ColumnFit.marked`), and what waits for a snapshot: a probe, the next judgement.
+    func noteColumns(_ s: OverlaySnapshot) {
+        // Snapshots hop to the main actor one by one: an older one that comes late must not replace a newer one.
+        guard s.version >= fit.version else { return }
+        let capture = CGRect(origin: s.origin, size: s.captureSize)
+        // An edge is known against what was read, not against the capture: a capture that has just grown holds the strips it uncovered unread, and the
+        // blocks end where the old read did (film4 F4/F5: a snap target and a fit 44 pt short of the column).
+        let read = s.read.offsetBy(dx: s.origin.x, dy: s.origin.y)
+        fit.columns = ColumnFit.marked(s.columns.map { $0.offset(dx: s.origin.x, dy: s.origin.y) }, capture: read, display: display(of: config.rect))
+        fit.targets = ColumnFit.Targets(columns: fit.columns)
+        fit.version = s.version
+        fit.receivedAt = ProcessInfo.processInfo.systemUptime
+        fit.captured = read
+        if Trace.enabled {
+            Trace.mark("lens columns: n=\(fit.columns.count) " + fit.columns.map {
+                "[\(TraceNumber.px($0.left))..\(TraceNumber.px($0.right)) blocks=\($0.blocks) lines=\($0.lines) edges=\($0.leftKnown && $0.rightKnown ? "known" : "unknown")]"
+            }.joined(separator: " "), since: Trace.now)
+        }
+        if let probe = fit.probe, let band = fit.band, s.version > probe.version, read.minX <= band.minX + 1, read.maxX >= band.maxX - 1 {
+            probeArrived(probe)
+        } else {
+            fitSettled()
+        }
+    }
+
+    /// The room a fit may take: the lens's display, and the window a window lens follows.
+    private func fitBounds() -> CGRect {
+        let d = display(of: config.rect)
+        guard let anchor = config.anchor, let w = WindowInfo.window(id: anchor.windowID) else { return d }
+        let room = d.intersection(w.bounds)
+        return room.isNull || room.isEmpty ? d : room
+    }
+
+    /// The capture's rect now (global points): the checks see a probe's band in it.
+    var captureRect: CGRect { capture }
+
+    private var fitScale: CGFloat { chrome.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2 }
+
+    /// What Fit to Column can say about the column under the lens now.
+    private enum FitAnswer { case column(ColumnFit.Column), none, reading }
+
+    private var fitAnswer: FitAnswer {
+        guard fit.version > 0 else { return .none }
+        // A snapshot that does not hold the lens (it was dragged out of it, the next read is not in), or that is older than the last motion of the
+        // content (a zoom, a sideways scroll may have moved the columns), says nothing yet: wait for the next.
+        guard fit.captured.contains(config.rect), fit.receivedAt >= fit.contentMovedAt else { return .reading }
+        return ColumnFit.under(config.rect, in: fit.columns).map(FitAnswer.column) ?? .none
+    }
+
+    // MARK: Menu, double-click, VoiceOver
+
+    /// "Undo Fit" while the lens's old rect is held, else "Fit to Column".
+    var fitTitle: String { fit.undo == nil ? String(localized: "Fit to Column") : String(localized: "Undo Fit") }
+
+    func addFitItems(to menu: NSMenu) {
+        var enabled = fit.undo != nil, tip: String?
+        if !enabled {
+            switch fitAnswer {
+            case .column: enabled = true
+            case .none: tip = String(localized: "Move the lens over one column of text.")
+            case .reading: tip = Self.reading
+            }
+        }
+        let row = ActionItem(fitTitle, enabled: enabled) { [weak self] in self?.fitToColumn() }
+        row.toolTip = enabled ? nil : tip
+        menu.addItem(row)
+        let auto = ActionItem(String(localized: "Auto Fit")) { [weak self] in self?.toggleAutoFit() }
+        auto.state = config.autoFit ? .on : .off
+        menu.addItem(auto)
+    }
+
+    /// Fit to Column: the lens's width becomes the column's, its top and height stay. A second call, while the old rect is held, takes it back.
+    func fitToColumn() {
+        guard !fit.animating, fit.probe == nil, !fit.handOn else { return }
+        if let back = fit.undo {
+            fit.undo = nil
+            move(to: back, edges: nil)
+            return
+        }
+        switch fitAnswer {
+        case .none:
+            Trace.mark("fit: no column under the lens (\(fit.columns.count) columns)", since: Trace.now)
+            chrome.flash(String(localized: "No column here"))
+        case .reading:
+            Trace.mark("fit: waiting for a newer snapshot (captured \(fit.captured), lens \(config.rect))", since: Trace.now)
+            chrome.flash(Self.reading)
+        case .column(let column):
+            fitNow(to: column)
+        }
+    }
+
+    private func fitNow(to column: ColumnFit.Column) {
+        switch ColumnFit.fitted(config.rect, to: column, within: fitBounds(), scale: fitScale) {
+        case .unchanged:
+            chrome.flash(String(localized: "Fitted to column"))
+        case .probe(let sides):
+            startProbe(sides, reason: .manual)
+        case .to(let rect, let runsOff):
+            fit.undo = config.rect
+            move(to: rect, edges: AutoFit.Edges(left: column.left, right: column.right), auto: false, column: column)
+            chrome.flash(runsOff ? String(localized: "The column runs off the screen") : String(localized: "Fitted to column"))
+        }
+    }
+
+    func toggleAutoFit() { setAutoFit(!config.autoFit) }
+
+    /// This lens's Auto Fit, on or off (the menu's row). Turned on, the lens is judged against what it reads now.
+    func setAutoFit(_ on: Bool) {
+        guard config.autoFit != on else { return }
+        config.autoFit = on
+        onConfigChange?(config)
+        apply(AutoFit.step(fit.machine, on ? .enable : .disable))
+        if on { fit.gate.rearm(); fitSettled() }
+    }
+
+    // MARK: Animation
+
+    /// One line a frame of the lens's own motion (a hand's or a fit's): the frame-timing log of the feel recordings (addendum A2).
+    func traceFrame(_ kind: String, _ rect: CGRect) {
+        guard Trace.enabled else { return }
+        Trace.mark("lens frame \(kind) \(rect.minX) \(rect.minY) \(rect.width) \(rect.height)", since: Trace.now)
+    }
+
+    /// Takes the lens to `rect` (global points) with the window's spring, then commits it as a drop does. `edges`: the column's, remembered as the
+    /// last fit (nil: an undo, which fits nothing).
+    private func move(to rect: CGRect, edges: AutoFit.Edges?, auto: Bool = false, column: ColumnFit.Column? = nil) {
+        if let column {
+            Trace.count(auto ? "lens.fit.auto" : "lens.fit.manual")
+            Trace.mark("fit: \(auto ? "auto" : "manual") column=\(column.left)..\(column.right) lens=\(config.rect.minX)..\(config.rect.maxX) -> \(rect.minX)..\(rect.maxX) steps=1", since: Trace.now)
+        }
+        fit.animatingTo = rect
+        chrome.animate(to: ScreenGeometry.appKitRect(fromQuartz: rect), duration: auto ? LensMotion.autoFit : LensMotion.fit) { [weak self] finished in
+            guard let self else { return }
+            fit.animatingTo = nil
+            if finished {
+                if let edges { apply(AutoFit.step(fit.machine, auto ? .animationDone(edges) : .fitted(edges))) }
+            } else {
+                apply(AutoFit.step(fit.machine, .dragged))
+            }
+            lensDropped()
+        }
+    }
+
+    // MARK: Snap
+
+    /// The pull of a column's edge on `rect` (the lens as the hand put it): a guide while an edge is within reach, one alignment tick as it comes in.
+    private func evaluateSnap(_ rect: CGRect, edges: ColumnFit.Sides) -> ColumnFit.Snap? {
+        let free = !settings.lensSnap || fit.commandDown()
+        let next = ColumnFit.snap(rect, edges: edges, targets: fit.targets, previous: fit.snap, bypass: free)
+        switch ColumnFit.change(from: fit.snap, to: next) {
+        case .enter(let snap):
+            Trace.count("lens.snap.enter")
+            Trace.mark("snap: edge=\(snap.edge == .left ? "left" : "right") target=\(snap.target.x) offset=\(snap.offset)", since: Trace.now)
+            let top = max(snap.target.top, display(of: rect).minY), bottom = min(snap.target.bottom, display(of: rect).maxY)
+            panel.showGuide(ScreenGeometry.appKitRect(fromQuartz: CGRect(x: snap.target.x, y: top, width: 0, height: max(0, bottom - top))))
+            // A move is the window server's: no events, so the tick is ours. A resize has events and the system's filter plays it.
+            if edges == .both { AlignmentHaptic.tick() }
+        case .leave:
+            panel.hideGuide()
+        case .none:
+            break
+        }
+        fit.snap = next
+        return next
+    }
+
+    /// A move frame (`lensMoved`): the first of a hand's moves takes the old rect of a fit away and tells Auto Fit; every one asks the snap.
+    func snapMoved(_ rect: CGRect) {
+        guard !fit.animating, !fit.settling else { return }
+        if !fit.handOn { beginHand() }
+        _ = evaluateSnap(rect, edges: .both)
+    }
+
+    private func beginHand() {
+        fit.handOn = true
+        fit.undo = nil
+        endProbe()
+        apply(AutoFit.step(fit.machine, .dragged))
+    }
+
+    /// A resize drag's frame (AppKit) after the snap: the right edge on a column's, the rest as the hand made it.
+    func snapResized(_ appKitFrame: NSRect) -> NSRect {
+        let hand = ScreenGeometry.quartzRect(fromAppKit: appKitFrame)
+        _ = evaluateSnap(hand, edges: .right)           // the guide and the tick: from 8 pt, kept to 12 (hysteresis)
+        // The edge's pull is a function of the hand's place alone, from 12 pt in: a hysteresis in it would be a jump.
+        guard !fit.commandDown(), settings.lensSnap,
+              let pull = ColumnFit.snap(hand, edges: .right, targets: fit.targets, entry: ColumnFit.release) else { return appKitFrame }
+        var snapped = appKitFrame
+        snapped.size.width = max(ColumnFit.minWidth, appKitFrame.width + ColumnFit.livePull(pull.offset))
+        return snapped
+    }
+
+    /// A resize let go at `appKitFrame` (which carries the live pull) while its right edge was in a column's reach: the rest of the way onto the edge, as a glide.
+    func settleResized(_ appKitFrame: NSRect) -> NSRect? {
+        defer { panel.hideGuide() }
+        guard let snap = fit.snap else { return nil }
+        let rest = snap.offset - ColumnFit.livePull(snap.offset)
+        guard abs(rest) >= 0.01 else { return nil }
+        var settled = appKitFrame
+        settled.size.width = max(ColumnFit.minWidth, appKitFrame.width + rest)
+        fit.settling = true
+        return settled
+    }
+
+    /// A resize frame (`lensResized`): the hand's own makes Auto Fit off for this lens; a fit's frames are not.
+    func noteResized() {
+        guard !fit.animating else { return }
+        let first = !fit.handOn
+        if first { fit.handOn = true; fit.undo = nil; endProbe() }
+        apply(AutoFit.step(fit.machine, .resized))
+        if first { scoutEdges() }
+    }
+
+    /// The first frame of a hand's resize, with a column near the lens whose right edge the read ended at: the capture does not follow the corner, so
+    /// the snap would have no target where the column really ends (film4 F4). The capture becomes the band for one read, the drag goes on meanwhile,
+    /// and the drop ends it. A lens with Snap off, or none of whose columns are cut, reads nothing more.
+    private func scoutEdges() {
+        guard settings.lensSnap, fit.band == nil, ColumnFit.unknownEdges(near: config.rect, in: fit.columns).contains(.right) else { return }
+        Trace.count("lens.fit.scout")
+        fit.probe = LensFit.Probe(sides: .right, reason: .scout, since: ProcessInfo.processInfo.systemUptime, version: fit.version)
+        fit.band = Overscan.band(around: config.rect, display: display(of: config.rect))
+        fitCapture(allowResize: true)
+    }
+
+    /// Where a lens let go at `appKitFrame` settles: onto the edge it was pulled to, within reach.
+    func settleFrame(for appKitFrame: NSRect) -> NSRect? {
+        defer { panel.hideGuide() }
+        guard let snap = fit.snap, snap.offset != 0 else { return nil }
+        let room = ScreenGeometry.appKitRect(fromQuartz: display(of: config.rect))
+        var settled = appKitFrame.offsetBy(dx: snap.offset, dy: 0)
+        settled.origin.x = min(max(settled.minX, room.minX), room.maxX - settled.width)
+        guard settled != appKitFrame else { return nil }
+        fit.settling = true
+        return settled
+    }
+
+    /// The lens was dropped (`lensDropped`): the snap and its guide are over, the next settle is judged afresh against the columns now.
+    func noteDropped() {
+        let byHand = fit.handOn
+        fit.handOn = false
+        fit.settling = false
+        fit.snap = nil
+        panel.hideGuide()
+        if fit.probe?.reason == .scout { endProbe() }
+        if fit.probe == nil, fit.band != nil {
+            fit.band = nil
+            settleBusy()
+        }
+        if byHand, fit.machine.state != .off { fit.gate.rearm(); scheduleJudgement(after: fit.calm + 0.05) }
+    }
+
+    // MARK: Auto Fit
+
+    /// A read settled, or the lens or the page stopped moving: judge the newest snapshot once (`AutoFit.step`).
+    func fitSettled() {
+        guard fit.machine.state != .off, !fit.animating, fit.probe == nil else { return }
+        switch fit.gate.check(version: fit.version, now: ProcessInfo.processInfo.systemUptime, lastMotion: lastMotion, calm: fit.calm, idle: activity == .idle,
+                              dragging: dragging, onScreen: offScreen.isEmpty) {
+        case .no: return
+        case .wait(let seconds): scheduleJudgement(after: seconds + 0.05)
+        case .judge: apply(AutoFit.step(fit.machine, .settled(fitContext)))
+        }
+    }
+
+    private var fitContext: AutoFit.Context {
+        AutoFit.Context(calm: true, lens: config.rect, bounds: fitBounds(), column: ColumnFit.under(config.rect, in: fit.columns), scale: fitScale)
+    }
+
+    private func scheduleJudgement(after seconds: TimeInterval) {
+        fit.settleTimer?.invalidate()
+        fit.settleTimer = Timer.scheduledTimer(withTimeInterval: max(0.05, seconds), repeats: false) { [weak self] _ in
+            MainActor.assumeIsolated { self?.fitSettled() }
+        }
+    }
+
+    /// Carries out the action a row of the table named.
+    private func apply(_ step: (machine: AutoFit.Machine, action: AutoFit.Action)) {
+        fit.machine = step.machine
+        switch step.action {
+        case .none, .commit:
+            break
+        case .grow(let rect):
+            let column = ColumnFit.under(config.rect, in: fit.columns)
+            fit.undo = config.rect
+            move(to: rect, edges: column.map { AutoFit.Edges(left: $0.left, right: $0.right) }, auto: true, column: column)
+        case .probe(let sides):
+            startProbe(sides, reason: .auto)
+        case .skip(let reason):
+            Trace.count("lens.fit.skipped.\(reason.rawValue)")
+            Trace.mark("autofit skipped: \(reason.rawValue)", since: Trace.now)
+            endProbe()
+        case .restoreCapture:
+            endProbe()
+        case .disable:
+            config.autoFit = false
+            onConfigChange?(config)
+            endProbe()
+            chrome.flash(String(localized: "Auto Fit off"))
+        }
+    }
+
+    // MARK: Probe
+
+    /// One wider read: the capture is the display's width at the lens's rows until the snapshot comes (`Overscan.band`), never during a drag.
+    private func startProbe(_ sides: ColumnFit.Sides, reason: LensFit.Probe.Reason) {
+        guard !dragging else { return }
+        fit.probe = LensFit.Probe(sides: sides, reason: reason, since: ProcessInfo.processInfo.systemUptime, version: fit.version)
+        fit.band = Overscan.band(around: config.rect, display: display(of: config.rect))
+        Trace.count("lens.fit.probe")
+        chrome.setBusy(true)
+        fitCapture(allowResize: true)
+        fit.probeTimer?.invalidate()
+        fit.probeTimer = Timer.scheduledTimer(withTimeInterval: fit.probeTimeout, repeats: false) { [weak self] _ in
+            MainActor.assumeIsolated { self?.probeLapsed() }
+        }
+    }
+
+    /// The probe's snapshot is in: the edges are known now (or are the display's), and the fit is made from them.
+    private func probeArrived(_ probe: LensFit.Probe) {
+        fit.probe = nil
+        fit.probeTimer?.invalidate()
+        switch probe.reason {
+        case .auto:
+            apply(AutoFit.step(fit.machine, .probed(fitContext)))
+            if fit.machine.state != .fitting { endProbe() }
+        case .scout:
+            break           // the read is in: the snap has its targets. The capture stays the band until the drop.
+        case .manual:
+            guard case .column(let column) = fitAnswer, case .to(let rect, let runsOff) = ColumnFit.fitted(config.rect, to: column, within: fitBounds(), scale: fitScale) else {
+                chrome.flash(String(localized: "No column here"))
+                return endProbe()
+            }
+            fit.undo = config.rect
+            move(to: rect, edges: AutoFit.Edges(left: column.left, right: column.right), auto: false, column: column)
+            chrome.flash(runsOff ? String(localized: "The column runs off the screen") : String(localized: "Fitted to column"))
+        }
+    }
+
+    private func probeLapsed() {
+        guard let probe = fit.probe else { return }
+        Trace.mark("fit probe lapsed after \(fit.probeTimeout) s", since: Trace.now)
+        switch probe.reason {
+        case .auto: apply(AutoFit.step(fit.machine, .probeLapsed))
+        case .manual: chrome.flash(Self.reading)
+        case .scout: return
+        }
+        endProbe()
+    }
+
+    /// The capture goes back to its usual shape and the pill to what the reading says.
+    private func endProbe() {
+        fit.probe = nil
+        fit.probeTimer?.invalidate()
+        fit.probeTimer = nil
+        guard fit.band != nil else { return }
+        fit.band = nil
+        fitCapture(allowResize: true)
+        settleBusy()
+    }
+
+    func stopFit() {
+        fit.probeTimer?.invalidate()
+        fit.settleTimer?.invalidate()
+        fit.probeTimer = nil
+        fit.settleTimer = nil
     }
 }
 

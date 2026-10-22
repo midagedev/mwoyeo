@@ -106,6 +106,30 @@ enum PickerChecks {
         }
         check("the clicks were counted as targets (\(RegionPicker.stats.clickTarget))", RegionPicker.stats.clickTarget >= 2)
 
+        // A pointer that rests where the picker opens (film defect F22, 2026-10-23, addendum A2 of skinland117): `open()` aims at it where it is, so the first map aims
+        // at once. The pointer is the check's own (`mouseLocation`): the real one is not ours to move.
+        let resting = CGPoint(x: (columns[0].0 + columns[0].1) / 2, y: twoColumns.paragraphs[0][1].midY)
+        let restingAt = NSPoint(x: screen.frame.minX + at(resting).x, y: screen.frame.minY + at(resting).y)
+        let (blind, blindHost) = picker(instant)
+        blind.mouseLocation = { restingAt }
+        blind.startMap()   // main's open: the read only, the pointer known from a move alone
+        _ = await ready(blind)
+        check("FAIL-first: with the read alone a resting pointer gets no outline when the map arrives (target \(blind.target != nil), spotlight \(blind.spotlight != nil))",
+              blind.target == nil && blind.spotlight == nil)
+        blind.close()
+        blindHost.orderOut(nil)
+        let (opened, openedHost) = picker(instant)
+        opened.mouseLocation = { restingAt }
+        opened.open()
+        check("a picker opened over a resting pointer shows the default lens under it at once, before any map", opened.spotlight != nil && opened.target == nil)
+        _ = await ready(opened)
+        now += 1
+        opened.render(at: now)
+        let aimedAt = opened.target.map { ScreenGeometry.appKitRect(fromQuartz: $0.rect).offsetBy(dx: -screen.frame.minX, dy: -screen.frame.minY) }
+        check("and when the map arrives, with no move of the pointer, the spotlight is the paragraph's lens", aimedAt != nil && opened.spotlight == aimedAt)
+        opened.close()
+        openedHost.orderOut(nil)
+
         // On a chat the click drops today's default lens.
         let chat = drawPage(paragraphs: false)
         let chatMap = (try? await PickerMap.read(chat.image, scale: 2, display: display, languages: []))?.0
@@ -182,18 +206,25 @@ enum PickerChecks {
         CATransaction.flush()
         let drawn = PickerView.draws
         var frames: [CGRect] = []
-        for f in 1...30 {
+        var bows: [CGFloat] = []
+        // 2026-10-23 (skinland117): 40 frames, not 30. The outline bows over the hop and is back on the rigid rect within 0.48 s of it (contract 9.6, "hop 2"),
+        // so the spotlight is the target's rect itself from frame 30 on, not at frame 18 where the glide itself lands; the property asserted is the same.
+        for f in 1...40 {
             view.render(at: now + Double(f) / 60)
             host.displayIfNeeded()
             CATransaction.flush()   // each frame committed as the display link's would be: a draw it causes is counted in its frame
             if let s = view.spotlight { frames.append(s) }
+            bows.append(view.spotlightDeviation)
         }
         let target = view.target.map { ScreenGeometry.appKitRect(fromQuartz: $0.rect).offsetBy(dx: -screen.frame.minX, dy: -screen.frame.minY) }
         check("the hosted picker draws (control: \(control) draws so far)", control > 0)
-        check("30 frames of a glide between two targets: \(PickerView.draws - drawn) draws of the picker's views, \(view.runningAnimations) layer animations",
+        check("40 frames of a glide between two targets: \(PickerView.draws - drawn) draws of the picker's views, \(view.runningAnimations) layer animations",
               PickerView.draws == drawn && view.runningAnimations == 0)
         check("the spotlight moved over them and came to rest on the target (\(frames.count) frames, \(Set(frames.map { "\($0)" }).count) distinct)",
-              frames.count == 30 && Set(frames.map { "\($0)" }).count > 10 && first != frames.last && target.map { frames.last?.insetBy(dx: 0, dy: 0) == $0 } == true)
+              frames.count == 40 && Set(frames.map { "\($0)" }).count > 10 && first != frames.last && target.map { frames.last?.insetBy(dx: 0, dy: 0) == $0 } == true)
+        let hopPeak = bows.max() ?? 0
+        check("the spotlight's outline bows over the hop (\(String(format: "%.2f", Double(hopPeak))) pt, at most the 4 pt cap) and is the rigid rect again by the end (\(String(format: "%.2f", Double(bows.last ?? -1))) pt)",
+              hopPeak > 1 && hopPeak <= 4.05 && (bows.last ?? 1) < LensSkin.restDistance)
 
         // MARK: Gate 7: Reduce Motion: the spotlight jumps; the click is the same
         Motion.shared.force(true)
@@ -202,6 +233,8 @@ enum PickerChecks {
         let jumped = view.spotlight
         check("under Reduce Motion the spotlight jumps to the target (no glide, \(view.runningAnimations) animations)",
               !view.gliding && view.runningAnimations == 0 && jumped == view.target.map { ScreenGeometry.appKitRect(fromQuartz: $0.rect).offsetBy(dx: -screen.frame.minX, dy: -screen.frame.minY) })
+        check("and its outline is the rigid rect (\(String(format: "%.2f", Double(view.spotlightDeviation))) pt; with motion the same hop bowed \(String(format: "%.2f", Double(hopPeak))) pt)",
+              view.spotlightDeviation == 0 && hopPeak > 1)
         click(view, a)
         let reduced = placed.flatMap { $0 }?.rect
         Motion.shared.force(false)

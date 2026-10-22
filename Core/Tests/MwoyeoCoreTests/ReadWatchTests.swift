@@ -160,6 +160,74 @@ final class ReadWatchTests: XCTestCase {
         XCTAssertEqual(counts.last, 0, "a blinking caret kept counting: \(counts)")
     }
 
+    func testTheInboxSeesUpToTheOldestFrameNotCounted() {
+        var inbox = ReadWatch.Inbox()
+        XCTAssertEqual(inbox.seen(at: 5), 5, "nothing waiting: the frames counted show the scene up to now")
+        inbox.delivered(1)
+        inbox.delivered(2)
+        XCTAssertEqual(inbox.seen(at: 5), 1)
+        XCTAssertEqual(inbox.count, 2)
+        inbox.counted(1)
+        XCTAssertEqual(inbox.seen(at: 5), 2)
+        inbox.counted(2)
+        inbox.counted(3)   // a frame never handed in changes nothing
+        XCTAssertEqual(inbox.seen(at: 5), 5)
+        inbox.delivered(7)
+        XCTAssertEqual(inbox.seen(at: 5), 5, "a frame stamped after now does not run the clock ahead of now")
+    }
+
+    /// The check's case (`GameChecks.movingBandDuringAPass`) on a clock the test moves, in milliseconds: the band moves a phase every 10 ms, a
+    /// pass holds the pipeline from 100 to 900 (hold 0.6 s), and after it the frames that waited are counted one every 8 ms while more come
+    /// in. A look is asked for by the frame counted after the last look ran, and runs once the frames handed in before it are counted (the
+    /// pipeline's actor takes its jobs in order). The band never stops until 2000: no look may find it at rest before then, and once the
+    /// frames are all counted it rests `hold` after its last frame, not later.
+    func testAPassThatOutlastsTheHoldDoesNotMakeAMovingBandRest() {
+        let hold = 0.6
+        var watch = ReadWatch(hold: hold), inbox = ReadWatch.Inbox()
+        // The stripes repeat every 4 phases: four pictures, and the change between any two of them, made once.
+        let frames = (0..<4).map { scene(phase: $0, line: 0) }
+        let changes = frames.map { a in frames.map { b in FrameDiff.changeMap(from: a, to: b) } }
+        var previous = 0
+        var waiting: [Int] = []   // the phases handed in and not counted, in order; phase k is captured at 10 k ms
+        var ahead: Int?           // frames still before the look asked for
+        var looks = 0, restedOnTheWall = 0, restedSeen: [Int] = []
+        func countNext() {
+            let phase = waiting.removeFirst(), t = Double(phase) / 100
+            inbox.counted(t)
+            let raw = changes[previous][phase % 4]
+            _ = watch.frame(raw, boxes: [box], at: t, learns: raw.ratio <= 0.2)
+            previous = phase % 4
+        }
+        var nextJob = 900
+        for ms in 1...2700 {
+            let now = Double(ms) / 1000
+            if ms % 10 == 0, ms <= 2000 { waiting.append(ms / 10); inbox.delivered(Double(ms) / 1000) }
+            if ms < 100 { while !waiting.isEmpty { countNext() }; continue }
+            guard ms >= 900, ms >= nextJob else { continue }
+            if ahead == 0 {
+                // The look: what the pipeline's `noteRested` judges when a run starts.
+                looks += 1
+                var wall = watch
+                if !wall.takeRested(at: now).isEmpty { restedOnTheWall += 1 }
+                if !watch.takeRested(at: inbox.seen(at: now)).isEmpty { restedSeen.append(ms) }
+                ahead = nil
+                nextJob = ms + 1
+            } else if !waiting.isEmpty {
+                countNext()
+                ahead = ahead.map { $0 - 1 } ?? waiting.count
+                nextJob = ms + 8
+            } else if ms % 10 == 5 {
+                // Nothing waits: the timer's look, as `run`'s wake asks for one.
+                ahead = 0
+            }
+        }
+        XCTAssertGreaterThan(restedOnTheWall, 0, "the case is not the one the check fails on: no look rested the band on the wall clock")
+        XCTAssertGreaterThan(looks, 20)
+        XCTAssertTrue(restedSeen.first.map { $0 >= 2600 } ?? false,
+                      "the band rested while it moved, or never once it stopped: rested at \(restedSeen) ms (it stopped at 2000, hold \(Int(hold * 1000)) ms)")
+        XCTAssertTrue(restedSeen.first.map { $0 <= 2610 } ?? false, "the band rested later than its hold after it stopped: \(restedSeen) ms")
+    }
+
     func testAnInjectedHoldIsHowLongATileMustBeStill() {
         for (hold, restsAt) in [(ReadWatch.standardHold, 0.45), (0.05, 0.08)] {
             var sim = Sim(watch: ReadWatch(hold: hold), previous: scene(phase: nil, line: 0))

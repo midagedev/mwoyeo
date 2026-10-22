@@ -250,6 +250,7 @@ enum GameChecks {
         let baseline = counter.count
         check("a scene that stops after a few frames is read when it has been still for the hold", started && restRead && baseline > afterFirst, "\(baseline - afterFirst) reads")
         let scene = (5...44).map { frame(picture([(second, box)], band: $0), at: 0)! }
+        let countsBefore = counts()
         gate.arm {
             Thread.sleep(forTimeInterval: 0.8)
             feed.letGo()
@@ -263,14 +264,27 @@ enum GameChecks {
         let stall = feed.stall
         feed.stop()
         let backlog = feed.backlog
-        print(String(format: "game-note: the scene after the pass: longest gap %.0f ms, longest count %.0f ms (hold %.0f ms), %d read; %d frames waited behind the pass, counted in %.0f ms",
-                     stall.gap * 1000, stall.lag * 1000, hold * 1000, during, backlog.frames, (backlog.drain ?? .nan) * 1000))
+        // What made the reads: rests judged (and those held back for frames still waiting to be counted), a reader that became ready, and the
+        // longest pause of the whole feed (one of the hold is a scene that stopped, before the pass was let go as well as after).
+        let countsAfter = counts()
+        func counted(_ key: String) -> Int { (countsAfter[key] ?? 0) - (countsBefore[key] ?? 0) }
+        let why = String(format: "%d rests, %d held back for frames waiting, %d reader re-reads, longest gap of the feed %.0f ms", counted("watch.rested"),
+                         counted("watch.rest_waits"), counted("reader.reread"), feed.longestGap * 1000)
+        print(String(format: "game-note: the scene after the pass: longest gap %.0f ms, longest count %.0f ms (hold %.0f ms), %d read; %d frames waited behind the pass, counted in %.0f ms; ",
+                     stall.gap * 1000, stall.lag * 1000, hold * 1000, during, backlog.frames, (backlog.drain ?? .nan) * 1000) + why)
         check("a pass that outlasts the hold is not followed by a read of the scene while the scene goes on (\(during) read: the new text)",
-              started && readSecond && during == 1, "\(during) reads, longest gap \(Int(stall.gap * 1000)) ms, longest count \(Int(stall.lag * 1000)) ms")
+              started && readSecond && during == 1, "\(during) reads, longest gap \(Int(stall.gap * 1000)) ms, longest count \(Int(stall.lag * 1000)) ms; \(why)")
         // The scene stops; what has rested by then is read, and the pipeline goes quiet with the new text.
         await quiet(p)
         let seen = await read(p)
         check("and the text of the pass is what was read", seen.contains("silver") && !seen.contains("button"), seen)
+    }
+
+    /// The pipeline's work counters now, left in place for whoever reads them next (`Trace.takeCounts` drains them).
+    private static func counts() -> [String: Int] {
+        let c = Trace.takeCounts()
+        for (key, n) in c { Trace.count(key, n) }
+        return c
     }
 
     /// The frames of a moving scene, fed to a pipeline from a thread a frame every 10 ms until stopped (the pictures go round).
@@ -280,6 +294,8 @@ enum GameChecks {
         private var letGoTime: Double?, backlogAtLetGo = 0, drainedAt: Double?
         /// The frames stamped after the pass was let go: when each was stamped and when the pipeline had counted it.
         private var after: [(stamp: Double, done: Double)] = []
+        /// When the feed started and when each of its frames was stamped.
+        private var stamps: [Double] = []
         var count: Int { lock.withLock { ingested } }
         var isLetGo: Bool { lock.withLock { passLetGo != nil } }
         /// How many frames had been made when the pass was let go: the frames that waited behind it are among them.
@@ -296,8 +312,16 @@ enum GameChecks {
                 return (gap, frames.map { $0.done - $0.stamp }.max() ?? 0)
             }
         }
+        /// The longest time between two frames of the whole feed, its start included.
+        var longestGap: Double {
+            lock.withLock {
+                let s = stamps.sorted()
+                return zip(s, s.dropFirst()).map { $1 - $0 }.max() ?? 0
+            }
+        }
         func stop() { lock.withLock { stopped = true } }
         func start(_ p: RegionPipeline, _ frames: [CapturedFrame]) {
+            lock.withLock { stamps.append(ProcessInfo.processInfo.systemUptime) }
             Thread.detachNewThread { [self] in
                 var k = 0
                 while !lock.withLock({ stopped }) {
@@ -312,6 +336,7 @@ enum GameChecks {
                         let done = ProcessInfo.processInfo.systemUptime
                         lock.withLock {
                             ingested += 1
+                            stamps.append(f.time)
                             if let g = passLetGo, drainedAt == nil, ingested >= g { drainedAt = done }
                             if let t = letGoTime, f.time >= t { after.append((f.time, done)) }
                         }

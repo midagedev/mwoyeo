@@ -8,6 +8,9 @@ import CoreGraphics
 /// new text appears once and stays, a scene keeps changing. A held tile that rests is handed back as an area to read
 /// (`takeRested`), like a strip a scroll uncovered.
 ///
+/// Still is judged on the clock of the frames counted (`Inbox.seen`), not the wall clock: a frame that waits behind a pass is counted late, and
+/// a tile of a scene that never stops would otherwise rest on the stamp of a frame from before the wait.
+///
 /// It also owns the animated tiles (`Churn`): they are taken out of a frame's change before it is weighed.
 public struct ReadWatch: Sendable {
     /// How long a tile away from the text must hold still before it counts (the pipeline's; a check may inject another).
@@ -119,6 +122,28 @@ public struct ReadWatch: Sendable {
         }
         columns = change.columns; rows = change.rows; tile = change.tile
         imageWidth = change.imageWidth; imageHeight = change.imageHeight
+    }
+
+    /// The frames handed to the pipeline and not counted yet: what they show is not known, so nothing is judged still past the oldest of them.
+    /// A frame is handed in when the capture gives it (`delivered`, off the pipeline's actor) and counted when the pipeline takes it, or drops it.
+    public struct Inbox: Sendable {
+        /// The capture times of the frames handed in and not counted, in the order they came.
+        private var waiting: [Double] = []
+
+        public init() {}
+
+        public mutating func delivered(_ time: Double) { waiting.append(time) }
+
+        public mutating func counted(_ time: Double) {
+            if let i = waiting.firstIndex(of: time) { waiting.remove(at: i) }
+        }
+
+        /// How many frames wait.
+        public var count: Int { waiting.count }
+
+        /// The time up to which the frames counted show the scene at `now`: the capture time of the oldest frame still waiting, or `now` when
+        /// none waits (a scene that does not change sends no frames).
+        public func seen(at now: Double) -> Double { min(now, waiting.min() ?? now) }
     }
 
     /// Tiles whose centre lies inside a box grown by `marginTiles` tiles.

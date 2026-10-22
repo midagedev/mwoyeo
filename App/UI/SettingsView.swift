@@ -600,7 +600,7 @@ struct AppearanceSettings: View {
     var body: some View {
         @Bindable var model = model
         Form {
-            Section("Lens") {
+            Section {
                 HStack(spacing: 8) {
                     ForEach(LensStyle.allCases) { style in
                         LensStyleCard(style: style, tint: model.settings.lensTint, selected: model.settings.lensStyle == style) { model.settings.lensStyle = style }
@@ -618,6 +618,12 @@ struct AppearanceSettings: View {
                 Picker("Name tag position", selection: $model.settings.lensTabPosition) {
                     ForEach(LensTabPosition.allCases) { Text($0.title).tag($0) }
                 }
+                Toggle("Snap to text columns", isOn: $model.settings.lensSnap)
+                Toggle("Auto Fit new lenses", isOn: $model.settings.lensAutoFit)
+            } header: {
+                Text("Lens")
+            } footer: {
+                Text("Hold ⌘ while dragging to place a lens freely.")
             }
             Section("Text") {
                 Picker(selection: $model.settings.fontStyle) {

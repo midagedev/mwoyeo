@@ -188,6 +188,18 @@ enum TextChecks {
         await settled(typing)
         check("a burst of keystrokes is one translation of what was typed last, by the Apple engine, with no engine of the settings",
               calls == [["abc"]] && engines == [nil] && typing.translation == "«abc»" && typing.phase == .done(engine: "Apple"), "\(calls) \(typing.phase)")
+        calls.removeAll()
+        let wrapped = "The background colour is the per-channel median of\nthe ring."
+        typing.source = wrapped
+        typing.translateNow()
+        await settled(typing)
+        check("a paragraph wrapped by hard line breaks (text copied from a PDF) is sent as one line and shown as one translated paragraph, not as two sentences",
+              calls == [["The background colour is the per-channel median of the ring."]] && typing.translation == "«The background colour is the per-channel median of the ring.»", "\(calls) \(typing.translation)")
+        calls.removeAll()
+        typing.source = "Dear John,\nI hope you are well.\nSee you soon"
+        typing.translateNow()
+        await settled(typing)
+        check("typed lines stay one unit each, and the breaks between them stay", calls == [["Dear John,", "I hope you are well.", "See you soon"]] && typing.translation == "«Dear John,»\n«I hope you are well.»\n«See you soon»", "\(calls) \(typing.translation)")
         next = TextTranslation.Answer(rows: [.init(translation: nil, engine: nil)], translated: false, issue: .languagePackMissing(source: "en", target: "ko"), profile: nil, memory: nil)
         typing.source = "needs a pack"
         typing.translateNow()
@@ -234,11 +246,45 @@ enum TextChecks {
         check("a language the action does not know is an error in words, and nothing is sent", unknown && mock.bodies.count == before + 1, "\(mock.bodies.count - before)")
 
         failed += await controls(model, engine: engine)
+        failed += await reopened(model)
         return failed
     }
 
     private static func say(_ what: String, _ ok: Bool, _ note: String) {
         print("check-logic: \(ok ? "PASS" : "FAIL") text: \(what)" + (ok || note.isEmpty ? "" : " [\(note)]"))
+    }
+
+    // MARK: the way in without the menu bar item
+
+    /// The app opened again (Spotlight, Finder) while its menu bar item is out of reach: a window holds the panel, and Translate Text is a button of it
+    /// that answers `AXPress`. FAIL-first: on 3a2e86a a reopen showed the welcome, which has no such button.
+    private static func reopened(_ model: AppModel) async -> Int {
+        guard AccessibilityChecks.canAsk else {
+            print("check-logic: SKIP text: the reopen window (this process may not ask the accessibility server)")
+            return 0
+        }
+        var failed = 0
+        func verify(_ what: String, _ ok: Bool, _ note: @autoclosure () -> String = "") {
+            say(what, ok, ok ? "" : note())
+            if !ok { failed += 1 }
+        }
+        let title = "Mwoyeo", translateText = String(localized: "Translate Text…")
+        TextTranslationWindow.shared.close()
+        // The delegate asks with the real welcome and the real grant of this process; the window under check is the one a set-up app shows.
+        WindowPresenter.shared.showForReopen(completedWelcome: true, screenAccess: true)
+        var button: AXUIElement?
+        for _ in 0..<60 where button == nil {
+            button = AccessibilityChecks.element(inWindowTitled: title, role: "AXButton", label: translateText)
+            if button == nil { try? await Task.sleep(for: .milliseconds(100)) }
+        }
+        var answer: AXError?
+        if let button { answer = AXUIElementPerformAction(button, kAXPressAction as CFString) }
+        for _ in 0..<100 where !TextTranslationWindow.shared.isShown { try? await Task.sleep(for: .milliseconds(20)) }
+        verify("reopening the app opens the menu panel in a window, and its Translate Text button answers AXPress and opens the Translate Text window",
+               button != nil && answer == .success && TextTranslationWindow.shared.isShown, "\(String(describing: button)) \(String(describing: answer)) \(TextTranslationWindow.shared.isShown)")
+        TextTranslationWindow.shared.close()
+        WindowPresenter.shared.closeMenu()
+        return failed
     }
 
     // MARK: the controls

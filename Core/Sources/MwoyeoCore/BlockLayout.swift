@@ -330,9 +330,36 @@ public enum CaptureEdge {
     /// at the edge of a picture cropped to the top left of a page (the use-case bench has four) is a title that stands there.
     public static let sideColumn = 3
 
+    /// A line's box may end this share of its glyph size (the lesser of the box's width and height: a line of vertical text is tall) short of the RIGHT edge and still reach it
+    /// (round edges117b, 2026-10-23, film4 F5). The recognizer's box ends where the last glyph it took in ends, and it does not always take in the glyph that the capture cut: a cut
+    /// line ends short of the right edge by up to a glyph, and by `tolerance` at least. At the left edge the boxes of cut lines start at it (the partial first glyph is in the box: 26 of
+    /// 26 lines at 0 px in the paper bench's side crop of page 7), so the left keeps the tolerance. What was measured (`tools/paper-bench/side-census.py --slack`):
+    /// - the paper bench's two side-cut crops, the document model's lines that end within 0.8 of their height of the right edge: 19 end 3 px short, then 5 (4 lines), 7, 9, 11, 15;
+    /// - a synthetic paragraph cut by the capture and read by the lines reader as the app runs it (`lens-window-checks`): four lines of 28 and 29 px end 1, 10, 16 and 17 px short
+    ///   (0.03 to 0.61 of their height); the same reader started in the process (`MWOYEO_OCR_PATH=vn`) puts all four at 2 to 4 px;
+    /// - lines that reach a side, on the paper bench's 41 renders (2736 lines): 59 at 4 px, 64 at 0.3, 68 at 0.6, 69 from 0.7 to 1.0, all in the two crops; the use-case bench's 40 pictures
+    ///   (351 lines): five lines reach a side and none is cut by one up to 0.9; at 1.0 nine reach a side and three are cut, in pictures that no edge cuts.
+    /// 0.7 stands above the longest gap of a cut line that was seen (0.61) and inside the range that cuts nothing that is not cut. In the paper bench's page-12 crop the line 'Each result is
+    /// produced' ends 18 px (0.67) short of the crop's edge and the uncut page reads it 65 px longer: that line is cut too. With a tolerance of 4 px only the lines whose box reached the
+    /// edge counted, a column of the lines reader's boxes had one such line, was not flagged cut, and its cut prefixes were translated and drawn (F5 of film4's take).
+    public static let rightSlack: CGFloat = 0.7
+
+    /// How far from the left or right edge `line`'s box may end for it to reach the edge (pixels).
+    public static func reach(_ line: CGRect, _ side: Side) -> CGFloat {
+        side == .right ? max(tolerance, rightSlack * min(line.width, line.height)) : tolerance
+    }
+
     /// Whether `line` reaches the left or right edge of `bounds`.
     public static func touchesSide(_ line: CGRect, in bounds: CGRect) -> Bool {
-        line.minX <= bounds.minX + tolerance || line.maxX >= bounds.maxX - tolerance
+        line.minX <= bounds.minX + reach(line, .left) || line.maxX >= bounds.maxX - reach(line, .right)
+    }
+
+    /// Whether text that was read (`box`: a block's lines) goes on past the left or right edge of `bounds`, by more than `tolerance`. A block that does was read whole by a
+    /// capture that reached further than this one (a lens in motion reads wider than one at rest) and is cut by this capture's edge now; one that ends at the edge, or short of
+    /// it, was read by a capture whose edge cut it, or not at all: nothing of it lies beyond to be held for (round edges117b, film4 F5: the translations of 'posi', 'whi', 'tal',
+    /// the line ends of a column the first read cut, were kept on the lens through every later read for the wide read to replace, which came 8 s later or never).
+    public static func continuesPastSide(_ box: CGRect, in bounds: CGRect) -> Bool {
+        box.minX < bounds.minX - tolerance || box.maxX > bounds.maxX + tolerance
     }
 
     /// The indices of the lines that the capture's left or right edge cuts: those that reach a side edge that `sideColumn` lines or more
@@ -342,8 +369,8 @@ public enum CaptureEdge {
     /// bottom, a capture with no line clear of the sides is a picture cropped to its text, and none is cut.
     public static func cutAtSides(_ lines: [CGRect], in bounds: CGRect) -> Set<Int> {
         guard lines.contains(where: { !touchesSide($0, in: bounds) }) else { return [] }
-        let left = lines.indices.filter { lines[$0].minX <= bounds.minX + tolerance }
-        let right = lines.indices.filter { lines[$0].maxX >= bounds.maxX - tolerance }
+        let left = lines.indices.filter { lines[$0].minX <= bounds.minX + reach(lines[$0], .left) }
+        let right = lines.indices.filter { lines[$0].maxX >= bounds.maxX - reach(lines[$0], .right) }
         return Set([left, right].filter { $0.count >= sideColumn }.joined())
     }
 }

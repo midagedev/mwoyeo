@@ -83,6 +83,13 @@ enum FitChecks {
               abs(width(a) - 330) <= 3 && abs(a.config.rect.minX - (left.x0 - pad)) <= 3, "\(a.config.rect)")
         check("its top and height stay, and it is saved", a.config.rect.minY == before.minY && a.config.rect.height == before.height && saved >= 1, "\(a.config.rect) saved \(saved)")
         check("it is counted (lens.fit.manual), and the lens now has an Undo Fit", c["lens.fit.manual"] == 1 && fitRow(a)?.title == String(localized: "Undo Fit") && fitRow(a)?.isEnabled == true, "\(c) \(menuTitles(a))")
+        // The pipeline is told the lens the fit goes to when the fit starts (`RegionPipeline.planLens`, edges117b, film4 F5): the blocks are laid out for it while the lens moves.
+        var planned = 0
+        for _ in 0..<80 where planned == 0 {
+            try? await Task.sleep(for: .milliseconds(25))
+            planned += Trace.takeCounts()["lens.planned"] ?? 0
+        }
+        check("a fit tells the pipeline the lens it goes to (lens.planned)", planned == 1, "planned \(planned)")
         a.fitToColumn()
         check("a second Fit to Column takes the old rect back exactly", a.config.rect == before && fitRow(a)?.title == String(localized: "Fit to Column"), "\(a.config.rect)")
 
@@ -311,6 +318,36 @@ enum FitChecks {
         _ = Trace.takeCounts()
         window(sw)?.onResize?(widened(sw, toRight: 420))
         check("and where the column is read whole there is nothing to scout for", Trace.takeCounts()["lens.fit.scout"] == nil && sw.fit.band == nil)
+
+        // MARK: A paragraph the capture cut under the lens: the capture reaches the column once (round edges117, film4 F16)
+
+        // The pipeline says (`OverlaySnapshot.cut`) that a paragraph the capture's side cut is under the lens: its lines end at the capture's edge, nothing can be laid out for the
+        // lens, so the capture becomes the band, once. A read that is still cut (a column that runs past the display) must not ask again: that was a loop of whole reads.
+        func cutSnapshot(_ capture: CGRect) -> OverlaySnapshot { var s = snapshot(capture); s.cut = true; return s }
+        let rc = await lens(CGRect(x: 180, y: 200, width: 100, height: 180))
+        let rcRect = rc.config.rect
+        _ = Trace.takeCounts()
+        rc.received(cutSnapshot(cutCapture))
+        let rcBand = Overscan.band(around: rcRect, display: display)
+        check("a cut paragraph under the lens makes the capture the band, and the lens does not move or resize",
+              Trace.takeCounts()["lens.reach"] == 1 && rc.fit.band != nil && rc.captureRect == rcBand && rc.config.rect == rcRect, "band \(String(describing: rc.fit.band)) \(rc.captureRect) \(rcBand) \(rc.config.rect)")
+        for _ in 0..<4 { rc.received(cutSnapshot(rcBand)) }
+        let rcAgain = Trace.takeCounts()["lens.reach"] ?? 0
+        check("four more reads that are still cut do not ask again (the capture grew once, `Reach`)", rcAgain == 0 && rc.captureRect == rcBand, "asked \(rcAgain) more times, \(rc.captureRect)")
+        window(rc)?.onCommit?()
+        check("the drop gives the band up", rc.fit.band == nil && rc.captureRect != rcBand, "\(rc.captureRect)")
+        _ = Trace.takeCounts()
+        rc.received(cutSnapshot(cutCapture))
+        check("and a cut read after it asks once more", Trace.takeCounts()["lens.reach"] == 1 && rc.captureRect == rcBand, "\(rc.captureRect)")
+        let rh = await lens(CGRect(x: 180, y: 200, width: 100, height: 180))
+        window(rh)?.onMove?(frame(rh))
+        _ = Trace.takeCounts()
+        rh.received(cutSnapshot(cutCapture))
+        check("a hand on the lens waits: nothing is asked while it holds the lens", Trace.takeCounts()["lens.reach"] == nil && rh.fit.band == nil, "\(String(describing: rh.fit.band))")
+        let rn = await lens(CGRect(x: 180, y: 200, width: 100, height: 180))
+        _ = Trace.takeCounts()
+        rn.received(snapshot(cutCapture))
+        check("and a read that is not cut asks for nothing", Trace.takeCounts()["lens.reach"] == nil && rn.fit.band == nil, "\(String(describing: rn.fit.band))")
 
         // MARK: A hand on the lens: no fit moves the edge it holds
 

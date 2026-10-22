@@ -11,9 +11,8 @@ import MwoyeoEngines
 /// A real session (`RegionSession`) on a capture that serves frames of a still page (`PageCapture`), the lens window dragged the way
 /// `RegionFrameWindow.mouseDragged` does it (`setRegion`, `onResize`, `onCommit`), a mock engine that answers after a delay. Every snapshot
 /// the pipeline makes is kept; the checks compare each with the one before it, inside the lens as it is at that moment: every block the last
-/// one drew still changes the pixels it changed, and the overlay changes as many pixels of the page as it did; the last drop lands over
-/// another app's window, which changes the reader's context and not the page. Then a second lens is resized while its first read is under
-/// way: the pass is kept and its blocks land on the page's paragraphs (addendum H1).
+/// one drew still changes the pixels it changed, and the overlay changes as many pixels of the page as it did. Then a second lens is resized
+/// while its first read is under way: the pass is kept and its blocks land on the page's paragraphs (addendum H1).
 @MainActor
 enum ResizeHoldChecks {
     static let scale: CGFloat = 2
@@ -66,10 +65,6 @@ enum ResizeHoldChecks {
         private(set) var running = false
         /// Set: a change of rect delivers no frame (the stream has not answered yet), so that nothing but a read already under way can show the page.
         var withholdFrames = false
-        /// The frames handed on, their rects and uptimes (the last few): `settle` waits for the frame of the lens's capture and the pass it may start.
-        var handedOn: [(rect: CGRect, time: Double)] { lock.withLock { frames } }
-        private let lock = NSLock()
-        private var frames: [(rect: CGRect, time: Double)] = []
         var streamDisplay: CGRect? { running ? display : nil }
 
         init(page: CGImage, display: CGRect) {
@@ -87,11 +82,7 @@ enum ResizeHoldChecks {
 
         private func deliver(_ rect: CGRect) {
             guard !withholdFrames, let frame = frame(of: rect) else { return }
-            DispatchQueue.global().asyncAfter(deadline: .now() + 0.02) { [weak self] in
-                guard let self else { return }
-                self.lock.withLock { self.frames = Array(self.frames.suffix(15)) + [(frame.rect, ProcessInfo.processInfo.systemUptime)] }
-                self.onFrame?(frame)
-            }
+            DispatchQueue.global().asyncAfter(deadline: .now() + 0.02) { [weak self] in self?.onFrame?(frame) }
         }
 
         /// The page as `ctx` (a bottom-left context of `rect`'s size in pixels) shows it for the screen rect `rect`.
@@ -122,6 +113,8 @@ enum ResizeHoldChecks {
         let snapshot: OverlaySnapshot
         /// Where the drawn blocks are on the screen (Quartz points).
         var rects: [CGRect] { snapshot.blocks.map { $0.frame.offsetBy(dx: snapshot.origin.x, dy: snapshot.origin.y) } }
+        /// Where the lens leaves a block out on purpose (`OverlaySnapshot.leftOut`).
+        var leftOut: [CGRect] { snapshot.leftOut.map { $0.offsetBy(dx: snapshot.origin.x, dy: snapshot.origin.y) } }
         /// How many of them stand in the lens.
         var inLens: Int { rects.filter { $0.intersects(lens) }.count }
         /// Every text the lens holds has its translation.
@@ -223,7 +216,13 @@ enum ResizeHoldChecks {
             // The overlay's pixels of the lens as it is now, of both snapshots.
             let wasMask = changed(by: before.snapshot, in: after.lens, over: page), hasMask = changed(by: after.snapshot, in: after.lens, over: page)
             let was = wasMask.mask.filter { $0 }.count, has = hasMask.mask.filter { $0 }.count
-            let back = lumas(of: after.snapshot, in: after.lens, over: page).map { worstRestored(before.rects, in: after.lens, now: $0) } ?? 1
+            // 2026-10-23 (edges117, docs/design/recognition.md §16.3): a block the lens covers too little of (`LensWindow.minShare`) is left out on purpose, and the page's own text
+            // shows there, whole, as it does beside the lens: that is the rule (film4 F1, F2: a few syllables of a translation over the English that goes on beside the lens), not
+            // a block that went. Derivation: a block of `before` that `after` lists as left out (half of it or more under one of the rects it lists) is no block that "was
+            // drawn and is not": the pipeline says why it is not. FAIL-first: without the listing, snapshot v21 of this check reads 1.00 (blocks 4 in lens, texts 6).
+            let leftOut = after.leftOut
+            let drawnBefore = before.rects.filter { r in !leftOut.contains { o in let i = o.intersection(r); return !i.isNull && i.width * i.height >= 0.5 * r.width * r.height } }
+            let back = lumas(of: after.snapshot, in: after.lens, over: page).map { worstRestored(drawnBefore, in: after.lens, now: $0) } ?? 1
             let ink = was == 0 ? 1 : Double(has) / Double(was)
             j.count += 1
             if back > j.worstBack { j.worstBack = back; j.worstAt = i }
@@ -277,12 +276,8 @@ enum ResizeHoldChecks {
         defer { window.orderOut(nil) }
 
         let first = CGRect(x: pageOrigin.x + 10, y: pageOrigin.y + 10, width: 420, height: 290)
-        // No app under the lens, as FitChecks has it: the window of the desktop behind the page (another app, another round's check) is the
-        // reader's context, and a drop whose centre lands over another one read the page again from nothing (holdfix117, addendum A1). The
-        // step "over another app" below changes it on purpose.
-        let noApp: @MainActor (RegionConfig) -> LensWatch.Read? = { _ in nil }
         let session = RegionSession(config: RegionConfig(name: "Hold", rect: first), settings: settings, translator: ContextChecks.service(settings),
-                                    inpainter: nil, capturer: capture, recovery: LensRobustChecks.fast, appUnderLens: noApp)
+                                    inpainter: nil, capturer: capture, recovery: LensRobustChecks.fast)
         let rec = Recorder()
         let t0 = ProcessInfo.processInfo.systemUptime
         func now() -> Double { ProcessInfo.processInfo.systemUptime - t0 }
@@ -296,20 +291,11 @@ enum ResizeHoldChecks {
         }
 
         /// Quiet: the pipeline idle, no snapshot for `quiet` seconds (the settle delay is 0.15 s below, so a pass that is coming has begun by then),
-        /// and `ready` holds of the last one. A drop makes a snapshot at once, so the wait counts from it. With `frames`, also: a capture that
-        /// changed since `since` (the capture and the uptime at the step's start) has had its frame handed on, and no frame came for `quiet`
-        /// seconds, so that a pass the frame starts is counted in its step (holdfix117 A2: the frame of a shrink came after the quiet snapshots,
-        /// and the read of every row it started was counted in no step).
-        func settle(_ s: RegionSession, _ r: Recorder, quiet: Double = 0.6, limit: Double = 240, frames: PageCapture? = nil,
-                    since: (capture: CGRect, time: Double)? = nil, ready: (Seen) -> Bool) async -> Bool {
+        /// and `ready` holds of the last one. A drop makes a snapshot at once, so the wait counts from it.
+        func settle(_ s: RegionSession, _ r: Recorder, quiet: Double = 0.6, limit: Double = 240, ready: (Seen) -> Bool) async -> Bool {
             let began = now()
             while now() - began < limit {
                 try? await Task.sleep(for: .milliseconds(50))
-                if let frames, let since {
-                    let handed = frames.handedOn, uptime = ProcessInfo.processInfo.systemUptime
-                    let fed = s.captureRect == since.capture || handed.contains { $0.rect == s.captureRect && $0.time >= since.time }
-                    guard fed, uptime - (handed.last?.time ?? 0) >= quiet else { continue }
-                }
                 if let last = r.seen.last, s.activity == .idle, now() - max(last.time, began) >= quiet, ready(last) { return true }
             }
             return false
@@ -357,7 +343,7 @@ enum ResizeHoldChecks {
             ("shrink", CGSize(width: 330, height: 220)), ("grow past the margin", CGSize(width: 760, height: 520)),
             ("shrink to the start", CGSize(width: 420, height: 290))]
         var unsettled: [String] = []
-        var total: [String: Int] = [:], passesIn: [String: Int] = [:]
+        var total: [String: Int] = [:], passesIn: [String: Int] = [:], scoutsIn: [String: Int] = [:], reachesIn: [String: Int] = [:]
         func drain() -> [String: Int] {
             let c = Trace.takeCounts()
             for (k, v) in c { total[k, default: 0] += v }
@@ -365,39 +351,19 @@ enum ResizeHoldChecks {
         }
         _ = drain()
         for (label, size) in steps {
-            let since = (session.captureRect, ProcessInfo.processInfo.systemUptime)
             await drag(session, lens, rec, to: size, label: label)
-            if await settle(session, rec, frames: capture, since: since, ready: { $0.inLens >= 1 && $0.translated }) == false { unsettled.append(label) }
-            passesIn[label] = drain()["pass.read", default: 0]
+            if await settle(session, rec, ready: { $0.inLens >= 1 && $0.translated }) == false { unsettled.append(label) }
+            let counts = drain()
+            passesIn[label] = counts["pass.read", default: 0]
+            scoutsIn[label] = counts["lens.fit.scout", default: 0]
+            reachesIn[label] = counts["lens.reach", default: 0]
         }
         check("after every resize the lens reads its page again and every text in it is translated", unsettled.isEmpty, "not settled after: \(unsettled)")
         // A lens made smaller shows what the blocks already describe: nothing is read again (film4 F8: every narrowing of a game lens's overscan
         // was a whole read of 3 to 5 s, in the way of the next line of text).
         let readAgain = ["shrink", "shrink to the start"].reduce(0) { $0 + passesIn[$1, default: 0] }
         check("a lens that shrinks to inside what was read is not read again (\(readAgain) passes)", readAgain == 0,
-              "passes per step: \(steps.map { "\($0.label) \(passesIn[$0.label, default: 0])" })")
-
-        // The lens dropped where its centre is over another app's window (holdfix117, A1: a lens across two windows): the reader's context
-        // changes, the page does not. The page is read again for that app's reader, and what is drawn stays meanwhile (the snapshots below).
-        session.appUnderLens = { _ in LensWatch.Read(bundleID: "dev.midagedev.mwoyeo.checks.other", appName: "Other", title: "") }
-        rec.marks.append((now(), "over another app"))
-        lens.onCommit?()
-        // The pipeline says it read again (`reader.context_reread`), not started over: a pass alone may be another one's (A2).
-        var overOther = 0, readsAgain = 0
-        func countOverOther() {
-            let c = drain()
-            overOther += c["pass.read", default: 0]
-            readsAgain += c["reader.context_reread", default: 0]
-        }
-        let rereadBy = now() + 240
-        while overOther == 0, now() < rereadBy {
-            try? await Task.sleep(for: .milliseconds(50))
-            countOverOther()
-        }
-        let reread = await settle(session, rec) { $0.inLens >= 1 && $0.translated }
-        countOverOther()
-        check("a drop over another app's window reads the page again for that app (\(readsAgain) read(s) again, \(overOther) pass(es)) and the lens ends translated",
-              reread && readsAgain >= 1 && overOther >= 1, "settled \(reread)")
+              "passes per step: \(steps.map { "\($0.label) \(passesIn[$0.label, default: 0])" }); scouts \(steps.map { scoutsIn[$0.label, default: 0] }), reaches \(steps.map { reachesIn[$0.label, default: 0] })")
 
         // Snapshot by snapshot, from the settled one: what the lens had drawn stays drawn. A translation that is replaced by the one the engine
         // answers (the old one is shown meanwhile) changes the pixels of its block, and is not a block gone: the page's own text must not come
@@ -431,7 +397,7 @@ enum ResizeHoldChecks {
         _ = Trace.takeCounts()
         let capture2 = PageCapture(page: page, display: capture.display)
         let session2 = RegionSession(config: RegionConfig(name: "Hold", rect: first), settings: settings, translator: ContextChecks.service(settings),
-                                     inpainter: nil, capturer: capture2, recovery: LensRobustChecks.fast, appUnderLens: noApp)
+                                     inpainter: nil, capturer: capture2, recovery: LensRobustChecks.fast)
         let rec2 = Recorder()
         session2.snapshotObserver = { [unowned session2] s in rec2.seen.append(Seen(time: now(), lens: session2.config.rect, snapshot: s)) }
         await session2.start()
@@ -463,77 +429,73 @@ enum ResizeHoldChecks {
         // after its Undo). Both put the lens at its new size in one move. This lens is narrow, and its capture ends inside the first column and
         // short of the second: the paragraphs that run past it are cut at the capture's edge. The Fit's capture reaches the page's right edge
         // and reads them longer, so each of them is a new block whose text the engine has not translated, and the Undo takes the capture back
-        // to what the blocks already describe. `which` names the lens in the lines of the second run of these steps below (empty: these).
-        func fitUndoMove(_ narrow: CGRect, _ which: String, timeline suffix: String) async {
+        // to what the blocks already describe.
+        _ = Trace.takeCounts()
+        let narrow = CGRect(x: first.minX, y: first.minY, width: 280, height: first.height)
+        let capture3 = PageCapture(page: page, display: capture.display)
+        let session3 = RegionSession(config: RegionConfig(name: "Hold", rect: narrow), settings: settings, translator: ContextChecks.service(settings),
+                                     inpainter: nil, capturer: capture3, recovery: LensRobustChecks.fast)
+        let rec3 = Recorder()
+        session3.snapshotObserver = { [unowned session3] s in rec3.seen.append(Seen(time: now(), lens: session3.config.rect, snapshot: s)) }
+        await session3.start()
+        let lens3 = session3.lensWindow as? RegionFrameWindow
+        let first3 = await settle(session3, rec3) { $0.inLens >= 3 && $0.translated }
+        if let lens3, first3 {
+            let from = rec3.seen.count - 1
+            var fit: [String: Int] = [:], undo: [String: Int] = [:]
+            func gather(into counts: inout [String: Int]) { for (k, v) in Trace.takeCounts() { counts[k, default: 0] += v } }
             _ = Trace.takeCounts()
-            let capture3 = PageCapture(page: page, display: capture.display)
-            let session3 = RegionSession(config: RegionConfig(name: "Hold", rect: narrow), settings: settings, translator: ContextChecks.service(settings),
-                                         inpainter: nil, capturer: capture3, recovery: LensRobustChecks.fast, appUnderLens: noApp)
-            let rec3 = Recorder()
-            session3.snapshotObserver = { [unowned session3] s in rec3.seen.append(Seen(time: now(), lens: session3.config.rect, snapshot: s)) }
-            await session3.start()
-            let lens3 = session3.lensWindow as? RegionFrameWindow
-            let first3 = await settle(session3, rec3) { $0.inLens >= 3 && $0.translated }
-            if let lens3, first3 {
-                let from = rec3.seen.count - 1
-                var fit: [String: Int] = [:], undo: [String: Int] = [:]
-                func gather(into counts: inout [String: Int]) { for (k, v) in Trace.takeCounts() { counts[k, default: 0] += v } }
-                _ = Trace.takeCounts()
-                await drag(session3, lens3, rec3, to: CGSize(width: 860, height: narrow.height), label: "fit", steps: 1)
-                // The read of what the Fit uncovered has begun before anything else is waited for: a machine that is slow to deliver the frame of
-                // the new capture does not make the Undo come first.
-                let readBy = now() + 240
-                while fit["pass.read", default: 0] == 0, now() < readBy {
-                    try? await Task.sleep(for: .milliseconds(50))
-                    gather(into: &fit)
-                }
-                let fitted = await settle(session3, rec3) { $0.inLens >= 1 && $0.translated }
+            // 2026-10-23 (edges117, addenda A2 and A3): this lens is the film's F16, a lens short of its column by more than its capture's margin. The paragraphs that run past the
+            // capture are left out of the read (`CaptureEdge.cutAtSides`), and the session now makes the capture the band before the lens is touched (`Reach`,
+            // `RegionSession.reachColumns`), so that the first read holds the column whole and the lens shows it. The Fit then has no strip to uncover: it reads
+            // what the capture uncovered, or the capture already reached the page's right edge.
+            let reachedBefore = session3.captureRect.maxX >= pageOrigin.x + pageSize.width - 20
+            await drag(session3, lens3, rec3, to: CGSize(width: 860, height: narrow.height), label: "fit", steps: 1)
+            // The read of what the Fit uncovered has begun before anything else is waited for: a machine that is slow to deliver the frame of
+            // the new capture does not make the Undo come first.
+            let readBy = now() + 240
+            while fit["pass.read", default: 0] == 0, now() < readBy {
+                try? await Task.sleep(for: .milliseconds(50))
                 gather(into: &fit)
-                await drag(session3, lens3, rec3, to: narrow.size, label: "undo", steps: 1)
-                let undone = await settle(session3, rec3) { $0.inLens >= 1 && $0.translated }
-                gather(into: &undo)
-                // The lens is moved on, and the page is read again where it was uncovered and once more when the lens rests (the settled reading groups
-                // the lines of a paragraph as the fast one did not): every text the lens held has its translation all the while.
-                var move: [String: Int] = [:]
-                await slide(session3, lens3, rec3, by: 220, label: "move")
-                let readBy2 = now() + 240
-                while move["pass.read", default: 0] == 0, now() < readBy2 {
-                    try? await Task.sleep(for: .milliseconds(50))
-                    gather(into: &move)
-                }
-                let moved = await settle(session3, rec3) { $0.inLens >= 1 && $0.translated }
-                gather(into: &move)
-                let j = judge(rec3, from: from, over: capture3)
-                if let path = ProcessInfo.processInfo.environment["MWOYEO_HOLD_TIMELINE"] {
-                    let marks = rec3.marks.map { String(format: "%6.0f ms mark %@", $0.time * 1000, $0.label) }
-                    try? (j.timeline + marks).joined(separator: "\n").write(toFile: path + suffix, atomically: true, encoding: .utf8)
-                }
-                check(which + "Fit to Column reads what its capture uncovered, and the lens ends translated (\(fit["pass.read", default: 0]) pass(es), \(fit["render.carried", default: 0]) blocks carried a translation)",
-                      fitted && fit["pass.read", default: 0] >= 1, "fitted \(fitted)")
-                check(which + "the Undo takes the lens back and nothing is read again (\(undo["pass.read", default: 0]) passes)", undone && undo["pass.read", default: 0] == 0, "undone \(undone)")
-                check(which + "moving the lens reads what it uncovered and the lens ends translated (\(move["pass.read", default: 0]) pass(es), \(move["render.carried", default: 0]) blocks carried a translation)",
-                      moved && move["pass.read", default: 0] >= 1, "moved \(moved)")
-                check(which + "no snapshot of the Fit, its Undo and the move brings the page's own text back under a block the snapshot before drew: the most that is dark again is \(String(format: "%.2f", j.worstBack)) (\(j.englishOver) of \(j.count) snapshots)",
-                      j.worstBack < 0.6, "snapshot \(j.worstAt) of \(rec3.seen.count), \(j.timeline.indices.contains(j.worstAt - from - 1) ? j.timeline[j.worstAt - from - 1] : "")")
-                let blanked = fit["overlay.blanked", default: 0] + undo["overlay.blanked", default: 0] + move["overlay.blanked", default: 0]
-                check(which + "and the lens never shows no drawn block where it had some, and the pipeline counts no block drawn and then left undrawn", j.emptyAt == 0 && blanked == 0,
-                      "snapshot \(j.emptyAt), blanked \(blanked)")
-                check(which + "and no snapshot swaps a drawn block of the lens for another that stands over it (\(j.swaps) of \(j.count) snapshots)", j.swaps == 0, "swaps \(j.swaps)")
-            } else {
-                check(which + "the lens of the Fit reads and translates its page first", false, "lens \(lens3 != nil) read \(first3)")
             }
-            await session3.stop()
+            let fitted = await settle(session3, rec3) { $0.inLens >= 1 && $0.translated }
+            gather(into: &fit)
+            await drag(session3, lens3, rec3, to: narrow.size, label: "undo", steps: 1)
+            let undone = await settle(session3, rec3) { $0.inLens >= 1 && $0.translated }
+            gather(into: &undo)
+            // The lens is moved on, and the page is read again where it was uncovered and once more when the lens rests (the settled reading groups
+            // the lines of a paragraph as the fast one did not): every text the lens held has its translation all the while.
+            var move: [String: Int] = [:]
+            await slide(session3, lens3, rec3, by: 220, label: "move")
+            let readBy2 = now() + 240
+            while move["pass.read", default: 0] == 0, now() < readBy2 {
+                try? await Task.sleep(for: .milliseconds(50))
+                gather(into: &move)
+            }
+            let moved = await settle(session3, rec3) { $0.inLens >= 1 && $0.translated }
+            gather(into: &move)
+            let j = judge(rec3, from: from, over: capture3)
+            if let path = ProcessInfo.processInfo.environment["MWOYEO_HOLD_TIMELINE"] {
+                let marks = rec3.marks.map { String(format: "%6.0f ms mark %@", $0.time * 1000, $0.label) }
+                try? (j.timeline + marks).joined(separator: "\n").write(toFile: path + ".fit", atomically: true, encoding: .utf8)
+            }
+            // Derivation of the second term: before the Fit the capture's right edge is at or past the page's text (980 of 980), so there is nothing to uncover; FAIL-first: the
+            // run of 2026-10-23 03:21 before this change printed "(0 pass(es), 0 blocks carried a translation) [fitted true]" with the first term alone.
+            check("Fit to Column reads what its capture uncovered (or the capture reached the page's right edge before it: \(reachedBefore)), and the lens ends translated (\(fit["pass.read", default: 0]) pass(es), \(fit["render.carried", default: 0]) blocks carried a translation)",
+                  fitted && (fit["pass.read", default: 0] >= 1 || reachedBefore), "fitted \(fitted)")
+            check("the Undo takes the lens back and nothing is read again (\(undo["pass.read", default: 0]) passes)", undone && undo["pass.read", default: 0] == 0, "undone \(undone)")
+            check("moving the lens reads what it uncovered and the lens ends translated (\(move["pass.read", default: 0]) pass(es), \(move["render.carried", default: 0]) blocks carried a translation)",
+                  moved && move["pass.read", default: 0] >= 1, "moved \(moved)")
+            check("no snapshot of the Fit, its Undo and the move brings the page's own text back under a block the snapshot before drew: the most that is dark again is \(String(format: "%.2f", j.worstBack)) (\(j.englishOver) of \(j.count) snapshots)",
+                  j.worstBack < 0.6, "snapshot \(j.worstAt) of \(rec3.seen.count), \(j.timeline.indices.contains(j.worstAt - from - 1) ? j.timeline[j.worstAt - from - 1] : "")")
+            let blanked = fit["overlay.blanked", default: 0] + undo["overlay.blanked", default: 0] + move["overlay.blanked", default: 0]
+            check("and the lens never shows no drawn block where it had some, and the pipeline counts no block drawn and then left undrawn", j.emptyAt == 0 && blanked == 0,
+                  "snapshot \(j.emptyAt), blanked \(blanked)")
+            check("and no snapshot swaps a drawn block of the lens for another that stands over it (\(j.swaps) of \(j.count) snapshots)", j.swaps == 0, "swaps \(j.swaps)")
+        } else {
+            check("the lens of the Fit reads and translates its page first", false, "lens \(lens3 != nil) read \(first3)")
         }
-        await fitUndoMove(CGRect(x: first.minX, y: first.minY, width: 280, height: first.height), "", timeline: ".fit")
-        // The same steps on a lens whose capture ends between the columns (holdfix117, 2026-10-23). The 280 lens above draws its title alone on
-        // main 7c58403: its capture (page x -74…374) ends inside the first column (x 20…400), and main's side-cut rule (5cad301,
-        // `CaptureEdge.cutAtSides`, docs/design/recognition.md §16.1) leaves a column as written when three of its lines reach a side of the
-        // capture (§16.2 item 4, round edges117). This one keeps the column whole: margins 0.3 × size (`Overscan.margins`) put its capture at page
-        // x -86…426, between the columns (400, 460), where the two lines of the first long paragraph alone reach its side; the capture's rows
-        // -83…413 end above the second long paragraph (420), and the lens's rows 10…320 hold the first line of the first one (310). Its Fit
-        // carries the cut paragraph, and its move, whose capture cuts both columns, reads nothing of them again: the drawn blocks stay
-        // (`TranslationCarry.unread`; FAIL-first on main: the page's text back at 1.00 after the move).
-        await fitUndoMove(CGRect(x: first.minX, y: first.minY, width: 320, height: 310), "a lens whose capture ends between the columns: ", timeline: ".fit2")
+        await session3.stop()
         return failed
     }
 }

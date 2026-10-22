@@ -1,0 +1,60 @@
+inpainter: none
+reader: docs pid=34521 gui pid=32375
+pipeline: 60000 ms
+work[still]: erase=12 first_paint.kept=1 first_paint.redrawn=2 first_paint.repainted=2 ocr.blocks=1 ocr.blocks.lines=13 ocr.blocks.vn=1 reader.docs.fallback=1 reader.reroute.lines.docs=1 render=10 translate.cancelled=0 translate.first_paint=1 translate.landed_outside=0 translate.lens_unserved=0 translate.model.hf=3 translate.requests=3 translate.texts=9 translate.wasted=0 lens_wait_ms[p50=15054 max=19083 last=19083 n=8] settle=n/a first_paint_ms[p50=1341 max=1453 last=1453 n=4] provisional_shown_ms[p50=7042 max=8805 last=8805 n=3] parked=0
+pace: en>ko|apple:highFidelity samples=2 first=5.94s perLine=1.70s batch[p50=9.87s p90=9.87s n=2] cancelled=0 lines[cached=0 translated=6]
+first-paint: start_uptime_ms=1978022798 first_request_ms=38304 first_drawn_ms=39260 first_final_ms=45391 last_final_ms=57004 drawn=6 snapshots=9
+fp-line: drawn_ms=39260 final_ms=45391 quick_first=1 shown_ms=6153 dist=2 size=35.7>35.7 ink_h=41>41 ink_w=92>154 src="# general"
+fp-line: drawn_ms=39282 final_ms=46302 quick_first=1 shown_ms=7042 dist=0 size=31.5>31.5 ink_h=35>35 ink_w=116>116 src="Priya Shah"
+fp-line: drawn_ms=39418 final_ms=48177 quick_first=1 shown_ms=8805 dist=16 size=29.5>29.5 ink_h=33>33 ink_w=805>773 src="Morning all! The release candidate is re"
+fp-line: drawn_ms=52977 final_ms=52977 quick_first=0 shown_ms=- dist=- src="Tom Becker"
+fp-line: drawn_ms=55812 final_ms=55812 quick_first=0 shown_ms=- dist=- src="Great, I will start with the payment f l"
+fp-line: drawn_ms=57004 final_ms=57004 quick_first=0 shown_ms=- dist=- src="3 replies"
+fp-summary: lines=6 painted=3 repainted=2 kept=1 open=0 refit=0 chars_changed=18 chars_final=43 shown_ms[p50=7042 max=8805]
+  # general
+    → # 일반적인
+  Priya Shah
+    → 프리야 샤
+  Morning all! The release candidate is ready for testing.
+    → 여러분, 안녕하세요! 리리스 후보자가 테스트 준비가 완료되었습니다.
+  Tom Becker
+    → 톰 베커
+  Great, I will start with the payment f low. Can someone share the staging credentials?
+    → 좋습니다, 결제 절차부터 시작하겠습니다. 스태지 자격 증명서를 공유해 주실 분 계신가요?
+  3 replies
+    → 3개의 답변
+  Yuki Tanaka
+    → (no translation)
+  Posted them in the vault. Please check https://wiki.example.comlrc-notes before you begin.
+    → (no translation)
+  Priya Shah
+    → 프리야 샤
+  Found a bug in checkout: the coupon field clears itself when you switch tabs. Filing a ticket now.
+    → (no translation)
+  Tom Becker
+    → 톰 베커
+  Confirmed, I can reproduce it on Safari too.
+    → (no translation)
+issues=0
+layout: blocks=8 overlaps=0 spill=1 cut=0 clipped=0 holds=0
+image: 1520×1440
+block: core=41,33,162,33 text=41,29,153,41 size=35.7 lines=1 chars=9 clipped=0 ellipsis=0 "# general"
+block: core=139,119,155,29 text=139,116,115,35 size=31.5 lines=1 chars=10 clipped=0 ellipsis=0 "Priya Shah"
+block: core=139,164,737,28 text=139,162,773,33 size=29.5 lines=1 chars=56 clipped=0 ellipsis=0 "Morning all! The release candidate is ready for testing."
+block: core=137,238,173,24 text=137,236,70,28 size=25.2 lines=1 chars=10 clipped=0 ellipsis=0 "Tom Becker"
+block: core=138,282,603,72 text=138,285,564,68 size=30.5 lines=2 chars=86 clipped=0 ellipsis=0 "Great, I will start with the payment f low. Can someone shar"
+block: core=138,375,101,25 text=138,374,112,29 size=26.3 lines=1 chars=9 clipped=0 ellipsis=0 "3 replies"
+block: core=139,565,155,29 text=139,562,115,35 size=31.5 lines=1 chars=10 clipped=0 ellipsis=0 "Priya Shah"
+block: core=137,685,173,24 text=137,683,70,28 size=25.2 lines=1 chars=10 clipped=0 ellipsis=0 "Tom Becker"
+  spill: "Morning all! The release candidate is re" past its column
+wrote /tmp/r117/fast117/s2/c01-hf-par-c-3.png
+reader: lines pid=32462 gui pid=32375
+hint: preparingRecognition at 0
+hint: none at 39304
+silence: longest=0 total=0
+drain: 65466 in-flight=0
+reader: docs state=idle pid=34521 warm=doc:en-Latn,fast:en-Latn dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=144550 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=93 MB gui=41 MB last-ms=64201 ms=136,64201
+reader: lines state=idle pid=32462 warm=rev3:en-Latn dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=144550 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=165 MB gui=41 MB last-ms=339 ms=65745,339
+reader: host reads=2 unavailable=0 rerouted=1 retried=0 late=0 rereads=2 superseded=0 docs-fallbacks=2 low-confidence=0 dropped=

@@ -1,0 +1,62 @@
+1988224095 [trace] engine ← "The size of the old text is read from the height h, of its glyphs: the em size is hg/0.88 for Chinese, Japanese and Korean text, whose glyphs fill about 88% of the em, and
+1988224102 [trace] session ll ready (en) 6 ms
+1988224453 [trace] service result 'The size of the ' 0 ms
+1988224474 [trace] service result 'ease-out y (Eg.' 0 ms
+1988224484 [trace] engine ← "spring error e(1)/eo (Eq." | "which is found by bisection to a resolution of 0.5 pt." | "time since the event (ms)" 0 ms
+1988224485 [trace] session ll ready (en) 0 ms
+1988224522 [trace] service result 'spring error e(1' 0 ms
+1988224561 [trace] service result 'which is found b' 0 ms
+1988224587 [trace] service result 'time since the e' 0 ms
+1988224600 [trace] engine ← "(TextFitter.fitFontSize); when nothing fits, Smin is returned and the caller wraps the text or lets it overflow." | "Figure 2. The two curves of the model, plotted from th
+1988224600 [trace] session ll ready (en) 0 ms
+1988224683 [trace] service result '(TextFitter.fitF' 0 ms
+1988224760 [trace] service result 'Figure 2. The tw' 0 ms
+1988224886 [trace] service result 'As a last resort' 0 ms
+1988224898 [trace] engine ← "16 ms, T = 150 ms) and the decay of a" | "correction (Eq." | "The prodictor keeps the events of the last 2s as triples (t¿, da, cx) with cx € {P, L} (precise, lines), posi
+1988224898 [trace] session ll ready (en) 0 ms
+1988224945 [trace] service result '16 ms, T = 150 m' 0 ms
+1988224963 [trace] service result 'correction (Eq.' 0 ms
+1988225080 [trace] service result 'The prodictor ke' 0 ms
+1988225090 [trace] engine ← "Place and colour." | "The text starts where the old text" | "started: the patch reaches the crase margin r past the original on every side, and the text area is the origin
+1988225090 [trace] session ll ready (en) 0 ms
+1988225116 [trace] service result 'Place and colour' 0 ms
+1988225138 [trace] service result 'The text starts ' 0 ms
+1988225293 [trace] service result 'started: the pat' 0 ms
+1988225306 [trace] engine ← "path from an event to the screen: a delivery latency" | "16 ms, and the duration T = 150 ms over which an application animates one line step. The fraction of event" | "tha
+1988225306 [trace] session ll ready (en) 0 ms
+1988225343 [trace] service result 'path from an eve' 0 ms
+1988225405 [trace] service result '16 ms, and the d' 0 ms
+1988225446 [trace] service result 'that is on scree' 0 ms
+1988225457 [trace] engine ← "5 Scroll prediction" | "A lens over a feed is used while the feed scrolls. At the default rate the screen is captured every 125 ms, and the blocks that are placed from a f
+1988225457 [trace] session ll ready (en) 0 ms
+1988225482 [trace] service result '5 Scroll predict' 0 ms
+1988225649 [trace] service result 'A lens over a fe' 0 ms
+1988225721 [trace] service result 'A precise delta ' 0 ms
+1988225730 [trace] engine ← "animation: it starts at speed 3/T = 20 s-\' of its to-tal and slows to zero at T, so that half of it is on" | "screen after T(1 - 2-3) = 31 ms, ninety percent after" | "T(
+1988225730 [trace] session ll ready (en) 0 ms
+1988225800 [trace] service result 'animation: it st' 0 ms
+1988225839 [trace] service result 'screen after T(1' 0 ms
+1988225886 [trace] service result 'T(1 - 0.1) ~ 80 ' 0 ms
+1988225896 [trace] engine ← "v = 1000 points per second a frame that is only 125 ms" | "old is v-0.125 = 125 points off, several lines of text. The" | "Offset between two frames" 0 ms
+1988225896 [trace] session ll ready (en) 0 ms
+1988225942 [trace] service result 'v = 1000 points ' 0 ms
+1988225987 [trace] service result 'old is v-0.125 =' 0 ms
+1988226005 [trace] service result 'Offset between t' 0 ms
+1988226013 [trace] engine ← "reading and the translation of a frame take longer than that. Moving the finished blocks along with the page is therefore not an optimisation; without it the overlay is wr
+1988226013 [trace] session ll ready (en) 0 ms
+1988226101 [trace] service result 'reading and the ' 0 ms
+1988226134 [trace] service result 'The wheel units ' 0 ms
+1988226148 [trace] service result '5.1 Model' 0 ms
+1988226157 [trace] engine ← "and the content movement expected between them, in points, is" | "The application cannot ask a page how far it has scrolled, and does not need to. It sees a scroll event a
+1988226157 [trace] session ll ready (en) 0 ms
+1988226197 [trace] service result 'and the content ' 0 ms
+1988226482 [trace] service result 'The application ' 0 ms
+1988226503 [trace] service result 'The ratios p: ar' 0 ms
+1988226511 [trace] engine ← "Op starts at" | "1; Pg is unknown, and contributes 0, until a frame has shown how far a line goes. A display tick at time t moves" | "*The sign convention is that of the s
+1988226511 [trace] session ll ready (en) 0 ms
+1988226535 [trace] service result 'Op starts at' 0 ms
+1988226608 [trace] service result '1; Pg is unknown' 0 ms
+1988226703 [trace] service result '*The sign conven' 0 ms
+1988226709 [trace] engine ← "negative delta, as in the examples of Appendix" 0 ms
+1988226710 [trace] session ll ready (en) 0 ms
+1988226742 [trace] service result 'negative delta, ' 0 ms

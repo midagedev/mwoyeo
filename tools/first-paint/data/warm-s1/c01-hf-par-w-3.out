@@ -1,0 +1,71 @@
+inpainter: none
+reader: lines pid=68709 gui pid=68691
+reader: docs pid=68827 gui pid=68691
+warm-up: 1362 ms
+prewarm: 5576 ms
+pipeline: 18541 ms
+work[still]: erase=13 first_paint.kept=1 first_paint.repainted=2 ocr.blocks=1 ocr.blocks.lines=13 ocr.blocks.swift=1 ocr.reader.auto.documentLayout=1 render=15 translate.cancelled=0 translate.first_paint=1 translate.landed_outside=0 translate.lens_unserved=0 translate.model.hf=4 translate.requests=4 translate.texts=11 translate.wasted=0 lens_wait_ms[p50=6249 max=12876 last=12876 n=13] settle=n/a parked=0
+pace: en>ko|apple:highFidelity samples=4 first=1.91s perLine=0.80s batch[p50=3.34s p90=3.87s n=4] cancelled=0 lines[cached=0 translated=11]
+first-paint: first_request_ms=4854 first_drawn_ms=5286 first_final_ms=6667 last_final_ms=17716 drawn=11 snapshots=14
+fp-line: drawn_ms=5286 final_ms=6667 quick_first=1 shown_ms=1388 dist=2 size=35.8>35.8 ink_h=41>41 ink_w=92>154 src="# general"
+fp-line: drawn_ms=5297 final_ms=8030 quick_first=1 shown_ms=1848 dist=0 size=31.6>31.6 ink_h=36>36 ink_w=116>116 src="Priya Shah"
+fp-line: drawn_ms=5338 final_ms=8030 quick_first=1 shown_ms=2695 dist=16 size=29.5>29.5 ink_h=33>33 ink_w=805>773 src="Morning all! The release candidate is re"
+fp-line: drawn_ms=10496 final_ms=10496 quick_first=0 shown_ms=- dist=- src="Tom Becker"
+fp-line: drawn_ms=11086 final_ms=11086 quick_first=0 shown_ms=- dist=- src="Great, I will start with the payment flo"
+fp-line: drawn_ms=11906 final_ms=11906 quick_first=0 shown_ms=- dist=- src="Can someone share the staging credential"
+fp-line: drawn_ms=13667 final_ms=13667 quick_first=0 shown_ms=- dist=- src="3 replies"
+fp-line: drawn_ms=14220 final_ms=14220 quick_first=0 shown_ms=- dist=- src="Yuki Tanaka"
+fp-line: drawn_ms=15254 final_ms=15254 quick_first=0 shown_ms=- dist=- src="Posted them in the vault. Please check h"
+fp-line: drawn_ms=16860 final_ms=16860 quick_first=0 shown_ms=- dist=- src="Found a bug in checkout: the coupon fiel"
+fp-line: drawn_ms=17716 final_ms=17716 quick_first=0 shown_ms=- dist=- src="Confirmed, I can reproduce it on Safari "
+fp-summary: lines=11 painted=3 repainted=2 kept=1 open=0 refit=0 chars_changed=18 chars_final=43 shown_ms[p50=1848 max=2695]
+  # general
+    → # 일반적인
+  Priya Shah
+    → 프리야 샤
+  Morning all! The release candidate is ready for testing.
+    → 여러분, 안녕하세요! 리리스 후보자가 테스트 준비가 완료되었습니다.
+  Tom Becker
+    → 톰 베커
+  Great, I will start with the payment flow.
+    → 좋습니다, 저는 결제 흐름으로 시작하겠습니다.
+  Can someone share the staging credentials?
+    → 누군가 스태지 자격 증명을 공유해 줄 수 있나요?
+  3 replies
+    → 3개의 답변
+  Yuki Tanaka
+    → 야키 타나카
+  Posted them in the vault. Please check https://wiki.example.com/rc-notes before you begin.
+    → 그것들을 보관함에 보관했습니다. 시작하기 전에 https://wiki.example.com/rc-notes 를 확인해 주세요.
+  Priya Shah
+    → 프리야 샤
+  Found a bug in checkout: the coupon field clears itself when you switch tabs. Filing a ticket now.
+    → 결제 시 버그를 발견했습니다: 탭을 전환하면 쿠폰 필드가 자동으로 지워집니다. 지금 티켓을 제출하고 있습니다.
+  Tom Becker
+    → 톰 베커
+  Confirmed, I can reproduce it on Safari too.
+    → 확인했습니다, 저는 Safari에서도 그것을 재현할 수 있습니다.
+issues=0
+layout: blocks=13 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 1520×1440
+block: core=41,32,162,41 text=41,32,154,41 size=35.8 lines=1 chars=9 clipped=0 ellipsis=0 "# general"
+block: core=139,119,155,33 text=139,118,115,36 size=31.6 lines=1 chars=10 clipped=0 ellipsis=0 "Priya Shah"
+block: core=139,164,737,32 text=139,164,773,33 size=29.5 lines=1 chars=56 clipped=0 ellipsis=0 "Morning all! The release candidate is ready for testing."
+block: core=137,239,173,27 text=137,237,79,32 size=28.4 lines=1 chars=10 clipped=0 ellipsis=0 "Tom Becker"
+block: core=138,284,534,35 text=138,284,522,33 size=29.5 lines=1 chars=42 clipped=0 ellipsis=0 "Great, I will start with the payment flow."
+block: core=138,323,603,35 text=138,326,563,35 size=30.5 lines=1 chars=42 clipped=0 ellipsis=0 "Can someone share the staging credentials?"
+block: core=138,374,101,23 text=138,372,108,28 size=25.2 lines=1 chars=9 clipped=0 ellipsis=0 "3 replies"
+block: core=137,446,160,29 text=137,444,142,35 size=31.5 lines=1 chars=11 clipped=0 ellipsis=0 "Yuki Tanaka"
+block: core=139,491,1243,32 text=139,490,1237,35 size=30.5 lines=1 chars=90 clipped=0 ellipsis=0 "Posted them in the vault. Please check https://wiki.example."
+block: core=139,566,155,33 text=139,565,115,36 size=31.6 lines=1 chars=10 clipped=0 ellipsis=0 "Priya Shah"
+block: core=139,608,1305,33 text=139,608,1293,35 size=30.5 lines=1 chars=98 clipped=0 ellipsis=0 "Found a bug in checkout: the coupon field clears itself when"
+block: core=137,686,173,27 text=137,684,79,32 size=28.4 lines=1 chars=10 clipped=0 ellipsis=0 "Tom Becker"
+block: core=138,728,585,36 text=138,730,684,33 size=29.5 lines=1 chars=44 clipped=0 ellipsis=0 "Confirmed, I can reproduce it on Safari too."
+wrote /tmp/r117/fast117/s1/c01-hf-par-w-3.png
+silence: longest=5305 total=5305
+drain: 0 in-flight=0
+reader: docs state=idle pid=68827 warm=doc:en-Latn dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=160783 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=101 MB gui=52 MB last-ms=440 ms=462,440
+reader: lines state=idle pid=68709 warm=rev3:en-Latn dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=160783 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=156 MB gui=52 MB last-ms=218 ms=760,218
+reader: host reads=2 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 low-confidence=0 dropped=

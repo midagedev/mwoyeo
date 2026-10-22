@@ -1,0 +1,15 @@
+1988172528 [trace] engine ← "TechDaily News Reviews Podcasts About" | "New chip doubles battery life of laptops" | "Trending" 0 ms
+1988172533 [trace] session ll ready (en) 5 ms
+1988172899 [trace] service result 'TechDaily News R' 0 ms
+1988172926 [trace] service result 'New chip doubles' 0 ms
+1988172927 [trace] service result 'Trending' 0 ms
+1988172936 [trace] engine ← "Ten tips for faster Wi-Fi" | "Posted October 14, 2026 by Dana Cole" | "The best budget phones of 2026" 0 ms
+1988172936 [trace] session ll ready (en) 0 ms
+1988172969 [trace] service result 'Ten tips for fas' 0 ms
+1988172996 [trace] service result 'Posted October 1' 0 ms
+1988173017 [trace] service result 'The best budget ' 0 ms
+1988173026 [trace] engine ← "A new processor design promises to double the battery life of thin laptops without raising their price, according to the company that makes it." | "Why your backup is not 
+1988173026 [trace] session ll ready (en) 0 ms
+1988173090 [trace] service result 'A new processor ' 0 ms
+1988173109 [trace] service result 'Why your backup ' 0 ms
+1988173146 [trace] service result 'Analysts say the' 0 ms

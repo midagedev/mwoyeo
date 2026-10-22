@@ -1,0 +1,19 @@
+1988761569 [trace] engine ← "# general" | "Priya Shah" | "Morning all! The release candidate is ready for testing." 0 ms
+1988761588 [trace] session ll ready (en) 19 ms
+1988761745 [trace] service result '# general' 0 ms
+1988761765 [trace] service result 'Priya Shah' 0 ms
+1988761802 [trace] service result 'Morning all! The' 0 ms
+1988761815 [trace] engine ← "Tom Becker" | "Great, I will start with the payment flow." | "Can someone share the staging credentials?" 0 ms
+1988761815 [trace] session ll ready (en) 0 ms
+1988761839 [trace] service result 'Tom Becker' 0 ms
+1988761862 [trace] service result 'Great, I will st' 0 ms
+1988761886 [trace] service result 'Can someone shar' 0 ms
+1988761897 [trace] engine ← "3 replies" | "Yuki Tanaka" | "Posted them in the vault. Please check https://wiki.example.com/rc-notes before you begin." 0 ms
+1988761897 [trace] session ll ready (en) 0 ms
+1988761920 [trace] service result '3 replies' 0 ms
+1988761936 [trace] service result 'Yuki Tanaka' 0 ms
+1988761998 [trace] service result 'Posted them in t' 0 ms
+1988762010 [trace] engine ← "Found a bug in checkout: the coupon field clears itself when you switch tabs. Filing a ticket now." | "Confirmed, I can reproduce it on Safari too." 0 ms
+1988762010 [trace] session ll ready (en) 0 ms
+1988762079 [trace] service result 'Found a bug in c' 0 ms
+1988762105 [trace] service result 'Confirmed, I can' 0 ms

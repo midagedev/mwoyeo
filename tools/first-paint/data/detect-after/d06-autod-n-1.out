@@ -1,0 +1,65 @@
+inpainter: none
+reader: lines pid=77316 gui pid=77297
+reader: docs pid=77394 gui pid=77297
+warm-up: 972 ms
+pipeline: 7058 ms
+work[still]: erase=9 ocr.blocks=1 ocr.blocks.lines=10 ocr.blocks.swift=1 ocr.reader.auto.documentLayout=1 render=9 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.model.ll=3 translate.requests=3 translate.texts=9 translate.wasted=0 lens_wait_ms[p50=239 max=392 last=392 n=9] settle=n/a parked=0
+pace: auto>ko|apple:auto samples=3 first=0.07s perLine=0.02s batch[p50=0.12s p90=0.14s n=3] cancelled=0 lines[cached=0 translated=9]
+first-paint: start_uptime_ms=1988783695 first_request_ms=6013 first_drawn_ms=6141 first_final_ms=6141 last_final_ms=6386 drawn=9 snapshots=10
+fp-line: drawn_ms=6141 final_ms=6141 quick_first=0 shown_ms=- dist=- src="TechDaily News Reviews Podcasts About"
+fp-line: drawn_ms=6162 final_ms=6162 quick_first=0 shown_ms=- dist=- src="New chip doubles battery life of laptops"
+fp-line: drawn_ms=6163 final_ms=6163 quick_first=0 shown_ms=- dist=- src="Trending"
+fp-line: drawn_ms=6206 final_ms=6206 quick_first=0 shown_ms=- dist=- src="Ten tips for faster Wi-Fi"
+fp-line: drawn_ms=6233 final_ms=6233 quick_first=0 shown_ms=- dist=- src="Posted October 14, 2026 by Dana Cole"
+fp-line: drawn_ms=6252 final_ms=6252 quick_first=0 shown_ms=- dist=- src="The best budget phones of 2026"
+fp-line: drawn_ms=6331 final_ms=6331 quick_first=0 shown_ms=- dist=- src="A new processor design promises to doubl"
+fp-line: drawn_ms=6347 final_ms=6347 quick_first=0 shown_ms=- dist=- src="Why your backup is not enough"
+fp-line: drawn_ms=6386 final_ms=6386 quick_first=0 shown_ms=- dist=- src="Analysts say the first devices could shi"
+fp-summary: lines=9 painted=0 repainted=0 kept=0 open=0 refit=0 chars_changed=0 chars_final=0 shown_ms[p50=- max=-]
+fp-cache: "TechDaily News Reviews Podcasts About" → "TechDaily 뉴스 리뷰 팟캐스트 소개"
+fp-cache: "New chip doubles battery life of laptops" → "새로운 칩이 노트북 배터리 수명을 두 배로 늘입니다"
+fp-cache: "Posted October 14, 2026 by Dana Cole" → "2026년 10월 14일에 다나 콜이 게시함"
+fp-cache: "A new processor design promises to doubl" → "새로운 프로세서 설계는 가격을 올리지 않으면서 얇은 노트북의 배터리 수명을 두 배로 늘릴 것이라고 회사에 따르면."
+fp-cache: "Analysts say the first devices could shi" → "분석가들은 첫 번째 장치가 내년 봄에 출시될 수 있다고 말합니다."
+fp-cache: "Trending" → "화제를 모으는"
+fp-cache: "Ten tips for faster Wi-Fi" → "더 빠른 Wi-Fi를 위한 10가지 팁"
+fp-cache: "The best budget phones of 2026" → "2026년 최고의 가성비 스마트폰"
+fp-cache: "Why your backup is not enough" → "왜 백업이 충분하지 않은가"
+  TechDaily News Reviews Podcasts About
+    → TechDaily 뉴스 리뷰 팟캐스트 소개
+  New chip doubles battery life of laptops
+    → 새로운 칩이 노트북 배터리 수명을 두 배로 늘입니다
+  Posted October 14, 2026 by Dana Cole
+    → 2026년 10월 14일에 다나 콜이 게시함
+  A new processor design promises to double the battery life of thin laptops without raising their price, according to the company that makes it.
+    → 새로운 프로세서 설계는 가격을 올리지 않으면서 얇은 노트북의 배터리 수명을 두 배로 늘릴 것이라고 회사에 따르면.
+  Analysts say the first devices could ship as early as next spring.
+    → 분석가들은 첫 번째 장치가 내년 봄에 출시될 수 있다고 말합니다.
+  Trending
+    → 화제를 모으는
+  Ten tips for faster Wi-Fi
+    → 더 빠른 Wi-Fi를 위한 10가지 팁
+  The best budget phones of 2026
+    → 2026년 최고의 가성비 스마트폰
+  Why your backup is not enough
+    → 왜 백업이 충분하지 않은가
+issues=0
+layout: blocks=9 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 2000×1280
+block: core=61,16,770,61 text=61,24,546,46 size=40.0 lines=1 chars=37 clipped=0 ellipsis=0 "TechDaily News Reviews Podcasts About"
+block: core=61,162,1011,58 text=61,171,690,40 size=35.1 lines=1 chars=40 clipped=0 ellipsis=0 "New chip doubles battery life of laptops"
+block: core=61,246,405,32 text=61,248,382,28 size=25.3 lines=1 chars=36 clipped=0 ellipsis=0 "Posted October 14, 2026 by Dana Cole"
+block: core=60,298,1211,98 text=60,313,1169,70 size=30.5 lines=2 chars=143 clipped=0 ellipsis=0 "A new processor design promises to double the battery life o"
+block: core=61,435,810,35 text=61,435,753,35 size=30.5 lines=1 chars=66 clipped=0 ellipsis=0 "Analysts say the first devices could ship as early as next s"
+block: core=1432,178,124,37 text=1432,179,164,35 size=30.5 lines=1 chars=8 clipped=0 ellipsis=0 "Trending"
+block: core=1432,231,308,41 text=1432,234,375,35 size=30.5 lines=1 chars=25 clipped=0 ellipsis=0 "Ten tips for faster Wi-Fi"
+block: core=1432,287,408,35 text=1432,287,385,35 size=30.5 lines=1 chars=30 clipped=0 ellipsis=0 "The best budget phones of 2026"
+block: core=1432,336,409,37 text=1432,338,310,35 size=30.5 lines=1 chars=29 clipped=0 ellipsis=0 "Why your backup is not enough"
+wrote /tmp/r117/fast117/s4/d06-autod-n-1.png
+silence: longest=6203 total=6203
+drain: 0 in-flight=0
+reader: docs state=idle pid=77394 warm=doc:auto dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=118312 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=98 MB gui=70 MB last-ms=211 ms=417,211
+reader: lines state=idle pid=77316 warm=rev3:auto dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=118312 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=110 MB gui=70 MB last-ms=172 ms=430,172
+reader: host reads=2 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 low-confidence=0 dropped=

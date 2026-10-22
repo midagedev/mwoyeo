@@ -1,0 +1,23 @@
+1989374847 [trace] engine ← "The size of the old text is read from the height h, of its glyphs: the em size is hg/0.88 for Chinese, Japanese and Korean text, whose glyphs fill about 88% of the em, and
+1989374854 [trace] session ll ready (en) 6 ms
+1989375255 [trace] service result 'The size of the ' 0 ms
+1989375275 [trace] service result 'ease-out y (Eg.' 0 ms
+1989375293 [trace] engine ← "spring error e(1)/eo (Eq." | "which is found by bisection to a resolution of 0.5 pt." | "time since the event (ms)" 0 ms
+1989375293 [trace] session ll ready (en) 0 ms
+1989375357 [trace] service result 'spring error e(1' 0 ms
+1989375392 [trace] service result 'which is found b' 0 ms
+1989375414 [trace] service result 'time since the e' 0 ms
+1989375432 [trace] engine ← "(TextFitter.fitFontSize); when nothing fits, Smin is returned and the caller wraps the text or lets it overflow." | "Figure 2. The two curves of the model, plotted from th
+1989375432 [trace] session ll ready (en) 0 ms
+1989375511 [trace] service result '(TextFitter.fitF' 0 ms
+1989375591 [trace] service result 'Figure 2. The tw' 0 ms
+1989375717 [trace] service result 'As a last resort' 0 ms
+1989375736 [trace] engine ← "16 ms, T = 150 ms) and the decay of a" | "correction (Eq." | "The prodictor keeps the events of the last 2s as triples (t¿, da, cx) with cx € {P, L} (precise, lines), posi
+1989375736 [trace] session ll ready (en) 0 ms
+1989375784 [trace] service result '16 ms, T = 150 m' 0 ms
+1989375802 [trace] service result 'correction (Eq.' 0 ms
+1989375926 [trace] service result 'The prodictor ke' 0 ms
+1989375943 [trace] engine ← "Place and colour." | "The text starts where the old text" | "started: the patch reaches the crase margin r past the original on every side, and the text area is the origin
+1989375943 [trace] session ll ready (en) 0 ms
+1989375970 [trace] service result 'Place and colour' 0 ms
+1989375993 [trace] service result 'The text starts ' 0 ms

@@ -1,0 +1,204 @@
+inpainter: none
+reader: lines pid=51494 gui pid=51475
+reader: docs pid=51525 gui pid=51475
+warm-up: 1364 ms
+prewarm: 142 ms
+pipeline: 27118 ms
+work[still]: erase=37 layout.squeezed=1 ocr.blocks=1 ocr.blocks.lines=101 ocr.blocks.swift=1 ocr.kept.formula=5 ocr.reader.auto.documentLayout=1 ocr.rotated_line=1 render=36 translate.cancelled=0 translate.landed_outside=0 translate.lens_unserved=0 translate.model.ll=13 translate.requests=13 translate.texts=36 translate.wasted=0 lens_wait_ms[p50=1357 max=2721 last=2721 n=37] settle=n/a parked=0
+pace: auto>ko|apple:auto samples=13 first=0.05s perLine=0.09s batch[p50=0.20s p90=0.30s n=13] cancelled=0 lines[cached=0 translated=36]
+first-paint: start_uptime_ms=1988493677 first_request_ms=23788 first_drawn_ms=24064 first_final_ms=24064 last_final_ms=26481 drawn=36 snapshots=38
+fp-line: drawn_ms=24064 final_ms=24064 quick_first=0 shown_ms=- dist=- src="The size of the old text is read from th"
+fp-line: drawn_ms=24066 final_ms=24066 quick_first=0 shown_ms=- dist=- src="ease-out y (Eg."
+fp-line: drawn_ms=24108 final_ms=24108 quick_first=0 shown_ms=- dist=- src="spring error e(1)/eo (Eq."
+fp-line: drawn_ms=24147 final_ms=24147 quick_first=0 shown_ms=- dist=- src="which is found by bisection to a resolut"
+fp-line: drawn_ms=24170 final_ms=24170 quick_first=0 shown_ms=- dist=- src="time since the event (ms)"
+fp-line: drawn_ms=24274 final_ms=24274 quick_first=0 shown_ms=- dist=- src="(TextFitter.fitFontSize); when nothing f"
+fp-line: drawn_ms=24354 final_ms=24354 quick_first=0 shown_ms=- dist=- src="Figure 2. The two curves of the model, p"
+fp-line: drawn_ms=24490 final_ms=24490 quick_first=0 shown_ms=- dist=- src="As a last resort a translation that does"
+fp-line: drawn_ms=24549 final_ms=24549 quick_first=0 shown_ms=- dist=- src="16 ms, T = 150 ms) and the decay of a"
+fp-line: drawn_ms=24568 final_ms=24568 quick_first=0 shown_ms=- dist=- src="correction (Eq."
+fp-line: drawn_ms=24697 final_ms=24697 quick_first=0 shown_ms=- dist=- src="The prodictor keeps the events of the la"
+fp-line: drawn_ms=24733 final_ms=24733 quick_first=0 shown_ms=- dist=- src="Place and colour."
+fp-line: drawn_ms=24762 final_ms=24762 quick_first=0 shown_ms=- dist=- src="The text starts where the old text"
+fp-line: drawn_ms=24924 final_ms=24924 quick_first=0 shown_ms=- dist=- src="started: the patch reaches the crase mar"
+fp-line: drawn_ms=24971 final_ms=24971 quick_first=0 shown_ms=- dist=- src="path from an event to the screen: a deli"
+fp-line: drawn_ms=25036 final_ms=25036 quick_first=0 shown_ms=- dist=- src="16 ms, and the duration T = 150 ms over "
+fp-line: drawn_ms=25080 final_ms=25080 quick_first=0 shown_ms=- dist=- src="that is on screen at time f is, with s ="
+fp-line: drawn_ms=25117 final_ms=25117 quick_first=0 shown_ms=- dist=- src="5 Scroll prediction"
+fp-line: drawn_ms=25309 final_ms=25309 quick_first=0 shown_ms=- dist=- src="A lens over a feed is used while the fee"
+fp-line: drawn_ms=25384 final_ms=25384 quick_first=0 shown_ms=- dist=- src="A precise delta is a step: the content h"
+fp-line: drawn_ms=25472 final_ms=25472 quick_first=0 shown_ms=- dist=- src="animation: it starts at speed 3/T = 20 s"
+fp-line: drawn_ms=25504 final_ms=25504 quick_first=0 shown_ms=- dist=- src="screen after T(1 - 2-3) = 31 ms, ninety "
+fp-line: drawn_ms=25556 final_ms=25556 quick_first=0 shown_ms=- dist=- src="T(1 - 0.1) ~ 80 ms, and all of it after "
+fp-line: drawn_ms=25612 final_ms=25612 quick_first=0 shown_ms=- dist=- src="v = 1000 points per second a frame that "
+fp-line: drawn_ms=25661 final_ms=25661 quick_first=0 shown_ms=- dist=- src="old is v-0.125 = 125 points off, several"
+fp-line: drawn_ms=25681 final_ms=25681 quick_first=0 shown_ms=- dist=- src="Offset between two frames"
+fp-line: drawn_ms=25789 final_ms=25789 quick_first=0 shown_ms=- dist=- src="reading and the translation of a frame t"
+fp-line: drawn_ms=25821 final_ms=25821 quick_first=0 shown_ms=- dist=- src="The wheel units of kind c that reached t"
+fp-line: drawn_ms=25836 final_ms=25836 quick_first=0 shown_ms=- dist=- src="5.1 Model"
+fp-line: drawn_ms=25888 final_ms=25888 quick_first=0 shown_ms=- dist=- src="and the content movement expected betwee"
+fp-line: drawn_ms=26204 final_ms=26204 quick_first=0 shown_ms=- dist=- src="The application cannot ask a page how fa"
+fp-line: drawn_ms=26216 final_ms=26216 quick_first=0 shown_ms=- dist=- src="The ratios p: are points per wheel unit."
+fp-line: drawn_ms=26253 final_ms=26253 quick_first=0 shown_ms=- dist=- src="Op starts at"
+fp-line: drawn_ms=26339 final_ms=26339 quick_first=0 shown_ms=- dist=- src="1; Pg is unknown, and contributes 0, unt"
+fp-line: drawn_ms=26442 final_ms=26442 quick_first=0 shown_ms=- dist=- src="*The sign convention is that of the sour"
+fp-line: drawn_ms=26481 final_ms=26481 quick_first=0 shown_ms=- dist=- src="negative delta, as in the examples of Ap"
+fp-summary: lines=36 painted=0 repainted=0 kept=0 open=0 refit=0 chars_changed=0 chars_final=0 shown_ms[p50=- max=-]
+fp-cache: "The size of the old text is read from th" → "구 텍스트의 크기는 글리프의 높이 h에서 읽히며, 중국어, 일본어 및 한국어 텍스트의 경우 em 크기가 hg/0.88이며, 글리프가 em의 약 88%를 차지하고, 라틴어 텍스트의 경우 kg/0.72(캡 높이) 또는 텍스트에 하강어가 있는 경우 kg/0.95가 됩니다. 그런 다음 변환은 방에 맞는 가장 큰 크기로 설정됩니다. 배치된 텍스트의 크기를 글꼴 크기 s에서 측정합니다."
+fp-cache: "which is found by bisection to a resolut" → "0.5 pt 해상도에서 이분할에 의해 발견됩니다."
+fp-cache: "(TextFitter.fitFontSize); when nothing f" → "(TextFitter.fitFontSize); 아무 것도 맞지 않을 경우, Smin이 반환되고 호출자는 텍스트를 감싸거나 오버플로를 허용합니다."
+fp-cache: "As a last resort a translation that does" → "최후의 수단으로, 가장 작은 크기에 맞지 않는 번역은 단어 경계에서 잘라내어 타원으로 끝납니다. 약점은 종이 작업대(섹션 6)에 의해 계산됩니다. 이는 손실이기 때문이며, 그 사람은 엔진이 반환한 것보다 짧은 문장을 읽습니다."
+fp-cache: "Place and colour." → "위치와 색상."
+fp-cache: "The text starts where the old text" → "텍스트는 이전 텍스트가 있는 곳에서 시작합니다."
+fp-cache: "started: the patch reaches the crase mar" → "시작: 패치는 모든 면에서 원본을 넘어 크래스 여백 r에 도달하고, 텍스트 영역은 원본 블록입니다. 텍스트 색상은 위에서 샘플링한 색상이며, 배경은 복구된 패치이며, 단어의 한글 음절은 단어 조인더로 연결되어 플랫폼의 줄 바인더가 단어를 두 음절 사이로 나누지 않도록 합니다."
+fp-cache: "5 Scroll prediction" → "5 스크롤 예측"
+fp-cache: "A lens over a feed is used while the fee" → "피드가 스크롤되는 동안 피드 위에 렌즈가 사용됩니다. 기본 속도에서는 화면이 125밀리초마다 캡처되며, 캡처된 프레임에서 배치된 블록은 이후의 표시 시간 t에 표시됩니다. 내용이 X(t) - X(to) 지점 사이로 이동한 경우, 예측할 수 없는 블록은 번역하는 텍스트와 매우 거리가 멉니다. 스크롤 속도에서"
+fp-cache: "v = 1000 points per second a frame that " → "v = 초당 1000점, 프레임은 단 125ms에 불과합니다."
+fp-cache: "old is v-0.125 = 125 points off, several" → "old는 v-0.125 = 125점 차이이며, 여러 줄의 텍스트가 있습니다. 그"
+fp-cache: "reading and the translation of a frame t" → "프레임을 읽고 번역하는 데는 그보다 더 오래 걸립니다. 완성된 블록을 페이지와 함께 이동하는 것은 최적화가 아니며, 이를 사용하지 않으면 페이지가 이동할 때마다 오버레이가 잘못됩니다."
+fp-cache: "5.1 Model" → "5.1 모델"
+fp-cache: "The application cannot ask a page how fa" → "애플리케이션은 페이지에 스크롤한 지를 물어볼 수 없으며, 물어볼 필요가 없습니다. 화면 어디에서든 스크롤 이벤트를 감지합니다(렌즈가 읽는 내용을 스크롤할지는 나중에 결정됩니다), 시스템은 이를 타임스탬프와 장치의 mit에 표시된 델타 d, 그리고 델타가 정확한지 여부를 표시하는 플래그(트랙패드: 브라우저가 일대일로 적용하는 점) 또는 미세한지(마우스 휠: 애플리케이션이 선의 점 수를 결정하고 일반적으로 스텝을 애니메이션합니다)를 표시하는 플래그와 함께 전송합니다. 모멘텀 스크롤링은 특별한 것이 필요하지 않습니다: 시스템이 계속해서 감소하는 이벤트를 전송합니다."
+fp-cache: "ease-out y (Eg." → "완화 y (예:"
+fp-cache: "spring error e(1)/eo (Eq." → "스프링 오류 e(1)/eo (식)"
+fp-cache: "time since the event (ms)" → "행사 이후 시간 (ms)"
+fp-cache: "Figure 2. The two curves of the model, p" → "그림 2. 모델의 두 곡선은 방정식에서 그려지지만 측정되지 않았으며, 화면에 표시된 선 단계의 분수(Eq. 11 with A"
+fp-cache: "16 ms, T = 150 ms) and the decay of a" → "16 ms, T = 150 ms) 그리고 a의 감쇠"
+fp-cache: "correction (Eq." → "수정 (Eq."
+fp-cache: "The prodictor keeps the events of the la" → "프로디터는 마지막 2초의 이벤트를 세 배(t¿, da, cx)로 유지하고, cx € {P, L} (정확도, 라인), 양의 d가 내용을 아래로 이동시킵니다. 두 개의 상수는 그(를) 설명합니다"
+fp-cache: "path from an event to the screen: a deli" → "이벤트에서 화면으로의 경로: 전달 지연 시간"
+fp-cache: "16 ms, and the duration T = 150 ms over " → "16밀리초이며, 애플리케이션이 한 줄 스텝을 애니메이션하는 시간 T = 150ms입니다. 사건의 비율"
+fp-cache: "that is on screen at time f is, with s =" → "그것은 화면에 f가 있는 시점에, s = f - & - A인 경우,"
+fp-cache: "A precise delta is a step: the content h" → "정확한 델타는 한 단계입니다: 내용이 한 번에 모두 이동했습니다. 라인 스텝이 부드러운 스크롤처럼 완화됩니다."
+fp-cache: "animation: it starts at speed 3/T = 20 s" → "애니메이션: 전체 속도 3/T = 20 s-' 로 시작하고 T에서 0으로 감속하여 절반이 켜집니다."
+fp-cache: "screen after T(1 - 2-3) = 31 ms, ninety " → "스크린 후 T(1 - 2-3) = 31밀리초, 90% 후"
+fp-cache: "T(1 - 0.1) ~ 80 ms, and all of it after " → "T(1 - 0.1) ~ 80 ms, 그리고 T 이후의 모든 것이 150 ms가 됩니다."
+fp-cache: "Offset between two frames" → "두 프레임 사이의 오프셋"
+fp-cache: "The wheel units of kind c that reached t" → "f1 사이에 화면에 도달한 종류 c의 휠 유닛은"
+fp-cache: "and the content movement expected betwee" → "그리고 그들 사이에 기대되는 콘텐츠 이동은 포인트 기준입니다."
+fp-cache: "The ratios p: are points per wheel unit." → "비율 p:는 휠 단위당 포인트입니다."
+fp-cache: "Op starts at" → "운영 시작은"
+fp-cache: "1; Pg is unknown, and contributes 0, unt" → "1; Pg는 알 수 없으며, 프레임이 선이 얼마나 멀리 가는지를 보여줄 때까지 0을 기여합니다. 시간 t에 디스플레이 틱이 이동합니다"
+fp-cache: "*The sign convention is that of the sour" → "*부호 규칙은 출처의 규칙입니다: 양의 델타는 콘텐츠를 아래로 깎습니다 (Scrol1Predictor.swift, 휠의 주석), 페이지를 아래로 읽으면 그 내용이 위로 이동합니다, 이는"
+fp-cache: "negative delta, as in the examples of Ap" → "음수 델타, 부록 예시와 같이"
+  Size.
+    → Size.
+  The size of the old text is read from the height h, of its glyphs: the em size is hg/0.88 for Chinese, Japanese and Korean text, whose glyphs fill about 88% of the em, and for Latin text kg/0.72 (cap height) or kg/0.95 when the text has descenders. The translation is then set at the largest size that fits the room. With measure(s) the size of the laid-out text at font size s,
+    → 구 텍스트의 크기는 글리프의 높이 h에서 읽히며, 중국어, 일본어 및 한국어 텍스트의 경우 em 크기가 hg/0.88이며, 글리프가 em의 약 88%를 차지하고, 라틴어 텍스트의 경우 kg/0.72(캡 높이) 또는 텍스트에 하강어가 있는 경우 kg/0.95가 됩니다. 그런 다음 변환은 방에 맞는 가장 큰 크기로 설정됩니다. 배치된 텍스트의 크기를 글꼴 크기 s에서 측정합니다.
+  which is found by bisection to a resolution of 0.5 pt.
+    → 0.5 pt 해상도에서 이분할에 의해 발견됩니다.
+  (TextFitter.fitFontSize); when nothing fits, Smin is returned and the caller wraps the text or lets it overflow.
+    → (TextFitter.fitFontSize); 아무 것도 맞지 않을 경우, Smin이 반환되고 호출자는 텍스트를 감싸거나 오버플로를 허용합니다.
+  As a last resort a translation that does not fit at the smallest size is cut at a word boundary and ends in an ellipsis. The ellipsis is counted by the paper bench (Sec-tion 6), because it is a loss: the person reads a shorter sentence than the engine returned.
+    → 최후의 수단으로, 가장 작은 크기에 맞지 않는 번역은 단어 경계에서 잘라내어 타원으로 끝납니다. 약점은 종이 작업대(섹션 6)에 의해 계산됩니다. 이는 손실이기 때문이며, 그 사람은 엔진이 반환한 것보다 짧은 문장을 읽습니다.
+  Place and colour.
+    → 위치와 색상.
+  The text starts where the old text
+    → 텍스트는 이전 텍스트가 있는 곳에서 시작합니다.
+  started: the patch reaches the crase margin r past the original on every side, and the text area is the original block. The text colour is the sampled colour above, the background is the repaired patch, and Hangul syllables of a word are joined with a word joiner so that the plat-form's line breaker does not split a word between two syllables.
+    → 시작: 패치는 모든 면에서 원본을 넘어 크래스 여백 r에 도달하고, 텍스트 영역은 원본 블록입니다. 텍스트 색상은 위에서 샘플링한 색상이며, 배경은 복구된 패치이며, 단어의 한글 음절은 단어 조인더로 연결되어 플랫폼의 줄 바인더가 단어를 두 음절 사이로 나누지 않도록 합니다.
+  5 Scroll prediction
+    → 5 스크롤 예측
+  A lens over a feed is used while the feed scrolls. At the default rate the screen is captured every 125 ms, and the blocks that are placed from a frame captured at to are shown at a later display time t. If the content has moved by X (t) - X (to) points in between, an unpredicted block is that far from the text it translates. At a scroll speed of
+    → 피드가 스크롤되는 동안 피드 위에 렌즈가 사용됩니다. 기본 속도에서는 화면이 125밀리초마다 캡처되며, 캡처된 프레임에서 배치된 블록은 이후의 표시 시간 t에 표시됩니다. 내용이 X(t) - X(to) 지점 사이로 이동한 경우, 예측할 수 없는 블록은 번역하는 텍스트와 매우 거리가 멉니다. 스크롤 속도에서
+  v = 1000 points per second a frame that is only 125 ms
+    → v = 초당 1000점, 프레임은 단 125ms에 불과합니다.
+  old is v-0.125 = 125 points off, several lines of text. The
+    → old는 v-0.125 = 125점 차이이며, 여러 줄의 텍스트가 있습니다. 그
+  reading and the translation of a frame take longer than that. Moving the finished blocks along with the page is therefore not an optimisation; without it the overlay is wrong whenever the page moves.
+    → 프레임을 읽고 번역하는 데는 그보다 더 오래 걸립니다. 완성된 블록을 페이지와 함께 이동하는 것은 최적화가 아니며, 이를 사용하지 않으면 페이지가 이동할 때마다 오버레이가 잘못됩니다.
+  5.1 Model
+    → 5.1 모델
+  The application cannot ask a page how far it has scrolled, and does not need to. It sees a scroll event anywhere on the screen (whether it scrolls what a lens reads is decided afterwards), and the system sends it with a time stamp, a signed delta d in the mits of the device, and a flag that says whether the deltas are precise (a trackpad: points, which browsers apply one to one) or fines (a mouse wheel: the application decides how many points a line is, and usually animates the step). Momentum scrolling needs nothing special: the system keeps sending events that decay.
+    → 애플리케이션은 페이지에 스크롤한 지를 물어볼 수 없으며, 물어볼 필요가 없습니다. 화면 어디에서든 스크롤 이벤트를 감지합니다(렌즈가 읽는 내용을 스크롤할지는 나중에 결정됩니다), 시스템은 이를 타임스탬프와 장치의 mit에 표시된 델타 d, 그리고 델타가 정확한지 여부를 표시하는 플래그(트랙패드: 브라우저가 일대일로 적용하는 점) 또는 미세한지(마우스 휠: 애플리케이션이 선의 점 수를 결정하고 일반적으로 스텝을 애니메이션합니다)를 표시하는 플래그와 함께 전송합니다. 모멘텀 스크롤링은 특별한 것이 필요하지 않습니다: 시스템이 계속해서 감소하는 이벤트를 전송합니다.
+  ease-out y (Eg.
+    → 완화 y (예:
+  spring error e(1)/eo (Eq.
+    → 스프링 오류 e(1)/eo (식)
+  time since the event (ms)
+    → 행사 이후 시간 (ms)
+  Figure 2. The two curves of the model, plotted from the equations, not measured: the fraction of a line step on screen (Eq. 11 with A
+    → 그림 2. 모델의 두 곡선은 방정식에서 그려지지만 측정되지 않았으며, 화면에 표시된 선 단계의 분수(Eq. 11 with A
+  16 ms, T = 150 ms) and the decay of a
+    → 16 ms, T = 150 ms) 그리고 a의 감쇠
+  correction (Eq.
+    → 수정 (Eq.
+  The prodictor keeps the events of the last 2s as triples (t¿, da, cx) with cx € {P, L} (precise, lines), positive d moving the content down.? Two constants describe the
+    → 프로디터는 마지막 2초의 이벤트를 세 배(t¿, da, cx)로 유지하고, cx € {P, L} (정확도, 라인), 양의 d가 내용을 아래로 이동시킵니다. 두 개의 상수는 그(를) 설명합니다
+  path from an event to the screen: a delivery latency
+    → 이벤트에서 화면으로의 경로: 전달 지연 시간
+  16 ms, and the duration T = 150 ms over which an application animates one line step. The fraction of event
+    → 16밀리초이며, 애플리케이션이 한 줄 스텝을 애니메이션하는 시간 T = 150ms입니다. 사건의 비율
+  that is on screen at time f is, with s = f - & - A,
+    → 그것은 화면에 f가 있는 시점에, s = f - & - A인 경우,
+  A precise delta is a step: the content has moved all at once. A line step eases out, as in a smooth-scroll
+    → 정확한 델타는 한 단계입니다: 내용이 한 번에 모두 이동했습니다. 라인 스텝이 부드러운 스크롤처럼 완화됩니다.
+  animation: it starts at speed 3/T = 20 s-' of its to-tal and slows to zero at T, so that half of it is on
+    → 애니메이션: 전체 속도 3/T = 20 s-' 로 시작하고 T에서 0으로 감속하여 절반이 켜집니다.
+  screen after T(1 - 2-3) = 31 ms, ninety percent after
+    → 스크린 후 T(1 - 2-3) = 31밀리초, 90% 후
+  T(1 - 0.1) ~ 80 ms, and all of it after T = 150 ms.
+    → T(1 - 0.1) ~ 80 ms, 그리고 T 이후의 모든 것이 150 ms가 됩니다.
+  Offset between two frames
+    → 두 프레임 사이의 오프셋
+  The wheel units of kind c that reached the screen be-tween to and f1 are
+    → f1 사이에 화면에 도달한 종류 c의 휠 유닛은
+  and the content movement expected between them, in points, is
+    → 그리고 그들 사이에 기대되는 콘텐츠 이동은 포인트 기준입니다.
+  The ratios p: are points per wheel unit.
+    → 비율 p:는 휠 단위당 포인트입니다.
+  Op starts at
+    → 운영 시작은
+  1; Pg is unknown, and contributes 0, until a frame has shown how far a line goes. A display tick at time t moves
+    → 1; Pg는 알 수 없으며, 프레임이 선이 얼마나 멀리 가는지를 보여줄 때까지 0을 기여합니다. 시간 t에 디스플레이 틱이 이동합니다
+  *The sign convention is that of the source: a positive delta mows content down (Scrol1Predictor.swift, the comment of wheel), Reading down a page moves its content up, which is a
+    → *부호 규칙은 출처의 규칙입니다: 양의 델타는 콘텐츠를 아래로 깎습니다 (Scrol1Predictor.swift, 휠의 주석), 페이지를 아래로 읽으면 그 내용이 위로 이동합니다, 이는
+  negative delta, as in the examples of Appendix
+    → 음수 델타, 부록 예시와 같이
+issues=0
+layout: blocks=36 overlaps=0 spill=0 cut=0 clipped=1 holds=1
+image: 1634×2114
+block: core=145,158,650,220 text=145,182,646,188 size=27.0 lines=7 chars=378 clipped=0 ellipsis=0 "The size of the old text is read from the height h, of its g"
+block: core=143,475,649,26 text=143,474,441,28 size=25.3 lines=1 chars=54 clipped=0 ellipsis=0 "which is found by bisection to a resolution of 0.5 pt."
+block: core=143,506,653,57 text=143,504,648,62 size=27.2 lines=2 chars=112 clipped=0 ellipsis=0 "(TextFitter.fitFontSize); when nothing fits, Smin is returne"
+block: core=144,568,652,158 text=144,587,650,121 size=26.3 lines=5 chars=261 clipped=0 ellipsis=0 "As a last resort a translation that does not fit at the smal"
+block: core=145,766,227,26 text=145,764,126,30 size=26.4 lines=1 chars=17 clipped=0 ellipsis=0 "Place and colour."
+block: core=401,766,391,26 text=401,767,390,24 size=20.8 lines=1 chars=34 clipped=0 ellipsis=0 "The text starts where the old text"
+block: core=145,801,651,217 text=145,838,615,143 size=25.3 lines=7 chars=345 clipped=0 ellipsis=0 "started: the patch reaches the crase margin r past the origi"
+block: core=146,1070,372,35 text=146,1067,191,41 size=35.8 lines=1 chars=19 clipped=0 ellipsis=0 "5 Scroll prediction"
+block: core=144,1136,650,184 text=144,1157,619,143 size=25.3 lines=6 chars=348 clipped=0 ellipsis=0 "A lens over a feed is used while the feed scrolls. At the de"
+block: core=145,1330,647,26 text=145,1329,515,28 size=25.3 lines=1 chars=54 clipped=0 ellipsis=0 "v = 1000 points per second a frame that is only 125 ms"
+block: core=145,1360,647,26 text=145,1361,649,28 size=25.3 lines=1 chars=59 clipped=0 ellipsis=0 "old is v-0.125 = 125 points off, several lines of text. The"
+block: core=143,1391,649,123 text=143,1394,620,121 size=26.3 lines=4 chars=199 clipped=0 ellipsis=0 "reading and the translation of a frame take longer than that"
+block: core=146,1559,178,26 text=146,1556,89,32 size=27.7 lines=1 chars=9 clipped=0 ellipsis=0 "5.1 Model"
+block: core=143,1611,652,343 text=143,1631,637,304 size=26.3 lines=11 chars=575 clipped=0 ellipsis=0 "The application cannot ask a page how far it has scrolled, a"
+block: core=1210,290,141,22 text=1210,290,83,23 size=20.0 lines=1 chars=15 clipped=0 ellipsis=0 "ease-out y (Eg."
+block: core=1167,321,227,22 text=1167,321,192,23 size=20.0 lines=1 chars=25 clipped=0 ellipsis=0 "spring error e(1)/eo (Eq."
+block: core=1073,475,248,22 text=1073,473,181,26 size=23.1 lines=1 chars=25 clipped=0 ellipsis=0 "time since the event (ms)"
+block: core=840,568,649,83 text=840,575,605,53 size=23.2 lines=3 chars=133 clipped=0 ellipsis=0 "Figure 2. The two curves of the model, plotted from the equa"
+block: core=1050,625,440,26 text=1050,638,367,22 size=25.3 lines=1 chars=37 clipped=1 ellipsis=0 "16 ms, T = 150 ms) and the decay of a"
+block: core=842,656,158,22 text=842,655,85,26 size=23.1 lines=1 chars=15 clipped=0 ellipsis=0 "correction (Eq."
+block: core=840,739,650,105 text=840,742,647,90 size=26.3 lines=4 chars=168 clipped=0 ellipsis=0 "The prodictor keeps the events of the last 2s as triples (t¿"
+block: core=842,836,648,30 text=842,841,427,28 size=25.3 lines=1 chars=52 clipped=0 ellipsis=0 "path from an event to the screen: a delivery latency"
+block: core=842,872,647,57 text=842,873,633,57 size=25.3 lines=2 chars=106 clipped=0 ellipsis=0 "16 ms, and the duration T = 150 ms over which an application"
+block: core=865,933,574,26 text=865,932,553,32 size=27.7 lines=1 chars=51 clipped=0 ellipsis=0 "that is on screen at time f is, with s = f - & - A,"
+block: core=841,1136,648,61 text=841,1136,623,57 size=25.3 lines=3 chars=106 clipped=0 ellipsis=0 "A precise delta is a step: the content has moved all at once"
+block: core=842,1196,651,62 text=842,1198,617,64 size=28.1 lines=2 chars=105 clipped=0 ellipsis=0 "animation: it starts at speed 3/T = 20 s-' of its to-tal and"
+block: core=842,1263,647,30 text=842,1262,495,33 size=30.3 lines=1 chars=53 clipped=0 ellipsis=0 "screen after T(1 - 2-3) = 31 ms, ninety percent after"
+block: core=841,1294,614,30 text=841,1297,651,29 size=25.6 lines=1 chars=51 clipped=0 ellipsis=0 "T(1 - 0.1) ~ 80 ms, and all of it after T = 150 ms."
+block: core=924,1369,413,26 text=924,1366,257,32 size=27.7 lines=1 chars=25 clipped=0 ellipsis=0 "Offset between two frames"
+block: core=841,1418,652,61 text=841,1432,462,32 size=27.7 lines=2 chars=72 clipped=0 ellipsis=0 "The wheel units of kind c that reached the screen be-tween t"
+block: core=842,1598,647,62 text=842,1616,612,28 size=25.3 lines=2 chars=61 clipped=0 ellipsis=0 "and the content movement expected between them, in points, i"
+block: core=841,1744,481,30 text=841,1744,345,30 size=26.3 lines=1 chars=40 clipped=0 ellipsis=0 "The ratios p: are points per wheel unit."
+block: core=1346,1744,143,32 text=1346,1745,110,27 size=24.2 lines=1 chars=12 clipped=0 ellipsis=0 "Op starts at"
+block: core=842,1779,647,57 text=842,1779,638,59 size=25.6 lines=2 chars=112 clipped=0 ellipsis=0 "1; Pg is unknown, and contributes 0, until a frame has shown"
+block: core=840,1854,651,79 text=840,1854,642,76 size=22.1 lines=3 chars=178 clipped=0 ellipsis=0 "*The sign convention is that of the source: a positive delta"
+block: core=842,1933,463,26 text=842,1936,214,23 size=20.0 lines=1 chars=46 clipped=0 ellipsis=0 "negative delta, as in the examples of Appendix"
+  holds: "Figure 2. The two curves of the model, p" holds "16 ms, T = 150 ms) and the decay of a"
+wrote /tmp/r117/fast117/s3/p6-autod-e-4.png
+silence: longest=24106 total=24106
+drain: 0 in-flight=0
+reader: docs state=idle pid=51525 warm=doc:auto dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=121032 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=131 MB gui=115 MB last-ms=589 ms=435,589
+reader: lines state=idle pid=51494 warm=rev3:auto dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=121032 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=162 MB gui=115 MB last-ms=525 ms=772,525
+reader: host reads=2 unavailable=0 rerouted=0 retried=0 late=0 rereads=0 superseded=0 docs-fallbacks=0 low-confidence=0 dropped=

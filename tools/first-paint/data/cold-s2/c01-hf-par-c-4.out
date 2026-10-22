@@ -1,0 +1,54 @@
+inpainter: none
+reader: docs pid=71707 gui pid=70856
+reader: lines pid=70903 gui pid=70856
+pipeline: 80780 ms
+work[still]: erase=24 ocr.blocks=2 ocr.blocks.lines=26 ocr.blocks.vn=2 reader.docs.fallback=2 reader.lines.ready=1 reader.reread=1 reader.reroute.lines.docs=1 render=11 translate.cancelled=0 translate.first_paint=1 translate.landed_outside=0 translate.lens_unserved=0 translate.model.hf=3 translate.requests=3 translate.struck=2 translate.texts=9 translate.wasted=0 lens_wait_ms[p50=7444 max=17232 last=17232 n=6] settle=n/a parked=0
+pace: en>ko|apple:highFidelity samples=2 first=7.23s perLine=1.34s batch[p50=7.36s p90=7.36s n=1] cancelled=0 lines[cached=0 translated=4]
+first-paint: start_uptime_ms=1978409755 first_request_ms=27691 first_drawn_ms=32403 first_final_ms=32403 last_final_ms=44839 drawn=4 snapshots=6
+fp-line: drawn_ms=32403 final_ms=32403 quick_first=0 shown_ms=- dist=- src="# general"
+fp-line: drawn_ms=33439 final_ms=33439 quick_first=0 shown_ms=- dist=- src="Priya Shah"
+fp-line: drawn_ms=35057 final_ms=35057 quick_first=0 shown_ms=- dist=- src="Morning all! The release candidate is re"
+fp-line: drawn_ms=44839 final_ms=44839 quick_first=0 shown_ms=- dist=- src="Tom Becker"
+fp-summary: lines=4 painted=0 repainted=0 kept=0 open=0 refit=0 chars_changed=0 chars_final=0 shown_ms[p50=- max=-]
+  # general
+    → # 일반적인
+  Priya Shah
+    → 프리야 샤
+  Morning all. The release candidate is ready for testing.
+    → (no translation)
+  Tom Becker
+    → 톰 베커
+  Great, I will start with the payment flow. Can someone share the staging credentials?
+    → (no translation)
+  3 replies
+    → (no translation)
+  Yuki Tanaka
+    → (no translation)
+  Posted them in the vault. Please check https://wiki.example.com/rc-notes before you begin.
+    → (no translation)
+  Priya Shah
+    → 프리야 샤
+  Found a bug in checkout: the coupon field clears itself when you switch tabs. Filing a ticket now.
+    → (no translation)
+  Tom Becker
+    → 톰 베커
+  Confirmed, I can reproduce it on Safari too.
+    → (no translation)
+issues=2
+layout: blocks=5 overlaps=0 spill=0 cut=0 clipped=0 holds=0
+image: 1520×1440
+block: core=41,28,162,40 text=41,28,154,41 size=35.8 lines=1 chars=9 clipped=0 ellipsis=0 "# general"
+block: core=139,118,155,38 text=139,119,116,36 size=31.6 lines=1 chars=10 clipped=0 ellipsis=0 "Priya Shah"
+block: core=137,240,173,24 text=137,238,71,29 size=25.5 lines=1 chars=10 clipped=0 ellipsis=0 "Tom Becker"
+block: core=139,565,155,31 text=139,562,115,36 size=31.6 lines=1 chars=10 clipped=0 ellipsis=0 "Priya Shah"
+block: core=137,684,173,26 text=137,681,78,32 size=27.8 lines=1 chars=10 clipped=0 ellipsis=0 "Tom Becker"
+wrote /tmp/r117/fast117/s2/c01-hf-par-c-4.png
+hint: preparingRecognition at 0
+hint: none at 32503
+silence: longest=0 total=0
+drain: 40399 in-flight=0
+reader: docs state=idle pid=71707 warm=doc:en-Latn,fast:en-Latn dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 slow-streak=0 free=143855 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: docs footprint=98 MB gui=48 MB last-ms=63387 ms=107,63387
+reader: lines state=idle pid=70903 warm=rev3:en-Latn dispatched=2 answered=2 failed=0 suspects=0 stuck=0 crashes=0 recycles=0 free=143855 MB compile-fails=0 last-compile-fail=- rest-until=- nospace=false
+reader: lines footprint=153 MB gui=48 MB last-ms=236 ms=61967,236
+reader: host reads=2 unavailable=0 rerouted=1 retried=0 late=0 rereads=2 superseded=0 docs-fallbacks=2 low-confidence=0 dropped=

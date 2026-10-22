@@ -1,0 +1,3 @@
+scene config         n               read    tr (batch->drawn)   first (lens->Korean)    final (batch->hf)  shown   chg  dist refit  load start/end
+c01   hf-off-c       5 19224 (4696..25130)    5137 (2872..9854)    24200 (7568..30267)    5137 (2872..9854)      - 0/0       0     0  155..242
+c01   hf-par-c       5 16397 (7787..38304)     3869 (956..9505)   25902 (10913..39260)    4712 (3126..9505) 7042 (7042..7042) 2/3      18     0  68..253

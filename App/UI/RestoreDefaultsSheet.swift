@@ -49,6 +49,8 @@ enum RestoreWords {
         case "lensTint": String(localized: "Color")
         case "lensTabVisibility": String(localized: "Name tag")
         case "lensTabPosition": String(localized: "Name tag position")
+        case "lensSnap": String(localized: "Snap to text columns")
+        case "lensAutoFit": String(localized: "Auto Fit new lenses")
         case "shortcuts": String(localized: "Shortcuts")
         case "checksForUpdates": String(localized: "Check for updates")
         default: key
@@ -79,7 +81,7 @@ enum RestoreWords {
         case "lensTabVisibility": return choice(LensTabVisibility.self, \.title)
         case "lensTabPosition": return choice(LensTabPosition.self, \.title)
         case "glossaryApply": return choice(EntryApply.self, applyWords)
-        case "savesTranscripts", "agentConnection", "useLearned", "useInpaintingModel", "fastFirstPaint":
+        case "savesTranscripts", "agentConnection", "useLearned", "useInpaintingModel", "fastFirstPaint", "lensSnap", "lensAutoFit":
             return (v as? NSNumber)?.boolValue == true ? String(localized: "on") : String(localized: "off")
         case "settleDelay": return String(localized: "\((v as? NSNumber)?.doubleValue ?? 0, specifier: "%.1f") s")
         case "framesPerSecond":

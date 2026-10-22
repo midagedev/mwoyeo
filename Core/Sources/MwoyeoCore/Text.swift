@@ -241,7 +241,7 @@ public enum TranslationCleanup {
     /// "S/starfallvalley". Latin tokens copied from the source get their original spelling back, where they stand as a word: not
     /// inside another one (the "A" of "A threshold" is not the "a" of "Man").
     public static func restoreSourceTokens(_ translated: String, source: String) -> String {
-        let tokens = source.matches(of: /[A-Za-z][A-Za-z0-9_\/.\-]*/).map { String($0.output) }
+        let tokens = source.matches(of: /[A-Za-z][A-Za-z0-9_\/.\-]*/).map { withoutClosingMark(String($0.output)) }
         guard !tokens.isEmpty else { return translated }
         var out = translated
         // One spelling per word: a word the source writes two ways ("a region", "let A be") has no original spelling to give back, and
@@ -257,10 +257,37 @@ public enum TranslationCleanup {
         return out
     }
 
-    /// No Latin letter, digit or underscore touches the range on either side (a particle in another script may: "iOS와").
+    /// A full stop, a dash or a slash that ends a token closes the sentence, not the name: the "fitFontSize." that ends a sentence is the
+    /// name "fitFontSize", which the engine writes "fitfontsize" and which the translation does not carry a full stop behind. Only a
+    /// token that has the shape of a name is cut (`isNameShaped`); a word keeps its mark, as the matching always took it.
+    private static func withoutClosingMark(_ token: String) -> String {
+        let name = String(token.reversed().drop { "./-".contains($0) }.reversed())
+        return name.count < token.count && isNameShaped(name) ? name : token
+    }
+
+    /// An uppercase letter after the first, a digit, an underscore, or a dot or a slash inside: camelCase, PascalCase, `snake_case`, `v1.4`,
+    /// `TextFitter.fitFontSize`, `src/app`. A word, capitalised or not, is none of these.
+    private static func isNameShaped(_ s: String) -> Bool {
+        s.dropFirst().contains { $0.isUppercase || $0.isNumber || "_./".contains($0) }
+    }
+
+    /// No Latin letter, digit or underscore touches the range on either side (a particle in another script may: "iOS와"), and no name goes
+    /// on through it: a `.`, `/` or `-` between the range and the next letter or digit joins them. The "Core" of "Core/Sources/..." is a
+    /// part of a path, not the word "core" of the sentence; the "I" of "I.asgignnent" is not the word "i".
     private static func standsAlone(_ r: Range<String.Index>, in s: String) -> Bool {
         let wordy: (Character) -> Bool = { $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "_") }
-        return !(r.lowerBound > s.startIndex && wordy(s[s.index(before: r.lowerBound)])) && !(r.upperBound < s.endIndex && wordy(s[r.upperBound]))
+        let joiners: Set<Character> = [".", "/", "-"]
+        if r.lowerBound > s.startIndex {
+            let before = s.index(before: r.lowerBound)
+            if wordy(s[before]) { return false }
+            if joiners.contains(s[before]), before > s.startIndex, wordy(s[s.index(before: before)]) { return false }
+        }
+        if r.upperBound < s.endIndex {
+            if wordy(s[r.upperBound]) { return false }
+            let next = s.index(after: r.upperBound)
+            if joiners.contains(s[r.upperBound]), next < s.endIndex, wordy(s[next]) { return false }
+        }
+        return true
     }
 
     /// Models asked to translate a numbered list often echo the numbering ("3. 게임 종료"). Strip it,

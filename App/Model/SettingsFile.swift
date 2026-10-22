@@ -41,7 +41,7 @@ struct SettingSpec {
         "sourceLanguage": (.general, .preference), "targetLanguage": (.general, .preference), "renderMode": (.general, .preference),
         "settleDelay": (.general, .preference), "framesPerSecond": (.general, .preference), "transcriptFormats": (.general, .preference),
         "savesTranscripts": (.general, .consent), "exportFolder": (.general, .consent), "agentConnection": (.general, .consent),
-        "engine": (.translation, .preference), "customEngineID": (.translation, .preference), "cacheSize": (.translation, .preference),
+        "engine": (.translation, .preference), "fastFirstPaint": (.translation, .preference), "customEngineID": (.translation, .preference), "cacheSize": (.translation, .preference),
         "paragraphReader": (.translation, .preference), "profilePin": (.translation, .preference),
         "context": (.translation, .consent), "useLearned": (.translation, .consent),
         "engines": (.translation, .data), "glossary": (.translation, .data), "glossaryApply": (.translation, .data), "profiles": (.translation, .data),
@@ -72,6 +72,8 @@ struct SettingSpec {
         .init(key: "targetLanguage", kind: .choice(Languages.targets), doc: "Language to translate into, as a code such as en or ko."),
         .init(key: "engine", kind: .choice(TranslationEngineChoice.allCases.map(\.rawValue)),
               doc: "Apple's translation choice: auto (the language pack when installed), highFidelity (Apple Intelligence's translation model) or customModel (a prompted on-device model that follows the glossary)."),
+        .init(key: "fastFirstPaint", kind: .bool,
+              doc: "Paint a lens's first translated lines at once with Apple's low-latency translation, and replace them with the high-fidelity translation when it lands. It acts only where high fidelity is what translates (engine highFidelity) and the language pack of the pair is installed; the translation kept, copied and logged is the high-fidelity one. Written to the file only when true; write false to turn it off."),
         .init(key: "engines", kind: .engines,
               doc: "Translation engines you added, each with a name, a kind, its address and what it may be sent (allow). API keys are never stored here; they stay in the Keychain. Add engines in Settings > Translation.",
               examples: SettingExamples.engines),
@@ -450,7 +452,7 @@ enum SettingsFileCheck {
     /// Keys added after 1.1.2 whose default is not written: the file holds one only while it differs, so a file from before the key
     /// re-saves byte for byte. The schema still lists it, with its default. A switch is written only while it is true, `glossaryApply`
     /// only while it is not hint.
-    static let writtenOnlyWhenSet: [String: NSObject] = ["useLearned": false as NSNumber, "agentConnection": false as NSNumber, "glossaryApply": "hint" as NSString, "rewrites": [] as NSArray]
+    static let writtenOnlyWhenSet: [String: NSObject] = ["useLearned": false as NSNumber, "agentConnection": false as NSNumber, "fastFirstPaint": false as NSNumber, "glossaryApply": "hint" as NSString, "rewrites": [] as NSArray]
 
     /// Keys AppSettings writes to the file that `SettingSpec.all` does not describe (the schema would lack them). Every
     /// switch counts, also one the file leaves out while it is off.

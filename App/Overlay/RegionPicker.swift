@@ -25,6 +25,8 @@ final class RegionPicker {
         var rect: CGRect
         /// The window to follow: the one the lens landed in, unless ⌥ pinned it to the screen.
         var window: WindowInfo?
+        /// Where the pointer was when the lens was placed (global Quartz points); nil for a key: the lens's outline takes hold from its middle.
+        var click: CGPoint?
     }
 
     /// What the picker did since launch, for the checks and the trace (`picker.*` counts carry the same).
@@ -63,7 +65,7 @@ final class RegionPicker {
             if let view = key?.contentView as? PickerView {
                 key?.makeFirstResponder(view)
                 // The display under the pointer is read at once; another display's when the pointer first comes to it.
-                view.startMap()
+                view.open()
                 let assisted = NSWorkspace.shared.isVoiceOverEnabled || NSWorkspace.shared.isSwitchControlEnabled
                 if assisted { view.handle(.engage) }
             }
@@ -223,24 +225,21 @@ private final class PickerWindow: NSWindow {
     override func accessibilityTitle() -> String? { String(localized: "Place a lens") }
 
     /// In: the dim, the spotlight and the label come up together, 0.15 s linear. Out (a lens placed, or none): the dim goes, 0.20 s
-    /// ease-out, while the lens window comes in under it; the pointer already belongs to what is underneath. Opacity only: the same under
-    /// Reduce Motion (motion contract 3.5).
+    /// ease-out, while the lens window comes in under it and its accent stroke and labels go in 0.10 s (`PickerView.release`); the pointer already
+    /// belongs to what is underneath. Opacity only: the same under Reduce Motion (motion contract 3.5, 9.4).
     func fade(in comingIn: Bool) {
-        if comingIn { alphaValue = 0 } else { ignoresMouseEvents = true }
+        if comingIn { alphaValue = 0 } else {
+            ignoresMouseEvents = true
+            (contentView as? PickerView)?.release()
+        }
         NSAnimationContext.runAnimationGroup { ctx in
-            ctx.duration = comingIn ? 0.15 : 0.20
+            ctx.duration = comingIn ? 0.15 : LensSkin.commitDimOut
             ctx.timingFunction = comingIn ? CAMediaTimingFunction(name: .linear) : CAMediaTimingFunction(controlPoints: 0, 0, 0.58, 1)
             animator().alphaValue = comingIn ? 1 : 0
         } completionHandler: { [weak self] in
             MainActor.assumeIsolated { if !comingIn { self?.orderOut(nil) } }
         }
     }
-}
-
-/// The outline of the picker's spotlight, for its hole in the dim and for its stroke: today a rounded rect. The one place the lens's
-/// organic outline (`LensSkin`, round skin117) replaces.
-func pickerOutlinePath(rect: CGRect) -> CGPath {
-    CGPath(roundedRect: rect, cornerWidth: 10, cornerHeight: 10, transform: nil)
 }
 
 final class PickerView: NSView {
@@ -262,6 +261,14 @@ final class PickerView: NSView {
     private(set) var target: LensTarget.Target?
     /// The spotlight's rect over time, in view coordinates (`LensTarget.Glide`), stepped by the display link while it moves.
     private var glide = LensTarget.Glide()
+    /// How far the spotlight's outline stands off its rect now (pt), for the checks and the trace: 0 at rest and under Reduce Motion.
+    private(set) var spotlightDeviation: CGFloat = 0
+    /// The spotlight's outline: the glide's rect, bowed while it hops towards its target (`LensSkin`, motion contract 9.6 "picker hop"), stepped on the
+    /// glide's clock. The default lens under a moving pointer is held by the pointer: its edges are the hand's, nothing bows.
+    private var skin: LensSkin?
+    private var skinClock: TimeInterval = 0
+    private var skinHand = LensSkin.Hand.none
+    private var restNoted = true
     private var link: CADisplayLink?
     /// The clock of the glide: the display link's (`CACurrentMediaTime`); the checks step their own.
     var clock: () -> TimeInterval = { CACurrentMediaTime() }
@@ -346,6 +353,21 @@ final class PickerView: NSView {
 
     // MARK: - The map
 
+    /// Where the pointer is, in global AppKit points (the checks' own: the real pointer is not theirs to move).
+    var mouseLocation: () -> NSPoint = { NSEvent.mouseLocation }
+
+    /// The picker is up on this display: its read begins, and a pointer that is already here and does not move aims at once (film defect F22, 2026-10-23: the
+    /// pointer was known only from a move, so a picker opened over a resting pointer showed the dim and the hint and nothing under it until the hand moved).
+    func open() {
+        startMap()
+        let mouse = mouseLocation()
+        guard screenFrame.contains(mouse) else { return }
+        let p = NSPoint(x: mouse.x - screenFrame.minX, y: mouse.y - screenFrame.minY)
+        hovered = window(at: p)
+        pointer = p
+        aimAt(p)
+    }
+
     /// Starts this display's read, once per picker; the picker goes on as it is meanwhile (a click places the default lens).
     func startMap() {
         guard case .idle = map, let readMap else { return }
@@ -379,6 +401,7 @@ final class PickerView: NSView {
         }
         map = .closed
         target = nil
+        forgetOutline()
         link?.invalidate()
         link = nil
         if Trace.enabled { Trace.mark("picker: closed \(RegionPicker.stats)", since: Trace.now) }
@@ -392,7 +415,14 @@ final class PickerView: NSView {
         let aimed = aim(p)
         let now = clock()
         let how: LensTarget.Glide.Move = Motion.shared.reduced ? .jump : (aimed == nil && target == nil ? .follow : .glide)
+        let before = glide.target
         glide.move(to: aimed.map { local($0.rect) } ?? clickLens(at: p), at: now, how)
+        // A new target is a hop of the outline; the pointer holds the default lens it carries.
+        skinHand = how == .follow ? .move : .none
+        if how == .glide, before != nil, glide.target != before {
+            skin?.begin(.pickerHop)
+            restNoted = false
+        }
         if Trace.enabled, aimed?.anchor != target?.anchor || aimed?.column != target?.column {
             let r = aimed?.rect ?? .zero
             Trace.mark("picker: target " + (aimed.map { "column=\($0.column) anchor=\($0.anchor) rect=\(TraceNumber.px(r.minX)),\(TraceNumber.px(r.minY)) \(TraceNumber.px(r.width))x\(TraceNumber.px(r.height))" } ?? "none"), since: now)
@@ -400,18 +430,32 @@ final class PickerView: NSView {
         if aimed != nil, aimed != target { Trace.count("picker.target.hit") }
         target = aimed
         render(at: now)
-        if glide.moving(at: now), link == nil {
+        if glide.moving(at: now) || settling, link == nil {
             link = displayLink(target: self, selector: #selector(frame(_:)))
             link?.add(to: .main, forMode: .common)
         }
     }
 
+    /// The outline is still bowing: the display link goes on after the glide has landed.
+    private var settling: Bool { skin.map { !$0.isAtRest } ?? false }
+
     @objc private func frame(_ link: CADisplayLink) {
         render(at: link.targetTimestamp)
-        if !glide.moving(at: link.targetTimestamp) {
+        if !glide.moving(at: link.targetTimestamp), !settling {
             link.invalidate()
             self.link = nil
+            if !restNoted, let skin {
+                restNoted = true
+                Trace.mark(skin.meter.summary, since: Trace.now)
+            }
         }
+    }
+
+    /// The pointer left, a drag began or the picker closed: the next rect is a new outline.
+    private func forgetOutline() {
+        skin = nil
+        skinClock = 0
+        restNoted = true
     }
 
     override func mouseMoved(with event: NSEvent) {
@@ -427,6 +471,7 @@ final class PickerView: NSView {
         pointer = nil
         target = nil
         glide.clear()
+        forgetOutline()
         refresh()
     }
 
@@ -439,7 +484,10 @@ final class PickerView: NSView {
 
     override func mouseDragged(with event: NSEvent) {
         dragCurrent = convert(event.locationInWindow, from: nil)
-        if dragged != nil { glide.clear() }   // the drag is the user's own rectangle: the spotlight goes
+        if dragged != nil {   // the drag is the user's own rectangle: the spotlight goes
+            glide.clear()
+            forgetOutline()
+        }
         refresh()
     }
 
@@ -449,7 +497,7 @@ final class PickerView: NSView {
             let rect = quartz(sel)
             // A lens overhanging a window's edge still belongs to it: go by its centre.
             let container = windows.first { $0.bounds.contains(CGPoint(x: rect.midX, y: rect.midY)) }
-            done(.init(rect: rect, window: pinned ? nil : container))
+            done(.init(rect: rect, window: pinned ? nil : container, click: quartz(NSRect(origin: convert(event.locationInWindow, from: nil), size: .zero)).origin))
         } else {
             let p = convert(event.locationInWindow, from: nil)
             hovered = window(at: p)
@@ -458,7 +506,7 @@ final class PickerView: NSView {
             RegionPicker.stats.clickTarget += aimed == nil ? 0 : 1
             RegionPicker.stats.clickGhost += aimed == nil ? 1 : 0
             Trace.count(aimed == nil ? "picker.click.ghost" : "picker.click.target")
-            done(.init(rect: aimed?.rect ?? quartz(clickLens(at: p)), window: pinned ? nil : hovered))
+            done(.init(rect: aimed?.rect ?? quartz(clickLens(at: p)), window: pinned ? nil : hovered, click: quartz(NSRect(origin: p, size: .zero)).origin))
         }
     }
 
@@ -533,6 +581,7 @@ final class PickerView: NSView {
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         defer { CATransaction.commit() }
+        spotlightDeviation = 0
         if let sel = dragged {
             let w = pinned ? nil : window(at: NSPoint(x: sel.midX, y: sel.midY))
             shapes.show(hole: CGPath(roundedRect: sel, cornerWidth: 4, cornerHeight: 4, transform: nil),
@@ -541,13 +590,11 @@ final class PickerView: NSView {
             label.show("\(Int(sel.width)) × \(Int(sel.height))  ·  \(mode(w))", near: sel, inside: false)
         } else if let r = placement?.rect {
             let w = pinned ? nil : window(at: NSPoint(x: r.midX, y: r.midY))
-            shapes.show(hole: pickerOutlinePath(rect: r), stroke: pickerOutlinePath(rect: r.insetBy(dx: -1.5, dy: -1.5)),
-                        color: .controlAccentColor, width: 3, window: w.map { local($0.bounds) })
+            show(.rigid(r), window: w.map { local($0.bounds) })
             label.show("\(Int(r.width)) × \(Int(r.height))  ·  \(mode(w))", near: r, inside: false)
         } else if pointer != nil, let r = glide.rect(at: t) {
             let w = pinned ? nil : hovered
-            shapes.show(hole: pickerOutlinePath(rect: r), stroke: pickerOutlinePath(rect: r.insetBy(dx: -1.5, dy: -1.5)),
-                        color: .controlAccentColor, width: 3, window: w.map { local($0.bounds) })
+            show(outline(around: r, at: t), window: w.map { local($0.bounds) })
             label.show(mode(w), near: r, inside: true)
         } else {
             shapes.show(hole: nil, stroke: nil, color: .controlAccentColor, width: 3, window: nil)
@@ -560,6 +607,40 @@ final class PickerView: NSView {
         keysPill.isHidden = hintPill.isHidden || placement == nil
         hintPill.setFrameOrigin(NSPoint(x: (bounds.midX - hintPill.frame.width / 2).rounded(), y: bounds.maxY - 120 - PickerPill.shadowRoom))
         keysPill.setFrameOrigin(NSPoint(x: (bounds.midX - keysPill.frame.width / 2).rounded(), y: bounds.maxY - 164 - PickerPill.shadowRoom))
+    }
+
+    /// The spotlight's outline (the same one the lens's ring will draw, `LensOutline`): its hole in the dim at the rect, its stroke 1.5 pt outside it.
+    private func show(_ outline: LensOutline, window: CGRect?) {
+        spotlightDeviation = outline.deviation
+        shapes.show(hole: outline.path(outset: 0), stroke: outline.path(outset: 1.5), color: .controlAccentColor, width: 3, window: window)
+    }
+
+    /// The outline of the spotlight whose rect is `r` at time `t`: the skin steps on the glide's clock towards the target the glide is going to.
+    private func outline(around r: CGRect, at t: TimeInterval) -> LensOutline {
+        var s = skin ?? LensSkin(frame: r)
+        s.reduceMotion = Motion.shared.reduced
+        if skinHand == .move {
+            s = LensSkin(frame: r)
+        } else if skinClock > 0, t > skinClock {
+            s.step(t - skinClock, target: glide.target ?? r, hand: .none)
+            s.land()   // at rest the spotlight is the rounded rect itself
+        }
+        skinClock = max(skinClock, t)
+        let o = s.outline(around: r)
+        s.record(o)
+        skin = s
+        return o
+    }
+
+    /// A lens was placed, or none: the accent stroke, the outline of the window it follows and the labels go in `LensSkin.commitAccentIn`, linear;
+    /// the window's own fade takes the dim (`PickerWindow.fade`). The ring of the new lens is already under it (motion contract 9.4).
+    func release() {
+        shapes.release(LensSkin.commitAccentIn)
+        NSAnimationContext.runAnimationGroup { ctx in
+            ctx.duration = LensSkin.commitAccentIn
+            ctx.timingFunction = CAMediaTimingFunction(name: .linear)
+            for pill in [label, hintPill, keysPill] { pill.animator().alphaValue = 0 }
+        }
     }
 
     /// The spotlight as it is now (view coordinates), for the checks: nil while there is none.
@@ -613,6 +694,22 @@ private final class PickerShapes: NSView {
         ring.lineWidth = width
         outline.path = window.map { CGPath(roundedRect: $0.insetBy(dx: -0.75, dy: -0.75), cornerWidth: 10, cornerHeight: 10, transform: nil) }
         outline.strokeColor = NSColor.controlAccentColor.withAlphaComponent(0.5).cgColor
+    }
+
+    /// The stroke and the window's outline fade out over `seconds`, linear; the dim is left to the window's fade.
+    func release(_ seconds: TimeInterval) {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        for l in [outline, ring] {
+            let fade = CABasicAnimation(keyPath: "opacity")
+            fade.fromValue = l.opacity
+            fade.toValue = 0
+            fade.duration = seconds
+            fade.timingFunction = CAMediaTimingFunction(name: .linear)
+            l.opacity = 0
+            l.add(fade, forKey: "release")
+        }
+        CATransaction.commit()
     }
 
     /// The dim over `bounds` with the hole punched; the window's outline is masked by the same shape.

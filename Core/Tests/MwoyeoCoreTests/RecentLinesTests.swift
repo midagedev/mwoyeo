@@ -83,7 +83,9 @@ final class RecentLinesTests: XCTestCase {
 
     func testFadingByAge() {
         XCTAssertEqual(RecentLines.opacity(rank: 0, of: 3), 1.0, accuracy: 1e-9)
-        XCTAssertEqual(RecentLines.opacity(rank: 2, of: 3), 0.45, accuracy: 1e-9)
+        // 2026-10-22 (game117 vision): re-pinned from 0.45, which measured about 2.2:1 on the light material; 0.6 is the floor that read
+        // (about 2.9:1 light, 5.4:1 dark). FAIL-first: the 0.45 build fails this line.
+        XCTAssertEqual(RecentLines.opacity(rank: 2, of: 3), 0.6, accuracy: 1e-9)
         XCTAssertEqual(RecentLines.opacity(rank: 0, of: 1), 1.0, accuracy: 1e-9)
         let o = (0..<5).map { RecentLines.opacity(rank: $0, of: 5) }
         XCTAssertEqual(o, o.sorted(by: >), "older never brighter")

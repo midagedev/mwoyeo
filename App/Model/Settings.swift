@@ -212,6 +212,10 @@ struct AppSettings: Codable, Equatable {
     var lensTint = LensTint.spectrum
     var lensTabVisibility = LensTabVisibility.automatic
     var lensTabPosition = LensTabPosition.topLeading
+    /// A lens snaps to the text columns under it while it is dragged or resized (`ColumnFit`, design lens-fit); ⌘ held places it freely.
+    var lensSnap = true
+    /// New lenses start with Auto Fit on (`RegionConfig.autoFit`); each lens keeps its own choice.
+    var lensAutoFit = false
     /// Translations kept in memory for reuse.
     var cacheSize = 5000
     /// HotKeyAction raw value → combo; an action missing here has no shortcut.
@@ -351,7 +355,7 @@ struct AppSettings: Codable, Equatable {
     // and `engines[].context` are read (`init(from:)`) and never written (design §5.2).
     enum CodingKeys: String, CodingKey {
         case sourceLanguage, targetLanguage, engine, engines, customEngineID, engineRejections, renderMode, useInpaintingModel, glossary
-        case framesPerSecond, settleDelay, fontStyle, boxOpacity, lensStyle, lensTint, lensTabVisibility, lensTabPosition, cacheSize, shortcuts
+        case framesPerSecond, settleDelay, fontStyle, boxOpacity, lensStyle, lensTint, lensTabVisibility, lensTabPosition, lensSnap, lensAutoFit, cacheSize, shortcuts
         case checksForUpdates, hasCompletedOnboarding, savesTranscripts, exportFolder, exportBookmark, enginePermissions, transcriptFormats
         case paragraphReader, agentConnection, fastFirstPaint
         case profiles, context, useLearned, profilePin, glossaryApply
@@ -377,6 +381,8 @@ struct AppSettings: Codable, Equatable {
         try c.encode(lensTint, forKey: .lensTint)
         try c.encode(lensTabVisibility, forKey: .lensTabVisibility)
         try c.encode(lensTabPosition, forKey: .lensTabPosition)
+        try c.encode(lensSnap, forKey: .lensSnap)
+        try c.encode(lensAutoFit, forKey: .lensAutoFit)
         try c.encode(cacheSize, forKey: .cacheSize)
         try c.encode(shortcuts, forKey: .shortcuts)
         try c.encode(checksForUpdates, forKey: .checksForUpdates)
@@ -430,6 +436,8 @@ struct AppSettings: Codable, Equatable {
         lensTint = (try? c.decodeIfPresent(LensTint.self, forKey: .lensTint)) ?? d.lensTint
         lensTabVisibility = (try? c.decodeIfPresent(LensTabVisibility.self, forKey: .lensTabVisibility)) ?? d.lensTabVisibility
         lensTabPosition = (try? c.decodeIfPresent(LensTabPosition.self, forKey: .lensTabPosition)) ?? d.lensTabPosition
+        lensSnap = (try? c.decodeIfPresent(Bool.self, forKey: .lensSnap)) ?? d.lensSnap
+        lensAutoFit = (try? c.decodeIfPresent(Bool.self, forKey: .lensAutoFit)) ?? d.lensAutoFit
         shortcuts = (try? c.decodeIfPresent([String: KeyCombo].self, forKey: .shortcuts)) ?? d.shortcuts
         checksForUpdates = try c.decodeIfPresent(Bool.self, forKey: .checksForUpdates) ?? d.checksForUpdates
         cacheSize = max(100, try c.decodeIfPresent(Int.self, forKey: .cacheSize) ?? d.cacheSize)
@@ -471,6 +479,9 @@ struct RegionConfig: Codable, Identifiable, Equatable {
     /// The profile this lens is pinned to (design §1.3: Auto or pinned, per lens): a profile's id, or `all` for All apps alone. nil is Auto,
     /// or the pin of the whole app (`AppSettings.profilePin`). Kept with the lens, not in settings.json: the file's reset never touches it.
     var profilePin: String? = nil
+    /// Auto Fit (`AutoFit`): after a read settles, the lens grows to the column it cuts. Each lens keeps its own; `AppSettings.lensAutoFit` is the
+    /// default of a lens that is made. Kept with the lens, not in settings.json, like `profilePin`.
+    var autoFit = false
 
     /// Follows `window` from where the lens is now, or pins it to the screen when nil. The name says which.
     mutating func follow(_ window: WindowInfo?) {
@@ -492,6 +503,7 @@ extension RegionConfig {
         isEnabled = try c.decode(Bool.self, forKey: .isEnabled)
         anchor = try c.decodeIfPresent(WindowAnchor.self, forKey: .anchor)
         profilePin = (try? c.decodeIfPresent(String.self, forKey: .profilePin)) ?? nil
+        autoFit = (try? c.decodeIfPresent(Bool.self, forKey: .autoFit)) ?? false
     }
 }
 

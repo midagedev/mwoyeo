@@ -11,6 +11,9 @@ import QuartzCore
 /// While the page scrolls, blocks in the scrolling area are moved ahead of the captured frames by `prediction`, and
 /// the frames' correction is eased in with a critically damped spring instead of a jump.
 ///
+/// The clip is the lens window's own outline (`LensSkin`, motion contract 9.5): the ring bows and settles over the frame, and the translations are cut
+/// by the same shape, so no text shows where the ring is not and none is cut where it is.
+///
 /// Parts of the lens its person marked not to read (`IgnoredRegions`) are cut out of the clip, so no translation is drawn over them, and
 /// outlined while the pointer is over the lens (`setIgnored`, `showsIgnored`). The outlines are in a view of their own: the clip would cut
 /// them away with the translations.
@@ -26,6 +29,9 @@ final class OverlayPanel: NSPanel {
     /// The lens, AppKit coordinates.
     private var lens: NSRect
     private var displayLink: CADisplayLink?
+
+    /// The lens's outline now, relative to its bottom-left (the lens window's ring draws the same one); nil: the rounded rect.
+    var outline: (() -> LensOutline?)?
 
     /// Predicted scrolling between a frame's capture time and a display time: the area that scrolls (global Quartz
     /// points) and by how much (points, positive = down). nil when nothing is being scrolled.
@@ -57,7 +63,19 @@ final class OverlayPanel: NSPanel {
         guide.alphaValue = 0
         root.addSubview(guide)
         contentView = root
-        host.lens = hostRect(frame)
+        host.prepare(outline: .rigid(CGRect(origin: .zero, size: frame.size)), lens: hostRect(frame))
+    }
+
+    /// The clip's outline as the layers place it, in screen coordinates (y up), for the checks.
+    func clipOutlineOnScreen() -> CGPath? {
+        guard let hostPath = host.clipOutlineInHost else { return nil }
+        var t = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: frame.minX, ty: frame.maxY)
+        return hostPath.copy(using: &t)
+    }
+
+    /// The outline changed with the lens where it was (it settles after a fit, a drag or a commit): the clip is cut again.
+    func restyle() {
+        host.prepare(outline: outline?() ?? .rigid(CGRect(origin: .zero, size: lens.size)), lens: host.lens)
     }
 
     /// The snap guide (design lens-fit): one point wide, in the accent colour, along `rect` (AppKit coordinates, the column's edge and its extent). It is
@@ -147,7 +165,7 @@ final class OverlayPanel: NSPanel {
             setFrame(display, display: false)
         }
         if d.dx != 0 || d.dy != 0 { host.offsetBlocks(by: d) }
-        host.lens = hostRect(newLens)
+        host.prepare(outline: outline?() ?? .rigid(CGRect(origin: .zero, size: newLens.size)), lens: hostRect(newLens))
         placeIgnored()
         CATransaction.commit()
         host.updateVisibility(animated: contentDelta == .zero)
@@ -188,16 +206,55 @@ private final class OverlayHostView: NSView {
     private var layersByID: [UUID: CALayer] = [:]
     /// Each block's frame as the last snapshot placed it (host coordinates), before any predicted scroll.
     private var placed: [UUID: CGRect] = [:]
-    /// The lens, host coordinates. Translations are clipped to it.
-    var lens = CGRect.zero {
-        didSet {
-            CATransaction.begin()
-            CATransaction.setDisableActions(true)
-            clip.frame = lens
-            cutIgnored()
-            CATransaction.commit()
+    /// The lens, host coordinates (top-left origin, y down). Translations are clipped to its outline, not to this rect.
+    private(set) var lens = CGRect.zero
+    /// The outline, relative to the lens's bottom-left (y up): the ring's own.
+    private(set) var outline = LensOutline.rigid(.zero)
+
+    /// The lens and its outline, as the lens window has them. The clip layer is the outline's own size, placed in the host (a move only changes its frame);
+    /// its path is that outline at the origin, turned over because the host's geometry is flipped.
+    func prepare(outline: LensOutline, lens: CGRect) {
+        guard outline != self.outline || lens != self.lens else { return }
+        self.outline = outline
+        self.lens = lens
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        let local = outline.moved(by: CGVector(dx: -outline.frame.minX, dy: -outline.frame.minY))
+        clip.frame = CGRect(x: lens.minX + outline.frame.minX, y: lens.maxY - outline.frame.maxY, width: local.frame.width, height: local.frame.height)
+        if clipped != local {
+            clipped = local
+            var turn = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: local.frame.height)
+            clip.path = local.path(outset: 0).copy(using: &turn)
         }
+        cutIgnored()
+        CATransaction.commit()
     }
+
+    /// The outline in host coordinates (y down), for the clip with parts cut out of it.
+    var hostPath: CGPath {
+        var turn = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: lens.minX, ty: lens.maxY)
+        return outline.path(outset: 0).copy(using: &turn) ?? CGPath(rect: lens, transform: nil)
+    }
+
+    /// The clip's outline as the layers place it: each point of its path taken to the host layer's space by CoreAnimation, which does the flip. For the checks.
+    var clipOutlineInHost: CGPath? {
+        guard let path = clip.path, let host = layer else { return nil }
+        let out = CGMutablePath()
+        path.applyWithBlock { e in
+            let p = e.pointee.points
+            func at(_ i: Int) -> CGPoint { clip.convert(p[i], to: host) }
+            switch e.pointee.type {
+            case .moveToPoint: out.move(to: at(0))
+            case .addLineToPoint: out.addLine(to: at(0))
+            case .addQuadCurveToPoint: out.addQuadCurve(to: at(1), control: at(0))
+            case .addCurveToPoint: out.addCurve(to: at(2), control1: at(0), control2: at(1))
+            case .closeSubpath: out.closeSubpath()
+            @unknown default: break
+            }
+        }
+        return out
+    }
+
     /// Parts of the lens (host coordinates) where nothing is drawn.
     var ignored: [CGRect] = [] {
         didSet {
@@ -208,7 +265,9 @@ private final class OverlayHostView: NSView {
             CATransaction.commit()
         }
     }
-    private let clip = CALayer()
+    private let clip = CAShapeLayer()
+    /// What `clip.path` holds: the outline at the origin.
+    private var clipped: LensOutline?
     /// The clip with the ignored parts cut out of it (even-odd), used only while there are any: a lens with none keeps the plain clip.
     private let holes = CAShapeLayer()
     /// Capture time of the frame the blocks were placed from.
@@ -221,9 +280,9 @@ private final class OverlayHostView: NSView {
         layer = CALayer()
         layer?.isGeometryFlipped = true // block frames are top-left based
         layerContentsRedrawPolicy = .never
-        clip.backgroundColor = .black
-        clip.cornerRadius = 12 // the lens frame's
-        clip.cornerCurve = .continuous
+        // The ring's corner construction (`LensOutline`: arcs and cubics), not a continuous corner radius: one outline for the ring and the clip.
+        clip.fillColor = NSColor.black.cgColor
+        clip.strokeColor = nil
         holes.fillColor = .black
         holes.fillRule = .evenOdd
         layer?.mask = clip
@@ -237,7 +296,7 @@ private final class OverlayHostView: NSView {
             return
         }
         let path = CGMutablePath()
-        path.addRoundedRect(in: lens, cornerWidth: 12, cornerHeight: 12)
+        path.addPath(hostPath)
         inside.forEach { path.addRect($0) }
         holes.frame = CGRect(origin: .zero, size: CGSize(width: max(bounds.width, lens.maxX), height: max(bounds.height, lens.maxY)))
         holes.path = path

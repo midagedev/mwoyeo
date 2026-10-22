@@ -234,6 +234,16 @@ enum UICapture {
                 // Only the Translate Text checks (the whole of check-logic takes minutes).
                 let failed = await TextChecks.run(model)
                 report("text", failed)
+            case "lens-fit-shots":
+                // The lens fit as the app draws it, light and dark, for the vision verdict (FIT_PAGE names the page picture).
+                report("lens-fit-shots", await FitShots.run(model, into: out))
+            case "lens-fit-click":
+                // A double-click on a live lens's ring, with real mouse events (needs the accessibility grant; takes the pointer for a moment).
+                report("lens-fit-click", await FitShots.click(model))
+            case "fit-checks":
+                // Only the lens fit's checks: Fit to Column, snap, Auto Fit, the probe (the whole of check-logic takes minutes).
+                let failed = await FitChecks.run(model)
+                report("fit", failed)
             case "hide-lens-checks":
                 // Only the Hide Lenses checks (the whole of check-logic takes minutes).
                 let failed = await HideLensChecks.run(model)
@@ -576,6 +586,7 @@ enum UICapture {
             failed += await RewriteChecks.run()
             failed += MCPChecks.run(model)
             failed += await HideLensChecks.run(model)
+            failed += await FitChecks.run(model)
             failed += await ProgramChecks.run()
             // Last: the checks before the script service's timing ones must not lengthen the gap between the Test button's use of the service (PressChecks) and
             // RewriteChecks, which counts on launchd's respawn throttle still holding (text117, 2026-10-22: with these before them, "a lens call is not queued behind a call

@@ -355,7 +355,7 @@ touched; deleted per item with its own confirmation. Each `SettingSpec` gets `ta
 | translation | preference | `engine`, `fastFirstPaint` (file only; first-lens §13), `customEngineID` (back to Apple; engines are kept), `cacheSize`, `paragraphReader` (file only), `profilePin` (Auto) |
 | translation | consent | `context` (All apps' amount: what leaves this Mac), `useLearned` (an opt-in, context-translation §9) |
 | translation | data | `engines` (with `allow`), `glossary`, `glossaryApply` (was the consent `appleUsesPinnedTerms`), `profiles` (was `appProfiles`), `rewrites`, `script` |
-| appearance | preference | `useInpaintingModel`, `fontStyle`, `boxOpacity`, `lensStyle`, `lensTint`, `lensTabVisibility`, `lensTabPosition`, `lensSnap`, `lensAutoFit` |
+| appearance | preference | `useInpaintingModel`, `fontStyle`, `boxOpacity`, `lensStyle`, `lensTint`, `lensTabVisibility`, `lensTabPosition`, `lensSnap`, `lensAutoFit`, `recentLineCount` (file only; the lens's Keep Recent Lines is its own, kept with the lens) |
 | shortcuts | preference | `shortcuts` |
 | about | consent | `checksForUpdates` |
 | not in the file | consent, data | `enginePermissions`; `exportBookmark`, `engineRejections`, `hasCompletedOnboarding`, learned rows, lens pins: never reset |

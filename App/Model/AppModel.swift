@@ -254,6 +254,7 @@ final class AppModel {
             let v = args[i + 1].split(separator: ",").compactMap { Double($0) }
             if v.count == 4 {
                 var config = RegionConfig(name: "", rect: CGRect(x: v[0], y: v[1], width: v[2], height: v[3]))
+                config.autoFit = settings.lensAutoFit
                 config.follow(nil)
                 regions.append(config)
                 await startSession(config)
@@ -412,6 +413,7 @@ final class AppModel {
         guard let result = await picker.pick() else { return }
         RegionSession.setHiding(false, in: sessions.values)   // a lens added while the others are hidden brings them back
         var config = RegionConfig(name: "", rect: result.rect)
+        config.autoFit = settings.lensAutoFit
         config.follow(result.window)
         regions.append(config)
         if isPaused { isPaused = false; for r in regions where r.isEnabled && sessions[r.id] == nil { await startSession(r) } }

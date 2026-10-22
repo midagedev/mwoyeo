@@ -12,7 +12,7 @@ enum RestorePlanChecks {
     private static let preferences: [SettingSpec.Tab: Set<String>] = [
         .general: ["sourceLanguage", "targetLanguage", "renderMode", "settleDelay", "framesPerSecond", "transcriptFormats"],
         .translation: ["engine", "fastFirstPaint", "customEngineID", "cacheSize", "paragraphReader", "profilePin"],
-        .appearance: ["useInpaintingModel", "fontStyle", "boxOpacity", "lensStyle", "lensTint", "lensTabVisibility", "lensTabPosition"],
+        .appearance: ["useInpaintingModel", "fontStyle", "boxOpacity", "lensStyle", "lensTint", "lensTabVisibility", "lensTabPosition", "lensSnap", "lensAutoFit"],
         .shortcuts: ["shortcuts"],
         .about: [],
     ]
@@ -49,6 +49,8 @@ enum RestorePlanChecks {
         s.lensTint = .ocean
         s.lensTabVisibility = .always
         s.lensTabPosition = .bottomTrailing
+        s.lensSnap = false
+        s.lensAutoFit = true
         s.shortcuts = [:]
         s.savesTranscripts = true
         s.exportFolder = "/tmp/restore-checks-export"

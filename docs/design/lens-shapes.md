@@ -55,6 +55,9 @@ and each is the right lens for reading that content.
 5. **Order and determinism.** Kinds are tried in `allCases` order: the first that recognises the content wins (strong evidence first, `group` last).
    A pure function of (blocks, pointer, bounds, held); the order of the read does not matter (a test reverses it).
 6. **Lines.** The read gives a block's box and its line count; lines are spread evenly over the box at a pitch of 1.35 x the glyph height (`Block.em`).
+7. **Content is what lies in `bounds`** (shapestab, section 13). The read is of the display; the hovered window's content is `bounds`. A block outside it (the title bar,
+   the menu bar, the window beside) is not content: `choose` builds the recognisers' map from the blocks that overlap `bounds` by more than `cutSlack` both ways
+   (`Map.within`, the same map when all do) and gives the answer's anchor in the read's own indices.
 
 ## 3. The kinds
 
@@ -75,9 +78,9 @@ and each is the right lens for reading that content.
 
 | kind | recognised from | rect | notes |
 |---|---|---|---|
-| `table` | The anchor's line and the lines beside it on its row (middles within 0.4 of the shorter height), each at least 1.5 ems from the next, are the lanes; the anchor's lane followed down and up within 3 ems gives the rows; another lane stays when it has a cell on 0.6 of them. At least 3 rows with a cell in another lane, cells alike in height down a lane (within 1.4 of the median), at least 0.6 of the blocks one line. A title line of the same group just above, within the table's width, is a member; a pointer on the title aims at the table. | the lanes x the rows, with the title | a page or a chat beside the table meets its rows now and then, which is why a lane needs 0.6 of them, not all |
-| `thread` | A message is a block of 4 lines or fewer that is not a name or a time (one line, 4 ems wide at most, or 0.8 of the messages' size). The message under the pointer (or nearest the name or time under it) keeps to an edge of the pane with others. Two-sided: the other side's messages keep to the opposite edge, two messages or more on each side (bubbles). One-sided: three messages of two lines or more keep to its left edge with ragged right edges (a name over a message). The thread is the lanes' messages one after another within 4.5 ems, ended by a gap of twice the usual one; its pane holds nothing else but names and times. | the pane: the messages with their names and times, windowed by the budget | both sides are tried, nearest first |
-| `dialog` | A name (one line, 8 ems at most, no taller than 1.25 x the body) at the body's left edge or a little inside it, within 0.85 em above a body of one to four lines set large (16 pt or more) and 10 ems wide or more; nothing under the body within an em. A doc's heading is a paragraph's space (0.94 to 1.26 ems) above its text, a speaker's name 0.58 to 0.74. | the name and the body, widened to 28 ems from the body's left edge (no wider than the mirror of its left margin in the bounds: the box is centred) and three body lines tall | the room is for the line being typed out |
+| `table` | The anchor's line and the lines beside it on its row (middles within 0.4 of the shorter height), each at least 1.5 ems from the next, are the lanes; the anchor's lane followed down and up within 3 ems gives the rows; another lane stays when it has a cell on 0.6 of them and at least 0.6 of its lines down them stand on a row (a text column beside the table has its own rhythm and meets a row now and then). At least 3 rows with a cell in another lane, the one-line cells alike in height down a lane (within 1.7 of the median; a merged block's lines have no height of their own), at least 0.6 of the blocks one line. A title line of the same group just above, within the table's width, is a member; a pointer on the title aims at the table. | the lanes x the rows, with the title | a page or a chat beside the table meets its rows now and then, which is why a lane needs 0.6 of them, not all |
+| `thread` | A message is a block of 4 lines or fewer that is not a name or a time (one line, 4 ems wide at most, or 0.8 of the messages' size). The message under the pointer (or nearest the name or time under it) keeps to an edge of the pane with others. The messages of one thread are set alike (glyph height within 1.7 of the anchor's: a heading is no message). Two-sided: the other side's messages keep to the opposite edge, two messages or more on each side (bubbles). One-sided: three messages of two lines or more keep to its left edge with ragged right edges (a name over a message). The thread is the lanes' messages one after another within 4.5 ems, ended by a gap of twice the usual one; its pane holds nothing else but names and times. | the pane: the messages with their names and times, windowed by the budget | both sides are tried, nearest first |
+| `dialog` | A name (one line, 8 ems at most, no taller than 1.25 x the body) at the body's left edge or a little inside it, within 0.85 em above a body of one to four lines set large (16 pt or more) and 10 ems wide or more; nothing under the body within an em. The name is the nearest block that pairs, not the nearest block above. A read that merged the name into the body's block (one block, its first line `head` the name) is split at that line and judged the same. A doc's heading is a paragraph's space (0.94 to 1.26 ems) above its text, a speaker's name 0.58 to 0.74. | the name and the body, widened to 28 ems from the body's left edge (no wider than the mirror of its left margin in the bounds: the box is centred) and three body lines tall | the room is for the line being typed out |
 | `subtitles` | One to three lines in blocks stacked within 0.8 em, middles within an em, set large (16 pt or more), in the lower half of the bounds; no text of like size (0.6 or more of it) within 3 ems of them. A player's controls and a menu's small print may be near; a page's lone line stands a paragraph's space from the next, a subtitle on its picture 6 ems or more. | centred on the lines, 2 ems wider each side (at least 18 ems wide), two lines tall from the last line up | |
 | `group` | `Map.group`: blocks of one connected part, two stacked with their x ranges overlapping and the gap at most 1.2 ems (of the larger), or on one row with at most 1.5 ems between; two lines or more in all. | the group's union, windowed by the budget | the fallback: whatever stands together |
 
@@ -85,7 +88,7 @@ and each is the right lens for reading that content.
 
 | target | today (first-lens.md 4.5) | gap | size |
 |---|---|---|---|
-| chat, game, subtitles, table, code, list, sidebar, popup under the pointer get a fitted lens | the 560 x 320 ghost | `LensShape` + the seam | Core 521 lines + 327 test lines; seam 39 lines + 5 patch lines |
+| chat, game, subtitles, table, code, list, sidebar, popup under the pointer get a fitted lens | the 560 x 320 ghost | `LensShape` + the seam | Core 586 lines (521 at shapes117, 65 for section 13) + 327 + 206 test lines + 384 of fixtures; seam 39 lines + 5 patch lines |
 | no flicker between the owners | (one owner) | the seam's hold, both ways, and between columns | in the seam |
 | a stage that shows it | one element on screen | `tools/first-lens/stage/` | page 174 lines |
 
@@ -238,7 +241,7 @@ A false claim is a shape a reader would call wrong. Rects are in the picture's s
 | c05-wechat-zh | a chat of one-line bubbles with their times gets a lens per bubble, not a thread (a time 4.2 ems wide is not "small") | per bubble | a miss: the lens is smaller than the unit |
 | d03-magazine-3col-en | headline, byline and three columns are one group: 835 pt wide | 32 26.5 867 255 | a miss: wanted the heading with its lede |
 | c01-slack-en | a three-line message gets the column rule's narrow column (61.5 120.5 377 201), the other messages the thread: mixed | | the order of the owners (section 11, question 1) |
-| g08-vn-choice-zh | the read merged the speaker's name into the body (one two-line block "小雪你真的…"); the dialog is taken for a subtitle band; the rect is right | 9.5 362.5 722 447 | a read artefact, not geometry |
+| g08-vn-choice-zh | the read merged the speaker's name into the body (one two-line block "小雪你真的…"); the dialog is taken for a subtitle band; the rect is right | 9.5 362.5 722 447 | a read artefact; closed where the picker hands over the first line's box (`Block.head`, section 13.7); the bench fixture has no first lines, so it stays |
 | k06-ide-diff-ko | the file list and the editor pane (line numbers | code) are one table | 6.5 40 650.5 231.5 | two panes read as lanes |
 
 ## 8. The stage
@@ -263,6 +266,7 @@ Every one FAIL-first (`tools/first-lens/shapes/mutants.sh`, `.../seam/check.sh`;
 | gate | what | FAIL-first |
 |---|---|---|
 | `LensShapeTests` (Core, 19 tests) | one synthetic layout per kind with the exact rect; a doc's heading over a paragraph is no dialog; a page's lone line is no subtitle; two rows are no table; the hold; reach and let-go; the 53 scenes: never cut, inside bounds, at least the floor, the kinds each must (and must not) claim, 0 reversals; the stage's stops; the read's order does not matter | stub, `no-hysteresis`, `cut-a-block-allowed`, `heading-is-dialog`, `page-line-is-subtitle`, `no-pad`, `reach-unbounded`, `label-takes-held-lens`, `table-without-min-rows` |
+| `LensShapeStabilityTests` (Core, 9 tests, shapestab) | the film stage's five stops on seven reads of it (`LensShapeHeroScenes`: hero2o's five reads one point apart, the zoom case, the live take): each its kind, its rect inside its panel; the stage moved 0..7 pt down, 0..3 across, at 1 and 0.888 (320 placements); every edge of every read off a point in 32 ways; a name merged into its lines still a dialog with the same lens, a three-line subtitle still a subtitle; a table with a column of cells beside it in another window; a dialog with a block ending above its body in another column; a heading over a chat; `explain` | on main's `LensShape` (scratch copy, `Block.head`, `Map.within` and `explain` stubbed): 8 of 9 fail, 422 issues (section 13.6); `content-not-scoped`, `messages-not-alike`, `dialog-nearest-above-only`, `merged-name-not-split`, `lane-without-precision`, `lane-spread-tight`, `merged-lines-judged-by-height`, `name-of-any-width` |
 | `LensSeamTests` (5 tests) | a shape where the column has none; a fallback that finds nothing changes nothing; each owner lets go only 8 pt beyond; no flicker at the edge, at a shape, at a gutter | `no-deep-test`, `no-release`, `no-hold-between-columns`, `shape-hold-forgotten`, `column-held-over-shape`; the test's own `plain` chain flickers |
 | the measure (`measure.sh`) | the numbers of section 5 on the picker's own reads | `--mutant nohold` |
 
@@ -276,6 +280,11 @@ Every one FAIL-first (`tools/first-lens/shapes/mutants.sh`, `.../seam/check.sh`;
 3. **Debuggability.** `shapes at <scenes> <scene> x y ...` prints the choice at each point with the held choice carried along (no debugger attach); `shapes
    grid` and `sheet.py` draw every position's kind and rect over the picture; `--why` prints each reversal with its jittered positions. In the app, the picker's
    trace line carries the shape's kind (section 6.1).
+
+Section 13 adds three more, for the stability of a kind: (1) the owners are `Map.within` (what is content), `alike` (what is set alike), the dialog's `pair` over
+the nearest *pairing* block, and the lane rule's rows and precision; (2) `LensShapeStabilityTests` and its eight named mutants; (3) `LensShape.explain` prints, for
+a pointer, the blocks inside `bounds`, the anchor, and what each kind gave in the order they are tried, the last line the choice; `tools/first-lens/shapes/stability`
+(on `LensShape.swift` alone) runs the hero's reads, the shift and jitter sweeps, the per-scene flip count, the grid diff, the cost, and `why` / `at` with `explain`.
 
 ## 11. Open questions for the lead
 
@@ -296,9 +305,111 @@ Every one FAIL-first (`tools/first-lens/shapes/mutants.sh`, `.../seam/check.sh`;
 cd tools/keep-labels && swift build -c release --product snap && swift build -c release --product ocrdump   # picture and read
 snap tools/first-lens/stage/index.html stage.png 1512 945; ocrdump stage.ocr.jsonl en stage.png              # the stage's read
 python3 tools/first-lens/shapes/tofix.py Core/Tests/MwoyeoCoreTests/LensShapeScenes.swift                  # fixtures from data/shapes/
-cd Core && swift test --filter LensShapeTests                                                               # 19 tests
+python3 tools/first-lens/shapes/herofix.py Core/Tests/MwoyeoCoreTests/LensShapeHeroScenes.swift            # the film stage's reads (section 13)
+swiftc -O -o /tmp/stability tools/first-lens/shapes/stability/main.swift Core/Sources/MwoyeoCore/LensShape.swift   # the probe of section 13 (modes in its header)
+cd Core && swift test --filter LensShape                                                                    # 28 tests (19 + 9)
 tools/first-lens/shapes/mutants.sh                                                                           # FAIL-first, scratch copy
 tools/first-lens/shapes/seam/check.sh <tree with LensTarget.swift>                                           # the seam: tests and mutants
 COLUMN=<seam sources> tools/first-lens/shapes/measure.sh                                                     # section 5, data/shapes/*.txt
 python3 tools/first-lens/shapes/proto.py data/shapes/sweep.txt stage.png sweep-proto.mp4                      # the prototype animation
 ```
+
+## 13. A kind must not change with a point of the read (shapestab, 1.1.7, 2026-10-22)
+
+The film's hero is the lens changing shape as the pointer sweeps varied content. hero2o found that the kind of a stop changed when the stage was read again
+a point lower (hero.html pasted into the screen frame `dy` = 0..3 pt below, read by Vision each time; the zoom case at 0.888; the live take). The same flips
+would show on any screen: the cause is in the recognisers, not the stage. Reads, stops and the sim are in `tools/first-lens/data/shapes/hero/` (`herofix.py`
+makes `LensShapeHeroScenes.swift` from them); a stop is a stage point (heading 240,64; chat 770,176; table 1236,140; subtitle 1240,492; dialog 1180,754 in
+hero.html, 850 in index.html), the pointer 61 pt lower plus `dy`, the zoom case scaled by 0.888. Reproduced exactly: heading thread/group/thread/ghost,
+table wide/ok/ok/ok, dialog ok/ok/ok/subtitles over hc0..hc3.
+
+### 13.1 What each flip was (every one traced to the guard that decided it)
+
+| flip | cause | owner | closed by |
+|---|---|---|---|
+| heading -> `thread` (38,61 904 x 151: the article's heading and paragraph, the chat's bubbles, and the window's title text) | the thread took the heading as a message: its em (29 pt) set the lane tolerance (1.5 em = 44 pt), the gap (4.5 em) and the neighbourhood (20 em = 580 pt), so the left lane held the article, the right the chat; and `webwin`, `Lens shapes` (the title bar, y < 61, outside the window's content) counted as messages | `thread`, and what `choose` hands the recognisers | `Map.within(bounds)`; the thread's messages are set alike (`alike`, `laneSpread`) |
+| table -> a table 38..1467 wide | the anchor's row held a line of the article 540 pt to the left: its lane met 3 of the table's 5 rows by chance, and the share needed was 0.6 (3 of 5), so a point of read decided it | `lanes` | a lane needs its lines down the rows to stand on a row too (0.6 of them): the article's lane has 3 of 7 |
+| table -> `group` (live take: only the first lane, 232 pt) | the read merged the first lane's three cells into one 3-line block, whose modelled glyph height (68.1 / 3.7 = 18.4 pt) is the box over the leading, not a glyph; against the lane's 11 and 13.2 pt cells it broke the 1.4 spread | `lanes` | a lane is judged by its one-line cells |
+| table -> `group` / ghost under 1 pt of noise (hc1, hc2, zc) | the 1.4 spread is inside the natural variation of box heights: digits 11 pt, words with descenders 17.8 pt in one lane (ratio 1.45 to 1.6 with a point of noise) | `laneSpread` | 1.7, section 13.4 |
+| dialog -> `group` (1 pt of noise, h0: 53 of 1000) | `above()` took the nearest block above the body, then tested it: a list item of the next panel ended 0.5 pt above the name's limit and was taken for the name | `dialog` | the name is the nearest block that *pairs* |
+| dialog -> `subtitles` (hc3, zc, live) | the read merged "Mira" into its lines: one 3-line block, which is what a 3-line subtitle is by its box (the name sits on the box's pitch, so even the line pitch is uniform) | `Block` (what the read gives) | `Block.head`, the first line's box, 13.6 |
+| heading -> ghost (hc3) | Vision lost the paragraph under the heading (it has the last line only); a heading alone is no group | the read | pinned as the ghost in the test (`readLostText`) |
+
+### 13.2 Target and gap
+
+| target | today (before) | gap | owner |
+|---|---|---|---|
+| a recogniser takes the blocks that belong with the anchor and no others | `lanes`, `thread`, `dialog` take any block that passes a geometric test, wherever it stands | what stands in `bounds`; what is set alike; a lane's lines stand on its rows; the name is a block that pairs | `Map.within`, `alike`, `lanes`, `dialog` |
+| a kind does not change with a point of the read | thresholds sat at the edge of the measure: 3 of 5 against 0.6, a ratio of 1.45 against 1.4, 0.5 pt of 17.8 | the measured quantity gets room: the lane's lines, 1.7, the pairing block | `lanes`, `laneSpread` |
+| a read that merged the name is read as the unmerged one | geometry cannot tell it from a three-line subtitle | `Block.head`, split at the first line and judged by `pair` | `dialog`, the picker's seam |
+| the reason for a kind can be read | nothing | `LensShape.explain` | `LensShape` |
+
+### 13.3 The panel boundary: what I measured instead of a gutter width
+
+The brief asked for a vertical gutter wider than some X across the rows. Measured on the reads, no X separates a panel's gutter from a table's own: the film stage's
+panels are 52 and 66 pt apart (41 and 53 at 0.888), the two columns of p02 22 pt; across the rows of a true table the free x gaps between lanes are 35 and 42 (the
+stage), 90 and 113 (d01), 44 to 163 (d02), 385 (d05), 71 and 131 (g03), 142 (the k06 pane pair, which is no table). Both ranges cover each other. What separates them is
+not the width of the gap but whether the content on its two sides is one thing, so the boundary is stated as what belongs with the anchor, at four owners: content is
+what is in `bounds` (a window is the first panel boundary the system draws); a lane's lines down the rows are cells on those rows; a thread's messages are alike;
+a dialog's name is a block that pairs with the body. None adds a number: they reuse `cutSlack`, `laneShare`, `laneSpread` and `pair`.
+
+### 13.4 The margin
+
+`laneSpread` 1.4 -> 1.7 (the same ratio now decides `alike` for the thread). In the film stage's table lanes the box heights run from 10.2 to 18.1 pt (digits to
+descenders), so a lane's cells are 1.42 to 1.6 apart with a point of noise; a heading stands 1.8 to 2.2 over the text (29.1 against 16.1 and 13.2 in h0; one read,
+hc3, 1.7). 1.7 is between. Over the 53 scenes (10 pt grid, 288,602 positions) it changes d01 only (13.5), and of the values tried (1.4, 1.5, 1.6, 1.7, 1.8, 2.0) 1.7 and
+1.8 flip no table in the seven reads at +-2 pt of noise (at +-2 pt 1.4 flips the table 20 to 85 times in 1000 on five of the reads, 1.6 up to 8), and 2.0 lets the heading back into the thread.
+
+### 13.5 The gates
+
+`LensShapeStabilityTests`, section 9. The kinds in the hero's five reads, the panel each rect stays in, and the sweeps: 320 placements (dy 0..7, dx 0..3, scale 1 and
+0.888), 32 jitters of 1 pt on every edge of every read (7 reads x 32 x 5 stops), the merged name, and one synthetic test per rule. `mutants.sh` takes each rule out in
+turn.
+
+### 13.6 Measured
+
+Hero reads, kind before -> after (`h0`..`live`, five stops):
+
+| read | heading | thread | table | subtitles | dialog |
+|---|---|---|---|---|---|
+| h0, hc0 | thread -> group | thread | table 38,147 1429 x 365 -> 996,125 471 x 151 | subtitles | dialog |
+| hc1 | group | thread | table | subtitles | dialog |
+| hc2 | thread -> group | thread | table | subtitles | dialog |
+| hc3 | ghost (the read lost the paragraph) | thread | table | subtitles | subtitles -> dialog |
+| zc | group | thread | table | subtitles | subtitles -> dialog |
+| live | group | thread | group -> table | subtitles | subtitles -> dialog |
+
+Wrong answers of 1000 (200 jitters x 5 stops) per read at +-1 pt on every edge, before -> after: h0 158 -> 0, hc1 73 -> 0, hc2 201 -> 0, hc3 400 -> 200 (the lost
+paragraph), zc 211 -> 0, live 466 -> 0; at +-1.5 pt after: 2, 2, 1, 200, 0, 0; the 320 placements of h0 (dy 0..7, dx 0..3, 1 and 0.888): 64 wrong -> 0.
+Over the 53 scenes, the kind at every block's centre with +-1 pt on every edge (24 jitters, 10,008 trials): 446 -> 431 flips; the offenders left are in section 13.8.
+
+The 53 scenes keep their kinds, position by position: of 288,602 positions on a 10 pt grid 308 change (d01-spec-table-en: `group` -> `table`, the title's and the first
+column's anchors now get the same table the other anchors of that table get: its table share of near positions 66 % -> 92 %, group 27 % -> 0 %); 0 change their rect;
+no other scene changes by a position (per-scene histograms before and after: the report of this round; `stability grid` makes the two grids to diff). `measure.sh`, the same tool, over the same 91,642 near
+positions, LensShape alone: claim 88.3 % -> 88.3 %, cut 0.00 % -> 0.00 %, reversals with the hold 0 -> 0 (without it 592,143 -> 592,683); d01 is the one row that
+moves (`data/shapes/hero/measure-alone-{before,after}.txt`). The stage's planned path (`sweep.txt`, 196 frames): identical, kinds in the same order, 0 frames with a cut. The seam's rows (`seam`, `plain`, `column`) were
+measured here on the hero tree's `LensTarget` (the shapes117 seam tree is gone): 78.3 %, 88.4 %, 20.8 % claim, identical before and after, so they do not move with this
+change; they are not the 88 % of section 5, which is the older column rule's.
+Cost: `choose` 7 -> 8 us on the stage when every block is inside `bounds`; 36 us when some are not (the scoped map is built per call: 46 blocks; its linking now stops at
+the first block out of reach, which took the build from 53 to 36 us), a pointer move at 120 Hz spends 0.4 % of a core on it.
+
+### 13.7 The first line's box (`Block.head`) and the picker's seam
+
+`LensShape.Block` gained `head: CGRect?`, the box of the block's first line, nil by default (every existing call and the bench fixtures are unchanged). The dialog splits
+a block with a `head` at that line (`split`: the name is the head, the body the rest, its lines spread over the rest of the box) and judges the pair with `pair`: a
+three-line subtitle's first line is as wide as the others, so it is no name (`threeLineSubtitleIsNoDialog`). The picker has the box: the vn read's block holds its
+lines. The wiring is two lines in the seam that is applied after this: `ColumnFit.Block` gets `head: CGRect? = nil`, the picker sets it from the block's first line (in
+the same points as `core`) where it builds `LensTarget.Map(read:)`, and `LensShape.Block.init(_ b: ColumnFit.Block)` passes it (`self.init(core: b.core, lines: b.lines,
+head: b.head)`). Without it the merged read stays a subtitle, as before.
+
+### 13.8 Open (outside this round; the first needs a decision)
+
+- p02-paper-fig-table: a bar chart's three labels paired with a column of text lines through a text column's own lines (711 positions, `table` 43..813 wide, across both
+  columns). It is one lane of paragraph lines against another (the two columns of a page set at one pitch) and no geometric rule of this section tells it from a table
+  with wrapped cells; the cell share counted in lines would, but loses d01, k06 and the right-hand table of p02 (2,318 positions). Unchanged by this round.
+- The table's title aims at the table only within `stackGap` (1.2 em) of its first row: the stage's title is 18.4 pt above its row against a limit of 18.48 (a 0.08 pt
+  margin; +-1 pt of noise flips it, `stage` 17 of 1104). Widening to 1.5 em adds table claims in d05 (45), k06 (75), p02 (3): needs a look at each.
+- Flips left over the 53 scenes at +-1 pt (24 jitters per block centre): c05-wechat 110 of 240 (a chat of four one-line bubbles),
+  k04 42, k10 36, k09 27, k12 25, k02 22 (group <-> ghost), d03 17 (thread -> dialog on a magazine), d05 18 (table -> ghost); none traced. `explain` prints
+  the ladder of each in a few lines.
+- hc3's heading: the read lost the paragraph; nothing to recover.

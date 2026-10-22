@@ -27,8 +27,9 @@ public enum BlockMerge {
     static let interlock = 0.5
 
     /// Groups of block indices (ascending) that are one block; `lines[i]` are the line boxes of block `i`. Blocks that
-    /// join nothing come back alone, in order of their first index.
-    public static func groups(_ lines: [[CGRect]]) -> [[Int]] {
+    /// join nothing come back alone, in order of their first index. `tails` are the short last lines of wrapped paragraphs
+    /// (`WrapTail`), which need the texts of the lines to be told from a short message: their blocks join the block above.
+    public static func groups(_ lines: [[CGRect]], tails: [WrapTail.Pair] = []) -> [[Int]] {
         var parent = Array(lines.indices)
         func find(_ i: Int) -> Int {
             var i = i
@@ -40,6 +41,7 @@ public enum BlockMerge {
                 parent[find(j)] = find(i)
             }
         }
+        for pair in tails { parent[find(pair.tail)] = find(pair.head) }
         var order: [Int: Int] = [:], out: [[Int]] = []
         for i in lines.indices {
             let root = find(i)
@@ -285,7 +287,8 @@ public enum LabelSize {
 /// A line the capture cuts. The recognizer reads what the picture holds: a line that stands half inside the capture is read
 /// from its upper or lower half, and its translation, drawn over the visible half, is of half a sentence. The capture is
 /// larger than the lens (overscan), so such a line is out of sight unless the capture ends at the edge of the display; it is
-/// left as it is (not translated, not erased) until the capture holds the whole line.
+/// left as it is (not translated, not erased) until the capture holds the whole line. At the left and right edges the same holds
+/// for a column of text the edge runs through (`cutAtSides`): a lens that overshoots into the next column ends the capture inside it.
 public enum CaptureEdge {
     /// A line's box this close to the top or bottom of the capture (pixels) touches it: the recognizer's boxes follow the
     /// glyphs it saw, and a line cut through the middle of its letters ends 3 px short of the edge as often as at it (measured
@@ -308,6 +311,28 @@ public enum CaptureEdge {
         guard !clear.isEmpty else { return [] }
         let reference = clear[clear.count / 2]
         return Set(lines.indices.filter { touches(lines[$0], in: bounds) && lines[$0].height < shortShare * reference })
+    }
+
+    /// A side of the capture that is the edge of a column of text: this many lines (or more) reach it. The lines of a column that goes on
+    /// past the capture all end at the edge, the full ones of a justified paragraph and the long ones of a ragged one. One heading or two
+    /// at the edge of a picture cropped to the top left of a page (the use-case bench has four) is a title that stands there.
+    public static let sideColumn = 3
+
+    /// Whether `line` reaches the left or right edge of `bounds`.
+    public static func touchesSide(_ line: CGRect, in bounds: CGRect) -> Bool {
+        line.minX <= bounds.minX + tolerance || line.maxX >= bounds.maxX - tolerance
+    }
+
+    /// The indices of the lines that the capture's left or right edge cuts: those that reach a side edge that `sideColumn` lines or more
+    /// reach. A capture larger than the lens ends inside the next column when the lens overshoots into it, and the line starts it holds
+    /// were read and translated word by word; the lines whose box is not the whole line are left as they are, like those the top and bottom
+    /// edges cut. A line has no width to compare with (a cut line is as wide as a whole one), so the edge itself says: as with the top and
+    /// bottom, a capture with no line clear of the sides is a picture cropped to its text, and none is cut.
+    public static func cutAtSides(_ lines: [CGRect], in bounds: CGRect) -> Set<Int> {
+        guard lines.contains(where: { !touchesSide($0, in: bounds) }) else { return [] }
+        let left = lines.indices.filter { lines[$0].minX <= bounds.minX + tolerance }
+        let right = lines.indices.filter { lines[$0].maxX >= bounds.maxX - tolerance }
+        return Set([left, right].filter { $0.count >= sideColumn }.joined())
     }
 }
 

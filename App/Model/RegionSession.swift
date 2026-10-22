@@ -1444,6 +1444,18 @@ extension RegionSession {
         } else {
             fitSettled()
         }
+        if s.cut { reachColumns() }
+    }
+
+    /// The read dropped a paragraph the capture's side cuts and the lens meets (`OverlaySnapshot.cut`): its lines end at the capture's edge, so there is nothing to lay
+    /// out for the lens. The capture becomes the band (the display's width at the lens's rows, as a probe's) until the lens is moved or resized, and the next read holds the
+    /// column whole (film4 F16: a lens drawn short of its column showed the page's English, since every line of its paragraph was cut). A hand on the lens waits.
+    private func reachColumns() {
+        guard Reach.wants(cut: true, widened: fit.band != nil, probing: fit.probe != nil, handOn: dragging || fit.handOn), offScreen.isEmpty else { return }
+        Trace.count("lens.reach")
+        Trace.mark("reach: the capture cuts a paragraph the lens meets, reading the band", since: Trace.now)
+        fit.band = Overscan.band(around: config.rect, display: display(of: config.rect))
+        fitCapture(allowResize: true)
     }
 
     /// The room a fit may take: the lens's display, and the window a window lens follows.

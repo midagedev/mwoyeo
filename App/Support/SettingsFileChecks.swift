@@ -1012,6 +1012,25 @@ enum SettingsFileChecks {
             }
         }
         check("--settings-schema prints the schema and exits 0 (a run that does not end in time fails)", printed.0 == 0 && Data(printed.1.utf8) == schemaText)
+        // A flag that is in no row of the usage text starts nothing (round text2, F3: on 3a2e86a it opened the app, on the settings path of whoever ran it).
+        let scratch = dir.appendingPathComponent("unknown-flag", isDirectory: true)
+        try? FileManager.default.createDirectory(at: scratch, withIntermediateDirectories: true)
+        var quiet = ProcessInfo.processInfo.environment
+        quiet["HOME"] = scratch.path
+        quiet["MWOYEO_SETTINGS_FILE"] = scratch.appendingPathComponent("settings.json").path
+        quiet["MWOYEO_DEFAULTS_SUITE"] = "dev.midagedev.mwoyeo.unknown-flag-check"
+        for flag in ["--help", "-h", "--bogus"] {
+            let r = launch([flag], environment: quiet, within: 10, captureError: true)
+            let written = (try? FileManager.default.contentsOfDirectory(atPath: scratch.path)) ?? ["unreadable"]
+            let refused = r.status == 64 && r.err.hasPrefix("Mwoyeo: unknown option \(flag)\n") && r.err.contains("usage: Mwoyeo") && r.out.isEmpty && written.isEmpty
+            if !refused { print("check-logic: note: \(flag) exit \(r.status) stderr \(r.err.prefix(80)) written \(written)") }
+            check("\(flag): usage naming it on stderr, exit 64, nothing on stdout, the app not started, and no file written (home and settings path point at an empty folder)", refused)
+            if r.status != 64 { break }   // the app was started (and ended after the wait): once is enough
+        }
+        let usage = CommandLineUsage.text(for: "--x")
+        check("every flag the app reads is known, and the usage text lists each one of them",
+              CommandLineUsage.flags.allSatisfy { CommandLineUsage.unknown(in: [$0.name]) == nil && usage.contains($0.name) }
+              && CommandLineUsage.unknown(in: ["--relaunched", "123"]) == nil && CommandLineUsage.unknown(in: ["--x"]) == "--x")
 
         // The app: a change in Settings writes the file; an edit of the file applies
         let url = model.settingsFile.url
@@ -1116,18 +1135,30 @@ enum SettingsFileChecks {
     /// The run speaks this process's language: `--lang` sets it in memory only, which a child does not inherit, and the schema's
     /// default for `targetLanguage` follows it (a 2026-10-19 English run printed "ko" against this run's "en").
     private static func command(_ arguments: [String], within seconds: Double = 20) -> (Int32, String) {
-        let p = Process(), pipe = Pipe()
+        let r = launch(arguments, within: seconds)
+        return (r.status, r.out)
+    }
+
+    /// `command` with the environment it is given (this process's by default) and, when `captureError`, what the run wrote to stderr.
+    private static func launch(_ arguments: [String], environment: [String: String]? = nil, within seconds: Double = 20, captureError: Bool = false)
+        -> (status: Int32, out: String, err: String) {
+        let p = Process(), pipe = Pipe(), errors = Pipe()
         p.executableURL = Bundle.main.executableURL
         p.arguments = arguments + ["-AppleLanguages", "(" + Locale.preferredLanguages.map { "\"\($0)\"" }.joined(separator: ", ") + ")"]
         p.standardOutput = pipe
-        p.environment = ProcessInfo.processInfo.environment
-        let exited = DispatchSemaphore(value: 0), read = DispatchSemaphore(value: 0)
-        let out = Output()
+        if captureError { p.standardError = errors }
+        p.environment = environment ?? ProcessInfo.processInfo.environment
+        let exited = DispatchSemaphore(value: 0), read = DispatchSemaphore(value: 0), readErrors = DispatchSemaphore(value: 0)
+        let out = Output(), err = Output()
         p.terminationHandler = { _ in exited.signal() }
-        do { try p.run() } catch { return (-1, "") }
+        do { try p.run() } catch { return (-1, "", "") }
         DispatchQueue.global().async {
             out.data = pipe.fileHandleForReading.readDataToEndOfFile()
             read.signal()
+        }
+        DispatchQueue.global().async {
+            if captureError { err.data = errors.fileHandleForReading.readDataToEndOfFile() }
+            readErrors.signal()
         }
         var timedOut = false
         if exited.wait(timeout: .now() + seconds) == .timedOut {
@@ -1136,7 +1167,8 @@ enum SettingsFileChecks {
             _ = exited.wait(timeout: .now() + 5)
         }
         let complete = read.wait(timeout: .now() + 5) == .success
-        return (timedOut ? -1 : p.terminationStatus, complete ? String(decoding: out.data, as: UTF8.self) : "")
+        let completeErrors = readErrors.wait(timeout: .now() + 5) == .success
+        return (timedOut ? -1 : p.terminationStatus, complete ? String(decoding: out.data, as: UTF8.self) : "", completeErrors ? String(decoding: err.data, as: UTF8.self) : "")
     }
 
     /// What the reader thread of `command` collected; read only after it has signalled.

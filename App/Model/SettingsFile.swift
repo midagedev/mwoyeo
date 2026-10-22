@@ -48,7 +48,7 @@ struct SettingSpec {
         "rewrites": (.translation, .preference), "script": (.translation, .preference),
         "useInpaintingModel": (.appearance, .preference), "fontStyle": (.appearance, .preference), "boxOpacity": (.appearance, .preference),
         "lensStyle": (.appearance, .preference), "lensTint": (.appearance, .preference), "lensTabVisibility": (.appearance, .preference),
-        "lensTabPosition": (.appearance, .preference),
+        "lensTabPosition": (.appearance, .preference), "lensSnap": (.appearance, .preference), "lensAutoFit": (.appearance, .preference),
         "shortcuts": (.shortcuts, .preference),
         "checksForUpdates": (.about, .consent),
         // 1.1.4's keys: read and converted, never written, shown by no tab; what they were is what they became (`profiles`, `glossaryApply`).
@@ -97,6 +97,10 @@ struct SettingSpec {
               doc: "When the lens shows its name tag: automatic (always, except under the pointer only on a minimal lens), always or onHover."),
         .init(key: "lensTabPosition", kind: .choice(LensTabPosition.allCases.map(\.rawValue)),
               doc: "Where the name tag sits: topLeading, topTrailing, bottomLeading or bottomTrailing."),
+        .init(key: "lensSnap", kind: .bool,
+              doc: "Snap a lens to the text columns under it: while you drag or resize it, a guide shows when an edge is within 8 points of a column's edge, and the lens lands on it when you let go. Hold ⌘ while dragging to place a lens freely. Written to the file only while false."),
+        .init(key: "lensAutoFit", kind: .bool,
+              doc: "Lenses you add start with Auto Fit on: after a read settles, a lens that cuts the text of its column at the left or right edge grows to the column once. It never makes a lens smaller. Each lens keeps its own choice, in its menu. Written to the file only while true."),
         .init(key: "cacheSize", kind: .integer(100...100_000), doc: "How many translations are kept in memory for reuse."),
         .init(key: "shortcuts", kind: .shortcuts,
               doc: "Global keyboard shortcuts by action name; an action left out has no shortcut. Each has a Carbon keyCode, a Carbon modifiers mask and a display text. Easier to set in Settings > Shortcuts."),
@@ -452,7 +456,8 @@ enum SettingsFileCheck {
     /// Keys added after 1.1.2 whose default is not written: the file holds one only while it differs, so a file from before the key
     /// re-saves byte for byte. The schema still lists it, with its default. A switch is written only while it is true, `glossaryApply`
     /// only while it is not hint.
-    static let writtenOnlyWhenSet: [String: NSObject] = ["useLearned": false as NSNumber, "agentConnection": false as NSNumber, "fastFirstPaint": false as NSNumber, "glossaryApply": "hint" as NSString, "rewrites": [] as NSArray]
+    static let writtenOnlyWhenSet: [String: NSObject] = ["useLearned": false as NSNumber, "agentConnection": false as NSNumber, "fastFirstPaint": false as NSNumber, "glossaryApply": "hint" as NSString, "rewrites": [] as NSArray,
+                                                         "lensSnap": true as NSNumber, "lensAutoFit": false as NSNumber]
 
     /// Keys AppSettings writes to the file that `SettingSpec.all` does not describe (the schema would lack them). Every
     /// switch counts, also one the file leaves out while it is off.

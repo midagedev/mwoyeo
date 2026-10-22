@@ -175,6 +175,8 @@ The top-level `glossary` is used the same way for every pair, by one key: `gloss
 
 `profilePin` pins every lens to one profile: its `id`, or `all` for All apps only. Left out, each lens picks by its window (Auto). It must name a profile in `profiles`; a pin to none is reported and keeps the current value. A lens's own pin, set from its menu, stays with the lens and is not in this file.
 
+`lensSnap` (default true) makes a lens snap to the text columns under it: while it is dragged or resized, a guide shows when an edge is within 8 points of a column's edge, and a dragged lens settles on the edge when it is let go; holding ⌘ places a lens freely. `lensAutoFit` (default false) is only the default of the lenses you add: after a read settles, a lens with Auto Fit on that cuts the text of its column at the left or right edge grows to the column once (it never makes a lens smaller, and a manual resize turns it off for that lens). A lens keeps its own Auto Fit (its menu row) with the lens, not in this file, like its profile pin. Both keys are booleans, written to the file only while they differ from the default (`lensSnap` while false, `lensAutoFit` while true); a value of another type is reported with its line and keeps the current value. Fit to Column has no key: it is a lens-menu row, VoiceOver's action and a double-click on the lens's ring.
+
 A wrong value inside a profile is reported and treated as not written:
 
 ```

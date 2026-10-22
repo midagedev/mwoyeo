@@ -74,7 +74,9 @@ final class ReadWatchTests: XCTestCase {
     }
 
     func testAMovingAreaIsReadOnceWhenItStops() {
-        var sim = Sim(previous: scene(phase: 0, line: 0))
+        // The hold's rule alone: the cap (`heldReadInterval`, 1.5 s) would hand the band back at 1.6 s, while it moves until 2.0 s. Its own
+        // tests are the ones below (untrans117, 2026-10-23: the cap was out of this one's way, no assertion of it was changed).
+        var sim = Sim(watch: ReadWatch(heldReadInterval: .infinity), previous: scene(phase: 0, line: 0))
         for i in 1...20 {
             _ = sim.step(scene(phase: i, line: 0), boxes: [box])
             XCTAssertEqual(sim.watch.takeRested(at: sim.time), [], "the band was handed back to be read while it still moved (frame \(i))")
@@ -183,7 +185,9 @@ final class ReadWatchTests: XCTestCase {
     /// frames are all counted it rests `hold` after its last frame, not later.
     func testAPassThatOutlastsTheHoldDoesNotMakeAMovingBandRest() {
         let hold = 0.6
-        var watch = ReadWatch(hold: hold), inbox = ReadWatch.Inbox()
+        // The hold's rule alone: the band moves for 2 s, longer than the cap's interval (untrans117, 2026-10-23: out of this one's way, no
+        // assertion changed).
+        var watch = ReadWatch(hold: hold, heldReadInterval: .infinity), inbox = ReadWatch.Inbox()
         // The stripes repeat every 4 phases: four pictures, and the change between any two of them, made once.
         let frames = (0..<4).map { scene(phase: $0, line: 0) }
         let changes = frames.map { a in frames.map { b in FrameDiff.changeMap(from: a, to: b) } }
@@ -235,6 +239,86 @@ final class ReadWatchTests: XCTestCase {
             XCTAssertEqual(sim.watch.hold, hold)
             XCTAssertEqual(sim.watch.takeRested(at: sim.time + hold / 2), [], "hold \(hold): read before it had been still")
             XCTAssertFalse(sim.watch.takeRested(at: sim.time + restsAt).isEmpty, "hold \(hold): not read once it had been still for \(restsAt) s")
+        }
+    }
+
+    // MARK: A scene that never stops (untrans117, 2026-10-23)
+
+    /// The pipeline's reads on the watch: a take is a read of what was handed back, as the pass `noteRested` starts is, and the frame it read
+    /// is the one just counted (`didRead`).
+    private func readsInANeverStillScene(frames: Int, dt: Double, appearing: [(frame: Int, at: PixelRect)] = [],
+                                         watch: ReadWatch = ReadWatch()) -> (reads: [(time: Double, areas: [PixelRect])], sim: Sim) {
+        var sim = Sim(watch: watch, previous: scene(phase: 0, line: 0))
+        var reads: [(time: Double, areas: [PixelRect])] = []
+        for i in 1...frames {
+            // Text that appears in the band at a frame stays; the band's cells move on under it.
+            let extra = appearing.last { $0.frame <= i }?.at
+            _ = sim.step(scene(phase: i, line: 0, extra: extra), boxes: [box], dt: dt)
+            let areas = sim.watch.takeRested(at: sim.time)
+            if !areas.isEmpty {
+                reads.append((sim.time, areas))
+                sim.watch.didRead(nil, frameTime: sim.time)
+            }
+        }
+        return (reads, sim)
+    }
+
+    func testNewTextInASceneThatNeverStopsIsReadWithinTheInterval() {
+        let text = PixelRect(x: 96, y: 32, width: 96, height: 16)
+        // The text appears at 0.5 s, at 1.65 s (just after the first read of the band) and at 2.3 s.
+        for frame in [5, 16, 23] {
+            let appeared = Double(frame) / 10
+            let run = readsInANeverStillScene(frames: 60, dt: 0.1, appearing: [(frame, text)])
+            let covering = run.reads.first { r in r.time >= appeared && r.areas.contains { $0.x <= text.x && $0.x + $0.width >= text.x + text.width && $0.y <= text.y && $0.y + $0.height >= text.y + text.height } }
+            XCTAssertNotNil(covering, "text that appeared at \(appeared) s in a scene that never stops was never read: reads at \(run.reads.map(\.time))")
+            if let covering {
+                XCTAssertLessThanOrEqual(covering.time - appeared, ReadWatch.standardHeldReadInterval + 0.1 + 1e-9, "text that appeared at \(appeared) s was read at \(covering.time) s")
+            }
+        }
+    }
+
+    func testASceneThatNeverStopsIsReadOncePerIntervalNotEveryFrame() {
+        // The game117 probe's case: 31 s of a band that moves in every frame, 8 frames a second.
+        let run = readsInANeverStillScene(frames: 248, dt: 0.125)
+        print("readwatch-note: a band that never stops, 31 s at 8 frames a second: \(run.reads.count) reads, first at \(run.reads.first?.time ?? -1) s")
+        XCTAssertGreaterThan(run.reads.count, 15, "reads of the band in 31 s: \(run.reads.count)")
+        XCTAssertLessThanOrEqual(run.reads.count, Int(31 / ReadWatch.standardHeldReadInterval) + 1, "reads of the band in 31 s: \(run.reads.count)")
+        for (a, b) in zip(run.reads, run.reads.dropFirst()) {
+            XCTAssertGreaterThanOrEqual(b.time - a.time, ReadWatch.standardHeldReadInterval - 1e-9, "two reads of the band \(b.time - a.time) s apart")
+        }
+    }
+
+    func testAToastInAStillAreaIsStillReadAtTheHoldWhileTheSceneNeverStops() {
+        // The band moves in every frame; a toast appears below it at 0.2 s and stays: it rests at 0.2 + 0.4 s, long before the band is read.
+        let toast = PixelRect(x: 224, y: 96, width: 64, height: 16)
+        let run = readsInANeverStillScene(frames: 8, dt: 0.1, appearing: [(2, toast)])
+        guard let first = run.reads.first else { return XCTFail("the toast was never read") }
+        XCTAssertEqual(first.time, 0.6, accuracy: 0.101, "the toast was read at \(first.time) s")
+        XCTAssertTrue(first.areas.allSatisfy { $0.y >= 80 }, "the band was read with it: \(first.areas)")
+        XCTAssertTrue(first.areas.contains { $0.x <= toast.x && $0.x + $0.width >= toast.x + toast.width && $0.y <= toast.y && $0.y + $0.height >= toast.y + toast.height }, "areas \(first.areas)")
+    }
+
+    func testTheLookAgainIsDueWhenAMovingSceneHasBeenHeldForTheInterval() {
+        // The band moves in every frame: the tiles never rest, so the look is due when the oldest has been held for the interval (1.6 s, the first
+        // frame being at 0.1 s), not 0.4 s after the last frame.
+        var sim = Sim(previous: scene(phase: 0, line: 0))
+        for i in 1...15 { _ = sim.step(scene(phase: i, line: 0), boxes: [box]) }
+        XCTAssertEqual(sim.time, 1.5, accuracy: 1e-9)
+        XCTAssertEqual(sim.watch.restsIn(at: sim.time) ?? -1, 0.1, accuracy: 1e-9)
+        XCTAssertEqual(sim.watch.wake(at: sim.time) ?? -1, 0.1, accuracy: 1e-9)
+        XCTAssertEqual(sim.watch.takeRested(at: sim.time), [], "handed back before the interval was up")
+        XCTAssertFalse(sim.watch.takeRested(at: sim.time + 0.1).isEmpty, "not handed back when the interval was up")
+    }
+
+    func testAnInjectedIntervalIsHowLongAMovingSceneGoesUnread() {
+        for interval in [0.5, 3.0] {
+            let run = readsInANeverStillScene(frames: 100, dt: 0.1, watch: ReadWatch(heldReadInterval: interval))
+            XCTAssertEqual(run.sim.watch.heldReadInterval, interval)
+            XCTAssertEqual(run.reads.first?.time ?? -1, interval + 0.1, accuracy: 0.101, "interval \(interval): first read of the band at \(run.reads.map(\.time))")
+            XCTAssertLessThanOrEqual(run.reads.count, Int(10 / interval) + 1, "interval \(interval): reads \(run.reads.map(\.time))")
+            for (a, b) in zip(run.reads, run.reads.dropFirst()) {
+                XCTAssertGreaterThanOrEqual(b.time - a.time, interval - 1e-9, "interval \(interval): two reads \(b.time - a.time) s apart")
+            }
         }
     }
 }

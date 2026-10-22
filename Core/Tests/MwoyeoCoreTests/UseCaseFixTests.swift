@@ -70,6 +70,48 @@ import Testing
         #expect(LabelRule.nameTags([tag, item("はい、シュザンヌ様。足元にお気をつけください", x: 10, y: 200, w: 300, black)]).isEmpty, "far under it: not its box")
     }
 
+    // MARK: a HUD's labels are translated (untrans117, 2026-10-23)
+
+    @Test func aWordBesideAFigureIsNotALabel() {
+        let white = RGBA(255, 255, 255), yellow = RGBA(255, 220, 60), red = RGBA(230, 60, 60)
+        // The three HUD fixtures of the audit: a label and its value in another colour were both left as written.
+        #expect(LabelRule.labels([item("Gold", x: 20, y: 20, w: 60, h: 24, white), item("540", x: 90, y: 20, w: 50, h: 24, yellow)]).isEmpty)
+        #expect(LabelRule.labels([item("体力", x: 20, y: 20, w: 50, h: 24, white), item("120", x: 80, y: 20, w: 50, h: 24, red)]).isEmpty)
+        // A price, a ratio, a time, a percentage, a count with its unit mark.
+        for value in ["1,280 G", "120/300", "00:45", "35%", "x12", "480円", "¥1,200", "3.5"] {
+            #expect(LabelRule.labels([item("Gold", x: 20, y: 20, w: 60, h: 24, white), item(value, x: 90, y: 20, w: 90, h: 24, yellow)]).isEmpty, "\(value)")
+        }
+        // What is not only a figure still makes the word a label: a phrase, a relative time, a clock with its marker, a name's handle and its age.
+        for value in ["Find the lost key", "5時間前", "8:12 PM", "3 replies", "12 hours ago"] {
+            #expect(LabelRule.labels([item("Quest", x: 20, y: 20, w: 70, h: 24, white), item(value, x: 100, y: 20, w: 120, h: 24, yellow)]) == [0], "\(value)")
+        }
+    }
+
+    @Test func aHeadingOverAListIsNotALabel() {
+        let white = RGBA(255, 255, 255), yellow = RGBA(255, 220, 60)
+        let heading = item("アイテム", x: 20, y: 20, w: 100, h: 24, yellow)
+        func rows(_ n: Int, _ texts: [String] = ["ポーションを使う", "ハイポーションを使う", "毒消しを使う", "エーテルを使う"]) -> [LabelRule.Item] {
+            (0..<n).map { item(texts[$0], x: 20, y: 52 + CGFloat($0) * 32, w: 200, h: 24, white) }
+        }
+        #expect(LabelRule.labels([heading] + rows(3)).isEmpty, "a yellow heading over a white list of three")
+        #expect(LabelRule.labels([heading] + rows(4)).isEmpty, "of four")
+        // Rows with a sparse pitch (a menu's), and a list that goes on past the heading's reach.
+        let sparse = (0..<4).map { item(["ポーション", "ハイポーション", "毒消し", "エーテル"][$0], x: 20, y: 70 + CGFloat($0) * 46, w: 160, h: 24, white) }
+        #expect(LabelRule.labels([heading] + sparse).isEmpty)
+        // A name over one line of speech, over two, or over three sentences is a name tag as before.
+        let speech = ["야 오늘 저녁에 뭐 해?", "약속 없는데 왜?", "새로 생긴 라멘집 가보자!"]
+        let name = item("민지", x: 20, y: 20, w: 40, h: 24, yellow)
+        for n in 1...3 {
+            let lines = (0..<n).map { item(speech[$0], x: 20, y: 52 + CGFloat($0) * 32, w: 200, h: 24, white) }
+            #expect(LabelRule.labels([name] + lines) == [0], "a name over \(n) lines of speech")
+        }
+        // A heading over one line, or over two, is not told from a name by its place: kept, as before.
+        #expect(LabelRule.labels([heading] + rows(1)) == [0])
+        #expect(LabelRule.labels([heading] + rows(2)) == [0])
+        // The list in the heading's own colour was never a label.
+        #expect(LabelRule.labels([item("アイテム", x: 20, y: 20, w: 100, h: 24, white)] + rows(3)).isEmpty)
+    }
+
     // MARK: Korean wraps at spaces
 
     @Test func koreanWrapsAtSpacesNotInsideWords() {

@@ -22,6 +22,7 @@ enum GameChecks {
         await ignoredRegionReading(check)
         await movingBand(check)
         await movingBandDuringAPass(check)
+        await neverStill(check)
         await lensOptions(model, check)
         await recentLines(model, check)
         keyboardMarker(check)
@@ -44,10 +45,14 @@ enum GameChecks {
 
     nonisolated static let size = CGSize(width: 900, height: 360)
     nonisolated static let capture = CGRect(origin: .zero, size: size)
+    /// Where the plate of a picture is (the text on it is at `plateRect.minY + 6`).
+    nonisolated static let plateRect = CGRect(x: 20, y: 140, width: 860, height: 44)
 
     /// A picture: a white page with each line of text at (40, y) and, when `band` is a phase, a texture of cells that moves 13 points a phase
-    /// along the top (a game's background; random cells, so no shift of it is a scroll).
-    nonisolated static func picture(_ lines: [(String, CGFloat)], band: Int? = nil) -> CGImage? {
+    /// along the top (a game's background; random cells, so no shift of it is a scroll), and, when `plate` is a phase, a plate (`plateRect`) behind
+    /// the text over it whose grey alternates with the phase by more than a tile's threshold (a HUD over a video: its tiles change in every frame
+    /// and the text stays legible).
+    nonisolated static func picture(_ lines: [(String, CGFloat)], band: Int? = nil, plate: Int? = nil) -> CGImage? {
         let w = Int(size.width), h = Int(size.height)
         guard let ctx = CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpace(name: CGColorSpace.sRGB)!,
                                   bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
@@ -66,6 +71,10 @@ enum GameChecks {
                     ctx.fill(CGRect(x: x, y: 20 + row * cell, width: cell, height: cell))
                 }
             }
+        }
+        if let phase = plate {
+            ctx.setFillColor(CGColor(gray: phase % 2 == 0 ? 0.80 : 0.96, alpha: 1))
+            ctx.fill(plateRect)
         }
         let font = CTFontCreateUIFontForLanguage(.system, 24, nil)!
         for (text, y) in lines {
@@ -93,12 +102,13 @@ enum GameChecks {
 
     /// A pipeline over the whole picture that reads as the lens does and translates through an engine that is not there (nothing is sent).
     static func pipeline(_ reads: ReadCounter, mode: RenderMode = .seamless, readHold: Double = ReadWatch.standardHold,
-                         onSnapshot: @escaping @Sendable (OverlaySnapshot) -> Void = { _ in }) async -> RegionPipeline {
+                         readHeldInterval: Double = ReadWatch.standardHeldReadInterval, onSnapshot: @escaping @Sendable (OverlaySnapshot) -> Void = { _ in }) async -> RegionPipeline {
         var s = ContextChecks.settings(ContextChecks.engine("openai", base: URL(string: "http://127.0.0.1:1")!))
         s.renderMode = mode
         s.paragraphReader = .lineGrouping
         s.useInpaintingModel = false
-        let p = RegionPipeline(options: PipelineOptions(s), capture: capture, translator: ContextChecks.service(s), inpainter: nil, readHold: readHold, onSnapshot: onSnapshot)
+        let p = RegionPipeline(options: PipelineOptions(s), capture: capture, translator: ContextChecks.service(s), inpainter: nil, readHold: readHold, readHeldInterval: readHeldInterval,
+                                onSnapshot: onSnapshot)
         await p.setReadHandler { _ in reads.read() }
         await p.setVisible(capture)
         return p
@@ -171,7 +181,8 @@ enum GameChecks {
     private static func movingBand(_ check: Check) async {
         let box = 250.0
         let first = "Press the green button to open the door", second = "Take the silver key from the old table"
-        let counter = ReadCounter(), p = await pipeline(counter)
+        // The cap on a scene that never stops is out of this one's way (a loaded machine may take a second to feed twelve frames): `neverStill` has it.
+        let counter = ReadCounter(), p = await pipeline(counter, readHeldInterval: .infinity)
         // Every picture is made before the first is fed, and each frame is stamped as it is fed: the frames of the scene follow each other at
         // once, as a scene that never rests does, and nothing here waits on the clock (a tile held for 0.4 s rests only after the last frame).
         let scene = (1...12).map { frame(picture([(first, box)], band: $0), at: 0)! }
@@ -234,7 +245,8 @@ enum GameChecks {
         let box = 250.0, hold = 0.6
         let first = "Press the green button to open the door", second = "Take the silver key from the old table"
         let counter = ReadCounter(), gate = OnNextSnapshot(), feed = Feed()
-        let p = await pipeline(counter, readHold: hold, onSnapshot: { gate.snapshot($0) })
+        // The hold's rule alone: the scene goes on for longer than the cap's interval, which is out of the way (`neverStill` has it).
+        let p = await pipeline(counter, readHold: hold, readHeldInterval: .infinity, onSnapshot: { gate.snapshot($0) })
         await p.ingest(stamped(frame(picture([(first, box)], band: 0), at: 0)!))
         let started = await counter.wait(beyond: 0)
         await quiet(p)
@@ -278,6 +290,30 @@ enum GameChecks {
         await quiet(p)
         let seen = await read(p)
         check("and the text of the pass is what was read", seen.contains("silver") && !seen.contains("button"), seen)
+    }
+
+    /// Text that appears in a scene that never stops (round untrans117, 2026-10-23): a plate over the moving band that changes in every frame, and a line of
+    /// text on it that the scene did not have when the first picture was read. The hold is out of the way (60 s: no tile rests while the check runs) and the
+    /// cap is injected (0.05 s), so that the line can be read only because the held tiles are handed back once they have been held for the interval; the feed
+    /// goes on until it is read, and `bound` only stops a read that never comes (the old rule: it came 60 s after the scene stopped).
+    static func neverStill(_ check: Check, bound: Double = 20) async {
+        let box = 250.0, hold = 60.0
+        let first = "Press the green button to open the door", second = "Take the silver key from the old table"
+        let counter = ReadCounter(), feed = Feed()
+        let p = await pipeline(counter, readHold: hold, readHeldInterval: 0.05)
+        await p.ingest(stamped(frame(picture([(first, box)], band: 0), at: 0)!))
+        let started = await counter.wait(beyond: 0)
+        await quiet(p)
+        let baseline = counter.count
+        let scene = (1...8).map { frame(picture([(first, box), (second, plateRect.minY + 6)], band: $0, plate: $0), at: 0)! }
+        feed.start(p, scene)
+        let came = await counter.wait(beyond: baseline, bound: bound)
+        let fed = feed.count
+        feed.stop()
+        await quiet(p)
+        let seen = await read(p)
+        check("text that appears in a scene that never stops is read while the scene goes on, the hold being out of the way (\(fed) frames fed)",
+              started && came && seen.contains("silver"), "read \(came) after \(fed) frames: \(seen)")
     }
 
     /// The pipeline's work counters now, left in place for whoever reads them next (`Trace.takeCounts` drains them).
@@ -361,17 +397,24 @@ enum GameChecks {
         var saved: [RegionConfig] = []
         s.onConfigChange = { saved.append($0) }
         await s.start()
+        // The three rows are in the lens menu's one "Games & Video" submenu (untrans117, 2026-10-23): a lens over a page shows one row for them.
         func item(_ title: String) -> (index: Int, item: NSMenuItem)? {
-            let menu = s.contextMenu()
-            return menu.items.enumerated().first { $0.element.title == title }.map { ($0.offset, $0.element) }
+            let sub = s.contextMenu().items.first { $0.title == RegionSession.gamesTitle }?.submenu
+            return sub?.items.enumerated().first { $0.element.title == title }.map { ($0.offset, $0.element) }
         }
         func press(_ title: String) {
             if let row = item(title)?.item, row.isEnabled, let action = row.action { _ = NSApp.sendAction(action, to: row.target, from: row) }
         }
-        check("the lens menu has Ignore Region…, Clear Ignored Regions and Keep Recent Lines",
-              item(String(localized: "Ignore Region…"))?.item.isEnabled == true && item(String(localized: "Clear Ignored Regions")) != nil
-              && item(String(localized: "Keep Recent Lines")) != nil)
-        check("Clear Ignored Regions is dimmed while the lens has none", item(String(localized: "Clear Ignored Regions"))?.item.isEnabled == false)
+        let loose = Set([String(localized: "Ignore Region…"), String(localized: "Clear Ignored Regions"), String(localized: "Keep Recent Lines")])
+        let top = s.contextMenu().items.map(\.title)
+        check("the lens menu has one \"Games & Video\" row with Ignore Region… and Keep Recent Lines in it, and none of the three loose",
+              item(String(localized: "Ignore Region…"))?.item.isEnabled == true && item(String(localized: "Keep Recent Lines")) != nil
+              && top.filter { $0 == RegionSession.gamesTitle }.count == 1 && !top.contains { loose.contains($0) }, top.joined(separator: " | "))
+        check("Fit to Column and Auto Fit stay in the menu, above Games & Video",
+              [String(localized: "Fit to Column"), String(localized: "Auto Fit")].allSatisfy { fit in
+                  top.firstIndex(of: fit).map { $0 < (top.firstIndex(of: RegionSession.gamesTitle) ?? 0) } == true
+              }, top.joined(separator: " | "))
+        check("Clear Ignored Regions is not shown while the lens has no region", item(String(localized: "Clear Ignored Regions")) == nil)
 
         // A drag over part of the lens is a region of it, in fractions of the lens; one outside it, or too small, is none.
         s.addIgnoredRegion(dragged: CGRect(x: 200, y: 260, width: 80, height: 40))
@@ -384,7 +427,7 @@ enum GameChecks {
         s.addIgnoredRegion(dragged: CGRect(x: 10, y: 10, width: 50, height: 50))
         s.addIgnoredRegion(dragged: CGRect(x: 200, y: 260, width: 3, height: 3))
         check("a drag outside the lens, or too small to be a region, is none", s.config.ignored.count == 1, "\(s.config.ignored.count)")
-        check("Clear Ignored Regions is on now", item(String(localized: "Clear Ignored Regions"))?.item.isEnabled == true)
+        check("Clear Ignored Regions is shown, and on, once the lens has one", item(String(localized: "Clear Ignored Regions"))?.item.isEnabled == true)
 
         // The saved lens: what a relaunch restores, and a lens saved before this has none of it.
         if let data = try? JSONEncoder().encode(s.config), let back = try? JSONDecoder().decode(RegionConfig.self, from: data) {
@@ -408,8 +451,8 @@ enum GameChecks {
         press(String(localized: "Keep Recent Lines"))
         check("and pressing it again turns it off", !s.config.keepsRecent && item(String(localized: "Keep Recent Lines"))?.item.state == .off && saved.last?.keepsRecent == false)
         press(String(localized: "Clear Ignored Regions"))
-        check("pressing Clear Ignored Regions takes every region away and saves the lens", s.config.ignored.isEmpty && saved.last?.ignored.isEmpty == true
-              && item(String(localized: "Clear Ignored Regions"))?.item.isEnabled == false)
+        check("pressing Clear Ignored Regions takes every region away and saves the lens, and the row goes", s.config.ignored.isEmpty && saved.last?.ignored.isEmpty == true
+              && item(String(localized: "Clear Ignored Regions")) == nil)
         check("Ignore Region… is a row that acts when pressed", item(String(localized: "Ignore Region…"))?.item.action != nil && item(String(localized: "Ignore Region…"))?.item.target != nil)
         // More than a lens can use: the oldest go.
         for i in 0..<(IgnoredRegions.limit + 3) {

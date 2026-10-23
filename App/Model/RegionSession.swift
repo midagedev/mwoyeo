@@ -98,6 +98,8 @@ final class RegionSession {
     private var wideMargins = false
     private var lastMotion: TimeInterval = 0
     private var calmTimer: Timer?
+    /// The display's map for a lens let go by hand with Auto Fit on (the picker's reader, `PickerMap.live`); nil: no landing, only the column fit.
+    var landingMap: PickerMap.Reader?
     /// The dot and glow follow translating only, settled by `BusyDebounce`; notices pass `NoticeGate`.
     private var busyDebounce = BusyDebounce()
     private var busyTimer: Timer?
@@ -1381,8 +1383,13 @@ final class RegionSession {
             config.anchor = anchor
         }
         // Hide while another window covers the region; the capture shows that window, not ours.
-        let covered = WindowInfo.windows(above: anchor.windowID).contains { $0.bounds.intersects(config.rect.insetBy(dx: 4, dy: 4)) }
-        setOccluded(!w.isOnScreen || covered)
+        let cover = WindowInfo.windows(above: anchor.windowID).first { $0.bounds.intersects(config.rect.insetBy(dx: 4, dy: 4)) }
+        let occluded = !w.isOnScreen || cover != nil
+        if Trace.enabled, occluded != offScreen.contains(.occluded) {
+            let by = cover.map { "'\($0.appName)' \(TraceNumber.px($0.bounds.minX)),\(TraceNumber.px($0.bounds.minY)) \(TraceNumber.px($0.bounds.width))x\(TraceNumber.px($0.bounds.height))" } ?? "none"
+            Trace.mark("lens occluded=\(occluded): window '\(w.appName)' on screen=\(w.isOnScreen) covered by \(by)", since: Trace.now)
+        }
+        setOccluded(occluded)
 
         let target = CGRect(origin: CGPoint(x: w.bounds.minX + anchor.offset.x, y: w.bounds.minY + anchor.offset.y), size: config.rect.size)
         guard abs(target.minX - config.rect.minX) > 0.5 || abs(target.minY - config.rect.minY) > 0.5 else { return }
@@ -1653,6 +1660,8 @@ extension RegionSession {
     private func beginHand() {
         fit.handOn = true
         fit.undo = nil
+        fit.landing?.cancel()
+        fit.landing = nil
         endProbe()
         apply(AutoFit.step(fit.machine, .dragged))
     }
@@ -1727,7 +1736,38 @@ extension RegionSession {
             fit.band = nil
             settleBusy()
         }
-        if byHand, fit.machine.state != .off { fit.gate.rearm(); scheduleJudgement(after: fit.calm + 0.05) }
+        if byHand, fit.machine.state != .off, !land() { fit.gate.rearm(); scheduleJudgement(after: fit.calm + 0.05) }
+    }
+
+    /// A lens moved by hand and let go, Auto Fit on: one read of its display, and the lens takes the target under its middle as the picker would
+    /// place it there (`AutoFit.landed`). Same content, no target, or a hand on it again: the column fit judges as before. False without a reader.
+    private func land() -> Bool {
+        guard let landingMap else { return false }
+        let from = config.rect, display = display(of: from), scale = fitScale
+        fit.landing?.cancel()
+        chrome.setBusy(true)
+        fit.landing = Task { [weak self] in
+            let map = await landingMap(display)
+            guard let self, !Task.isCancelled else { return }
+            fit.landing = nil
+            settleBusy()
+            guard config.rect == from, !dragging, !fit.animating, fit.machine.state != .off else { return }
+            let middle = CGPoint(x: from.midX, y: from.midY)
+            let windows = WindowInfo.onScreen()
+            let window = windows.first { $0.bounds.contains(middle) }
+            var target: CGRect?
+            if let map, let area = LensTarget.targetBounds(over: window?.bounds, windowsKnown: !windows.isEmpty, on: display) {
+                let own = window.map { w in map.scoped { c in windows.first { $0.bounds.contains(c) }?.id == w.id } } ?? map
+                target = LensTarget.choose(own, pointer: middle, bounds: area, scale: scale)?.rect
+            }
+            if Trace.enabled {
+                let shown = { (r: CGRect) in "\(TraceNumber.px(r.minX)),\(TraceNumber.px(r.minY)) \(TraceNumber.px(r.width))x\(TraceNumber.px(r.height))" }
+                Trace.mark("fit: landed lens=\(shown(from)) target=\(target.map(shown) ?? "none") window='\(window?.appName ?? "")'", since: Trace.now)
+            }
+            let step = AutoFit.step(fit.machine, .landed(lens: from, target: target))
+            if case .land = step.action { apply(step) } else { fit.machine = step.machine; fit.gate.rearm(); scheduleJudgement(after: fit.calm + 0.05) }
+        }
+        return true
     }
 
     // MARK: Auto Fit
@@ -1764,6 +1804,10 @@ extension RegionSession {
             let column = ColumnFit.under(config.rect, in: fit.columns)
             fit.undo = config.rect
             move(to: rect, edges: column.map { AutoFit.Edges(left: $0.left, right: $0.right) }, auto: true, column: column)
+        case .land(let rect):
+            Trace.count("lens.fit.land")
+            fit.undo = config.rect
+            move(to: rect, edges: AutoFit.Edges(left: rect.minX, right: rect.maxX), auto: true)
         case .probe(let sides):
             startProbe(sides, reason: .auto)
         case .skip(let reason):

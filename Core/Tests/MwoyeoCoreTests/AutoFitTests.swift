@@ -185,4 +185,25 @@ import Testing
         let (m, a) = AutoFit.step(AutoFit.Machine(), .settled(context()))
         #expect(m.state == .off && a == .none)
     }
+
+    @Test func aLensLetGoOnOtherContentTakesItsShape_andOnTheSameContentStays() {
+        let lens = CGRect(x: 849, y: 266, width: 550, height: 271)
+        let other = CGRect(x: 60, y: 400, width: 250, height: 330)    // narrower, lower, to the left: a land may shrink and move
+        for s in [AutoFit.State.armed, .held] {
+            let (m, a) = AutoFit.step(AutoFit.Machine(state: s, lastFit: edges), .landed(lens: lens, target: other))
+            #expect(m.state == .fitting && a == .land(other), "\(s)")
+        }
+        // The same content (every edge within minGrow), or none: armed, nothing done; the column fit judges as before.
+        let same = lens.insetBy(dx: 2, dy: 2)
+        for target in [same, nil] {
+            let (m, a) = AutoFit.step(armed(), .landed(lens: lens, target: target))
+            #expect(m.state == .armed && a == .none)
+        }
+        // The animation ends held on the target's edges.
+        let done = AutoFit.step(AutoFit.Machine(state: .fitting), .animationDone(AutoFit.Edges(left: other.minX, right: other.maxX)))
+        #expect(done.machine.state == .held && done.action == .commit)
+        // Off, or mid-fit: a landing changes nothing.
+        #expect(AutoFit.step(AutoFit.Machine(), .landed(lens: lens, target: other)).action == .none)
+        #expect(AutoFit.step(AutoFit.Machine(state: .fitting), .landed(lens: lens, target: other)).action == .none)
+    }
 }

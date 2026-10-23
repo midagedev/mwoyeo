@@ -54,6 +54,8 @@ struct LensFit {
     var settling = false
     /// The probe's wait for its snapshot, and the wait for content to stand still before Auto Fit judges.
     var probeTimer: Timer?
+    /// The display read of a lens let go by hand (`RegionSession.land`), until its target is known.
+    var landing: Task<Void, Never>?
     var settleTimer: Timer?
     /// Seconds content must have stood still before Auto Fit judges, and how long a probe waits for its snapshot: the design's numbers, held here so the
     /// checks give a lens none to wait for.

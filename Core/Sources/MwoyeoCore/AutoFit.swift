@@ -2,7 +2,8 @@ import CoreGraphics
 import Foundation
 
 /// Auto Fit, a lens option (off by default): after a read settles, a lens that cuts the text of its column at its left or right edge grows to
-/// the column once. It never shrinks, never moves while content scrolls or the user drags, acts at most once per settle, stays inside the display
+/// the column once; a lens the user moves onto other content takes that content's shape when let go, as the picker would place it (`landed`).
+/// Otherwise it never shrinks, never moves while content scrolls or the user drags, acts at most once per settle, stays inside the display
 /// and window, and a manual resize turns it off for that lens (docs/design/lens-fit.md section 7).
 ///
 /// The whole of it is `step`: a table of (state, event) rows over plain values, so every row is a test case and the session only carries out the
@@ -103,6 +104,9 @@ public enum AutoFit {
         case animationDone(Edges)
         /// Fit to Column by hand, ending on these edges.
         case fitted(Edges)
+        /// A lens moved by hand came to rest at `lens`: `target` is what the picker would place for the content under its middle (`LensTarget.choose`
+        /// on a read of its display), nil where there is none.
+        case landed(lens: CGRect, target: CGRect?)
     }
 
     public enum Skip: String, Equatable, Sendable {
@@ -123,6 +127,8 @@ public enum AutoFit {
         /// One wider read.
         case probe(ColumnFit.Sides)
         case skip(Skip)
+        /// Animate the lens onto the content it was put on (the picker's target), then commit: unlike `grow` it may shrink and move.
+        case land(CGRect)
         /// The capture goes back to its usual shape.
         case restoreCapture
         /// The animation ended: follow the window, save the rect, refit the capture.
@@ -149,6 +155,14 @@ public enum AutoFit {
         case (_, .resized):
             m.state = .off
             return (m, .disable)
+        case (.armed, .landed(let lens, let target)), (.held, .landed(let lens, let target)):
+            // Put on other content, the lens takes that content's shape; on the same (every edge within `minGrow`), it stays as the hand left it.
+            guard let target, changed(lens, target) else {
+                m.state = .armed
+                return (m, .none)
+            }
+            m.state = .fitting
+            return (m, .land(target))
         case (.armed, .settled(let c)):
             return decide(&m, c)
         case (.held, .settled(let c)):
@@ -175,6 +189,10 @@ public enum AutoFit {
         default:
             return (m, .none)
         }
+    }
+
+    private static func changed(_ a: CGRect, _ b: CGRect) -> Bool {
+        abs(a.minX - b.minX) >= minGrow || abs(a.maxX - b.maxX) >= minGrow || abs(a.minY - b.minY) >= minGrow || abs(a.maxY - b.maxY) >= minGrow
     }
 
     private static func isProbing(_ state: State) -> Bool {

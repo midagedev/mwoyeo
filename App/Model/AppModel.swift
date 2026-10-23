@@ -416,10 +416,7 @@ final class AppModel {
         defer { picking = false }
         // The picker's map of the display (docs/design/first-lens.md 4.4): read once per open; the language it finds is warmed when the
         // source is detected.
-        let source = settings.sourceLanguage
-        let translator = translator
-        picker.readMap = PickerMap.live(languages: source == "auto" ? [] : [Locale.Language(identifier: source)], target: settings.targetLanguage,
-                                        detects: source == "auto") { language in await translator.prewarm(route: nil, source: language) }
+        picker.readMap = displayMap()
         guard let result = await picker.pick() else { return }
         RegionSession.setHiding(false, in: sessions.values)   // a lens added while the others are hidden brings them back
         var config = RegionConfig(name: "", rect: result.rect)
@@ -430,6 +427,15 @@ final class AppModel {
         let click = result.click ?? CGPoint(x: result.rect.midX, y: result.rect.midY)
         if isPaused { isPaused = false; for r in regions where r.isEnabled && sessions[r.id] == nil { await startSession(r, placedAt: r.id == config.id ? click : nil) } }
         else { await startSession(config, placedAt: click) }
+    }
+
+    /// The picker's reader of a display's map: the source language's recognizer, and the language it finds warmed when the source is detected. A
+    /// lens let go with Auto Fit on reads with it too (`RegionSession.land`).
+    private func displayMap() -> PickerMap.Reader {
+        let source = settings.sourceLanguage
+        let translator = translator
+        return PickerMap.live(languages: source == "auto" ? [] : [Locale.Language(identifier: source)], target: settings.targetLanguage,
+                              detects: source == "auto") { language in await translator.prewarm(route: nil, source: language) }
     }
 
     func remove(_ id: UUID) async {
@@ -515,6 +521,7 @@ final class AppModel {
             regions[i].ignored = updated.ignored
             regions[i].keepsRecent = updated.keepsRecent
         }
+        s.landingMap = displayMap()
         s.onCloseRequest = { [weak self] in Task { await self?.remove(config.id) } }
         s.onToggleOriginal = { [weak self] in self?.toggleTranslations() }
         sessions[config.id] = s

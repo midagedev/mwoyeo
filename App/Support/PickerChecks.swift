@@ -120,6 +120,7 @@ enum PickerChecks {
         blindHost.orderOut(nil)
         let (opened, openedHost) = picker(instant)
         opened.mouseLocation = { restingAt }
+        opened.ghostGrace = 0   // 2026-10-23 picktarget117: the default lens waits for the read (`LensTarget.ghostGrace`); this gate injects no wait, its claim is unchanged
         opened.open()
         check("a picker opened over a resting pointer shows the default lens under it at once, before any map", opened.spotlight != nil && opened.target == nil)
         _ = await ready(opened)
@@ -157,6 +158,7 @@ enum PickerChecks {
 
         // MARK: Gate 4: the read is off the main thread; a map that never comes leaves the picker as it always was
         let (stuck, stuckHost) = picker { _ in try? await Task.sleep(for: .seconds(3600)); return nil }
+        stuck.ghostGrace = 0   // this gate is about the picker opening at once; the grace has its own gate below
         let t = CACurrentMediaTime()
         stuck.startMap()
         let started = CACurrentMediaTime() - t
@@ -166,6 +168,112 @@ enum PickerChecks {
         CATransaction.flush()   // the pills draw through their layers, at the commit
         check("with a read that never answers the picker opens at once (startMap \(fmt(started * 1000)) ms) and draws its hint and label (\(PickerView.draws - drawsBefore) draws)",
               started < 0.05 && PickerView.draws > drawsBefore && stuck.spotlight != nil)
+
+        // MARK: Round picktarget117 (2026-10-23): while the read is young the spotlight is nothing; the first target opens from the pointer
+        // The film4 take showed the default lens (the window's content, not the page's) over Preview's dark margin for the 532 ms of the read,
+        // then gliding into the first target. The grace and the clock are the check's own; nothing here waits on a wall clock.
+        final class Deliver: @unchecked Sendable { var map: CheckedContinuation<LensTarget.Map?, Never>? }
+        let deliver = Deliver()
+        let (young, youngHost) = picker { _ in await withCheckedContinuation { c in deliver.map = c } }
+        young.startMap()
+        young.mouseMoved(with: event(.mouseMoved, early))
+        check("while the read is young the spotlight is nothing, not the default lens (\(young.spotlight.map { "\($0)" } ?? "none"))",
+              young.spotlight == nil && !young.gliding)
+        check("and the picker is to look again when the grace ends (\(young.recheckIn.map { fmt($0) } ?? "none") s of \(fmt(LensTarget.ghostGrace)))",
+              young.recheckIn.map { $0 > 0 && $0 <= LensTarget.ghostGrace } == true)
+        click(young, early)
+        check("a click in that time still drops the default lens", placed.flatMap { $0 }?.rect == ghost(early))
+        now += LensTarget.ghostGrace + 0.01
+        young.mouseMoved(with: event(.mouseMoved, early))
+        young.render(at: now + 1)   // it opens from the pointer: a frame after its spring
+        check("once the read has taken its grace the default lens shows (\(young.spotlight.map { "\(Int($0.width)) x \(Int($0.height))" } ?? "none"))",
+              young.spotlight.map { $0.width <= KeyboardLens.defaultSize.width && $0.height <= KeyboardLens.defaultSize.height && $0.width > 100 } == true
+              && young.recheckIn == nil)
+        young.close()
+        youngHost.orderOut(nil)
+
+        let deliverFirst = Deliver()
+        let (fresh, freshHost) = picker { _ in await withCheckedContinuation { c in deliverFirst.map = c } }
+        fresh.startMap()
+        fresh.mouseMoved(with: event(.mouseMoved, early))
+        try? await Task.sleep(for: .milliseconds(20))
+        deliverFirst.map?.resume(returning: map)
+        let freshReady = await ready(fresh)
+        let opening = fresh.spotlight
+        let finalRect = fresh.target.map { ScreenGeometry.appKitRect(fromQuartz: $0.rect).offsetBy(dx: -screen.frame.minX, dy: -screen.frame.minY) }
+        let pointerAt = at(early)
+        check("the map arrives while nothing shows, and the first target is a square at the pointer (\(opening.map { "\($0)" } ?? "none"))",
+              freshReady && opening.map { $0.width == LensTarget.seedSide && $0.height == LensTarget.seedSide
+                                         && abs($0.midX - pointerAt.x) < 0.5 && abs($0.midY - pointerAt.y) < 0.5 } == true && fresh.gliding)
+        var inside = true, growing = true, previous = opening ?? .zero
+        for f in 1...20 {
+            fresh.render(at: now + Double(f) / 60)
+            guard let r = fresh.spotlight, let end = finalRect else { inside = false; break }
+            inside = inside && end.insetBy(dx: -0.01, dy: -0.01).contains(r)
+            growing = growing && r.width >= previous.width - 0.01 && r.height >= previous.height - 0.01
+            previous = r
+        }
+        check("it opens on the glide's spring to the target and every frame stays inside it (\(fmt(previous.width)) x \(fmt(previous.height)) of \(finalRect.map { "\(fmt($0.width)) x \(fmt($0.height))" } ?? "none"))",
+              inside && growing && previous == finalRect)
+        fresh.close()
+        freshHost.orderOut(nil)
+
+        Motion.shared.force(true)
+        let deliverReduced = Deliver()
+        let (still, stillHost) = picker { _ in await withCheckedContinuation { c in deliverReduced.map = c } }
+        still.startMap()
+        still.mouseMoved(with: event(.mouseMoved, early))
+        try? await Task.sleep(for: .milliseconds(20))
+        deliverReduced.map?.resume(returning: map)
+        let stillReady = await ready(still)
+        check("under Reduce Motion the first target is there at once", stillReady && !still.gliding
+              && still.spotlight == still.target.map { ScreenGeometry.appKitRect(fromQuartz: $0.rect).offsetBy(dx: -screen.frame.minX, dy: -screen.frame.minY) })
+        Motion.shared.force(nil)
+        still.close()
+        stillHost.orderOut(nil)
+
+        // Where nothing is to wait for, the default lens is there at once: no reader, and a read that gave nothing.
+        let (unread, unreadHost) = picker(nil)
+        unread.mouseMoved(with: event(.mouseMoved, early))
+        check("with no reader the default lens shows at once", unread.spotlight != nil && unread.recheckIn == nil)
+        unread.close()
+        unreadHost.orderOut(nil)
+        let (empty, emptyHost) = picker { _ in nil }
+        empty.startMap()
+        empty.mouseMoved(with: event(.mouseMoved, early))
+        let emptyEnd = Date().addingTimeInterval(bound)
+        while empty.spotlight == nil, Date() < emptyEnd { try? await Task.sleep(for: .milliseconds(10)) }
+        check("a read that gave nothing shows the default lens at once", empty.spotlight != nil && empty.recheckIn == nil)
+        empty.close()
+        emptyHost.orderOut(nil)
+
+        // A2 (the skinland117 take): the pointer below the window, over the Dock, has no target; over the window the target stays inside it.
+        // The window ends just under the first paragraph of the first column; the second and third paragraphs below it stand for the Dock's blocks.
+        let paragraphs = twoColumns.paragraphs[0]
+        let windowBounds = CGRect(x: 0, y: 0, width: pageSize.width, height: paragraphs[0].maxY + 10)
+        let listed = WindowInfo(id: 1, pid: 1, appName: "Preview", title: "", bounds: windowBounds, isOnScreen: true)
+        let (windowed, windowedHost) = { () -> (PickerView, NSWindow) in
+            let view = PickerView(screen: screen, windows: [listed], readMap: instant) { _ in }
+            view.clock = { now }
+            view.ghostGrace = 0
+            let host = NSWindow(contentRect: screen.frame, styleMask: .borderless, backing: .buffered, defer: false)
+            host.isReleasedWhenClosed = false
+            host.alphaValue = 0
+            host.ignoresMouseEvents = true
+            host.contentView = view
+            host.orderFront(nil)
+            return (view, host)
+        }()
+        windowed.startMap()
+        _ = await ready(windowed)
+        windowed.mouseMoved(with: event(.mouseMoved, CGPoint(x: 230, y: paragraphs[0].midY)))
+        let onWindow = windowed.target?.rect
+        check("over the window the target stays inside it (\(onWindow.map { "\($0)" } ?? "none") in \(windowBounds))",
+              onWindow.map { windowBounds.contains($0) } == true)
+        windowed.mouseMoved(with: event(.mouseMoved, CGPoint(x: 230, y: paragraphs[2].midY)))
+        check("below the window, over no window, there is no target (\(windowed.target.map { "\($0.rect)" } ?? "none"))", windowed.target == nil)
+        windowed.close()
+        windowedHost.orderOut(nil)
 
         // MARK: Gate 8: one read per picker, cancelled with it; no picture kept
         let readsBefore = RegionPicker.stats.reads

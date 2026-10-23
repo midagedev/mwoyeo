@@ -8,6 +8,11 @@ import CoreGraphics
 /// new text appears once and stays, a scene keeps changing. A held tile that rests is handed back as an area to read
 /// (`takeRested`), like a strip a scroll uncovered.
 ///
+/// A scene that never stops would hold its tiles for ever, and a HUD number, a toast or a second subtitle that appears inside it would stay
+/// as it was written (untrans117, 2026-10-23: 0 reads in a scene that kept changing). So the held tiles are also handed back once the oldest
+/// of them has been held for `heldReadInterval`, all of them in one read: a scene that keeps changing is read at most once per interval
+/// (the next interval counts from the frame that read was made on), and text that appears in it waits at most that long.
+///
 /// Still is judged on the clock of the frames counted (`Inbox.seen`), not the wall clock: a frame that waits behind a pass is counted late, and
 /// a tile of a scene that never stops would otherwise rest on the stamp of a frame from before the wait.
 ///
@@ -15,16 +20,27 @@ import CoreGraphics
 public struct ReadWatch: Sendable {
     /// How long a tile away from the text must hold still before it counts (the pipeline's; a check may inject another).
     public static let standardHold: Double = 0.4
+    /// How long a tile that keeps changing away from the text is held before it is read anyway (the pipeline's; a check may inject another).
+    /// [provisional: untrans117, 2026-10-23: predicted from the game117 probe, 31 s of a band that never stops: 19 reads under the hold alone,
+    /// about 19 + 31 / 1.5 with the cap, 229 when every change counted. Re-pin on a real game's frames.]
+    public static let standardHeldReadInterval: Double = 1.5
     /// Tiles a change may lie from a box and still count (a line that grows, the next line).
     public static let marginTiles = 1
 
     public let hold: Double
+    public let heldReadInterval: Double
     public var churn = Churn()
     /// Per tile of the last grid, when it last changed while away from the text; -infinity when it is not held.
     private var held: [Double] = []
+    /// Per tile, when it began to be held (it changed away from the text while not held, or the read that last saw it ended): how long the
+    /// scene has gone on without a read of it. Meaningful only where `held` is.
+    private var heldSince: [Double] = []
     private var columns = 0, rows = 0, tile = 16, imageWidth = 0, imageHeight = 0
 
-    public init(hold: Double = ReadWatch.standardHold) { self.hold = hold }
+    public init(hold: Double = ReadWatch.standardHold, heldReadInterval: Double = ReadWatch.standardHeldReadInterval) {
+        self.hold = hold
+        self.heldReadInterval = heldReadInterval
+    }
 
     /// What a frame's change comes to.
     public struct Noted: Sendable, Equatable {
@@ -52,6 +68,7 @@ public struct ReadWatch: Sendable {
         var counted = masked.changed, away = 0
         for i in counted.indices where counted[i] && !near[i] {
             counted[i] = false
+            if held[i] == -.infinity { heldSince[i] = t }
             held[i] = t
             away += 1
         }
@@ -68,13 +85,15 @@ public struct ReadWatch: Sendable {
         return masked.with(changed: changed)
     }
 
-    /// The held tiles that have been still for `hold` at `t`, as gray-pixel areas (a run of tiles in a row is one), and no longer held.
+    /// The held tiles that have been still for `hold` at `t`, as gray-pixel areas (a run of tiles in a row is one), and no longer held. When the
+    /// oldest held tile has been held for `heldReadInterval` they all are: the scene that keeps changing is read now.
     public mutating func takeRested(at t: Double) -> [PixelRect] {
+        let capped = (capDue ?? .infinity) <= t
         var areas: [PixelRect] = []
         for r in 0..<rows {
             var start: Int?
             for c in 0...columns {
-                let rested = c < columns && held[r * columns + c] > -.infinity && t - held[r * columns + c] >= hold
+                let rested = c < columns && held[r * columns + c] > -.infinity && (capped || t - held[r * columns + c] >= hold)
                 if rested {
                     if start == nil { start = c }
                     held[r * columns + c] = -.infinity
@@ -88,19 +107,29 @@ public struct ReadWatch: Sendable {
     }
 
     /// `area` (gray pixels; nil = all of the frame) of the frame captured at `time` was read: tiles held inside it that changed no later than
-    /// that frame are not held any more (the read has what they showed). A tile that changed after the frame stays held: the scene moved on.
+    /// that frame are not held any more (the read has what they showed). A tile that changed after the frame stays held: the scene moved on;
+    /// its interval counts from that frame.
     public mutating func didRead(_ area: PixelRect?, frameTime time: Double) {
         for r in 0..<rows {
-            for c in 0..<columns where held[r * columns + c] > -.infinity && held[r * columns + c] <= time {
+            for c in 0..<columns where held[r * columns + c] > -.infinity {
                 let x = min(c * tile + tile / 2, imageWidth - 1), y = min(r * tile + tile / 2, imageHeight - 1)
-                if area.map({ x >= $0.x && x < $0.x + $0.width && y >= $0.y && y < $0.y + $0.height }) ?? true { held[r * columns + c] = -.infinity }
+                guard area.map({ x >= $0.x && x < $0.x + $0.width && y >= $0.y && y < $0.y + $0.height }) ?? true else { continue }
+                if held[r * columns + c] <= time { held[r * columns + c] = -.infinity } else { heldSince[r * columns + c] = max(heldSince[r * columns + c], time) }
             }
         }
     }
 
-    /// Seconds until the first held tile has been still long enough; nil when none is held.
+    /// When the oldest held tile has been held for `heldReadInterval`; nil when none is held.
+    private var capDue: Double? {
+        var oldest = Double.infinity
+        for i in held.indices where held[i] > -.infinity { oldest = min(oldest, heldSince[i]) }
+        return oldest < .infinity ? oldest + heldReadInterval : nil
+    }
+
+    /// Seconds until the first held tile has been still long enough, or the oldest has been held for `heldReadInterval`; nil when none is held.
     public func restsIn(at t: Double) -> Double? {
-        held.filter { $0 > -.infinity }.map { max(0, $0 + hold - t) }.min()
+        guard let rests = held.filter({ $0 > -.infinity }).map({ $0 + hold }).min() else { return nil }
+        return max(0, min(rests, capDue ?? .infinity) - t)
     }
 
     /// Seconds until a look again is due: an animated tile counting as still, or a held one resting. nil when neither is pending.
@@ -114,11 +143,12 @@ public struct ReadWatch: Sendable {
         forget()
     }
 
-    private mutating func forget() { held = [] ; columns = 0; rows = 0 }
+    private mutating func forget() { held = []; heldSince = []; columns = 0; rows = 0 }
 
     private mutating func fit(to change: ChangeMap) {
         if held.count != change.changed.count || change.columns != columns || change.tile != tile {
             held = Array(repeating: -.infinity, count: change.changed.count)
+            heldSince = held
         }
         columns = change.columns; rows = change.rows; tile = change.tile
         imageWidth = change.imageWidth; imageHeight = change.imageHeight

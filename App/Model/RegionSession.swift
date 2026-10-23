@@ -113,6 +113,12 @@ final class RegionSession {
     #else
     static let predicts = !DebugSwitch.isOff("MWOYEO_PREDICT", in: ProcessInfo.processInfo.environment)
     #endif
+    /// `MWOYEO_SNAP=instant|dwell` (takes of the two feels of a resize's snap, `LiveSnap`): the feel a lens has. The App Store build has the standard one.
+    #if MAS
+    static let snapFeel = LiveSnap.standard
+    #else
+    static let snapFeel = DebugSwitch.snapFeel(in: ProcessInfo.processInfo.environment)
+    #endif
     /// The area under the pointer that scrolled last (global Quartz points), and the window it belongs to.
     private var scrollArea: CGRect?
     private var scrollWindow: CGWindowID?
@@ -939,15 +945,31 @@ final class RegionSession {
         menu.addItem(read)
         menu.addItem(.separator())
         addFitItems(to: menu)
-        menu.addItem(ActionItem(String(localized: "Ignore Region…"), enabled: !marking) { [weak self] in Task { await self?.ignoreRegion() } })
-        menu.addItem(ActionItem(String(localized: "Clear Ignored Regions"), enabled: !config.ignored.isEmpty) { [weak self] in self?.clearIgnoredRegions() })
-        let keep = ActionItem(String(localized: "Keep Recent Lines")) { [weak self] in self?.toggleKeepsRecent() }
-        keep.state = config.keepsRecent ? .on : .off
-        menu.addItem(keep)
+        addGameItems(to: menu)
         menu.addItem(.separator())
         menu.addItem(ActionItem(String(localized: "Save Lens Image"), enabled: lastSnapshot?.frame != nil) { [weak self] in self?.saveLensImage() })
         addProfileItems(to: menu)
         return menu
+    }
+
+    /// The title of the lens menu's one submenu that is not the profile's.
+    static var gamesTitle: String { String(localized: "Games & Video") }
+
+    /// What a game or a video asks of a lens, in one submenu (progressive disclosure: a lens over a page shows one row for it, not three): Ignore
+    /// Region…, Clear Ignored Regions (only while a region is ignored) and Keep Recent Lines.
+    private func addGameItems(to menu: NSMenu) {
+        let sub = NSMenu()
+        sub.autoenablesItems = false
+        sub.addItem(ActionItem(String(localized: "Ignore Region…"), enabled: !marking) { [weak self] in Task { await self?.ignoreRegion() } })
+        if !config.ignored.isEmpty {
+            sub.addItem(ActionItem(String(localized: "Clear Ignored Regions")) { [weak self] in self?.clearIgnoredRegions() })
+        }
+        let keep = ActionItem(String(localized: "Keep Recent Lines")) { [weak self] in self?.toggleKeepsRecent() }
+        keep.state = config.keepsRecent ? .on : .off
+        sub.addItem(keep)
+        let item = NSMenuItem(title: Self.gamesTitle, action: nil, keyEquivalent: "")
+        item.submenu = sub
+        menu.addItem(item)
     }
 
     /// The app under the lens: the window it follows, else the topmost window under its centre (`LensWatch.window(of:)`). The check harness
@@ -1462,6 +1484,18 @@ extension RegionSession {
         } else {
             fitSettled()
         }
+        if s.cut { reachColumns() }
+    }
+
+    /// The read dropped a paragraph the capture's side cuts and the lens meets (`OverlaySnapshot.cut`): its lines end at the capture's edge, so there is nothing to lay
+    /// out for the lens. The capture becomes the band (the display's width at the lens's rows, as a probe's) until the lens is moved or resized, and the next read holds the
+    /// column whole (film4 F16: a lens drawn short of its column showed the page's English, since every line of its paragraph was cut). A hand on the lens waits.
+    private func reachColumns() {
+        guard Reach.wants(cut: true, widened: fit.band != nil, probing: fit.probe != nil, handOn: dragging || fit.handOn), offScreen.isEmpty else { return }
+        Trace.count("lens.reach")
+        Trace.mark("reach: the capture cuts a paragraph the lens meets, reading the band", since: Trace.now)
+        fit.band = Overscan.band(around: config.rect, display: display(of: config.rect))
+        fitCapture(allowResize: true)
     }
 
     /// The room a fit may take: the lens's display, and the window a window lens follows.
@@ -1570,6 +1604,8 @@ extension RegionSession {
             Trace.mark("fit: \(auto ? "auto" : "manual") column=\(column.left)..\(column.right) lens=\(config.rect.minX)..\(config.rect.maxX) -> \(rect.minX)..\(rect.maxX) steps=1", since: Trace.now)
         }
         fit.animatingTo = rect
+        // The translation is laid out for the lens it will be before it is: the strip it grows over shows Korean when the lens gets there.
+        Task { [pipeline] in await pipeline.planLens(for: rect) }
         // The ring's outline plays this moment over the frame (`LensSkin.choreography`): an undo fits nothing.
         let moment: LensSkin.Moment = auto ? .autoFit : edges == nil ? .undoFit : .fit
         chrome.animate(to: ScreenGeometry.appKitRect(fromQuartz: rect), duration: auto ? LensMotion.autoFit : LensMotion.fit, moment: moment) { [weak self] finished in
@@ -1621,23 +1657,24 @@ extension RegionSession {
         apply(AutoFit.step(fit.machine, .dragged))
     }
 
-    /// A resize drag's frame (AppKit) after the snap: the right edge on a column's, the rest as the hand made it.
+    /// A resize drag's frame (AppKit) after the snap: the right edge where `LiveSnap` shows it while the guide is up (the guide and the tick: from 8 pt, kept
+    /// to 12, hysteresis), the rest as the hand made it. ⌘ held, or Snap off: nothing pulls.
     func snapResized(_ appKitFrame: NSRect) -> NSRect {
         let hand = ScreenGeometry.quartzRect(fromAppKit: appKitFrame)
-        _ = evaluateSnap(hand, edges: .right)           // the guide and the tick: from 8 pt, kept to 12 (hysteresis)
-        // The edge's pull is a function of the hand's place alone, from 12 pt in: a hysteresis in it would be a jump.
-        guard !fit.commandDown(), settings.lensSnap,
-              let pull = ColumnFit.snap(hand, edges: .right, targets: fit.targets, entry: ColumnFit.release) else { return appKitFrame }
-        var snapped = appKitFrame
-        snapped.size.width = max(ColumnFit.minWidth, appKitFrame.width + ColumnFit.livePull(pull.offset))
-        return snapped
+        let snap = evaluateSnap(hand, edges: .right)
+        let free = !settings.lensSnap || fit.commandDown()
+        var shown = appKitFrame
+        shown.size.width = fit.live.width(hand: hand, snap: snap, targets: free ? ColumnFit.Targets() : fit.targets, at: fit.now())
+        if Trace.enabled { Trace.mark("snap: live hand=\(hand.maxX) edge=\(hand.minX + shown.width) guide=\(snap != nil) capturing=\(fit.live.capturing)", since: Trace.now) }
+        return shown
     }
 
-    /// A resize let go at `appKitFrame` (which carries the live pull) while its right edge was in a column's reach: the rest of the way onto the edge, as a glide.
+    /// A resize let go at `appKitFrame` (which carries what `LiveSnap` shows) while the guide was up: the rest of the way onto the column's edge, as a glide.
+    /// Nothing when the edge is on it already (the `instant` feel always, the `dwell` one once the hand has held).
     func settleResized(_ appKitFrame: NSRect) -> NSRect? {
         defer { panel.hideGuide() }
-        guard let snap = fit.snap else { return nil }
-        let rest = snap.offset - ColumnFit.livePull(snap.offset)
+        guard let snap = fit.snap, !fit.commandDown() else { return nil }
+        let rest = snap.target.x - ScreenGeometry.quartzRect(fromAppKit: appKitFrame).maxX
         guard abs(rest) >= 0.01 else { return nil }
         var settled = appKitFrame
         settled.size.width = max(ColumnFit.minWidth, appKitFrame.width + rest)
@@ -1683,6 +1720,7 @@ extension RegionSession {
         fit.handOn = false
         fit.settling = false
         fit.snap = nil
+        fit.live.reset()
         panel.hideGuide()
         if fit.probe?.reason == .scout { endProbe() }
         if fit.probe == nil, fit.band != nil {

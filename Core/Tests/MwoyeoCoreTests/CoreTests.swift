@@ -131,6 +131,23 @@ func texture(width: Int, height: Int, seed: Int = 1) -> GrayImage {
         #expect(a.uncovered(dx: -1, dy: 0, width: 2, height: 2).isEmpty)
     }
 
+    /// The strips a grow uncovered, carried through the shrink back to the old size, lie outside the canvas: nothing is left to read
+    /// (holdfix117 A2: the strip left of the capture was read as every row of the next frame).
+    @Test func stripsOfAGrowAreGoneAfterTheShrinkBack() {
+        let a = GrayImage(width: 304, height: 208)
+        let strips = a.uncovered(dx: 38, dy: 26, width: 380, height: 260)
+        #expect(strips.count == 4)
+        #expect(PixelRect.moved(strips, dx: -38, dy: -26, width: 304, height: 208).isEmpty)
+    }
+
+    /// A strip a shrink cuts keeps the part the smaller canvas still has; a move keeps the strips that stay on the canvas as they are.
+    @Test func aStripKeepsThePartTheCanvasHas() {
+        let right = PixelRect(x: 300, y: 10, width: 20, height: 50)
+        #expect(PixelRect.moved([right], dx: -10, dy: 0, width: 300, height: 200) == [PixelRect(x: 290, y: 10, width: 10, height: 50)])
+        #expect(PixelRect.moved([right], dx: -40, dy: 5, width: 300, height: 200) == [PixelRect(x: 260, y: 15, width: 20, height: 50)])
+        #expect(PixelRect.moved([right], dx: 0, dy: -60, width: 400, height: 200).isEmpty)
+    }
+
     @Test func unrelatedChangeIsNotAScroll() {
         let a = texture(width: 80, height: 100, seed: 1)
         let b = texture(width: 80, height: 100, seed: 9)

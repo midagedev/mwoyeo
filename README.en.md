@@ -304,7 +304,8 @@ claude mcp add mwoyeo -- "/Applications/Mwoyeo.app/Contents/MacOS/Mwoyeo" --mcp
 - **Nothing shows up after an update?** macOS sometimes asks for Screen Recording again. Check it in System Settings,
   then reopen Mwoyeo.
 - **Want to compare with the original?** Press ⌃⌥O to see the original, and again to go back.
-- **Privacy.** Mwoyeo reads only what is under a lens and, by default, never stores or sends it. If you turn on saving,
+- **Privacy.** Mwoyeo reads only what is under a lens, and the display once while you place one (that picture is
+  discarded when you finish), and by default never stores or sends it. If you turn on saving,
   it writes only to the folder you chose; if you add a cloud engine, the text a lens reads goes to that engine. It
   leaves its own overlays out of what it captures. Beyond that, the only thing it ever asks the internet is GitHub's latest version
   number, once a day, and you can turn that off in Settings › About. The check downloads a small file attached to the

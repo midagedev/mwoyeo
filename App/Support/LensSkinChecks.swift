@@ -146,6 +146,31 @@ enum LensSkinChecks {
         Motion.shared.force(false)
         check("under Reduce Motion a lens the picker placed shows no grown outline", gw.outline().isRigid, gw.stats())
 
+        // MARK: Low Power Mode holds the outline rigid as Reduce Motion does (round untrans117, 2026-10-23)
+        // The system's own state is not the check's: `forceLowPower` puts the power state in its place and posts the notification the system posts, and the
+        // listener reads it on the main queue (the wait is for that hop, bounded; nothing is asserted about how long it took).
+        Motion.shared.force(nil)
+        for on in [false, true] {
+            Motion.shared.forceLowPower(on)
+            for _ in 0..<400 where Motion.shared.reduced != on { try? await Task.sleep(for: .milliseconds(5)) }
+            let (pw, pp) = lens(from)
+            pw.beginOutline(.fit)
+            play(pw, pp, from: from, to: to, duration: LensMotion.fit, until: 0.07)
+            let power = Self.offsets(ring: Self.ring(pw), clip: Self.clip(pp))
+            let (hw, _) = lens(rest, hold: click)
+            if on {
+                check("in Low Power Mode the outline is the rigid ring through a Fit, and the clip is 1 pt inside it",
+                      Motion.shared.reduced && pw.outline().isRigid && power.low > 0.8 && power.high < 1.2,
+                      String(format: "reduced %@, %.2f..%.2f pt, %@", "\(Motion.shared.reduced)", Double(power.low), Double(power.high), pw.stats()))
+                check("in Low Power Mode a lens the picker placed shows no grown outline", hw.outline().isRigid, hw.stats())
+            } else {
+                check("FAIL-first: with Low Power Mode off the same Fit bows the outline (\(String(format: "%.2f", Double(pw.outline().deviation))) pt) and a placed lens grows it",
+                      !Motion.shared.reduced && !pw.outline().isRigid && hw.outline().deviation >= 3.5, pw.stats())
+            }
+        }
+        Motion.shared.forceLowPower(nil)
+        Motion.shared.force(false)
+
         // MARK: The real display link plays a Fit
         let shown = lens(CGRect(x: base.x, y: base.y + 260, width: 175, height: 136))
         shown.window.alphaValue = 0

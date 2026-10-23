@@ -262,9 +262,11 @@ enum UICapture {
                 let failed = await GameChecks.run(model)
                 report("game", failed)
             case "band-pass-checks":
-                // Only the scene that goes on after a pass that outlasts the watch's hold (no window: needs no screen lock).
+                // Only the scene that goes on after a pass that outlasts the watch's hold, and the text that appears in a scene that never stops
+                // (no window: needs no screen lock).
                 let check = GameChecks.Check()
                 await GameChecks.movingBandDuringAPass(check)
+                await GameChecks.neverStill(check)
                 report("band pass", check.failed)
             case "marker-hint-checks":
                 // Only where the marker's hint pills go (no window; the whole of game-checks puts lenses on the screen).
@@ -279,6 +281,10 @@ enum UICapture {
                 // Only the checks of a lens resized over a still page (the whole of check-logic takes minutes).
                 let failed = await ResizeHoldChecks.run(model)
                 report("resize hold", failed)
+            case "lens-window-checks":
+                // Only what a lens shows of a block that crosses one of its edges (the whole of check-logic takes minutes).
+                let failed = await LensWindowChecks.run()
+                report("lens window", failed)
             case "trust-checks":
                 // Only the trust1 checks: the secret store of scratch runs, who translated a line, a line that reaches a busy engine.
                 var t = ContextChecks.Tally()
@@ -624,6 +630,7 @@ enum UICapture {
             failed += await LensSkinChecks.run()
             failed += await GameChecks.run(model)
             failed += await ResizeHoldChecks.run(model)
+            failed += await LensWindowChecks.run()
             failed += await ProgramChecks.run()
             // Last: the checks before the script service's timing ones must not lengthen the gap between the Test button's use of the service (PressChecks) and
             // RewriteChecks, which counts on launchd's respawn throttle still holding (text117, 2026-10-22: with these before them, "a lens call is not queued behind a call
@@ -1190,7 +1197,7 @@ enum UICapture {
                 if let app { session.appUnderLens = { _ in app } }
                 var m = session.contextMenu()
                 // The Profile item's submenu on its own, as it opens beside the item (a menu cannot be asked to open a submenu without a pointer).
-                if submenu, let holder = m.items.first(where: { $0.submenu != nil }), let sub = holder.submenu {
+                if submenu, let holder = m.items.first(where: { $0.submenu != nil && $0.title != RegionSession.gamesTitle }), let sub = holder.submenu {
                     holder.submenu = nil
                     m = sub
                 }

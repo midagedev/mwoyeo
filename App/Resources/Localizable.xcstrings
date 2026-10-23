@@ -17682,6 +17682,22 @@
         }
       }
     },
+    "Games & Video": {
+      "localizations": {
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Games & Video"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "Games & Video"
+          }
+        }
+      }
+    },
     "Gemini, DeepSeek, Ollama, your own server": {
       "localizations": {
         "de": {

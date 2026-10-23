@@ -261,6 +261,13 @@ final class PickerView: NSView {
     private(set) var target: LensTarget.Target?
     /// The spotlight's rect over time, in view coordinates (`LensTarget.Glide`), stepped by the display link while it moves.
     private var glide = LensTarget.Glide()
+    /// When this display's read began (the picker's clock): while it is young the spotlight is nothing, not the default lens (`LensTarget.preview`).
+    private var readBegan: TimeInterval?
+    /// How long a read may keep the default lens off the screen (`LensTarget.ghostGrace`); the checks inject theirs.
+    var ghostGrace = LensTarget.ghostGrace
+    /// Seconds to the moment the picker must look again though nothing moved (the grace's end), for the checks; nil when none is due.
+    private(set) var recheckIn: TimeInterval?
+    private var recheck: Task<Void, Never>?
     /// How far the spotlight's outline stands off its rect now (pt), for the checks and the trace: 0 at rest and under Reduce Motion.
     private(set) var spotlightDeviation: CGFloat = 0
     /// The spotlight's outline: the glide's rect, bowed while it hops towards its target (`LensSkin`, motion contract 9.6 "picker hop"), stepped on the
@@ -347,8 +354,20 @@ final class PickerView: NSView {
     private func aim(_ p: NSPoint) -> LensTarget.Target? {
         guard case let .ready(m) = map else { return nil }
         let q = quartz(NSRect(origin: p, size: .zero)).origin
-        return LensTarget.choose(m, pointer: q, held: target, bounds: LensTarget.content(of: hovered?.bounds, on: quartz(bounds)),
-                                 scale: window?.backingScaleFactor ?? 2)
+        // Over no window (the Dock, the menu bar) there is no target: its labels are blocks of the page's column and carried a target over them.
+        guard let area = LensTarget.targetBounds(over: hovered?.bounds, windowsKnown: !windows.isEmpty, on: quartz(bounds)) else { return nil }
+        return LensTarget.choose(m, pointer: q, held: target, bounds: area, scale: window?.backingScaleFactor ?? 2)
+    }
+
+    /// Where this display's read stands, for `LensTarget.preview`.
+    private var mapPhase: LensTarget.MapPhase {
+        switch map {
+        case .idle: .unread
+        case .reading: .reading(since: readBegan ?? clock())
+        case .ready: .ready
+        case .none: .empty
+        case .closed: .closed
+        }
     }
 
     // MARK: - The map
@@ -372,6 +391,7 @@ final class PickerView: NSView {
     func startMap() {
         guard case .idle = map, let readMap else { return }
         let display = quartz(bounds)
+        readBegan = clock()
         RegionPicker.stats.reads += 1
         Trace.count("picker.map.read")
         map = .reading(Task { [weak self] in
@@ -401,6 +421,8 @@ final class PickerView: NSView {
         }
         map = .closed
         target = nil
+        recheck?.cancel()
+        recheck = nil
         forgetOutline()
         link?.invalidate()
         link = nil
@@ -414,9 +436,29 @@ final class PickerView: NSView {
     private func aimAt(_ p: NSPoint) {
         let aimed = aim(p)
         let now = clock()
+        // While the read is young the spotlight is nothing (the default lens knows the window, not the page, and spilled over its margins), and the
+        // first one opens from the pointer; the picker looks again when the grace ends (`LensTarget.preview`, round picktarget117).
+        let preview = LensTarget.preview(mapPhase, aimed: aimed != nil, now: now, grace: ghostGrace)
+        recheck?.cancel()
+        recheckIn = preview.recheckIn
+        recheck = preview.recheckIn.map { wait in
+            Task { [weak self] in
+                try? await Task.sleep(for: .seconds(wait))
+                guard !Task.isCancelled, let self, let p = self.pointer else { return }
+                self.aimAt(p)
+            }
+        }
+        guard preview.shown != .nothing else {
+            glide.clear()
+            target = nil
+            forgetOutline()
+            render(at: now)
+            return
+        }
         let how: LensTarget.Glide.Move = Motion.shared.reduced ? .jump : (aimed == nil && target == nil ? .follow : .glide)
         let before = glide.target
-        glide.move(to: aimed.map { local($0.rect) } ?? clickLens(at: p), at: now, how)
+        let rect = aimed.map { local($0.rect) } ?? clickLens(at: p)
+        if before == nil { glide.appear(from: p, to: rect, at: now, how == .jump ? .jump : .glide) } else { glide.move(to: rect, at: now, how) }
         // A new target is a hop of the outline; the pointer holds the default lens it carries.
         skinHand = how == .follow ? .move : .none
         if how == .glide, before != nil, glide.target != before {

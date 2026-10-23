@@ -29,6 +29,9 @@ struct OverlayBlock: Identifiable, @unchecked Sendable {
     var frame: CGRect
     var image: CGImage
     var seamless: Bool
+    /// The translation's line boxes, in points relative to `frame` (top-left origin): a lens that cuts the block's top or bottom shows the lines
+    /// that stand wholly in it (`LensWindow.shown`). Empty: nothing to hide by (a block drawn as a box, a drawing the overlay does not know).
+    var lines: [CGRect] = []
 }
 
 /// What a block reads, for the lens's own text actions (copy, transcripts): region-local frame in points (top-left
@@ -62,6 +65,12 @@ struct OverlaySnapshot: @unchecked Sendable {
     /// The part of the capture (capture-local points) the blocks were read from: a capture that has just grown holds what the last read saw, not the
     /// strips it uncovered, so a column that reaches this rect's side may go on beyond it (`ColumnFit.marked`).
     var read: CGRect = .zero
+    /// The last read dropped a paragraph that the capture's edge cuts (`CaptureEdge.cutAtSides`) and that the lens sits in (`LensWindow.sitsIn`): its lines end at the capture's side, the rest of
+    /// them was never read, so nothing can be laid out for the lens until the capture holds the column (`RegionSession.reachColumns`, film4 F16).
+    var cut = false
+    /// The drawn blocks the lens leaves out because it covers too little of them (`LensWindow.plan` `.hidden`), region-local points like `OverlayBlock.frame`: the page's
+    /// own text shows there on purpose (whole or not at all). For the checks that hold a drawn block to stay drawn (`ResizeHoldChecks`).
+    var leftOut: [CGRect] = []
 }
 
 /// Content scrolled by `shift` points (positive = down) in `area` (global Quartz points) between frames captured at
@@ -141,6 +150,12 @@ actor RegionPipeline {
         /// whether it was cut to fit.
         var drawnSize: CGFloat = 0
         var clipped = false, ellipsis = false
+        /// The translation's line boxes in `image` (pixels, relative to `rect`, top-left origin), for the overlay's whole-line mask.
+        var drawnLines: [CGRect] = []
+        /// What `image` was laid out for: the block's own layout (`.whole`) or the part of it a lens covered (`LensWindow.plan`, never `.hidden`).
+        var laid = LensWindow.Plan.whole
+        /// The lens covers too little of the block for a translation to read in it: the block is not drawn, the page's own text shows.
+        var hidden = false
 
         /// Whether this block stands for its paragraph where blocks are listed to a person or a gate (Copy Text, the self-test's
         /// source/translation pairs): the first piece of a paragraph, or a block that is a paragraph of its own.
@@ -200,6 +215,10 @@ actor RegionPipeline {
     private var blocks: [Block] = []
     /// The blocks of the latest read that stay as written because they sit in a region of code (`CodeKeep`); the self-test lists them.
     private var keptBlocks: [CodeKeep.Kept] = []
+    /// The paragraphs of the latest read that the capture's side cut and `readableLines` left out (image pixels): not drawn and not translated, but they are where
+    /// the columns stand and what asks the capture to reach them. A move of the content leaves them behind: the next read finds them again.
+    private var cutLayout: [CutBlock] = []
+    private struct CutBlock { var core: CGRect; var lineHeight: CGFloat; var lines: Int }
     private var working = false
     private var settleTask: Task<Void, Never>?
     /// Sources waiting for translation, and whether the translation worker runs.
@@ -290,17 +309,36 @@ actor RegionPipeline {
     /// steps every 400 ms and must not flicker between moving and still. An interval over 1 s is a new motion, not a rhythm.
     private static let stillFloor: TimeInterval = 0.35, stillFactor = 2.5, rhythmCap: TimeInterval = 1
 
+    // MARK: The lens's edges (docs/design/recognition.md §16.2, round edges117)
+    /// How long the lens, or the content under it, stands still before the blocks the lens crosses the side of are laid out in the part it covers.
+    private let lensSettle: TimeInterval
+    private var lensSettleTask: Task<Void, Never>?
+    /// `MWOYEO_LENS_WINDOW=off` (for measuring against) lays every block out as it stands, as before the lens's edges had a rule: no block is
+    /// laid out again for the lens, none is left undrawn, the overlay masks no line, a paragraph the capture cuts is not a column and does not ask
+    /// the capture to grow. The App Store build has no such switch.
+    #if MAS
+    static let windowing = true
+    #else
+    static let windowing = !DebugSwitch.isOff("MWOYEO_LENS_WINDOW", in: ProcessInfo.processInfo.environment)
+    #endif
+
     /// Capture rect and the visible lens inside it, global Quartz points.
     private var origin: CGPoint
     private var captureSize: CGSize
     private var visible: CGRect
+    /// The lens the blocks are laid out for before it is there: a Fit's animation has its end decided (`planLens(for:)`), so that the strip the lens grows over shows
+    /// the translation when the lens arrives and not 0.4 s after it (edges117b, film4 F5: a Fit left the Korean at the old width and the new strip showed English).
+    /// Cleared when the lens is at it or has stood still for `lensSettle`.
+    private var planned: CGRect?
     /// What the blocks were read from, capture-local points (`OverlaySnapshot.read`): the capture whole after a pass, less what a move or a resize of
     /// the capture has uncovered since. Null while nothing is read.
     private var readRect = CGRect.null
 
     init(options: PipelineOptions, route: LensRoute? = nil, capture: CGRect, translator: TranslationService, inpainter: Inpainter?,
-         readHold: Double = ReadWatch.standardHold, onSnapshot: @escaping @Sendable (OverlaySnapshot) -> Void) {
-        self.watch = ReadWatch(hold: readHold)
+         readHold: Double = ReadWatch.standardHold, readHeldInterval: Double = ReadWatch.standardHeldReadInterval, lensSettle: TimeInterval = 0.4,
+         onSnapshot: @escaping @Sendable (OverlaySnapshot) -> Void) {
+        self.watch = ReadWatch(hold: readHold, heldReadInterval: readHeldInterval)
+        self.lensSettle = lensSettle
         self.origin = capture.origin
         self.captureSize = capture.size
         self.visible = capture
@@ -349,21 +387,44 @@ actor RegionPipeline {
 
     /// What this lens translates with from now on (`RegionSession.pushRoute`). Called before `update(options:)`: a pair that changed with the
     /// route resets the queue there, and the next batch is for the new route.
-    func setRoute(_ new: LensRoute?) { route = new }
+    func setRoute(_ new: LensRoute?) {
+        // Another engine, pair or glossary (`namespace`): what is drawn is another route's translation, and the `update(options:)` that follows
+        // starts from nothing, also when the app under the lens is all that changed with it.
+        if new?.namespace != route?.namespace { routeChanged = true }
+        route = new
+    }
+
+    /// Set by `setRoute` when the route translates otherwise; read and cleared by the next `update(options:)`.
+    private var routeChanged = false
 
     /// The app this lens was last told it covers (for the checks and the debug ring).
     var lensApp: ReaderContext { options.lensApp }
 
     func update(options new: PipelineOptions) {
+        let routeChanged = self.routeChanged
+        self.routeChanged = false
         guard new != options else { return }
         var restyled = options
         restyled.fontStyle = new.fontStyle
         restyled.boxOpacity = new.boxOpacity
         restyled.settleDelay = new.settleDelay
-        let reread = restyled != new, redraw = new.fontStyle != options.fontStyle || new.boxOpacity != options.boxOpacity
+        // Another app under the lens (a lens dropped with its centre over another window) is the same page for another reader: it is read
+        // again as when a reader becomes ready (`readerReady`), and what is drawn stays until the new reading has its own (`carryTranslations`,
+        // round holdfix117). What changes the translation itself (languages, glossary, render mode, the route) starts from nothing.
+        var reread = restyled
+        reread.paragraphReader = new.paragraphReader
+        reread.lensApp = new.lensApp
+        let startsOver = reread != new || routeChanged, readsAgain = reread != restyled
+        let redraw = new.fontStyle != options.fontStyle || new.boxOpacity != options.boxOpacity
         options = new
         readerPlan.configure(setting: new.paragraphReader, context: new.lensApp)
-        if reread { reset(); return }
+        if startsOver { reset(); return }
+        if readsAgain {
+            Trace.count("reader.context_reread")
+            layoutStale = true
+            seamlessDone = false
+            if latest != nil { kick() }
+        }
         guard redraw else { return }
         // Only the look changed: redraw what is already read, erased and translated.
         for i in blocks.indices { blocks[i].image = nil }
@@ -376,11 +437,14 @@ actor RegionPipeline {
         Trace.count("pipeline.reset")
         settleTask?.cancel()
         stillTask?.cancel()
+        lensSettleTask?.cancel()
+        lensSettleTask = nil
         wasMoving = false
         velocity = .zero
         velocityRegion = nil
         settleFrom = nil
         blocks = []
+        cutLayout = []
         readRect = .null
         baseGray = nil
         prevGray = nil
@@ -576,6 +640,8 @@ actor RegionPipeline {
         velocityRegion = nil
         settleFrom = lastMotionCapture
         Trace.mark("motion stopped (window \(Int(stillWindow * 1000)) ms)", since: lastMotionCapture)
+        // The content stands still under the lens: the blocks it crosses the side of are laid out in the part it covers.
+        settleLens()
         // Nothing else changes at a stop: this is the one moment to cut a batch the still lens no longer needs and to
         // start text the motion held back.
         guard Self.planning else { return }
@@ -830,7 +896,9 @@ actor RegionPipeline {
         }
         let moved = rect != visible
         visible = rect
+        if rect == planned { planned = nil }
         if moved, !ignored.isEmpty { remask() }
+        if moved { scheduleLensSettle() }
         reconsider()
     }
 
@@ -910,7 +978,7 @@ actor RegionPipeline {
         }
         if let base = baseGray, gx != 0 || gy != 0 {
             baseGray = base.shifted(dx: gx, dy: gy)
-            forcedDirty = forcedDirty.map { PixelRect(x: $0.x + gx, y: $0.y + gy, width: $0.width, height: $0.height) }
+            forcedDirty = PixelRect.moved(forcedDirty, dx: gx, dy: gy, width: base.width, height: base.height)
                 + base.vacatedStrips(dx: gx, dy: gy)
         }
         apply(Move(area: nil, dx: px, dy: py, gx: gx, gy: gy, grayArea: nil, strip: nil))
@@ -960,7 +1028,7 @@ actor RegionPipeline {
             } else {
                 prevGray = nil
             }
-            forcedDirty = forcedDirty.map { PixelRect(x: $0.x + gx, y: $0.y + gy, width: $0.width, height: $0.height) } + strips
+            forcedDirty = PixelRect.moved(forcedDirty, dx: gx, dy: gy, width: gw, height: gh) + strips
         }
         // A capture that grew has something new to read; one that shrank to inside what was read shows what the blocks already describe.
         // A pass already at work is rebased onto this capture and is not followed by a second whole read.
@@ -969,6 +1037,7 @@ actor RegionPipeline {
         let readAgain = uncovered && !working && !deferRead
         Trace.mark("capture \(Int(was.width))×\(Int(was.height)) → \(Int(rect.width))×\(Int(rect.height)): "
                    + (held ? "newly covered, held" : readAgain ? "newly covered area, read" : uncovered ? "pass in flight, rebased" : "nothing new, not read")
+                   + (forcedDirty.isEmpty ? "" : ", strips to read " + forcedDirty.map { "\($0.x),\($0.y) \($0.width)×\($0.height)" }.joined(separator: " ; "))
                    + (working ? ", \(moves.count) move(s) for the pass in flight" : ""), since: Trace.now)
         if !uncovered {
             // A larger size queued ahead of this one may already have asked for a read. This capture is inside
@@ -1015,6 +1084,8 @@ actor RegionPipeline {
         settleTask = nil
         stillTask?.cancel()
         stillTask = nil
+        lensSettleTask?.cancel()
+        lensSettleTask = nil
         latest = nil
     }
 
@@ -1023,6 +1094,7 @@ actor RegionPipeline {
 
     private func apply(_ m: Move) {
         moves.append(m)
+        cutLayout = []
         watch.reset()
         unexplained = unexplained.map { m.apply(to: $0) }
         let bounds = CGRect(x: 0, y: 0, width: captureSize.width * scale, height: captureSize.height * scale)
@@ -1056,7 +1128,7 @@ actor RegionPipeline {
         for m in moves {
             if let r = m.resized {
                 Trace.count("pass.rebased")
-                forced = forced.map { PixelRect(x: $0.x + m.gx, y: $0.y + m.gy, width: $0.width, height: $0.height) }
+                forced = PixelRect.moved(forced, dx: m.gx, dy: m.gy, width: r.grayWidth, height: r.grayHeight)
                     + base.uncovered(dx: m.gx, dy: m.gy, width: r.grayWidth, height: r.grayHeight)
                 base = base.reframed(dx: m.gx, dy: m.gy, width: r.grayWidth, height: r.grayHeight)
             } else if let g = m.grayArea {
@@ -1064,7 +1136,7 @@ actor RegionPipeline {
                 forced = forced.map { $0.cgRect.intersects(g.cgRect) ? PixelRect(x: $0.x, y: $0.y + m.gy, width: $0.width, height: $0.height) : $0 }
                     + [m.strip].compactMap { $0 }
             } else if m.gx != 0 || m.gy != 0 {
-                forced = forced.map { PixelRect(x: $0.x + m.gx, y: $0.y + m.gy, width: $0.width, height: $0.height) }
+                forced = PixelRect.moved(forced, dx: m.gx, dy: m.gy, width: base.width, height: base.height)
                     + base.vacatedStrips(dx: m.gx, dy: m.gy)
                 base = base.shifted(dx: m.gx, dy: m.gy)
             }
@@ -1075,9 +1147,10 @@ actor RegionPipeline {
         }
         baseGray = base
         forcedDirty = forced
-        // The pass read the whole frame it was given: the capture as it was, moved with the content since.
-        readRect = moves.filter { $0.area == nil }.reduce(CGRect(origin: .zero, size: captureSize)) { $0.offsetBy(dx: $1.dx / scale, dy: $1.dy / scale) }
-            .intersection(CGRect(origin: .zero, size: captureSize))
+        // The pass read the whole frame it was given: the capture as it was when the frame was taken (not as it is now: a capture that grew while the
+        // pass read was rebased onto, and the strips it uncovered are not read yet), moved with the content since. A pass rebased onto a wider capture
+        // that called the wider rect read made a column the capture cut look whole: Fit to Column took the cut edge for the column's (edges117b, film4 F5).
+        readRect = ReadArea.read(frame: frame.rect.size, moves: moves.filter { $0.area == nil }.map { CGVector(dx: $0.dx / scale, dy: $0.dy / scale) }, capture: captureSize)
         if moves.contains(where: { $0.resized != nil }) {
             // Rebased onto the capture the resize moved to. The settled whole read would OCR that page again.
             rebasedThisPass = true
@@ -1126,6 +1199,8 @@ actor RegionPipeline {
             _ = finishPass(frame: frame)
             return
         }
+        cutLayout.removeAll { $0.core.intersects(dirty) }
+        traceBlocks(found, as: "fast-block")
         found = readBlocks(found, in: frame.image)
         Trace.mark("fast: OCR \(Int(dirty.width))×\(Int(dirty.height))px → \(found.count) blocks", since: t)
         let (verdicts, kept) = CodeKeep.apply(found.map { TextRecognizer.verdict($0.text, target: options.targetLanguage) }, to: found, frame: frame.image) {
@@ -1166,8 +1241,11 @@ actor RegionPipeline {
             made.append(b)
         }
         capBodySizes(&made, among: blocks.filter { !staleIDs.contains($0.id) })
-        let keep = carryTranslations(into: &made, from: oldRects, old: old, took: took, stale: stale, step: frame.grayStep)
+        let held = heldByCut(old: old, rects: oldRects, stale: stale, step: frame.grayStep, bounds: CGRect(x: 0, y: 0, width: frame.image.width, height: frame.image.height))
+        for i in made.indices where held.contains(made[i].id) { made[i].id = UUID() }
+        let keep = carryTranslations(into: &made, from: oldRects, old: old, took: took, stale: stale, step: frame.grayStep).union(held)
         let moved = finishPass(frame: frame)
+        if !moved.isEmpty { cutLayout = [] }
         watch.didRead(PixelRect(dirty.applying(CGAffineTransform(scaleX: 1 / CGFloat(frame.grayStep), y: 1 / CGFloat(frame.grayStep)))), frameTime: frame.time)
         let bounds = CGRect(x: 0, y: 0, width: captureSize.width * scale, height: captureSize.height * scale)   // the capture now: a resize may have moved on
         // Translations that arrived meanwhile are on the current copies of the old blocks.
@@ -1211,17 +1289,14 @@ actor RegionPipeline {
         }
         readBackoff.success()
         Trace.mark("seamless: document OCR (\(found.count) blocks)", since: t); t = Trace.now
-        if Trace.enabled {
-            for (i, b) in found.enumerated() {
-                Trace.mark("ocr-block \(i) lines: " + b.lines.map { l in "\(Int(l.rect.minX)),\(Int(l.rect.minY)),\(Int(l.rect.width)),\(Int(l.rect.height)) '\(l.text.prefix(24))'" }.joined(separator: " ; "), since: Trace.now)
-            }
-        }
+        traceBlocks(found, as: "ocr-block")
         if holdsVerticalText(found) {
             _ = finishPass(frame: frame)
             blocks = []
             emit(animated: false)
             return true
         }
+        cutLayout = []
         let read = readBlocks(found, in: frame.image)
         let (verdicts, kept) = CodeKeep.apply(read.map { TextRecognizer.verdict($0.text, target: options.targetLanguage) }, to: read, frame: frame.image) {
             appearance(of: $0, in: frame.image)
@@ -1254,9 +1329,12 @@ actor RegionPipeline {
             next.append(b)
         }
         capBodySizes(&next, among: [])
-        let keep = carryTranslations(into: &next, from: undone, old: prior, took: took, stale: stale, step: frame.grayStep)
+        let held = heldByCut(old: prior, rects: undone, stale: stale, step: frame.grayStep, bounds: CGRect(x: 0, y: 0, width: frame.image.width, height: frame.image.height))
+        for i in next.indices where held.contains(next[i].id) { next[i].id = UUID() }   // one identity is one layer
+        let keep = carryTranslations(into: &next, from: undone, old: prior, took: took, stale: stale, step: frame.grayStep).union(held)
         Trace.mark("seamless: erase \(next.count) blocks", since: t); t = Trace.now
         let moved = finishPass(frame: frame)
+        if !moved.isEmpty { cutLayout = [] }   // the content moved while the pass read: where it cut is not where it was
         watch.didRead(nil, frameTime: frame.time)
         let bounds = CGRect(x: 0, y: 0, width: captureSize.width * scale, height: captureSize.height * scale)   // the capture now: a resize may have moved on
         blocks = blocks.filter { keep.contains($0.id) } + next.compactMap { b in moved.reduce(Optional(b)) { b, m in b.flatMap { m.apply(to: $0, bounds: bounds) } } }
@@ -1265,6 +1343,15 @@ actor RegionPipeline {
         Trace.mark("seamless: render", since: t)
         emit(animated: true)
         return true
+    }
+
+    /// The blocks a read found, line by line (`x,y,w,h 'text'`, pixels of the frame), in the trace: what the rules of `readBlocks` start from. `ocr-block` is the settled
+    /// read's (the benches' census tools read it), `fast-block` the fast pass's (a first read can come from another reader than the settled one, and its boxes differ).
+    private func traceBlocks(_ found: [OCRBlock], as label: String) {
+        guard Trace.enabled else { return }
+        for (i, b) in found.enumerated() {
+            Trace.mark("\(label) \(i) lines: " + b.lines.map { l in "\(Int(l.rect.minX)),\(Int(l.rect.minY)),\(Int(l.rect.width)),\(Int(l.rect.height)) '\(l.text.prefix(24))'" }.joined(separator: " ; "), since: Trace.now)
+        }
     }
 
     /// The words that go to the engine whole because their line break was a hyphen (`LineJoin`): counted, and named in the trace. The pieces
@@ -1276,11 +1363,35 @@ actor RegionPipeline {
         Trace.mark("hyphen join: " + words.joined(separator: " "), since: Trace.now)
     }
 
+    /// The old blocks that drew a translation where the capture now cuts a paragraph (`cutLayout`, in the frame of the pass), on a page that did not change: the capture
+    /// was wider when they were read (a lens in motion reads further than one at rest), and a cut read has nothing to draw there. They stay as they are until the capture
+    /// reaches the column again (`RegionSession.reachColumns`), so that the lens does not go from Korean to English and back (docs/design/lens-hold.md §2, film4 F16).
+    private func heldByCut(old: [Block], rects: [CGRect], stale: Staleness, step: Int, bounds: CGRect) -> Set<UUID> {
+        guard !cutLayout.isEmpty else { return [] }
+        var held = Set<UUID>()
+        for (i, b) in old.enumerated() where b.image != nil && !stale.edited(rects[i], step: step) {
+            let r = rects[i]
+            // Only a block whose text goes on past the capture's side was read whole, by a wider capture, and is cut by this one. One that ends at the edge was read cut
+            // (film4 F5: the translations of the cut line ends, 'posi' and 'whi', stayed on the lens through every read until the wide one): it is not held.
+            guard CaptureEdge.continuesPastSide(b.core.offsetBy(dx: r.minX - b.rect.minX, dy: r.minY - b.rect.minY), in: bounds) else {
+                Trace.count("render.cut_not_held")
+                continue
+            }
+            let overlaps = cutLayout.contains { c in
+                let x = c.core.intersection(r)
+                return !x.isNull && x.width * x.height >= TranslationCarry.share * min(r.width * r.height, c.core.width * c.core.height)
+            }
+            if overlaps { held.insert(b.id) }
+        }
+        if !held.isEmpty { Trace.count("render.held_cut", held.count) }
+        return held
+    }
+
     /// What a block read again shows meanwhile, where the page under the old blocks is as it was (docs/design/lens-hold.md). `rects` are the old
     /// blocks' places in the frame's space; `took` the old blocks whose translation a new block took already. Only a block that drew something has
     /// something to hand on. A new block draws until its translation arrives what the old blocks it holds drew (`TranslationCarry.assign`), and
     /// takes the identity of the largest of them. A new block that is only a piece of an old one (the capture's edge cuts the old one's text) is not
-    /// made: the old block stays as it is. Returns those old blocks.
+    /// made: the old block stays as it is, and so does an old block that the new reading leaves out with nothing over it. Returns those old blocks.
     private func carryTranslations(into new: inout [Block], from rects: [CGRect], old: [Block], took: Set<Int>, stale: Staleness, step: Int) -> Set<UUID> {
         let olds = old.indices.map { i in
             TranslationCarry.Old(rect: rects[i], shown: took.contains(i) || old[i].image == nil ? nil : old[i].translation ?? old[i].carried,
@@ -1311,6 +1422,10 @@ actor RegionPipeline {
             pieces.insert(i)
         }
         if !pieces.isEmpty { Trace.count("render.pieces", pieces.count) }
+        // A drawn block that the new reading leaves out, nothing of it standing over it, stays as it is (`TranslationCarry.unread`).
+        let unread = TranslationCarry.unread(old: olds, new: new.map(\.rect))
+        for oi in unread { keep.insert(old[oi].id) }
+        if !unread.isEmpty { Trace.count("render.unread", unread.count) }
         if Trace.enabled {
             // Which blocks that drew something have it to hand on, and which of those the page's change keeps from it.
             let handing = olds.indices.filter { olds[$0].shown != nil }
@@ -1318,7 +1433,7 @@ actor RegionPipeline {
             let taken = Set(carry.compactMap { $0 }.flatMap { $0.from })
             let left = handing.filter { olds[$0].unchanged && !taken.contains($0) }.map { "'\(old[$0].source.prefix(14))' \(TraceNumber.px(rects[$0].minX)),\(TraceNumber.px(rects[$0].minY)) \(TraceNumber.px(rects[$0].width))x\(TraceNumber.px(rects[$0].height))" }
             Trace.mark("carry: \(handing.count) old drawn block(s) to hand on, \(edited.count) edited \(edited.joined(separator: ", ")); \(carry.compactMap { $0 }.count) of \(new.count) new carry, \(new.filter { oldIDs.contains($0.id) }.count) with an old id; "
-                       + "no new block holds half of: \(left.joined(separator: " ; ")); new: " + new.map { "'\($0.source.prefix(10))' \(TraceNumber.px($0.rect.minX)),\(TraceNumber.px($0.rect.minY)) \(TraceNumber.px($0.rect.width))x\(TraceNumber.px($0.rect.height))" }.joined(separator: " ; "),
+                       + "no new block holds half of: \(left.joined(separator: " ; ")); kept unread: \(unread.map { "'\(old[$0].source.prefix(14))'" }.joined(separator: ", ")); new: " + new.map { "'\($0.source.prefix(10))' \(TraceNumber.px($0.rect.minX)),\(TraceNumber.px($0.rect.minY)) \(TraceNumber.px($0.rect.width))x\(TraceNumber.px($0.rect.height))" }.joined(separator: " ; "),
                        since: Trace.now)
         }
         new = new.enumerated().filter { !pieces.contains($0.offset) }.map(\.element)
@@ -1478,10 +1593,23 @@ actor RegionPipeline {
         let cut = CaptureEdge.cut(all.map(\.rect), in: bounds)
         let sides = CaptureEdge.cutAtSides(all.map(\.rect), in: bounds)
         let rotated = VerticalText.rotatedLines(all.map { (box: $0.rect, text: $0.text) })
+        if Trace.enabled, !all.isEmpty {
+            // How far the lines stand from the capture's side edges, nearest first (px; `*` = reaches it by `CaptureEdge`'s rule): what a cut column looks like to it.
+            func gaps(_ gap: (CGRect) -> CGFloat) -> String {
+                all.indices.map { (gap(all[$0].rect), $0) }.filter { $0.0 <= all[$0.1].rect.height }.sorted { $0.0 < $1.0 }.prefix(10)
+                    .map { "\(Int($0.0.rounded()))\(sides.contains($0.1) ? "*" : "")" }.joined(separator: " ")
+            }
+            Trace.mark("sides \(Int(bounds.width))x\(Int(bounds.height)): \(sides.count) of \(all.count) lines cut; px short of the left edge: [\(gaps { $0.minX - bounds.minX })], of the right: [\(gaps { bounds.maxX - $0.maxX })]", since: Trace.now)
+        }
         var first = 0
         return blocks.compactMap { block in
             defer { first += block.lines.count }
-            if block.lines.indices.contains(where: { sides.contains(first + $0) }) { Trace.count("ocr.cut_side"); return nil }
+            if block.lines.indices.contains(where: { sides.contains(first + $0) }) {
+                Trace.count("ocr.cut_side")
+                let heights = block.lines.map(\.rect.height).sorted()
+                cutLayout.append(CutBlock(core: block.rect, lineHeight: heights[heights.count / 2], lines: block.lines.count))
+                return nil
+            }
             let kept = block.lines.indices.filter { i in
                 if cut.contains(first + i) { Trace.count("ocr.cut_line"); return false }
                 let line = block.lines[i]
@@ -1931,10 +2059,82 @@ actor RegionPipeline {
     }
 
     /// The visible lens in image pixels.
-    private var lensRect: CGRect {
-        CGRect(x: (visible.minX - origin.x) * scale, y: (visible.minY - origin.y) * scale,
-               width: visible.width * scale, height: visible.height * scale)
+    private var lensRect: CGRect { imageRect(of: visible) }
+
+    /// A rect of global Quartz points (a lens) in image pixels.
+    private func imageRect(of r: CGRect) -> CGRect {
+        CGRect(x: (r.minX - origin.x) * scale, y: (r.minY - origin.y) * scale, width: r.width * scale, height: r.height * scale)
     }
+
+    /// What the lens makes of `b`'s layout: the whole of it, the part the lens covers, or nothing (`LensWindow.plan`). Only a block whose text stands in
+    /// the lens counts; one beside it keeps its own layout for the lens that comes over it. Every block's own while `windowing` is off.
+    private func lensPlan(of b: Block) -> LensWindow.Plan {
+        guard Self.windowing else { return .whole }
+        let lens = planned.map(imageRect(of:)) ?? lensRect
+        guard b.core.intersects(lens) else { return .whole }
+        let heights = b.lines.map(\.height).sorted()
+        return LensWindow.plan(text: b.core, lens: lens, lineHeight: heights.isEmpty ? b.rect.height : heights[heights.count / 2], lines: b.lines.count)
+    }
+
+    /// The lens (or the content under it) stands still: each block that crosses a side edge of it is laid out again in the part it covers, and one
+    /// it covers too little of is left undrawn; a block that does not any more gets its own layout back. Once per settle, never while the lens
+    /// moves (the image drawn stays, clipped by the lens: a move is no re-render), and a block whose plan did not change is not touched.
+    private func settleLens() {
+        guard !halted, Self.windowing else { return }
+        var relaid = 0, flipped = 0
+        for i in blocks.indices where blocks[i].image != nil {
+            let plan = lensPlan(of: blocks[i])
+            let hidden = plan == .hidden
+            if hidden != blocks[i].hidden {
+                blocks[i].hidden = hidden
+                flipped += 1
+            }
+            guard !hidden, plan != blocks[i].laid else { continue }
+            blocks[i].image = nil
+            relaid += 1
+        }
+        guard relaid + flipped > 0 else { return }
+        Trace.count("layout.settled")
+        Trace.mark("lens settled: \(relaid) block(s) laid out again, \(flipped) shown or hidden, \(blocks.filter(\.hidden).count) hidden", since: Trace.now)
+        renderMissing()
+        emit(animated: true)
+    }
+
+    /// Asks for `settleLens` once the lens has not changed for `lensSettle`: every change of it starts the wait again.
+    private func scheduleLensSettle() {
+        guard Self.windowing else { return }
+        lensSettleTask?.cancel()
+        lensSettleTask = Task { [weak self, lensSettle] in
+            try? await Task.sleep(for: .seconds(lensSettle))
+            guard !Task.isCancelled else { return }
+            await self?.settleLensForGood()
+        }
+    }
+
+    /// The lens has stood still for `lensSettle`: what it is now is what the blocks are laid out for, whatever was planned.
+    private func settleLensForGood() {
+        planned = nil
+        settleLens()
+    }
+
+    /// The lens is about to be `rect` (global Quartz points: the end of a Fit's animation): the blocks are laid out for it now, once, so that they are there when it is.
+    /// A lens that does not get there (a hand takes it) is laid out for again when it has stood still.
+    func planLens(for rect: CGRect) {
+        guard Self.windowing, rect != visible else { return }
+        planned = rect
+        Trace.count("lens.planned")
+        Trace.mark("lens planned for \(Int(rect.width))x\(Int(rect.height)) at \(Int(rect.minX)),\(Int(rect.minY))", since: Trace.now)
+        settleLens()
+        scheduleLensSettle()   // a lens that never gets there is laid out for as it stands once it has been still
+    }
+
+    /// For the checks: how many blocks are laid out in the part of themselves the lens covers, and how many are left undrawn.
+    func lensWindowState() -> (narrowed: Int, hidden: Int) {
+        (blocks.filter { $0.laid != .whole }.count, blocks.filter(\.hidden).count)
+    }
+
+    /// For the checks: the lens settles now (the wait of `scheduleLensSettle` is the session's clock, not a gate's).
+    func settleLensNow() { settleLensForGood() }
 
     /// Measures the lens's wait: when text first stands in the lens untranslated, and when it is translated there or
     /// leaves it (or the capture) without. Called wherever blocks, lens or translations change.
@@ -2087,22 +2287,40 @@ actor RegionPipeline {
             let lineHeight = heights.isEmpty ? b.rect.height : heights[heights.count / 2]
             let background: BlockRenderer.Background = b.erased.map { .erased($0) }
                 ?? .box(b.appearance.backgroundColor, opacity: options.boxOpacity)
+            // The lens's side edges: laid out in the part of the block the lens covers (`LensWindow`); a block it covers too little of is drawn as it
+            // stands and left out of the snapshot (`emit`), so that a lens that grows has it ready.
+            let plan = lensPlan(of: b)
+            var window: ClosedRange<CGFloat>?
+            if case let .narrowed(range) = plan {
+                window = (range.lowerBound - b.rect.minX)...(range.upperBound - b.rect.minX)
+                Trace.count("layout.visible_width")
+            }
+            if plan == .hidden { Trace.count("layout.share_hidden") }
             Trace.count("render")
-            let rendered = BlockRenderer.render(.init(
+            let input = BlockRenderer.Input(
                 size: b.rect.size, text: text, background: background, appearance: b.appearance,
                 lineHeight: lineHeight, fontSize: b.fontSize, originalLineCount: max(1, b.lines.count), spareWidth: b.spareWidth,
                 fontStyle: options.fontStyle,
                 targetLanguage: options.targetLanguage, scale: scale,
                 centered: LineAlignment.isCentered(b.lines.map { ($0.minX, $0.maxX) }, outlined: b.appearance.outlineColor != nil),
-                textArea: b.textArea))
+                textArea: b.textArea, window: window)
+            let rendered = BlockRenderer.render(input)
+            #if !MAS
+            if LensSweep.enabled { LensSweep.report(input, source: b.source, core: b.core.offsetBy(dx: -b.rect.minX, dy: -b.rect.minY)) }
+            #endif
             blocks[i].image = rendered?.image
             blocks[i].ink = rendered?.text
             blocks[i].drawnSize = rendered?.fontSize ?? 0
             blocks[i].clipped = rendered?.clipped ?? false
             blocks[i].ellipsis = rendered?.ellipsis ?? false
+            blocks[i].drawnLines = rendered?.lines ?? []
+            blocks[i].laid = plan == .hidden ? .whole : plan
+            blocks[i].hidden = plan == .hidden
             if Trace.enabled, let ink = rendered?.text {
                 Trace.mark("render '\(b.source.prefix(24))' patch \(TraceNumber.px(b.rect.minX)),\(TraceNumber.px(b.rect.minY)) \(TraceNumber.px(b.rect.width))x\(TraceNumber.px(b.rect.height)) spare \(TraceNumber.px(b.spareWidth)) "
-                    + "area \(b.textArea.map { "\(TraceNumber.px($0.minX)),\(TraceNumber.px($0.minY)) \(TraceNumber.px($0.width))x\(TraceNumber.px($0.height))" } ?? "-") ink \(TraceNumber.px(ink.minX)),\(TraceNumber.px(ink.minY)) \(TraceNumber.px(ink.width))x\(TraceNumber.px(ink.height))",
+                    + "area \(b.textArea.map { "\(TraceNumber.px($0.minX)),\(TraceNumber.px($0.minY)) \(TraceNumber.px($0.width))x\(TraceNumber.px($0.height))" } ?? "-") ink \(TraceNumber.px(ink.minX)),\(TraceNumber.px(ink.minY)) \(TraceNumber.px(ink.width))x\(TraceNumber.px(ink.height))"
+                    + (plan == .whole ? "" : " lens \(plan == .hidden ? "hidden" : "window \(window.map { "\(TraceNumber.px($0.lowerBound))..\(TraceNumber.px($0.upperBound))" } ?? "")")")
+                    + " size \(TraceNumber.px(rendered?.fontSize ?? 0)) lines \(rendered?.lines.count ?? 0)",
                     since: Trace.now)
             }
         }
@@ -2110,12 +2328,12 @@ actor RegionPipeline {
 
     private func emit(animated: Bool) {
         version += 1
-        Trace.mark("pipeline emit v\(version)", since: Trace.now)
+        Trace.mark("pipeline emit v\(version): \(blocks.filter { $0.image != nil && !$0.hidden }.count) blocks drawn of \(blocks.count), \(cutLayout.count) cut", since: Trace.now)
         let s = scale
         let out = blocks.compactMap { b -> OverlayBlock? in
-            guard let img = b.image else { return nil }
+            guard let img = b.image, !b.hidden else { return nil }
             return OverlayBlock(id: b.id, frame: CGRect(x: b.rect.minX / s, y: b.rect.minY / s, width: b.rect.width / s, height: b.rect.height / s),
-                                image: img, seamless: b.erased != nil)
+                                image: img, seamless: b.erased != nil, lines: Self.windowing ? b.drawnLines.map { CGRect(x: $0.minX / s, y: $0.minY / s, width: $0.width / s, height: $0.height / s) } : [])
         }
         // A block that was drawn and is still read but draws nothing now: the lens shows the page's own text where its translation was.
         let blanked = blocks.filter { $0.image == nil && lastDrawn.contains($0.id) }
@@ -2128,22 +2346,63 @@ actor RegionPipeline {
                                            source: $0.source, translation: $0.translation) }
         // What the self-test's layout line counts: every drawn block, in draw order.
         let drawn = blocks.compactMap { b -> DrawnBlock? in
-            guard b.image != nil else { return nil }
+            guard b.image != nil, !b.hidden else { return nil }
             let text = b.ink.map { $0.offsetBy(dx: b.rect.minX, dy: b.rect.minY) } ?? b.rect
             return DrawnBlock(source: b.source, core: b.core, patch: b.rect, text: text, fontSize: b.drawnSize, lines: max(1, b.lines.count), clipped: b.clipped,
                               ellipsis: b.ellipsis)
         }
         // Where the text columns stand: from every block's lines, translated or not, never from the patches (`ColumnFit`).
+        // The paragraphs the capture cut stand there too (film4 F17: a lens short of its column found none, since every block of it was left out).
+        // Only the ones the lens sits in (`LensWindow.sitsIn`): the column it is over. Another cut column beside it, which a hand brushes, is not a column to snap to or to scout (hold117's gate: a lens made smaller is not read again).
+        let lens = lensRect
+        let cuts = Self.windowing ? cutLayout.filter { LensWindow.sitsIn(text: $0.core, lens: lens, lineHeight: $0.lineHeight, lines: $0.lines) } : []
         let columns = ColumnFit.columns(blocks.map { b in
             ColumnFit.Block(core: CGRect(x: b.core.minX / s, y: b.core.minY / s, width: b.core.width / s, height: b.core.height / s), lines: b.lines.count)
+        } + cuts.map { c in
+            ColumnFit.Block(core: CGRect(x: c.core.minX / s, y: c.core.minY / s, width: c.core.width / s, height: c.core.height / s), lines: c.lines)
         })
+        if Trace.enabled, !cutLayout.isEmpty {
+            Trace.mark("lens sits in \(cuts.count) of \(cutLayout.count) cut paragraph(s): " + cutLayout.map { c in
+                let covered = max(0, min(c.core.maxX, lens.maxX) - max(c.core.minX, lens.minX))
+                return "[\(TraceNumber.px(c.core.minX / s))..\(TraceNumber.px(c.core.maxX / s)) lines=\(c.lines) holds \(String(format: "%.2f", covered / max(1, lens.width))) of the lens, \(String(format: "%.2f", covered / max(1, c.core.width))) of itself]"
+            }.joined(separator: " "), since: Trace.now)
+        }
         if Trace.enabled {
             Trace.mark("columns: n=\(columns.count) " + columns.map { "[\(TraceNumber.px($0.left))..\(TraceNumber.px($0.right)) blocks=\($0.blocks) lines=\($0.lines)]" }.joined(separator: " "),
                        since: Trace.now)
         }
+        noteLensEdges()
         onSnapshot(OverlaySnapshot(version: version, blocks: out, animated: animated, origin: origin, time: frameTime,
-                                   texts: texts, frame: latest?.image, scale: s, drawn: drawn, columns: columns, captureSize: captureSize, read: readRect.isNull ? .zero : readRect))
+                                   texts: texts, frame: latest?.image, scale: s, drawn: drawn, columns: columns, captureSize: captureSize, read: readRect.isNull ? .zero : readRect,
+                                   cut: !cuts.isEmpty, leftOut: blocks.filter { $0.image != nil && $0.hidden }.map { CGRect(x: $0.rect.minX / s, y: $0.rect.minY / s, width: $0.rect.width / s, height: $0.rect.height / s) }))
         dump(out)
+    }
+
+    /// What the lens's edges do to the snapshot just made, in the trace (`MWOYEO_TRACE`; film4 F1 and F2, docs/design/recognition.md §16.2): of the lines the lens
+    /// meets, how many it cuts (a box that is not whole in it) and how many of those it shows anyway (a cut at a side always, one at the top or bottom unless the
+    /// overlay masks it), and the drawn blocks that stand in it as fragments (a source text the lens covers under `minShare` of, drawn as it stands). The same
+    /// count with `MWOYEO_LENS_WINDOW=off` is the picture before the rule.
+    private func noteLensEdges() {
+        guard Trace.enabled else { return }
+        let drawn = blocks.filter { $0.image != nil && !$0.hidden && $0.rect.intersects(lensRect) }.map { b -> LensWindow.Drawn in
+            let heights = b.lines.map(\.height).sorted()
+            return .init(text: b.core, lineHeight: heights.isEmpty ? b.rect.height : heights[heights.count / 2], sourceLines: b.lines.count,
+                         lines: b.drawnLines.map { $0.offsetBy(dx: b.rect.minX, dy: b.rect.minY) })
+        }
+        let c = LensWindow.census(drawn, lens: lensRect, masksRows: Self.windowing)
+        Trace.mark("lens edges: \(c.lines) lines in the lens, \(c.cut) cut, \(c.shown) cut and shown, \(c.blocksCut) blocks cut, \(c.fragments) fragments, \(blocks.filter(\.hidden).count) blocks not drawn", since: Trace.now)
+        // The lines that stand on the lens's top or bottom edge, one by one (film4 F1 and F16 were a line that the edge cut, or took for cut by a point): the box of the line
+        // against the edge, in shares of its height (+ = the box reaches past the edge, outside the lens), and what `LensWindow.shown` makes of it.
+        let lens = lensRect
+        var rows: [String] = []
+        for b in drawn {
+            for l in b.lines where l.maxY > lens.minY - l.height && l.minY < lens.maxY + l.height && (l.minY < lens.minY + l.height || l.maxY > lens.maxY - l.height) {
+                let over = l.minY < lens.minY ? (lens.minY - l.minY) / l.height : l.maxY > lens.maxY ? (l.maxY - lens.maxY) / l.height : 0
+                let top = l.minY < lens.minY + l.height / 2
+                rows.append("\(top ? "top" : "bottom") y \(TraceNumber.px(l.minY))..\(TraceNumber.px(l.maxY)) over \(String(format: "%.2f", Double(over))) \(LensWindow.shown(lines: [l], lens: lens) == .all ? "whole" : "cut")")
+            }
+        }
+        if !rows.isEmpty { Trace.mark("lens rows: lens y \(TraceNumber.px(lens.minY))..\(TraceNumber.px(lens.maxY)): " + rows.joined(separator: " ; "), since: Trace.now) }
     }
 
     private var lastDump: TimeInterval = 0

@@ -216,4 +216,10 @@ public struct PixelRect: Sendable, Equatable, Hashable {
         let x1 = max(x0, min(x + width, w)), y1 = max(y0, min(y + height, h))
         return PixelRect(x: x0, y: y0, width: x1 - x0, height: y1 - y0)
     }
+    /// `rects` moved with the content by (`dx`, `dy`) onto a `width`×`height` canvas: the parts that fall outside it are gone, a frame of
+    /// that size has no pixels there. The strips a grow uncovered and a shrink back to the old size took away leave nothing to read
+    /// (holdfix117 A2: left in place, the one left of the capture made the first frame after a shrink a read of every row).
+    public static func moved(_ rects: [PixelRect], dx: Int, dy: Int, width w: Int, height h: Int) -> [PixelRect] {
+        rects.map { PixelRect(x: $0.x + dx, y: $0.y + dy, width: $0.width, height: $0.height).clamped(width: w, height: h) }.filter { !$0.isEmpty }
+    }
 }

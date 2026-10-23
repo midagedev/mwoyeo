@@ -16,6 +16,8 @@ import sys
 
 TOLERANCE = 4
 SIDE_COLUMN = 3
+SLACK = 0.0   # --slack <share>: a line reaches the RIGHT edge when it is within max(TOLERANCE, share x min(its width, its height)) of it (`CaptureEdge.rightSlack`, round edges117b)
+SLACK_LEFT = 0.0   # --slack-left <share>: the same for the left edge (default 0: the boxes of cut lines start at the edge)
 
 
 def png_size(path):
@@ -35,7 +37,10 @@ def lines_of(err):
 
 def sides(lines, width):
     """(left, right) indices of the lines that reach a side edge."""
-    return ([i for i, x in enumerate(lines) if x[0] <= TOLERANCE], [i for i, x in enumerate(lines) if x[0] + x[2] >= width - TOLERANCE])
+    def reach(x, share):
+        return max(TOLERANCE, share * min(x[2], x[3]))
+    left_share = SLACK_LEFT
+    return ([i for i, x in enumerate(lines) if x[0] <= reach(x, left_share)], [i for i, x in enumerate(lines) if x[0] + x[2] >= width - reach(x, SLACK)])
 
 
 def cut(lines, width):
@@ -60,7 +65,12 @@ def renders(paper, uc):
 
 
 def main():
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    global SLACK, SLACK_LEFT
+    if "--slack" in sys.argv:
+        SLACK = float(sys.argv[sys.argv.index("--slack") + 1])
+    if "--slack-left" in sys.argv:
+        SLACK_LEFT = float(sys.argv[sys.argv.index("--slack-left") + 1])
+    args = [a for a in sys.argv[1:] if not a.startswith("--") and a not in (str(SLACK), str(SLACK_LEFT))]
     if not args:
         sys.exit(__doc__)
     total = {"paper": [0, 0, 0, 0], "uc": [0, 0, 0, 0]}

@@ -426,7 +426,7 @@ actor TranslationService {
         var outcome = TranslationOutcome()
         var todo: [String] = []
         var seen = Set<String>()
-        let cjkSource = sourceIsCJK(lens)
+        let cjkSource = sourceIsCJK(lens, batch: texts)
         for t in texts where seen.insert(t).inserted {
             if !TranslationFilter.needsTranslation(t, cjkSource: cjkSource) {
                 // Not source-language text (a handle, a brand, a counter): kept as is, and the pipeline leaves it alone.
@@ -982,16 +982,21 @@ actor TranslationService {
 
 
     /// Languages seen in confidently detected text, so short or ambiguous snippets ("# fan-art", a user name)
-    /// follow the page instead of being guessed as Catalan.
-    private var seenLanguages: [String: Int] = [:]
+    /// follow the page instead of being guessed as Catalan; the lines read lately weigh most (`PageLanguage`).
+    private var page = PageLanguage()
 
-    /// The lens's configured source language, or the language most of the page's longer lines were detected in.
+    /// The lens's configured source language, or the language the page's longer lines read lately were detected in.
     private func pageLanguage(_ lens: LensRoute) -> String? {
-        lens.settings.sourceLanguage != "auto" ? lens.settings.sourceLanguage : seenLanguages.max { $0.value < $1.value }?.key
+        lens.settings.sourceLanguage != "auto" ? lens.settings.sourceLanguage : page.language
     }
 
-    /// The page's source is Japanese, Chinese or Korean: what `TranslationFilter.needsTranslation` asks of every line.
-    private func sourceIsCJK(_ lens: LensRoute) -> Bool { ["ja", "zh-Hans", "zh-Hant", "ko"].contains(pageLanguage(lens) ?? "") }
+    /// The source of `texts` is Japanese, Chinese or Korean: what `TranslationFilter.needsTranslation` asks of every line. Under auto, the
+    /// language most of the batch's confident lines are in decides, else the page's (`PageLanguage.source`): English lines a lens reads after a
+    /// Japanese chat are English, not names on a Japanese page.
+    private func sourceIsCJK(_ lens: LensRoute, batch texts: [String]) -> Bool {
+        guard lens.settings.sourceLanguage == "auto" else { return PageLanguage.isCJK(lens.settings.sourceLanguage) }
+        return PageLanguage.isCJK(page.source(ofBatch: texts.compactMap { confidentLanguage(of: $0, learns: true) }))
+    }
 
     /// The service's own configured source language, or the language of `text` when set to auto ("und" if unsure).
     func sourceLanguage(for text: String) -> String { sourceLanguage(for: text, route: defaultRoute) }
@@ -1012,21 +1017,33 @@ actor TranslationService {
     }
 
     /// The lens's configured source language, or the language of `text` when set to auto ("und" if unsure). `learns`: a confident long line counts
-    /// towards the page's language (`seenLanguages`).
+    /// towards the page's language (`page`).
     func sourceLanguage(for text: String, route lens: LensRoute, learns: Bool = true) -> String {
         if lens.settings.sourceLanguage != "auto" { return lens.settings.sourceLanguage }
+        let page = self.page.language
+        guard let (code, p) = detect(text) else { return page ?? "und" }
+        if learns, p > 0.9, text.count >= 20 { self.page.learn(code) }
+        return p < 0.75 || text.count < 12 ? page ?? code : code
+    }
+
+    /// The language of `text` when the recognizer is sure of it on a line long enough to tell (what counts towards the page's language).
+    private func confidentLanguage(of text: String, learns: Bool) -> String? {
+        guard text.count >= 20, let (code, p) = detect(text), p > 0.9 else { return nil }
+        if learns { page.learn(code) }
+        return code
+    }
+
+    private func detect(_ text: String) -> (String, Double)? {
         let r = NLLanguageRecognizer()
         r.languageConstraints = Languages.sources.filter { $0 != "auto" }.map { NLLanguage($0) }
         r.processString(text)
-        let page = seenLanguages.max { $0.value < $1.value }?.key
-        guard let (lang, p) = r.languageHypotheses(withMaximum: 1).first else { return page ?? "und" }
+        guard let (lang, p) = r.languageHypotheses(withMaximum: 1).first else { return nil }
         let code: String = switch lang {
         case .simplifiedChinese: "zh-Hans"
         case .traditionalChinese: "zh-Hant"
         default: lang.rawValue
         }
-        if learns, p > 0.9, text.count >= 20 { seenLanguages[code, default: 0] += 1 }
-        return p < 0.75 || text.count < 12 ? page ?? code : code
+        return (code, p)
     }
 }
 
@@ -1076,7 +1093,7 @@ extension TranslationService {
 
         var todo: [String] = [], needing: [String] = []
         var seen = Set<String>()
-        let cjkSource = sourceIsCJK(route)
+        let cjkSource = sourceIsCJK(route, batch: texts)
         // A line that is only a name or a term of the memory this call sends is that row's translation, the engine not asked (a name plate
         // the engine renders its own way in a batch). The rows are the ones the request sends (`RequestLayout.exactRows`).
         let named = RequestLayout.exactRows(request: contexts.request(lens, pass: pass, items: [], source: nil, target: target, glossary: route.settings.glossaryHintPairs),
@@ -1252,8 +1269,9 @@ extension TranslationService {
         // A line that is only a pinned name or term is its translation, Apple not asked; the rows are the ones the pre-insertion uses.
         let pinned = entries.filter { $0.origin == .user }
         var named = TranslationOutcome()
+        let cjkSource = sourceIsCJK(lens, batch: texts)
         for t in texts where seen.insert(t).inserted {
-            if TranslationFilter.needsTranslation(t, cjkSource: sourceIsCJK(lens)), let row = ContextMemory.exactTranslation(of: t, in: pinned) {
+            if TranslationFilter.needsTranslation(t, cjkSource: cjkSource), let row = ContextMemory.exactTranslation(of: t, in: pinned) {
                 Trace.count("translate.memory_exact")
                 pace.recordLookup(hit: true, slot: lens.slot)
                 named.translations[t] = row

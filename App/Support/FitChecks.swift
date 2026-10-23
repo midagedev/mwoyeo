@@ -317,6 +317,57 @@ enum FitChecks {
         c = Trace.takeCounts()
         check("with ⌘ held a move has no guide, no tick and no settle", c["lens.snap.enter"] == nil && window(mc)?.onSettle?(frame(mc)) == nil)
 
+        // MARK: Where a moved lens lands, shown while it moves (user 2026-10-23: "내려놓을때 리사이즈 되서 어떤 콘텐츠에 맞춰질지 감이 되게 안오거든")
+
+        // A lens over the left column, Auto Fit on, moved by hand across the gutter to the right one: the outline shows the target under its middle once
+        // the display's read is there, ticks as it takes a new target, hides with ⌘ and over the content the lens already fits; let go, the lens takes the
+        // outline's rect. FAIL-first: before `LandingPreview` no outline showed (fit.landing.preview 0) and the drop alone told where it landed.
+        do {
+            let page = LensTarget.Map(blocks: blocks(left) + blocks(right))
+            let lp = await lens(CGRect(x: 140, y: 230, width: 200, height: 90), autoFit: true)
+            lp.fit.windowsOnScreen = { [] }
+            lp.landingMap = { _ in page }
+            lp.received(snapshot(wholePage))
+            _ = Trace.takeCounts()
+            let start = frame(lp)
+            window(lp)?.onMove?(start.offsetBy(dx: 2, dy: 0))
+            for _ in 0..<50 where lp.landingPreview.shown == nil { try? await Task.sleep(for: .milliseconds(10)) }
+            let overLeft = lp.landingPreview.shown
+            let leftTarget = LensTarget.choose(page, pointer: CGPoint(x: lp.config.rect.midX, y: lp.config.rect.midY), bounds: lp.display(of: lp.config.rect), scale: lp.fitScale)?.rect
+            check("moved over the left column, the outline shows the picker's target there once the read is in (\(overLeft.map { "\($0)" } ?? "none"))",
+                  overLeft != nil && overLeft == leftTarget)
+            let acrossRight = start.offsetBy(dx: 370, dy: 0)
+            window(lp)?.onMove?(acrossRight)
+            let overRight = lp.landingPreview.shown
+            c = Trace.takeCounts()
+            check("moved on over the right column, it glides to that column's target, one tick per target (\(c["fit.landing.preview", default: 0]))",
+                  overRight != nil && overRight != overLeft && overRight.map { $0.minX >= right.x0 - 20 } == true && c["fit.landing.preview"] == 2, "\(String(describing: overRight)) \(c)")
+            lp.fit.commandDown = { true }
+            window(lp)?.onMove?(acrossRight.offsetBy(dx: 1, dy: 0))
+            check("⌘ held, no outline", lp.landingPreview.shown == nil)
+            lp.fit.commandDown = { false }
+            window(lp)?.onMove?(acrossRight)
+            let promised = lp.landingPreview.shown
+            window(lp)?.onCommit?()
+            for _ in 0..<50 where lp.config.rect != promised { try? await Task.sleep(for: .milliseconds(10)) }
+            check("let go, the lens takes the outline's rect, and the outline is gone (\(lp.config.rect) for \(promised.map { "\($0)" } ?? "none"))",
+                  promised != nil && lp.config.rect == promised && lp.landingPreview.shown == nil)
+            window(lp)?.onMove?(frame(lp).offsetBy(dx: 1, dy: 0))
+            for _ in 0..<50 where lp.fit.aheadMap == nil { try? await Task.sleep(for: .milliseconds(10)) }
+            window(lp)?.onMove?(frame(lp).offsetBy(dx: 1, dy: 0))
+            check("moved a little on the content it already fits, no outline", lp.landingPreview.shown == nil)
+            window(lp)?.onCommit?()
+            let off = await lens(CGRect(x: 140, y: 230, width: 200, height: 90))
+            off.fit.windowsOnScreen = { [] }
+            off.landingMap = { _ in page }
+            window(off)?.onMove?(frame(off).offsetBy(dx: 370, dy: 0))
+            try? await Task.sleep(for: .milliseconds(100))
+            window(off)?.onMove?(frame(off).offsetBy(dx: 1, dy: 0))
+            check("Auto Fit off, no outline and no read of the display", off.landingPreview.shown == nil && off.fit.ahead == nil)
+            window(off)?.onCommit?()
+            await lp.stop(); await off.stop()
+        }
+
         // MARK: Auto Fit
 
         let auto = await lens(narrow, autoFit: true)

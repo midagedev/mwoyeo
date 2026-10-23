@@ -100,6 +100,8 @@ final class RegionSession {
     private var calmTimer: Timer?
     /// The display's map for a lens let go by hand with Auto Fit on (the picker's reader, `PickerMap.live`); nil: no landing, only the column fit.
     var landingMap: PickerMap.Reader?
+    /// Where the lens a hand moves will land, shown while it moves (`updateLandingPreview`).
+    let landingPreview = LandingPreview()
     /// The dot and glow follow translating only, settled by `BusyDebounce`; notices pass `NoticeGate`.
     private var busyDebounce = BusyDebounce()
     private var busyTimer: Timer?
@@ -320,6 +322,7 @@ final class RegionSession {
         panel.orderOut(nil)
         chrome.orderOut(nil)
         recentPanel?.orderOut(nil)
+        landingPreview.close()
     }
 
     /// A quiet line on the lens's pill for a few seconds.
@@ -1193,7 +1196,7 @@ final class RegionSession {
         layout.display(showing: lens) ?? lens
     }
 
-    private func display(of lens: CGRect) -> CGRect { Self.display(of: lens, in: layoutProvider()) }
+    func display(of lens: CGRect) -> CGRect { Self.display(of: lens, in: layoutProvider()) }
 
     /// `layout`: the displays as the session sees them (`layoutProvider`); nil at construction, when the real ones are looked at.
     static func overscan(_ lens: CGRect, wide: Bool, in layout: DisplayLayout? = nil) -> CGRect {
@@ -1516,7 +1519,7 @@ extension RegionSession {
     /// The capture's rect now (global points): the checks see a probe's band in it.
     var captureRect: CGRect { capture }
 
-    private var fitScale: CGFloat { chrome.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2 }
+    var fitScale: CGFloat { chrome.screen?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2 }
 
     /// What Fit to Column can say about the column under the lens now.
     private enum FitAnswer { case column(ColumnFit.Column), none, reading }
@@ -1655,6 +1658,7 @@ extension RegionSession {
         guard !fit.animating, !fit.settling else { return }
         if !fit.handOn { beginHand() }
         _ = evaluateSnap(rect, edges: .both)
+        updateLandingPreview(rect)
     }
 
     private func beginHand() {
@@ -1664,10 +1668,45 @@ extension RegionSession {
         fit.landing = nil
         endProbe()
         apply(AutoFit.step(fit.machine, .dragged))
+        fit.aheadMap = nil
         if let landingMap, fit.machine.state != .off {
             let display = display(of: config.rect)
-            fit.ahead = (display, Task { await landingMap(display) })
+            let map = Task { await landingMap(display) }
+            fit.ahead = (display, map)
+            fit.aheadWindows = fit.windowsOnScreen()
+            // The read outlasts the first moves: once it is there the outline shows where the lens is now.
+            Task { [weak self] in
+                let found = await map.value
+                guard let self, fit.handOn, fit.ahead?.map == map else { return }
+                fit.aheadMap = found
+                updateLandingPreview(config.rect)
+            }
         }
+    }
+
+    /// The content a lens at `lens` lands on: the target under its middle as the picker would place it there, in the frontmost window's own map, on
+    /// its display (`LensTarget.choose`); nil over no target.
+    private func landingTarget(for lens: CGRect, map: LensTarget.Map, windows: [WindowInfo]) -> (rect: CGRect?, window: WindowInfo?) {
+        let middle = CGPoint(x: lens.midX, y: lens.midY)
+        let window = windows.first { $0.bounds.contains(middle) }
+        guard let area = LensTarget.targetBounds(over: window?.bounds, windowsKnown: !windows.isEmpty, on: display(of: lens)) else { return (nil, window) }
+        let own = window.map { w in map.scoped { c in windows.first { $0.bounds.contains(c) }?.id == w.id } } ?? map
+        return (LensTarget.choose(own, pointer: middle, bounds: area, scale: fitScale)?.rect, window)
+    }
+
+    /// While a hand moves the lens (Auto Fit on, ⌘ up): the outline of where it lands if let go now, with the trackpad's tick as it takes a new
+    /// target; hidden over the content the lens already fits (`AutoFit.landed` would leave it) and over no target.
+    private func updateLandingPreview(_ rect: CGRect) {
+        guard fit.handOn, fit.machine.state != .off, !fit.commandDown(), let map = fit.aheadMap,
+              let target = landingTarget(for: rect, map: map, windows: fit.aheadWindows).rect,
+              case .land = AutoFit.step(fit.machine, .landed(lens: rect, target: target)).action else {
+            landingPreview.hide()
+            return
+        }
+        guard target != landingPreview.shown else { return }
+        AlignmentHaptic.tick()
+        Trace.count("fit.landing.preview")
+        landingPreview.show(target, on: display(of: rect))
     }
 
     /// A resize drag's frame (AppKit) after the snap: the right edge where `LiveSnap` shows it while the guide is up (the guide and the tick: from 8 pt, kept
@@ -1740,14 +1779,17 @@ extension RegionSession {
             fit.band = nil
             settleBusy()
         }
-        if byHand, fit.machine.state != .off, !land() { fit.gate.rearm(); scheduleJudgement(after: fit.calm + 0.05) }
+        landingPreview.hide()
+        fit.aheadMap = nil
+        // ⌘ held, the lens stays where the hand left it, as a drag with ⌘ snaps to nothing.
+        if byHand, fit.machine.state != .off, fit.commandDown() || !land() { fit.gate.rearm(); scheduleJudgement(after: fit.calm + 0.05) }
     }
 
     /// A lens moved by hand and let go, Auto Fit on: one read of its display (begun with the drag), and the lens takes the target under its middle as
     /// the picker would place it there (`AutoFit.landed`). Same content, no target, or a hand on it again: the column fit judges as before. False without a reader.
     private func land() -> Bool {
         guard let landingMap else { return false }
-        let from = config.rect, display = display(of: from), scale = fitScale
+        let from = config.rect, display = display(of: from)
         fit.landing?.cancel()
         chrome.setBusy(true)
         // The read the drag began (`beginHand`), when the lens is let go on the display it began on; else one now.
@@ -1759,14 +1801,8 @@ extension RegionSession {
             fit.landing = nil
             settleBusy()
             guard config.rect == from, !dragging, !fit.animating, fit.machine.state != .off else { return }
-            let middle = CGPoint(x: from.midX, y: from.midY)
-            let windows = WindowInfo.onScreen()
-            let window = windows.first { $0.bounds.contains(middle) }
-            var target: CGRect?
-            if let map, let area = LensTarget.targetBounds(over: window?.bounds, windowsKnown: !windows.isEmpty, on: display) {
-                let own = window.map { w in map.scoped { c in windows.first { $0.bounds.contains(c) }?.id == w.id } } ?? map
-                target = LensTarget.choose(own, pointer: middle, bounds: area, scale: scale)?.rect
-            }
+            let found = map.map { landingTarget(for: from, map: $0, windows: fit.windowsOnScreen()) }
+            let target = found?.rect, window = found?.window
             if Trace.enabled {
                 let shown = { (r: CGRect) in "\(TraceNumber.px(r.minX)),\(TraceNumber.px(r.minY)) \(TraceNumber.px(r.width))x\(TraceNumber.px(r.height))" }
                 Trace.mark("fit: landed lens=\(shown(from)) target=\(target.map(shown) ?? "none") window='\(window?.appName ?? "")'", since: Trace.now)

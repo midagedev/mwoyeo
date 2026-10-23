@@ -58,6 +58,11 @@ struct LensFit {
     var landing: Task<Void, Never>?
     /// The display's map read as a hand began to move the lens (Auto Fit on), so the lens lands as it is let go: the drag outlasts the read.
     var ahead: (display: CGRect, map: Task<LensTarget.Map?, Never>)?
+    /// That read once it is there, and the windows on the screen as the hand began (the outline of where the lens lands, `LandingPreview`).
+    var aheadMap: LensTarget.Map?
+    var aheadWindows: [WindowInfo] = []
+    /// The other apps' windows on the screen, as the checks give them (`WindowInfo.onScreen`).
+    var windowsOnScreen: () -> [WindowInfo] = { WindowInfo.onScreen() }
     var settleTimer: Timer?
     /// Seconds content must have stood still before Auto Fit judges, and how long a probe waits for its snapshot: the design's numbers, held here so the
     /// checks give a lens none to wait for.

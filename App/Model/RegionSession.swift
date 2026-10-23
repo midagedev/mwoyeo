@@ -1664,6 +1664,10 @@ extension RegionSession {
         fit.landing = nil
         endProbe()
         apply(AutoFit.step(fit.machine, .dragged))
+        if let landingMap, fit.machine.state != .off {
+            let display = display(of: config.rect)
+            fit.ahead = (display, Task { await landingMap(display) })
+        }
     }
 
     /// A resize drag's frame (AppKit) after the snap: the right edge where `LiveSnap` shows it while the guide is up (the guide and the tick: from 8 pt, kept
@@ -1739,15 +1743,18 @@ extension RegionSession {
         if byHand, fit.machine.state != .off, !land() { fit.gate.rearm(); scheduleJudgement(after: fit.calm + 0.05) }
     }
 
-    /// A lens moved by hand and let go, Auto Fit on: one read of its display, and the lens takes the target under its middle as the picker would
-    /// place it there (`AutoFit.landed`). Same content, no target, or a hand on it again: the column fit judges as before. False without a reader.
+    /// A lens moved by hand and let go, Auto Fit on: one read of its display (begun with the drag), and the lens takes the target under its middle as
+    /// the picker would place it there (`AutoFit.landed`). Same content, no target, or a hand on it again: the column fit judges as before. False without a reader.
     private func land() -> Bool {
         guard let landingMap else { return false }
         let from = config.rect, display = display(of: from), scale = fitScale
         fit.landing?.cancel()
         chrome.setBusy(true)
+        // The read the drag began (`beginHand`), when the lens is let go on the display it began on; else one now.
+        let ahead = fit.ahead.flatMap { $0.display == display ? $0.map : nil }
+        fit.ahead = nil
         fit.landing = Task { [weak self] in
-            let map = await landingMap(display)
+            let map = if let ahead { await ahead.value } else { await landingMap(display) }
             guard let self, !Task.isCancelled else { return }
             fit.landing = nil
             settleBusy()

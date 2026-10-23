@@ -56,6 +56,8 @@ struct LensFit {
     var probeTimer: Timer?
     /// The display read of a lens let go by hand (`RegionSession.land`), until its target is known.
     var landing: Task<Void, Never>?
+    /// The display's map read as a hand began to move the lens (Auto Fit on), so the lens lands as it is let go: the drag outlasts the read.
+    var ahead: (display: CGRect, map: Task<LensTarget.Map?, Never>)?
     var settleTimer: Timer?
     /// Seconds content must have stood still before Auto Fit judges, and how long a probe waits for its snapshot: the design's numbers, held here so the
     /// checks give a lens none to wait for.

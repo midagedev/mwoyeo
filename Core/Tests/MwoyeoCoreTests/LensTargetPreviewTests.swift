@@ -43,11 +43,11 @@ private enum FilmTake {
         #expect(map.readingColumns == 2)
         let t = try #require(LensTarget.choose(map, pointer: FilmTake.atMap, bounds: FilmTake.content))
         #expect(t.column == 0)
-        // `picker: target column=0 anchor=1 rect=301,96 449x318`
-        #expect(abs(t.rect.minX - 301) <= 1 && abs(t.rect.minY - 96) <= 1 && abs(t.rect.width - 449) <= 1 && abs(t.rect.height - 318) <= 1, "\(t.rect)")
+        // `picker: target column=0 anchor=1 rect=301,96 449x318`, padded 6 pt above and below since 2026-10-23 (film5)
+        #expect(abs(t.rect.minX - 301) <= 1 && abs(t.rect.minY - 90) <= 1 && abs(t.rect.width - 449) <= 1 && abs(t.rect.height - 330) <= 1, "\(t.rect)")
         let second = try #require(LensTarget.choose(map, pointer: CGPoint(x: 986, y: 330), bounds: FilmTake.content))
         // `picker: target column=1 anchor=2 rect=763,252 449x435`
-        #expect(abs(second.rect.minX - 763) <= 1 && abs(second.rect.minY - 252) <= 1 && abs(second.rect.width - 449) <= 1 && abs(second.rect.height - 435) <= 1, "\(second.rect)")
+        #expect(abs(second.rect.minX - 763) <= 1 && abs(second.rect.minY - 246) <= 1 && abs(second.rect.width - 449) <= 1 && abs(second.rect.height - 447) <= 1, "\(second.rect)")
     }
 
     @Test func noTargetOnTheTakesPathLeavesItsColumnOrThePage() {

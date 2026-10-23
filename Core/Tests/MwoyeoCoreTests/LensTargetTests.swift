@@ -40,10 +40,12 @@ private enum DrawnPage {
                 #expect(abs(t.rect.minX - (column.left - 6)) <= 3 && abs(t.rect.maxX - (column.right + 6)) <= 3, "\(t.rect) for \(column)")
                 // It starts at its anchor's top and ends on a block's bottom; where nothing within 44 pt follows its bottom, it may have
                 // grown upward instead, by whole blocks.
-                let grewUp = !members.contains { $0.minY > t.rect.maxY && $0.minY - t.rect.maxY <= LensTarget.breakGap }
-                #expect(abs(t.rect.minY - members[t.anchor].minY) <= 0.5 || (grewUp && members.contains { abs($0.minY - t.rect.minY) <= 0.5 }),
+                // 2026-10-23 (film5): the rect is the lines padded by `ColumnFit.pad` (6 pt) above and below, as at the sides.
+                let top = t.rect.minY + 6, bottom = t.rect.maxY - 6
+                let grewUp = !members.contains { $0.minY > bottom && $0.minY - bottom <= LensTarget.breakGap }
+                #expect(abs(top - members[t.anchor].minY) <= 0.5 || (grewUp && members.contains { abs($0.minY - top) <= 0.5 }),
                         "\(t.rect) anchor \(members[t.anchor])")
-                #expect(members.contains { abs($0.maxY - t.rect.maxY) <= 0.5 }, "\(t.rect) ends inside a block")
+                #expect(members.contains { abs($0.maxY - bottom) <= 0.5 || ($0.maxY + 6 > display.maxY && t.rect.maxY == display.maxY) }, "\(t.rect) ends inside a block")   // the pad stops at the display
             }
         }
         // Every pointer inside a paragraph of several lines has a target.
@@ -56,9 +58,9 @@ private enum DrawnPage {
         let map = LensTarget.Map(blocks: DrawnPage.blocks)
         #expect(map.readingColumns == 2)
         let left = try #require(LensTarget.choose(map, pointer: CGPoint(x: 200, y: 140), bounds: display))
-        #expect(left.rect.minX == 54 && left.rect.maxX == 406 && left.rect.minY == 120)
+        #expect(left.rect.minX == 54 && left.rect.maxX == 406 && left.rect.minY == 114)   // 2026-10-23 (film5): 120 less the 6 pt pad
         let right = try #require(LensTarget.choose(map, pointer: CGPoint(x: 600, y: 100), bounds: display))
-        #expect(right.rect.minX == 442 && right.rect.maxX == 794 && right.rect.minY == 80)
+        #expect(right.rect.minX == 442 && right.rect.maxX == 794 && right.rect.minY == 74)
         // The gutter's middle is more than 12 pt from both padded edges.
         #expect(LensTarget.choose(map, pointer: CGPoint(x: 424, y: 200), bounds: display) == nil)
         // The heading is one line with nothing within 44 pt below it.
@@ -74,7 +76,8 @@ private enum DrawnPage {
         let narrow = (0..<4).map { ColumnFit.Block(core: CGRect(x: 100, y: 100 + CGFloat($0) * 40, width: 150, height: 28), lines: 2) }
         let map = LensTarget.Map(blocks: narrow)
         #expect(map.columns.count == 1 && map.readingColumns == 0)
-        #expect(LensTarget.choose(map, pointer: CGPoint(x: 170, y: 150), bounds: display) == nil)
+        // 2026-10-23 (film5): not a reading column, but a group (a list): its target is the group's, column -1.
+        #expect(LensTarget.choose(map, pointer: CGPoint(x: 170, y: 150), bounds: display)?.column == -1)
         let wide = (0..<4).map { ColumnFit.Block(core: CGRect(x: 100, y: 100 + CGFloat($0) * 40, width: 160, height: 28), lines: 2) }
         #expect(LensTarget.choose(LensTarget.Map(blocks: wide), pointer: CGPoint(x: 170, y: 150), bounds: display) != nil)
     }
@@ -85,14 +88,14 @@ private enum DrawnPage {
         let blocks = (0..<14).map { ColumnFit.Block(core: CGRect(x: 60, y: 100 + CGFloat($0) * 56, width: 340, height: 46), lines: 3) }
         let map = LensTarget.Map(blocks: blocks)
         let t = try #require(LensTarget.choose(map, pointer: CGPoint(x: 200, y: 120), bounds: CGRect(x: 0, y: 0, width: 1512, height: 2000)))
-        #expect(t.rect.minY == 100 && t.rect.height == 494)
+        #expect(t.rect.minY == 94 && t.rect.height == 506)   // 2026-10-23 (film5): 100..594 padded 6 pt each way
         // A narrow column gets the taller budget (capped at 560), a wide one the shorter (at least 160).
         let narrow = (0..<14).map { ColumnFit.Block(core: CGRect(x: 60, y: 100 + CGFloat($0) * 56, width: 200, height: 46), lines: 3) }
         let n = try #require(LensTarget.choose(LensTarget.Map(blocks: narrow), pointer: CGPoint(x: 100, y: 120), bounds: CGRect(x: 0, y: 0, width: 1512, height: 2000)))
-        #expect(n.rect.height <= 560 + 23 && n.rect.height > 494)
+        #expect(n.rect.height <= 560 + 23 + 12 && n.rect.height > 506)
         let wide = (0..<14).map { ColumnFit.Block(core: CGRect(x: 60, y: 100 + CGFloat($0) * 56, width: 1300, height: 46), lines: 3) }
         let w = try #require(LensTarget.choose(LensTarget.Map(blocks: wide), pointer: CGPoint(x: 100, y: 120), bounds: CGRect(x: 0, y: 0, width: 1512, height: 2000)))
-        #expect(w.rect.height == 158)   // budget 160: three paragraphs make 158 pt; the fourth would end at 214 with 2 pt left: out
+        #expect(w.rect.height == 170)   // budget 160: three paragraphs make 158 pt; the fourth would end at 214 with 2 pt left: out
     }
 
     @Test func theWindowAndTheDisplayClampItBelowTheTitleBar() throws {
@@ -108,17 +111,36 @@ private enum DrawnPage {
         #expect(LensTarget.content(of: nil, on: display) == display)
     }
 
+    /// 2026-10-23 (film5 probe): a desktop of several windows. A window's own map keeps another window's blocks out of its columns, and a
+    /// chat's messages (15.5 pt type, 48 pt apart) make one target, not one per message.
+    @Test func aWindowsOwnMapAndAChatsMessagesMakeOneTarget() throws {
+        // A chat window above a docs window, both with text at x 900..1270.
+        let chat = (0..<5).map { ColumnFit.Block(core: CGRect(x: 900, y: 140 + CGFloat($0) * 92, width: 370, height: 44), lines: 2) }
+        let table = (0..<3).map { ColumnFit.Block(core: CGRect(x: 900, y: 760 + CGFloat($0) * 40, width: 300, height: 36), lines: 2) }
+        let whole = LensTarget.Map(blocks: chat + table)
+        #expect(whole.columns.contains { c in c.members.contains { $0.core.minY >= 760 } && c.members.contains { $0.core.minY < 600 } })
+        let own = whole.scoped { $0.y < 600 }
+        #expect(own.columns.allSatisfy { c in c.members.allSatisfy { $0.core.minY < 600 } })
+        let t = try #require(LensTarget.choose(own, pointer: CGPoint(x: 1000, y: 160), bounds: CGRect(x: 830, y: 100, width: 600, height: 470)))
+        #expect(t.rect.minY == 134 && t.rect.maxY >= 140 + 2 * 92 + 44, "\(t.rect): the next messages are in it")
+        // One's own message on the right, between two of the others': the outline takes it in. A paper's other column does not (the other tests).
+        let mine = ColumnFit.Block(core: CGRect(x: 1180, y: 140 + 92 + 44 + 4, width: 230, height: 20), lines: 1)
+        let thread = LensTarget.Map(blocks: chat + [mine])
+        let u = try #require(LensTarget.choose(thread, pointer: CGPoint(x: 1000, y: 160), bounds: CGRect(x: 830, y: 100, width: 600, height: 470)))
+        #expect(u.rect.maxX == 1416, "\(u.rect)")
+    }
+
     @Test func shortOfRoomBelowItGrowsUpwardByWholeParagraphs() throws {
         let map = LensTarget.Map(blocks: DrawnPage.blocks)
         // The last paragraph of the left column (4 lines, 56 pt) is the anchor; nothing below it.
         let last = map.columns[0].members.last!.core
         let t = try #require(LensTarget.choose(map, pointer: CGPoint(x: 200, y: last.midY), bounds: display))
-        #expect(t.rect.maxY == last.maxY && t.rect.minY < last.minY)
-        #expect(map.columns[0].members.contains { $0.core.minY == t.rect.minY }, "it grows by whole members")
+        #expect(t.rect.maxY == last.maxY + 6 && t.rect.minY + 6 < last.minY)   // 2026-10-23 (film5): padded 6 pt
+        #expect(map.columns[0].members.contains { $0.core.minY == t.rect.minY + 6 }, "it grows by whole members")
         // A window that ends inside a paragraph: the lens ends at the window, and grows upward instead.
         let cut = CGRect(x: 0, y: 0, width: 1512, height: 200)
         let u = try #require(LensTarget.choose(map, pointer: CGPoint(x: 200, y: 180), bounds: cut))
-        #expect(u.rect.maxY == 200 && u.rect.minY == 120)
+        #expect(u.rect.maxY == 200 && u.rect.minY == 114)
     }
 
     /// Fails with the anchor not held: `data/hover-paper.txt` counts 107 to 1253 reversals per column on the paper pages without the 8 pt rule.
@@ -189,7 +211,8 @@ private enum DrawnPage {
         for i in 0..<500 {
             let p = CGPoint(x: rng.uniform(-20, 1532), y: rng.uniform(-20, 1002))
             let window: CGRect? = i % 5 == 0 ? nil : CGRect(x: rng.uniform(-200, 1400), y: rng.uniform(-100, 900), width: rng.uniform(40, 1600), height: rng.uniform(40, 1100))
-            for map in maps { #expect(LensTarget.choose(map, pointer: p, bounds: display) == nil) }
+            // 2026-10-23 (film5): a chat's messages may make a group target (column -1); never a column's.
+            for map in maps { #expect(LensTarget.choose(map, pointer: p, bounds: display).map { $0.column == -1 } ?? true) }
             let ghost = LensTarget.ghost(at: p, window: window, in: display), old = before(p, window: window, bounds: display)
             let bits = { (r: CGRect) in [r.minX, r.minY, r.width, r.height].map(\.bitPattern) }
             #expect(bits(ghost) == bits(old), "pointer \(p) window \(String(describing: window))")

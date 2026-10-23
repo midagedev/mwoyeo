@@ -17,8 +17,67 @@ public enum LensTarget {
     public static let reach: CGFloat = 40
     /// A new anchor must beat the held one by this much (points of signed distance): no flicker at a gap's midpoint.
     public static let switchBy: CGFloat = 8
-    /// A vertical gap between members that ends the target (a figure, a full-width element).
+    /// A vertical gap between members that ends the target (a figure, a full-width element): this, or `gapLines` of the column's lines when
+    /// that is more.
     public static let breakGap: CGFloat = 44
+    public static let gapLines: CGFloat = 2.6
+
+    /// Where no reading column holds the pointer (a list, a table, a heading with its lead, a short note): the group of blocks around the one
+    /// under it, the way the eye groups them: blocks stacked on one left edge or overlapping in x, a line gap or so apart, and short blocks
+    /// side by side on one row (a table's cells). Its `column` is -1. Nil with no block within `slack` of the pointer, or a group of one line.
+    /// film5 probe, 2026-10-23: a desktop of an article, a chat and a docs page showed the 560 x 320 ghost over a sidebar, a table and a
+    /// headline; each of them is a shape the outline can take.
+    static func group(_ map: Map, pointer p: CGPoint, bounds: CGRect, scale: CGFloat) -> Target? {
+        let blocks = map.found.filter { bounds.contains(CGPoint(x: $0.core.midX, y: $0.core.midY)) }
+        func distance(_ r: CGRect) -> CGFloat { max(0, r.minX - p.x, p.x - r.maxX, r.minY - p.y, p.y - r.maxY) }
+        guard let seed = blocks.indices.min(by: { distance(blocks[$0].core) < distance(blocks[$1].core) }), distance(blocks[seed].core) <= slack
+        else { return nil }
+        let line = max(8, blocks[seed].core.height / CGFloat(max(1, blocks[seed].lines)))
+        func joins(_ a: ColumnFit.Block, _ b: ColumnFit.Block) -> Bool {
+            let (r, s) = (a.core, b.core)
+            let vGap = max(r.minY - s.maxY, s.minY - r.maxY), hGap = max(r.minX - s.maxX, s.minX - r.maxX)
+            let xOverlap = min(r.maxX, s.maxX) - max(r.minX, s.minX), yOverlap = min(r.maxY, s.maxY) - max(r.minY, s.minY)
+            let stacked = (abs(r.minX - s.minX) <= 2 * memberTolerance || xOverlap >= 0.5 * max(r.width, s.width)) && vGap <= gapLines * line
+            let rowMates = yOverlap >= 0.5 * min(r.height, s.height) && hGap <= 4 * line && a.lines <= 2 && b.lines <= 2
+            return stacked || rowMates
+        }
+        var inGroup: Set<Int> = [seed], frontier = [seed]
+        var box = blocks[seed].core
+        while let i = frontier.popLast() {
+            for j in blocks.indices where !inGroup.contains(j) && joins(blocks[i], blocks[j]) {
+                let grown = box.union(blocks[j].core)
+                guard grown.height <= maxBudget, grown.width * grown.height <= 2 * budgetArea else { continue }
+                inGroup.insert(j); frontier.append(j); box = grown
+            }
+        }
+        let lines = inGroup.reduce(0) { $0 + blocks[$1].lines }
+        guard lines >= minLines else { return nil }
+        let pad = ColumnFit.pad, grid = max(scale, 1)
+        func aligned(_ v: CGFloat) -> CGFloat { (v * grid).rounded() / grid }
+        let x0 = aligned(max(box.minX - pad, bounds.minX)), x1 = aligned(min(box.maxX + pad, bounds.maxX))
+        let y0 = aligned(max(box.minY - pad, bounds.minY)), y1 = aligned(min(box.maxY + pad, bounds.maxY))
+        guard y1 - y0 >= minHeight, x1 - x0 >= minHeight else { return nil }
+        return Target(rect: CGRect(x: x0, y: y0, width: x1 - x0, height: y1 - y0), column: -1, anchor: seed)
+    }
+
+    /// The widest empty run between `from` and `to` once the small blocks standing in the gap over the column are counted: a chat's names
+    /// and times between its messages (film5 probe: a name between two messages made a 52 pt gap of two 20 pt ones). A figure's empty
+    /// middle stays a gap.
+    static func bridged(from: CGFloat, to: CGFloat, in column: Column, _ map: Map) -> CGFloat {
+        let inGap = map.found.map(\.core).filter { b in
+            b.minY >= from - 1 && b.maxY <= to + 1 && b.maxX > column.left - memberTolerance && b.minX < column.right + memberTolerance
+                && b.width < column.width * 0.4
+        }.sorted { $0.minY < $1.minY }
+        var widest: CGFloat = 0, at = from
+        for b in inGap { widest = max(widest, b.minY - at); at = max(at, b.maxY) }
+        return max(widest, to - at)
+    }
+
+    /// The median height of one line in `column` (each member's lines' box over its line count); 0 with no members.
+    static func lineHeight(of column: Column) -> CGFloat {
+        let h = column.members.filter { $0.lines > 0 }.map { $0.core.height / CGFloat($0.lines) }.sorted()
+        return h.isEmpty ? 0 : h[h.count / 2]
+    }
     /// A block is a member of the column whose x range, widened by this, holds it.
     public static let memberTolerance: CGFloat = 8
     /// The height budget is the default lens's area over the target's width (a read costs about what the default lens costs), within these.
@@ -52,7 +111,11 @@ public enum LensTarget {
         /// How many blocks the read found (the trace's `n`).
         public var blocks: Int
 
+        /// Every block the read found: a window's own map is built again from those inside it (`scoped`).
+        public var found: [ColumnFit.Block]
+
         public init(blocks: [ColumnFit.Block]) {
+            found = blocks
             columns = ColumnFit.columns(blocks).map { c in
                 let held = blocks.filter { $0.core.minX >= c.left - LensTarget.memberTolerance && $0.core.maxX <= c.right + LensTarget.memberTolerance }
                 return Column(left: c.left, right: c.right, members: held.sorted { ($0.core.minY, $0.core.minX) < ($1.core.minY, $1.core.minX) })
@@ -62,6 +125,13 @@ public enum LensTarget {
 
         /// How many columns a target can stand in.
         public var readingColumns: Int { columns.filter { $0.width >= LensTarget.minWidth }.count }
+
+        /// The map of the blocks `keep` holds (the centre of each block's lines): one window's own columns. Built from the whole display, a
+        /// column runs on through the windows above and below it that share its x range (film5 probe, 2026-10-23: a chat window's column
+        /// ran down into a docs window's table, an article's into the code under it), and a target's members come from both.
+        public func scoped(_ keep: (CGPoint) -> Bool) -> Map {
+            Map(blocks: found.filter { keep(CGPoint(x: $0.core.midX, y: $0.core.midY)) })
+        }
     }
 
     /// What the pointer aims at: a lens rect, and the column and member it was chosen from (the held anchor of the next choice).
@@ -78,6 +148,11 @@ public enum LensTarget {
     /// `bounds` is what the lens may cover: the display, and the content of the window under the pointer below its title bar (`content`).
     /// The rect does not depend on the pointer's y inside the anchor: the outline steps from paragraph to paragraph, it does not follow the hand.
     public static func choose(_ map: Map, pointer p: CGPoint, held: Target? = nil, bounds: CGRect, scale: CGFloat = 2) -> Target? {
+        inColumn(map, pointer: p, held: held, bounds: bounds, scale: scale) ?? group(map, pointer: p, bounds: bounds, scale: scale)
+    }
+
+    /// `choose` in the reading column that holds the pointer; nil where none does or none has a member there.
+    static func inColumn(_ map: Map, pointer p: CGPoint, held: Target?, bounds: CGRect, scale: CGFloat) -> Target? {
         // 1. The column whose padded range, widened by `slack`, holds the pointer; the nearer one when two do.
         let pad = ColumnFit.pad
         var nearest: (distance: CGFloat, index: Int)?
@@ -103,16 +178,19 @@ public enum LensTarget {
         //    when at least half of it fits. Short of members (or room) below, up over whole members.
         let width = column.width + 2 * pad
         let budget = max(minBudget, min(maxBudget, budgetArea / width))
+        // The gap that ends a target scales with the column's type: a chat's or a web page's larger text stands farther apart than a paper's
+        // paragraphs (film5 probe: messages of 15.5 pt type 48 pt apart made every message a target of its own).
+        let gapLimit = max(breakGap, gapLines * lineHeight(of: column))
         var top = members[anchor].minY, bottom = members[anchor].maxY
         var j = anchor
-        while j + 1 < members.count, bottom - top < budget, members[j + 1].minY - bottom <= breakGap,
+        while j + 1 < members.count, bottom - top < budget, bridged(from: bottom, to: members[j + 1].minY, in: column, map) <= gapLimit,
               members[j + 1].maxY - top <= budget || budget - (bottom - top) >= members[j + 1].height / 2 {
             j += 1
             bottom = max(bottom, members[j].maxY)
         }
         bottom = min(bottom, bounds.maxY)
         var k = anchor
-        while bottom - top < budget * upwardShare, k > 0, top - members[k - 1].maxY <= breakGap, members[k - 1].minY >= bounds.minY {
+        while bottom - top < budget * upwardShare, k > 0, top - members[k - 1].maxY <= gapLimit, members[k - 1].minY >= bounds.minY {
             k -= 1
             top = min(top, members[k].minY)
         }
@@ -123,8 +201,21 @@ public enum LensTarget {
         // 4. The width: the column, padded as a fit pads it, kept inside `bounds`, on the pixel grid.
         let grid = max(scale, 1)
         func aligned(_ v: CGFloat) -> CGFloat { (v * grid).rounded() / grid }
-        let left = aligned(max(column.left - pad, bounds.minX)), right = aligned(min(column.right + pad, bounds.maxX))
-        let y0 = aligned(top), y1 = aligned(bottom)
+        // A thread's other side: blocks that stand between this column's members within the target's rows, never beside one (a chat's own
+        // messages on the right between the others' on the left; film5 probe: the outline ran through them). A paper's other column stands
+        // beside this one's paragraphs and stays out, and so does anything of another reading column (its heading between two of these).
+        let own = members[min(k, j)...max(k, j)].filter { $0.width >= column.width * 0.4 }   // the column's text, not a time or a name beside it
+        let others = Set(map.columns.indices.filter { $0 != ci && map.columns[$0].width >= minWidth }.flatMap { map.columns[$0].members.map(\.core) })
+        let between = map.found.map(\.core).filter { b in
+            !others.contains(b) && top - 1 <= b.minY && b.maxY <= bottom + 1 && bounds.contains(CGPoint(x: b.midX, y: b.midY))
+                && own.contains { $0.maxY <= b.minY } && own.contains { $0.minY >= b.maxY }
+                && !own.contains { $0 == b || ($0.minY < b.maxY && b.minY < $0.maxY) }
+        }
+        let lo = between.map(\.minX).reduce(column.left, min), hi = between.map(\.maxX).reduce(column.right, max)
+        let left = aligned(max(lo - pad, bounds.minX)), right = aligned(min(hi + pad, bounds.maxX))
+        // The lines' boxes are the glyphs' own: padded as the sides are, the outline clears the first line's ascenders and the last line's
+        // descenders (film5 probe: a two-line message's outline ran through its second line).
+        let y0 = aligned(max(top - pad, bounds.minY)), y1 = aligned(min(bottom + pad, bounds.maxY))
         guard right - left >= minWidth else { return nil }
         return Target(rect: CGRect(x: left, y: y0, width: right - left, height: y1 - y0), column: ci, anchor: anchor)
     }

@@ -356,8 +356,23 @@ final class PickerView: NSView {
         let q = quartz(NSRect(origin: p, size: .zero)).origin
         // Over no window (the Dock, the menu bar) there is no target: its labels are blocks of the page's column and carried a target over them.
         guard let area = LensTarget.targetBounds(over: hovered?.bounds, windowsKnown: !windows.isEmpty, on: quartz(bounds)) else { return nil }
-        return LensTarget.choose(m, pointer: q, held: target, bounds: area, scale: window?.backingScaleFactor ?? 2)
+        return LensTarget.choose(scoped(m), pointer: q, held: target, bounds: area, scale: window?.backingScaleFactor ?? 2)
     }
+
+    /// The hovered window's own map: the blocks whose frontmost window it is (`LensTarget.Map.scoped`), built once per window per picker.
+    private func scoped(_ m: LensTarget.Map) -> LensTarget.Map {
+        guard let w = hovered else { return m }
+        if let known = scopedMaps[w.id] { return known }
+        let own = m.scoped { c in windows.first { $0.bounds.contains(c) }?.id == w.id }
+        scopedMaps[w.id] = own
+        if Trace.enabled {
+            let cols = own.columns.map { "[\(Int($0.left))..\(Int($0.right))]" }.joined(separator: " ")
+            let blocks = own.found.map { "\(Int($0.core.minX)),\(Int($0.core.minY)) \(Int($0.core.width))x\(Int($0.core.height))/\($0.lines)" }.joined(separator: " ; ")
+            Trace.mark("picker: window '\(w.appName)' columns \(cols) blocks \(blocks)", since: Trace.now)
+        }
+        return own
+    }
+    private var scopedMaps: [CGWindowID: LensTarget.Map] = [:]
 
     /// Where this display's read stands, for `LensTarget.preview`.
     private var mapPhase: LensTarget.MapPhase {
@@ -402,6 +417,7 @@ final class PickerView: NSView {
 
     private func mapArrived(_ found: LensTarget.Map?) {
         guard case .reading = map else { return }
+        scopedMaps = [:]
         if let found, found.readingColumns > 0 {
             map = .ready(found)
             RegionPicker.stats.maps += 1

@@ -323,9 +323,14 @@ enum FitChecks {
         // the display's read is there, ticks as it takes a new target, hides with ⌘ and over the content the lens already fits; let go, the lens takes the
         // outline's rect. FAIL-first: before `LandingPreview` no outline showed (fit.landing.preview 0) and the drop alone told where it landed.
         do {
+            let held = CGRect(x: 100, y: 200, width: 300, height: 90)
+            check("a hand on the lens's top edge aims a third down its body at the pointer's x, and a pointer past a side aims at that side",
+                  RegionSession.landingPoint(lens: held, pointer: CGPoint(x: 150, y: 195)) == CGPoint(x: 150, y: 230)
+                  && RegionSession.landingPoint(lens: held, pointer: CGPoint(x: 520, y: 195)).x == 400)
             let page = LensTarget.Map(blocks: blocks(left) + blocks(right))
             let lp = await lens(CGRect(x: 140, y: 230, width: 200, height: 90), autoFit: true)
             lp.fit.windowsOnScreen = { [] }
+            lp.fit.pointer = { [weak lp] in lp.map { CGPoint(x: $0.config.rect.midX, y: $0.config.rect.minY + 12) } ?? .zero }   // the hand on the lens's top
             lp.landingMap = { _ in page }
             lp.received(snapshot(wholePage))
             _ = Trace.takeCounts()
@@ -333,8 +338,8 @@ enum FitChecks {
             window(lp)?.onMove?(start.offsetBy(dx: 2, dy: 0))
             for _ in 0..<50 where lp.landingPreview.shown == nil { try? await Task.sleep(for: .milliseconds(10)) }
             let overLeft = lp.landingPreview.shown
-            let leftTarget = LensTarget.choose(page, pointer: CGPoint(x: lp.config.rect.midX, y: lp.config.rect.midY), bounds: lp.display(of: lp.config.rect), scale: lp.fitScale)?.rect
-            check("moved over the left column, the outline shows the picker's target there once the read is in (\(overLeft.map { "\($0)" } ?? "none"))",
+            let leftTarget = LensTarget.choose(page, pointer: RegionSession.landingPoint(lens: lp.config.rect, pointer: lp.fit.pointer()), bounds: lp.display(of: lp.config.rect), scale: lp.fitScale)?.rect
+            check("moved over the left column, the outline shows the picker's target where the lens aims once the read is in (\(overLeft.map { "\($0)" } ?? "none"))",
                   overLeft != nil && overLeft == leftTarget)
             let acrossRight = start.offsetBy(dx: 370, dy: 0)
             window(lp)?.onMove?(acrossRight)
@@ -357,15 +362,29 @@ enum FitChecks {
             window(lp)?.onMove?(frame(lp).offsetBy(dx: 1, dy: 0))
             check("moved a little on the content it already fits, no outline", lp.landingPreview.shown == nil)
             window(lp)?.onCommit?()
-            let off = await lens(CGRect(x: 140, y: 230, width: 200, height: 90))
+            // The landing is the hand's, as a snap is (user 2026-10-23, on by default): a lens whose Auto Fit is off lands, and its Auto Fit stays off.
+            let manual = await lens(CGRect(x: 140, y: 230, width: 200, height: 90))
+            manual.fit.windowsOnScreen = { [] }
+            manual.fit.pointer = { [weak manual] in manual.map { CGPoint(x: $0.config.rect.midX, y: $0.config.rect.minY + 12) } ?? .zero }
+            manual.landingMap = { _ in page }
+            window(manual)?.onMove?(frame(manual).offsetBy(dx: 370, dy: 0))
+            for _ in 0..<50 where manual.landingPreview.shown == nil { try? await Task.sleep(for: .milliseconds(10)) }
+            let manualPromise = manual.landingPreview.shown
+            window(manual)?.onCommit?()
+            for _ in 0..<50 where manual.config.rect != manualPromise { try? await Task.sleep(for: .milliseconds(10)) }
+            check("Auto Fit off, Snap on: the outline shows, the lens lands on it, and its Auto Fit stays off",
+                  manualPromise != nil && manual.config.rect == manualPromise && manual.fit.machine.state == .off, "\(manual.config.rect) for \(String(describing: manualPromise))")
+            var snapOff = AppSettings()
+            snapOff.lensSnap = false
+            let off = await lens(CGRect(x: 140, y: 230, width: 200, height: 90), autoFit: true, settings: snapOff)
             off.fit.windowsOnScreen = { [] }
             off.landingMap = { _ in page }
             window(off)?.onMove?(frame(off).offsetBy(dx: 370, dy: 0))
             try? await Task.sleep(for: .milliseconds(100))
             window(off)?.onMove?(frame(off).offsetBy(dx: 1, dy: 0))
-            check("Auto Fit off, no outline and no read of the display", off.landingPreview.shown == nil && off.fit.ahead == nil)
+            check("Snap off, no outline and no read of the display", off.landingPreview.shown == nil && off.fit.ahead == nil)
             window(off)?.onCommit?()
-            await lp.stop(); await off.stop()
+            await lp.stop(); await manual.stop(); await off.stop()
         }
 
         // MARK: Auto Fit

@@ -1669,7 +1669,7 @@ extension RegionSession {
         endProbe()
         apply(AutoFit.step(fit.machine, .dragged))
         fit.aheadMap = nil
-        if let landingMap, fit.machine.state != .off {
+        if let landingMap, landsByHand {
             let display = display(of: config.rect)
             let map = Task { await landingMap(display) }
             fit.ahead = (display, map)
@@ -1684,22 +1684,39 @@ extension RegionSession {
         }
     }
 
-    /// The content a lens at `lens` lands on: the target under its middle as the picker would place it there, in the frontmost window's own map, on
-    /// its display (`LensTarget.choose`); nil over no target.
-    private func landingTarget(for lens: CGRect, map: LensTarget.Map, windows: [WindowInfo]) -> (rect: CGRect?, window: WindowInfo?) {
-        let middle = CGPoint(x: lens.midX, y: lens.midY)
-        let window = windows.first { $0.bounds.contains(middle) }
-        guard let area = LensTarget.targetBounds(over: window?.bounds, windowsKnown: !windows.isEmpty, on: display(of: lens)) else { return (nil, window) }
-        let own = window.map { w in map.scoped { c in windows.first { $0.bounds.contains(c) }?.id == w.id } } ?? map
-        return (LensTarget.choose(own, pointer: middle, bounds: area, scale: fitScale)?.rect, window)
+    /// A lens moved by hand takes the content it is let go on (Snap on, as a resize snaps; ⌘ held, it does not): its own Auto Fit aside, which only
+    /// grows a lens that rests.
+    private var landsByHand: Bool { settings.lensSnap && landingMap != nil }
+
+    /// Where a lens held by the pointer at `pointer` aims: the pointer's x inside the lens, a third of the way down its body. The hand holds the lens by
+    /// its top edge, where the content is a gap or the line above (film5 take, 2026-10-23: under the pointer, two of three drops took nothing or the
+    /// heading above), and the lens's middle, on a tall lens, is the group around what it covers; the upper body is what the eye reads through it.
+    static func landingPoint(lens: CGRect, pointer: CGPoint) -> CGPoint {
+        CGPoint(x: min(max(pointer.x, lens.minX), lens.maxX), y: lens.minY + lens.height / 3)
     }
 
-    /// While a hand moves the lens (Auto Fit on, ⌘ up): the outline of where it lands if let go now, with the trackpad's tick as it takes a new
+    /// The content a lens at `lens` held by the pointer at `pointer` lands on: the target at `landingPoint` as the picker would place it there, in the
+    /// frontmost window's own map, on the lens's display (`LensTarget.choose`); nil over no target.
+    private func landingTarget(for lens: CGRect, at pointer: CGPoint, map: LensTarget.Map, windows: [WindowInfo]) -> (rect: CGRect?, window: WindowInfo?) {
+        let point = Self.landingPoint(lens: lens, pointer: pointer)
+        let window = windows.first { $0.bounds.contains(point) }
+        guard let area = LensTarget.targetBounds(over: window?.bounds, windowsKnown: !windows.isEmpty, on: display(of: lens)) else { return (nil, window) }
+        let own = window.map { w in map.scoped { c in windows.first { $0.bounds.contains(c) }?.id == w.id } } ?? map
+        return (LensTarget.choose(own, pointer: point, bounds: area, scale: fitScale)?.rect, window)
+    }
+
+    /// `AutoFit.landed`'s rule for a lens let go at `lens` over `target`: other content (an edge `minGrow` or more away) is taken, the same is left. A lens
+    /// whose Auto Fit is off is judged as an armed one.
+    private func landing(_ lens: CGRect, on target: CGRect?) -> (machine: AutoFit.Machine, action: AutoFit.Action) {
+        AutoFit.step(fit.machine.state == .off ? AutoFit.Machine(state: .armed) : fit.machine, .landed(lens: lens, target: target))
+    }
+
+    /// While a hand moves the lens (Snap on, ⌘ up): the outline of where it lands if let go now, with the trackpad's tick as it takes a new
     /// target; hidden over the content the lens already fits (`AutoFit.landed` would leave it) and over no target.
     private func updateLandingPreview(_ rect: CGRect) {
-        guard fit.handOn, fit.machine.state != .off, !fit.commandDown(), let map = fit.aheadMap,
-              let target = landingTarget(for: rect, map: map, windows: fit.aheadWindows).rect,
-              case .land = AutoFit.step(fit.machine, .landed(lens: rect, target: target)).action else {
+        guard fit.handOn, landsByHand, !fit.commandDown(), let map = fit.aheadMap,
+              let target = landingTarget(for: rect, at: fit.pointer(), map: map, windows: fit.aheadWindows).rect,
+              case .land = landing(rect, on: target).action else {
             landingPreview.hide()
             return
         }
@@ -1782,14 +1799,16 @@ extension RegionSession {
         landingPreview.hide()
         fit.aheadMap = nil
         // ⌘ held, the lens stays where the hand left it, as a drag with ⌘ snaps to nothing.
-        if byHand, fit.machine.state != .off, fit.commandDown() || !land() { fit.gate.rearm(); scheduleJudgement(after: fit.calm + 0.05) }
+        let lands = byHand && landsByHand && !fit.commandDown() && land()
+        if byHand, !lands, fit.machine.state != .off { fit.gate.rearm(); scheduleJudgement(after: fit.calm + 0.05) }
     }
 
-    /// A lens moved by hand and let go, Auto Fit on: one read of its display (begun with the drag), and the lens takes the target under its middle as
-    /// the picker would place it there (`AutoFit.landed`). Same content, no target, or a hand on it again: the column fit judges as before. False without a reader.
+    /// A lens moved by hand and let go (`landsByHand`): one read of its display (begun with the drag), and the lens takes the target it aims at
+    /// (`landingPoint`) as the picker would place it there, the one the outline showed (`AutoFit.landed`). Same content, no target, or a hand on it again: Auto Fit, when
+    /// on, judges the column as before. False without a reader.
     private func land() -> Bool {
         guard let landingMap else { return false }
-        let from = config.rect, display = display(of: from)
+        let from = config.rect, display = display(of: from), point = fit.pointer()
         fit.landing?.cancel()
         chrome.setBusy(true)
         // The read the drag began (`beginHand`), when the lens is let go on the display it began on; else one now.
@@ -1800,15 +1819,27 @@ extension RegionSession {
             guard let self, !Task.isCancelled else { return }
             fit.landing = nil
             settleBusy()
-            guard config.rect == from, !dragging, !fit.animating, fit.machine.state != .off else { return }
-            let found = map.map { landingTarget(for: from, map: $0, windows: fit.windowsOnScreen()) }
+            guard config.rect == from, !dragging, !fit.animating, landsByHand else { return }
+            let found = map.map { landingTarget(for: from, at: point, map: $0, windows: fit.windowsOnScreen()) }
             let target = found?.rect, window = found?.window
             if Trace.enabled {
                 let shown = { (r: CGRect) in "\(TraceNumber.px(r.minX)),\(TraceNumber.px(r.minY)) \(TraceNumber.px(r.width))x\(TraceNumber.px(r.height))" }
                 Trace.mark("fit: landed lens=\(shown(from)) target=\(target.map(shown) ?? "none") window='\(window?.appName ?? "")'", since: Trace.now)
             }
-            let step = AutoFit.step(fit.machine, .landed(lens: from, target: target))
-            if case .land = step.action { apply(step) } else { fit.machine = step.machine; fit.gate.rearm(); scheduleJudgement(after: fit.calm + 0.05) }
+            let step = landing(from, on: target)
+            switch (step.action, fit.machine.state) {
+            case (.land, .off):
+                // The lens's Auto Fit stays off: the landing is the hand's, as a snap is.
+                apply((fit.machine, step.action))
+            case (.land, _):
+                apply(step)
+            case (_, .off):
+                break
+            default:
+                fit.machine = step.machine
+                fit.gate.rearm()
+                scheduleJudgement(after: fit.calm + 0.05)
+            }
         }
         return true
     }

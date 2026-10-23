@@ -63,6 +63,8 @@ struct LensFit {
     var aheadWindows: [WindowInfo] = []
     /// The other apps' windows on the screen, as the checks give them (`WindowInfo.onScreen`).
     var windowsOnScreen: () -> [WindowInfo] = { WindowInfo.onScreen() }
+    /// Where the pointer is (global Quartz points): what a moved lens lands on is under it, as under the picker's.
+    var pointer: () -> CGPoint = { ScreenGeometry.quartzRect(fromAppKit: NSRect(origin: NSEvent.mouseLocation, size: .zero)).origin }
     var settleTimer: Timer?
     /// Seconds content must have stood still before Auto Fit judges, and how long a probe waits for its snapshot: the design's numbers, held here so the
     /// checks give a lens none to wait for.

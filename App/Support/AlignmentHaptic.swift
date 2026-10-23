@@ -11,7 +11,7 @@ import AppKit
 final class AlignmentHaptic {
     private let filter = NSAlignmentFeedbackFilter()
 
-    /// An edge came within reach of a column's edge during a move.
+    /// An edge came within reach of a column's edge during a move, or the picker's spotlight took a new target's shape (`PickerView`).
     static func tick() {
         NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)
     }

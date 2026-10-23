@@ -92,9 +92,15 @@ enum PickerChecks {
             let left = r.minX - (column.0 - 6), right = r.maxX - (column.1 + 6)
             check("column \(i + 1): a click places the column ± 6 pt within 3 pt (left \(fmt(left)), right \(fmt(right)), width − 12 = \(fmt(r.width - 12)) for \(fmt(column.1 - column.0)))",
                   abs(left) <= 3 && abs(right) <= 3)
+            // 2026-10-23 (film5, 27f22ab "padded rows"): the target's top and bottom stand `ColumnFit.pad` off the lines' boxes, as its sides do (the boxes are
+            // the glyphs' own, and an outline on them cut a two-line message's ascenders). Derivation: the blocks' edges are the lines' boxes, so each edge is
+            // `pad` (6) away, within the 2 pt the check held before; the paragraph's ink top is the lens's top plus `pad`, within the 4 pt it held. FAIL-first: on
+            // this build before the re-pin the old terms read 6.0, 6.2 and 6.1, 5.9 (FAIL), and an unpadded target reads 0 here, 6 off (FAIL).
+            let pad = ColumnFit.pad
             let top = members.map { abs($0.minY - r.minY) }.min() ?? .infinity, bottom = members.map { abs($0.maxY - r.maxY) }.min() ?? .infinity
-            check("column \(i + 1): its top and bottom stand on the read blocks' edges within 2 pt (\(fmt(top)), \(fmt(bottom)))", top <= 2 && bottom <= 2)
-            check("column \(i + 1): its top is the hovered paragraph's (drawn ink \(fmt(paragraph.minY)), lens \(fmt(r.minY)))", abs(r.minY - paragraph.minY) <= 4)
+            check("column \(i + 1): its top and bottom stand `pad` off the read blocks' edges within 2 pt (\(fmt(top)), \(fmt(bottom)) for \(fmt(pad)))",
+                  abs(top - pad) <= 2 && abs(bottom - pad) <= 2)
+            check("column \(i + 1): its top is the hovered paragraph's, padded (drawn ink \(fmt(paragraph.minY)), lens \(fmt(r.minY)) + \(fmt(pad)))", abs(r.minY + pad - paragraph.minY) <= 4)
             // Gate 6: Return with the pointer over the target places the same lens, the click's keyboard twin.
             let (keys, keysHost) = picker(instant)
             keys.startMap()
@@ -105,6 +111,28 @@ enum PickerChecks {
             keysHost.orderOut(nil)
         }
         check("the clicks were counted as targets (\(RegionPicker.stats.clickTarget))", RegionPicker.stats.clickTarget >= 2)
+
+        // The trackpad's tick as the spotlight takes a target's shape (user 2026-10-23: "피커 붙을때도"): one per new target, none while the pointer stays on
+        // it, none within `tickGap` of the last (a sweep across a page does not buzz). FAIL-first: before the tick, picker.tick stayed 0 for the three hops.
+        do {
+            func ticks() -> Int { let c = Trace.takeCounts(); for (k, n) in c { Trace.count(k, n) }; return c["picker.tick", default: 0] }
+            let (tv, tHost) = picker(instant)
+            tv.startMap()
+            _ = await ready(tv)
+            let points = columns.enumerated().map { i, c in CGPoint(x: (c.0 + c.1) / 2, y: twoColumns.paragraphs[i][1].midY) }
+            let start = ticks()
+            now += 1; tv.mouseMoved(with: event(.mouseMoved, points[0]))
+            let first = ticks() - start
+            tv.mouseMoved(with: event(.mouseMoved, CGPoint(x: points[0].x + 4, y: points[0].y + 3)))
+            let stay = ticks() - start - first
+            now += 0.05; tv.mouseMoved(with: event(.mouseMoved, points[1]))
+            let quick = ticks() - start - first - stay
+            now += 1; tv.mouseMoved(with: event(.mouseMoved, points[0]))
+            let back = ticks() - start - first - stay - quick
+            check("the spotlight ticks once on a new target (\(first)), not while the pointer stays on it (\(stay)), not 50 ms after a tick (\(quick)), and again on the next target after (\(back))",
+                  first == 1 && stay == 0 && quick == 0 && back == 1)
+            tHost.orderOut(nil)
+        }
 
         // A pointer that rests where the picker opens (film defect F22, 2026-10-23, addendum A2 of skinland117): `open()` aims at it where it is, so the first map aims
         // at once. The pointer is the check's own (`mouseLocation`): the real one is not ours to move.
@@ -213,8 +241,10 @@ enum PickerChecks {
             growing = growing && r.width >= previous.width - 0.01 && r.height >= previous.height - 0.01
             previous = r
         }
+        // 2026-10-23 (film5): the last frame within 0.01 pt of the target, the tolerance `inside` holds every frame to. Derivation: with the padded target
+        // (27f22ab) the last frame read x 52.999999995 of 53.0, a float's residue of the spring, not a frame short; FAIL-first: exact equality failed on it.
         check("it opens on the glide's spring to the target and every frame stays inside it (\(fmt(previous.width)) x \(fmt(previous.height)) of \(finalRect.map { "\(fmt($0.width)) x \(fmt($0.height))" } ?? "none"))",
-              inside && growing && previous == finalRect)
+              inside && growing && finalRect.map { e in [previous.minX - e.minX, previous.minY - e.minY, previous.width - e.width, previous.height - e.height].allSatisfy { abs($0) < 0.01 } } == true, "inside \(inside) growing \(growing) last \(previous) target \(finalRect.map { "\($0)" } ?? "none")")
         fresh.close()
         freshHost.orderOut(nil)
 

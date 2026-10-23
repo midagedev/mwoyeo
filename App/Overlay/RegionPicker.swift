@@ -270,6 +270,9 @@ final class PickerView: NSView {
     private var recheck: Task<Void, Never>?
     /// How far the spotlight's outline stands off its rect now (pt), for the checks and the trace: 0 at rest and under Reduce Motion.
     private(set) var spotlightDeviation: CGFloat = 0
+    /// When the spotlight last ticked (the picker's clock), and how close two ticks may come.
+    private var lastTick: TimeInterval = -.infinity
+    private static let tickGap: TimeInterval = 0.12
     /// The spotlight's outline: the glide's rect, bowed while it hops towards its target (`LensSkin`, motion contract 9.6 "picker hop"), stepped on the
     /// glide's clock. The default lens under a moving pointer is held by the pointer: its edges are the hand's, nothing bows.
     private var skin: LensSkin?
@@ -486,6 +489,13 @@ final class PickerView: NSView {
             Trace.mark("picker: target " + (aimed.map { "column=\($0.column) anchor=\($0.anchor) rect=\(TraceNumber.px(r.minX)),\(TraceNumber.px(r.minY)) \(TraceNumber.px(r.width))x\(TraceNumber.px(r.height))" } ?? "none"), since: now)
         }
         if aimed != nil, aimed != target { Trace.count("picker.target.hit") }
+        // The spotlight takes a new target's shape: the trackpad's alignment tick with it, as a lens's edge that comes to a column's (`AlignmentHaptic`).
+        // A sweep across many targets ticks at most every `tickGap`.
+        if let aimed, aimed.rect != target?.rect, now - lastTick >= Self.tickGap {
+            AlignmentHaptic.tick()
+            lastTick = now
+            Trace.count("picker.tick")
+        }
         target = aimed
         render(at: now)
         if glide.moving(at: now) || settling, link == nil {

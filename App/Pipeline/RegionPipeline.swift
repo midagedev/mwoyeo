@@ -686,6 +686,10 @@ actor RegionPipeline {
                 // after which a reader became ready while it ran (`readerReady`). A pass rebased onto a resize is that read:
                 // `lastChange` may be newer than its frame without the page having changed.
                 if await seamlessPass(frame), !rebasedThisPass { seamlessDone = lastChange <= frame.time && !layoutStale }
+                // Why the page is read once more (a read that never ends is one of these, held).
+                if !seamlessDone, Trace.enabled {
+                    Trace.mark("pass: read again: change \(String(format: "%.3f", (lastChange - frame.time) * 1000)) ms after the frame, layout stale \(layoutStale), rebased \(rebasedThisPass)", since: Trace.now)
+                }
                 continue
             }
             if options.renderMode != .seamless, let dirty = dirtyRect(for: frame, stale) {
@@ -990,6 +994,8 @@ actor RegionPipeline {
     /// a move (`Move.resized`): its results land in the new capture, where the page has not changed.
     /// A grow asked for a read, and the session has not settled on that size yet. `armDeferredResizeRead` starts it.
     private var deferredUncovered = false
+    /// When the last of those grows was made: the page changed then, not when the session settles (`armDeferredResizeRead`).
+    private var deferredAt: TimeInterval = 0
     /// The settled grow's read has been asked for and the pass has not started. `run` keeps the activity at reading.
     private var readPending = false
 
@@ -1050,6 +1056,7 @@ actor RegionPipeline {
             }
         } else if !working, deferRead {
             deferredUncovered = true
+            deferredAt = ProcessInfo.processInfo.systemUptime
         } else if !working {
             // A pass already at work is rebased onto this capture (`Move.resized` in `moves`) and is that read.
             // Bumping `lastChange` here would schedule a second whole read of the same page when the pass ends.
@@ -1066,7 +1073,10 @@ actor RegionPipeline {
         guard !halted, deferredUncovered, !working else { return }
         deferredUncovered = false
         readPending = true
-        lastChange = ProcessInfo.processInfo.systemUptime
+        // The change is the grow's, not this moment's: the capture delivered the grown frame before the session settled (a still page sends no
+        // other), and a change stamped after that frame left every read of it undone, read again for as long as the lens stayed (film5 merge
+        // gate, 2026-10-23: 630 whole reads of a still page after a Fit, "change 0 ms after the frame").
+        lastChange = max(lastChange, deferredAt)
         seamlessDone = false
         settleTask?.cancel()
         settleTask = nil

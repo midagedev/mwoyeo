@@ -9,29 +9,33 @@ import QuartzCore
 /// The lens's queue translates a few lines at a time so that a moving lens is served first; here nothing moves and every line is wanted at once,
 /// so the queue takes them in one batch (`PipelineOptions.translationBatch`).
 ///
-/// A read of a whole display takes about two seconds. Meanwhile a band of light sweeps down the screen (`Beam`); once most of the screen is
-/// translated, one last sweep writes it in: the translations show above the band and the original below (`Reveal`). Under Reduce Motion there is
-/// no band and the translations fade in.
+/// A read of a whole display takes about two seconds. Meanwhile a thin frame in the lens's colours turns round the display (`Glow`). Once the
+/// paragraphs are found, each is outlined the way a reading lens is, drawn on in reading order (`Glow.outline`), and each turns into its
+/// translation as that lands (`Bloom`), its outline fading. Under Reduce Motion nothing turns or draws on: the outlines and the translations
+/// fade in.
 @MainActor
 final class Peek {
     /// Lines per engine call: every block of a screen of text in one or two calls.
     static let batch = 64
-    /// Seconds of one sweep down the display.
-    static let sweep: CFTimeInterval = 1.0
-    static let revealSweep: CFTimeInterval = 0.7
-    /// The reveal starts once this share of the blocks is drawn, or this long after the first one was.
-    static let revealShare = 0.6
-    static let revealWait: TimeInterval = 0.8
+    /// Seconds an outline takes to draw itself on, and the most the last one starts after the first (reading order).
+    static let draw: CFTimeInterval = 0.35
+    static let stagger: CFTimeInterval = 0.4
+    /// Seconds a paragraph takes to turn into its translation, and its outline to fade.
+    static let turn: CFTimeInterval = 0.3
+    /// An outline whose paragraph has no translation this long after the first one turned (text already in the target language, code) fades.
+    static let linger: TimeInterval = 1.2
     /// Nothing drawn this long after the key went down: the line under the top of the screen says why, when the app knows (`Note`).
     static let noteAfter: TimeInterval = 2.5
 
     private var pipeline: RegionPipeline?
     private var panel: OverlayPanel?
-    private var beam: Beam?
+    private var glow: Glow?
+    private var bloom: Bloom?
     private var task: Task<Void, Never>?
-    private var revealTask: Task<Void, Never>?
     private var noteTask: Task<Void, Never>?
+    private var lingerTask: Task<Void, Never>?
     private var note: Note?
+    private var outlined = false
     private var revealed = false
     private(set) var holding = false
 
@@ -47,9 +51,9 @@ final class Peek {
         Trace.mark("peek: begin display=\(TraceNumber.px(display.width))x\(TraceNumber.px(display.height))", since: Trace.now)
         let panel = OverlayPanel(frame: screen.frame)
         self.panel = panel
+        outlined = false
         revealed = false
-        let reduced = Motion.shared.reduced
-        if reduced { panel.alphaValue = 0 } else { Reveal.cover(panel) }
+        bloom = Bloom(panel)
         var options = PipelineOptions(settings)
         options.renderMode = .seamless
         options.translationBatch = Self.batch
@@ -57,12 +61,10 @@ final class Peek {
             Task { @MainActor in self?.shown(snapshot) }
         })
         self.pipeline = pipeline
+        let origin = display.origin
+        Task { await pipeline.setFoundHandler { [weak self] rects in Task { @MainActor in self?.found(rects, origin: origin) } } }
         panel.orderFrontRegardless()
-        if !reduced {
-            let beam = Beam(frame: screen.frame)
-            self.beam = beam
-            beam.scan(period: Self.sweep)
-        }
+        glow = Glow(frame: screen.frame, colors: settings.lensTint.colors)
         noteTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(Self.noteAfter))
             guard !Task.isCancelled, let self, !revealed, preparing() else { return }
@@ -88,16 +90,17 @@ final class Peek {
         holding = false
         task?.cancel()
         task = nil
-        revealTask?.cancel()
-        revealTask = nil
         noteTask?.cancel()
         noteTask = nil
+        lingerTask?.cancel()
+        lingerTask = nil
         note?.close()
         note = nil
         if let pipeline { Task { await pipeline.halt() } }
         pipeline = nil
-        beam?.close()
-        beam = nil
+        glow?.close()
+        glow = nil
+        bloom = nil
         guard let panel else { return }
         self.panel = nil
         Trace.mark("peek: end", since: Trace.now)
@@ -115,82 +118,49 @@ final class Peek {
     }
 
     private func shown(_ snapshot: OverlaySnapshot) {
-        guard let panel else { return }
+        guard let panel, let bloom else { return }
         panel.apply(snapshot)
-        if !snapshot.blocks.isEmpty, let note {
+        guard !snapshot.blocks.isEmpty else { return }
+        if let note {
             note.close()
             self.note = nil
         }
-        guard !revealed, !snapshot.blocks.isEmpty else { return }
-        if Double(snapshot.blocks.count) >= Self.revealShare * Double(max(1, snapshot.texts.count)) {
-            reveal()
-        } else if revealTask == nil {
-            revealTask = Task { [weak self] in
-                try? await Task.sleep(for: .seconds(Self.revealWait))
-                guard !Task.isCancelled else { return }
-                self?.reveal()
-            }
+        glow?.turned(bloom.add(snapshot))
+        guard !revealed else { return }
+        revealed = true
+        Trace.mark("peek: reveal", since: Trace.now)
+        Trace.count("peek.reveal")
+        glow?.settle()
+        lingerTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(Self.linger))
+            guard !Task.isCancelled else { return }
+            self?.glow?.turned(nil)
         }
     }
 
-    private func reveal() {
-        guard !revealed, let panel else { return }
-        revealed = true
-        revealTask?.cancel()
-        revealTask = nil
-        Trace.mark("peek: reveal", since: Trace.now)
-        Trace.count("peek.reveal")
-        guard let beam else {
-            panel.setTranslationsVisible(true, animated: true)
-            return
-        }
-        Reveal.uncover(panel, duration: Self.revealSweep)
-        beam.last(duration: Self.revealSweep)
+    /// The read found the paragraphs to translate (capture-local points from `origin`): each is outlined while they are erased and drawn.
+    private func found(_ rects: [CGRect], origin: CGPoint) {
+        guard let panel, !outlined, !rects.isEmpty else { return }
+        outlined = true
+        Trace.mark("peek: outlines \(rects.count)", since: Trace.now)
+        glow?.outline(rects.map { Self.local($0, from: origin, in: panel) })
+    }
+
+    /// A frame of `snapshot` (top-left points from its origin, global Quartz) in `panel`'s view (AppKit points, y up).
+    static func local(_ frame: CGRect, of snapshot: OverlaySnapshot, in panel: NSPanel) -> CGRect {
+        local(frame, from: snapshot.origin, in: panel)
+    }
+
+    static func local(_ frame: CGRect, from origin: CGPoint, in panel: NSPanel) -> CGRect {
+        let here = ScreenGeometry.quartzRect(fromAppKit: panel.frame).origin
+        let dx = origin.x - here.x, dy = origin.y - here.y
+        return CGRect(x: dx + frame.minX, y: panel.frame.height - (dy + frame.maxY), width: frame.width, height: frame.height)
     }
 
     private nonisolated static func frame(_ image: CGImage, scale: CGFloat, display: CGRect) -> CapturedFrame? {
         guard let rgba = RGBAImage(cgImage: image), let image = rgba.cgImage else { return nil }
         let gray = rgba.withBGRA { GrayImage(bgra: $0, width: rgba.width, height: rgba.height, bytesPerRow: rgba.width * 4, step: 4) }
         return CapturedFrame(image: image, gray: gray, grayStep: 4, scale: scale, rect: display, time: ProcessInfo.processInfo.systemUptime)
-    }
-
-    /// The translations are written in from the top: a mask on the panel, opaque above an edge that moves down the display and clear below it,
-    /// with a soft feather where the band of light is.
-    enum Reveal {
-        static let feather = 0.08
-
-        static func cover(_ panel: NSPanel) {
-            guard let root = panel.contentView else { return }
-            root.wantsLayer = true
-            let mask = CAGradientLayer()
-            mask.frame = root.bounds
-            // The view is not flipped: y 1 is the top of the display.
-            mask.startPoint = CGPoint(x: 0.5, y: 1)
-            mask.endPoint = CGPoint(x: 0.5, y: 0)
-            mask.colors = [NSColor.black.cgColor, NSColor.black.cgColor, NSColor.clear.cgColor, NSColor.clear.cgColor]
-            mask.locations = locations(edge: 0)
-            root.layer?.mask = mask
-        }
-
-        static func uncover(_ panel: NSPanel, duration: CFTimeInterval) {
-            guard let mask = panel.contentView?.layer?.mask as? CAGradientLayer else { return }
-            let end = locations(edge: 1 + feather)
-            let a = CABasicAnimation(keyPath: "locations")
-            a.fromValue = mask.locations
-            a.toValue = end
-            a.duration = duration
-            a.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            CATransaction.begin()
-            CATransaction.setCompletionBlock { [weak panel] in panel?.contentView?.layer?.mask = nil }
-            mask.locations = end
-            mask.add(a, forKey: "reveal")
-            CATransaction.commit()
-        }
-
-        /// The gradient's stops for an edge at `edge` (0 top, 1 bottom): opaque down to the feather, clear from the edge.
-        static func locations(edge: Double) -> [NSNumber] {
-            [0, edge - feather, edge, max(1, edge + 0.001)].map { NSNumber(value: $0) }
-        }
     }
 
     /// Why nothing shows yet, in a pill near the top of the display: the lens hint's words (`LensHintText`), as a lens's pill says them.
@@ -233,14 +203,24 @@ final class Peek {
         func close() { window.orderOut(nil) }
     }
 
-    /// A band of light in the accent colour that sweeps down the display while it is read, over the panel and click-through.
-    @MainActor final class Beam {
-        static let height: CGFloat = 120
+    /// The lens's colours (`LensTint.colors`) turning round the display: a conic gradient seen through a mask. The mask holds a thin soft frame along
+    /// the display's edges, which says the key is down, and the outline of every paragraph found, drawn as a reading lens's (`LensRing`): a line
+    /// and a faint wider one. An outline fades when its paragraph turns.
+    @MainActor final class Glow {
+        /// Points from the display's edge the frame's band reaches; the depths below are shares of it.
+        static let depth: CGFloat = 60
+        static let reading = 0.5, breath = 0.3, thin = 0.12
+        static let period: CFTimeInterval = 3
+        /// Points between a paragraph and its outline, and the outline's corner radius.
+        static let pad: CGFloat = 5
+        static let corner: CGFloat = 8
         private let window: NSPanel
-        private let band = CAGradientLayer()
-        private let line = CALayer()
+        private let spin = CAGradientLayer()
+        private let mask = CALayer()
+        private var edges: [CAGradientLayer] = []
+        private var outlines: [(rect: CGRect, layers: [CAShapeLayer])] = []
 
-        init(frame: NSRect) {
+        init(frame: NSRect, colors: [NSColor]) {
             let w = NSPanel(contentRect: frame, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
             w.isOpaque = false
             w.backgroundColor = .clear
@@ -249,66 +229,215 @@ final class Peek {
             w.isReleasedWhenClosed = false
             w.level = .statusBar
             w.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
-            let view = NSView(frame: NSRect(origin: .zero, size: frame.size))
+            let size = frame.size
+            let view = NSView(frame: NSRect(origin: .zero, size: size))
             view.wantsLayer = true
             w.contentView = view
             window = w
-            let accent = NSColor.controlAccentColor
-            var colors: [CGColor] = []
-            w.effectiveAppearance.performAsCurrentDrawingAppearance {
-                colors = [accent.withAlphaComponent(0).cgColor, accent.withAlphaComponent(0.16).cgColor, accent.withAlphaComponent(0.30).cgColor]
-                line.backgroundColor = accent.withAlphaComponent(0.85).cgColor
+            // A square as wide as the display's diagonal, so it covers the display at every angle while it turns.
+            let side = hypot(size.width, size.height)
+            spin.type = .conic
+            spin.colors = colors.map(\.cgColor)
+            spin.startPoint = CGPoint(x: 0.5, y: 0.5)
+            spin.endPoint = CGPoint(x: 0.5, y: 0)
+            spin.frame = CGRect(x: (size.width - side) / 2, y: (size.height - side) / 2, width: side, height: side)
+            let host = CALayer()
+            host.frame = CGRect(origin: .zero, size: size)
+            host.addSublayer(spin)
+            mask.frame = host.bounds
+            host.mask = mask
+            view.layer?.addSublayer(host)
+            let d = Self.depth
+            // The view is not flipped: y 0 is the bottom of the display. Each band is opaque at the edge and clear inward.
+            for (rect, from, to) in [(CGRect(x: 0, y: size.height - d, width: size.width, height: d), CGPoint(x: 0.5, y: 1), CGPoint(x: 0.5, y: 0)),
+                                     (CGRect(x: 0, y: 0, width: size.width, height: d), CGPoint(x: 0.5, y: 0), CGPoint(x: 0.5, y: 1)),
+                                     (CGRect(x: 0, y: 0, width: d, height: size.height), CGPoint(x: 0, y: 0.5), CGPoint(x: 1, y: 0.5)),
+                                     (CGRect(x: size.width - d, y: 0, width: d, height: size.height), CGPoint(x: 1, y: 0.5), CGPoint(x: 0, y: 0.5))] {
+                let band = CAGradientLayer()
+                band.frame = rect
+                band.startPoint = from
+                band.endPoint = to
+                band.colors = [NSColor.black.cgColor, NSColor.black.withAlphaComponent(0.35).cgColor, NSColor.clear.cgColor]
+                band.locations = Self.stops(Motion.shared.reduced ? Self.reading : 0)
+                mask.addSublayer(band)
+                edges.append(band)
             }
-            // The band trails above its leading line, which is at the bottom of the band (the sweep goes down).
-            band.colors = colors
-            band.locations = [0, 0.75, 1]
-            band.startPoint = CGPoint(x: 0.5, y: 1)
-            band.endPoint = CGPoint(x: 0.5, y: 0)
-            band.frame = CGRect(x: 0, y: 0, width: frame.width, height: Self.height)
-            band.anchorPoint = CGPoint(x: 0.5, y: 0)
-            line.frame = CGRect(x: 0, y: 0, width: frame.width, height: 2)
-            band.addSublayer(line)
-            view.layer?.addSublayer(band)
-            band.position = CGPoint(x: frame.width / 2, y: frame.height)
             w.orderFrontRegardless()
-        }
-
-        private var top: CGFloat { window.frame.height }
-
-        /// Sweeps down again and again until `last` or `close`.
-        func scan(period: CFTimeInterval) {
-            let a = sweep(duration: period, timing: .linear)
-            a.repeatCount = .infinity
-            band.add(a, forKey: "scan")
-        }
-
-        /// One last sweep, with the reveal's edge, then the band fades.
-        func last(duration: CFTimeInterval) {
-            band.removeAnimation(forKey: "scan")
-            let a = sweep(duration: duration, timing: .easeInEaseOut)
-            a.fillMode = .forwards
-            a.isRemovedOnCompletion = false
-            CATransaction.begin()
-            CATransaction.setCompletionBlock { [weak self] in
+            if Motion.shared.reduced {
+                w.alphaValue = 0
                 NSAnimationContext.runAnimationGroup { ctx in
                     ctx.duration = 0.2
-                    self?.window.animator().alphaValue = 0
+                    w.animator().alphaValue = 1
                 }
+                return
             }
-            band.add(a, forKey: "last")
+            let turn = CABasicAnimation(keyPath: "transform.rotation.z")
+            turn.fromValue = 0
+            turn.toValue = -2 * Double.pi
+            turn.duration = Self.period
+            turn.repeatCount = .infinity
+            spin.add(turn, forKey: "turn")
+            let swell = CABasicAnimation(keyPath: "locations")
+            swell.fromValue = Self.stops(0)
+            swell.toValue = Self.stops(Self.reading)
+            swell.duration = 0.3
+            swell.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            let breathe = CABasicAnimation(keyPath: "locations")
+            breathe.fromValue = Self.stops(Self.reading)
+            breathe.toValue = Self.stops(Self.breath)
+            breathe.beginTime = 0.3
+            breathe.duration = 0.8
+            breathe.autoreverses = true
+            breathe.repeatCount = .infinity
+            breathe.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            let group = CAAnimationGroup()
+            group.animations = [swell, breathe]
+            group.duration = .infinity
+            set(Self.stops(Self.reading))
+            for band in edges { band.add(group, forKey: "breathe") }
+        }
+
+        /// Outlines the paragraphs found (panel-local points), each drawn on in reading order: top to bottom, then left to right.
+        func outline(_ rects: [CGRect]) {
+            let order = rects.sorted { ($0.maxY, -$0.minX) > ($1.maxY, -$1.minX) }
+            let step = order.count > 1 ? min(0.03, Peek.stagger / Double(order.count - 1)) : 0
+            let reduced = Motion.shared.reduced
+            let now = CACurrentMediaTime()
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            for (i, rect) in order.enumerated() {
+                let path = CGPath(roundedRect: rect.insetBy(dx: -Self.pad, dy: -Self.pad), cornerWidth: Self.corner, cornerHeight: Self.corner, transform: nil)
+                var layers: [CAShapeLayer] = []
+                for (width, alpha) in [(CGFloat(6), 0.3), (2, 1.0)] {
+                    let line = CAShapeLayer()
+                    line.path = path
+                    line.fillColor = nil
+                    line.strokeColor = NSColor.black.withAlphaComponent(alpha).cgColor
+                    line.lineWidth = width
+                    let on = CABasicAnimation(keyPath: reduced ? "opacity" : "strokeEnd")
+                    on.fromValue = 0
+                    on.toValue = 1
+                    on.duration = reduced ? 0.2 : Peek.draw
+                    on.beginTime = now + Double(i) * step
+                    on.fillMode = .backwards
+                    on.timingFunction = CAMediaTimingFunction(name: .easeOut)
+                    mask.addSublayer(line)
+                    line.add(on, forKey: "on")
+                    layers.append(line)
+                }
+                outlines.append((rect, layers))
+            }
             CATransaction.commit()
         }
 
-        func close() { window.orderOut(nil) }
+        /// Paragraphs that turned (panel-local points): their outlines fade. Nil: every outline left fades.
+        func turned(_ rects: [CGRect]?) {
+            var gone: [CAShapeLayer] = []
+            outlines.removeAll { o in
+                guard rects?.contains(where: { o.rect.contains(CGPoint(x: $0.midX, y: $0.midY)) || $0.contains(CGPoint(x: o.rect.midX, y: o.rect.midY)) }) ?? true else {
+                    return false
+                }
+                gone += o.layers
+                return true
+            }
+            guard !gone.isEmpty else { return }
+            CATransaction.begin()
+            CATransaction.setAnimationDuration(Peek.turn)
+            CATransaction.setCompletionBlock { gone.forEach { $0.removeFromSuperlayer() } }
+            for line in gone {
+                let fade = CABasicAnimation(keyPath: "opacity")
+                fade.fromValue = line.presentation()?.opacity ?? 1
+                fade.toValue = 0
+                line.opacity = 0
+                line.add(fade, forKey: "off")
+            }
+            CATransaction.commit()
+        }
 
-        /// The band's leading line from the top of the display to past its bottom, the band behind it.
-        private func sweep(duration: CFTimeInterval, timing: CAMediaTimingFunctionName) -> CABasicAnimation {
-            let a = CABasicAnimation(keyPath: "position.y")
-            a.fromValue = top
-            a.toValue = -Self.height * 0.1
-            a.duration = duration
-            a.timingFunction = CAMediaTimingFunction(name: timing)
-            return a
+        /// The first paragraph turned: the frame thins for as long as the key is held.
+        func settle() {
+            let end = Self.stops(Self.thin)
+            guard !Motion.shared.reduced else { return set(end) }
+            let thin = CABasicAnimation(keyPath: "locations")
+            thin.fromValue = edges.first?.presentation()?.locations ?? Self.stops(Self.reading)
+            thin.toValue = end
+            thin.duration = 0.5
+            thin.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            set(end)
+            for band in edges {
+                band.removeAnimation(forKey: "breathe")
+                band.add(thin, forKey: "settle")
+            }
+        }
+
+        func close() {
+            let w = window
+            NSAnimationContext.runAnimationGroup({ ctx in
+                ctx.duration = 0.2
+                w.animator().alphaValue = 0
+            }, completionHandler: { w.orderOut(nil) })
+        }
+
+        private func set(_ locations: [NSNumber]) {
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            for band in edges { band.locations = locations }
+            CATransaction.commit()
+        }
+
+        /// A band `share` of `depth` deep: opaque at the edge, 35 % a fifth of the way in, clear at the end.
+        static func stops(_ share: Double) -> [NSNumber] {
+            [0, share * 0.2, max(share, 0.001)].map { NSNumber(value: $0) }
+        }
+    }
+
+    /// The panel seen through a mask of one soft rounded rect per drawn paragraph: nothing shows until a paragraph's translation is drawn, then
+    /// that paragraph turns (fading in, and growing from 97 % unless Reduce Motion is on).
+    @MainActor final class Bloom {
+        private weak var panel: NSPanel?
+        private let mask = CALayer()
+        private var shown: Set<UUID> = []
+
+        init(_ panel: NSPanel) {
+            self.panel = panel
+            guard let root = panel.contentView else { return }
+            root.wantsLayer = true
+            mask.frame = root.bounds
+            root.layer?.mask = mask
+        }
+
+        /// Turns the paragraphs of `snapshot` drawn for the first time; returns them (panel-local points).
+        func add(_ snapshot: OverlaySnapshot) -> [CGRect] {
+            guard let panel else { return [] }
+            let new = snapshot.blocks.filter { !shown.contains($0.id) }
+            guard !new.isEmpty else { return [] }
+            let reduced = Motion.shared.reduced
+            let pad = Glow.pad
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            let rects = new.map { b in
+                shown.insert(b.id)
+                let rect = Peek.local(b.frame, of: snapshot, in: panel)
+                let l = CALayer()
+                l.frame = rect.insetBy(dx: -pad, dy: -pad)
+                l.cornerRadius = Glow.corner
+                l.backgroundColor = NSColor.black.cgColor
+                let fade = CABasicAnimation(keyPath: "opacity")
+                fade.fromValue = 0
+                fade.toValue = 1
+                let grow = CABasicAnimation(keyPath: "transform.scale")
+                grow.fromValue = reduced ? 1 : 0.97
+                grow.toValue = 1
+                let group = CAAnimationGroup()
+                group.animations = [fade, grow]
+                group.duration = Peek.turn
+                group.timingFunction = CAMediaTimingFunction(name: .easeOut)
+                mask.addSublayer(l)
+                l.add(group, forKey: "turn")
+                return rect
+            }
+            CATransaction.commit()
+            return rects
         }
     }
 }

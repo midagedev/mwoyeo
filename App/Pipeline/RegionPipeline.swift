@@ -173,6 +173,7 @@ actor RegionPipeline {
     private var onActivity: (@Sendable (RegionActivity) -> Void)?
     private var onNotice: (@Sendable (String) -> Void)?
     private var onRead: (@Sendable (ReadTally) -> Void)?
+    private var onFound: (@Sendable ([CGRect]) -> Void)?
     /// The last read found vertical text, and said so: the notice is shown once per such text, not per pass.
     private var verticalNoticed = false
     private let log = Logger(subsystem: "dev.midagedev.mwoyeo", category: "pipeline")
@@ -375,6 +376,9 @@ actor RegionPipeline {
     func setNoticeHandler(_ h: @escaping @Sendable (String) -> Void) { onNotice = h }
     /// Told after every read what it found, for the lens's "already in <language>" line.
     func setReadHandler(_ h: @escaping @Sendable (ReadTally) -> Void) { onRead = h }
+    /// Told after a whole read (seamless) where the blocks to translate are, capture-local points (top-left origin), before they are erased and
+    /// drawn: what `Peek` outlines while the rest of the pass runs.
+    func setFoundHandler(_ h: @escaping @Sendable ([CGRect]) -> Void) { onFound = h }
     func setActivityHandler(_ h: @escaping @Sendable (RegionActivity) -> Void) { onActivity = h }
     /// Called (at most twice a second) when content moves a lot: scrolling, page flips, animation.
     func setMotionHandler(_ h: @escaping @Sendable () -> Void) { onMotion = h }
@@ -1322,6 +1326,10 @@ actor RegionPipeline {
         onRead?(TextRecognizer.tally(verdicts))
         found = zip(read, verdicts).filter { $1 == .needs }.map(\.0)
         noteHyphenJoins(found)
+        if let onFound {
+            let s = frame.scale
+            onFound(found.map { CGRect(x: $0.rect.minX / s, y: $0.rect.minY / s, width: $0.rect.width / s, height: $0.rect.height / s) })
+        }
         let places = layoutPlaces(of: found, among: read, in: frame.image)
         guard let full = RGBAImage(cgImage: frame.image) else { return true }
         Trace.mark("seamless: frame → RGBA", since: t); t = Trace.now

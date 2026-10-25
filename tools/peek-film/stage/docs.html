@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Developer Guide — Sessions</title>
+<style>
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.55 -apple-system,"Helvetica Neue",sans-serif;color:#1d1d1f;background:#fff;width:900px;overflow:hidden;display:grid;grid-template-columns:170px 1fr}
+nav{background:#f5f5f7;border-right:1px solid #e5e5ea;padding:18px 16px;font-size:13.5px;height:100vh}
+nav b{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8e8e93;margin-bottom:8px}
+nav a{display:block;color:#3a3a3c;margin-bottom:7px;text-decoration:none}
+nav a.on{color:#0a66d8;font-weight:600}
+main{padding:18px 26px}
+h2{font-size:22px;margin-bottom:6px}
+p{margin-bottom:10px;max-width:640px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:4px}
+pre{background:#1e1f24;color:#e6e6e6;border-radius:10px;padding:12px 14px;font:13px/1.55 "SF Mono",Menlo,monospace}
+pre .k{color:#ff7ab2}pre .s{color:#fc6a5d}pre .c{color:#7f8c98}
+table{border-collapse:collapse;font-size:13.5px;width:100%}
+th{text-align:left;font-size:11.5px;color:#8e8e93;text-transform:uppercase;letter-spacing:.05em;padding:4px 8px;border-bottom:1px solid #e5e5ea}
+td{padding:6px 8px;border-bottom:1px solid #f0f0f2;vertical-align:top}
+td code{font:12.5px "SF Mono",Menlo,monospace;color:#0a66d8}
+</style></head><body>
+<nav><b>Guide</b><a>Getting started</a><a>Accounts</a><a class="on">Sessions</a><a>Webhooks</a><a>Rate limits</a><a>Errors</a></nav>
+<main>
+<h2>Starting a session</h2>
+<p>A session keeps the state of one conversation between requests. Create it once, then pass its id with every message you send.</p>
+<div class="row">
+<pre><span class="c">// open a session and send a message</span>
+<span class="k">let</span> session = <span class="k">try await</span> client.open()
+<span class="k">try await</span> session.send(<span class="s">"Hello"</span>)
+<span class="k">for try await</span> reply <span class="k">in</span> session.replies {
+    print(reply.text)
+}</pre>
+<table><tr><th>Field</th><th>Meaning</th></tr>
+<tr><td><code>id</code></td><td>Unique id of the session</td></tr>
+<tr><td><code>expires</code></td><td>Time when it closes if idle</td></tr>
+<tr><td><code>region</code></td><td>Where its data is stored</td></tr>
+</table></div>
+</main>
+</body></html>

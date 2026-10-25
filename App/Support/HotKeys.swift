@@ -47,6 +47,8 @@ enum HotKeyAction: String, Codable, CaseIterable, Identifiable {
     case saveLensImage, copyOriginal, readAloud, ignoreRegion, keepRecentLines
     /// Opens the Translate Text window; no default combo, and no lens to act on.
     case translateText
+    /// The whole screen translated while it is held (`Peek`), or seen through a circle at the pointer (`xray`); no default combo.
+    case peek, xray
 
     var id: String { rawValue }
     var title: String {
@@ -62,6 +64,8 @@ enum HotKeyAction: String, Codable, CaseIterable, Identifiable {
         case .translateText: String(localized: "Translate Text")
         case .ignoreRegion: String(localized: "Ignore Region")
         case .keepRecentLines: String(localized: "Keep Recent Lines")
+        case .peek: String(localized: "Translate Screen While Held")
+        case .xray: String(localized: "X-ray While Held")
         }
     }
 
@@ -82,10 +86,13 @@ final class HotKeys {
     static let shared = HotKeys()
 
     private var handlers: [HotKeyAction: () -> Void] = [:]
+    /// What a held action does when its key comes up (`peek`, `xray`).
+    private var releases: [HotKeyAction: () -> Void] = [:]
     private var refs: [EventHotKeyRef] = []
     private var installed = false
 
     func setHandler(_ action: HotKeyAction, _ handler: @escaping () -> Void) { handlers[action] = handler }
+    func setRelease(_ action: HotKeyAction, _ handler: @escaping () -> Void) { releases[action] = handler }
 
     /// Registers `combos` (action raw value → combo), replacing what was registered.
     func apply(_ combos: [String: KeyCombo]) {
@@ -107,22 +114,24 @@ final class HotKeys {
         refs = []
     }
 
-    fileprivate func fire(_ index: UInt32) {
+    fileprivate func fire(_ index: UInt32, released: Bool) {
         guard Int(index) < HotKeyAction.allCases.count else { return }
-        handlers[HotKeyAction.allCases[Int(index)]]?()
+        let action = HotKeyAction.allCases[Int(index)]
+        (released ? releases[action] : handlers[action])?()
     }
 
     private func installIfNeeded() {
         guard !installed else { return }
         installed = true
-        var spec = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
+        var specs = [EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed)),
+                     EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyReleased))]
         InstallEventHandler(GetApplicationEventTarget(), { _, event, _ in
             var hk = EventHotKeyID()
             GetEventParameter(event, EventParamName(kEventParamDirectObject), EventParamType(typeEventHotKeyID), nil,
                               MemoryLayout<EventHotKeyID>.size, nil, &hk)
-            let id = hk.id
-            Task { @MainActor in HotKeys.shared.fire(id) }
+            let id = hk.id, released = GetEventKind(event) == UInt32(kEventHotKeyReleased)
+            Task { @MainActor in HotKeys.shared.fire(id, released: released) }
             return noErr
-        }, 1, &spec, nil, nil)
+        }, 2, &specs, nil, nil)
     }
 }

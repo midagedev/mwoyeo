@@ -87,6 +87,8 @@ final class AppModel {
     @ObservationIgnored private var loggedIssues: [SettingsFileIssue] = []
     @ObservationIgnored private var sessions: [UUID: RegionSession] = [:]
     @ObservationIgnored private(set) var inpainter: Inpainter?
+    /// The screen translated while a shortcut is held.
+    @ObservationIgnored let peek = Peek()
     @ObservationIgnored private let picker = RegionPicker()
     /// Hears the Mac wake and the displays change, for the lenses' captures (`CaptureRecovery`).
     @ObservationIgnored private var displayWatcher: DisplayWatcher?
@@ -203,6 +205,13 @@ final class AppModel {
         HotKeys.shared.setHandler(.hideLenses) { [weak self] in self?.toggleLensesHidden() }
         HotKeys.shared.setHandler(.pause) { [weak self] in Task { await self?.togglePause() } }
         HotKeys.shared.setHandler(.refresh) { [weak self] in Task { await self?.refreshAll() } }
+        for (action, style) in [(HotKeyAction.peek, Peek.Style.screen), (.xray, .xray)] {
+            HotKeys.shared.setHandler(action) { [weak self] in
+                guard let self else { return }
+                peek.begin(style, settings: settings, translator: translator, inpainter: inpainter) { [weak self] in self?.recognitionPreparing ?? false }
+            }
+            HotKeys.shared.setRelease(action) { [weak self] in self?.peek.end() }
+        }
         HotKeys.shared.setHandler(.saveLensImage) { [weak self] in self?.lensForShortcut()?.saveLensImage() }
         HotKeys.shared.setHandler(.copyOriginal) { [weak self] in self?.lensForShortcut()?.copyOriginal() }
         HotKeys.shared.setHandler(.readAloud) { [weak self] in self?.lensForShortcut()?.toggleReadAloud() }

@@ -32,8 +32,12 @@ enum TextChecks {
         // (ignoreRegion, keepRecentLines) between readAloud and translateText; the hot keys are registered by index (HotKeys.swift:97), so what must
         // stay is the index of every action registered before, not readAloud's distance from the end. FAIL-first: translateText moved before
         // readAloud fails both clauses.
-        check("Translate Text is a shortcut action with no default key, after the others (so the ids of the registered ones stay)",
-              HotKeyAction.translateText.rawValue == "translateText" && HotKeyAction.defaults["translateText"] == nil && HotKeyAction.allCases.last == .translateText
+        // 2026-10-25 (peek): "translateText is last" became "translateText keeps its index, 10". Peek adds two actions after it (peek, xray), by
+        // the same reason (registered by index); FAIL-first: peek put before translateText moves it to 11 and fails.
+        check("Translate Text is a shortcut action with no default key, at its index (so the ids of the registered ones stay)",
+              HotKeyAction.translateText.rawValue == "translateText" && HotKeyAction.defaults["translateText"] == nil
+              && HotKeyAction.allCases.firstIndex(of: .translateText) == 10 && HotKeyAction.allCases.suffix(2) == [.peek, .xray]
+              && HotKeyAction.defaults["peek"] == nil && HotKeyAction.defaults["xray"] == nil
               && HotKeyAction.addLens.id == "addLens" && HotKeyAction.allCases.firstIndex(of: .readAloud) == 7)
         let file = SettingsFileCheck.read(Data(#"{"shortcuts": {"translateText": {"keyCode": 17, "modifiers": 4096, "display": "⌃T"}}}"#.utf8), over: AppSettings())
         let wrong = SettingsFileCheck.read(Data(#"{"shortcuts": {"translateTxt": {"keyCode": 17, "modifiers": 4096, "display": "⌃T"}}}"#.utf8), over: AppSettings())

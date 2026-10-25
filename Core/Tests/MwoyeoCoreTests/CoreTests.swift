@@ -617,6 +617,12 @@ func texture(width: Int, height: Int, seed: Int = 1) -> GrayImage {
     #expect(c.map(\.minX) == [4, 40, 50])
     #expect(c.map(\.solid) == [true, false, false])
     #expect(c[1].color == RGBA(150, 152, 158))
+    // A bold "a" of a heading (measured 2026-10-25 on the film5 "Starting a session": 22×24 px, 73 % ink, on a 48 px line) fills its box as a
+    // shape does, but it is half the line tall: a letter, not an avatar, so "a" does not cut the heading into "Starting" and "session".
+    var heading = RGBAImage(width: 60, height: 56, color: RGBA(255, 255, 255))
+    for y in 20..<44 { for x in 10..<32 where !(x >= 17 && x < 26 && y >= 30 && y < 41) { heading.set(x: x, y: y, RGBA(29, 29, 31)) } }
+    let hm = TextEraser.mask(for: heading, textRect: PixelRect(x: 4, y: 4, width: 52, height: 48), dilation: 0)
+    #expect(TextEraser.clusters(hm, in: heading, lineHeight: 48).map(\.solid) == [false])
 }
 
 @Test func wordTokenLeavesOutAnIconItsBoxTookIn() {

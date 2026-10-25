@@ -317,8 +317,9 @@ public enum TextEraser {
     }
 
     /// Glyph pixels of `mask` (built without dilation) gathered into column runs — letters, or an icon or avatar
-    /// in the line — left to right, in patch coordinates. `solid` marks filled shapes at least half a line tall:
-    /// an avatar or an emoji, not a stroke of text.
+    /// in the line — left to right, in patch coordinates. `solid` marks filled shapes at least 0.7 of a line tall:
+    /// an avatar or an emoji, not a stroke of text. A bold lower-case letter fills its box as densely but is half the
+    /// line tall (a heading's "a": 24 px on a 48 px line), and an emoji or avatar is most of it.
     public static func clusters(_ mask: TextMask, in patch: RGBAImage, lineHeight: Int) -> [InkCluster] {
         let w = mask.width, h = mask.height, bg = mask.appearance.backgroundColor
         guard mask.appearance.coverage < 1 else { return [] }
@@ -339,7 +340,7 @@ public enum TextEraser {
             }
             let rows = bottom - top + 1, width = end - x + 1
             let core = colors.sorted { $0.1 > $1.1 }.prefix(max(1, colors.count / 2)).map(\.0)
-            let solid = rows * 2 >= lineHeight && width * 2 >= rows && Double(colors.count) >= 0.7 * Double(rows * width)
+            let solid = rows * 10 >= lineHeight * 7 && width * 2 >= rows && Double(colors.count) >= 0.7 * Double(rows * width)
             out.append(InkCluster(minX: x, maxX: end + 1, color: meanColor(Array(core)), ink: colors.count, solid: solid))
             x = end + 1
         }

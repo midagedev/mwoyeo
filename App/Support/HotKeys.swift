@@ -47,8 +47,8 @@ enum HotKeyAction: String, Codable, CaseIterable, Identifiable {
     case saveLensImage, copyOriginal, readAloud, ignoreRegion, keepRecentLines
     /// Opens the Translate Text window; no default combo, and no lens to act on.
     case translateText
-    /// The whole screen translated while it is held (`Peek`), or seen through a circle at the pointer (`xray`); no default combo.
-    case peek, xray
+    /// The whole screen translated while it is held (`Peek`); no default combo.
+    case peek
 
     var id: String { rawValue }
     var title: String {
@@ -65,7 +65,6 @@ enum HotKeyAction: String, Codable, CaseIterable, Identifiable {
         case .ignoreRegion: String(localized: "Ignore Region")
         case .keepRecentLines: String(localized: "Keep Recent Lines")
         case .peek: String(localized: "Translate Screen While Held")
-        case .xray: String(localized: "X-ray While Held")
         }
     }
 
@@ -86,7 +85,7 @@ final class HotKeys {
     static let shared = HotKeys()
 
     private var handlers: [HotKeyAction: () -> Void] = [:]
-    /// What a held action does when its key comes up (`peek`, `xray`).
+    /// What a held action does when its key comes up (`peek`).
     private var releases: [HotKeyAction: () -> Void] = [:]
     private var refs: [EventHotKeyRef] = []
     private var installed = false

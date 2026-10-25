@@ -12,13 +12,8 @@ import QuartzCore
 /// A read of a whole display takes about two seconds. Meanwhile a band of light sweeps down the screen (`Beam`); once most of the screen is
 /// translated, one last sweep writes it in: the translations show above the band and the original below (`Reveal`). Under Reduce Motion there is
 /// no band and the translations fade in.
-///
-/// X-ray (`HotKeyAction.xray`) reads the same way and shows the translations only inside a circle that follows the pointer (`Lens`), the rest
-/// of the screen as it is: the ring is there at once, and the translations come into it as they land.
 @MainActor
 final class Peek {
-    enum Style { case screen, xray }
-
     /// Lines per engine call: every block of a screen of text in one or two calls.
     static let batch = 64
     /// Seconds of one sweep down the display.
@@ -33,7 +28,6 @@ final class Peek {
     private var pipeline: RegionPipeline?
     private var panel: OverlayPanel?
     private var beam: Beam?
-    private var xray: XRay?
     private var task: Task<Void, Never>?
     private var revealTask: Task<Void, Never>?
     private var noteTask: Task<Void, Never>?
@@ -43,22 +37,19 @@ final class Peek {
 
     /// The key went down: read and translate the display under the pointer.
     /// `preparing`: the text recognizer is still in its first-time setup (`AppModel.recognitionPreparing`).
-    func begin(_ style: Style, settings: AppSettings, translator: TranslationService, inpainter: Inpainter?, preparing: @escaping () -> Bool) {
+    func begin(settings: AppSettings, translator: TranslationService, inpainter: Inpainter?, preparing: @escaping () -> Bool) {
         guard !holding else { return }
         holding = true
         let pointer = NSEvent.mouseLocation
         guard let screen = NSScreen.screens.first(where: { $0.frame.contains(pointer) }) ?? NSScreen.main else { return }
         let display = ScreenGeometry.quartzRect(fromAppKit: screen.frame)
         Trace.count("peek.begin")
-        Trace.mark("peek: begin \(style) display=\(TraceNumber.px(display.width))x\(TraceNumber.px(display.height))", since: Trace.now)
+        Trace.mark("peek: begin display=\(TraceNumber.px(display.width))x\(TraceNumber.px(display.height))", since: Trace.now)
         let panel = OverlayPanel(frame: screen.frame)
         self.panel = panel
         revealed = false
         let reduced = Motion.shared.reduced
-        switch style {
-        case .xray: xray = XRay(panel: panel)
-        case .screen: if reduced { panel.alphaValue = 0 } else { Reveal.cover(panel) }
-        }
+        if reduced { panel.alphaValue = 0 } else { Reveal.cover(panel) }
         var options = PipelineOptions(settings)
         options.renderMode = .seamless
         options.translationBatch = Self.batch
@@ -67,14 +58,14 @@ final class Peek {
         })
         self.pipeline = pipeline
         panel.orderFrontRegardless()
-        if style == .screen, !reduced {
+        if !reduced {
             let beam = Beam(frame: screen.frame)
             self.beam = beam
             beam.scan(period: Self.sweep)
         }
         noteTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(Self.noteAfter))
-            guard !Task.isCancelled, let self, !revealed, xray?.hasTranslation != true, preparing() else { return }
+            guard !Task.isCancelled, let self, !revealed, preparing() else { return }
             say(.preparingRecognition, on: screen.frame)
         }
         task = Task { [weak self] in
@@ -107,8 +98,6 @@ final class Peek {
         pipeline = nil
         beam?.close()
         beam = nil
-        xray?.close()
-        xray = nil
         guard let panel else { return }
         self.panel = nil
         Trace.mark("peek: end", since: Trace.now)
@@ -132,8 +121,7 @@ final class Peek {
             note.close()
             self.note = nil
         }
-        if let xray, !snapshot.blocks.isEmpty { xray.translated() }
-        guard xray == nil, !revealed, !snapshot.blocks.isEmpty else { return }
+        guard !revealed, !snapshot.blocks.isEmpty else { return }
         if Double(snapshot.blocks.count) >= Self.revealShare * Double(max(1, snapshot.texts.count)) {
             reveal()
         } else if revealTask == nil {
@@ -202,98 +190,6 @@ final class Peek {
         /// The gradient's stops for an edge at `edge` (0 top, 1 bottom): opaque down to the feather, clear from the edge.
         static func locations(edge: Double) -> [NSNumber] {
             [0, edge - feather, edge, max(1, edge + 0.001)].map { NSNumber(value: $0) }
-        }
-    }
-
-    /// The x-ray: the panel masked to a circle at the pointer, soft at its edge, with a ring in the accent colour around it (a click-through
-    /// window over the panel). The circle follows the pointer every display frame; the ring breathes until the first translation lands.
-    @MainActor final class XRay {
-        static let radius: CGFloat = 190
-        static let feather: CGFloat = 0.12
-        private weak var panel: NSPanel?
-        private let mask = CAGradientLayer()
-        private let ringWindow: NSPanel
-        private let ring = CAShapeLayer()
-        private var timer: Timer?
-
-        init(panel: NSPanel) {
-            self.panel = panel
-            let r = Self.radius
-            mask.type = .radial
-            mask.colors = [NSColor.black.cgColor, NSColor.black.cgColor, NSColor.clear.cgColor]
-            mask.locations = [0, NSNumber(value: Double(1 - Self.feather)), 1]
-            mask.startPoint = CGPoint(x: 0.5, y: 0.5)
-            mask.endPoint = CGPoint(x: 1, y: 1)
-            mask.frame = CGRect(x: 0, y: 0, width: 2 * r, height: 2 * r)
-            if let root = panel.contentView {
-                root.wantsLayer = true
-                root.layer?.mask = mask
-            }
-            let w = NSPanel(contentRect: panel.frame, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
-            w.isOpaque = false
-            w.backgroundColor = .clear
-            w.hasShadow = false
-            w.ignoresMouseEvents = true
-            w.isReleasedWhenClosed = false
-            w.level = .statusBar
-            w.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
-            let view = NSView(frame: NSRect(origin: .zero, size: panel.frame.size))
-            view.wantsLayer = true
-            w.contentView = view
-            ringWindow = w
-            ring.path = CGPath(ellipseIn: CGRect(x: -r, y: -r, width: 2 * r, height: 2 * r), transform: nil)
-            ring.fillColor = nil
-            ring.lineWidth = 3
-            w.effectiveAppearance.performAsCurrentDrawingAppearance {
-                ring.strokeColor = NSColor.controlAccentColor.withAlphaComponent(0.9).cgColor
-                ring.shadowColor = NSColor.controlAccentColor.cgColor
-            }
-            ring.shadowRadius = 8
-            ring.shadowOpacity = 0.6
-            ring.shadowOffset = .zero
-            view.layer?.addSublayer(ring)
-            follow()
-            w.orderFrontRegardless()
-            if !Motion.shared.reduced {
-                let a = CABasicAnimation(keyPath: "opacity")
-                a.fromValue = 1
-                a.toValue = 0.35
-                a.duration = 0.5
-                a.autoreverses = true
-                a.repeatCount = .infinity
-                ring.add(a, forKey: "breathe")
-            }
-            let t = Timer(timeInterval: 1.0 / 120, repeats: true) { [weak self] _ in MainActor.assumeIsolated { self?.follow() } }
-            RunLoop.main.add(t, forMode: .common)
-            timer = t
-        }
-
-        private(set) var hasTranslation = false
-
-        /// A translation is in: the ring stops breathing.
-        func translated() {
-            hasTranslation = true
-            guard ring.animation(forKey: "breathe") != nil else { return }
-            ring.removeAnimation(forKey: "breathe")
-            Trace.mark("peek: xray translated", since: Trace.now)
-        }
-
-        func close() {
-            timer?.invalidate()
-            timer = nil
-            ringWindow.orderOut(nil)
-        }
-
-        /// The circle and the ring where the pointer is, in the panel's (unflipped) view coordinates.
-        private func follow() {
-            guard let panel else { return }
-            let p = NSEvent.mouseLocation
-            let local = CGPoint(x: p.x - panel.frame.minX, y: p.y - panel.frame.minY)
-            CATransaction.begin()
-            CATransaction.setDisableActions(true)
-            mask.position = local
-            ring.position = local
-            CATransaction.commit()
         }
     }
 

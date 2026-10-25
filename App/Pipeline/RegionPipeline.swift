@@ -98,6 +98,8 @@ struct PipelineOptions: Sendable, Equatable {
     /// How text is cut into paragraphs in this lens (the app's profile over the global choice) and the app it covers.
     var paragraphReader: ParagraphReader
     var lensApp: ReaderContext
+    /// Lines per engine call when nothing moves: a lens takes a few at a time so what it shows comes first; a still picture read whole (`Peek`) takes them all.
+    var translationBatch = 3
 
     init(_ s: AppSettings, lensApp: ReaderContext = ReaderContext()) {
         renderMode = s.renderMode
@@ -1085,9 +1087,13 @@ actor RegionPipeline {
         if latest != nil { kick() }
     }
 
-    /// The session has stopped. A pass already inside OCR may finish; no frame and no resize starts another.
+    /// The session has stopped. A pass already inside OCR may finish its read, but erases and draws nothing (`seamlessPass`); no frame and no
+    /// resize starts another, and nothing more is sent to the engine: the batch in flight is cancelled and the queue emptied (a closed lens, or a
+    /// `Peek` let go, has no one to show the rest to, and the next one waits for the engine).
     func halt() {
         halted = true
+        pending.removeAll()
+        flight?.task.cancel()
         readPending = false
         deferredUncovered = false
         settleTask?.cancel()
@@ -1299,6 +1305,7 @@ actor RegionPipeline {
         }
         readBackoff.success()
         Trace.mark("seamless: document OCR (\(found.count) blocks)", since: t); t = Trace.now
+        guard !halted else { return true }
         traceBlocks(found, as: "ocr-block")
         if holdsVerticalText(found) {
             _ = finishPass(frame: frame)
@@ -2200,7 +2207,7 @@ actor RegionPipeline {
         let ordered = blocks.filter { !(moving && TranslationScheduling.isTrailing($0.rect, lens: lens, lead: lead)) }
             .sorted { priority($0.rect) < priority($1.rect) }.map(\.source)
             .filter { pending.contains($0) && seen.insert($0).inserted }
-        return Array(ordered.prefix(3))
+        return Array(ordered.prefix(options.translationBatch))
     }
 
     /// What the lens shows comes first, in reading order; then the overscan, nearest first.

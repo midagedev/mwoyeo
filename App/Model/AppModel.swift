@@ -118,6 +118,7 @@ final class AppModel {
                 settingsFile.save(s)
             }
         }
+        if s.offerNewShortcuts() { settingsFile.save(s) }
         // The first start of the version that asks: the DMG's engines in settings.json are allowed once; the App Store build allows none.
         s.enginePermissions.launch(engines: s.engines, grantsExisting: !Distribution.isAppStore)
         settings = s

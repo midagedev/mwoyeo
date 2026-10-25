@@ -222,6 +222,18 @@ struct AppSettings: Codable, Equatable {
     var recentLineCount = RecentLines.standard
     /// HotKeyAction raw value → combo; an action missing here has no shortcut.
     var shortcuts = HotKeyAction.defaults
+    /// The actions whose default shortcut these settings have been given (`offerNewShortcuts`); run-time state, not in the file.
+    var shortcutsOffered = Set(HotKeyAction.defaults.keys)
+
+    /// At launch: a default shortcut added since these settings were saved is given once (`HotKeyAction.givingNewDefaults`). True when the
+    /// shortcuts changed, so the file is written with it (the file's shortcuts are read over the preferences' copy at the next launch).
+    mutating func offerNewShortcuts() -> Bool {
+        let given = HotKeyAction.givingNewDefaults(shortcuts, offered: shortcutsOffered)
+        shortcutsOffered = Set(HotKeyAction.defaults.keys)
+        guard given != shortcuts else { return false }
+        shortcuts = given
+        return true
+    }
     /// Ask GitHub once a day whether a newer version is out.
     var checksForUpdates = true
     var hasCompletedOnboarding = false
@@ -357,7 +369,7 @@ struct AppSettings: Codable, Equatable {
     // and `engines[].context` are read (`init(from:)`) and never written (design §5.2).
     enum CodingKeys: String, CodingKey {
         case sourceLanguage, targetLanguage, engine, engines, customEngineID, engineRejections, renderMode, useInpaintingModel, glossary
-        case framesPerSecond, settleDelay, fontStyle, boxOpacity, lensStyle, lensTint, lensTabVisibility, lensTabPosition, lensSnap, lensAutoFit, cacheSize, recentLineCount, shortcuts
+        case framesPerSecond, settleDelay, fontStyle, boxOpacity, lensStyle, lensTint, lensTabVisibility, lensTabPosition, lensSnap, lensAutoFit, cacheSize, recentLineCount, shortcuts, shortcutsOffered
         case checksForUpdates, hasCompletedOnboarding, savesTranscripts, exportFolder, exportBookmark, enginePermissions, transcriptFormats
         case paragraphReader, agentConnection, fastFirstPaint
         case profiles, context, useLearned, profilePin, glossaryApply
@@ -388,6 +400,7 @@ struct AppSettings: Codable, Equatable {
         try c.encode(cacheSize, forKey: .cacheSize)
         try c.encode(recentLineCount, forKey: .recentLineCount)
         try c.encode(shortcuts, forKey: .shortcuts)
+        try c.encode(shortcutsOffered.sorted(), forKey: .shortcutsOffered)
         try c.encode(checksForUpdates, forKey: .checksForUpdates)
         try c.encode(hasCompletedOnboarding, forKey: .hasCompletedOnboarding)
         try c.encode(savesTranscripts, forKey: .savesTranscripts)
@@ -442,6 +455,8 @@ struct AppSettings: Codable, Equatable {
         lensSnap = (try? c.decodeIfPresent(Bool.self, forKey: .lensSnap)) ?? d.lensSnap
         lensAutoFit = (try? c.decodeIfPresent(Bool.self, forKey: .lensAutoFit)) ?? d.lensAutoFit
         shortcuts = (try? c.decodeIfPresent([String: KeyCombo].self, forKey: .shortcuts)) ?? d.shortcuts
+        // Saved before the key: those settings were given the defaults of 1.1.7 (`offerNewShortcuts`).
+        shortcutsOffered = (try? c.decodeIfPresent(Set<String>.self, forKey: .shortcutsOffered)) ?? HotKeyAction.defaultsUntil117
         checksForUpdates = try c.decodeIfPresent(Bool.self, forKey: .checksForUpdates) ?? d.checksForUpdates
         cacheSize = max(100, try c.decodeIfPresent(Int.self, forKey: .cacheSize) ?? d.cacheSize)
         recentLineCount = min(max((try? c.decodeIfPresent(Int.self, forKey: .recentLineCount)) ?? d.recentLineCount, RecentLines.range.lowerBound), RecentLines.range.upperBound)

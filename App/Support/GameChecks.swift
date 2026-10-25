@@ -671,7 +671,9 @@ enum GameChecks {
         check("Ignore Region and Keep Recent Lines are shortcut actions, unassigned until the person assigns them",
               HotKeyAction.allCases.contains(.ignoreRegion) && HotKeyAction.allCases.contains(.keepRecentLines)
               && HotKeyAction.defaults[HotKeyAction.ignoreRegion.rawValue] == nil && HotKeyAction.defaults[HotKeyAction.keepRecentLines.rawValue] == nil
-              && Set(HotKeyAction.defaults.keys) == [HotKeyAction.addLens.rawValue, HotKeyAction.toggleOriginal.rawValue])
+              // 2026-10-25 (peek default): the defaults gained peek (⌃⌥P, the user's choice); these two still have none. FAIL-first: a default
+              // for ignoreRegion fails it.
+              && Set(HotKeyAction.defaults.keys) == [HotKeyAction.addLens.rawValue, HotKeyAction.toggleOriginal.rawValue, HotKeyAction.peek.rawValue])
         let known = SettingsFileCheck.read(Data("{\"shortcuts\": {\"ignoreRegion\": {\"keyCode\": 34, \"modifiers\": 6144, \"display\": \"⌃⌥I\"}}}".utf8), over: base)
         check("settings.json accepts a shortcut for them", known.issues.isEmpty && known.settings.shortcuts["ignoreRegion"]?.display == "⌃⌥I", "\(known.issues)")
     }

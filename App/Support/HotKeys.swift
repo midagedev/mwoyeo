@@ -69,12 +69,27 @@ enum HotKeyAction: String, Codable, CaseIterable, Identifiable {
     }
 
     /// ⌃⌥ plus a letter, avoiding the ⌃⌥ letters window managers such as Rectangle and Magnet take by default
-    /// (D F G E T for thirds, U I J K for corners, C for centre). Only the two used all the time have one (the user, 2026-10-21: few
-    /// defaults, the fewest clashes with other apps); every other action is assigned by the person in Settings › Shortcuts.
+    /// (D F G E T for thirds, U I J K for corners, C for centre). Only the few used all the time have one (the user, 2026-10-21: few
+    /// defaults, the fewest clashes with other apps; 2026-10-25: the whole screen while held, ⌃⌥P, is one); every other action is assigned
+    /// by the person in Settings › Shortcuts.
     static let defaults: [String: KeyCombo] = [
         HotKeyAction.addLens.rawValue: KeyCombo(keyCode: kVK_ANSI_L, modifiers: controlKey | optionKey, display: "⌃⌥L"),
         HotKeyAction.toggleOriginal.rawValue: KeyCombo(keyCode: kVK_ANSI_O, modifiers: controlKey | optionKey, display: "⌃⌥O"),
+        HotKeyAction.peek.rawValue: KeyCombo(keyCode: kVK_ANSI_P, modifiers: controlKey | optionKey, display: "⌃⌥P"),
     ]
+    /// The actions that had a default up to 1.1.7: settings saved then have been given these and no other.
+    static let defaultsUntil117: Set<String> = [HotKeyAction.addLens.rawValue, HotKeyAction.toggleOriginal.rawValue]
+
+    /// `shortcuts` given each default it has not been given yet (`offered`), unless its keys are already some action's: a default added in a
+    /// later version reaches settings saved before it, once; one the person cleared stays cleared.
+    static func givingNewDefaults(_ shortcuts: [String: KeyCombo], offered: Set<String>) -> [String: KeyCombo] {
+        var out = shortcuts
+        for (action, combo) in defaults where !offered.contains(action) && out[action] == nil
+            && !out.values.contains(where: { $0.keyCode == combo.keyCode && $0.modifiers == combo.modifiers }) {
+            out[action] = combo
+        }
+        return out
+    }
 }
 
 /// System-wide shortcuts via Carbon's RegisterEventHotKey — still the only API that works without

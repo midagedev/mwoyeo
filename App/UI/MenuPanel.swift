@@ -45,6 +45,14 @@ struct MenuPanel: View {
             if !model.settings.appProfiles.isEmpty { ProfileCaption().padding(.top, -6) }
             regionList
             addButton
+            if let k = model.shortcut(.peek) {
+                // The whole screen while held has no button (it lasts as long as its key is down): the menu names its key under the lens's.
+                Text("Hold \(k) to translate the whole screen")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, -6)
+            }
             Divider().padding(.horizontal, -4)
             footer
         }

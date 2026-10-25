@@ -167,8 +167,10 @@ enum HideLensChecks {
         // No default (the user, 2026-10-21: only Add Lens and Show Original have one, so few keys clash with other apps).
         check("it has no default shortcut", HotKeyAction.defaults["hideLenses"] == nil, "\(String(describing: HotKeyAction.defaults["hideLenses"]))")
         let all = HotKeyAction.defaults
-        check("the defaults are two shortcuts, Add Lens and Show Original, on two different keys",
-              Set(all.keys) == ["addLens", "toggleOriginal"] && Set(all.values.map { "\($0.keyCode).\($0.modifiers)" }).count == 2,
+        // 2026-10-25 (peek default): two became three, the whole screen while held on ⌃⌥P (the user's choice); still each on its own keys.
+        // FAIL-first: peek's default on ⌃⌥L fails the count.
+        check("the defaults are three shortcuts, Add Lens, Show Original and the whole screen while held, on three different keys",
+              Set(all.keys) == ["addLens", "toggleOriginal", "peek"] && Set(all.values.map { "\($0.keyCode).\($0.modifiers)" }).count == 3,
               "\(all.mapValues(\.display))")
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("hidelens-\(UUID().uuidString)").appendingPathExtension("json")
         try? Data(#"{"shortcuts":{"hideLenses":{"keyCode":4,"modifiers":6144,"display":"⌃⌥H"}}}"#.utf8).write(to: file)

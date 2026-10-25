@@ -438,7 +438,7 @@ struct SettingsFileResult {
 
 enum SettingsFileCheck {
     /// Settings kept in UserDefaults instead (run-time state, not a choice), so never in the file.
-    static let notInFile: Set<String> = ["engineRejections", "hasCompletedOnboarding", "exportBookmark", "enginePermissions"]
+    static let notInFile: Set<String> = ["engineRejections", "hasCompletedOnboarding", "exportBookmark", "enginePermissions", "shortcutsOffered"]
 
     /// The file's own view of the settings: what AppSettings encodes, without the run-time state, plus an explicit null id.
     static func fileValues(_ s: AppSettings, omittingUnset: Bool = true) -> [String: Any] {

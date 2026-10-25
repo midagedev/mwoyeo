@@ -35,11 +35,42 @@ enum TextChecks {
         // 2026-10-25 (peek): "translateText is last" became "translateText keeps its index, 10". Peek adds an action after it (peek), by
         // the same reason (registered by index); FAIL-first: peek put before translateText moves it to 11 and fails. 2026-10-25: x-ray, the
         // second, dropped before release (the user: the fitted lens does it better), so no shipped id moves.
+        // 2026-10-25 (peek default): "peek has no default" became "peek's default is ⌃⌥P" (the user chose it, to lead 1.1.8 with it); the
+        // clauses about the ids are unchanged. FAIL-first: the ⌃⌥P entry left out of `defaults` fails it.
         check("Translate Text is a shortcut action with no default key, at its index (so the ids of the registered ones stay)",
               HotKeyAction.translateText.rawValue == "translateText" && HotKeyAction.defaults["translateText"] == nil
               && HotKeyAction.allCases.firstIndex(of: .translateText) == 10 && HotKeyAction.allCases.last == .peek
-              && HotKeyAction.defaults["peek"] == nil
+              && HotKeyAction.defaults["peek"]?.display == "⌃⌥P"
               && HotKeyAction.addLens.id == "addLens" && HotKeyAction.allCases.firstIndex(of: .readAloud) == 7)
+        // A default added after 1.1.7 (⌃⌥P) reaches settings saved by 1.1.7 once, through the file read over the preferences' copy at launch, and
+        // stays: unless its keys are some action's already, or the person cleared it after it was given. FAIL-first: `offerNewShortcuts`
+        // returning false without giving, and AppModel not writing the file, each fail the first or the second clause.
+        do {
+            let old = Data(#"{"shortcuts": {"addLens": {"keyCode": 37, "modifiers": 6144, "display": "⌃⌥L"}, "toggleOriginal": {"keyCode": 31, "modifiers": 6144, "display": "⌃⌥O"}}}"#.utf8)
+            let folder = FileManager.default.temporaryDirectory.appendingPathComponent("peekdefault-\(UUID().uuidString)")
+            try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+            defer { try? FileManager.default.removeItem(at: folder) }
+            let url = folder.appendingPathComponent("settings.json")
+            try? old.write(to: url)
+            let prefs = (try? JSONDecoder().decode(AppSettings.self, from: old)) ?? AppSettings()
+            let store = SettingsFileStore(url: url)
+            var first = store.startup(fallback: prefs)
+            if first.offerNewShortcuts() { store.save(first) }
+            var second = SettingsFileStore(url: url).startup(fallback: first)
+            let givenAgain = second.offerNewShortcuts()
+            check("settings saved by 1.1.7 get ⌃⌥P for the whole screen at the first launch, and keep it at the next",
+                  first.shortcuts["peek"]?.display == "⌃⌥P" && second.shortcuts["peek"]?.display == "⌃⌥P" && !givenAgain && first.shortcuts["addLens"]?.display == "⌃⌥L",
+                  "first \(first.shortcuts.keys.sorted()) second \(second.shortcuts.keys.sorted()) again \(givenAgain)")
+            var taken = prefs
+            taken.shortcuts["pause"] = KeyCombo(keyCode: 35, modifiers: 6144, display: "⌃⌥P")
+            _ = taken.offerNewShortcuts()
+            var cleared = second
+            cleared.shortcuts["peek"] = nil
+            let clearedGiven = cleared.offerNewShortcuts()
+            check("⌃⌥P is not given while another action has it, and not again once the person cleared it",
+                  taken.shortcuts["peek"] == nil && taken.shortcuts["pause"]?.display == "⌃⌥P" && !clearedGiven && cleared.shortcuts["peek"] == nil,
+                  "taken \(taken.shortcuts.keys.sorted()) cleared \(cleared.shortcuts.keys.sorted())")
+        }
         let file = SettingsFileCheck.read(Data(#"{"shortcuts": {"translateText": {"keyCode": 17, "modifiers": 4096, "display": "⌃T"}}}"#.utf8), over: AppSettings())
         let wrong = SettingsFileCheck.read(Data(#"{"shortcuts": {"translateTxt": {"keyCode": 17, "modifiers": 4096, "display": "⌃T"}}}"#.utf8), over: AppSettings())
         check("settings.json takes shortcuts.translateText and refuses a name that is not an action",

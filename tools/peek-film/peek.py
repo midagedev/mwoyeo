@@ -69,6 +69,9 @@ try:
         elif op in ('keydown', 'keyup'): post(f'{op} {rest[0]} {rest[1]}'); put(op, code=rest[0])
         if app.poll() is not None: sys.exit(f'peek: the app quit (rc {app.returncode})')
     put('end')
+    # The capture's first frame on the same clock (avfoundation stamps uptime seconds): video seconds = event ns / 1e9 - this.
+    m = re.search(r'start: ([\d.]+)', open(f'{out}/ffmpeg.log').read())
+    if m: put('video0', seconds=float(m.group(1)))
 finally:
     stop_all()
     print(json.dumps(dict(name=name, out=out)))

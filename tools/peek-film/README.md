@@ -10,4 +10,5 @@ Rebuilt 2026-10-26 after a restart emptied /tmp, where film4/film5's tools lived
 | `post.swift` | posted input on the uptime clock (`path`, `click`, `key`, `keydown`/`keyup` with `ctrl,opt`…) |
 | `peek.py <shot.json> <out>` | one take: stage, app, ffmpeg capture of the main display at 60 fps, the shot's steps; `events.jsonl` and `app.err` share the uptime clock. Run it under `lockf /tmp/r117/screen.lock` |
 | `gates.sh <tag> <check>...` | `--capture-ui` gates one at a time under the screen lock (`BIN=<Mwoyeo>`); a line per check in /tmp/film5/gates/summary.txt |
-| `stage/`, `shots/` | the pages (an article, a Japanese chat, an API doc) and the 1.1.8 take (`p9b-bounds`: three holds of ⌃⌥P) |
+| `edit.py <edit.json> <out.mp4> [--square] [--proxy]` | film5's one-take edit (camera keys, captions, keycaps, end card, music bed); take seconds are video seconds: subtract `video0` from event times |
+| `stage/`, `shots/` | the pages (an article, a Japanese chat, an API doc) the 1.1.8 takes (`p9b-bounds`; `p10-film` + `edit-p10.json`, the X clip; music future-s11 from the box at 9.2 s, its drop on the turn) |

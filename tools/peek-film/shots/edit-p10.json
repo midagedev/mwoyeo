@@ -1,0 +1,110 @@
+{
+ "take": "/tmp/film4/takes/film5/p10a/p10-film.mp4",
+ "take_in": 1.707,
+ "take_out": 13.907,
+ "base": [
+  1512,
+  850
+ ],
+ "base_square": [
+  1512,
+  1512
+ ],
+ "stage": "#292b33",
+ "camera": [
+  [
+   1.707,
+   756,
+   470,
+   1.0
+  ],
+  [
+   6.407,
+   756,
+   470,
+   1.0
+  ],
+  [
+   7.707,
+   1130,
+   300,
+   1.55
+  ],
+  [
+   9.607,
+   1130,
+   300,
+   1.55
+  ],
+  [
+   11.007,
+   756,
+   470,
+   1.0
+  ],
+  [
+   13.907,
+   756,
+   470,
+   1.0
+  ]
+ ],
+ "keycaps": [
+  {
+   "t": [
+    1.93,
+    9.94
+   ],
+   "text": "⌃ ⌥ P"
+  }
+ ],
+ "captions": [
+  {
+   "t": [
+    0.2,
+    1.85
+   ],
+   "ko": "영어 기사, 일본어 채팅, 영문 문서",
+   "en": "An English article, a Japanese chat, API docs"
+  },
+  {
+   "t": [
+    2.0,
+    4.1
+   ],
+   "ko": "키를 누르고 있는 동안",
+   "en": "While you hold the keys"
+  },
+  {
+   "t": [
+    4.3,
+    9.6
+   ],
+   "ko": "찾은 문단마다 렌즈, 그리고 한국어로",
+   "en": "Every paragraph found, then turned into Korean"
+  },
+  {
+   "t": [
+    10.1,
+    12.0
+   ],
+   "ko": "떼면 원래 화면",
+   "en": "Let go, and it is back"
+  }
+ ],
+ "end_card": {
+  "seconds": 3.2,
+  "lead": 0.5,
+  "fade": 0.7,
+  "icon": "/Users/hckim/repo/mwoyeo/App/Assets.xcassets/AppIcon.appiconset/icon_512x512.png",
+  "title": "Mwoyeo 1.1.8",
+  "line": "brew install midagedev/tap/mwoyeo"
+ },
+ "music": {
+  "path": "/tmp/film5/music/future-s11.wav",
+  "start": 9.2,
+  "gain_db": 0,
+  "fade_in": 0.3,
+  "fade_out": 1.6
+ }
+}

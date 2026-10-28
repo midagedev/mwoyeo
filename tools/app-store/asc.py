@@ -3,7 +3,7 @@
 
   asc.py status          the app, its versions and their state, the builds and their processing state
   asc.py apply [--dry]   writes docs/app-store/metadata.md and metadata/*.md to the version being prepared: the version
-                         string (newest v* tag), the 12 locales (name, subtitle, privacy URL; description, keywords,
+                         string (MWOYEO_MAS_VERSION, else the newest v* tag), the Notes for Review, the 12 locales (name, subtitle, privacy URL; description, keywords,
                          promotional text, support and marketing URLs), categories, copyright, and the newest valid build
   asc.py shots [--dry]   the Mac screenshots of every locale (APP_DESKTOP set of the version being prepared): Korean gets
                          tools/app-store/screenshots/out/ko, every other locale out/en (compose.sh makes them); the set's
@@ -130,6 +130,15 @@ def metadata():
     return out
 
 
+def review_notes():
+    """The "Notes for Review (English)" section of metadata.md, its paragraphs as typed (App Review reads it as plain text)."""
+    text = open(os.path.join(ROOT, 'docs/app-store/metadata.md'), encoding='utf-8').read()
+    body = text.split('## Notes for Review (English)', 1)[1].split('\n## ', 1)[0].strip()
+    if len(body) > 4000:
+        sys.exit(f'review notes are {len(body)} characters; the field takes 4000')
+    return body
+
+
 def upsert(kind, parent_rel, parent_type, parent_id, existing, locale, attrs, dry):
     cur = existing.get(locale)
     if dry:
@@ -146,8 +155,9 @@ def upsert(kind, parent_rel, parent_type, parent_id, existing, locale, attrs, dr
 def apply(dry):
     a = app()
     v = editable_version(a['id'])
-    tag = subprocess.run(['git', '-C', ROOT, 'describe', '--tags', '--abbrev=0', '--match', 'v*'], capture_output=True, text=True, check=True).stdout.strip()
-    version = tag.lstrip('v')
+    # MWOYEO_MAS_VERSION names a store-only version (no tag, no GitHub release), as scripts/mas.sh takes it.
+    version = os.environ.get('MWOYEO_MAS_VERSION') or subprocess.run(
+        ['git', '-C', ROOT, 'describe', '--tags', '--abbrev=0', '--match', 'v*'], capture_output=True, text=True, check=True).stdout.strip().lstrip('v')
     meta = metadata()
     missing = set(LOCALES) - set(meta)
     if missing:
@@ -179,6 +189,15 @@ def apply(dry):
         upsert('appStoreVersionLocalizations', 'appStoreVersion', 'appStoreVersions', v['id'], have_ver, theirs,
                {'description': f['description'], 'keywords': f['keywords'], 'promotionalText': f['promotional'],
                 'supportUrl': SUPPORT, 'marketingUrl': MARKETING}, dry)
+
+    notes = review_notes()
+    detail = call('GET', f'/v1/appStoreVersions/{v["id"]}/appStoreReviewDetail')['data']
+    if dry:
+        print('review notes', len(notes))
+    else:
+        call('PATCH', f'/v1/appStoreReviewDetails/{detail["id"]}', {'data': {'type': 'appStoreReviewDetails', 'id': detail['id'],
+             'attributes': {'notes': notes}}})
+        print('wrote review notes', len(notes))
 
     builds = call('GET', f'/v1/builds?filter[app]={a["id"]}&filter[processingState]=VALID&sort=-uploadedDate&limit=1')['data']
     if not builds:

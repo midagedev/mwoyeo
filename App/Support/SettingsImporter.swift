@@ -28,7 +28,7 @@ enum SettingsImporter {
 
     /// Whether the import brought engines that cannot send text until the person allows them: an import never grants (`EnginePermissions`).
     static func needsAllowing(_ r: SettingsImport, in s: AppSettings) -> Bool {
-        r.parsed && r.applied.contains("engines") && s.engines.contains { !s.enginePermissions.allows($0) }
+        r.parsed && r.applied.contains("engines") && s.engines.contains { $0.needsPermission(s.enginePermissions) }
     }
 
     /// One line for the result: what was applied, or the first problem. `askingToAllow`: the engines it brought wait for the person.

@@ -25244,6 +25244,76 @@
         }
       }
     },
+    "Needs Screen Recording": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bildschirmaufnahme nötig"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se necesita Grabación de pantalla"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrement de l’écran requis"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serve la registrazione dello schermo"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面収録が必要です"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "화면 기록 권한 필요"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Precisa de Gravação de Tela"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нужна запись экрана"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Потрібен запис екрана"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要屏幕录制权限"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要螢幕錄製權限"
+          }
+        }
+      }
+    },
     "Needs your permission": {
       "localizations": {
         "de": {
@@ -42422,6 +42492,76 @@
         }
       }
     },
+    "This version translates on this Mac only. Use a server on this Mac, such as http://localhost:11434/v1.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Version übersetzt nur auf diesem Mac. Verwende einen Server auf diesem Mac, etwa http://localhost:11434/v1."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta versión solo traduce en este Mac. Usa un servidor en este Mac, como http://localhost:11434/v1."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette version traduit uniquement sur ce Mac. Utilisez un serveur sur ce Mac, par exemple http://localhost:11434/v1."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa versione traduce solo su questo Mac. Usa un server su questo Mac, ad esempio http://localhost:11434/v1."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このバージョンはこのMacの中だけで翻訳します。http://localhost:11434/v1 のように、このMacのサーバを使ってください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 버전은 이 Mac 안에서만 번역합니다. http://localhost:11434/v1처럼 이 Mac의 서버를 쓰세요."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta versão traduz apenas neste Mac. Use um servidor neste Mac, como http://localhost:11434/v1."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Эта версия переводит только на этом Mac. Используйте сервер на этом Mac, например http://localhost:11434/v1."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ця версія перекладає лише на цьому Mac. Використовуйте сервер на цьому Mac, наприклад http://localhost:11434/v1."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此版本仅在这台 Mac 上翻译。请使用这台 Mac 上的服务器，例如 http://localhost:11434/v1。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此版本僅在這台 Mac 上翻譯。請使用這台 Mac 上的伺服器，例如 http://localhost:11434/v1。"
+          }
+        }
+      }
+    },
     "This Window’s Title": {
       "localizations": {
         "de": {
@@ -42558,6 +42698,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "此 App 最多儲存 %lld 個名稱。移除一個後才能固定它。"
+          }
+        }
+      }
+    },
+    "This engine is not available in this version.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Engine ist in dieser Version nicht verfügbar."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este motor no está disponible en esta versión."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce moteur n’est pas disponible dans cette version."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo motore non è disponibile in questa versione."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このバージョンではこのエンジンを使えません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 버전에서는 이 엔진을 사용할 수 없습니다."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este mecanismo não está disponível nesta versão."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Этот движок недоступен в этой версии."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цей рушій недоступний у цій версії."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此版本不支持此引擎。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此版本不支援此引擎。"
           }
         }
       }

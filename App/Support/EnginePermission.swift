@@ -34,8 +34,10 @@ struct EnginePermissions: Codable, Equatable {
         return hosts[engine.id.uuidString] == host
     }
 
-    /// The sheet's rule: Add and Save are open for an engine off this Mac only while the box is ticked for the host it has now.
-    static func mayCommit(_ engine: EngineConfig, ticked: String?) -> Bool {
+    /// The sheet's rule: Add and Save are open only for an engine this build runs (`EngineReach`), and for one off this Mac only while
+    /// the box is ticked for the host it has now.
+    static func mayCommit(_ engine: EngineConfig, ticked: String?, reach: EngineReach = Distribution.engineReach) -> Bool {
+        guard reach.admits(engine.kind) else { return false }
         guard let host = host(of: engine) else { return true }
         return ticked == host
     }

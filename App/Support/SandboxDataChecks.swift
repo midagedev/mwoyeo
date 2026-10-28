@@ -104,9 +104,17 @@ enum SandboxDataChecks {
         let http = EngineConfig(name: "Local", kind: .openAICompatible(baseURL: URL(string: "http://localhost:8765/v1")!, model: "m", thinking: .off, extraHeaders: [:]))
         let label = String(localized: "Not available in this version")
         check("the engine list marks a command engine as not available when commands are not allowed, and otherwise as before",
-              !command.isAvailable(allowsCommands: false) && command.listSubtitle(allowsCommands: false) == label
-              && command.isAvailable(allowsCommands: true) && command.listSubtitle(allowsCommands: true) == command.subtitle
-              && http.isAvailable(allowsCommands: false) && http.listSubtitle(allowsCommands: false) == http.subtitle)
+              !command.isAvailable(reach: .thisMac) && command.listSubtitle(reach: .thisMac) == label
+              && command.isAvailable(reach: .anywhere) && command.listSubtitle(reach: .anywhere) == command.subtitle
+              && http.isAvailable(reach: .thisMac) && http.listSubtitle(reach: .thisMac) == http.subtitle)
+
+        // The App Store build's reach (review-2026-10-27): an engine off this Mac is listed as not available and can never be added.
+        let cloud = EngineConfig(name: "Cloud", kind: .deepL(baseURL: URL(string: "https://api.deepl.com")!, formality: nil))
+        check("the engine list marks an engine off this Mac as not available on this Mac's reach, and the sheet cannot add it",
+              !cloud.isAvailable(reach: .thisMac) && cloud.listSubtitle(reach: .thisMac) == label && !cloud.needsPermission(EnginePermissions(), reach: .thisMac)
+              && !EnginePermissions.mayCommit(cloud, ticked: EnginePermissions.host(of: cloud), reach: .thisMac)
+              && EnginePermissions.mayCommit(http, ticked: nil, reach: .thisMac)
+              && EnginePermissions.mayCommit(cloud, ticked: EnginePermissions.host(of: cloud), reach: .anywhere))
 
         // Paste: a Finder file the sandbox cannot read falls back to the image data; with neither it says so.
         let file = URL(fileURLWithPath: "/tmp/copied.png"), pixels = Data([1, 2, 3])

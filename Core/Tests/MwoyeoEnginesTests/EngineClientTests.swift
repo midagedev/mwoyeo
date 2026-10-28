@@ -156,6 +156,21 @@ import MwoyeoCore
         #expect(server.requests.first?.contains("auth=absent") == true)
     }
 
+    /// The App Store build's reach (review-2026-10-27): an engine off this Mac is refused before anything is sent, with its key set and
+    /// whatever brought it in; an engine at this Mac's address still runs.
+    @Test func thisMacReachSendsNothingOffThisMac() async throws {
+        let client = EngineClient(secrets: MemorySecrets(), reach: .thisMac)
+        let cloud = EngineConfig(name: "c", kind: .openAICompatible(baseURL: URL(string: "https://api.example.invalid/v1")!, model: "m",
+                                                                      thinking: .off, extraHeaders: [:]))
+        let keyed = EngineClient(secrets: { let s = MemorySecrets(); try? s.setSecret("sk-x", for: cloud.id); return s }(), reach: .thisMac)
+        await #expect(throws: EngineError.notInThisVersion) { try await keyed.translate(["a"], source: nil, target: "ko", glossary: [], engine: cloud) }
+        await #expect(throws: EngineError.notInThisVersion) { try await keyed.models(cloud, refresh: true) }
+        #expect(await keyed.probe(cloud, target: "ko").error == .notInThisVersion)
+        let server = try MockServer(mode: "ok")
+        defer { server.stop() }
+        #expect(try await run(client, EngineConfig(name: "l", kind: openAI(server))).count == 2)
+    }
+
     @Test func deepLOk() async throws {
         let (server, client, engine) = try setup("ok", kind: { .deepL(baseURL: $0.base, formality: nil) })
         defer { server.stop() }

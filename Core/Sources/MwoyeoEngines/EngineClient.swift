@@ -10,16 +10,16 @@ public actor EngineClient {
     private let metrics: (@Sendable (URLSessionTaskMetrics) -> Void)?
     private var rejections: [UUID: Set<String>] = [:]
     private var modelLists: [String: [String]] = [:]
-    private let allowsCommands: Bool
+    private let reach: EngineReach
 
     /// `metrics` sees every finished HTTP task (timing and `isReusedConnection`); the client logs nothing itself.
-    /// `allowsCommands` is false in the Mac App Store build: a command engine is refused at dispatch, whatever file or
-    /// setting brought it in (Core cannot see the app's `#if MAS`, so the app passes it on).
+    /// `reach` is `thisMac` in the Mac App Store build: a command engine, and every request to an address off this Mac, is refused,
+    /// whatever file or setting brought the engine in (Core cannot see the app's `#if MAS`, so the app passes it on).
     public init(secrets: any SecretStore, metrics: (@Sendable (URLSessionTaskMetrics) -> Void)? = nil,
-                allowsCommands: Bool = true) {
+                reach: EngineReach = .anywhere) {
         self.secrets = secrets
         self.metrics = metrics
-        self.allowsCommands = allowsCommands
+        self.reach = reach
     }
 
     // MARK: remembered rejections
@@ -79,7 +79,7 @@ public actor EngineClient {
         case let .httpTemplate(template):
             return TranslationReply(lines: try await httpTemplate(template, engine: engine, lines: lines, source: source, target: target))
         case let .command(spec):
-            guard allowsCommands else { throw .commandUnavailable }
+            guard reach.admits(engine.kind) else { throw .notInThisVersion }
             let reply = try await CommandRunner.run(spec, input: CommandEngine.encodeRequest(lines: lines, source: source, target: target),
                                                     scrub: Scrubber(key: nil))
             return TranslationReply(lines: try mapped { () throws(ChatTranslationError) in try CommandEngine.decodeResponse(reply, count: lines.count) })
@@ -234,8 +234,10 @@ public actor EngineClient {
         return try await send(request, scrub: scrub)
     }
 
+    /// Every HTTP request of every engine goes out here, so the reach is checked here once.
     private func send(_ request: URLRequest, scrub: Scrubber) async throws(EngineError) -> EngineTransport.Reply {
-        try await EngineTransport.send(request, metrics: metrics, scrub: scrub)
+        guard reach.admits(request.url) else { throw .notInThisVersion }
+        return try await EngineTransport.send(request, metrics: metrics, scrub: scrub)
     }
 
     /// A non-2xx reply as an `EngineError`.

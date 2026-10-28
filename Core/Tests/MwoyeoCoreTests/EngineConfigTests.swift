@@ -83,11 +83,31 @@ import Testing
         #expect(throws: EngineConfigError.self) { try EngineShare.decode("nope") }
     }
 
-    @Test func pasteRejectsACommandEngineWhenCommandsAreNotAllowed() throws {
+    @Test func pasteRejectsACommandEngineOnlyOnThisMac() throws {
         let shared = EngineShare.encode(EngineConfig(name: "C", kind: .command(CommandSpec(executable: "/usr/bin/python3"))))
-        #expect(throws: EngineConfigError.commandNotAllowed) { try EngineShare.decode(shared, allowsCommands: false) }
+        #expect(throws: EngineConfigError.notInThisVersion) { try EngineShare.decode(shared, reach: .thisMac) }
         guard case .command = try EngineShare.decode(shared).kind else { Issue.record("default must still import it"); return }
-        let http = EngineShare.encode(EngineConfig(name: "H", kind: .deepL(baseURL: URL(string: "https://api.deepl.com")!, formality: nil)))
-        #expect(throws: Never.self) { try EngineShare.decode(http, allowsCommands: false) }
+    }
+
+    /// The App Store build (reach `thisMac`) imports an engine at this Mac's address and refuses one off it (review-2026-10-27).
+    @Test func pasteRejectsAnEngineOffThisMacOnlyOnThisMac() throws {
+        let cloud = EngineShare.encode(EngineConfig(name: "H", kind: .deepL(baseURL: URL(string: "https://api.deepl.com")!, formality: nil)))
+        #expect(throws: EngineConfigError.notInThisVersion) { try EngineShare.decode(cloud, reach: .thisMac) }
+        #expect(throws: Never.self) { try EngineShare.decode(cloud) }
+        let local = EngineShare.encode(EngineConfig(name: "L", kind: .httpTemplate(HTTPTemplate(url: "http://localhost:5000/translate", body: "{}", resultPath: "t"))))
+        #expect(throws: Never.self) { try EngineShare.decode(local, reach: .thisMac) }
+    }
+
+    @Test func thisMacAdmitsOnlyLoopbackAddresses() {
+        let reach = EngineReach.thisMac
+        for (url, admitted) in [("http://localhost:11434/v1", true), ("http://127.0.0.1:1234/v1", true), ("http://[::1]:8080/v1", true),
+                                ("http://studio.local:11434/v1", false), ("http://192.168.0.2:11434/v1", false), ("https://api.openai.com/v1", false)] {
+            #expect(reach.admits(URL(string: url)) == admitted, "\(url)")
+            #expect(reach.admits(.openAICompatible(baseURL: URL(string: url)!, model: "m", thinking: .off, extraHeaders: [:])) == admitted, "\(url)")
+            #expect(EngineReach.anywhere.admits(URL(string: url)))
+        }
+        #expect(!reach.admits(nil))
+        #expect(!reach.admits(.command(CommandSpec(executable: "/bin/echo"))))
+        #expect(EngineReach.anywhere.admits(.command(CommandSpec(executable: "/bin/echo"))))
     }
 }

@@ -125,9 +125,11 @@ struct EngineSheet: View {
                     if let p = Self.preset(name) { pickRow(verbatim: p.name, verbatim: p.localizedHint, status: localRunning[p.name]) { begin(preset: p) } }
                 }
             }
-            Section("Cloud") {
-                ForEach(Self.cloudNames, id: \.self) { name in
-                    if let p = Self.preset(name) { pickRow(verbatim: p.name, verbatim: p.localizedHint) { begin(preset: p) } }
+            // The App Store build runs no engine off this Mac (`EngineReach`), so it lists no cloud preset.
+            let cloud = Self.cloudNames.compactMap(Self.preset).filter { Distribution.engineReach.admits($0.config.kind) }
+            if !cloud.isEmpty {
+                Section("Cloud") {
+                    ForEach(cloud, id: \.name) { p in pickRow(verbatim: p.name, verbatim: p.localizedHint) { begin(preset: p) } }
                 }
             }
             Section("Connect your own") {
@@ -229,7 +231,7 @@ struct EngineSheet: View {
 
     private func readPasted() {
         do {
-            let config = try EngineShare.decode(pasted, allowsCommands: !Distribution.isAppStore)
+            let config = try EngineShare.decode(pasted, reach: Distribution.engineReach)
             preset = EnginePresets.all.first { $0.name == config.name }
             custom = false
             load(config, blankURL: false)
@@ -240,7 +242,7 @@ struct EngineSheet: View {
             switch e {
             case .unknownKind: pasteError = String(localized: "This engine needs a newer Mwoyeo.")
             case .secretField: pasteError = String(localized: "This setup contains a key. Remove it and try again.")
-            case .commandNotAllowed: pasteError = String(localized: "Command engines are not available in this version.")
+            case .notInThisVersion: pasteError = String(localized: "This engine is not available in this version.")
             case .notAnEngineFile: pasteError = String(localized: "This is not an engine setup.")
             case .malformed: pasteError = String(localized: "This text is not a valid setup.")
             }
@@ -263,7 +265,12 @@ struct EngineSheet: View {
             } header: {
                 Text(headerTitle)
             }
-            if let host = remoteHost {
+            if remoteHost != nil, let c = build(), !Distribution.engineReach.admits(c.kind) {
+                Section {
+                    Text("This version translates on this Mac only. Use a server on this Mac, such as http://localhost:11434/v1.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            } else if let host = remoteHost {
                 Section {
                     Toggle("Send the text the lens reads to \(host)", isOn: consent)
                         .toggleStyle(.checkbox)

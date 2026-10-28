@@ -58,8 +58,8 @@ enum EnginePermissionChecks {
         p.forget(id)
         check("removing an engine forgets its record", !p.allows(cloud))
         check("the sheet's Add and Save open only with the box ticked for the host the engine has now",
-              !EnginePermissions.mayCommit(cloud, ticked: nil) && !EnginePermissions.mayCommit(moved, ticked: "api.example.com")
-              && EnginePermissions.mayCommit(cloud, ticked: "api.example.com") && EnginePermissions.mayCommit(local, ticked: nil))
+              !EnginePermissions.mayCommit(cloud, ticked: nil, reach: .anywhere) && !EnginePermissions.mayCommit(moved, ticked: "api.example.com", reach: .anywhere)
+              && EnginePermissions.mayCommit(cloud, ticked: "api.example.com", reach: .anywhere) && EnginePermissions.mayCommit(local, ticked: nil))
 
         // The upgrade step: the DMG grants what it already has, once; the App Store build grants nothing; a later arrival is never granted.
         let other = chat("https://api.second.example/v1"), later = chat("https://api.third.example/v1")
@@ -134,7 +134,7 @@ enum EnginePermissionChecks {
               && local.listSubtitle() == local.subtitle && !local.needsPermission(EnginePermissions())
               && moved.listSubtitle(permissions: dmg) == needs)
         check("the engine list: a command engine this build cannot run says so first, and never asks",
-              command.listSubtitle(allowsCommands: false, permissions: EnginePermissions()) == unavailable && !command.needsPermission(EnginePermissions(), allowsCommands: false))
+              command.listSubtitle(reach: .thisMac, permissions: EnginePermissions()) == unavailable && !command.needsPermission(EnginePermissions(), reach: .thisMac))
 
         // "Recent lines are sent too" shows where context could be on for the engine.
         let nearby = AppProfile(bundleID: "com.example.chat", appName: "Chat", source: "en", target: "ko", context: AppContextOverride(mode: .nearby))

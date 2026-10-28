@@ -13,8 +13,8 @@ public enum EngineError: Error, Equatable, Sendable {
     case malformed(String)
     case network(String)
     case commandFailed(String)
-    /// A command engine reached a build that does not run programs (the Mac App Store build).
-    case commandUnavailable
+    /// The engine reached a build that does not run it (`EngineReach`): a command engine, or in the App Store build one off this Mac.
+    case notInThisVersion
     /// The engine is off this Mac and the person has not allowed sending the lens's text to `host` (the app keeps that record).
     case needsPermission(host: String)
     case cancelled
@@ -32,7 +32,7 @@ public enum EngineError: Error, Equatable, Sendable {
         case .malformed: "The engine's answer was not in the expected format."
         case let .network(m): "Could not reach the engine: \(m)"
         case let .commandFailed(m): "The command failed: \(m)"
-        case .commandUnavailable: "Not available in this version"
+        case .notInThisVersion: "Not available in this version"
         case let .needsPermission(host): "Allow sending to \(host) in Settings"
         case .cancelled: "Cancelled."
         }

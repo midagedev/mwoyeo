@@ -22,36 +22,27 @@ extension EngineConfig {
     }
 
     /// True when nothing leaves this Mac: a local server, or the user's own program.
-    var isOnThisMac: Bool {
-        switch kind {
-        case let .openAICompatible(url, _, _, _), let .anthropic(url, _, _), let .deepL(url, _): ChatTranslation.isOnThisMac(url)
-        case let .httpTemplate(t): URL(string: t.url).map(ChatTranslation.isOnThisMac) ?? false
-        case .command: true
-        }
-    }
+    var isOnThisMac: Bool { kind.isOnThisMac }
 
     /// "<host or command> · <model>", the list row's second line.
     var subtitle: String {
         [endpointName, modelName].compactMap { $0 }.joined(separator: " · ")
     }
 
-    /// Whether this build can run the engine: the App Store build runs no program, so a command engine that came in with
-    /// imported settings or a file stays in the list but is never used.
-    func isAvailable(allowsCommands: Bool = !Distribution.isAppStore) -> Bool {
-        if case .command = kind { return allowsCommands }
-        return true
-    }
+    /// Whether this build runs the engine (`EngineReach`): the App Store build runs no program and sends nothing off this Mac, so a
+    /// command engine or one off this Mac that came in with imported settings or a file stays in the list but is never used.
+    func isAvailable(reach: EngineReach = Distribution.engineReach) -> Bool { reach.admits(kind) }
 
     /// Whether the engine list asks for the person's permission to send text to this engine's host (`EnginePermissions`): it runs in this
     /// build, is off this Mac and has no record for its current host.
-    func needsPermission(_ permissions: EnginePermissions, allowsCommands: Bool = !Distribution.isAppStore) -> Bool {
-        isAvailable(allowsCommands: allowsCommands) && !permissions.allows(self)
+    func needsPermission(_ permissions: EnginePermissions, reach: EngineReach = Distribution.engineReach) -> Bool {
+        isAvailable(reach: reach) && !permissions.allows(self)
     }
 
     /// `subtitle` for the engine list; "Not available in this version" while this build cannot run it, "Needs your permission" while the
     /// person has not allowed sending to its host.
-    func listSubtitle(allowsCommands: Bool = !Distribution.isAppStore, permissions: EnginePermissions = EnginePermissions()) -> String {
-        if !isAvailable(allowsCommands: allowsCommands) { return String(localized: "Not available in this version") }
+    func listSubtitle(reach: EngineReach = Distribution.engineReach, permissions: EnginePermissions = EnginePermissions()) -> String {
+        if !isAvailable(reach: reach) { return String(localized: "Not available in this version") }
         return permissions.allows(self) ? subtitle : String(localized: "Needs your permission")
     }
 

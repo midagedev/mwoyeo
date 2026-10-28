@@ -148,7 +148,7 @@ actor TranslationService {
 
     init(settings: AppSettings, secrets: any SecretStore = KeychainSecrets()) {
         defaultRoute = LensRoute(settings)
-        client = EngineClient(secrets: secrets, allowsCommands: !Distribution.isAppStore)
+        client = EngineClient(secrets: secrets, reach: Distribution.engineReach)
         cache.use(defaultRoute.namespace)
         cache.capacity = settings.cacheSize
         ledger.capacity = settings.cacheSize
@@ -571,7 +571,10 @@ actor TranslationService {
     /// testing the engine before they allow it and send no lens text.
     private func isPermitted(_ engine: EngineConfig) -> Bool { settings.enginePermissions.allows(engine) }
 
+    /// An engine this build does not run (`EngineReach`: the App Store build's off this Mac) fails first, as what it is: no permission
+    /// would let it run.
     private func requirePermission(_ engine: EngineConfig) throws(EngineError) {
+        guard engine.isAvailable() else { throw .notInThisVersion }
         guard isPermitted(engine) else { throw .needsPermission(host: engine.endpointName) }
     }
 

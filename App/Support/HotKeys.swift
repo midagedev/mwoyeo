@@ -10,15 +10,16 @@ struct KeyCombo: Codable, Equatable {
 
     /// A combo from a key press, if it has ⌃ or ⌥. Bare keys would steal typing in every app, and ⌘ combos are
     /// the apps' own (⌘Q, ⌘W, ⌘C…): registered globally they would stop working everywhere.
+    /// The key is named by its code, not by what the current input source typed: under Korean input ⌃⌥P types "ㅔ", and a
+    /// layout may type nothing at all for ⌥ and a key, which recorded nothing.
     init?(event: NSEvent) {
         let f = event.modifierFlags.intersection([.control, .option, .shift, .command])
-        guard !f.intersection([.control, .option]).isEmpty,
-              let key = event.charactersIgnoringModifiers?.uppercased(), !key.isEmpty else { return nil }
+        guard !f.intersection([.control, .option]).isEmpty else { return nil }
         keyCode = UInt32(event.keyCode)
         modifiers = (f.contains(.control) ? UInt32(controlKey) : 0) | (f.contains(.option) ? UInt32(optionKey) : 0)
             | (f.contains(.shift) ? UInt32(shiftKey) : 0) | (f.contains(.command) ? UInt32(cmdKey) : 0)
-        display = (f.contains(.control) ? "⌃" : "") + (f.contains(.option) ? "⌥" : "") + (f.contains(.shift) ? "⇧" : "")
-            + (f.contains(.command) ? "⌘" : "") + Self.name(of: event.keyCode, typed: key)
+        guard let shown = Self.display(keyCode: event.keyCode, modifiers: modifiers) else { return nil }
+        display = shown
     }
 
     init(keyCode: Int, modifiers: Int, display: String) {
@@ -27,7 +28,23 @@ struct KeyCombo: Codable, Equatable {
         self.display = display
     }
 
-    private static func name(of keyCode: UInt16, typed: String) -> String {
+    /// A saved combo is shown by its code too, so one recorded under another input source ("⌃⌥ㅔ") reads "⌃⌥P" again.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        keyCode = try c.decode(UInt32.self, forKey: .keyCode)
+        modifiers = try c.decode(UInt32.self, forKey: .modifiers)
+        if let shown = Self.display(keyCode: UInt16(truncatingIfNeeded: keyCode), modifiers: modifiers) { display = shown }
+        else { display = try c.decode(String.self, forKey: .display) }
+    }
+
+    /// "⌃⌥⇧⌘" and the key's name; nil for a key that has no name.
+    static func display(keyCode: UInt16, modifiers: UInt32) -> String? {
+        guard let key = name(of: keyCode) else { return nil }
+        return (modifiers & UInt32(controlKey) != 0 ? "⌃" : "") + (modifiers & UInt32(optionKey) != 0 ? "⌥" : "")
+            + (modifiers & UInt32(shiftKey) != 0 ? "⇧" : "") + (modifiers & UInt32(cmdKey) != 0 ? "⌘" : "") + key
+    }
+
+    private static func name(of keyCode: UInt16) -> String? {
         switch Int(keyCode) {
         case kVK_Space: "Space"
         case kVK_Return: "↩"
@@ -36,8 +53,33 @@ struct KeyCombo: Codable, Equatable {
         case kVK_RightArrow: "→"
         case kVK_UpArrow: "↑"
         case kVK_DownArrow: "↓"
-        default: typed
+        default: functionKeys[Int(keyCode)] ?? printed(keyCode)
         }
+    }
+
+    private static let functionKeys: [Int: String] = [
+        kVK_F1: "F1", kVK_F2: "F2", kVK_F3: "F3", kVK_F4: "F4", kVK_F5: "F5", kVK_F6: "F6", kVK_F7: "F7", kVK_F8: "F8", kVK_F9: "F9",
+        kVK_F10: "F10", kVK_F11: "F11", kVK_F12: "F12", kVK_F13: "F13", kVK_F14: "F14", kVK_F15: "F15", kVK_F16: "F16", kVK_F17: "F17",
+        kVK_F18: "F18", kVK_F19: "F19", kVK_F20: "F20",
+    ]
+
+    /// What the key prints, unshifted, on the ASCII keyboard the person uses (U.S., Dvorak…), whatever input source is on.
+    private static func printed(_ keyCode: UInt16) -> String? {
+        guard let source = TISCopyCurrentASCIICapableKeyboardLayoutInputSource()?.takeRetainedValue(),
+              let raw = TISGetInputSourceProperty(source, kTISPropertyUnicodeKeyLayoutData) else { return nil }
+        let layout = Unmanaged<CFData>.fromOpaque(raw).takeUnretainedValue() as Data
+        var dead: UInt32 = 0
+        var chars = [UniChar](repeating: 0, count: 4)
+        var length = 0
+        let status = layout.withUnsafeBytes { bytes in
+            UCKeyTranslate(bytes.bindMemory(to: UCKeyboardLayout.self).baseAddress, keyCode, UInt16(kUCKeyActionDisplay), 0,
+                           UInt32(LMGetKbdType()), OptionBits(kUCKeyTranslateNoDeadKeysBit), &dead, chars.count, &length, &chars)
+        }
+        guard status == noErr, length > 0 else { return nil }
+        let key = String(utf16CodeUnits: chars, count: length).uppercased()
+        // Function keys print private-use characters and some keys control characters: no name to show.
+        let shown = key.unicodeScalars.allSatisfy { !CharacterSet.controlCharacters.contains($0) && !(0xF700...0xF8FF).contains($0.value) }
+        return shown && !key.trimmingCharacters(in: .whitespaces).isEmpty ? key : nil
     }
 }
 

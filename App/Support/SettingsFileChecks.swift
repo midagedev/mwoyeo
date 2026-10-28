@@ -1,5 +1,6 @@
 #if !MAS
-import Foundation
+import AppKit
+import Carbon.HIToolbox
 import MwoyeoCore
 
 /// The checks of settings.json, run by `--capture-ui … check-logic` (PASS/FAIL lines). Files live in a scratch folder; the
@@ -16,6 +17,18 @@ enum SettingsFileChecks {
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
         func text(_ u: URL) -> String { (try? String(contentsOf: u, encoding: .utf8)) ?? "" }
+
+        // A shortcut is named by its key, whatever the input source typed: under Korean input ⌃⌥P types "ㅔ", and a layout may
+        // type nothing for ⌥ and a key (which recorded nothing). The names assume a QWERTY ASCII layout on the checking Mac.
+        func pressed(_ code: Int, _ typed: String) -> KeyCombo? {
+            NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: [.control, .option], timestamp: 0, windowNumber: 0, context: nil,
+                             characters: typed, charactersIgnoringModifiers: typed, isARepeat: false, keyCode: UInt16(code)).flatMap(KeyCombo.init(event:))
+        }
+        check("a shortcut typed under Korean input is named by its key (⌃⌥P, not ⌃⌥ㅔ)", pressed(kVK_ANSI_P, "ㅔ")?.display == "⌃⌥P")
+        check("a shortcut whose key typed nothing is still recorded", pressed(kVK_ANSI_P, "")?.display == "⌃⌥P")
+        check("a function key is named", pressed(kVK_F5, "\u{F708}")?.display == "⌃⌥F5")
+        let savedHangul = try? JSONDecoder().decode(KeyCombo.self, from: Data(#"{"keyCode":35,"modifiers":6144,"display":"⌃⌥ㅔ"}"#.utf8))
+        check("a shortcut saved as ⌃⌥ㅔ reads ⌃⌥P", savedHangul?.display == "⌃⌥P" && savedHangul?.keyCode == 35)
 
         var changed = AppSettings()
         let engine = EngineConfig(name: "Local", kind: .openAICompatible(baseURL: URL(string: "http://localhost:8765/v1")!, model: "qwen3:8b",

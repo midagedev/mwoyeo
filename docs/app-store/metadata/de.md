@@ -32,7 +32,7 @@ So funktioniert es
 • Linsen lassen sich mit der Tastatur platzieren, und VoiceOver liest sie vor. Ist „Bewegung reduzieren“ aktiviert, bleibt die Linse ruhig.
 
 Datenschutz
-Standardmäßig verwendet Mwoyeo Apple Übersetzung, alles bleibt auf Ihrem Mac, und nichts von Ihrem Bildschirm wird irgendwohin gesendet. Es gibt keine Analysewerkzeuge. Sie können eine Engine auf diesem Mac hinzufügen, etwa Ollama oder LM Studio, oder eine Cloud-Engine mit Ihrem eigenen Schlüssel. Eine Cloud-Engine fragt einmal pro Engine und Host um Erlaubnis, bevor etwas gesendet wird, und es wird nur der Text gesendet, den eine Linse liest, nie ein Bild Ihres Bildschirms. Schlüssel werden ausschließlich im macOS-Schlüsselbund gespeichert.
+Mwoyeo übersetzt mit Apple Übersetzung auf Ihrem Mac, und nichts von Ihrem Bildschirm wird irgendwohin gesendet. Es gibt keine Analysewerkzeuge. Sie können auch einen Übersetzungsserver auf diesem Mac verwenden, etwa Ollama oder LM Studio.
 
 Voraussetzungen
 • macOS 26 oder neuer, Apple Silicon (M1 oder neuer)

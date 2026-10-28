@@ -32,7 +32,7 @@ Source: the English section of ../metadata.md. UI terms from App/Resources/Local
 • 可以用鍵盤放置透鏡，VoiceOver 也能讀出它。開啟「減少動態效果」後，透鏡會保持靜止。
 
 隱私
-預設情況下，Mwoyeo 使用 Apple 翻譯，所有處理都在你的 Mac 上完成，螢幕上的任何內容都不會傳送到別處。沒有任何分析工具。你可以加入這部 Mac 上的引擎，例如 Ollama 或 LM Studio，也可以加入使用你自己金鑰的雲端引擎。雲端引擎在首次傳送任何內容前，會依引擎和主機各詢問一次許可，而且只傳送透鏡讀取的文字，絕不傳送螢幕影像。金鑰只儲存在 macOS 鑰匙圈中。
+Mwoyeo 在你的 Mac 上使用 Apple 翻譯，螢幕上的任何內容都不會傳送到別處。沒有任何分析工具。你也可以使用這部 Mac 上的翻譯伺服器，例如 Ollama 或 LM Studio。
 
 系統需求
 • macOS 26 或更新版本，Apple 晶片（M1 或更新）

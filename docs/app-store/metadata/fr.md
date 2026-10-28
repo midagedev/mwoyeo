@@ -32,7 +32,7 @@ Comment ça marche
 • Vous pouvez placer une loupe au clavier, et VoiceOver la lit. Avec « Réduire les animations » activé, elle reste immobile.
 
 Confidentialité
-Par défaut, Mwoyeo utilise Traduction Apple, tout reste sur votre Mac et rien de ce qui est à l’écran n’est envoyé nulle part. Il n’y a aucun outil d’analyse. Vous pouvez ajouter un moteur sur ce Mac, comme Ollama ou LM Studio, ou un moteur cloud avec votre propre clé. Un moteur cloud demande votre accord une fois par moteur et par hôte avant tout envoi, et seul le texte lu par une loupe est envoyé, jamais une image de votre écran. Les clés sont stockées uniquement dans le trousseau macOS.
+Mwoyeo traduit avec Traduction Apple sur votre Mac, et rien de ce qui est à l’écran n’est envoyé nulle part. Il n’y a aucun outil d’analyse. Vous pouvez aussi utiliser un serveur de traduction sur ce Mac, comme Ollama ou LM Studio.
 
 Configuration requise
 • macOS 26 ou version ultérieure, Apple silicon (M1 ou version ultérieure)

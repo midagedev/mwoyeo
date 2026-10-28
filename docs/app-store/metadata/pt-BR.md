@@ -32,7 +32,7 @@ Como funciona
 • Dá para posicionar uma lente pelo teclado, e o VoiceOver a lê. Com “Reduzir movimento” ativado, ela fica parada.
 
 Privacidade
-Por padrão, o Mwoyeo usa a Tradução da Apple, tudo fica no seu Mac e nada do que está na sua tela é enviado a lugar nenhum. Não há análise de uso. Você pode adicionar um mecanismo neste Mac, como Ollama ou LM Studio, ou um mecanismo na nuvem com a sua própria chave. Um mecanismo na nuvem pede permissão uma vez por mecanismo e host antes de enviar qualquer coisa, e só o texto lido por uma lente é enviado, nunca uma imagem da sua tela. As chaves ficam guardadas somente nas Chaves do macOS.
+O Mwoyeo traduz com a Tradução da Apple no seu Mac, e nada do que está na sua tela é enviado a lugar nenhum. Não há análise de uso. Você também pode usar um servidor de tradução neste Mac, como Ollama ou LM Studio.
 
 Requisitos
 • macOS 26 ou posterior, Apple Silicon (M1 ou posterior)

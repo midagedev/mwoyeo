@@ -51,7 +51,7 @@ were taken with `python3 -c 'print(len(s))'` when this file was written.
 • 키보드로 렌즈를 놓을 수 있고, 렌즈는 VoiceOver로 읽혀요. "동작 줄이기"를 켜면 움직임이 멈춰요.
 
 개인정보
-기본 설정에서는 Apple의 번역을 써서 모든 처리가 Mac 안에서 끝나고, 화면 내용은 어디에도 보내지 않아요. 분석 도구도 없어요. Ollama나 LM Studio 같은 이 Mac의 엔진, 또는 직접 키를 넣은 클라우드 엔진을 더할 수 있어요. 클라우드 엔진은 처음 보내기 전에 엔진과 주소마다 한 번 허락을 받고, 렌즈가 읽은 글자만 보내요. 화면 이미지는 보내지 않아요. 키는 macOS 키체인에만 저장해요.
+Apple의 번역으로 Mac 안에서 번역하고, 화면 내용은 어디에도 보내지 않아요. 분석 도구도 없어요. Ollama나 LM Studio 같은 이 Mac의 번역 서버를 쓸 수도 있어요.
 
 필요한 것
 • macOS 26 이상, Apple silicon(M1 이상)
@@ -90,7 +90,7 @@ How it works
 • Place a lens with the keyboard; VoiceOver reads it. With Reduce Motion on, it holds still.
 
 Privacy
-By default Mwoyeo uses Apple's translation, everything stays on your Mac, and nothing on your screen is sent anywhere. There are no analytics. You can add an engine on this Mac, such as Ollama or LM Studio, or a cloud engine with your own key. A cloud engine asks once per engine and host before anything is sent, and only the text a lens reads is sent, never a picture of your screen. Keys are stored only in the macOS Keychain.
+Mwoyeo translates with Apple's translation on your Mac, and nothing on your screen is sent anywhere. There are no analytics. You can also use a translation server on this Mac, such as Ollama or LM Studio.
 
 Requirements
 • macOS 26 or later, Apple silicon (M1 or later)
@@ -102,18 +102,22 @@ Requirements
 Mwoyeo translates text on the screen in place. It lives in the menu bar (viewfinder icon); there is no Dock icon.
 
 To try it:
-1. Open Mwoyeo. The welcome window asks for Screen Recording permission. Allow it in System Settings › Privacy &
-   Security › Screen & System Audio Recording. If the lens stays empty after allowing, quit and reopen Mwoyeo once
-   (macOS applies the permission to a running app only after a relaunch).
+1. Open Mwoyeo. The welcome window explains why it needs Screen Recording. Click Continue; macOS then shows its own
+   prompt. If you allow it in System Settings › Privacy & Security › Screen & System Audio Recording and the lens stays
+   empty, quit and reopen Mwoyeo once (macOS applies the permission to a running app only after a relaunch).
 2. Open any page with English or Japanese text, for example a news site in Safari.
 3. Press Control-Option-L and drag a box over the text. The text inside the box is replaced by its translation.
    Control-Option-O shows the original again.
+4. Hold Control-Option-P: the whole screen is shown translated while the keys are held.
 
 Translation uses Apple's Translation framework on the device. If the language pack is not installed, Mwoyeo offers the
 download in Settings › Translation; without it, Apple Intelligence translates when available (slower). No account, no
 server of ours, no analytics. Screen frames are read in memory and never saved; saving transcripts and lens images is
 off by default and goes to a folder the person picks.
 
-Optional engines: a person may add an engine on the Mac (Ollama, LM Studio) or a cloud engine with their own API key.
-Before text is first sent to a cloud host, the app asks for permission for that engine and host. Keys are kept in the
-Keychain. Nothing is downloaded or executed; command-line engines of the GitHub build are not available in this build.
+Screen Recording: it is used only to read the text under a lens, and on the whole screen while Control-Option-P is held,
+and to draw the translation over it. Frames and the text read from them stay in memory on the Mac and are never saved
+or sent. This build has no translation engine off the Mac: besides Apple's frameworks, a person may add only a server on
+this Mac (Ollama, LM Studio at localhost). Nothing read from the screen leaves the Mac. See the "Screen Recording"
+section of the privacy policy. Nothing is downloaded or executed; command-line engines of the GitHub build are not
+available in this build.

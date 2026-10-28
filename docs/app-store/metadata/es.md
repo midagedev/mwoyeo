@@ -32,7 +32,7 @@ Cómo funciona
 • Puedes colocar una lupa con el teclado, y VoiceOver la lee. Con «Reducir movimiento» activado, se queda quieta.
 
 Privacidad
-Por defecto, Mwoyeo usa la Traducción de Apple, todo se queda en tu Mac y nada de lo que hay en tu pantalla se envía a ninguna parte. No hay analíticas. Puedes añadir un motor en este Mac, como Ollama o LM Studio, o un motor en la nube con tu propia clave. Un motor en la nube pide permiso una vez por motor y servidor antes de enviar nada, y solo se envía el texto que lee una lupa, nunca una imagen de tu pantalla. Las claves se guardan únicamente en el llavero de macOS.
+Mwoyeo traduce con la Traducción de Apple en tu Mac, y nada de lo que hay en tu pantalla se envía a ninguna parte. No hay analíticas. También puedes usar un servidor de traducción en este Mac, como Ollama o LM Studio.
 
 Requisitos
 • macOS 26 o posterior, Apple Silicon (M1 o posterior)

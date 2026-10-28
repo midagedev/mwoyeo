@@ -30,8 +30,9 @@ struct OnboardingView: View {
                          detail: model.hasScreenPermission ? String(localized: "Allowed. Mwoyeo reads the screen only while you place a lens and under a lens, on this Mac, and never stores or sends it.")
                              : String(localized: "Needed to read the text under a lens. You may have to reopen Mwoyeo after allowing it.")) {
                     if !model.hasScreenPermission {
-                        // While the permission is missing this is the step to take: Return presses it (ui-audit-1-1-5 8.1).
-                        Button("Allow") { model.requestPermission() }.buttonStyle(.glassProminent).keyboardShortcut(.defaultAction)
+                        // While the permission is missing this is the step to take: Return presses it (ui-audit-1-1-5 8.1). It says
+                        // "Continue", not "Allow": the choice is the system's prompt that follows (App Review 5.1.1(iv), review-2026-10-27).
+                        Button("Continue") { model.requestPermission() }.buttonStyle(.glassProminent).keyboardShortcut(.defaultAction)
                     }
                 }
                 StepCard(number: 2, title: String(localized: "Languages"), done: true,

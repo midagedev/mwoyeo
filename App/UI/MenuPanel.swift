@@ -27,7 +27,7 @@ struct MenuPanel: View {
             }
             SetupIssue()
             if !model.hasScreenPermission {
-                IssueBanner(message: String(localized: "Mwoyeo needs Screen Recording permission."), action: String(localized: "Allow…")) {
+                IssueBanner(message: String(localized: "Mwoyeo needs Screen Recording permission."), action: String(localized: "Continue")) {
                     WindowPresenter.shared.showOnboarding()
                 }
             }

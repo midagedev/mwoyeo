@@ -5,7 +5,7 @@ import MwoyeoCore
 enum LensHintText {
     static func line(_ hint: LensHint) -> String {
         switch hint {
-        case .allowScreenRecording: String(localized: "Allow screen recording")
+        case .allowScreenRecording: String(localized: "Needs Screen Recording")
         case .restartToFinish: String(localized: "Restart Mwoyeo to finish")
         case let .downloadPack(pair): downloadPack(pair)
         case let .downloadingPack(pair): downloading(pair)

@@ -600,11 +600,11 @@ enum AccessibilityChecks {
         // Notices and hints are the state in words, in the pill's order.
         window.flash("Copied", seconds: 0.2)
         r.check("a notice is what the lens says", value() == "Copied")
-        window.setHint("Allow screen recording", actionable: true)
+        window.setHint("Needs Screen Recording", actionable: true)
         try? await Task.sleep(for: .milliseconds(500))
-        r.check("a hint is what it says once the notice is gone", value().hasPrefix("Allow screen recording"))
+        r.check("a hint is what it says once the notice is gone", value().hasPrefix("Needs Screen Recording"))
         let buttons = (view.accessibilityChildren()?.compactMap { $0 as? NSAccessibilityElement } ?? []).filter { $0.accessibilityRole() == .button }
-        r.check("a hint to click is a button inside the lens", buttons.contains { ($0.accessibilityLabel() ?? "").hasPrefix("Allow screen recording") })
+        r.check("a hint to click is a button inside the lens", buttons.contains { ($0.accessibilityLabel() ?? "").hasPrefix("Needs Screen Recording") })
         window.setHint(nil)
         window.setOriginal(true)
         r.check("showing the original is what it says", value() == String(localized: "Showing original"))

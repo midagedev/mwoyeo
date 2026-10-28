@@ -9,73 +9,73 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mwoyeo reads the text under your lenses so it can translate it in place."
+            "value": "Mwoyeo reads the text under your lenses, and on the whole screen while you hold its shortcut, to translate it in place. Screen images stay on this Mac."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "렌즈 아래의 글자를 읽어 그 자리에서 번역하는 데 쓰입니다."
+            "value": "렌즈 아래의 글자와, 단축키를 누르고 있는 동안 화면 전체의 글자를 읽어 그 자리에서 번역합니다. 화면 이미지는 이 Mac 밖으로 나가지 않습니다."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mwoyeoは、レンズの下にあるテキストを読み取り、その場で翻訳するために画面を使用します。"
+            "value": "Mwoyeoは、レンズの下のテキストと、ショートカットを押している間は画面全体のテキストを読み取り、その場で翻訳します。画面の画像はこのMacの外に出ません。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mwoyeo 会读取透镜下方的文字,并就地翻译。"
+            "value": "Mwoyeo 会读取透镜下方的文字，以及按住其快捷键时整个屏幕上的文字，并就地翻译。屏幕图像不会离开这台 Mac。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mwoyeo 會讀取透鏡下方的文字,並就地翻譯。"
+            "value": "Mwoyeo 會讀取透鏡下方的文字，以及按住其快速鍵時整個螢幕上的文字，並就地翻譯。螢幕影像不會離開這台 Mac。"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mwoyeo liest den Text unter einer Linse und übersetzt ihn direkt an Ort und Stelle."
+            "value": "Mwoyeo liest den Text unter einer Linse und, solange du das Kürzel gedrückt hältst, auf dem ganzen Bildschirm, um ihn an Ort und Stelle zu übersetzen. Bildschirmbilder bleiben auf diesem Mac."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mwoyeo lit le texte sous une loupe pour le traduire sur place."
+            "value": "Mwoyeo lit le texte sous une loupe et, tant que vous maintenez son raccourci, sur tout l’écran, pour le traduire sur place. Les images de l’écran restent sur ce Mac."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mwoyeo lee el texto que hay bajo una lupa para traducirlo en el mismo lugar."
+            "value": "Mwoyeo lee el texto bajo una lupa y, mientras mantienes pulsado su atajo, en toda la pantalla, para traducirlo en el mismo lugar. Las imágenes de la pantalla no salen de este Mac."
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mwoyeo читает текст под линзой, чтобы перевести его прямо на месте."
+            "value": "Mwoyeo читает текст под линзой, а пока вы удерживаете его сочетание клавиш, — на всём экране, чтобы перевести его прямо на месте. Изображения экрана остаются на этом Mac."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Mwoyeo lê o texto sob uma lente para traduzi-lo no próprio lugar."
+            "value": "O Mwoyeo lê o texto sob uma lente e, enquanto você mantém o atalho pressionado, em toda a tela, para traduzi-lo no próprio lugar. As imagens da tela ficam neste Mac."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mwoyeo legge il testo sotto una lente per tradurlo sul posto."
+            "value": "Mwoyeo legge il testo sotto una lente e, finché tieni premuta la sua scorciatoia, su tutto lo schermo, per tradurlo sul posto. Le immagini dello schermo restano su questo Mac."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mwoyeo читає текст під лінзою, щоб перекласти його прямо на місці."
+            "value": "Mwoyeo читає текст під лінзою, а поки ви утримуєте його сполучення клавіш, — на всьому екрані, щоб перекласти його прямо на місці. Зображення екрана залишаються на цьому Mac."
           }
         }
       }

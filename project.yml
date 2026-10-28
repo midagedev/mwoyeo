@@ -158,7 +158,7 @@ targets:
         # Ollama, LM Studio, LibreTranslate and DeepLX answer on http://localhost, which ATS blocks by default.
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
-        NSScreenCaptureUsageDescription: "Mwoyeo reads the text under your lenses so it can translate it in place."
+        NSScreenCaptureUsageDescription: "Mwoyeo reads the text under your lenses, and on the whole screen while you hold its shortcut, to translate it in place. Screen images stay on this Mac."
         # Only HTTPS to a host the person typed in; no encryption of our own.
         ITSAppUsesNonExemptEncryption: false
         # The Services menu: "Translate with Mwoyeo" on selected text in any app (App/Support/TextEntryPoints.swift, `ServicesProvider`; docs/design/text-translation.md §3).

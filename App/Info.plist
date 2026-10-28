@@ -38,7 +38,7 @@
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Mwoyeo connects to a translation server on your network only if you add one as an engine.</string>
 	<key>NSScreenCaptureUsageDescription</key>
-	<string>Mwoyeo reads the text under your lenses so it can translate it in place.</string>
+	<string>Mwoyeo reads the text under your lenses, and on the whole screen while you hold its shortcut, to translate it in place. Screen images stay on this Mac.</string>
 	<key>NSServices</key>
 	<array>
 		<dict>

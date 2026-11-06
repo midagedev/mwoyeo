@@ -5,16 +5,19 @@ import MwoyeoCore
 /// time, in a fresh global object per job. It reads no file, opens no connection and keeps nothing between jobs. The time limit is the app's
 /// (`App/Script/ScriptConnection.swift` kills this process over it): `JSContextGroupSetExecutionTimeLimit` is private API.
 
-// Exit is the host's decision (`exitWhenIdle` after its idle time, a kill over the limit, the app quitting), as in the reader services.
+// Exit is the host's decision (`exitWhenIdle` after its idle time, a kill over the limit), as in the reader services; the app gone, its
+// connection is invalidated and `ServiceLifetime` ends the service (App Review 2.4.5(iii), 2026-11-05).
 ProcessInfo.processInfo.disableAutomaticTermination("script worker")
 ProcessInfo.processInfo.disableSuddenTermination()
 
 final class Listener: NSObject, NSXPCListenerDelegate {
     let worker = ScriptWorker()
+    let lifetime = ServiceLifetime()
 
     func listener(_ listener: NSXPCListener, shouldAcceptNewConnection connection: NSXPCConnection) -> Bool {
         connection.exportedInterface = ScriptWire.interface()
         connection.exportedObject = worker
+        lifetime.hold(connection)
         connection.resume()
         return true
     }

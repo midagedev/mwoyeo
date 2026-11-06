@@ -48,7 +48,7 @@ enum MCPTool: String, CaseIterable {
         case .setMemory:
             "Writes the memory of one profile or app, a note for the translator and names and terms with their translations (the glossary is for every app and is not set here), and with profile also its name, where it is used (when), languages, engine, context and learning; mode merge replaces names by src and keeps the rest, replace makes the note and names exactly what you give, remove deletes the profile. A wrong field rejects the whole call and writes nothing, and the running Mwoyeo applies a saved change within a second."
         case .translateText:
-            "Translates up to \(MCPTranslate.maxLines) lines the way a lens does over a window (its app and title) or under a profile, with the engine, languages and memory of its chain, to check a memory you wrote; it returns each translation and the engine that made it. The text goes to that engine (a cloud one sees it), Apple Translation uses only the names a row writes into the text (apply replace or both), and command engines are not run."
+            "Translates up to \(MCPTranslate.maxLines) lines the way a lens does over a window (its app and title) or under a profile, with the engine, languages and memory of its chain (source and target pick other languages), to check a memory you wrote; it returns each translation and the engine that made it. The text goes to that engine (a cloud one sees it), Apple Translation uses only the names a row writes into the text (apply replace or both), and command engines are not run."
         case .getSettings:
             "Returns Mwoyeo's settings as settings.json holds them: every setting, or the keys named. Engine API keys are not settings: they stay in the Keychain and are never returned."
         case .setSettings:
@@ -110,7 +110,9 @@ enum MCPTool: String, CaseIterable {
              Self.app(required: false, doc: "The app whose profiles, languages, engine and memory apply, by bundle ID. Left out, the base settings."),
              Self.profile(doc: "Translate under this profile, as if every lens were pinned to it (list_apps lists them); it brings its languages, engine and memory."),
              FieldSpec("title", .text(minLength: 1), "The title of the window, as a lens would have confirmed it: the profiles with a title condition that it meets apply. The engine is sent it only when it is allowed the title."),
-             FieldSpec("engine", .text(minLength: 1), "\"apple\" for Apple Translation, or the id of an added engine (get_settings engines). Left out, the engine the profile or app uses.")]
+             FieldSpec("engine", .text(minLength: 1), "\"apple\" for Apple Translation, or the id of an added engine (get_settings engines). Left out, the engine the profile or app uses."),
+             FieldSpec("source", .choice(Languages.sources), "The language of the lines, a code such as ja, or auto to detect it per line. Left out, the profile's or app's source language."),
+             FieldSpec("target", .choice(Languages.targets), "The language to translate into, a code such as ko. Left out, the profile's or app's target language.")]
         case .getSettings:
             [FieldSpec("keys", .list(.choice(SettingSpec.all.map(\.key)), unique: true), "The settings to return, by key. Left out, every setting.")]
         case .setSettings:

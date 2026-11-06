@@ -617,6 +617,14 @@ enum MCPChecks {
             let withoutApp = t.call("translate_text", ["lines": ["Alice sent another photo"]])
             check("translate_text without an app sends the lines alone: no memory, no note",
                   !withoutApp.isError && withoutApp.data["memory"] == nil && mock.bodies.count == before + 1 && !(mock.bodies.last ?? "").contains("앨리스") && withoutApp.rows.first?[1] as? String == "O")
+            // source and target pick the languages over the chain's (asked 2026-11-06): the engine is told them; a code that is no language is refused.
+            let picked = t.call("translate_text", ["lines": ["Alice sent a photo"], "app": ContextChecks.chat, "source": "en", "target": "ja"])
+            let pickedBody = mock.bodies.last ?? ""
+            let wrongTarget = t.call("translate_text", ["lines": ["x"], "target": "klingon"])
+            check("translate_text with source and target sends those languages to the engine, keeps the app's memory, and refuses a target that is no language",
+                  !picked.isError && pickedBody.contains("into Japanese") && pickedBody.contains("from English")
+                  && picked.data["memory"] as? String == "used" && wrongTarget.isError && wrongTarget.text.contains("target"),
+                  "\(picked.text) body \(pickedBody.prefix(200)) wrong \(wrongTarget.text)")
             // Apple Translation answers on the main queue, which this run holds (a job of the main actor, waiting on the call): its answer is
             // `tools/mcp/smoke.sh`'s, in a process that waits on the run loop alone. Here the choice of the engine is checked: "apple" is no
             // added engine, and an id is that engine.

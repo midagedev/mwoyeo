@@ -26,7 +26,8 @@ enum MCPTranslate {
     /// The request path is `TextTranslation`'s (the Translate Text window is its other caller); the words of a refusal are this tool's.
     static func translate(_ lines: [String], _ a: [String: Any], _ world: MCPWorld, tool: String = "translate_text",
                           withRewrites: Bool = true) throws -> (rows: [[Any]], extra: [String: Any]) {
-        let request = TextTranslation.Request(app: a["app"] as? String, title: a["title"] as? String, profile: a["profile"] as? String, engine: a["engine"] as? String)
+        let request = TextTranslation.Request(app: a["app"] as? String, title: a["title"] as? String, profile: a["profile"] as? String, engine: a["engine"] as? String,
+                                              source: a["source"] as? String, target: a["target"] as? String)
         let resolved: TextTranslation.Resolved
         do {
             resolved = try TextTranslation.resolve(request, base: world.settings(), asker: .agent, secrets: world.secrets, withRewrites: withRewrites)

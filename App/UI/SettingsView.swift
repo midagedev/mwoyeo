@@ -133,6 +133,7 @@ struct GeneralSettings: View {
                         .font(.caption)
                 }
                 if Distribution.isAppStore { ImportSettingsRow() }
+                #if !MAS
                 Toggle(isOn: $model.settings.agentConnection) {
                     Text("Connect an agent (MCP)")
                     Text("Lets an agent such as Claude Code read the translation log, change settings and write each app’s memory.")
@@ -146,6 +147,7 @@ struct GeneralSettings: View {
                     }
                     Text(MCPServer.addCommand()).font(.caption.monospaced()).foregroundStyle(.secondary).textSelection(.enabled)
                 }
+                #endif
             } header: {
                 Text("Advanced")
             }

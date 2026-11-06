@@ -31,9 +31,12 @@ enum Entry {
             UICapture.run(Array(CommandLine.arguments.dropFirst(2)))
         }
         #endif
+        #if !MAS
+        // The App Store build has no agent connection: what it reads from the screen stays in the app (App Review notes, 1.1.9).
         if CommandLine.arguments.dropFirst().first == "--mcp" {
             MCPServer.runStdio()
         }
+        #endif
         if let first = CommandLine.arguments.dropFirst().first, first == "--settings-path" || first == "--settings-schema" || first == "--check-settings" {
             SettingsFileCommand.run(Array(CommandLine.arguments.dropFirst()))
         }

@@ -13,7 +13,7 @@ enum CommandLineUsage {
     }
 
     /// The flags a person or a script may use, in the order of the usage text. A build for the App Store has the modes that need no files of
-    /// this machine: the settings commands and the MCP server.
+    /// this machine and send nothing out of the app: the settings commands (no MCP server, App Review 2026-11-05).
     static var flags: [Flag] {
         var flags: [Flag] = []
         #if !MAS
@@ -23,8 +23,10 @@ enum CommandLineUsage {
             Flag(name: "--capture-ui", arguments: "outdir scenario …", summary: "window captures and logic checks"),
         ]
         #endif
+        #if !MAS
+        flags.append(Flag(name: "--mcp", arguments: "", summary: "an MCP server on stdin and stdout (the translation log and each app's memory, for an agent)"))
+        #endif
         flags += [
-            Flag(name: "--mcp", arguments: "", summary: "an MCP server on stdin and stdout (the translation log and each app's memory, for an agent)"),
             Flag(name: "--settings-path", arguments: "", summary: "print where settings.json is (MWOYEO_SETTINGS_FILE names another)"),
             Flag(name: "--settings-schema", arguments: "", summary: "print the schema of settings.json"),
             Flag(name: "--check-settings", arguments: "[path]", summary: "print each issue of a settings file, or ok; exit 1 when there are issues"),

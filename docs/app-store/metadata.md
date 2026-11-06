@@ -119,5 +119,9 @@ Screen Recording: it is used only to read the text under a lens, and on the whol
 and to draw the translation over it. Frames and the text read from them stay in memory on the Mac and are never saved
 or sent. This build has no translation engine off the Mac: besides Apple's frameworks, a person may add only a server on
 this Mac (Ollama, LM Studio at localhost). Nothing read from the screen leaves the Mac. See the "Screen Recording"
-section of the privacy policy. Nothing is downloaded or executed; command-line engines of the GitHub build are not
-available in this build.
+section of the privacy policy. Nothing is downloaded. Command-line engines and the agent connection (MCP) of the GitHub
+build are not in this build. Rewrite rules, off until a person writes one, run that person's own short text scripts in
+JavaScriptCore, in a sandboxed helper with no network and no file access.
+
+Helper processes: the app bundle has three XPC services (two text readers, one rewrite runner) that work only for the
+running app. Each exits within one second after Mwoyeo quits, also after a force quit.
